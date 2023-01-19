@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
+  beerPosts       BeerPost[]
+  beerTypes       BeerType[]
+  breweryPosts    BreweryPost[]
+  beerComments    BeerComment[]
+  breweryComments BreweryComment[]
+}
+
+model BeerPost {
+  id           String        @id @default(uuid())
+  name         String
+  ibu          Float
+  abv          Float
+  postedBy     User          @relation(fields: [postedById], references: [id])
+  postedById   String
+  brewery      BreweryPost   @relation(fields: [breweryId], references: [id])
+  breweryId    String
+  type         BeerType      @relation(fields: [typeId], references: [id])
+  typeId       String
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime?     @updatedAt @db.Timestamptz(3)
+  beerComments BeerComment[]
+}
+
+model BeerComment {
+  id         String    @id @default(uuid())
+  beerPost   BeerPost  @relation(fields: [beerPostId], references: [id])
+  beerPostId String
+  postedBy   User      @relation(fields: [postedById], references: [id])
+  postedById String
+  content    String
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
+}
+
+model BeerType {
+  id         String     @id @default(cuid())
+  name       String
+  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime?  @updatedAt @db.Timestamptz(3)
+  postedBy   User       @relation(fields: [postedById], references: [id])
+  postedById String
+  beerPosts  BeerPost[]
+}
+
+model BreweryPost {
+  id              String           @id @default(cuid())
+  name            String
+  location        String
+  beers           BeerPost[]
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
+  postedBy        User             @relation(fields: [postedById], references: [id])
+  postedById      String
+  breweryComments BreweryComment[]
+}
+
+model BreweryComment {
+  id            String      @id @default(uuid())
+  breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id])
+  breweryPostId String
+  postedBy      User        @relation(fields: [postedById], references: [id])
+  postedById    String
+  content       String
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
+}
