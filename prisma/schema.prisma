@@ -12,11 +12,13 @@ datasource db {
 
 model User {
   id              String           @id @default(cuid())
+  username        String
   firstName       String
   lastName        String
   email           String
   createdAt       DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
+  dateOfBirth     DateTime
   beerPosts       BeerPost[]
   beerTypes       BeerType[]
   breweryPosts    BreweryPost[]
@@ -29,6 +31,7 @@ model BeerPost {
   name         String
   ibu          Float
   abv          Float
+  description  String
   postedBy     User          @relation(fields: [postedById], references: [id])
   postedById   String
   brewery      BreweryPost   @relation(fields: [breweryId], references: [id])
@@ -66,6 +69,7 @@ model BreweryPost {
   name            String
   location        String
   beers           BeerPost[]
+  description     String
   createdAt       DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
   postedBy        User             @relation(fields: [postedById], references: [id])

@@ -1,3 +1,10 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "airbnb-base", "airbnb-typescript", "prettier"],
+  "rules": {
+    "arrow-body-style": "off",
+    "import/extensions": "off"
+  },
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  }
 }
