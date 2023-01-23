@@ -1,4 +1,4 @@
-import DBClient from '@/prisma/client';
+import DBClient from '@/prisma/DBClient';
 import GetAllBreweryPostsQueryResult from './types/BreweryPostQueryResult';
 
 const prisma = DBClient.instance;

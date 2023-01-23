@@ -32,22 +32,23 @@ model BeerPost {
   ibu          Float
   abv          Float
   description  String
-  postedBy     User          @relation(fields: [postedById], references: [id])
+  postedBy     User          @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById   String
-  brewery      BreweryPost   @relation(fields: [breweryId], references: [id])
+  brewery      BreweryPost   @relation(fields: [breweryId], references: [id], onDelete: Cascade)
   breweryId    String
-  type         BeerType      @relation(fields: [typeId], references: [id])
+  type         BeerType?     @relation(fields: [typeId], references: [id], onDelete: Cascade)
   typeId       String
   createdAt    DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime?     @updatedAt @db.Timestamptz(3)
   beerComments BeerComment[]
+  BeerImage    BeerImage[]
 }
 
 model BeerComment {
   id         String    @id @default(uuid())
-  beerPost   BeerPost  @relation(fields: [beerPostId], references: [id])
+  beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
-  postedBy   User      @relation(fields: [postedById], references: [id])
+  postedBy   User      @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById String
   content    String
   createdAt  DateTime  @default(now()) @db.Timestamptz(3)
@@ -59,7 +60,7 @@ model BeerType {
   name       String
   createdAt  DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime?  @updatedAt @db.Timestamptz(3)
-  postedBy   User       @relation(fields: [postedById], references: [id])
+  postedBy   User       @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById String
   beerPosts  BeerPost[]
 }
@@ -72,18 +73,37 @@ model BreweryPost {
   description     String
   createdAt       DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
-  postedBy        User             @relation(fields: [postedById], references: [id])
+  postedBy        User             @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById      String
   breweryComments BreweryComment[]
+  BreweryImage    BreweryImage[]
 }
 
 model BreweryComment {
   id            String      @id @default(uuid())
-  breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id])
+  breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
-  postedBy      User        @relation(fields: [postedById], references: [id])
+  postedBy      User        @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById    String
   content       String
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
+}
+
+model BeerImage {
+  id         String    @id @default(uuid())
+  beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
+  beerPostId String
+  url        String
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
+}
+
+model BreweryImage {
+  id            String      @id @default(uuid())
+  breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
+  breweryPostId String
+  url           String
   createdAt     DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
 }

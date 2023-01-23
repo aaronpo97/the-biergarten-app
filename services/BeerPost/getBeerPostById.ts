@@ -1,4 +1,4 @@
-import DBClient from '@/prisma/client';
+import DBClient from '@/prisma/DBClient';
 import BeerPostQueryResult from './types/BeerPostQueryResult';
 
 const prisma = DBClient.instance;
@@ -14,6 +14,7 @@ const getBeerPostById = async (id: string) => {
           id: true,
         },
       },
+      description: true,
       postedBy: {
         select: {
           firstName: true,

@@ -4,7 +4,7 @@ import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
 import Link from 'next/link';
 
 import { useRouter } from 'next/router';
-import DBClient from '@/prisma/client';
+import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/Layout';
 import { FC } from 'react';
 

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "npx prettier . --write",
+    "prestart": "npm run build",
     "prismaDev": "dotenv -e .env.local prisma migrate dev"
   },
   "dependencies": {
@@ -20,6 +21,8 @@
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.2",
     "next": "13.1.2",
+    "pino": "^8.8.0",
+    "pino-pretty": "^9.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "4.9.4"
@@ -28,17 +31,17 @@
     "@faker-js/faker": "^7.6.0",
     "autoprefixer": "^10.4.13",
     "dotenv-cli": "^6.0.0",
-    "postcss": "^8.4.21",
-    "prisma": "^4.8.1",
-    "tailwindcss": "^3.2.4",
     "eslint": "^8.30.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "17.0.0",
     "eslint-config-next": "^13.0.7",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react": "^7.31.11",
+    "postcss": "^8.4.21",
     "prettier": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.1",
+    "prisma": "^4.8.1",
+    "tailwindcss": "^3.2.4",
     "ts-node": "^10.9.1"
   }
 }
