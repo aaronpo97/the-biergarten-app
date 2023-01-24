@@ -32,7 +32,7 @@ const createNewBeerPosts = async ({
           abv: 10,
           ibu: 10,
           name: `${faker.commerce.productName()} ${beerType.name}`,
-          description: faker.lorem.lines(),
+          description: faker.lorem.lines(24),
           brewery: { connect: { id: breweryPost.id } },
           postedBy: { connect: { id: user.id } },
           type: { connect: { id: beerType.id } },

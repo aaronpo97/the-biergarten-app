@@ -2,10 +2,10 @@ import { GetServerSideProps, NextPage } from 'next';
 
 import Link from 'next/link';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
-import GetAllBreweryPostsQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 
 interface BreweryPageProps {
-  breweryPosts: GetAllBreweryPostsQueryResult[];
+  breweryPosts: BreweryPostQueryResult[];
 }
 
 const BreweryPage: NextPage<BreweryPageProps> = ({ breweryPosts }) => {

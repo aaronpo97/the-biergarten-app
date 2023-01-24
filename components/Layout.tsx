@@ -7,7 +7,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       <header className="top-0">
         <Navbar />
       </header>
-      <div className="top-0 h-full flex-1 animate-in fade-in">{children}</div>
+      <div className="animate-in fade-in top-0 h-full flex-1">{children}</div>
     </div>
   );
 };

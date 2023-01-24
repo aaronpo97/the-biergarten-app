@@ -1,4 +1,4 @@
-export default interface GetAllBreweryPostsQueryResult {
+export default interface BreweryPostQueryResult {
   id: string;
   location: string;
   name: string;

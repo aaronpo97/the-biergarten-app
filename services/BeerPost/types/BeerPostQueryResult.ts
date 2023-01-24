@@ -6,9 +6,21 @@ export default interface BeerPostQueryResult {
     name: string;
   };
   description: string;
+  beerImages: {
+    url: string;
+    id: string;
+  }[];
+
+  ibu: number;
+  abv: number;
+  type: {
+    id: string;
+    name: string;
+  };
   postedBy: {
     id: string;
-    firstName: string;
-    lastName: string;
+    username: string;
   };
+
+  createdAt: Date;
 }

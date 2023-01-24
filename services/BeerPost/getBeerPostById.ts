@@ -14,11 +14,25 @@ const getBeerPostById = async (id: string) => {
           id: true,
         },
       },
+      ibu: true,
+      abv: true,
+      type: {
+        select: {
+          name: true,
+          id: true,
+        },
+      },
+      beerImages: {
+        select: {
+          url: true,
+          id: true,
+        },
+      },
+      createdAt: true,
       description: true,
       postedBy: {
         select: {
-          firstName: true,
-          lastName: true,
+          username: true,
           id: true,
         },
       },

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/Layout';
 import { FC } from 'react';
+import Image from 'next/image';
 
 interface BeerPageProps {
   initialBeerPosts: BeerPostQueryResult[];
@@ -48,8 +49,14 @@ const Pagination: FC<PaginationProps> = ({ pageCount, pageNum }) => {
 
 const BeerCard: FC<{ post: BeerPostQueryResult }> = ({ post }) => {
   return (
-    <div className="card h-52 bg-base-200 p-6" key={post.id}>
-      <div className="card-content space-y-3">
+    <div className="card bg-base-300" key={post.id}>
+      <figure className="card-image h-96">
+        {post.beerImages.length > 0 && (
+          <Image src={post.beerImages[0].url} alt={post.name} width="1029" height="110" />
+        )}
+      </figure>
+
+      <div className="card-body space-y-3">
         <div>
           <h2 className="text-3xl font-bold">
             <Link href={`/beers/${post.id}`}>{post.name}</Link>
@@ -70,10 +77,9 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
   const pageNum = parseInt(query.page_num as string, 10) || 1;
   return (
     <Layout>
-      <div className="flex items-center justify-center">
-        <main className="mt-10 flex w-8/12 flex-col space-y-4">
-          <h1 className="card-title text-5xl font-bold">Beer Posts</h1>
-          <div className="space-y-4">
+      <div className="flex items-center justify-center bg-base-100">
+        <main className="mt-10 flex w-10/12 flex-col space-y-4">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {initialBeerPosts.map((post) => {
               return <BeerCard post={post} key={post.id} />;
             })}
@@ -90,7 +96,7 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
 
   const pageNumber = parseInt(query.page_num as string, 10) || 1;
 
-  const pageSize = 9;
+  const pageSize = 24;
   const numberOfPosts = await DBClient.instance.beerPost.count();
   const pageCount = numberOfPosts ? Math.ceil(numberOfPosts / pageSize) : 0;
 

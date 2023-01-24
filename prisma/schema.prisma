@@ -36,12 +36,12 @@ model BeerPost {
   postedById   String
   brewery      BreweryPost   @relation(fields: [breweryId], references: [id], onDelete: Cascade)
   breweryId    String
-  type         BeerType?     @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  type         BeerType      @relation(fields: [typeId], references: [id], onDelete: Cascade)
   typeId       String
   createdAt    DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime?     @updatedAt @db.Timestamptz(3)
   beerComments BeerComment[]
-  BeerImage    BeerImage[]
+  beerImages   BeerImage[]
 }
 
 model BeerComment {
@@ -76,7 +76,7 @@ model BreweryPost {
   postedBy        User             @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById      String
   breweryComments BreweryComment[]
-  BreweryImage    BreweryImage[]
+  breweryImages   BreweryImage[]
 }
 
 model BreweryComment {
