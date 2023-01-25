@@ -1,13 +1,11 @@
+import { NewBeerInfo } from '@/pages/api/beers/create';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import { BeerType } from '@prisma/client';
 
 import { FunctionComponent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-// import { useNavigate } from 'react-router-dom';
-// import createBeerPost from '../api/beerPostRoutes/createBeerPost';
-// import getAllBreweryPosts from '../api/breweryPostRoutes/getAllBreweryPosts';
+import { z } from 'zod';
 
-// import BreweryPostI from '../types/BreweryPostI';
-// import isValidUuid from '../util/isValidUuid';
 import Button from './ui/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -17,25 +15,37 @@ import FormSelect from './ui/forms/FormSelect';
 import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
-interface IFormInput {
-  name: string;
-  description: string;
-  type: string;
-  abv: number;
-  ibu: number;
-  breweryId: string;
-}
+type IFormInput = z.infer<typeof NewBeerInfo>;
 
 interface BeerFormProps {
   type: 'edit' | 'create';
   // eslint-disable-next-line react/require-default-props
   defaultValues?: IFormInput;
   breweries?: BreweryPostQueryResult[];
+  types?: BeerType[];
 }
+
+const sendCreateBeerPostRequest = async (data: IFormInput) => {
+  // const body = JSON.stringify(data);
+
+  const response = await fetch('/api/beers/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await response.json();
+
+  console.log(json);
+};
+
 const BeerForm: FunctionComponent<BeerFormProps> = ({
   type,
   defaultValues,
   breweries = [],
+  types = [],
 }) => {
   const {
     register,
@@ -78,8 +88,24 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     validate: (ibu) => !Number.isNaN(ibu) || 'IBU is invalid.',
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
+  const descriptionValidationSchema = register('description', {
+    required: 'Description is required.',
+  });
+
+  const typeIdValidationSchema = register('typeId', {
+    required: 'Type is required.',
+  });
+
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    switch (type) {
+      case 'create':
+        await sendCreateBeerPostRequest(data);
+        break;
+      case 'edit':
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -156,27 +182,27 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
         <FormTextArea
           placeholder="Ratione cumque quas quia aut impedit ea culpa facere. Ut in sit et quas reiciendis itaque."
           error={!!errors.description}
-          formValidationSchema={register('description', {
-            required: 'Beer description is required.',
-          })}
+          formValidationSchema={descriptionValidationSchema}
           id="description"
           rows={8}
         />
       </FormSegment>
 
       <FormInfo>
-        <FormLabel htmlFor="type">Type</FormLabel>
-        <FormError>{errors.type?.message}</FormError>
+        <FormLabel htmlFor="typeId">Type</FormLabel>
+        <FormError>{errors.typeId?.message}</FormError>
       </FormInfo>
       <FormSegment>
-        <FormTextInput
-          placeholder="Lagered Ale"
-          error={!!errors.type}
-          formValidationSchema={register('type', {
-            required: 'Beer type is required.',
-          })}
-          id="type"
-          type="text"
+        <FormSelect
+          formRegister={typeIdValidationSchema}
+          error={!!errors.typeId}
+          id="typeId"
+          options={types.map((beerType) => ({
+            value: beerType.id,
+            text: beerType.name,
+          }))}
+          placeholder="Beer type"
+          message="Pick a beer type"
         />
       </FormSegment>
 

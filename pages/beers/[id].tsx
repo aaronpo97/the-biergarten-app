@@ -86,7 +86,25 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
   );
 };
 
+const CommentCard: React.FC<{ comment: BeerPostQueryResult['beerComments'][number] }> = ({
+  comment,
+}) => {
+  return (
+    <div className="card bg-base-300">
+      <div className="card-body">
+        <h3 className="text-2xl font-semibold">{comment.postedBy.username}</h3>
+        <h4 className="italic">{`posted ${formatDistanceStrict(
+          new Date(comment.createdAt),
+          new Date(),
+        )} ago`}</h4>
+        <p>{comment.content}</p>
+      </div>
+    </div>
+  );
+};
+
 const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
+  console.log(beerPost.beerComments);
   return (
     <Layout>
       <Head>
@@ -108,7 +126,13 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
             <div className="mt-4 flex space-x-3">
               <div className="w-[60%] space-y-3">
                 <div className="card h-[22rem] bg-base-300"></div>
-                <div className="card h-[44rem] bg-base-300"></div>
+                <div className="card h-[44rem] overflow-y-auto bg-base-300">
+                  {/* for each comment make a card */}
+
+                  {beerPost.beerComments.map((comment) => (
+                    <CommentCard key={comment.id} comment={comment} />
+                  ))}
+                </div>
               </div>
               <div className="w-[40%]">
                 <div className="card h-full bg-base-300"></div>

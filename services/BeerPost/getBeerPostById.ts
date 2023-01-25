@@ -6,6 +6,19 @@ const prisma = DBClient.instance;
 const getBeerPostById = async (id: string) => {
   const beerPost: BeerPostQueryResult | null = await prisma.beerPost.findFirst({
     select: {
+      beerComments: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          postedBy: {
+            select: {
+              username: true,
+              id: true,
+            },
+          },
+        },
+      },
       id: true,
       name: true,
       brewery: {

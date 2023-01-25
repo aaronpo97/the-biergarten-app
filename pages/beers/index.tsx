@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
 
   const pageNumber = parseInt(query.page_num as string, 10) || 1;
 
-  const pageSize = 24;
+  const pageSize = 12;
   const numberOfPosts = await DBClient.instance.beerPost.count();
   const pageCount = numberOfPosts ? Math.ceil(numberOfPosts / pageSize) : 0;
 

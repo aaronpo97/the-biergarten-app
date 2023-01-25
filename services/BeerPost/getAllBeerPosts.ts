@@ -32,6 +32,21 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
           username: true,
         },
       },
+
+      beerComments: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          postedBy: {
+            select: {
+              username: true,
+              id: true,
+            },
+          },
+        },
+      },
+
       beerImages: {
         select: {
           url: true,
