@@ -1,6 +1,6 @@
 /* eslint-disable react/require-default-props */
 import { FunctionComponent } from 'react';
-import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import { UseFormRegisterReturn } from 'react-hook-form';
 
 interface FormInputProps {
   placeholder?: string;
@@ -12,6 +12,25 @@ interface FormInputProps {
   height?: string;
 }
 
+/**
+ * @example
+ *   <FormTextInput
+ *     placeholder="Lorem Ipsum Lager"
+ *     formValidationSchema={register('name')}
+ *     error={!!errors.name}
+ *     type="text"
+ *     id="name"
+ *   />;
+ *
+ * @param param0 The props for the FormTextInput component
+ * @param param0.placeholder The placeholder text for the input
+ * @param param0.formValidationSchema The validation schema for the input, provided by
+ *   react-hook-form.
+ * @param param0.error Whether or not the input has an error.
+ * @param param0.type The input type (email, password, text, date).
+ * @param param0.id The id of the input.
+ * @param param0.height The height of the input.
+ */
 const FormTextInput: FunctionComponent<FormInputProps> = ({
   placeholder = '',
   formValidationSchema,
@@ -23,7 +42,7 @@ const FormTextInput: FunctionComponent<FormInputProps> = ({
     id={id}
     type={type}
     placeholder={placeholder}
-    className={`input w-full transition ease-in-out rounded-lg input-bordered ${
+    className={`input-bordered input w-full rounded-lg transition ease-in-out ${
       error ? 'input-error' : ''
     }`}
     {...formValidationSchema}

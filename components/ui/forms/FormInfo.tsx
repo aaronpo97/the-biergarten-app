@@ -1,10 +1,16 @@
 import { FunctionComponent, ReactNode } from 'react';
 
-/** A container for both the form error and form label. */
 interface FormInfoProps {
-  children: Array<ReactNode> | ReactNode;
+  children: [ReactNode, ReactNode];
 }
 
+/**
+ * @example
+ *   <FormInfo>
+ *     <FormLabel htmlFor="name">Name</FormLabel>
+ *     <FormError>{errors.name?.message}</FormError>
+ *   </FormInfo>;
+ */
 const FormInfo: FunctionComponent<FormInfoProps> = ({ children }) => (
   <div className="flex justify-between">{children}</div>
 );

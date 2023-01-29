@@ -3,8 +3,6 @@ import { FunctionComponent } from 'react';
 // import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 /**
- * Component for a styled form error message.
- *
  * @example
  *   <FormError>Something went wrong!</FormError>;
  */

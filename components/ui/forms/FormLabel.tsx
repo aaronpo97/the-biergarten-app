@@ -5,9 +5,13 @@ interface FormLabelProps {
   children: string;
 }
 
+/**
+ * @example
+ *   <FormLabel htmlFor="name">Name</FormLabel>;
+ */
 const FormLabel: FunctionComponent<FormLabelProps> = ({ htmlFor, children }) => (
   <label
-    className="block uppercase tracking-wide text-sm sm:text-xs font-extrabold my-1"
+    className="my-1 block text-sm font-extrabold uppercase tracking-wide sm:text-xs"
     htmlFor={htmlFor}
   >
     {children}

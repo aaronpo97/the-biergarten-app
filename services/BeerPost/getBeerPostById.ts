@@ -37,6 +37,7 @@ const getBeerPostById = async (id: string) => {
       },
       beerImages: {
         select: {
+          alt: true,
           url: true,
           id: true,
         },

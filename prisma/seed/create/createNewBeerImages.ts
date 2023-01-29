@@ -20,6 +20,7 @@ const createNewBeerImages = async ({
       prisma.beerImage.create({
         data: {
           url: 'https://picsum.photos/900/1600',
+          alt: 'Placeholder beer image.',
           beerPost: { connect: { id: beerPost.id } },
         },
       }),

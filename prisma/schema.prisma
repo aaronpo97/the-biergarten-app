@@ -95,6 +95,7 @@ model BeerImage {
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
   url        String
+  alt        String
   createdAt  DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }
@@ -106,4 +107,5 @@ model BreweryImage {
   url           String
   createdAt     DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
+  alt           String
 }

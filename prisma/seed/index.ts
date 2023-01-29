@@ -33,11 +33,11 @@ import createNewUsers from './create/createNewUsers';
     });
     const [beerPostComments, breweryPostComments] = await Promise.all([
       createNewBeerPostComments({
-        numberOfComments: 1000,
+        numberOfComments: 500,
         joinData: { beerPosts, users },
       }),
       createNewBreweryPostComments({
-        numberOfComments: 1000,
+        numberOfComments: 500,
         joinData: { breweryPosts, users },
       }),
     ]);

@@ -1,6 +1,9 @@
+import BeerPostValidationSchema from '@/validation/BeerPostValidationSchema';
 import DBClient from '@/prisma/DBClient';
 import { NextApiHandler } from 'next';
+
 import { z } from 'zod';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
 class ServerError extends Error {
   constructor(message: string, public statusCode: number) {
@@ -9,23 +12,10 @@ class ServerError extends Error {
   }
 }
 
-export const NewBeerInfo = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().min(1).max(1000),
-  typeId: z.string().uuid(),
-  abv: z.number().min(1).max(50),
-  ibu: z.number().min(2),
-  breweryId: z.string().uuid(),
-});
-
-export const ResponseBody = z.object({
-  message: z.string(),
-  statusCode: z.number(),
-  success: z.boolean(),
-  payload: z.unknown(),
-});
-
-const handler: NextApiHandler<z.infer<typeof ResponseBody>> = async (req, res) => {
+const handler: NextApiHandler<z.infer<typeof APIResponseValidationSchema>> = async (
+  req,
+  res,
+) => {
   try {
     const { method } = req;
 
@@ -33,14 +23,12 @@ const handler: NextApiHandler<z.infer<typeof ResponseBody>> = async (req, res) =
       throw new ServerError('Method not allowed', 405);
     }
 
-    const cleanedReqBody = NewBeerInfo.safeParse(req.body);
-
+    const cleanedReqBody = BeerPostValidationSchema.safeParse(req.body);
     if (!cleanedReqBody.success) {
       throw new ServerError('Invalid request body', 400);
     }
 
     const { name, description, typeId, abv, ibu, breweryId } = cleanedReqBody.data;
-
     const user = await DBClient.instance.user.findFirstOrThrow();
 
     const newBeerPost = await DBClient.instance.beerPost.create({
@@ -67,9 +55,12 @@ const handler: NextApiHandler<z.infer<typeof ResponseBody>> = async (req, res) =
       },
     });
 
-    res
-      .status(200)
-      .json({ message: 'Success', statusCode: 200, payload: newBeerPost, success: true });
+    res.status(201).json({
+      message: 'Beer post created successfully',
+      statusCode: 201,
+      payload: newBeerPost,
+      success: true,
+    });
   } catch (error) {
     if (error instanceof ServerError) {
       res.status(error.statusCode).json({

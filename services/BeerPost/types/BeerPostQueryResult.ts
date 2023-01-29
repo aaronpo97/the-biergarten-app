@@ -9,6 +9,7 @@ export default interface BeerPostQueryResult {
   beerImages: {
     url: string;
     id: string;
+    alt: string;
   }[];
 
   ibu: number;
@@ -21,7 +22,6 @@ export default interface BeerPostQueryResult {
     id: string;
     username: string;
   };
-
   beerComments: {
     id: string;
     content: string;

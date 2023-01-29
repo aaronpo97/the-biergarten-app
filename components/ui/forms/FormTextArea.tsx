@@ -7,31 +7,41 @@ interface FormTextAreaProps {
   error: boolean;
   id: string;
   rows: number;
-  className?: string;
 }
 
+/**
+ * @example
+ *   <FormTextArea
+ *     id="test"
+ *     formValidationSchema={register('test')}
+ *     error={true}
+ *     placeholder="Test"
+ *     rows={5}
+ *   />;
+ *
+ * @param props
+ * @param props.placeholder The placeholder text for the textarea.
+ * @param props.formValidationSchema The form register hook from react-hook-form.
+ * @param props.error Whether or not the textarea has an error.
+ * @param props.id The id of the textarea.
+ * @param props.rows The number of rows to display in the textarea.
+ */
 const FormTextArea: FunctionComponent<FormTextAreaProps> = ({
   placeholder = '',
   formValidationSchema,
   error,
   id,
   rows,
-  className,
 }) => (
   <textarea
     id={id}
     placeholder={placeholder}
-    className={`${className} textarea textarea-bordered w-full resize-none  rounded-lg bg-clip-padding border border-solid transition ease-in-out m-0  ${
+    className={`textarea-bordered textarea m-0 w-full  resize-none rounded-lg border border-solid bg-clip-padding transition ease-in-out  ${
       error ? 'textarea-error' : ''
     }`}
     {...formValidationSchema}
     rows={rows}
   />
 );
-
-FormTextArea.defaultProps = {
-  placeholder: '',
-  className: '',
-};
 
 export default FormTextArea;

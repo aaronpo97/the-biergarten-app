@@ -32,7 +32,6 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
           username: true,
         },
       },
-
       beerComments: {
         select: {
           id: true,
@@ -46,11 +45,11 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
           },
         },
       },
-
       beerImages: {
         select: {
           url: true,
           id: true,
+          alt: true,
         },
       },
     },
