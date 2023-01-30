@@ -18,6 +18,7 @@ const createNewBreweryPostComments = async ({
   const { breweryPosts, users } = joinData;
   const prisma = DBClient.instance;
   const breweryCommentPromises: Promise<BreweryComment>[] = [];
+  const createdAt = faker.date.past(1);
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfComments; i++) {
     const content = faker.lorem.lines(5);
@@ -29,6 +30,8 @@ const createNewBreweryPostComments = async ({
           content,
           postedBy: { connect: { id: user.id } },
           breweryPost: { connect: { id: breweryPost.id } },
+          rating: Math.floor(Math.random() * 5) + 1,
+          createdAt,
         },
       }),
     );

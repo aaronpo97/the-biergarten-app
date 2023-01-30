@@ -22,15 +22,6 @@ export default interface BeerPostQueryResult {
     id: string;
     username: string;
   };
-  beerComments: {
-    id: string;
-    content: string;
-    createdAt: Date;
-    postedBy: {
-      id: string;
-      username: string;
-    };
-  }[];
 
   createdAt: Date;
 }

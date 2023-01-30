@@ -23,12 +23,15 @@ const createNewBeerComments = async ({
     const content = faker.lorem.lines(5);
     const user = users[Math.floor(Math.random() * users.length)];
     const beerPost = beerPosts[Math.floor(Math.random() * beerPosts.length)];
+    const createdAt = faker.date.past(1);
     beerCommentPromises.push(
       prisma.beerComment.create({
         data: {
           content,
           postedBy: { connect: { id: user.id } },
           beerPost: { connect: { id: beerPost.id } },
+          rating: Math.floor(Math.random() * 5) + 1,
+          createdAt,
         },
       }),
     );

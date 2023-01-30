@@ -5,7 +5,7 @@ import { FunctionComponent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import BeerPostValidationSchema from '@/validation/BeerPostValidationSchema';
+import BeerPostValidationSchema from '@/validation/CreateBeerPostValidationSchema';
 import Router from 'next/router';
 import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
 import Button from './ui/forms/Button';

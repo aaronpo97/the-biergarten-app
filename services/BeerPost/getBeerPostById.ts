@@ -17,6 +17,7 @@ const getBeerPostById = async (id: string) => {
               id: true,
             },
           },
+          rating: true,
         },
       },
       id: true,

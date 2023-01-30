@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { faker } from '@faker-js/faker';
 import { User, BeerType } from '@prisma/client';
 import DBClient from '../../DBClient';
 
@@ -36,9 +38,10 @@ const createNewBeerTypes = async ({ joinData }: CreateNewBeerTypesArgs) => {
 
   types.forEach((type) => {
     const user = users[Math.floor(Math.random() * users.length)];
+    const createdAt = faker.date.past(1);
     beerTypePromises.push(
       prisma.beerType.create({
-        data: { name: type, postedBy: { connect: { id: user.id } } },
+        data: { name: type, postedBy: { connect: { id: user.id } }, createdAt },
       }),
     );
   });

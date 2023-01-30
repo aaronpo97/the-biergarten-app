@@ -1,4 +1,4 @@
-import BeerPostValidationSchema from '@/validation/BeerPostValidationSchema';
+import BeerPostValidationSchema from '@/validation/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

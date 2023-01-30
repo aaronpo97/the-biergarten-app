@@ -52,7 +52,7 @@ const Navbar = () => {
       <div className="flex-none lg:hidden">
         <div className="dropdown-end dropdown">
           <label tabIndex={0} className="btn-ghost btn-circle btn">
-            <div className="w-10 rounded-full">
+            <span className="w-10 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -66,7 +66,7 @@ const Navbar = () => {
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
-            </div>
+            </span>
           </label>
           <ul
             tabIndex={0}

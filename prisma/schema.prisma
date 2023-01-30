@@ -46,6 +46,7 @@ model BeerPost {
 
 model BeerComment {
   id         String    @id @default(uuid())
+  rating     Int
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
   postedBy   User      @relation(fields: [postedById], references: [id], onDelete: Cascade)
@@ -81,6 +82,7 @@ model BreweryPost {
 
 model BreweryComment {
   id            String      @id @default(uuid())
+  rating        Int
   breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
   postedBy      User        @relation(fields: [postedById], references: [id], onDelete: Cascade)

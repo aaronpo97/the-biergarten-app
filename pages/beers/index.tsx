@@ -21,13 +21,15 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
   return (
     <Layout>
       <div className="flex items-center justify-center bg-base-100">
-        <main className="mt-10 flex w-10/12 flex-col space-y-4">
+        <main className="my-10 flex w-10/12 flex-col space-y-4">
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {initialBeerPosts.map((post) => {
               return <BeerCard post={post} key={post.id} />;
             })}
           </div>
-          <Pagination pageNum={pageNum} pageCount={pageCount} />
+          <div className="flex justify-center">
+            <Pagination pageNum={pageNum} pageCount={pageCount} />
+          </div>
         </main>
       </div>
     </Layout>

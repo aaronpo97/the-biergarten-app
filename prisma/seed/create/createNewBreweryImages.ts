@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { faker } from '@faker-js/faker';
 import { BreweryPost, BreweryImage } from '@prisma/client';
 import DBClient from '../../DBClient';
 
@@ -10,7 +12,7 @@ const createNewBreweryImages = async ({
   breweryPosts,
 }: CreateBreweryImagesArgs) => {
   const prisma = DBClient.instance;
-
+  const createdAt = faker.date.past(1);
   const breweryImagesPromises: Promise<BreweryImage>[] = [];
 
   // eslint-disable-next-line no-plusplus
@@ -23,6 +25,7 @@ const createNewBreweryImages = async ({
           url: 'https://picsum.photos/900/1600',
           alt: 'Placeholder brewery image.',
           breweryPost: { connect: { id: breweryPost.id } },
+          createdAt,
         },
       }),
     );

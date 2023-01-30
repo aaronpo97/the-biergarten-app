@@ -16,7 +16,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     const username = `${firstName[0]}.${lastName}`;
     const email = faker.internet.email(firstName, lastName, 'example.com');
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
-
+    const createdAt = faker.date.past(1);
     userPromises.push(
       prisma.user.create({
         data: {
@@ -25,6 +25,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
           email,
           username,
           dateOfBirth,
+          createdAt,
         },
       }),
     );
