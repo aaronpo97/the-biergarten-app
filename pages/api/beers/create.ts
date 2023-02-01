@@ -1,10 +1,9 @@
-import BeerPostValidationSchema from '@/validation/CreateBeerPostValidationSchema';
-import DBClient from '@/prisma/DBClient';
-import { NextApiHandler } from 'next';
-
-import { z } from 'zod';
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import ServerError from '@/config/util/ServerError';
+import createNewBeerPost from '@/services/BeerPost/createNewBeerPost';
+import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
+import { NextApiHandler } from 'next';
+import { z } from 'zod';
 
 const handler: NextApiHandler<z.infer<typeof APIResponseValidationSchema>> = async (
   req,
@@ -23,30 +22,13 @@ const handler: NextApiHandler<z.infer<typeof APIResponseValidationSchema>> = asy
     }
 
     const { name, description, typeId, abv, ibu, breweryId } = cleanedReqBody.data;
-    const user = await DBClient.instance.user.findFirstOrThrow();
-
-    const newBeerPost = await DBClient.instance.beerPost.create({
-      data: {
-        name,
-        description,
-        abv,
-        ibu,
-        type: {
-          connect: {
-            id: typeId,
-          },
-        },
-        postedBy: {
-          connect: {
-            id: user.id,
-          },
-        },
-        brewery: {
-          connect: {
-            id: breweryId,
-          },
-        },
-      },
+    const newBeerPost = await createNewBeerPost({
+      name,
+      description,
+      abv,
+      ibu,
+      typeId,
+      breweryId,
     });
 
     res.status(201).json({

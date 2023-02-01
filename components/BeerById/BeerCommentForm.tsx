@@ -1,36 +1,30 @@
-import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
-import { Dispatch, FunctionComponent, SetStateAction } from 'react';
-import { z } from 'zod';
-import FormLabel from '@/components/ui/forms/FormLabel';
-import FormError from '@/components/ui/forms/FormError';
-import FormTextArea from '@/components/ui/forms/FormTextArea';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Button from '@/components/ui/forms/Button';
-import FormInfo from '@/components/ui/forms/FormInfo';
-// @ts-expect-error
-import ReactStars from 'react-rating-stars-component';
-import FormSegment from '@/components/ui/forms/FormSegment';
-import BeerCommentQueryResult from '@/services/BeerPost/types/BeerCommentQueryResult';
-import BeerCommentValidationSchema from '@/validation/CreateBeerCommentValidationSchema';
 import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentRequest';
+import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
+import { Dispatch, SetStateAction, FunctionComponent, useState, useEffect } from 'react';
+import { Rating } from 'react-daisyui';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
+
+import Button from '../ui/forms/Button';
+import FormError from '../ui/forms/FormError';
+import FormInfo from '../ui/forms/FormInfo';
+import FormLabel from '../ui/forms/FormLabel';
+import FormSegment from '../ui/forms/FormSegment';
+import FormTextArea from '../ui/forms/FormTextArea';
 
 interface BeerCommentFormProps {
   beerPost: BeerPostQueryResult;
-  setComments: Dispatch<SetStateAction<BeerCommentQueryResult[]>>;
+  setComments: Dispatch<SetStateAction<BeerCommentQueryResultArrayT>>;
 }
 
-const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
-  beerPost,
-  setComments,
-}) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm<z.infer<typeof BeerCommentValidationSchema>>({
+const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) => {
+  const { register, handleSubmit, formState, reset, setValue } = useForm<
+    z.infer<typeof BeerCommentValidationSchema>
+  >({
     defaultValues: {
       beerPostId: beerPost.id,
       rating: 0,
@@ -38,14 +32,24 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     resolver: zodResolver(BeerCommentValidationSchema),
   });
 
+  const [rating, setRating] = useState(0);
+  useEffect(() => {
+    setRating(0);
+    reset({ beerPostId: beerPost.id, rating: 0, content: '' });
+  }, [beerPost.id, reset]);
+
+  const router = useRouter();
   const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
     data,
   ) => {
     setValue('rating', 0);
+    setRating(0);
     await sendCreateBeerCommentRequest(data);
-    setComments((prev) => prev);
     reset();
+    router.replace(router.asPath, undefined, { scroll: false });
   };
+
+  const { errors } = formState;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -53,7 +57,6 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
         <FormLabel htmlFor="content">Leave a comment</FormLabel>
         <FormError>{errors.content?.message}</FormError>
       </FormInfo>
-
       <FormSegment>
         <FormTextArea
           id="content"
@@ -63,20 +66,23 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
           error={!!errors.content?.message}
         />
       </FormSegment>
-
       <FormInfo>
         <FormLabel htmlFor="rating">Rating</FormLabel>
         <FormError>{errors.rating?.message}</FormError>
       </FormInfo>
-      <ReactStars
-        id="rating"
-        count={5}
-        size={34}
-        activeColor="#ffd700"
-        edit={true}
-        value={0}
-        onChange={(value: 1 | 2 | 3 | 4 | 5) => setValue('rating', value)}
-      />
+      <Rating
+        value={rating}
+        onChange={(value) => {
+          setRating(value);
+          setValue('rating', value);
+        }}
+      >
+        <Rating.Item name="rating-1" className="mask mask-star" />
+        <Rating.Item name="rating-1" className="mask mask-star" />
+        <Rating.Item name="rating-1" className="mask mask-star" />
+        <Rating.Item name="rating-1" className="mask mask-star" />
+        <Rating.Item name="rating-1" className="mask mask-star" />
+      </Rating>
       <Button type="submit">Submit</Button>
     </form>
   );

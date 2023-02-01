@@ -1,5 +1,7 @@
+import { BeerCommentQueryResult } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
-import BeerCommentValidationSchema from '../validation/CreateBeerCommentValidationSchema';
 
 const sendCreateBeerCommentRequest = async ({
   beerPostId,
@@ -20,7 +22,26 @@ const sendCreateBeerCommentRequest = async ({
 
   const data = await response.json();
 
-  console.log(data);
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  const parsedResponse = APIResponseValidationSchema.safeParse(data);
+
+  if (!parsedResponse.success) {
+    console.log(parsedResponse.error);
+    throw new Error('Invalid API response');
+  }
+
+  console.log(parsedResponse);
+  const parsedPayload = BeerCommentQueryResult.safeParse(parsedResponse.data.payload);
+
+  if (!parsedPayload.success) {
+    console.log(parsedPayload.error);
+    throw new Error('Invalid API response payload');
+  }
+
+  return parsedPayload.data;
 };
 
 export default sendCreateBeerCommentRequest;

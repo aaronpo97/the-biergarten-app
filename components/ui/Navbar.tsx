@@ -24,10 +24,10 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="navbar bg-base-300">
+    <nav className="navbar bg-primary">
       <div className="flex-1">
         <Link className="btn-ghost btn text-3xl normal-case" href="/">
-          <span className="cursor-pointer text-xl font-bold">Aaron William Po</span>
+          <span className="cursor-pointer text-xl font-bold">The Biergarten App</span>
         </Link>
       </div>
       <div className="hidden flex-none lg:block">

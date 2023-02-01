@@ -1,7 +1,7 @@
-import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
 import Link from 'next/link';
 import { FC } from 'react';
 import Image from 'next/image';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const BeerCard: FC<{ post: BeerPostQueryResult }> = ({ post }) => {
   return (

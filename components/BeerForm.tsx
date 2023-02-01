@@ -1,13 +1,12 @@
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
-import { BeerType } from '@prisma/client';
-
-import { FunctionComponent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import BeerPostValidationSchema from '@/validation/CreateBeerPostValidationSchema';
-import Router from 'next/router';
 import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
+import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { BeerType } from '@prisma/client';
+import router from 'next/router';
+import { FunctionComponent } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -52,7 +51,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
       case 'create': {
         try {
           const response = await sendCreateBeerPostRequest(data);
-          Router.push(`/beers/${response.id}`);
+          router.push(`/beers/${response.id}`);
           break;
         } catch (e) {
           // eslint-disable-next-line no-console

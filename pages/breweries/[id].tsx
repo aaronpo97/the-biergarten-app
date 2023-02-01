@@ -1,6 +1,6 @@
-import { GetServerSideProps, NextPage } from 'next';
-import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
+import { GetServerSideProps, NextPage } from 'next';
 
 interface BreweryPageProps {
   breweryPost: BeerPostQueryResult;

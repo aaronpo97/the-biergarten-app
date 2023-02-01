@@ -1,13 +1,17 @@
-import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
 import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaRegThumbsUp, FaThumbsUp } from 'react-icons/fa';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
   const createdAtDate = new Date(beerPost.createdAt);
-  const timeDistance = formatDistanceStrict(createdAtDate, Date.now());
+  const [timeDistance, setTimeDistance] = useState('');
+
+  useEffect(() => {
+    setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
+  }, [beerPost.createdAt]);
 
   const [isLiked, setIsLiked] = useState(false);
 

@@ -1,20 +1,19 @@
-import { GetServerSideProps, NextPage } from 'next';
-import BeerPostQueryResult from '@/services/BeerPost/types/BeerPostQueryResult';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import Layout from '@/components/ui/Layout';
-import Head from 'next/head';
-
-import Image from 'next/image';
+import BeerCommentForm from '@/components/BeerById/BeerCommentForm';
 import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
+import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
 import CommentCard from '@/components/BeerById/CommentCard';
-import { useState } from 'react';
-
+import Layout from '@/components/ui/Layout';
+import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
+import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import getBeerPostById from '@/services/BeerPost/getBeerPostById';
+import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerPost } from '@prisma/client';
-import BeerCommentQueryResult from '@/services/BeerPost/types/BeerCommentQueryResult';
-import BeerCommentForm from '../../components/BeerById/BeerCommentForm';
-import BeerRecommendations from '../../components/BeerById/BeerRecommendations';
-import getBeerRecommendations from '../../services/BeerPost/getBeerRecommendations';
-import getAllBeerComments from '../../services/BeerPost/getAllBeerComments';
+import { NextPage, GetServerSideProps } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+
+import { useEffect, useState } from 'react';
 
 interface BeerPageProps {
   beerPost: BeerPostQueryResult;
@@ -29,7 +28,7 @@ interface BeerPageProps {
       url: string;
     }[];
   })[];
-  beerComments: BeerCommentQueryResult[];
+  beerComments: BeerCommentQueryResultArrayT;
 }
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({
@@ -38,6 +37,9 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
   beerComments,
 }) => {
   const [comments, setComments] = useState(beerComments);
+  useEffect(() => {
+    setComments(beerComments);
+  }, [beerComments]);
   return (
     <Layout>
       <Head>
@@ -65,7 +67,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
                     <BeerCommentForm beerPost={beerPost} setComments={setComments} />
                   </div>
                 </div>
-                <div className="card bg-base-300">
+                <div className="card h-[135rem] bg-base-300">
                   {comments.map((comment) => (
                     <CommentCard key={comment.id} comment={comment} />
                   ))}
@@ -90,8 +92,11 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
   }
 
   const { type, brewery, id } = beerPost;
-  const beerComments = await getAllBeerComments({ id }, { pageSize: 3, pageNum: 1 });
-  const beerRecommendations = await getBeerRecommendations({ type, brewery });
+  const beerComments = await getAllBeerComments(
+    { id: beerPost.id },
+    { pageSize: 9, pageNum: 1 },
+  );
+  const beerRecommendations = await getBeerRecommendations({ type, brewery, id });
 
   const props = {
     beerPost: JSON.parse(JSON.stringify(beerPost)),

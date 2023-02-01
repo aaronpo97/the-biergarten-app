@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from './types/BeerPostQueryResult';
+import BeerPostQueryResult from './schema/BeerPostQueryResult';
 
 const prisma = DBClient.instance;
 

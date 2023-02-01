@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
+import BeerRecommendationQueryResult from '@/services/BeerPost/schema/BeerReccomendationQueryResult';
 import Link from 'next/link';
-import BeerRecommendationQueryResult from '@/services/BeerPost/types/BeerReccomendationQueryResult';
+import { FunctionComponent } from 'react';
 
 interface BeerRecommendationsProps {
   beerRecommendations: BeerRecommendationQueryResult[];
@@ -14,7 +14,7 @@ const BeerRecommendations: FunctionComponent<BeerRecommendationsProps> = ({
         {beerRecommendations.map((beerPost) => (
           <div key={beerPost.id} className="w-full">
             <div>
-              <Link href={`/beers/${beerPost.id}`} className="link-hover">
+              <Link className="link-hover" href={`/beers/${beerPost.id}`} scroll={false}>
                 <h2 className="text-2xl font-bold">{beerPost.name}</h2>
               </Link>
               <Link href={`/breweries/${beerPost.brewery.id}`} className="link-hover">
