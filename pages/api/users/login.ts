@@ -7,12 +7,8 @@ import { setLoginSession } from '@/config/auth/session';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
+import LoginValidationSchema from '@/services/user/schema/LoginValidationSchema';
 import { ExtendedNextApiRequest } from '../../../config/auth/types';
-
-const LoginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
 
 export default nextConnect<
   ExtendedNextApiRequest,
@@ -21,7 +17,7 @@ export default nextConnect<
   .use(passport.initialize())
   .use(async (req, res, next) => {
     passport.use(localStrat);
-    const parsed = LoginSchema.safeParse(req.body);
+    const parsed = LoginValidationSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new ServerError('Username and password are required.', 400);
     }
@@ -41,6 +37,7 @@ export default nextConnect<
 
     res.status(200).json({
       message: 'Login successful.',
+      payload: user,
       statusCode: 200,
       success: true,
     });

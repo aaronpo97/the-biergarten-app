@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
 interface FormSelectProps {
-  options: ReadonlyArray<{ value: string; text: string }>;
+  options: readonly { value: string; text: string }[];
   id: string;
   formRegister: UseFormRegisterReturn<string>;
   error: boolean;

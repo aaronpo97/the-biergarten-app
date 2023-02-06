@@ -1,6 +1,10 @@
 import { NextApiResponse } from 'next';
 import Iron from '@hapi/iron';
-import { SessionRequest, UserInfoSchema, UserSessionSchema } from '@/config/auth/types';
+import {
+  SessionRequest,
+  BasicUserInfoSchema,
+  UserSessionSchema,
+} from '@/config/auth/types';
 import { z } from 'zod';
 import { MAX_AGE, setTokenCookie, getTokenCookie } from './cookie';
 import ServerError from '../util/ServerError';
@@ -9,7 +13,7 @@ const { TOKEN_SECRET } = process.env;
 
 export async function setLoginSession(
   res: NextApiResponse,
-  session: z.infer<typeof UserInfoSchema>,
+  session: z.infer<typeof BasicUserInfoSchema>,
 ) {
   if (!TOKEN_SECRET) {
     throw new ServerError('Authentication is not configured.', 500);

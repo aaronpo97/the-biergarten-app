@@ -1,13 +1,14 @@
+import GetUserSchema from '@/services/user/schema/GetUserSchema';
 import { IncomingMessage } from 'http';
 import { NextApiRequest } from 'next';
 import { z } from 'zod';
 
-export const UserInfoSchema = z.object({
+export const BasicUserInfoSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
 });
 
-export const UserSessionSchema = UserInfoSchema.merge(
+export const UserSessionSchema = BasicUserInfoSchema.merge(
   z.object({
     createdAt: z.number(),
     maxAge: z.number(),
@@ -15,7 +16,7 @@ export const UserSessionSchema = UserInfoSchema.merge(
 );
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
-  user?: z.infer<typeof UserInfoSchema>;
+  user?: z.infer<typeof GetUserSchema>;
 }
 
 export type SessionRequest = IncomingMessage & {
