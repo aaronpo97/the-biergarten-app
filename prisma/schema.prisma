@@ -12,10 +12,11 @@ datasource db {
 
 model User {
   id              String           @id @default(uuid())
-  username        String
+  username        String           @unique
   firstName       String
   lastName        String
-  email           String
+  hash            String
+  email           String           @unique
   createdAt       DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
   dateOfBirth     DateTime
