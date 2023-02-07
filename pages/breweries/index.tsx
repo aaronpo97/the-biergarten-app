@@ -3,6 +3,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import Layout from '@/components/ui/Layout';
 
 interface BreweryPageProps {
   breweryPosts: BreweryPostQueryResult[];
@@ -10,7 +11,7 @@ interface BreweryPageProps {
 
 const BreweryPage: NextPage<BreweryPageProps> = ({ breweryPosts }) => {
   return (
-    <>
+    <Layout>
       <h1 className="text-3xl font-bold underline">Brewery Posts</h1>
       {breweryPosts.map((post) => {
         return (
@@ -21,7 +22,7 @@ const BreweryPage: NextPage<BreweryPageProps> = ({ breweryPosts }) => {
           </div>
         );
       })}
-    </>
+    </Layout>
   );
 };
 
