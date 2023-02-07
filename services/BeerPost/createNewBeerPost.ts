@@ -2,6 +2,10 @@ import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
 import BeerPostValidationSchema from './schema/CreateBeerPostValidationSchema';
 
+const CreateBeerPostWithUserSchema = BeerPostValidationSchema.extend({
+  userId: z.string().uuid(),
+});
+
 const createNewBeerPost = async ({
   name,
   description,
@@ -9,9 +13,8 @@ const createNewBeerPost = async ({
   ibu,
   typeId,
   breweryId,
-}: z.infer<typeof BeerPostValidationSchema>) => {
-  const user = await DBClient.instance.user.findFirstOrThrow();
-
+  userId,
+}: z.infer<typeof CreateBeerPostWithUserSchema>) => {
   const newBeerPost = await DBClient.instance.beerPost.create({
     data: {
       name,
@@ -19,7 +22,7 @@ const createNewBeerPost = async ({
       abv,
       ibu,
       type: { connect: { id: typeId } },
-      postedBy: { connect: { id: user.id } },
+      postedBy: { connect: { id: userId } },
       brewery: { connect: { id: breweryId } },
     },
   });

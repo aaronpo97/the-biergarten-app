@@ -8,20 +8,19 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import LoginValidationSchema from '@/services/user/schema/LoginValidationSchema';
-import { ExtendedNextApiRequest } from '../../../config/auth/types';
+import { UserExtendedNextApiRequest } from '../../../config/auth/types';
 
 export default nextConnect<
-  ExtendedNextApiRequest,
+  UserExtendedNextApiRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >(NextConnectConfig)
   .use(passport.initialize())
   .use(async (req, res, next) => {
-    passport.use(localStrat);
     const parsed = LoginValidationSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new ServerError('Username and password are required.', 400);
     }
-
+    passport.use(localStrat);
     passport.authenticate('local', { session: false }, (error, token) => {
       if (error) {
         next(error);

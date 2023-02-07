@@ -1,12 +1,12 @@
 import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
-import { ExtendedNextApiRequest } from '@/config/auth/types';
+import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
 import nextConnect from 'next-connect';
 import { z } from 'zod';
 
-const sendCurrentUser = async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
+const sendCurrentUser = async (req: UserExtendedNextApiRequest, res: NextApiResponse) => {
   const { user } = req;
   res.status(200).json({
     message: `Currently logged in as ${user!.username}`,
@@ -17,7 +17,7 @@ const sendCurrentUser = async (req: ExtendedNextApiRequest, res: NextApiResponse
 };
 
 const handler = nextConnect<
-  ExtendedNextApiRequest,
+  UserExtendedNextApiRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >(NextConnectConfig).get(getCurrentUser, sendCurrentUser);
 

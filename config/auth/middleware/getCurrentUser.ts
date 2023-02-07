@@ -3,11 +3,11 @@ import { NextHandler } from 'next-connect';
 import findUserById from '@/services/user/findUserById';
 import ServerError from '@/config/util/ServerError';
 import { getLoginSession } from '../session';
-import { ExtendedNextApiRequest } from '../types';
+import { UserExtendedNextApiRequest } from '../types';
 
 /** Get the current user from the session. Adds the user to the request object. */
 const getCurrentUser = async (
-  req: ExtendedNextApiRequest,
+  req: UserExtendedNextApiRequest,
   res: NextApiResponse,
   next: NextHandler,
 ) => {

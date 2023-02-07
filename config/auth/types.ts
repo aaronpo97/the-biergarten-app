@@ -15,7 +15,7 @@ export const UserSessionSchema = BasicUserInfoSchema.merge(
   }),
 );
 
-export interface ExtendedNextApiRequest extends NextApiRequest {
+export interface UserExtendedNextApiRequest extends NextApiRequest {
   user?: z.infer<typeof GetUserSchema>;
 }
 

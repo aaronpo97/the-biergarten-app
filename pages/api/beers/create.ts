@@ -1,21 +1,24 @@
+import { UserExtendedNextApiRequest } from '@/config/auth/types';
+import validateRequest from '@/config/zod/middleware/validateRequest';
 import nextConnect from 'next-connect';
-import ServerError from '@/config/util/ServerError';
 import createNewBeerPost from '@/services/BeerPost/createNewBeerPost';
 import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiHandler } from 'next';
+import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
+import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
 
-const createBeerPost: NextApiHandler<
-  z.infer<typeof APIResponseValidationSchema>
-> = async (req, res) => {
-  const cleanedReqBody = BeerPostValidationSchema.safeParse(req.body);
-  if (!cleanedReqBody.success) {
-    throw new ServerError('Invalid request body', 400);
-  }
+interface CreateBeerPostRequest extends UserExtendedNextApiRequest {
+  body: z.infer<typeof BeerPostValidationSchema>;
+}
 
-  const { name, description, typeId, abv, ibu, breweryId } = cleanedReqBody.data;
+const createBeerPost = async (
+  req: CreateBeerPostRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { name, description, typeId, abv, ibu, breweryId } = req.body;
+
   const newBeerPost = await createNewBeerPost({
     name,
     description,
@@ -23,6 +26,7 @@ const createBeerPost: NextApiHandler<
     ibu,
     typeId,
     breweryId,
+    userId: req.user!.id,
   });
 
   res.status(201).json({
@@ -33,6 +37,10 @@ const createBeerPost: NextApiHandler<
   });
 };
 
-const handler = nextConnect(NextConnectConfig).post(createBeerPost);
+const handler = nextConnect(NextConnectConfig).post(
+  validateRequest({ bodySchema: BeerPostValidationSchema }),
+  getCurrentUser,
+  createBeerPost,
+);
 
 export default handler;
