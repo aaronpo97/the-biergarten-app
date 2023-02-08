@@ -4,9 +4,10 @@ import format from 'date-fns/format';
 import { useContext, useEffect, useState } from 'react';
 import { FaRegThumbsUp, FaThumbsUp } from 'react-icons/fa';
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
-import UserContext from '@/pages/contexts/userContext';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
+import UserContext from '@/contexts/userContext';
 
 const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
   const createdAtDate = new Date(beerPost.createdAt);

@@ -3,6 +3,7 @@ import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
 import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
 import CommentCard from '@/components/BeerById/CommentCard';
 import Layout from '@/components/ui/Layout';
+import UserContext from '@/contexts/userContext';
 import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
@@ -13,7 +14,6 @@ import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useState, useEffect, useContext } from 'react';
-import UserContext from '../contexts/userContext';
 
 interface BeerPageProps {
   beerPost: BeerPostQueryResult;
