@@ -7,6 +7,7 @@ interface FormTextAreaProps {
   error: boolean;
   id: string;
   rows: number;
+  disabled?: boolean;
 }
 
 /**
@@ -17,6 +18,7 @@ interface FormTextAreaProps {
  *     error={true}
  *     placeholder="Test"
  *     rows={5}
+ *     disabled
  *   />;
  *
  * @param props
@@ -25,6 +27,7 @@ interface FormTextAreaProps {
  * @param props.error Whether or not the textarea has an error.
  * @param props.id The id of the textarea.
  * @param props.rows The number of rows to display in the textarea.
+ * @param props.disabled Whether or not the textarea is disabled.
  */
 const FormTextArea: FunctionComponent<FormTextAreaProps> = ({
   placeholder = '',
@@ -32,6 +35,7 @@ const FormTextArea: FunctionComponent<FormTextAreaProps> = ({
   error,
   id,
   rows,
+  disabled = false,
 }) => (
   <textarea
     id={id}
@@ -41,6 +45,7 @@ const FormTextArea: FunctionComponent<FormTextAreaProps> = ({
     }`}
     {...formValidationSchema}
     rows={rows}
+    disabled={disabled}
   />
 );
 

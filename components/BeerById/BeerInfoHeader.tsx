@@ -1,19 +1,83 @@
 import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FaRegThumbsUp, FaThumbsUp } from 'react-icons/fa';
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import UserContext from '@/pages/contexts/userContext';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
+import { z } from 'zod';
 
 const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
   const createdAtDate = new Date(beerPost.createdAt);
   const [timeDistance, setTimeDistance] = useState('');
-
+  const { user } = useContext(UserContext);
   useEffect(() => {
     setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
   }, [beerPost.createdAt]);
 
+  const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    fetch(`/api/beers/${beerPost.id}/like/is-liked`)
+      .then((response) => response.json())
+      .then((data) => {
+        const parsed = APIResponseValidationSchema.safeParse(data);
+
+        if (!parsed.success) {
+          throw new Error('Invalid API response.');
+        }
+        const { payload } = parsed.data;
+
+        const parsedPayload = z
+          .object({
+            isLiked: z.boolean(),
+          })
+          .safeParse(payload);
+
+        if (!parsedPayload.success) {
+          throw new Error('Invalid API response payload.');
+        }
+
+        const { isLiked: alreadyLiked } = parsedPayload.data;
+
+        setIsLiked(alreadyLiked);
+        setLoading(false);
+      });
+  }, [user, beerPost.id]);
+
+  const handleLike = async () => {
+    const response = await fetch(`/api/beers/${beerPost.id}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: '',
+    });
+
+    if (!response.ok) {
+      throw new Error('Something went wrong.');
+    }
+
+    const data = await response.json();
+
+    const parsed = APIResponseValidationSchema.safeParse(data);
+
+    if (!parsed.success) {
+      throw new Error('Invalid API response.');
+    }
+
+    const { success, message } = parsed.data;
+
+    setIsLiked(!isLiked);
+    console.log({ success, message });
+  };
 
   return (
     <div className="card flex flex-col justify-center bg-base-300">
@@ -59,27 +123,30 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
             </div>
           </div>
           <div className="card-actions">
-            <button
-              type="button"
-              className={`btn gap-2 rounded-2xl ${
-                !isLiked ? 'btn-ghost outline' : 'btn-primary'
-              }`}
-              onClick={() => {
-                setIsLiked(!isLiked);
-              }}
-            >
-              {isLiked ? (
-                <>
-                  <FaThumbsUp className="text-2xl" />
-                  <span>Liked</span>
-                </>
-              ) : (
-                <>
-                  <FaRegThumbsUp className="text-2xl" />
-                  <span>Like</span>
-                </>
-              )}
-            </button>
+            {user && (
+              <button
+                type="button"
+                className={`btn gap-2 rounded-2xl ${
+                  !isLiked ? 'btn-ghost outline' : 'btn-primary'
+                }`}
+                onClick={() => {
+                  handleLike();
+                }}
+                disabled={loading}
+              >
+                {isLiked ? (
+                  <>
+                    <FaThumbsUp className="text-2xl" />
+                    <span>Liked</span>
+                  </>
+                ) : (
+                  <>
+                    <FaRegThumbsUp className="text-2xl" />
+                    <span>Like</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
