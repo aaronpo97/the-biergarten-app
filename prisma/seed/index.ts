@@ -24,7 +24,7 @@ import createNewUsers from './create/createNewUsers';
 
     const users = await createNewUsers({ numberOfUsers: 1000 });
     const [breweryPosts, beerTypes] = await Promise.all([
-      createNewBreweryPosts({ numberOfPosts: 10, joinData: { users } }),
+      createNewBreweryPosts({ numberOfPosts: 100, joinData: { users } }),
       createNewBeerTypes({ joinData: { users } }),
     ]);
     const beerPosts = await createNewBeerPosts({
