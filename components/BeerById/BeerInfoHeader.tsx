@@ -9,9 +9,7 @@ import UserContext from '@/contexts/userContext';
 import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
 import sendLikeRequest from '../../requests/sendLikeRequest';
 
-const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({
-  beerPost,
-}) => {
+const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
   const createdAtDate = new Date(beerPost.createdAt);
   const [timeDistance, setTimeDistance] = useState('');
   const { user } = useContext(UserContext);
@@ -36,9 +34,7 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({
   }, [user, beerPost.id]);
 
   useEffect(() => {
-    setTimeDistance(
-      formatDistanceStrict(new Date(beerPost.createdAt), new Date()),
-    );
+    setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
   }, [beerPost.createdAt]);
 
   const handleLike = async () => {
@@ -66,10 +62,7 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({
 
         <h3 className="italic">
           posted by{' '}
-          <Link
-            href={`/users/${beerPost.postedBy.id}`}
-            className="link-hover link"
-          >
+          <Link href={`/users/${beerPost.postedBy.id}`} className="link-hover link">
             {beerPost.postedBy.username}{' '}
           </Link>
           <span
@@ -92,9 +85,7 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({
               </Link>
             </div>
             <div>
-              <span className="mr-4 text-lg font-medium">
-                {beerPost.abv}% ABV
-              </span>
+              <span className="mr-4 text-lg font-medium">{beerPost.abv}% ABV</span>
               <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
             </div>
           </div>

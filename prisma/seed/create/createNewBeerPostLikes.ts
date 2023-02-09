@@ -1,4 +1,4 @@
-import type { BeerPost, BeerPostLikes, User } from '@prisma/client';
+import type { BeerPost, BeerPostLike, User } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 const createNewBeerPostLikes = async ({
@@ -11,7 +11,7 @@ const createNewBeerPostLikes = async ({
   };
   numberOfLikes: number;
 }) => {
-  const beerPostLikePromises: Promise<BeerPostLikes>[] = [];
+  const beerPostLikePromises: Promise<BeerPostLike>[] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfLikes; i++) {
@@ -19,7 +19,7 @@ const createNewBeerPostLikes = async ({
     const user = users[Math.floor(Math.random() * users.length)];
 
     beerPostLikePromises.push(
-      DBClient.instance.beerPostLikes.create({
+      DBClient.instance.beerPostLike.create({
         data: {
           beerPost: { connect: { id: beerPost.id } },
           user: { connect: { id: user.id } },

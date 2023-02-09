@@ -1,5 +1,5 @@
 import sendLoginUserRequest from '@/requests/sendLoginUserRequest';
-import LoginValidationSchema from '@/services/user/schema/LoginValidationSchema';
+import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -66,7 +66,7 @@ const LoginForm = () => {
       </div>
 
       <div className="w-full">
-        <button type="submit" className="btn-primary btn w-full">
+        <button type="submit" className="btn btn-primary w-full">
           Login
         </button>
       </div>

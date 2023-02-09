@@ -25,29 +25,29 @@ model User {
   breweryPosts    BreweryPost[]
   beerComments    BeerComment[]
   breweryComments BreweryComment[]
-  BeerPostLikes   BeerPostLikes[]
+  BeerPostLikes   BeerPostLike[]
 }
 
 model BeerPost {
-  id            String          @id @default(uuid())
+  id            String         @id @default(uuid())
   name          String
   ibu           Float
   abv           Float
   description   String
-  postedBy      User            @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedBy      User           @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById    String
-  brewery       BreweryPost     @relation(fields: [breweryId], references: [id], onDelete: Cascade)
+  brewery       BreweryPost    @relation(fields: [breweryId], references: [id], onDelete: Cascade)
   breweryId     String
-  type          BeerType        @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  type          BeerType       @relation(fields: [typeId], references: [id], onDelete: Cascade)
   typeId        String
-  createdAt     DateTime        @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime?       @updatedAt @db.Timestamptz(3)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime?      @updatedAt @db.Timestamptz(3)
   beerComments  BeerComment[]
   beerImages    BeerImage[]
-  BeerPostLikes BeerPostLikes[]
+  BeerPostLikes BeerPostLike[]
 }
 
-model BeerPostLikes {
+model BeerPostLike {
   id         String    @id @default(uuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String

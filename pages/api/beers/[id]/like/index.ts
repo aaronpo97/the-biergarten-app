@@ -1,4 +1,3 @@
-import DBClient from '@/prisma/DBClient';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
@@ -9,8 +8,11 @@ import nextConnect from 'next-connect';
 import { z } from 'zod';
 import { NextApiResponse } from 'next';
 import ServerError from '@/config/util/ServerError';
+import createBeerPostLike from '@/services/BeerPostLike/createBeerPostLike';
+import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeById';
+import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
 
-const likeBeerPost = async (
+const sendLikeRequest = async (
   req: UserExtendedNextApiRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
@@ -22,41 +24,23 @@ const likeBeerPost = async (
     throw new ServerError('Could not find a beer post with that id', 404);
   }
 
-  const alreadyLiked = await DBClient.instance.beerPostLikes.findFirst({
-    where: {
-      beerPostId: id,
-      userId: user.id,
-    },
-  });
+  const alreadyLiked = await findBeerPostLikeById(id);
+
+  const jsonResponse = {
+    success: true as const,
+    message: '',
+    statusCode: 200 as const,
+  };
 
   if (alreadyLiked) {
-    await DBClient.instance.beerPostLikes.delete({
-      where: {
-        id: alreadyLiked.id,
-      },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Successfully unliked beer post',
-      statusCode: 200,
-    });
-
-    return;
+    await removeBeerPostLikeById(alreadyLiked.id);
+    jsonResponse.message = 'Successfully unliked beer post';
+  } else {
+    await createBeerPostLike({ id, user });
+    jsonResponse.message = 'Successfully liked beer post';
   }
 
-  await DBClient.instance.beerPostLikes.create({
-    data: {
-      beerPost: { connect: { id } },
-      user: { connect: { id: user.id } },
-    },
-  });
-
-  res.status(200).json({
-    success: true,
-    message: 'Successfully liked beer post',
-    statusCode: 200,
-  });
+  res.status(200).json(jsonResponse);
 };
 
 const handler = nextConnect(NextConnectConfig).post(
@@ -66,7 +50,7 @@ const handler = nextConnect(NextConnectConfig).post(
       id: z.string().uuid(),
     }),
   }),
-  likeBeerPost,
+  sendLikeRequest,
 );
 
 export default handler;

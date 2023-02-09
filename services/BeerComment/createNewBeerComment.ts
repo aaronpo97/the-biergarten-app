@@ -5,6 +5,7 @@ import BeerCommentValidationSchema from './schema/CreateBeerCommentValidationSch
 const CreateBeerCommentWithUserSchema = BeerCommentValidationSchema.extend({
   userId: z.string().uuid(),
 });
+
 const createNewBeerComment = async ({
   content,
   rating,

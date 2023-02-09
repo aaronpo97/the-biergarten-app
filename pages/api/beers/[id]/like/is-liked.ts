@@ -15,7 +15,7 @@ const checkIfLiked = async (
   const user = req.user!;
   const id = req.query.id as string;
 
-  const alreadyLiked = await DBClient.instance.beerPostLikes.findFirst({
+  const alreadyLiked = await DBClient.instance.beerPostLike.findFirst({
     where: {
       beerPostId: id,
       userId: user.id,
@@ -26,19 +26,13 @@ const checkIfLiked = async (
     success: true,
     message: alreadyLiked ? 'Beer post is liked.' : 'Beer post is not liked.',
     statusCode: 200,
-    payload: {
-      isLiked: !!alreadyLiked,
-    },
+    payload: { isLiked: !!alreadyLiked },
   });
 };
 
 const handler = nextConnect(NextConnectConfig).get(
   getCurrentUser,
-  validateRequest({
-    querySchema: z.object({
-      id: z.string().uuid(),
-    }),
-  }),
+  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
   checkIfLiked,
 );
 
