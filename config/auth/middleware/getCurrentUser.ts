@@ -19,7 +19,7 @@ const getCurrentUser = async (
   }
 
   req.user = user;
-  next();
+  await next();
 };
 
 export default getCurrentUser;
