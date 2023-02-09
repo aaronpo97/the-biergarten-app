@@ -1,19 +1,50 @@
 import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
-import { useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import { FaRegThumbsUp, FaThumbsUp } from 'react-icons/fa';
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
-const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
+import UserContext from '@/contexts/userContext';
+import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
+import sendLikeRequest from '../../requests/sendLikeRequest';
+
+const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
   const createdAtDate = new Date(beerPost.createdAt);
   const [timeDistance, setTimeDistance] = useState('');
+  const { user } = useContext(UserContext);
+
+  const [loading, setLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    sendCheckIfUserLikesBeerPostRequest(beerPost.id)
+      .then((currentLikeStatus) => {
+        setIsLiked(currentLikeStatus);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.error(e);
+        setLoading(false);
+      });
+  }, [user, beerPost.id]);
 
   useEffect(() => {
     setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
   }, [beerPost.createdAt]);
 
-  const [isLiked, setIsLiked] = useState(false);
+  const handleLike = async () => {
+    try {
+      await sendLikeRequest(beerPost);
+      setIsLiked(!isLiked);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="card flex flex-col justify-center bg-base-300">
@@ -59,27 +90,30 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
             </div>
           </div>
           <div className="card-actions">
-            <button
-              type="button"
-              className={`btn gap-2 rounded-2xl ${
-                !isLiked ? 'btn-ghost outline' : 'btn-primary'
-              }`}
-              onClick={() => {
-                setIsLiked(!isLiked);
-              }}
-            >
-              {isLiked ? (
-                <>
-                  <FaThumbsUp className="text-2xl" />
-                  <span>Liked</span>
-                </>
-              ) : (
-                <>
-                  <FaRegThumbsUp className="text-2xl" />
-                  <span>Like</span>
-                </>
-              )}
-            </button>
+            {user && (
+              <button
+                type="button"
+                className={`btn gap-2 rounded-2xl ${
+                  !isLiked ? 'btn-ghost outline' : 'btn-primary'
+                }`}
+                onClick={() => {
+                  handleLike();
+                }}
+                disabled={loading}
+              >
+                {isLiked ? (
+                  <>
+                    <FaThumbsUp className="text-2xl" />
+                    <span>Liked</span>
+                  </>
+                ) : (
+                  <>
+                    <FaRegThumbsUp className="text-2xl" />
+                    <span>Like</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

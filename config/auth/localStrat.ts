@@ -1,4 +1,4 @@
-import findUserByUsername from '@/services/user/findUserByUsername';
+import findUserByUsername from '@/services/User/findUserByUsername';
 import Local from 'passport-local';
 import ServerError from '../util/ServerError';
 import { validatePassword } from './passwordFns';

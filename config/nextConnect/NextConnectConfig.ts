@@ -2,7 +2,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Options } from 'next-connect';
 import { z } from 'zod';
-import logger from '../pino/logger';
+
 import ServerError from '../util/ServerError';
 
 const NextConnectConfig: Options<
@@ -17,7 +17,6 @@ const NextConnectConfig: Options<
     });
   },
   onError(error, req, res) {
-    logger.error(error);
     const message = error instanceof Error ? error.message : 'Internal server error.';
     const statusCode = error instanceof ServerError ? error.statusCode : 500;
     res.status(statusCode).json({

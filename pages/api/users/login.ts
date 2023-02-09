@@ -7,7 +7,7 @@ import { setLoginSession } from '@/config/auth/session';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
-import LoginValidationSchema from '@/services/user/schema/LoginValidationSchema';
+import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { UserExtendedNextApiRequest } from '../../../config/auth/types';
 
 export default nextConnect<

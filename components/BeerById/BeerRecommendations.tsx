@@ -1,4 +1,4 @@
-import BeerRecommendationQueryResult from '@/services/BeerPost/schema/BeerReccomendationQueryResult';
+import BeerRecommendationQueryResult from '@/services/BeerPost/schema/BeerRecommendationQueryResult';
 import Link from 'next/link';
 import { FunctionComponent } from 'react';
 

@@ -10,6 +10,7 @@ interface FormInputProps {
   type: 'email' | 'password' | 'text' | 'date';
   id: string;
   height?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -20,6 +21,7 @@ interface FormInputProps {
  *     error={!!errors.name}
  *     type="text"
  *     id="name"
+ *     disabled
  *   />;
  *
  * @param param0 The props for the FormTextInput component
@@ -30,6 +32,7 @@ interface FormInputProps {
  * @param param0.type The input type (email, password, text, date).
  * @param param0.id The id of the input.
  * @param param0.height The height of the input.
+ * @param param0.disabled Whether or not the input is disabled.
  */
 const FormTextInput: FunctionComponent<FormInputProps> = ({
   placeholder = '',
@@ -37,6 +40,7 @@ const FormTextInput: FunctionComponent<FormInputProps> = ({
   error,
   type,
   id,
+  disabled = false,
 }) => (
   <input
     id={id}
@@ -46,6 +50,7 @@ const FormTextInput: FunctionComponent<FormInputProps> = ({
       error ? 'input-error' : ''
     }`}
     {...formValidationSchema}
+    disabled={disabled}
   />
 );
 

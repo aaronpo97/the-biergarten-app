@@ -2,11 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import nc from 'next-connect';
-import createNewUser from '@/services/user/createNewUser';
-import CreateUserValidationSchema from '@/services/user/schema/CreateUserValidationSchema';
+import createNewUser from '@/services/User/createNewUser';
+import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
 import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
-import findUserByUsername from '@/services/user/findUserByUsername';
-import findUserByEmail from '@/services/user/findUserByEmail';
+import findUserByUsername from '@/services/User/findUserByUsername';
+import findUserByEmail from '@/services/User/findUserByEmail';
 import validateRequest from '@/config/zod/middleware/validateRequest';
 
 interface RegisterUserRequest extends NextApiRequest {

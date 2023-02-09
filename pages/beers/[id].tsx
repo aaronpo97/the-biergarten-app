@@ -3,6 +3,7 @@ import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
 import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
 import CommentCard from '@/components/BeerById/CommentCard';
 import Layout from '@/components/ui/Layout';
+import UserContext from '@/contexts/userContext';
 import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
@@ -12,8 +13,7 @@ import { BeerPost } from '@prisma/client';
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 interface BeerPageProps {
   beerPost: BeerPostQueryResult;
@@ -36,10 +36,13 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
   beerRecommendations,
   beerComments,
 }) => {
+  const { user } = useContext(UserContext);
+
   const [comments, setComments] = useState(beerComments);
   useEffect(() => {
     setComments(beerComments);
   }, [beerComments]);
+
   return (
     <Layout>
       <Head>
@@ -63,8 +66,16 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
             <div className="mt-4 flex space-x-3">
               <div className="w-[60%] space-y-3">
                 <div className="card h-96 bg-base-300">
-                  <div className="card-body">
-                    <BeerCommentForm beerPost={beerPost} setComments={setComments} />
+                  <div className="card-body h-full">
+                    {user ? (
+                      <BeerCommentForm beerPost={beerPost} setComments={setComments} />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center">
+                        <span className="text-lg font-bold">
+                          Log in to leave a comment.
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="card h-[135rem] bg-base-300">

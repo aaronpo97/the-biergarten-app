@@ -25,24 +25,36 @@ model User {
   breweryPosts    BreweryPost[]
   beerComments    BeerComment[]
   breweryComments BreweryComment[]
+  BeerPostLikes   BeerPostLike[]
 }
 
 model BeerPost {
-  id           String        @id @default(uuid())
-  name         String
-  ibu          Float
-  abv          Float
-  description  String
-  postedBy     User          @relation(fields: [postedById], references: [id], onDelete: Cascade)
-  postedById   String
-  brewery      BreweryPost   @relation(fields: [breweryId], references: [id], onDelete: Cascade)
-  breweryId    String
-  type         BeerType      @relation(fields: [typeId], references: [id], onDelete: Cascade)
-  typeId       String
-  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime?     @updatedAt @db.Timestamptz(3)
-  beerComments BeerComment[]
-  beerImages   BeerImage[]
+  id            String         @id @default(uuid())
+  name          String
+  ibu           Float
+  abv           Float
+  description   String
+  postedBy      User           @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById    String
+  brewery       BreweryPost    @relation(fields: [breweryId], references: [id], onDelete: Cascade)
+  breweryId     String
+  type          BeerType       @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  typeId        String
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime?      @updatedAt @db.Timestamptz(3)
+  beerComments  BeerComment[]
+  beerImages    BeerImage[]
+  BeerPostLikes BeerPostLike[]
+}
+
+model BeerPostLike {
+  id         String    @id @default(uuid())
+  beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
+  beerPostId String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }
 
 model BeerComment {

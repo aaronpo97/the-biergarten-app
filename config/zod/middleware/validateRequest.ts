@@ -37,7 +37,7 @@ const validateRequest =
     if (querySchema) {
       const parsed = querySchema.safeParse(req.query);
       if (!parsed.success) {
-        throw new ServerError(parsed.error.message, 400);
+        throw new ServerError('Invalid request query.', 400);
       }
       req.query = parsed.data;
     }

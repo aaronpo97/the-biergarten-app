@@ -1,11 +1,13 @@
 import Layout from '@/components/ui/Layout';
 import Spinner from '@/components/ui/Spinner';
 import withPageAuthRequired from '@/config/auth/withPageAuthRequired';
-import useUser from '@/hooks/useUser';
+import UserContext from '@/contexts/userContext';
+
 import { GetServerSideProps, NextPage } from 'next';
+import { useContext } from 'react';
 
 const ProtectedPage: NextPage = () => {
-  const { user, isLoading, error } = useUser();
+  const { user, error, isLoading } = useContext(UserContext);
 
   return (
     <Layout>
