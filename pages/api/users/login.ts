@@ -15,7 +15,7 @@ export default nextConnect<
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >(NextConnectConfig)
   .use(passport.initialize())
-  .use(async (req, res, next) => {
+  .use((req, res, next) => {
     const parsed = LoginValidationSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new ServerError('Username and password are required.', 400);
