@@ -1,4 +1,4 @@
-import BeerRecommendationQueryResult from '@/services/BeerPost/schema/BeerReccomendationQueryResult';
+import BeerRecommendationQueryResult from '@/services/BeerPost/schema/BeerRecommendationQueryResult';
 import Link from 'next/link';
 import { FunctionComponent } from 'react';
 
@@ -14,10 +14,17 @@ const BeerRecommendations: FunctionComponent<BeerRecommendationsProps> = ({
         {beerRecommendations.map((beerPost) => (
           <div key={beerPost.id} className="w-full">
             <div>
-              <Link className="link-hover" href={`/beers/${beerPost.id}`} scroll={false}>
+              <Link
+                className="link-hover"
+                href={`/beers/${beerPost.id}`}
+                scroll={false}
+              >
                 <h2 className="text-2xl font-bold">{beerPost.name}</h2>
               </Link>
-              <Link href={`/breweries/${beerPost.brewery.id}`} className="link-hover">
+              <Link
+                href={`/breweries/${beerPost.brewery.id}`}
+                className="link-hover"
+              >
                 <p className="text-lg font-semibold">{beerPost.brewery.name}</p>
               </Link>
             </div>

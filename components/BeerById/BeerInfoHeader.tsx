@@ -1,21 +1,20 @@
 import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
-import { useContext, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import { FaRegThumbsUp, FaThumbsUp } from 'react-icons/fa';
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { z } from 'zod';
 import UserContext from '@/contexts/userContext';
+import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
+import sendLikeRequest from '../../requests/sendLikeRequest';
 
-const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost }) => {
+const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult }> = ({
+  beerPost,
+}) => {
   const createdAtDate = new Date(beerPost.createdAt);
   const [timeDistance, setTimeDistance] = useState('');
   const { user } = useContext(UserContext);
-  useEffect(() => {
-    setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
-  }, [beerPost.createdAt]);
 
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
@@ -25,59 +24,30 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
       setLoading(false);
       return;
     }
-
-    fetch(`/api/beers/${beerPost.id}/like/is-liked`)
-      .then((response) => response.json())
-      .then((data) => {
-        const parsed = APIResponseValidationSchema.safeParse(data);
-
-        if (!parsed.success) {
-          throw new Error('Invalid API response.');
-        }
-        const { payload } = parsed.data;
-
-        const parsedPayload = z
-          .object({
-            isLiked: z.boolean(),
-          })
-          .safeParse(payload);
-
-        if (!parsedPayload.success) {
-          throw new Error('Invalid API response payload.');
-        }
-
-        const { isLiked: alreadyLiked } = parsedPayload.data;
-
-        setIsLiked(alreadyLiked);
+    sendCheckIfUserLikesBeerPostRequest(beerPost.id)
+      .then((currentLikeStatus) => {
+        setIsLiked(currentLikeStatus);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.error(e);
         setLoading(false);
       });
   }, [user, beerPost.id]);
 
+  useEffect(() => {
+    setTimeDistance(
+      formatDistanceStrict(new Date(beerPost.createdAt), new Date()),
+    );
+  }, [beerPost.createdAt]);
+
   const handleLike = async () => {
-    const response = await fetch(`/api/beers/${beerPost.id}/like`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: '',
-    });
-
-    if (!response.ok) {
-      throw new Error('Something went wrong.');
+    try {
+      await sendLikeRequest(beerPost);
+      setIsLiked(!isLiked);
+    } catch (e) {
+      console.error(e);
     }
-
-    const data = await response.json();
-
-    const parsed = APIResponseValidationSchema.safeParse(data);
-
-    if (!parsed.success) {
-      throw new Error('Invalid API response.');
-    }
-
-    const { success, message } = parsed.data;
-
-    setIsLiked(!isLiked);
-    console.log({ success, message });
   };
 
   return (
@@ -96,7 +66,10 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
 
         <h3 className="italic">
           posted by{' '}
-          <Link href={`/users/${beerPost.postedBy.id}`} className="link-hover link">
+          <Link
+            href={`/users/${beerPost.postedBy.id}`}
+            className="link-hover link"
+          >
             {beerPost.postedBy.username}{' '}
           </Link>
           <span
@@ -119,7 +92,9 @@ const BeerInfoHeader: React.FC<{ beerPost: BeerPostQueryResult }> = ({ beerPost 
               </Link>
             </div>
             <div>
-              <span className="mr-4 text-lg font-medium">{beerPost.abv}% ABV</span>
+              <span className="mr-4 text-lg font-medium">
+                {beerPost.abv}% ABV
+              </span>
               <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
             </div>
           </div>

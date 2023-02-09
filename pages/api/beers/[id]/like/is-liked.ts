@@ -24,7 +24,7 @@ const checkIfLiked = async (
 
   res.status(200).json({
     success: true,
-    message: 'Successfully checked if beer post is liked by the current user',
+    message: alreadyLiked ? 'Beer post is liked.' : 'Beer post is not liked.',
     statusCode: 200,
     payload: {
       isLiked: !!alreadyLiked,

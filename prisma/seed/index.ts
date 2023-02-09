@@ -6,6 +6,7 @@ import cleanDatabase from './clean/cleanDatabase';
 
 import createNewBeerImages from './create/createNewBeerImages';
 import createNewBeerPostComments from './create/createNewBeerPostComments';
+import createNewBeerPostLikes from './create/createNewBeerPostLikes';
 import createNewBeerPosts from './create/createNewBeerPosts';
 import createNewBeerTypes from './create/createNewBeerTypes';
 import createNewBreweryImages from './create/createNewBreweryImages';
@@ -31,7 +32,14 @@ import createNewUsers from './create/createNewUsers';
       numberOfPosts: 48,
       joinData: { breweryPosts, beerTypes, users },
     });
-    const [beerPostComments, breweryPostComments] = await Promise.all([
+
+    const [
+      beerPostComments,
+      breweryPostComments,
+      beerPostLikes,
+      beerImages,
+      breweryImages,
+    ] = await Promise.all([
       createNewBeerPostComments({
         numberOfComments: 1000,
         joinData: { beerPosts, users },
@@ -40,11 +48,18 @@ import createNewUsers from './create/createNewUsers';
         numberOfComments: 1000,
         joinData: { breweryPosts, users },
       }),
-    ]);
-
-    const [beerImages, breweryImages] = await Promise.all([
-      createNewBeerImages({ numberOfImages: 1000, beerPosts }),
-      createNewBreweryImages({ numberOfImages: 1000, breweryPosts }),
+      createNewBeerPostLikes({
+        numberOfLikes: 10000,
+        joinData: { beerPosts, users },
+      }),
+      createNewBeerImages({
+        numberOfImages: 1000,
+        beerPosts,
+      }),
+      createNewBreweryImages({
+        numberOfImages: 1000,
+        breweryPosts,
+      }),
     ]);
 
     const end = performance.now();
@@ -57,6 +72,7 @@ import createNewUsers from './create/createNewUsers';
       numberOfBreweryPosts: breweryPosts.length,
       numberOfBeerPosts: beerPosts.length,
       numberOfBeerTypes: beerTypes.length,
+      numberOfBeerPostLikes: beerPostLikes.length,
       numberOfBeerPostComments: beerPostComments.length,
       numberOfBreweryPostComments: breweryPostComments.length,
       numberOfBeerImages: beerImages.length,
