@@ -1,16 +1,16 @@
+import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import validateRequest from '@/config/zod/middleware/validateRequest';
-import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
-import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import { NextApiResponse } from 'next';
 import ServerError from '@/config/util/ServerError';
 import createBeerPostLike from '@/services/BeerPostLike/createBeerPostLike';
 import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeById';
 import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
+import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 
 const sendLikeRequest = async (
   req: UserExtendedNextApiRequest,
@@ -43,7 +43,12 @@ const sendLikeRequest = async (
   res.status(200).json(jsonResponse);
 };
 
-const handler = nextConnect(NextConnectConfig).post(
+const router = createRouter<
+  UserExtendedNextApiRequest,
+  NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
+>();
+
+router.post(
   getCurrentUser,
   validateRequest({
     querySchema: z.object({
@@ -53,4 +58,5 @@ const handler = nextConnect(NextConnectConfig).post(
   sendLikeRequest,
 );
 
+const handler = router.handler(NextConnectOptions);
 export default handler;

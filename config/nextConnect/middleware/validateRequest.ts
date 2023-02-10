@@ -42,7 +42,7 @@ const validateRequest =
       req.query = parsed.data;
     }
 
-    next();
+    return next();
   };
 
 export default validateRequest;

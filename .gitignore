@@ -38,3 +38,6 @@ next-env.d.ts
 
 # http requests
 *.http
+
+# uploaded images
+public/uploads

@@ -1,22 +1,15 @@
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Options } from 'next-connect';
-import { z } from 'zod';
-
 import ServerError from '../util/ServerError';
 
-const NextConnectConfig: Options<
-  NextApiRequest,
-  NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
-> = {
-  onNoMatch(req, res) {
+const NextConnectOptions = {
+  onNoMatch(req: NextApiRequest, res: NextApiResponse) {
     res.status(405).json({
       message: 'Method not allowed.',
       statusCode: 405,
       success: false,
     });
   },
-  onError(error, req, res) {
+  onError(error: unknown, req: NextApiRequest, res: NextApiResponse) {
     const message = error instanceof Error ? error.message : 'Internal server error.';
     const statusCode = error instanceof ServerError ? error.statusCode : 500;
     res.status(statusCode).json({
@@ -27,4 +20,4 @@ const NextConnectConfig: Options<
   },
 };
 
-export default NextConnectConfig;
+export default NextConnectOptions;
