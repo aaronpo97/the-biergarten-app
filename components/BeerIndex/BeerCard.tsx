@@ -8,7 +8,12 @@ const BeerCard: FC<{ post: BeerPostQueryResult }> = ({ post }) => {
     <div className="card bg-base-300" key={post.id}>
       <figure className="card-image h-96">
         {post.beerImages.length > 0 && (
-          <Image src={post.beerImages[0].url} alt={post.name} width="1029" height="110" />
+          <Image
+            src={post.beerImages[0].path}
+            alt={post.name}
+            width="1029"
+            height="110"
+          />
         )}
       </figure>
 

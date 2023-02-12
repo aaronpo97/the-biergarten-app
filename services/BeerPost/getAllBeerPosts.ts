@@ -34,7 +34,8 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
       },
       beerImages: {
         select: {
-          url: true,
+          path: true,
+          caption: true,
           id: true,
           alt: true,
         },

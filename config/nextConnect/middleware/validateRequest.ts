@@ -28,10 +28,11 @@ const validateRequest =
   }) =>
   async (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
     if (bodySchema) {
-      const parsed = bodySchema.safeParse(req.body);
+      const parsed = bodySchema.safeParse(JSON.parse(JSON.stringify(req.body)));
       if (!parsed.success) {
         throw new ServerError('Invalid request body.', 400);
       }
+      req.body = parsed.data;
     }
 
     if (querySchema) {

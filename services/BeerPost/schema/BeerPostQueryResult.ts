@@ -7,7 +7,8 @@ export default interface BeerPostQueryResult {
   };
   description: string;
   beerImages: {
-    url: string;
+    path: string;
+    caption: string;
     id: string;
     alt: string;
   }[];

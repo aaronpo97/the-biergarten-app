@@ -53,7 +53,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
         {beerPost.beerImages[0] && (
           <Image
             alt={beerPost.beerImages[0].alt}
-            src={beerPost.beerImages[0].url}
+            src={beerPost.beerImages[0].path}
             height={1080}
             width={1920}
             className="h-[42rem] w-full object-cover"
