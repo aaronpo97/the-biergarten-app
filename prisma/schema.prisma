@@ -5,6 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erdSVG {
+  provider                  = "prisma-erd-generator"
+  output                    = "./ERD.svg"
+  includeRelationFromFields = true
+  theme                     = "neutral"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -53,8 +60,8 @@ model BeerPostLike {
   id         String    @id @default(uuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  likedBy    User      @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById  String
   createdAt  DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }

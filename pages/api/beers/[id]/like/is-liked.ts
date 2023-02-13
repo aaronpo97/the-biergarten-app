@@ -18,7 +18,7 @@ const checkIfLiked = async (
   const alreadyLiked = await DBClient.instance.beerPostLike.findFirst({
     where: {
       beerPostId: id,
-      userId: user.id,
+      likedById: user.id,
     },
   });
 

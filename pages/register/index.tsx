@@ -33,6 +33,7 @@ const RegisterUserPage: NextPage<RegisterUserProps> = () => {
   const onSubmit = async (data: z.infer<typeof CreateUserValidationSchema>) => {
     try {
       await sendRegisterUserRequest(data);
+      reset();
       router.push('/', undefined, { shallow: true });
     } catch (error) {
       setServerResponseError(
