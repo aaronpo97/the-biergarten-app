@@ -9,10 +9,6 @@ const useUser = () => {
     error,
     isLoading,
   } = useSWR('/api/users/current', async (url) => {
-    if (!document.cookie) {
-      throw new Error('Not logged in.');
-    }
-
     const response = await fetch(url);
 
     if (!response.ok) {

@@ -1,6 +1,11 @@
 import DBClient from '@/prisma/DBClient';
 
-const findBeerPostLikeById = async (id: string) =>
-  DBClient.instance.beerPostLike.findUnique({ where: { id } });
+const findBeerPostLikeById = async (beerPostId: string, userId: string) =>
+  DBClient.instance.beerPostLike.findFirst({
+    where: {
+      beerPostId,
+      userId,
+    },
+  });
 
 export default findBeerPostLikeById;

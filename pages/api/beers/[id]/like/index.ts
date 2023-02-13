@@ -24,7 +24,7 @@ const sendLikeRequest = async (
     throw new ServerError('Could not find a beer post with that id', 404);
   }
 
-  const alreadyLiked = await findBeerPostLikeById(id);
+  const alreadyLiked = await findBeerPostLikeById(beer.id, user.id);
 
   const jsonResponse = {
     success: true as const,
@@ -50,11 +50,7 @@ const router = createRouter<
 
 router.post(
   getCurrentUser,
-  validateRequest({
-    querySchema: z.object({
-      id: z.string().uuid(),
-    }),
-  }),
+  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
   sendLikeRequest,
 );
 

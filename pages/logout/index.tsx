@@ -10,7 +10,7 @@ const LogoutPage: NextPage = () => {
     router.reload();
     router.push('/');
   }, [router]);
-  return <div />;
+  return null;
 };
 
 export default LogoutPage;

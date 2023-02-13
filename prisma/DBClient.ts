@@ -1,11 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
 const DBClient = {
-  instance: new PrismaClient(),
+  instance:
+    globalForPrisma.prisma ||
+    new PrismaClient({
+      log: ['info', 'warn'],
+    }),
 };
 
-export type IDBClient = typeof DBClient;
-
-Object.freeze(DBClient);
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = DBClient.instance;
+}
 
 export default DBClient;
