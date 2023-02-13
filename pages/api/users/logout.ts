@@ -21,11 +21,7 @@ router.all(async (req, res) => {
 
   removeTokenCookie(res);
 
-  res.status(200).json({
-    message: 'Logged out.',
-    statusCode: 200,
-    success: true,
-  });
+  res.redirect('/');
 });
 
 const handler = router.handler(NextConnectOptions);

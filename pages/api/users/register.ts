@@ -1,3 +1,4 @@
+import { setLoginSession } from '@/config/auth/session';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
@@ -35,6 +36,11 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
   }
 
   const user = await createNewUser(req.body);
+
+  await setLoginSession(res, {
+    id: user.id,
+    username: user.username,
+  });
   res.status(201).json({
     message: 'User created successfully.',
     payload: user,

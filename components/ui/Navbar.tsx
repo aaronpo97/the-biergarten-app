@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const authenticatedPages: readonly Page[] = [
     { slug: '/account', name: 'Account' },
-    { slug: '/logout', name: 'Logout' },
+    { slug: '/api/users/logout', name: 'Logout' },
   ];
 
   const unauthenticatedPages: readonly Page[] = [
@@ -44,7 +44,7 @@ const Navbar = () => {
   return (
     <nav className="navbar bg-primary text-primary-content">
       <div className="flex-1">
-        <Link className="btn btn-ghost text-3xl normal-case" href="/">
+        <Link className="btn-ghost btn text-3xl normal-case" href="/">
           <span className="cursor-pointer text-xl font-bold">The Biergarten App</span>
         </Link>
       </div>
@@ -69,7 +69,7 @@ const Navbar = () => {
       </div>
       <div className="flex-none lg:hidden">
         <div className="dropdown-end dropdown">
-          <label tabIndex={0} className="btn btn-ghost btn-circle">
+          <label tabIndex={0} className="btn-ghost btn-circle btn">
             <span className="w-10 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

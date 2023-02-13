@@ -10,6 +10,7 @@ import sendRegisterUserRequest from '@/requests/sendRegisterUserRequest';
 import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUserCircle } from 'react-icons/fa';
@@ -18,6 +19,7 @@ import { z } from 'zod';
 interface RegisterUserProps {}
 
 const RegisterUserPage: NextPage<RegisterUserProps> = () => {
+  const router = useRouter();
   const { reset, register, handleSubmit, formState } = useForm<
     z.infer<typeof CreateUserValidationSchema>
   >({
@@ -31,7 +33,7 @@ const RegisterUserPage: NextPage<RegisterUserProps> = () => {
   const onSubmit = async (data: z.infer<typeof CreateUserValidationSchema>) => {
     try {
       await sendRegisterUserRequest(data);
-      reset();
+      router.push('/', undefined, { shallow: true });
     } catch (error) {
       setServerResponseError(
         error instanceof Error
