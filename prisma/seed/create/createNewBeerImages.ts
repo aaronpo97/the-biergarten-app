@@ -5,12 +5,9 @@ import DBClient from '../../DBClient';
 
 interface CreateNewBeerImagesArgs {
   numberOfImages: number;
-
-  joinData: {
-    beerPosts: BeerPost[];
-    users: User[];
-  };
+  joinData: { beerPosts: BeerPost[]; users: User[] };
 }
+
 const createNewBeerImages = async ({
   numberOfImages,
   joinData: { beerPosts, users },
@@ -26,7 +23,7 @@ const createNewBeerImages = async ({
     beerImagesPromises.push(
       prisma.beerImage.create({
         data: {
-          path: 'https://picsum.photos/900/1600',
+          path: 'https://picsum.photos/1040/1080',
           alt: 'Placeholder beer image.',
           caption: 'Placeholder beer image caption.',
           beerPost: { connect: { id: beerPost.id } },

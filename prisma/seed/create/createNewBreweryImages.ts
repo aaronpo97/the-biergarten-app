@@ -27,7 +27,7 @@ const createNewBreweryImages = async ({
     breweryImagesPromises.push(
       prisma.breweryImage.create({
         data: {
-          path: 'https://picsum.photos/900/1600',
+          path: 'https://picsum.photos/1040/1080',
           alt: 'Placeholder brewery image.',
           caption: 'Placeholder brewery image caption.',
           breweryPost: { connect: { id: breweryPost.id } },

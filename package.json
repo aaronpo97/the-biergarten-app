@@ -10,6 +10,7 @@
     "format": "npx prettier . --write",
     "prestart": "npm run build",
     "prismaDev": "dotenv -e .env.local prisma migrate dev",
+    "vercel-build": "DISABLE_ERD=true npx prisma generate && npx prisma migrate deploy && next build",
     "seed": "npx ts-node ./prisma/seed/index.ts"
   },
   "dependencies": {
