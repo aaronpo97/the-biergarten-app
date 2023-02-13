@@ -13,7 +13,7 @@ const CommentCard: React.FC<{
   }, [comment.createdAt]);
 
   return (
-    <div className="card-body h-[1/9]">
+    <div className="card-body h-64">
       <div className="flex justify-between">
         <div>
           <h3 className="text-2xl font-semibold">{comment.postedBy.username}</h3>

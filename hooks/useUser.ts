@@ -3,14 +3,20 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWR from 'swr';
 
 const useUser = () => {
+  // check cookies for user
   const {
     data: user,
     error,
     isLoading,
   } = useSWR('/api/users/current', async (url) => {
+    if (!document.cookie) {
+      throw new Error('Not logged in.');
+    }
+
     const response = await fetch(url);
 
     if (!response.ok) {
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       throw new Error(response.statusText);
     }
 

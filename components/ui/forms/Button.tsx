@@ -7,7 +7,7 @@ interface FormButtonProps {
 
 const Button: FunctionComponent<FormButtonProps> = ({ children, type }) => (
   // eslint-disable-next-line react/button-has-type
-  <button type={type} className="btn btn-primary mt-4 w-full rounded-xl">
+  <button type={type} className="btn-primary btn mt-4 w-full rounded-xl">
     {children}
   </button>
 );

@@ -7,6 +7,7 @@ import Layout from '@/components/ui/Layout';
 import Pagination from '@/components/BeerIndex/Pagination';
 import BeerCard from '@/components/BeerIndex/BeerCard';
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import Head from 'next/head';
 
 interface BeerPageProps {
   initialBeerPosts: BeerPostQueryResult[];
@@ -20,6 +21,10 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
   const pageNum = parseInt(query.page_num as string, 10) || 1;
   return (
     <Layout>
+      <Head>
+        <title>Beer</title>
+        <meta name="description" content="Beer posts" />
+      </Head>
       <div className="flex items-center justify-center bg-base-100">
         <main className="my-10 flex w-10/12 flex-col space-y-4">
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
