@@ -9,9 +9,6 @@ const useUser = () => {
     error,
     isLoading,
   } = useSWR('/api/users/current', async (url) => {
-    if (!document.cookie.includes('token')) {
-      return undefined;
-    }
     const response = await fetch(url);
 
     if (!response.ok) {
