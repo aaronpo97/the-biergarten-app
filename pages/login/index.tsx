@@ -29,7 +29,7 @@ const LoginPage: NextPage = () => {
       </Head>
 
       <div className="flex h-full flex-row">
-        <div className="flex h-full w-[60%] flex-col items-center justify-center bg-base-100">
+        <div className="hidden h-full flex-col items-center justify-center bg-base-100 lg:flex lg:w-[60%]">
           <Image
             src="https://picsum.photos/1040/1080"
             alt="Login Image"
@@ -38,13 +38,15 @@ const LoginPage: NextPage = () => {
             className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex h-full w-[40%] flex-col items-center space-y-5 bg-base-300">
+        <div className="flex h-full w-full flex-col items-center space-y-5 bg-base-300 lg:w-[40%]">
           <div className="mt-44 w-9/12">
-            <div className="flex flex-col items-center space-y-2">
+            <div className=" flex flex-col items-center space-y-2">
               <FaUserCircle className="text-3xl" />
               <h1 className="text-4xl font-bold">Login</h1>
             </div>
-            <LoginForm />
+            <div className="mt-10">
+              <LoginForm />
+            </div>
           </div>
         </div>
       </div>
