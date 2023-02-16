@@ -26,6 +26,7 @@ interface BeerPageProps {
   })[];
   beerComments: BeerCommentQueryResultArrayT;
   commentsPageCount: number;
+  likeCount: number;
 }
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({
@@ -33,6 +34,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
   beerRecommendations,
   beerComments,
   commentsPageCount,
+  likeCount,
 }) => {
   const { user } = useContext(UserContext);
   const [comments, setComments] = useState(beerComments);
@@ -66,7 +68,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
 
         <div className="my-12 flex w-full items-center justify-center ">
           <div className="w-11/12 space-y-3 lg:w-9/12">
-            <BeerInfoHeader beerPost={beerPost} />
+            <BeerInfoHeader beerPost={beerPost} initialLikeCount={likeCount} />
             <div className="mt-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
               <div className="w-full space-y-3 sm:w-[60%]">
                 <div className="card h-96 bg-base-300">
@@ -153,12 +155,16 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
     where: { beerPostId: beerPost.id },
   });
   const pageCount = numberOfPosts ? Math.ceil(numberOfPosts / pageSize) : 0;
+  const likeCount = await DBClient.instance.beerPostLike.count({
+    where: { beerPostId: beerPost.id },
+  });
 
   const props = {
     beerPost: JSON.parse(JSON.stringify(beerPost)),
     beerRecommendations: JSON.parse(JSON.stringify(beerRecommendations)),
     beerComments: JSON.parse(JSON.stringify(beerComments)),
     commentsPageCount: JSON.parse(JSON.stringify(pageCount)),
+    likeCount: JSON.parse(JSON.stringify(likeCount)),
   };
 
   return { props };
