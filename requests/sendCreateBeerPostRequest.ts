@@ -1,9 +1,10 @@
-import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import { beerPostQueryResultSchema } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 
 const sendCreateBeerPostRequest = async (
-  data: z.infer<typeof BeerPostValidationSchema>,
+  data: z.infer<typeof CreateBeerPostValidationSchema>,
 ) => {
   const response = await fetch('/api/beers/create', {
     method: 'POST',
@@ -23,18 +24,13 @@ const sendCreateBeerPostRequest = async (
     throw new Error(message);
   }
 
-  if (
-    !(
-      payload &&
-      typeof payload === 'object' &&
-      'id' in payload &&
-      typeof payload.id === 'string'
-    )
-  ) {
+  const parsedPayload = beerPostQueryResultSchema.safeParse(payload);
+
+  if (!parsedPayload.success) {
     throw new Error('Invalid API response');
   }
 
-  return payload;
+  return parsedPayload.data;
 };
 
 export default sendCreateBeerPostRequest;

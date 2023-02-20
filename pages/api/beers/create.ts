@@ -2,7 +2,7 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { createRouter } from 'next-connect';
 import createNewBeerPost from '@/services/BeerPost/createNewBeerPost';
-import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
@@ -10,7 +10,7 @@ import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 
 interface CreateBeerPostRequest extends UserExtendedNextApiRequest {
-  body: z.infer<typeof BeerPostValidationSchema>;
+  body: z.infer<typeof CreateBeerPostValidationSchema>;
 }
 
 const createBeerPost = async (
@@ -43,7 +43,7 @@ const router = createRouter<
 >();
 
 router.post(
-  validateRequest({ bodySchema: BeerPostValidationSchema }),
+  validateRequest({ bodySchema: CreateBeerPostValidationSchema }),
   getCurrentUser,
   createBeerPost,
 );

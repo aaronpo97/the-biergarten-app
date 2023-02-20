@@ -1,5 +1,5 @@
 import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
-import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
@@ -17,7 +17,7 @@ import FormSelect from './ui/forms/FormSelect';
 import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
-type BeerPostT = z.infer<typeof BeerPostValidationSchema>;
+type BeerPostT = z.infer<typeof CreateBeerPostValidationSchema>;
 
 interface BeerFormProps {
   formType: 'edit' | 'create';
@@ -38,7 +38,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm<BeerPostT>({
-    resolver: zodResolver(BeerPostValidationSchema),
+    resolver: zodResolver(CreateBeerPostValidationSchema),
     defaultValues: {
       name: defaultValues?.name,
       description: defaultValues?.description,

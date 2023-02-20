@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from '../BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerCommentQueryResultArrayT } from './schema/BeerCommentQueryResult';
 
 const getAllBeerComments = async (

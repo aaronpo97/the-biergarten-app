@@ -6,7 +6,7 @@ import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/ui/Layout';
 import Pagination from '@/components/BeerIndex/Pagination';
 import BeerCard from '@/components/BeerIndex/BeerCard';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
 
 interface BeerPageProps {

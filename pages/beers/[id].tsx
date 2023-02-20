@@ -9,7 +9,7 @@ import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerPost } from '@prisma/client';
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
 import { FC, useContext, useEffect, useState } from 'react';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 import UserContext from '@/contexts/userContext';
 import BeerPostLikeButton from './BeerPostLikeButton';

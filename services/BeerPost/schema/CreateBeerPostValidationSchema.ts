@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const BeerPostValidationSchema = z.object({
+const CreateBeerPostValidationSchema = z.object({
   name: z
     .string({
       required_error: 'Beer name is required.',
@@ -40,4 +40,4 @@ const BeerPostValidationSchema = z.object({
     .uuid({ message: 'Invalid brewery id.' }),
 });
 
-export default BeerPostValidationSchema;
+export default CreateBeerPostValidationSchema;
