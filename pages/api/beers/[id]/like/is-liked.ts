@@ -1,11 +1,11 @@
-import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
+import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
-import validateRequest from '@/config/zod/middleware/validateRequest';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
+import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 const checkIfLiked = async (
@@ -18,7 +18,7 @@ const checkIfLiked = async (
   const alreadyLiked = await DBClient.instance.beerPostLike.findFirst({
     where: {
       beerPostId: id,
-      userId: user.id,
+      likedById: user.id,
     },
   });
 
@@ -30,10 +30,20 @@ const checkIfLiked = async (
   });
 };
 
-const handler = nextConnect(NextConnectConfig).get(
+const router = createRouter<
+  UserExtendedNextApiRequest,
+  NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
+>();
+
+router.get(
   getCurrentUser,
-  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
+  validateRequest({
+    querySchema: z.object({
+      id: z.string().uuid(),
+    }),
+  }),
   checkIfLiked,
 );
 
+const handler = router.handler(NextConnectOptions);
 export default handler;

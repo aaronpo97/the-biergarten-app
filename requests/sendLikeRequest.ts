@@ -1,8 +1,7 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
-const sendLikeRequest = async (beerPost: BeerPostQueryResult) => {
-  const response = await fetch(`/api/beers/${beerPost.id}/like`, {
+const sendLikeRequest = async (beerPostId: string) => {
+  const response = await fetch(`/api/beers/${beerPostId}/like`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

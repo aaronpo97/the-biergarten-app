@@ -2,8 +2,9 @@ import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
 import BeerCommentValidationSchema from './schema/CreateBeerCommentValidationSchema';
 
-const CreateBeerCommentWithUserSchema = BeerCommentValidationSchema.extend({
+const CreateNewBeerCommentServiceSchema = BeerCommentValidationSchema.extend({
   userId: z.string().uuid(),
+  beerPostId: z.string().uuid(),
 });
 
 const createNewBeerComment = async ({
@@ -11,7 +12,7 @@ const createNewBeerComment = async ({
   rating,
   beerPostId,
   userId,
-}: z.infer<typeof CreateBeerCommentWithUserSchema>) => {
+}: z.infer<typeof CreateNewBeerCommentServiceSchema>) => {
   return DBClient.instance.beerComment.create({
     data: {
       content,

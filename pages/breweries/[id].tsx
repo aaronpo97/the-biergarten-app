@@ -1,4 +1,4 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
 import { GetServerSideProps, NextPage } from 'next';
 

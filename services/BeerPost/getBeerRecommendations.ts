@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from './schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const getBeerRecommendations = async (
   beerPost: Pick<BeerPostQueryResult, 'type' | 'brewery' | 'id'>,
@@ -10,7 +10,7 @@ const getBeerRecommendations = async (
       NOT: { id: beerPost.id },
     },
     include: {
-      beerImages: { select: { id: true, url: true, alt: true } },
+      beerImages: { select: { id: true, path: true, caption: true, alt: true } },
       brewery: { select: { id: true, name: true } },
     },
   });

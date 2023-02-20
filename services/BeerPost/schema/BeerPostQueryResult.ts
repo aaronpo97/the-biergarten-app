@@ -1,27 +1,36 @@
-export default interface BeerPostQueryResult {
-  id: string;
-  name: string;
-  brewery: {
-    id: string;
-    name: string;
-  };
-  description: string;
-  beerImages: {
-    url: string;
-    id: string;
-    alt: string;
-  }[];
+import { z } from 'zod';
 
-  ibu: number;
-  abv: number;
-  type: {
-    id: string;
-    name: string;
-  };
-  postedBy: {
-    id: string;
-    username: string;
-  };
+export const beerPostQueryResultSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  brewery: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  description: z.string(),
+  beerImages: z.array(
+    z.object({
+      path: z.string(),
+      caption: z.string(),
+      id: z.string(),
+      alt: z.string(),
+    }),
+  ),
+  ibu: z.number(),
+  abv: z.number(),
+  type: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  postedBy: z.object({
+    id: z.string(),
+    username: z.string(),
+  }),
+  createdAt: z.coerce.date(),
+});
 
-  createdAt: Date;
-}
+export const beerPostQueryResultArraySchema = z.array(beerPostQueryResultSchema);
+
+export type BeerPostQueryResult = z.infer<typeof beerPostQueryResultSchema>;
+
+export type BeerPostQueryResultArray = z.infer<typeof beerPostQueryResultArraySchema>;

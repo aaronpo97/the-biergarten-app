@@ -1,14 +1,19 @@
 import Link from 'next/link';
 import { FC } from 'react';
 import Image from 'next/image';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const BeerCard: FC<{ post: BeerPostQueryResult }> = ({ post }) => {
   return (
     <div className="card bg-base-300" key={post.id}>
       <figure className="card-image h-96">
         {post.beerImages.length > 0 && (
-          <Image src={post.beerImages[0].url} alt={post.name} width="1029" height="110" />
+          <Image
+            src={post.beerImages[0].path}
+            alt={post.name}
+            width="1029"
+            height="110"
+          />
         )}
       </figure>
 

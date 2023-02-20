@@ -1,5 +1,6 @@
 import BeerForm from '@/components/BeerForm';
 import Layout from '@/components/ui/Layout';
+import withPageAuthRequired from '@/config/auth/withPageAuthRequired';
 
 import DBClient from '@/prisma/DBClient';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
@@ -30,7 +31,7 @@ const Create: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
   );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = withPageAuthRequired(async () => {
   const breweryPosts = await getAllBreweryPosts();
   const beerTypes = await DBClient.instance.beerType.findMany();
 
@@ -40,6 +41,6 @@ export const getServerSideProps = async () => {
       types: JSON.parse(JSON.stringify(beerTypes)),
     },
   };
-};
+});
 
 export default Create;

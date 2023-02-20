@@ -5,6 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erdSVG {
+  provider                  = "prisma-erd-generator"
+  output                    = "./ERD.svg"
+  includeRelationFromFields = true
+  theme                     = "neutral"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -26,6 +33,8 @@ model User {
   beerComments    BeerComment[]
   breweryComments BreweryComment[]
   BeerPostLikes   BeerPostLike[]
+  BeerImage       BeerImage[]
+  BreweryImage    BreweryImage[]
 }
 
 model BeerPost {
@@ -51,8 +60,8 @@ model BeerPostLike {
   id         String    @id @default(uuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  likedBy    User      @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById  String
   createdAt  DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }
@@ -109,18 +118,24 @@ model BeerImage {
   id         String    @id @default(uuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
-  url        String
+  path       String
   alt        String
+  caption    String
   createdAt  DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
+  postedBy   User      @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById String
 }
 
 model BreweryImage {
   id            String      @id @default(uuid())
   breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
-  url           String
+  path          String
   createdAt     DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
+  caption       String
   alt           String
+  postedBy      User        @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById    String
 }

@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from './schema/BeerPostQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const prisma = DBClient.instance;
 
@@ -10,35 +10,14 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
     select: {
       id: true,
       name: true,
-      type: {
-        select: {
-          name: true,
-          id: true,
-        },
-      },
       ibu: true,
       abv: true,
-      brewery: {
-        select: {
-          name: true,
-          id: true,
-        },
-      },
       description: true,
       createdAt: true,
-      postedBy: {
-        select: {
-          id: true,
-          username: true,
-        },
-      },
-      beerImages: {
-        select: {
-          url: true,
-          id: true,
-          alt: true,
-        },
-      },
+      type: { select: { name: true, id: true } },
+      brewery: { select: { name: true, id: true } },
+      postedBy: { select: { id: true, username: true } },
+      beerImages: { select: { path: true, caption: true, id: true, alt: true } },
     },
     take: pageSize,
     skip,

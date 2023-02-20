@@ -54,11 +54,11 @@ import createNewUsers from './create/createNewUsers';
       }),
       createNewBeerImages({
         numberOfImages: 1000,
-        beerPosts,
+        joinData: { beerPosts, users },
       }),
       createNewBreweryImages({
         numberOfImages: 1000,
-        breweryPosts,
+        joinData: { breweryPosts, users },
       }),
     ]);
 

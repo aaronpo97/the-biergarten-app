@@ -22,7 +22,7 @@ const createNewBeerPostLikes = async ({
       DBClient.instance.beerPostLike.create({
         data: {
           beerPost: { connect: { id: beerPost.id } },
-          user: { connect: { id: user.id } },
+          likedBy: { connect: { id: user.id } },
         },
       }),
     );

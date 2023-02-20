@@ -1,9 +1,9 @@
-import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
-import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
-import nextConnect from 'next-connect';
+import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
+import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 const sendCurrentUser = async (req: UserExtendedNextApiRequest, res: NextApiResponse) => {
@@ -16,9 +16,12 @@ const sendCurrentUser = async (req: UserExtendedNextApiRequest, res: NextApiResp
   });
 };
 
-const handler = nextConnect<
+const router = createRouter<
   UserExtendedNextApiRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
->(NextConnectConfig).get(getCurrentUser, sendCurrentUser);
+>();
 
+router.get(getCurrentUser, sendCurrentUser);
+
+const handler = router.handler(NextConnectOptions);
 export default handler;

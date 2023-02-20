@@ -1,13 +1,15 @@
+import { setLoginSession } from '@/config/auth/session';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
-import nc from 'next-connect';
+import { createRouter } from 'next-connect';
 import createNewUser from '@/services/User/createNewUser';
 import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
-import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import findUserByUsername from '@/services/User/findUserByUsername';
 import findUserByEmail from '@/services/User/findUserByEmail';
-import validateRequest from '@/config/zod/middleware/validateRequest';
+import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
 interface RegisterUserRequest extends NextApiRequest {
   body: z.infer<typeof CreateUserValidationSchema>;
@@ -34,6 +36,11 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
   }
 
   const user = await createNewUser(req.body);
+
+  await setLoginSession(res, {
+    id: user.id,
+    username: user.username,
+  });
   res.status(201).json({
     message: 'User created successfully.',
     payload: user,
@@ -42,9 +49,12 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
   });
 };
 
-const handler = nc(NextConnectConfig).post(
-  validateRequest({ bodySchema: CreateUserValidationSchema }),
-  registerUser,
-);
+const router = createRouter<
+  RegisterUserRequest,
+  NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
+>();
 
+router.post(validateRequest({ bodySchema: CreateUserValidationSchema }), registerUser);
+
+const handler = router.handler(NextConnectOptions);
 export default handler;

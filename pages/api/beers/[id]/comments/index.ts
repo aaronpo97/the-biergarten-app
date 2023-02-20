@@ -1,25 +1,28 @@
-import validateRequest from '@/config/zod/middleware/validateRequest';
+import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import NextConnectConfig from '@/config/nextConnect/NextConnectConfig';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import createNewBeerComment from '@/services/BeerComment/createNewBeerComment';
 import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import getCurrentUser from '@/config/auth/middleware/getCurrentUser';
+import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
   body: z.infer<typeof BeerCommentValidationSchema>;
+  query: { id: string };
 }
 
 const createComment = async (
   req: CreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { content, rating, beerPostId } = req.body;
+  const { content, rating } = req.body;
+
+  const beerPostId = req.query.id;
 
   const newBeerComment: BeerCommentQueryResultT = await createNewBeerComment({
     content,
@@ -36,10 +39,19 @@ const createComment = async (
   });
 };
 
-const handler = nextConnect(NextConnectConfig).post(
-  validateRequest({ bodySchema: BeerCommentValidationSchema }),
+const router = createRouter<
+  CreateCommentRequest,
+  NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
+>();
+
+router.post(
+  validateRequest({
+    bodySchema: BeerCommentValidationSchema,
+    querySchema: z.object({ id: z.string().uuid() }),
+  }),
   getCurrentUser,
   createComment,
 );
 
+const handler = router.handler(NextConnectOptions);
 export default handler;

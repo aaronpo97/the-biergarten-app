@@ -17,6 +17,9 @@ const sendLoginUserRequest = async (data: { username: string; password: string }
     throw new Error('API response validation failed');
   }
 
+  if (!parsed.data.success) {
+    throw new Error(parsed.data.message);
+  }
   const parsedPayload = BasicUserInfoSchema.safeParse(parsed.data.payload);
   if (!parsedPayload.success) {
     throw new Error('API response payload validation failed');

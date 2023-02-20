@@ -1,12 +1,13 @@
 import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
-import BeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
 import router from 'next/router';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
+import ErrorAlert from './ui/alerts/ErrorAlert';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -16,7 +17,7 @@ import FormSelect from './ui/forms/FormSelect';
 import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
-type BeerPostT = z.infer<typeof BeerPostValidationSchema>;
+type BeerPostT = z.infer<typeof CreateBeerPostValidationSchema>;
 
 interface BeerFormProps {
   formType: 'edit' | 'create';
@@ -37,7 +38,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm<BeerPostT>({
-    resolver: zodResolver(BeerPostValidationSchema),
+    resolver: zodResolver(CreateBeerPostValidationSchema),
     defaultValues: {
       name: defaultValues?.name,
       description: defaultValues?.description,
@@ -46,7 +47,12 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     },
   });
 
+  const [error, setError] = useState('');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit: SubmitHandler<BeerPostT> = async (data) => {
+    setIsSubmitting(true);
     switch (formType) {
       case 'create': {
         try {
@@ -54,8 +60,9 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           router.push(`/beers/${response.id}`);
           break;
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(e);
+          if (e instanceof Error) {
+            setError(e.message);
+          }
           break;
         }
       }
@@ -68,6 +75,9 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
 
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
+      <div className="my-5">
+        {error && <ErrorAlert error={error} setError={setError} />}
+      </div>
       <FormInfo>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormError>{errors.name?.message}</FormError>
@@ -79,6 +89,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           error={!!errors.name}
           type="text"
           id="name"
+          disabled={isSubmitting}
         />
       </FormSegment>
       {formType === 'create' && breweries.length && (
@@ -89,6 +100,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           </FormInfo>
           <FormSegment>
             <FormSelect
+              disabled={isSubmitting}
               formRegister={register('breweryId')}
               error={!!errors.breweryId}
               id="breweryId"
@@ -110,6 +122,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
             <FormError>{errors.abv?.message}</FormError>
           </FormInfo>
           <FormTextInput
+            disabled={isSubmitting}
             placeholder="12"
             formValidationSchema={register('abv', { valueAsNumber: true })}
             error={!!errors.abv}
@@ -123,6 +136,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
             <FormError>{errors.ibu?.message}</FormError>
           </FormInfo>
           <FormTextInput
+            disabled={isSubmitting}
             placeholder="52"
             formValidationSchema={register('ibu', { valueAsNumber: true })}
             error={!!errors.ibu}
@@ -138,6 +152,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
       </FormInfo>
       <FormSegment>
         <FormTextArea
+          disabled={isSubmitting}
           placeholder="Ratione cumque quas quia aut impedit ea culpa facere. Ut in sit et quas reiciendis itaque."
           error={!!errors.description}
           formValidationSchema={register('description')}
@@ -152,6 +167,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
       </FormInfo>
       <FormSegment>
         <FormSelect
+          disabled={isSubmitting}
           formRegister={register('typeId')}
           error={!!errors.typeId}
           id="typeId"
@@ -164,11 +180,19 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
         />
       </FormSegment>
 
-      <Button type="submit">{`${
-        formType === 'edit'
-          ? `Edit ${defaultValues?.name || 'beer post'}`
-          : 'Create beer post'
-      } `}</Button>
+      {!isSubmitting && (
+        <Button type="submit" isSubmitting={isSubmitting}>{`${
+          formType === 'edit'
+            ? `Edit ${defaultValues?.name || 'beer post'}`
+            : 'Create beer post'
+        }`}</Button>
+      )}
+
+      {isSubmitting && (
+        <Button type="submit" isSubmitting={isSubmitting}>
+          Submitting
+        </Button>
+      )}
     </form>
   );
 };

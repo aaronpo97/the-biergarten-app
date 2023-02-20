@@ -1,15 +1,19 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
-import { BreweryPost, BreweryImage } from '@prisma/client';
+import { BreweryPost, BreweryImage, User } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 interface CreateBreweryImagesArgs {
   numberOfImages: number;
-  breweryPosts: BreweryPost[];
+
+  joinData: {
+    breweryPosts: BreweryPost[];
+    users: User[];
+  };
 }
 const createNewBreweryImages = async ({
   numberOfImages,
-  breweryPosts,
+  joinData: { breweryPosts, users },
 }: CreateBreweryImagesArgs) => {
   const prisma = DBClient.instance;
   const createdAt = faker.date.past(1);
@@ -18,13 +22,16 @@ const createNewBreweryImages = async ({
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfImages; i++) {
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
 
     breweryImagesPromises.push(
       prisma.breweryImage.create({
         data: {
-          url: 'https://picsum.photos/900/1600',
+          path: 'https://picsum.photos/1040/1080',
           alt: 'Placeholder brewery image.',
+          caption: 'Placeholder brewery image caption.',
           breweryPost: { connect: { id: breweryPost.id } },
+          postedBy: { connect: { id: user.id } },
           createdAt,
         },
       }),
