@@ -26,7 +26,6 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
     z.infer<typeof BeerCommentValidationSchema>
   >({
     defaultValues: {
-      beerPostId: beerPost.id,
       rating: 0,
     },
     resolver: zodResolver(BeerCommentValidationSchema),
@@ -35,8 +34,8 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
   const [rating, setRating] = useState(0);
   useEffect(() => {
     setRating(0);
-    reset({ beerPostId: beerPost.id, rating: 0, content: '' });
-  }, [beerPost.id, reset]);
+    reset({ rating: 0, content: '' });
+  }, [reset]);
 
   const router = useRouter();
   const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
@@ -44,7 +43,11 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
   ) => {
     setValue('rating', 0);
     setRating(0);
-    await sendCreateBeerCommentRequest(data);
+    await sendCreateBeerCommentRequest({
+      content: data.content,
+      rating: data.rating,
+      beerPostId: beerPost.id,
+    });
     reset();
     router.replace(router.asPath, undefined, { scroll: false });
   };

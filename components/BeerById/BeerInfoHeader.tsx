@@ -68,7 +68,9 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
               <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
             </div>
             <div>
-              <span>Liked by {likeCount} users</span>
+              <span>
+                Liked by {likeCount} user{likeCount !== 1 && 's'}
+              </span>
             </div>
           </div>
           <div className="card-actions items-end">

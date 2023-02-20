@@ -1,8 +1,8 @@
 import UserContext from '@/contexts/userContext';
-import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
 import sendLikeRequest from '@/requests/sendLikeRequest';
 import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from 'react';
 import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
+import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
 
 const BeerPostLikeButton: FC<{
   beerPostId: string;

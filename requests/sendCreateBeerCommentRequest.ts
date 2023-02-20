@@ -3,11 +3,15 @@ import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBee
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 
+const BeerCommentValidationSchemaWithId = BeerCommentValidationSchema.extend({
+  beerPostId: z.string().uuid(),
+});
+
 const sendCreateBeerCommentRequest = async ({
   beerPostId,
   content,
   rating,
-}: z.infer<typeof BeerCommentValidationSchema>) => {
+}: z.infer<typeof BeerCommentValidationSchemaWithId>) => {
   const response = await fetch(`/api/beers/${beerPostId}/comments`, {
     method: 'POST',
     headers: {
@@ -29,7 +33,6 @@ const sendCreateBeerCommentRequest = async ({
   const parsedResponse = APIResponseValidationSchema.safeParse(data);
 
   if (!parsedResponse.success) {
-    console.log(parsedResponse.error);
     throw new Error('Invalid API response');
   }
 
@@ -37,7 +40,6 @@ const sendCreateBeerCommentRequest = async ({
   const parsedPayload = BeerCommentQueryResult.safeParse(parsedResponse.data.payload);
 
   if (!parsedPayload.success) {
-    console.log(parsedPayload.error);
     throw new Error('Invalid API response payload');
   }
 

@@ -7,21 +7,21 @@ const sendCreateBeerPostRequest = async (
 ) => {
   const response = await fetch('/api/beers/create', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-
   const json = await response.json();
-
   const parsed = APIResponseValidationSchema.safeParse(json);
 
   if (!parsed.success) {
     throw new Error('Invalid API response');
   }
 
-  const { payload } = parsed.data;
+  const { payload, success, message } = parsed.data;
+
+  if (!success) {
+    throw new Error(message);
+  }
 
   if (
     !(

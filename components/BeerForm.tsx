@@ -4,9 +4,10 @@ import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQuer
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
 import router from 'next/router';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
+import ErrorAlert from './ui/alerts/ErrorAlert';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -46,6 +47,8 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     },
   });
 
+  const [error, setError] = useState('');
+
   const onSubmit: SubmitHandler<BeerPostT> = async (data) => {
     switch (formType) {
       case 'create': {
@@ -54,8 +57,9 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           router.push(`/beers/${response.id}`);
           break;
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(e);
+          if (e instanceof Error) {
+            setError(e.message);
+          }
           break;
         }
       }
@@ -68,6 +72,9 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
 
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
+      <div className="my-5">
+        {error && <ErrorAlert error={error} setError={setError} />}
+      </div>
       <FormInfo>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormError>{errors.name?.message}</FormError>

@@ -13,13 +13,16 @@ import { NextApiResponse } from 'next';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
   body: z.infer<typeof BeerCommentValidationSchema>;
+  query: { id: string };
 }
 
 const createComment = async (
   req: CreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { content, rating, beerPostId } = req.body;
+  const { content, rating } = req.body;
+
+  const beerPostId = req.query.id;
 
   const newBeerComment: BeerCommentQueryResultT = await createNewBeerComment({
     content,
@@ -42,7 +45,10 @@ const router = createRouter<
 >();
 
 router.post(
-  validateRequest({ bodySchema: BeerCommentValidationSchema }),
+  validateRequest({
+    bodySchema: BeerCommentValidationSchema,
+    querySchema: z.object({ id: z.string().uuid() }),
+  }),
   getCurrentUser,
   createComment,
 );

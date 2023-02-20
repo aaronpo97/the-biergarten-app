@@ -10,7 +10,6 @@ const BeerCommentValidationSchema = z.object({
     .int()
     .min(1, { message: 'Rating must be greater than 1.' })
     .max(5, { message: 'Rating must be less than 5.' }),
-  beerPostId: z.string().uuid({ message: 'Beer post ID must be a valid UUID.' }),
 });
 
 export default BeerCommentValidationSchema;

@@ -12,6 +12,7 @@ const withPageAuthRequired =
       }
       return await fn(context);
     } catch (error) {
+      console.log(error);
       return {
         redirect: {
           destination: '/login',
