@@ -8,6 +8,7 @@ interface FormSelectProps {
   error: boolean;
   placeholder: string;
   message: string;
+  disabled?: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ const FormSelect: FunctionComponent<FormSelectProps> = ({
   formRegister,
   placeholder,
   message,
+  disabled = false,
 }) => (
   <select
     id={id}
@@ -47,6 +49,7 @@ const FormSelect: FunctionComponent<FormSelectProps> = ({
       error ? 'select-error' : ''
     }`}
     placeholder={placeholder}
+    disabled={disabled}
     {...formRegister}
   >
     <option value="">{message}</option>

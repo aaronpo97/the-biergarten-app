@@ -49,7 +49,10 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
 
   const [error, setError] = useState('');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit: SubmitHandler<BeerPostT> = async (data) => {
+    setIsSubmitting(true);
     switch (formType) {
       case 'create': {
         try {
@@ -86,6 +89,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           error={!!errors.name}
           type="text"
           id="name"
+          disabled={isSubmitting}
         />
       </FormSegment>
       {formType === 'create' && breweries.length && (
@@ -96,6 +100,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           </FormInfo>
           <FormSegment>
             <FormSelect
+              disabled={isSubmitting}
               formRegister={register('breweryId')}
               error={!!errors.breweryId}
               id="breweryId"
@@ -117,6 +122,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
             <FormError>{errors.abv?.message}</FormError>
           </FormInfo>
           <FormTextInput
+            disabled={isSubmitting}
             placeholder="12"
             formValidationSchema={register('abv', { valueAsNumber: true })}
             error={!!errors.abv}
@@ -130,6 +136,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
             <FormError>{errors.ibu?.message}</FormError>
           </FormInfo>
           <FormTextInput
+            disabled={isSubmitting}
             placeholder="52"
             formValidationSchema={register('ibu', { valueAsNumber: true })}
             error={!!errors.ibu}
@@ -145,6 +152,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
       </FormInfo>
       <FormSegment>
         <FormTextArea
+          disabled={isSubmitting}
           placeholder="Ratione cumque quas quia aut impedit ea culpa facere. Ut in sit et quas reiciendis itaque."
           error={!!errors.description}
           formValidationSchema={register('description')}
@@ -159,6 +167,7 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
       </FormInfo>
       <FormSegment>
         <FormSelect
+          disabled={isSubmitting}
           formRegister={register('typeId')}
           error={!!errors.typeId}
           id="typeId"
@@ -171,11 +180,19 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
         />
       </FormSegment>
 
-      <Button type="submit">{`${
-        formType === 'edit'
-          ? `Edit ${defaultValues?.name || 'beer post'}`
-          : 'Create beer post'
-      } `}</Button>
+      {!isSubmitting && (
+        <Button type="submit" isSubmitting={isSubmitting}>{`${
+          formType === 'edit'
+            ? `Edit ${defaultValues?.name || 'beer post'}`
+            : 'Create beer post'
+        }`}</Button>
+      )}
+
+      {isSubmitting && (
+        <Button type="submit" isSubmitting={isSubmitting}>
+          Submitting
+        </Button>
+      )}
     </form>
   );
 };

@@ -27,7 +27,7 @@ const sendCreateBeerPostRequest = async (
   const parsedPayload = beerPostQueryResultSchema.safeParse(payload);
 
   if (!parsedPayload.success) {
-    throw new Error('Invalid API response');
+    throw new Error('Invalid API response payload');
   }
 
   return parsedPayload.data;

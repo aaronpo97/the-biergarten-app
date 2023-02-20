@@ -26,7 +26,7 @@ export const beerPostQueryResultSchema = z.object({
     id: z.string(),
     username: z.string(),
   }),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
 });
 
 export const beerPostQueryResultArraySchema = z.array(beerPostQueryResultSchema);
