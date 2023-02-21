@@ -74,7 +74,7 @@ const LoginForm = () => {
 
       {responseError && <ErrorAlert error={responseError} setError={setResponseError} />}
       <div className="w-full">
-        <button type="submit" className="btn-primary btn w-full">
+        <button type="submit" className="btn btn-primary w-full">
           Login
         </button>
       </div>
