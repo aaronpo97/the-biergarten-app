@@ -10,6 +10,7 @@ module.exports = {
     extend: {},
   },
   plugins: [require('daisyui')],
+
   daisyui: {
     logs: false,
     themes: [
@@ -25,9 +26,9 @@ module.exports = {
           error: '#CF1259',
           'primary-content': '#FAF9F6',
           'error-content': '#FAF9F6',
-          'base-100': 'hsl(190, 4%, 15%)',
-          'base-200': 'hsl(190, 4%, 12%)',
-          'base-300': 'hsl(190, 4%, 10%)',
+          'base-100': 'hsl(190, 4%, 11%)',
+          'base-200': 'hsl(190, 4%, 9%)',
+          'base-300': 'hsl(190, 4%, 8%)',
         },
       },
     ],

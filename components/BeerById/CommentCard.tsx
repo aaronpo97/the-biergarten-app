@@ -1,5 +1,6 @@
 import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { formatDistanceStrict } from 'date-fns';
+import { format, formatDistanceStrict } from 'date-fns';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Rating } from 'react-daisyui';
 
@@ -13,23 +14,38 @@ const CommentCard: React.FC<{
   }, [comment.createdAt]);
 
   return (
-    <div className="card-body h-64">
-      <div className="flex justify-between">
+    <div className="card-body sm:h-64">
+      <div className="flex flex-col justify-between sm:flex-row">
         <div>
-          <h3 className="text-2xl font-semibold">{comment.postedBy.username}</h3>
-          <h4 className="italic">posted {timeDistance} ago</h4>
+          <h3 className="font-semibold sm:text-2xl">
+            <Link href={`/users/${comment.postedBy.id}`} className="link-hover link">
+              {comment.postedBy.username}
+            </Link>
+          </h3>
+          <h4 className="italic">
+            posted{' '}
+            <time
+              className="tooltip tooltip-bottom"
+              data-tip={format(new Date(comment.createdAt), 'MM/dd/yyyy')}
+            >
+              {timeDistance}
+            </time>{' '}
+            ago
+          </h4>
         </div>
-        <Rating value={comment.rating}>
-          {Array.from({ length: 5 }).map((val, index) => (
-            <Rating.Item
-              name="rating-1"
-              className="mask mask-star cursor-default"
-              disabled
-              aria-disabled
-              key={index}
-            />
-          ))}
-        </Rating>
+        <div>
+          <Rating value={comment.rating}>
+            {Array.from({ length: 5 }).map((val, index) => (
+              <Rating.Item
+                name="rating-1"
+                className="mask mask-star cursor-default"
+                disabled
+                aria-disabled
+                key={index}
+              />
+            ))}
+          </Rating>
+        </div>
       </div>
       <p>{comment.content}</p>
     </div>
