@@ -106,7 +106,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
                         Next Comments
                       </Link>
                       <Link
-                        className={`btn btn-outline ${
+                        className={`btn-outline btn ${
                           commentsPageNum === commentsPageCount
                             ? 'btn-disabled pointer-events-none'
                             : 'pointer-events-auto'

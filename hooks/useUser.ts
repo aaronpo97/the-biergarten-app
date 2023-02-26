@@ -12,7 +12,6 @@ const useUser = () => {
     const response = await fetch(url);
 
     if (!response.ok) {
-      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       throw new Error(response.statusText);
     }
 

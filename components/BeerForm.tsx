@@ -161,24 +161,28 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
         />
       </FormSegment>
 
-      <FormInfo>
-        <FormLabel htmlFor="typeId">Type</FormLabel>
-        <FormError>{errors.typeId?.message}</FormError>
-      </FormInfo>
-      <FormSegment>
-        <FormSelect
-          disabled={isSubmitting}
-          formRegister={register('typeId')}
-          error={!!errors.typeId}
-          id="typeId"
-          options={types.map((beerType) => ({
-            value: beerType.id,
-            text: beerType.name,
-          }))}
-          placeholder="Beer type"
-          message="Pick a beer type"
-        />
-      </FormSegment>
+      {formType === 'create' && types.length && (
+        <>
+          <FormInfo>
+            <FormLabel htmlFor="typeId">Type</FormLabel>
+            <FormError>{errors.typeId?.message}</FormError>
+          </FormInfo>
+          <FormSegment>
+            <FormSelect
+              disabled={isSubmitting}
+              formRegister={register('typeId')}
+              error={!!errors.typeId}
+              id="typeId"
+              options={types.map((beerType) => ({
+                value: beerType.id,
+                text: beerType.name,
+              }))}
+              placeholder="Beer type"
+              message="Pick a beer type"
+            />
+          </FormSegment>
+        </>
+      )}
 
       {!isSubmitting && (
         <Button type="submit" isSubmitting={isSubmitting}>{`${

@@ -5,6 +5,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 import UserContext from '@/contexts/userContext';
+import { FaRegEdit } from 'react-icons/fa';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
 const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: number }> = ({
@@ -16,6 +17,18 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
   const { user } = useContext(UserContext);
 
   const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const [isPostOwner, setIsPostOwner] = useState(false);
+
+  useEffect(() => {
+    const idMatches = user && beerPost.postedBy.id === user.id;
+
+    if (!(user && idMatches)) {
+      setIsPostOwner(false);
+      return;
+    }
+
+    setIsPostOwner(true);
+  }, [user, beerPost]);
 
   useEffect(() => {
     setLikeCount(initialLikeCount);
@@ -28,16 +41,31 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
   return (
     <div className="card flex flex-col justify-center bg-base-300">
       <div className="card-body">
-        <h1 className="text-4xl font-bold">{beerPost.name}</h1>
-        <h2 className="text-2xl font-semibold">
-          by{' '}
-          <Link
-            href={`/breweries/${beerPost.brewery.id}`}
-            className="link-hover link text-2xl font-semibold"
-          >
-            {beerPost.brewery.name}
-          </Link>
-        </h2>
+        <div className="flex justify-between">
+          <div>
+            <h1 className="text-4xl font-bold">{beerPost.name}</h1>
+            <h2 className="text-2xl font-semibold">
+              by{' '}
+              <Link
+                href={`/breweries/${beerPost.brewery.id}`}
+                className="link-hover link text-2xl font-semibold"
+              >
+                {beerPost.brewery.name}
+              </Link>
+            </h2>
+          </div>
+          <div>
+            {isPostOwner && (
+              <Link
+                className="btn-outline btn-sm btn gap-2 rounded-2xl"
+                href={`/beers/${beerPost.id}/edit`}
+              >
+                <FaRegEdit className="text-xl" />
+                Edit
+              </Link>
+            )}
+          </div>
+        </div>
 
         <h3 className="italic">
           posted by{' '}
@@ -53,7 +81,7 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
         </h3>
 
         <p>{beerPost.description}</p>
-        <div className="mt-5 flex justify-between">
+        <div className="flex justify-between">
           <div className="space-y-1">
             <div>
               <Link
