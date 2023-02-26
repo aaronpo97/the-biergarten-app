@@ -32,7 +32,7 @@ const createNewBeerPosts = async ({
           abv: Math.floor(Math.random() * (12 - 4) + 4),
           ibu: Math.floor(Math.random() * (60 - 10) + 10),
           name: faker.commerce.productName(),
-          description: faker.lorem.lines(24),
+          description: faker.lorem.lines(42).replace(/(\r\n|\n|\r)/gm, ' '),
           brewery: { connect: { id: breweryPost.id } },
           postedBy: { connect: { id: user.id } },
           type: { connect: { id: beerType.id } },

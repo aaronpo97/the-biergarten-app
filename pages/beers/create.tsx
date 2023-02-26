@@ -31,7 +31,7 @@ const Create: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
   );
 };
 
-export const getServerSideProps = withPageAuthRequired(async () => {
+export const getServerSideProps = withPageAuthRequired<CreateBeerPageProps>(async () => {
   const breweryPosts = await getAllBreweryPosts();
   const beerTypes = await DBClient.instance.beerType.findMany();
 

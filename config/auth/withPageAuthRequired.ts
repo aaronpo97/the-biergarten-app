@@ -1,24 +1,32 @@
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext, GetServerSidePropsResult, PreviewData } from 'next';
+import { ParsedUrlQuery } from 'querystring';
 import { getLoginSession } from './session';
 
+export type ExtendedGetServerSideProps<
+  P extends { [key: string]: any } = { [key: string]: any },
+  Q extends ParsedUrlQuery = ParsedUrlQuery,
+  D extends PreviewData = PreviewData,
+> = (
+  context: GetServerSidePropsContext<Q, D>,
+  session: Awaited<ReturnType<typeof getLoginSession>>,
+) => Promise<GetServerSidePropsResult<P>>;
+
 const withPageAuthRequired =
-  (fn?: GetServerSideProps) => async (context: GetServerSidePropsContext) => {
+  <P extends { [key: string]: any } = { [key: string]: any }>(
+    fn?: ExtendedGetServerSideProps<P>,
+  ) =>
+  async (context: GetServerSidePropsContext) => {
     try {
       const { req } = context;
-      await getLoginSession(req);
+      const session = await getLoginSession(req);
 
       if (!fn) {
         return { props: {} };
       }
-      return await fn(context);
+
+      return await fn(context, session);
     } catch (error) {
-      console.log(error);
-      return {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-      };
+      return { redirect: { destination: '/login', permanent: false } };
     }
   };
 
