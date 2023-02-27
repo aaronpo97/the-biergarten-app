@@ -1,6 +1,6 @@
 import Layout from '@/components/ui/Layout';
 import Spinner from '@/components/ui/Spinner';
-import withPageAuthRequired from '@/config/auth/withPageAuthRequired';
+import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import UserContext from '@/contexts/userContext';
 
 import { GetServerSideProps, NextPage } from 'next';

@@ -1,27 +1,14 @@
 import { NextPage } from 'next';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Layout from '@/components/ui/Layout';
-import useUser from '@/hooks/useUser';
 import LoginForm from '@/components/Login/LoginForm';
 import Image from 'next/image';
 
 import { FaUserCircle } from 'react-icons/fa';
 import Head from 'next/head';
 import Link from 'next/link';
+import redirectIfLoggedIn from '@/getServerSideProps/redirectIfLoggedIn';
 
 const LoginPage: NextPage = () => {
-  const { user } = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    router.push(`/user/current`);
-  }, [user, router]);
-
   return (
     <Layout>
       <Head>
@@ -65,3 +52,8 @@ const LoginPage: NextPage = () => {
 };
 
 export default LoginPage;
+
+export const getServerSideProps = redirectIfLoggedIn({
+  destination: '/',
+  permanent: false,
+});

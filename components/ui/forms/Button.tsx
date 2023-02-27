@@ -14,7 +14,7 @@ const Button: FunctionComponent<FormButtonProps> = ({
   // eslint-disable-next-line react/button-has-type
   <button
     type={type}
-    className={`btn btn-primary mt-4 w-full rounded-xl ${isSubmitting ? 'loading' : ''}`}
+    className={`btn-primary btn w-full rounded-xl ${isSubmitting ? 'loading' : ''}`}
   >
     {children}
   </button>
