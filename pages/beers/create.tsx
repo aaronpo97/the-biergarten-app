@@ -1,13 +1,12 @@
-import BeerForm from '@/components/BeerForm';
+import CreateBeerPostForm from '@/components/CreateBeerPostForm';
+import FormPageLayout from '@/components/ui/forms/BeerPostFormPageLayout';
 import Layout from '@/components/ui/Layout';
-import withPageAuthRequired from '@/config/auth/withPageAuthRequired';
-
+import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import DBClient from '@/prisma/DBClient';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { BeerType } from '@prisma/client';
 import { NextPage } from 'next';
-
 import { BiBeer } from 'react-icons/bi';
 
 interface CreateBeerPageProps {
@@ -18,15 +17,9 @@ interface CreateBeerPageProps {
 const Create: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
   return (
     <Layout>
-      <div className="align-center my-20 flex h-fit flex-col items-center justify-center">
-        <div className="w-8/12">
-          <div className="flex flex-col items-center space-y-1">
-            <BiBeer className="text-5xl" />
-            <h1 className="text-3xl font-bold">Create a New Beer</h1>
-          </div>
-          <BeerForm formType="create" breweries={breweries} types={types} />
-        </div>
-      </div>
+      <FormPageLayout headingText="Create a new beer" headingIcon={BiBeer}>
+        <CreateBeerPostForm breweries={breweries} types={types} />
+      </FormPageLayout>
     </Layout>
   );
 };

@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult, PreviewData } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import { getLoginSession } from './session';
+import { getLoginSession } from '../config/auth/session';
 
 export type ExtendedGetServerSideProps<
   P extends { [key: string]: any } = { [key: string]: any },

@@ -1,3 +1,4 @@
+import Layout from '@/components/ui/Layout';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
 import { GetServerSideProps, NextPage } from 'next';
@@ -8,9 +9,9 @@ interface BreweryPageProps {
 
 const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
   return (
-    <>
+    <Layout>
       <h1 className="text-3xl font-bold underline">{breweryPost.name}</h1>
-    </>
+    </Layout>
   );
 };
 

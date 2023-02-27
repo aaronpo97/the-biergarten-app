@@ -17,19 +17,14 @@ import FormSelect from './ui/forms/FormSelect';
 import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
-type BeerPostT = z.infer<typeof CreateBeerPostValidationSchema>;
+type CreateBeerPostSchema = z.infer<typeof CreateBeerPostValidationSchema>;
 
 interface BeerFormProps {
-  formType: 'edit' | 'create';
-  // eslint-disable-next-line react/require-default-props
-  defaultValues?: BeerPostT;
-  breweries?: BreweryPostQueryResult[];
-  types?: BeerType[];
+  breweries: BreweryPostQueryResult[];
+  types: BeerType[];
 }
 
-const BeerForm: FunctionComponent<BeerFormProps> = ({
-  formType,
-  defaultValues,
+const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
   breweries = [],
   types = [],
 }) => {
@@ -37,47 +32,30 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<BeerPostT>({
+  } = useForm<CreateBeerPostSchema>({
     resolver: zodResolver(CreateBeerPostValidationSchema),
-    defaultValues: {
-      name: defaultValues?.name,
-      description: defaultValues?.description,
-      abv: defaultValues?.abv,
-      ibu: defaultValues?.ibu,
-    },
   });
 
   const [error, setError] = useState('');
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit: SubmitHandler<BeerPostT> = async (data) => {
-    setIsSubmitting(true);
-    switch (formType) {
-      case 'create': {
-        try {
-          const response = await sendCreateBeerPostRequest(data);
-          router.push(`/beers/${response.id}`);
-          break;
-        } catch (e) {
-          if (e instanceof Error) {
-            setError(e.message);
-          }
-          break;
-        }
+  const onSubmit: SubmitHandler<CreateBeerPostSchema> = async (data) => {
+    try {
+      setIsSubmitting(true);
+      const response = await sendCreateBeerPostRequest(data);
+      router.push(`/beers/${response.id}`);
+    } catch (e) {
+      if (!(e instanceof Error)) {
+        setError('Something went wrong');
+        return;
       }
-      case 'edit':
-        break;
-      default:
-        break;
+      setError(e.message);
     }
   };
 
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5">
-        {error && <ErrorAlert error={error} setError={setError} />}
-      </div>
+      <div>{error && <ErrorAlert error={error} setError={setError} />}</div>
       <FormInfo>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormError>{errors.name?.message}</FormError>
@@ -92,8 +70,9 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
           disabled={isSubmitting}
         />
       </FormSegment>
-      {formType === 'create' && breweries.length && (
-        <>
+
+      <div className="flex flex-wrap">
+        <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pr-3">
           <FormInfo>
             <FormLabel htmlFor="breweryId">Brewery</FormLabel>
             <FormError>{errors.breweryId?.message}</FormError>
@@ -112,10 +91,30 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
               message="Pick a brewery"
             />
           </FormSegment>
-        </>
-      )}
+        </div>
+        <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pl-3">
+          <FormInfo>
+            <FormLabel htmlFor="typeId">Type</FormLabel>
+            <FormError>{errors.typeId?.message}</FormError>
+          </FormInfo>
+          <FormSegment>
+            <FormSelect
+              disabled={isSubmitting}
+              formRegister={register('typeId')}
+              error={!!errors.typeId}
+              id="typeId"
+              options={types.map((beerType) => ({
+                value: beerType.id,
+                text: beerType.name,
+              }))}
+              placeholder="Beer type"
+              message="Pick a beer type"
+            />
+          </FormSegment>
+        </div>
+      </div>
 
-      <div className="flex flex-wrap sm:text-xs md:mb-3">
+      <div className="flex flex-wrap md:mb-3">
         <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pr-3">
           <FormInfo>
             <FormLabel htmlFor="abv">ABV</FormLabel>
@@ -161,44 +160,13 @@ const BeerForm: FunctionComponent<BeerFormProps> = ({
         />
       </FormSegment>
 
-      {formType === 'create' && types.length && (
-        <>
-          <FormInfo>
-            <FormLabel htmlFor="typeId">Type</FormLabel>
-            <FormError>{errors.typeId?.message}</FormError>
-          </FormInfo>
-          <FormSegment>
-            <FormSelect
-              disabled={isSubmitting}
-              formRegister={register('typeId')}
-              error={!!errors.typeId}
-              id="typeId"
-              options={types.map((beerType) => ({
-                value: beerType.id,
-                text: beerType.name,
-              }))}
-              placeholder="Beer type"
-              message="Pick a beer type"
-            />
-          </FormSegment>
-        </>
-      )}
-
-      {!isSubmitting && (
-        <Button type="submit" isSubmitting={isSubmitting}>{`${
-          formType === 'edit'
-            ? `Edit ${defaultValues?.name || 'beer post'}`
-            : 'Create beer post'
-        }`}</Button>
-      )}
-
-      {isSubmitting && (
+      <div className="mt-6">
         <Button type="submit" isSubmitting={isSubmitting}>
-          Submitting
+          {isSubmitting ? 'Submitting...' : 'Submit'}
         </Button>
-      )}
+      </div>
     </form>
   );
 };
 
-export default BeerForm;
+export default CreateBeerPostForm;

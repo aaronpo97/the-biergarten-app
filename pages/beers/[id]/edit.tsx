@@ -1,23 +1,40 @@
+import { NextPage } from 'next';
 import Head from 'next/head';
 import React from 'react';
 
 import Layout from '@/components/ui/Layout';
-import { NextPage } from 'next';
-import withPageAuthRequired from '@/config/auth/withPageAuthRequired';
+import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import EditBeerPostForm from '@/components/EditBeerPostForm';
+import FormPageLayout from '@/components/ui/forms/BeerPostFormPageLayout';
+import { BiBeer } from 'react-icons/bi';
 
 interface EditPageProps {
   beerPost: BeerPostQueryResult;
 }
 
 const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
+  const pageTitle = `Edit "${beerPost.name}"`;
+
   return (
     <Layout>
       <Head>
-        <title>Edit {beerPost.name}</title>
-        <meta name="description" content={`Edit ${beerPost.name}`} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageTitle} />
       </Head>
+
+      <FormPageLayout headingText={pageTitle} headingIcon={BiBeer}>
+        <EditBeerPostForm
+          previousValues={{
+            name: beerPost.name,
+            abv: beerPost.abv,
+            ibu: beerPost.ibu,
+            description: beerPost.description,
+            id: beerPost.id,
+          }}
+        />
+      </FormPageLayout>
     </Layout>
   );
 };
@@ -36,16 +53,8 @@ export const getServerSideProps = withPageAuthRequired<EditPageProps>(
 
     const isBeerPostOwner = beerPost.postedBy.id === userId;
 
-    if (!isBeerPostOwner) {
-      return {
-        redirect: { destination: `/beers/${beerPostId}`, permanent: false },
-      };
-    }
-
-    return {
-      props: {
-        beerPost: JSON.parse(JSON.stringify(beerPost)),
-      },
-    };
+    return isBeerPostOwner
+      ? { props: { beerPost: JSON.parse(JSON.stringify(beerPost)) } }
+      : { redirect: { destination: `/beers/${beerPostId}`, permanent: false } };
   },
 );
