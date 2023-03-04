@@ -7,7 +7,7 @@ import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import EditBeerPostForm from '@/components/EditBeerPostForm';
-import FormPageLayout from '@/components/ui/forms/BeerPostFormPageLayout';
+import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import { BiBeer } from 'react-icons/bi';
 
 interface EditPageProps {
@@ -24,7 +24,12 @@ const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
         <meta name="description" content={pageTitle} />
       </Head>
 
-      <FormPageLayout headingText={pageTitle} headingIcon={BiBeer}>
+      <FormPageLayout
+        headingText={pageTitle}
+        headingIcon={BiBeer}
+        backLink={`/beers/${beerPost.id}`}
+        backLinkText={`Back to "${beerPost.name}"`}
+      >
         <EditBeerPostForm
           previousValues={{
             name: beerPost.name,

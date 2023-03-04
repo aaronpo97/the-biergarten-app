@@ -42,6 +42,7 @@ export async function getLoginSession(req: SessionRequest) {
   if (!parsed.success) {
     throw new ServerError('Session is invalid.', 401);
   }
+
   const { createdAt, maxAge } = parsed.data;
 
   const expiresAt = createdAt + maxAge * 1000;

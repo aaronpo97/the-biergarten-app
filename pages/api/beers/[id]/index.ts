@@ -32,9 +32,7 @@ const editBeerPost = async (
     throw new ServerError('You cannot edit that beer post.', 403);
   }
 
-  const updated = await editBeerPostById(id, body);
-
-  console.log(updated);
+  await editBeerPostById(id, body);
 
   res.status(200).json({
     message: 'Beer post updated successfully',

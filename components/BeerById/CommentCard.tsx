@@ -1,20 +1,69 @@
+import UserContext from '@/contexts/userContext';
 import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import { format, formatDistanceStrict } from 'date-fns';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 import { Rating } from 'react-daisyui';
+
+import { FaEllipsisH } from 'react-icons/fa';
+
+const CommentCardDropdown: React.FC<{
+  comment: BeerCommentQueryResultT;
+  beerPostId: string;
+}> = ({ comment, beerPostId }) => {
+  const router = useRouter();
+  const { user } = useContext(UserContext);
+
+  const isCommentOwner = user?.id === comment.postedBy.id;
+
+  const handleDelete = async () => {
+    const response = await fetch(`/api/beer-comments/${comment.id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete comment');
+    }
+
+    router.replace(`/beers/${beerPostId}?comments_page=1`, undefined, { scroll: false });
+  };
+
+  return (
+    <div className="dropdown">
+      <label tabIndex={0} className="btn btn-ghost btn-sm m-1">
+        <FaEllipsisH />
+      </label>
+      <ul
+        tabIndex={0}
+        className="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
+      >
+        {isCommentOwner ? (
+          <li>
+            <button onClick={handleDelete}>Delete</button>
+          </li>
+        ) : (
+          <li>
+            <button>Report</button>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+};
 
 const CommentCard: React.FC<{
   comment: BeerCommentQueryResultT;
-}> = ({ comment }) => {
+  beerPostId: string;
+}> = ({ comment, beerPostId }) => {
   const [timeDistance, setTimeDistance] = useState('');
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     setTimeDistance(formatDistanceStrict(new Date(comment.createdAt), new Date()));
   }, [comment.createdAt]);
 
   return (
-    <div className="card-body sm:h-64">
+    <div className="card-body">
       <div className="flex flex-col justify-between sm:flex-row">
         <div>
           <h3 className="font-semibold sm:text-2xl">
@@ -33,21 +82,24 @@ const CommentCard: React.FC<{
             ago
           </h4>
         </div>
-        <div>
-          <Rating value={comment.rating}>
-            {Array.from({ length: 5 }).map((val, index) => (
-              <Rating.Item
-                name="rating-1"
-                className="mask mask-star cursor-default"
-                disabled
-                aria-disabled
-                key={index}
-              />
-            ))}
-          </Rating>
-        </div>
+
+        {user && <CommentCardDropdown comment={comment} beerPostId={beerPostId} />}
       </div>
-      <p>{comment.content}</p>
+
+      <div className="space-y-1">
+        <Rating value={comment.rating}>
+          {Array.from({ length: 5 }).map((val, index) => (
+            <Rating.Item
+              name="rating-1"
+              className="mask mask-star cursor-default"
+              disabled
+              aria-disabled
+              key={index}
+            />
+          ))}
+        </Rating>
+        <p>{comment.content}</p>
+      </div>
     </div>
   );
 };

@@ -1,22 +1,22 @@
-import BeerCommentForm from '@/components/BeerById/BeerCommentForm';
-import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
-import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
-import CommentCard from '@/components/BeerById/CommentCard';
-import Layout from '@/components/ui/Layout';
-import UserContext from '@/contexts/userContext';
-import DBClient from '@/prisma/DBClient';
-import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
-import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
-import { BeerPost } from '@prisma/client';
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState, useEffect, useContext } from 'react';
+
+import { useState, useEffect } from 'react';
+
+import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
+import BeerPostCommentsSection from '@/components/BeerById/BeerPostCommentsSection';
+import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
+import Layout from '@/components/ui/Layout';
+
+import DBClient from '@/prisma/DBClient';
+import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
+import getBeerPostById from '@/services/BeerPost/getBeerPostById';
+import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
+
+import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { BeerPost } from '@prisma/client';
 
 interface BeerPageProps {
   beerPost: BeerPostQueryResult;
@@ -36,14 +36,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
   commentsPageCount,
   likeCount,
 }) => {
-  const { user } = useContext(UserContext);
   const [comments, setComments] = useState(beerComments);
-
-  const router = useRouter();
-
-  const commentsPageNum = router.query.comments_page
-    ? parseInt(router.query.comments_page as string, 10)
-    : 1;
 
   useEffect(() => {
     setComments(beerComments);
@@ -67,63 +60,16 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
         )}
 
         <div className="my-12 flex w-full items-center justify-center ">
-          <div className="w-11/12 space-y-3 lg:w-9/12">
+          <div className="w-11/12 space-y-3 xl:w-9/12">
             <BeerInfoHeader beerPost={beerPost} initialLikeCount={likeCount} />
-            <div className="mt-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-              <div className="w-full space-y-3 sm:w-[60%]">
-                <div className="card h-96 bg-base-300">
-                  <div className="card-body h-full">
-                    {user ? (
-                      <BeerCommentForm beerPost={beerPost} setComments={setComments} />
-                    ) : (
-                      <div className="flex h-full flex-col items-center justify-center">
-                        <span className="text-lg font-bold">
-                          Log in to leave a comment.
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="card bg-base-300 pb-6">
-                  {comments.map((comment) => (
-                    <CommentCard key={comment.id} comment={comment} />
-                  ))}
-
-                  <div className="flex items-center justify-center">
-                    <div className="btn-group grid w-6/12 grid-cols-2">
-                      <Link
-                        className={`btn-outline btn ${
-                          commentsPageNum === 1
-                            ? 'btn-disabled pointer-events-none'
-                            : 'pointer-events-auto'
-                        }`}
-                        href={{
-                          pathname: `/beers/${beerPost.id}`,
-                          query: { comments_page: commentsPageNum - 1 },
-                        }}
-                        scroll={false}
-                      >
-                        Next Comments
-                      </Link>
-                      <Link
-                        className={`btn-outline btn ${
-                          commentsPageNum === commentsPageCount
-                            ? 'btn-disabled pointer-events-none'
-                            : 'pointer-events-auto'
-                        }`}
-                        href={{
-                          pathname: `/beers/${beerPost.id}`,
-                          query: { comments_page: commentsPageNum + 1 },
-                        }}
-                        scroll={false}
-                      >
-                        Previous Comments
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="sm:w-[40%]">
+            <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
+              <BeerPostCommentsSection
+                beerPost={beerPost}
+                comments={comments}
+                setComments={setComments}
+                commentsPageCount={commentsPageCount}
+              />
+              <div className="md:w-[40%]">
                 <BeerRecommendations beerRecommendations={beerRecommendations} />
               </div>
             </div>
