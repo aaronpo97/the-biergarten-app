@@ -49,7 +49,7 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
       beerPostId: beerPost.id,
     });
     reset();
-    router.replace(router.asPath, undefined, { scroll: false });
+    router.replace(`/beers/${beerPost.id}?comments_page=1`, undefined, { scroll: false });
   };
 
   const { errors } = formState;

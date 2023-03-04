@@ -1,5 +1,5 @@
 import CreateBeerPostForm from '@/components/CreateBeerPostForm';
-import FormPageLayout from '@/components/ui/forms/BeerPostFormPageLayout';
+import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import Layout from '@/components/ui/Layout';
 import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import DBClient from '@/prisma/DBClient';
@@ -17,7 +17,12 @@ interface CreateBeerPageProps {
 const Create: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
   return (
     <Layout>
-      <FormPageLayout headingText="Create a new beer" headingIcon={BiBeer}>
+      <FormPageLayout
+        headingText="Create a new beer"
+        headingIcon={BiBeer}
+        backLink="/beers"
+        backLinkText="Back to beers"
+      >
         <CreateBeerPostForm breweries={breweries} types={types} />
       </FormPageLayout>
     </Layout>

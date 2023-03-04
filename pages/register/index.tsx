@@ -1,5 +1,5 @@
 import RegisterUserForm from '@/components/RegisterUserForm';
-import FormPageLayout from '@/components/ui/forms/BeerPostFormPageLayout';
+import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import Layout from '@/components/ui/Layout';
 import redirectIfLoggedIn from '@/getServerSideProps/redirectIfLoggedIn';
 import { NextPage } from 'next';
@@ -13,7 +13,12 @@ const RegisterUserPage: NextPage = () => {
         <title>Register User</title>
         <meta name="description" content="Register a new user" />
       </Head>
-      <FormPageLayout headingText="Register User" headingIcon={BiUser}>
+      <FormPageLayout
+        headingText="Register User"
+        headingIcon={BiUser}
+        backLink="/"
+        backLinkText="Back to home"
+      >
         <RegisterUserForm />
       </FormPageLayout>
     </Layout>

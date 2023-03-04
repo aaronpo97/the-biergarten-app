@@ -56,13 +56,14 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
           </div>
           <div>
             {isPostOwner && (
-              <Link
-                className="btn-outline btn-sm btn gap-2 rounded-2xl"
-                href={`/beers/${beerPost.id}/edit`}
-              >
-                <FaRegEdit className="text-xl" />
-                Edit
-              </Link>
+              <div className="tooltip tooltip-left" data-tip={`Edit '${beerPost.name}'`}>
+                <Link
+                  href={`/beers/${beerPost.id}/edit`}
+                  className="btn btn-outline btn-sm"
+                >
+                  <FaRegEdit className="text-xl" />
+                </Link>
+              </div>
             )}
           </div>
         </div>

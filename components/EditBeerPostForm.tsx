@@ -1,7 +1,7 @@
 import sendEditBeerPostRequest from '@/requests/sendEditBeerPostRequest';
 import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
+
 import { useRouter } from 'next/router';
 import { FC, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -52,7 +52,7 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
 
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5">
+      <div className="mb-5">
         {error && <ErrorAlert error={error} setError={setError} />}
       </div>
       <FormInfo>
@@ -116,23 +116,10 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
         />
       </FormSegment>
 
-      <div className="mt-6 flex w-full space-x-6">
-        <div className="w-3/6">
-          <Link
-            className={`btn-primary btn w-full rounded-xl ${
-              isSubmitting ? 'loading' : ''
-            }`}
-            href={`/beers/${previousValues.id}`}
-          >
-            Discard Changes
-          </Link>
-        </div>
-
-        <div className="w-3/6">
-          <Button type="submit" isSubmitting={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit'}
-          </Button>
-        </div>
+      <div className="mt-2">
+        <Button type="submit" isSubmitting={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit'}
+        </Button>
       </div>
     </form>
   );
