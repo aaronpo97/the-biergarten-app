@@ -15,7 +15,7 @@ const getCurrentUser = async (
   const user = await findUserById(session?.id);
 
   if (!user) {
-    throw new ServerError('Could not get user.', 401);
+    throw new ServerError('User is not logged in.', 401);
   }
 
   req.user = user;

@@ -11,8 +11,16 @@ import findUserByEmail from '@/services/User/findUserByEmail';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
+import sendConfirmationEmail from '@/services/User/sendConfirmationEmail';
+
 interface RegisterUserRequest extends NextApiRequest {
   body: z.infer<typeof CreateUserValidationSchema>;
+}
+
+const { BASE_URL } = process.env;
+
+if (!BASE_URL) {
+  throw new ServerError('BASE_URL env variable is not set.', 500);
 }
 
 const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
@@ -41,11 +49,14 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
     id: user.id,
     username: user.username,
   });
-  res.status(201).json({
-    message: 'User created successfully.',
-    payload: user,
-    statusCode: 201,
+
+  await sendConfirmationEmail(user);
+
+  res.status(200).json({
     success: true,
+    statusCode: 200,
+    message: 'User registered successfully.',
+    payload: user,
   });
 };
 

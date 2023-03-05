@@ -9,24 +9,24 @@ import { z } from 'zod';
 import { MAX_AGE, setTokenCookie, getTokenCookie } from './cookie';
 import ServerError from '../util/ServerError';
 
-const { TOKEN_SECRET } = process.env;
+const { SESSION_SECRET } = process.env;
 
 export async function setLoginSession(
   res: NextApiResponse,
   session: z.infer<typeof BasicUserInfoSchema>,
 ) {
-  if (!TOKEN_SECRET) {
+  if (!SESSION_SECRET) {
     throw new ServerError('Authentication is not configured.', 500);
   }
   const createdAt = Date.now();
   const obj = { ...session, createdAt, maxAge: MAX_AGE };
-  const token = await Iron.seal(obj, TOKEN_SECRET, Iron.defaults);
+  const token = await Iron.seal(obj, SESSION_SECRET, Iron.defaults);
 
   setTokenCookie(res, token);
 }
 
 export async function getLoginSession(req: SessionRequest) {
-  if (!TOKEN_SECRET) {
+  if (!SESSION_SECRET) {
     throw new ServerError('Authentication is not configured.', 500);
   }
 
@@ -35,7 +35,7 @@ export async function getLoginSession(req: SessionRequest) {
     throw new ServerError('You are not logged in.', 401);
   }
 
-  const session = await Iron.unseal(token, TOKEN_SECRET, Iron.defaults);
+  const session = await Iron.unseal(token, SESSION_SECRET, Iron.defaults);
 
   const parsed = UserSessionSchema.safeParse(session);
 

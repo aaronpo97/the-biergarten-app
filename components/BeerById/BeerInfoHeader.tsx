@@ -59,7 +59,7 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
               <div className="tooltip tooltip-left" data-tip={`Edit '${beerPost.name}'`}>
                 <Link
                   href={`/beers/${beerPost.id}/edit`}
-                  className="btn btn-outline btn-sm"
+                  className="btn-outline btn-sm btn"
                 >
                   <FaRegEdit className="text-xl" />
                 </Link>
