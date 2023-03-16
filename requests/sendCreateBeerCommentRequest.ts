@@ -36,7 +36,6 @@ const sendCreateBeerCommentRequest = async ({
     throw new Error('Invalid API response');
   }
 
-  console.log(parsedResponse);
   const parsedPayload = BeerCommentQueryResult.safeParse(parsedResponse.data.payload);
 
   if (!parsedPayload.success) {

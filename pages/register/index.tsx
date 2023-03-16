@@ -1,12 +1,15 @@
 import RegisterUserForm from '@/components/RegisterUserForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import Layout from '@/components/ui/Layout';
-import redirectIfLoggedIn from '@/getServerSideProps/redirectIfLoggedIn';
+
+import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { BiUser } from 'react-icons/bi';
 
 const RegisterUserPage: NextPage = () => {
+  useRedirectWhenLoggedIn();
+
   return (
     <Layout>
       <Head>
@@ -26,8 +29,3 @@ const RegisterUserPage: NextPage = () => {
 };
 
 export default RegisterUserPage;
-
-export const getServerSideProps = redirectIfLoggedIn({
-  destination: '/',
-  permanent: false,
-});

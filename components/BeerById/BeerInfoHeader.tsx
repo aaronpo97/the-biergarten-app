@@ -39,10 +39,10 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
   }, [beerPost.createdAt]);
 
   return (
-    <div className="card flex flex-col justify-center bg-base-300">
-      <div className="card-body">
+    <main className="card flex flex-col justify-center bg-base-300">
+      <article className="card-body">
         <div className="flex justify-between">
-          <div>
+          <header>
             <h1 className="text-4xl font-bold">{beerPost.name}</h1>
             <h2 className="text-2xl font-semibold">
               by{' '}
@@ -53,31 +53,29 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
                 {beerPost.brewery.name}
               </Link>
             </h2>
-          </div>
-          <div>
-            {isPostOwner && (
-              <div className="tooltip tooltip-left" data-tip={`Edit '${beerPost.name}'`}>
-                <Link
-                  href={`/beers/${beerPost.id}/edit`}
-                  className="btn-outline btn-sm btn"
-                >
-                  <FaRegEdit className="text-xl" />
-                </Link>
-              </div>
-            )}
-          </div>
+          </header>
+          {isPostOwner && (
+            <div className="tooltip tooltip-left" data-tip={`Edit '${beerPost.name}'`}>
+              <Link
+                href={`/beers/${beerPost.id}/edit`}
+                className="btn-outline btn-sm btn"
+              >
+                <FaRegEdit className="text-xl" />
+              </Link>
+            </div>
+          )}
         </div>
 
         <h3 className="italic">
           posted by{' '}
           <Link href={`/users/${beerPost.postedBy.id}`} className="link-hover link">
-            {beerPost.postedBy.username}{' '}
+            {beerPost.postedBy.username}
           </Link>
           <span
             className="tooltip tooltip-bottom"
             data-tip={format(createdAtDate, 'MM/dd/yyyy')}
           >
-            {timeDistance} ago
+            {` ${timeDistance}`} ago
           </span>
         </h3>
 
@@ -108,8 +106,8 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </article>
+    </main>
   );
 };
 
