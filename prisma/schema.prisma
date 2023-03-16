@@ -11,23 +11,24 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(uuid())
-  username        String           @unique
-  firstName       String
-  lastName        String
-  hash            String
-  email           String           @unique
-  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
-  dateOfBirth     DateTime
-  beerPosts       BeerPost[]
-  beerTypes       BeerType[]
-  breweryPosts    BreweryPost[]
-  beerComments    BeerComment[]
-  breweryComments BreweryComment[]
-  BeerPostLikes   BeerPostLike[]
-  BeerImage       BeerImage[]
-  BreweryImage    BreweryImage[]
+  id                String           @id @default(uuid())
+  username          String           @unique
+  firstName         String
+  lastName          String
+  hash              String
+  email             String           @unique
+  createdAt         DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime?        @updatedAt @db.Timestamptz(3)
+  isAccountVerified Boolean          @default(false)
+  dateOfBirth       DateTime
+  beerPosts         BeerPost[]
+  beerTypes         BeerType[]
+  breweryPosts      BreweryPost[]
+  beerComments      BeerComment[]
+  breweryComments   BreweryComment[]
+  BeerPostLikes     BeerPostLike[]
+  BeerImage         BeerImage[]
+  BreweryImage      BreweryImage[]
 }
 
 model BeerPost {
