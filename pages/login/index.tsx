@@ -6,9 +6,11 @@ import Image from 'next/image';
 import { FaUserCircle } from 'react-icons/fa';
 import Head from 'next/head';
 import Link from 'next/link';
-import redirectIfLoggedIn from '@/getServerSideProps/redirectIfLoggedIn';
+
+import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
 
 const LoginPage: NextPage = () => {
+  useRedirectWhenLoggedIn();
   return (
     <Layout>
       <Head>
@@ -52,8 +54,3 @@ const LoginPage: NextPage = () => {
 };
 
 export default LoginPage;
-
-export const getServerSideProps = redirectIfLoggedIn({
-  destination: '/',
-  permanent: false,
-});

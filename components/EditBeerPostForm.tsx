@@ -50,6 +50,18 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
     }
   };
 
+  const onDelete = async () => {
+    try {
+      const response = await fetch(`/api/beers/${previousValues.id}`, {
+        method: 'DELETE',
+      });
+      if (response.status === 200) {
+        router.push('/beers');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-5">
@@ -116,10 +128,17 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
         />
       </FormSegment>
 
-      <div className="mt-2">
+      <div className="mt-2 space-y-4">
         <Button type="submit" isSubmitting={isSubmitting}>
           {isSubmitting ? 'Submitting...' : 'Submit'}
         </Button>
+        <button
+          className={`btn-primary btn w-full rounded-xl ${isSubmitting ? 'loading' : ''}`}
+          type="button"
+          onClick={onDelete}
+        >
+          Delete
+        </button>
       </div>
     </form>
   );
