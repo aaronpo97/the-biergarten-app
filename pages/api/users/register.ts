@@ -17,12 +17,6 @@ interface RegisterUserRequest extends NextApiRequest {
   body: z.infer<typeof CreateUserValidationSchema>;
 }
 
-const { BASE_URL } = process.env;
-
-if (!BASE_URL) {
-  throw new ServerError('BASE_URL env variable is not set.', 500);
-}
-
 const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
   const [usernameTaken, emailTaken] = await Promise.all([
     findUserByUsername(req.body.username),

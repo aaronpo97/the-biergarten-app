@@ -4,7 +4,7 @@ import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
 import { useRouter } from 'next/router';
 import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/ui/Layout';
-import Pagination from '@/components/BeerIndex/Pagination';
+import BeerIndexPaginationBar from '@/components/BeerIndex/BeerIndexPaginationBar';
 import BeerCard from '@/components/BeerIndex/BeerCard';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
@@ -26,16 +26,24 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
         <meta name="description" content="Beer posts" />
       </Head>
       <div className="flex items-center justify-center bg-base-100">
-        <main className="my-10 flex w-10/12 flex-col space-y-4">
+        <div className="my-10 flex  w-10/12 flex-col space-y-4">
+          <header className="my-10">
+            <div className="space-y-2">
+              <h1 className="text-6xl font-bold">The Biergarten Index</h1>
+              <h2 className="text-2xl font-bold">
+                Page {pageNum} of {pageCount}
+              </h2>
+            </div>
+          </header>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {initialBeerPosts.map((post) => {
               return <BeerCard post={post} key={post.id} />;
             })}
           </div>
           <div className="flex justify-center">
-            <Pagination pageNum={pageNum} pageCount={pageCount} />
+            <BeerIndexPaginationBar pageNum={pageNum} pageCount={pageCount} />
           </div>
-        </main>
+        </div>
       </div>
     </Layout>
   );
