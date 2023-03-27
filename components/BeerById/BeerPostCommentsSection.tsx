@@ -9,14 +9,13 @@ import CommentCard from './CommentCard';
 
 interface BeerPostCommentsSectionProps {
   beerPost: BeerPostQueryResult;
-  setComments: React.Dispatch<React.SetStateAction<BeerCommentQueryResultArrayT>>;
   comments: BeerCommentQueryResultArrayT;
   commentsPageCount: number;
 }
 
 const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({
   beerPost,
-  setComments,
+
   comments,
   commentsPageCount,
 }) => {
@@ -30,7 +29,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({
       <div className="card h-96 bg-base-300">
         <div className="card-body h-full">
           {user ? (
-            <BeerCommentForm beerPost={beerPost} setComments={setComments} />
+            <BeerCommentForm beerPost={beerPost} />
           ) : (
             <div className="flex h-full flex-col items-center justify-center">
               <span className="text-lg font-bold">Log in to leave a comment.</span>

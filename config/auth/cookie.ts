@@ -8,7 +8,7 @@ export const MAX_AGE = 60 * 60 * 8; // 8 hours
 export function setTokenCookie(res: NextApiResponse, token: string) {
   const cookie = serialize(TOKEN_NAME, token, {
     maxAge: MAX_AGE,
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     sameSite: 'lax',

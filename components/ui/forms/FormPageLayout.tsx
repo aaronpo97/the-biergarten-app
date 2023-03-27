@@ -22,7 +22,7 @@ const FormPageLayout: FC<FormPageLayoutProps> = ({
     <div className="align-center my-20 flex h-fit flex-col items-center justify-center">
       <div className="w-8/12">
         <div className="tooltip tooltip-bottom absolute" data-tip={backLinkText}>
-          <Link href={backLink} className="btn btn-ghost btn-sm">
+          <Link href={backLink} className="btn-ghost btn-sm btn p-0">
             <BiArrowBack className="text-xl" />
           </Link>
         </div>

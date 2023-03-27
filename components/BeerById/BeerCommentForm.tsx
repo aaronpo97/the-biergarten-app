@@ -1,10 +1,9 @@
 import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentRequest';
-import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, FunctionComponent, useState, useEffect } from 'react';
+import { FunctionComponent, useState, useEffect } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -18,7 +17,6 @@ import FormTextArea from '../ui/forms/FormTextArea';
 
 interface BeerCommentFormProps {
   beerPost: BeerPostQueryResult;
-  setComments: Dispatch<SetStateAction<BeerCommentQueryResultArrayT>>;
 }
 
 const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) => {
