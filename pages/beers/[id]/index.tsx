@@ -2,14 +2,11 @@ import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 
-import { useState, useEffect } from 'react';
-
 import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
 import BeerPostCommentsSection from '@/components/BeerById/BeerPostCommentsSection';
 import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
 import Layout from '@/components/ui/Layout';
 
-import DBClient from '@/prisma/DBClient';
 import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
@@ -17,6 +14,8 @@ import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
 import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerPost } from '@prisma/client';
+import getBeerPostLikeCount from '@/services/BeerPostLike/getBeerPostLikeCount';
+import getBeerCommentCount from '@/services/BeerComment/getBeerCommentCount';
 
 interface BeerPageProps {
   beerPost: BeerPostQueryResult;
@@ -36,12 +35,6 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
   commentsPageCount,
   likeCount,
 }) => {
-  const [comments, setComments] = useState(beerComments);
-
-  useEffect(() => {
-    setComments(beerComments);
-  }, [beerComments]);
-
   return (
     <Layout>
       <Head>
@@ -65,8 +58,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
             <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
               <BeerPostCommentsSection
                 beerPost={beerPost}
-                comments={comments}
-                setComments={setComments}
+                comments={beerComments}
                 commentsPageCount={commentsPageCount}
               />
               <div className="md:w-[40%]">
@@ -82,7 +74,6 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
 
 export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (context) => {
   const beerPost = await getBeerPostById(context.params!.id! as string);
-
   const beerCommentPageNum = parseInt(context.query.comments_page as string, 10) || 1;
 
   if (!beerPost) {
@@ -97,19 +88,17 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
     { id: beerPost.id },
     { pageSize, pageNum: beerCommentPageNum },
   );
-  const numberOfPosts = await DBClient.instance.beerComment.count({
-    where: { beerPostId: beerPost.id },
-  });
-  const pageCount = numberOfPosts ? Math.ceil(numberOfPosts / pageSize) : 0;
-  const likeCount = await DBClient.instance.beerPostLike.count({
-    where: { beerPostId: beerPost.id },
-  });
+
+  const commentCount = await getBeerCommentCount(beerPost.id);
+
+  const commentPageCount = commentCount ? Math.ceil(commentCount / pageSize) : 0;
+  const likeCount = await getBeerPostLikeCount(beerPost.id);
 
   const props = {
     beerPost: JSON.parse(JSON.stringify(beerPost)),
     beerRecommendations: JSON.parse(JSON.stringify(beerRecommendations)),
     beerComments: JSON.parse(JSON.stringify(beerComments)),
-    commentsPageCount: JSON.parse(JSON.stringify(pageCount)),
+    commentsPageCount: JSON.parse(JSON.stringify(commentPageCount)),
     likeCount: JSON.parse(JSON.stringify(likeCount)),
   };
 
