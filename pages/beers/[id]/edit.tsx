@@ -5,13 +5,14 @@ import React from 'react';
 import Layout from '@/components/ui/Layout';
 import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import EditBeerPostForm from '@/components/EditBeerPostForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import { BiBeer } from 'react-icons/bi';
+import { z } from 'zod';
 
 interface EditPageProps {
-  beerPost: BeerPostQueryResult;
+  beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
 const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {

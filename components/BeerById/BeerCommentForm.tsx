@@ -1,6 +1,6 @@
 import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentRequest';
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { FunctionComponent, useState, useEffect } from 'react';
@@ -16,7 +16,7 @@ import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 
 interface BeerCommentFormProps {
-  beerPost: BeerPostQueryResult;
+  beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
 const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) => {

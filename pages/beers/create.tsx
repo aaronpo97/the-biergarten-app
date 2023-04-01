@@ -8,9 +8,10 @@ import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQuer
 import { BeerType } from '@prisma/client';
 import { NextPage } from 'next';
 import { BiBeer } from 'react-icons/bi';
+import { z } from 'zod';
 
 interface CreateBeerPageProps {
-  breweries: BreweryPostQueryResult[];
+  breweries: z.infer<typeof BreweryPostQueryResult>[];
   types: BeerType[];
 }
 

@@ -2,33 +2,24 @@ import Link from 'next/link';
 import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
 import { FC, useContext, useEffect, useState } from 'react';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 import UserContext from '@/contexts/userContext';
 import { FaRegEdit } from 'react-icons/fa';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { z } from 'zod';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
-const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: number }> = ({
-  beerPost,
-  initialLikeCount,
-}) => {
+const BeerInfoHeader: FC<{
+  beerPost: z.infer<typeof beerPostQueryResult>;
+  initialLikeCount: number;
+}> = ({ beerPost, initialLikeCount }) => {
   const createdAtDate = new Date(beerPost.createdAt);
   const [timeDistance, setTimeDistance] = useState('');
   const { user } = useContext(UserContext);
 
   const [likeCount, setLikeCount] = useState(initialLikeCount);
-  const [isPostOwner, setIsPostOwner] = useState(false);
-
-  useEffect(() => {
-    const idMatches = user && beerPost.postedBy.id === user.id;
-
-    if (!(user && idMatches)) {
-      setIsPostOwner(false);
-      return;
-    }
-
-    setIsPostOwner(true);
-  }, [user, beerPost]);
+  const idMatches = user && beerPost.postedBy.id === user.id;
+  const isPostOwner = !!(user && idMatches);
 
   useEffect(() => {
     setLikeCount(initialLikeCount);
@@ -67,15 +58,15 @@ const BeerInfoHeader: FC<{ beerPost: BeerPostQueryResult; initialLikeCount: numb
         </div>
 
         <h3 className="italic">
-          posted by{' '}
+          {' posted by '}
           <Link href={`/users/${beerPost.postedBy.id}`} className="link-hover link">
-            {beerPost.postedBy.username}
+            {`${beerPost.postedBy.username} `}
           </Link>
           <span
-            className="tooltip tooltip-bottom"
+            className="tooltip tooltip-right"
             data-tip={format(createdAtDate, 'MM/dd/yyyy')}
           >
-            {` ${timeDistance}`} ago
+            {`${timeDistance} ago`}
           </span>
         </h3>
 

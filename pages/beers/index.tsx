@@ -6,11 +6,12 @@ import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/ui/Layout';
 import BeerIndexPaginationBar from '@/components/BeerIndex/BeerIndexPaginationBar';
 import BeerCard from '@/components/BeerIndex/BeerCard';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
+import { z } from 'zod';
 
 interface BeerPageProps {
-  initialBeerPosts: BeerPostQueryResult[];
+  initialBeerPosts: z.infer<typeof beerPostQueryResult>[];
   pageCount: number;
 }
 

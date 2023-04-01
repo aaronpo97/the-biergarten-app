@@ -1,5 +1,5 @@
 import UserContext from '@/contexts/userContext';
-import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import { format, formatDistanceStrict } from 'date-fns';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,9 +7,10 @@ import { useContext, useEffect, useState } from 'react';
 import { Rating } from 'react-daisyui';
 
 import { FaEllipsisH } from 'react-icons/fa';
+import { z } from 'zod';
 
 const CommentCardDropdown: React.FC<{
-  comment: BeerCommentQueryResultT;
+  comment: z.infer<typeof BeerCommentQueryResult>;
   beerPostId: string;
 }> = ({ comment, beerPostId }) => {
   const router = useRouter();
@@ -52,7 +53,7 @@ const CommentCardDropdown: React.FC<{
 };
 
 const CommentCard: React.FC<{
-  comment: BeerCommentQueryResultT;
+  comment: z.infer<typeof BeerCommentQueryResult>;
   beerPostId: string;
 }> = ({ comment, beerPostId }) => {
   const [timeDistance, setTimeDistance] = useState('');

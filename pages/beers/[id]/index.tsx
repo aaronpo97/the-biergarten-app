@@ -11,19 +11,20 @@ import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
 
-import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerPost } from '@prisma/client';
 import getBeerPostLikeCount from '@/services/BeerPostLike/getBeerPostLikeCount';
 import getBeerCommentCount from '@/services/BeerComment/getBeerCommentCount';
+import { z } from 'zod';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 
 interface BeerPageProps {
-  beerPost: BeerPostQueryResult;
+  beerPost: z.infer<typeof beerPostQueryResult>;
   beerRecommendations: (BeerPost & {
     brewery: { id: string; name: string };
     beerImages: { id: string; alt: string; url: string }[];
   })[];
-  beerComments: BeerCommentQueryResultArrayT;
+  beerComments: z.infer<typeof BeerCommentQueryResult>[];
   commentsPageCount: number;
   likeCount: number;
 }

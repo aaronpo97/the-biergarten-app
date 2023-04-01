@@ -1,15 +1,17 @@
 import UserContext from '@/contexts/userContext';
-import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { useRouter } from 'next/router';
 import { FC, useContext } from 'react';
+import { z } from 'zod';
 import BeerCommentForm from './BeerCommentForm';
 import BeerCommentsPaginationBar from './BeerPostCommentsPaginationBar';
 import CommentCard from './CommentCard';
 
 interface BeerPostCommentsSectionProps {
-  beerPost: BeerPostQueryResult;
-  comments: BeerCommentQueryResultArrayT;
+  beerPost: z.infer<typeof beerPostQueryResult>;
+  comments: z.infer<typeof BeerCommentQueryResult>[];
   commentsPageCount: number;
 }
 

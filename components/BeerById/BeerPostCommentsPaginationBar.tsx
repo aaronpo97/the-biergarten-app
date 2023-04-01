@@ -1,11 +1,12 @@
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { FC } from 'react';
 import Link from 'next/link';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { z } from 'zod';
 
 interface BeerCommentsPaginationBarProps {
   commentsPageNum: number;
   commentsPageCount: number;
-  beerPost: BeerPostQueryResult;
+  beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
 const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
