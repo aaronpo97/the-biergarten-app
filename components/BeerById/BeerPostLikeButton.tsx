@@ -1,41 +1,23 @@
-import UserContext from '@/contexts/userContext';
+import useCheckIfUserLikesBeerPost from '@/hooks/useCheckIfUserLikesBeerPost';
 import sendLikeRequest from '@/requests/sendLikeRequest';
-import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
-import sendCheckIfUserLikesBeerPostRequest from '@/requests/sendCheckIfUserLikesBeerPostRequest';
 
 const BeerPostLikeButton: FC<{
   beerPostId: string;
   setLikeCount: Dispatch<SetStateAction<number>>;
 }> = ({ beerPostId, setLikeCount }) => {
-  const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
-
-  const { user } = useContext(UserContext);
-
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    sendCheckIfUserLikesBeerPostRequest(beerPostId)
-      .then((currentLikeStatus) => {
-        setIsLiked(currentLikeStatus);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, [user, beerPostId]);
+  const { isLiked, mutate: mutateLikeStatus } = useCheckIfUserLikesBeerPost(beerPostId);
+  const [loading, setLoading] = useState(false);
 
   const handleLike = async () => {
     try {
       setLoading(true);
       await sendLikeRequest(beerPostId);
-      setIsLiked(!isLiked);
       setLikeCount((prevCount) => prevCount + (isLiked ? -1 : 1));
+      mutateLikeStatus();
       setLoading(false);
-    } catch (error) {
+    } catch (e) {
       setLoading(false);
     }
   };
