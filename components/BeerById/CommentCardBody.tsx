@@ -55,7 +55,7 @@ const CommentCardDropdown: React.FC<{
   );
 };
 
-const CommentCard: React.FC<{
+const CommentCardBody: React.FC<{
   comment: z.infer<typeof BeerCommentQueryResult>;
 
   mutate: KeyedMutator<{
@@ -112,4 +112,4 @@ const CommentCard: React.FC<{
   );
 };
 
-export default CommentCard;
+export default CommentCardBody;

@@ -9,49 +9,25 @@ import useBeerPostComments from '@/hooks/useBeerPostComments';
 import { useRouter } from 'next/router';
 import BeerCommentForm from './BeerCommentForm';
 import BeerCommentsPaginationBar from './BeerPostCommentsPaginationBar';
-import CommentCard from './CommentCard';
+import CommentCardBody from './CommentCardBody';
+import NoCommentsCard from './NoCommentsCard';
+import CommentLoadingCardBody from './CommentLoadingCardBody';
 
 interface BeerPostCommentsSectionProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
-const CommentLoadingCard = () => {
-  return (
-    <div className="card-body h-64">
-      <div className="flex animate-pulse space-x-4">
-        <div className="flex-1 space-y-4 py-1">
-          <div className="h-4 w-3/4 rounded bg-gray-400" />
-          <div className="space-y-2">
-            <div className="h-4 rounded bg-gray-400" />
-            <div className="h-4 w-5/6 rounded bg-gray-400" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const NoCommentsCard = () => {
-  return (
-    <div className="card bg-base-300">
-      <div className="card-body h-64">
-        <div className="flex h-full flex-col items-center justify-center">
-          <span className="text-lg font-bold">No comments yet.</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost }) => {
   const { user } = useContext(UserContext);
   const router = useRouter();
-  const commentsPageNum = parseInt(router.query.comments_page as string, 10) || 1;
+  const { id } = beerPost;
+  const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
+  const pageSize = 5;
 
   const { comments, commentsPageCount, isLoading, mutate } = useBeerPostComments({
-    id: beerPost.id,
-    pageNum: commentsPageNum,
-    pageSize: 5,
+    id,
+    pageNum,
+    pageSize,
   });
   return (
     <div className="w-full space-y-3 md:w-[60%]">
@@ -70,11 +46,11 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
       {comments && !!commentsPageCount && !isLoading && (
         <div className="card bg-base-300 pb-6">
           {comments.map((comment) => (
-            <CommentCard key={comment.id} comment={comment} mutate={mutate} />
+            <CommentCardBody key={comment.id} comment={comment} mutate={mutate} />
           ))}
 
           <BeerCommentsPaginationBar
-            commentsPageNum={commentsPageNum}
+            commentsPageNum={pageNum}
             commentsPageCount={commentsPageCount}
             beerPost={beerPost}
           />
@@ -86,7 +62,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
       {isLoading && (
         <div className="card bg-base-300">
           {Array.from({ length: 5 }).map((_, i) => (
-            <CommentLoadingCard key={i} />
+            <CommentLoadingCardBody key={i} />
           ))}
         </div>
       )}
