@@ -2,18 +2,20 @@ import UserContext from '@/contexts/userContext';
 import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import { format, formatDistanceStrict } from 'date-fns';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Rating } from 'react-daisyui';
 
 import { FaEllipsisH } from 'react-icons/fa';
+import { KeyedMutator } from 'swr';
 import { z } from 'zod';
 
 const CommentCardDropdown: React.FC<{
   comment: z.infer<typeof BeerCommentQueryResult>;
-  beerPostId: string;
-}> = ({ comment, beerPostId }) => {
-  const router = useRouter();
+  mutate: KeyedMutator<{
+    comments: z.infer<typeof BeerCommentQueryResult>[];
+    pageCount: number;
+  }>;
+}> = ({ comment, mutate }) => {
   const { user } = useContext(UserContext);
 
   const isCommentOwner = user?.id === comment.postedBy.id;
@@ -22,16 +24,17 @@ const CommentCardDropdown: React.FC<{
     const response = await fetch(`/api/beer-comments/${comment.id}`, {
       method: 'DELETE',
     });
+
     if (!response.ok) {
       throw new Error('Failed to delete comment');
     }
 
-    router.replace(`/beers/${beerPostId}?comments_page=1`, undefined, { scroll: false });
+    await mutate();
   };
 
   return (
     <div className="dropdown">
-      <label tabIndex={0} className="btn btn-ghost btn-sm m-1">
+      <label tabIndex={0} className="btn-ghost btn-sm btn m-1">
         <FaEllipsisH />
       </label>
       <ul
@@ -54,8 +57,12 @@ const CommentCardDropdown: React.FC<{
 
 const CommentCard: React.FC<{
   comment: z.infer<typeof BeerCommentQueryResult>;
-  beerPostId: string;
-}> = ({ comment, beerPostId }) => {
+
+  mutate: KeyedMutator<{
+    comments: z.infer<typeof BeerCommentQueryResult>[];
+    pageCount: number;
+  }>;
+}> = ({ comment, mutate }) => {
   const [timeDistance, setTimeDistance] = useState('');
   const { user } = useContext(UserContext);
 
@@ -64,7 +71,7 @@ const CommentCard: React.FC<{
   }, [comment.createdAt]);
 
   return (
-    <div className="card-body">
+    <div className="card-body h-64">
       <div className="flex flex-col justify-between sm:flex-row">
         <div>
           <h3 className="font-semibold sm:text-2xl">
@@ -84,7 +91,7 @@ const CommentCard: React.FC<{
           </h4>
         </div>
 
-        {user && <CommentCardDropdown comment={comment} beerPostId={beerPostId} />}
+        {user && <CommentCardDropdown comment={comment} mutate={mutate} />}
       </div>
 
       <div className="space-y-1">

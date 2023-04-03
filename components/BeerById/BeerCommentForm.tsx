@@ -2,12 +2,14 @@ import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentReques
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/router';
+
 import { FunctionComponent, useState, useEffect } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
+import { KeyedMutator } from 'swr';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import Button from '../ui/forms/Button';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -17,9 +19,16 @@ import FormTextArea from '../ui/forms/FormTextArea';
 
 interface BeerCommentFormProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
+  mutate: KeyedMutator<{
+    comments: z.infer<typeof BeerCommentQueryResult>[];
+    pageCount: number;
+  }>;
 }
 
-const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) => {
+const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
+  beerPost,
+  mutate,
+}) => {
   const { register, handleSubmit, formState, reset, setValue } = useForm<
     z.infer<typeof BeerCommentValidationSchema>
   >({
@@ -35,7 +44,6 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
     reset({ rating: 0, content: '' });
   }, [reset]);
 
-  const router = useRouter();
   const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
     data,
   ) => {
@@ -47,7 +55,7 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({ beerPost }) 
       beerPostId: beerPost.id,
     });
     reset();
-    router.replace(`/beers/${beerPost.id}?comments_page=1`, undefined, { scroll: false });
+    await mutate();
   };
 
   const { errors } = formState;
