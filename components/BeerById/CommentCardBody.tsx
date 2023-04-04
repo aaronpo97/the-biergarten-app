@@ -1,8 +1,9 @@
 import UserContext from '@/contexts/userContext';
+import useTimeDistance from '@/hooks/useTimeDistance';
 import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { format, formatDistanceStrict } from 'date-fns';
+import { format } from 'date-fns';
 import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Rating } from 'react-daisyui';
 
 import { FaEllipsisH } from 'react-icons/fa';
@@ -63,12 +64,9 @@ const CommentCardBody: React.FC<{
     pageCount: number;
   }>;
 }> = ({ comment, mutate }) => {
-  const [timeDistance, setTimeDistance] = useState('');
   const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    setTimeDistance(formatDistanceStrict(new Date(comment.createdAt), new Date()));
-  }, [comment.createdAt]);
+  const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
     <div className="card-body h-64">

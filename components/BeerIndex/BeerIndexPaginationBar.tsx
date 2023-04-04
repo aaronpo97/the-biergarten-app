@@ -14,7 +14,6 @@ const BeerIndexPaginationBar: FC<PaginationProps> = ({ pageCount, pageNum }) => 
         className={`btn ${pageNum === 1 ? 'btn-disabled' : ''}`}
         href={{ pathname: '/beers', query: { page_num: pageNum - 1 } }}
         scroll={false}
-        prefetch={true}
       >
         «
       </Link>
@@ -23,7 +22,6 @@ const BeerIndexPaginationBar: FC<PaginationProps> = ({ pageCount, pageNum }) => 
         className={`btn ${pageNum === pageCount ? 'btn-disabled' : ''}`}
         href={{ pathname: '/beers', query: { page_num: pageNum + 1 } }}
         scroll={false}
-        prefetch={true}
       >
         »
       </Link>

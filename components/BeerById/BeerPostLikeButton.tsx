@@ -1,12 +1,13 @@
 import useCheckIfUserLikesBeerPost from '@/hooks/useCheckIfUserLikesBeerPost';
 import sendLikeRequest from '@/requests/sendLikeRequest';
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { FC, useState } from 'react';
 import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
+import { KeyedMutator } from 'swr';
 
 const BeerPostLikeButton: FC<{
   beerPostId: string;
-  setLikeCount: Dispatch<SetStateAction<number>>;
-}> = ({ beerPostId, setLikeCount }) => {
+  mutateCount: KeyedMutator<number>;
+}> = ({ beerPostId, mutateCount }) => {
   const { isLiked, mutate: mutateLikeStatus } = useCheckIfUserLikesBeerPost(beerPostId);
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +15,7 @@ const BeerPostLikeButton: FC<{
     try {
       setLoading(true);
       await sendLikeRequest(beerPostId);
-      setLikeCount((prevCount) => prevCount + (isLiked ? -1 : 1));
+      mutateCount();
       mutateLikeStatus();
       setLoading(false);
     } catch (e) {

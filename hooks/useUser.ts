@@ -2,6 +2,15 @@ import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWR from 'swr';
 
+/**
+ * A custom React hook that fetches the current user's data from the server.
+ *
+ * @returns An object containing the current user's data, a boolean indicating if the
+ *   request is currently loading, and an error object if an error occurred during the
+ *   request.
+ * @throws When the user is not logged in, the server returns an error status code, or if
+ *   the response data fails to validate against the expected schema.
+ */
 const useUser = () => {
   const {
     data: user,

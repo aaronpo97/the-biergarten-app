@@ -12,7 +12,6 @@ import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { BeerPost } from '@prisma/client';
-import getBeerPostLikeCount from '@/services/BeerPostLike/getBeerPostLikeCount';
 
 import { z } from 'zod';
 
@@ -22,14 +21,9 @@ interface BeerPageProps {
     brewery: { id: string; name: string };
     beerImages: { id: string; alt: string; url: string }[];
   })[];
-  likeCount: number;
 }
 
-const BeerByIdPage: NextPage<BeerPageProps> = ({
-  beerPost,
-  beerRecommendations,
-  likeCount,
-}) => {
+const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }) => {
   return (
     <Layout>
       <Head>
@@ -49,7 +43,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({
 
         <div className="my-12 flex w-full items-center justify-center ">
           <div className="w-11/12 space-y-3 xl:w-9/12">
-            <BeerInfoHeader beerPost={beerPost} initialLikeCount={likeCount} />
+            <BeerInfoHeader beerPost={beerPost} />
             <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
               <BeerPostCommentsSection beerPost={beerPost} />
               <div className="md:w-[40%]">
@@ -73,12 +67,9 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
   const { type, brewery, id } = beerPost;
   const beerRecommendations = await getBeerRecommendations({ type, brewery, id });
 
-  const likeCount = await getBeerPostLikeCount(beerPost.id);
-
   const props = {
     beerPost: JSON.parse(JSON.stringify(beerPost)),
     beerRecommendations: JSON.parse(JSON.stringify(beerRecommendations)),
-    likeCount: JSON.parse(JSON.stringify(likeCount)),
   };
 
   return { props };

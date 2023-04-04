@@ -1,33 +1,26 @@
 import Link from 'next/link';
-import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import format from 'date-fns/format';
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useContext } from 'react';
 
 import UserContext from '@/contexts/userContext';
 import { FaRegEdit } from 'react-icons/fa';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
+import useGetLikeCount from '@/hooks/useGetLikeCount';
+import useTimeDistance from '@/hooks/useTimeDistance';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
 const BeerInfoHeader: FC<{
   beerPost: z.infer<typeof beerPostQueryResult>;
-  initialLikeCount: number;
-}> = ({ beerPost, initialLikeCount }) => {
-  const createdAtDate = new Date(beerPost.createdAt);
-  const [timeDistance, setTimeDistance] = useState('');
-  const { user } = useContext(UserContext);
+}> = ({ beerPost }) => {
+  const createdAt = new Date(beerPost.createdAt);
+  const timeDistance = useTimeDistance(createdAt);
 
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const { user } = useContext(UserContext);
   const idMatches = user && beerPost.postedBy.id === user.id;
   const isPostOwner = !!(user && idMatches);
 
-  useEffect(() => {
-    setLikeCount(initialLikeCount);
-  }, [initialLikeCount]);
-
-  useEffect(() => {
-    setTimeDistance(formatDistanceStrict(new Date(beerPost.createdAt), new Date()));
-  }, [beerPost.createdAt]);
+  const { likeCount, mutate } = useGetLikeCount(beerPost.id);
 
   return (
     <main className="card flex flex-col justify-center bg-base-300">
@@ -62,12 +55,14 @@ const BeerInfoHeader: FC<{
           <Link href={`/users/${beerPost.postedBy.id}`} className="link-hover link">
             {`${beerPost.postedBy.username} `}
           </Link>
-          <span
-            className="tooltip tooltip-right"
-            data-tip={format(createdAtDate, 'MM/dd/yyyy')}
-          >
-            {`${timeDistance} ago`}
-          </span>
+          {timeDistance && (
+            <span
+              className="tooltip tooltip-right"
+              data-tip={format(createdAt, 'MM/dd/yyyy')}
+            >
+              {`${timeDistance} ago`}
+            </span>
+          )}
         </h3>
 
         <p>{beerPost.description}</p>
@@ -86,15 +81,15 @@ const BeerInfoHeader: FC<{
               <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
             </div>
             <div>
-              <span>
-                Liked by {likeCount} user{likeCount !== 1 && 's'}
-              </span>
+              {likeCount && (
+                <span>
+                  Liked by {likeCount} user{likeCount !== 1 && 's'}
+                </span>
+              )}
             </div>
           </div>
           <div className="card-actions items-end">
-            {user && (
-              <BeerPostLikeButton beerPostId={beerPost.id} setLikeCount={setLikeCount} />
-            )}
+            {user && <BeerPostLikeButton beerPostId={beerPost.id} mutateCount={mutate} />}
           </div>
         </div>
       </article>
