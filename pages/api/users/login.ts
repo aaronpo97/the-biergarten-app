@@ -9,6 +9,7 @@ import { z } from 'zod';
 import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import GetUserSchema from '@/services/User/schema/GetUserSchema';
 
 const router = createRouter<
   UserExtendedNextApiRequest,
@@ -20,14 +21,18 @@ router.post(
   expressWrapper(async (req, res, next) => {
     passport.initialize();
     passport.use(localStrat);
-    passport.authenticate('local', { session: false }, (error, token) => {
-      if (error) {
-        next(error);
-        return;
-      }
-      req.user = token;
-      next();
-    })(req, res, next);
+    passport.authenticate(
+      'local',
+      { session: false },
+      (error: unknown, token: z.infer<typeof GetUserSchema>) => {
+        if (error) {
+          next(error);
+          return;
+        }
+        req.user = token;
+        next();
+      },
+    )(req, res, next);
   }),
   async (req, res) => {
     const user = req.user!;
