@@ -1,7 +1,7 @@
 import UserContext from '@/contexts/userContext';
 import useTimeDistance from '@/hooks/useTimeDistance';
 import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { format } from 'date-fns';
+import format from 'date-fns/format';
 import Link from 'next/link';
 import { useContext } from 'react';
 import { Rating } from 'react-daisyui';
@@ -69,7 +69,7 @@ const CommentCardBody: React.FC<{
   const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
-    <div className="card-body h-64">
+    <div className="card-body h-64 animate-in fade-in-10">
       <div className="flex flex-col justify-between sm:flex-row">
         <div>
           <h3 className="font-semibold sm:text-2xl">

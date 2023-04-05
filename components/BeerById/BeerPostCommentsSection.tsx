@@ -29,6 +29,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
     pageNum,
     pageSize,
   });
+
   return (
     <div className="w-full space-y-3 md:w-[60%]">
       <div className="card h-96 bg-base-300">
@@ -43,7 +44,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
         </div>
       </div>
 
-      {comments && !!commentsPageCount && !isLoading && (
+      {comments && !!comments.length && !!commentsPageCount && !isLoading && (
         <div className="card bg-base-300 pb-6">
           {comments.map((comment) => (
             <CommentCardBody key={comment.id} comment={comment} mutate={mutate} />
@@ -60,10 +61,16 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
       {!comments?.length && !isLoading && <NoCommentsCard />}
 
       {isLoading && (
-        <div className="card bg-base-300">
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className="card bg-base-300 pb-6">
+          {Array.from({ length: pageSize }).map((_, i) => (
             <CommentLoadingCardBody key={i} />
           ))}
+
+          <BeerCommentsPaginationBar
+            commentsPageNum={pageNum}
+            commentsPageCount={20}
+            beerPost={beerPost}
+          />
         </div>
       )}
     </div>

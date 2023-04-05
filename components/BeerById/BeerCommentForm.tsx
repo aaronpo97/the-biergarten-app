@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { KeyedMutator } from 'swr';
 import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import { useRouter } from 'next/router';
 import Button from '../ui/forms/Button';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -44,6 +45,7 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     reset({ rating: 0, content: '' });
   }, [reset]);
 
+  const router = useRouter();
   const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
     data,
   ) => {
@@ -55,44 +57,58 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
       beerPostId: beerPost.id,
     });
     reset();
-    await mutate();
+
+    const submitTasks: Promise<unknown>[] = [
+      router.push(`/beers/${beerPost.id}`, undefined, { scroll: false }),
+      mutate(),
+    ];
+
+    await Promise.all(submitTasks);
   };
 
   const { errors } = formState;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <FormInfo>
-        <FormLabel htmlFor="content">Leave a comment</FormLabel>
-        <FormError>{errors.content?.message}</FormError>
-      </FormInfo>
-      <FormSegment>
-        <FormTextArea
-          id="content"
-          formValidationSchema={register('content')}
-          placeholder="Comment"
-          rows={5}
-          error={!!errors.content?.message}
-        />
-      </FormSegment>
-      <FormInfo>
-        <FormLabel htmlFor="rating">Rating</FormLabel>
-        <FormError>{errors.rating?.message}</FormError>
-      </FormInfo>
-      <Rating
-        value={rating}
-        onChange={(value) => {
-          setRating(value);
-          setValue('rating', value);
-        }}
-      >
-        <Rating.Item name="rating-1" className="mask mask-star" />
-        <Rating.Item name="rating-1" className="mask mask-star" />
-        <Rating.Item name="rating-1" className="mask mask-star" />
-        <Rating.Item name="rating-1" className="mask mask-star" />
-        <Rating.Item name="rating-1" className="mask mask-star" />
-      </Rating>
-      <Button type="submit">Submit</Button>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div>
+        <FormInfo>
+          <FormLabel htmlFor="content">Leave a comment</FormLabel>
+          <FormError>{errors.content?.message}</FormError>
+        </FormInfo>
+        <FormSegment>
+          <FormTextArea
+            id="content"
+            formValidationSchema={register('content')}
+            placeholder="Comment"
+            rows={5}
+            error={!!errors.content?.message}
+            disabled={formState.isSubmitting}
+          />
+        </FormSegment>
+        <FormInfo>
+          <FormLabel htmlFor="rating">Rating</FormLabel>
+          <FormError>{errors.rating?.message}</FormError>
+        </FormInfo>
+        <Rating
+          value={rating}
+          onChange={(value) => {
+            setRating(value);
+            setValue('rating', value);
+          }}
+        >
+          <Rating.Item name="rating-1" className="mask mask-star" />
+          <Rating.Item name="rating-1" className="mask mask-star" />
+          <Rating.Item name="rating-1" className="mask mask-star" />
+          <Rating.Item name="rating-1" className="mask mask-star" />
+          <Rating.Item name="rating-1" className="mask mask-star" />
+        </Rating>
+      </div>
+
+      <div>
+        <Button type="submit" isSubmitting={formState.isSubmitting}>
+          Submit
+        </Button>
+      </div>
     </form>
   );
 };

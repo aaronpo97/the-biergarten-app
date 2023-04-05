@@ -40,7 +40,7 @@ const useBeerPostComments = ({ pageNum, id, pageSize }: UseBeerPostCommentsProps
         throw new Error(parsedPayload.error.message);
       }
 
-      const pageCount = Math.ceil(parseInt(count as string, 10) / 10);
+      const pageCount = Math.ceil(parseInt(count as string, 10) / pageSize);
       return { comments: parsedPayload.data, pageCount };
     },
   );
