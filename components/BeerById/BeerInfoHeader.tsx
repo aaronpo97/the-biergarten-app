@@ -81,7 +81,7 @@ const BeerInfoHeader: FC<{
               <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
             </div>
             <div>
-              {likeCount && (
+              {(!!likeCount || likeCount === 0) && (
                 <span>
                   Liked by {likeCount} user{likeCount !== 1 && 's'}
                 </span>
