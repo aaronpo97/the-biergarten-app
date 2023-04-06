@@ -1,7 +1,7 @@
 import { FC } from 'react';
 
 interface SpinnerProps {
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const Spinner: FC<SpinnerProps> = ({ size = 'md' }) => {
@@ -10,13 +10,14 @@ const Spinner: FC<SpinnerProps> = ({ size = 'md' }) => {
     sm: 'w-[20px]',
     md: 'w-[100px]',
     lg: 'w-[150px]',
+    xl: 'w-[200px]',
   };
 
   return (
     <div role="status" className="flex flex-col items-center justify-center rounded-3xl">
       <svg
         aria-hidden="true"
-        className={`${spinnerWidths[size]} animate-spin fill-success text-gray-500`}
+        className={`${spinnerWidths[size]} animate-spin fill-secondary text-primary`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
