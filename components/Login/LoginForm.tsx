@@ -11,6 +11,7 @@ import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextInput from '../ui/forms/FormTextInput';
+import Button from '../ui/forms/Button';
 
 type LoginT = z.infer<typeof LoginValidationSchema>;
 const LoginForm = () => {
@@ -51,6 +52,7 @@ const LoginForm = () => {
             id="username"
             type="text"
             formValidationSchema={register('username')}
+            disabled={formState.isSubmitting}
             error={!!errors.username}
             placeholder="username"
           />
@@ -62,6 +64,7 @@ const LoginForm = () => {
         </FormInfo>
         <FormSegment>
           <FormTextInput
+            disabled={formState.isSubmitting}
             id="password"
             type="password"
             formValidationSchema={register('password')}
@@ -73,9 +76,9 @@ const LoginForm = () => {
 
       {responseError && <ErrorAlert error={responseError} setError={setResponseError} />}
       <div className="w-full">
-        <button type="submit" className="btn-primary btn w-full">
+        <Button type="submit" isSubmitting={formState.isSubmitting}>
           Login
-        </button>
+        </Button>
       </div>
     </form>
   );
