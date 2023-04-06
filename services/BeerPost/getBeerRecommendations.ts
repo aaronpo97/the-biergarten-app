@@ -1,8 +1,9 @@
 import DBClient from '@/prisma/DBClient';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { z } from 'zod';
 
 const getBeerRecommendations = async (
-  beerPost: Pick<BeerPostQueryResult, 'type' | 'brewery' | 'id'>,
+  beerPost: Pick<z.infer<typeof beerPostQueryResult>, 'type' | 'brewery' | 'id'>,
 ) => {
   const beerRecommendations = await DBClient.instance.beerPost.findMany({
     where: {

@@ -1,19 +1,26 @@
+import DBClient from '@/prisma/DBClient';
+import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import createNewBeerComment from '@/services/BeerComment/createNewBeerComment';
-import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
   body: z.infer<typeof BeerCommentValidationSchema>;
   query: { id: string };
+}
+
+interface GetAllCommentsRequest extends UserExtendedNextApiRequest {
+  query: { id: string; page_size: string; page_num: string };
 }
 
 const createComment = async (
@@ -24,12 +31,13 @@ const createComment = async (
 
   const beerPostId = req.query.id;
 
-  const newBeerComment: BeerCommentQueryResultT = await createNewBeerComment({
-    content,
-    rating,
-    beerPostId,
-    userId: req.user!.id,
-  });
+  const newBeerComment: z.infer<typeof BeerCommentQueryResult> =
+    await createNewBeerComment({
+      content,
+      rating,
+      beerPostId,
+      userId: req.user!.id,
+    });
 
   res.status(201).json({
     message: 'Beer comment created successfully',
@@ -39,8 +47,34 @@ const createComment = async (
   });
 };
 
+const getAll = async (
+  req: GetAllCommentsRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const beerPostId = req.query.id;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { page_size, page_num } = req.query;
+
+  const comments = await getAllBeerComments(
+    { id: beerPostId },
+    { pageSize: parseInt(page_size, 10), pageNum: parseInt(page_num, 10) },
+  );
+
+  const pageCount = await DBClient.instance.beerComment.count({ where: { beerPostId } });
+
+  res.setHeader('X-Total-Count', pageCount);
+
+  res.status(200).json({
+    message: 'Beer comments fetched successfully',
+    statusCode: 200,
+    payload: comments,
+    success: true,
+  });
+};
+
 const router = createRouter<
-  CreateCommentRequest,
+  // I don't want to use any, but I can't figure out how to get the types to work
+  any,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
@@ -51,6 +85,17 @@ router.post(
   }),
   getCurrentUser,
   createComment,
+);
+
+router.get(
+  validateRequest({
+    querySchema: z.object({
+      id: z.string().uuid(),
+      page_size: z.coerce.number().int().positive(),
+      page_num: z.coerce.number().int().positive(),
+    }),
+  }),
+  getAll,
 );
 
 const handler = router.handler(NextConnectOptions);

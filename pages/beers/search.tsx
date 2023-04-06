@@ -14,8 +14,8 @@ const DEBOUNCE_DELAY = 300;
 
 const SearchPage: NextPage = () => {
   const router = useRouter();
-  const querySearch = router.query.search as string | undefined;
-  const [searchValue, setSearchValue] = useState(querySearch || '');
+  const querySearch = (router.query.search as string) || '';
+  const [searchValue, setSearchValue] = useState(querySearch);
   const { searchResults, isLoading, searchError } = useBeerPostSearch(searchValue);
 
   const debounceSearch = debounce((value: string) => {
@@ -36,7 +36,7 @@ const SearchPage: NextPage = () => {
       if (!querySearch || searchValue) {
         return;
       }
-      setSearchValue(searchValue);
+      setSearchValue(querySearch);
     }, DEBOUNCE_DELAY)();
   }, [querySearch, searchValue]);
 

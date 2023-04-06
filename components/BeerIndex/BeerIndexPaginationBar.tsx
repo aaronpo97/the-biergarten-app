@@ -1,5 +1,5 @@
 import Link from 'next/link';
-
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { FC } from 'react';
 
 interface PaginationProps {
@@ -14,18 +14,16 @@ const BeerIndexPaginationBar: FC<PaginationProps> = ({ pageCount, pageNum }) => 
         className={`btn ${pageNum === 1 ? 'btn-disabled' : ''}`}
         href={{ pathname: '/beers', query: { page_num: pageNum - 1 } }}
         scroll={false}
-        prefetch={true}
       >
-        «
+        <FaArrowLeft />
       </Link>
       <button className="btn">Page {pageNum}</button>
       <Link
         className={`btn ${pageNum === pageCount ? 'btn-disabled' : ''}`}
         href={{ pathname: '/beers', query: { page_num: pageNum + 1 } }}
         scroll={false}
-        prefetch={true}
       >
-        »
+        <FaArrowRight />
       </Link>
     </div>
   );

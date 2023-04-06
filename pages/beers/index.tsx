@@ -6,11 +6,12 @@ import DBClient from '@/prisma/DBClient';
 import Layout from '@/components/ui/Layout';
 import BeerIndexPaginationBar from '@/components/BeerIndex/BeerIndexPaginationBar';
 import BeerCard from '@/components/BeerIndex/BeerCard';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
+import { z } from 'zod';
 
 interface BeerPageProps {
-  initialBeerPosts: BeerPostQueryResult[];
+  initialBeerPosts: z.infer<typeof beerPostQueryResult>[];
   pageCount: number;
 }
 
@@ -26,7 +27,7 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
         <meta name="description" content="Beer posts" />
       </Head>
       <div className="flex items-center justify-center bg-base-100">
-        <div className="my-10 flex  w-10/12 flex-col space-y-4">
+        <div className="my-10 flex w-10/12 flex-col space-y-4">
           <header className="my-10">
             <div className="space-y-2">
               <h1 className="text-6xl font-bold">The Biergarten Index</h1>

@@ -1,4 +1,4 @@
-import { BeerCommentQueryResult } from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
@@ -14,14 +14,8 @@ const sendCreateBeerCommentRequest = async ({
 }: z.infer<typeof BeerCommentValidationSchemaWithId>) => {
   const response = await fetch(`/api/beers/${beerPostId}/comments`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      beerPostId,
-      content,
-      rating,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ beerPostId, content, rating }),
   });
 
   const data = await response.json();

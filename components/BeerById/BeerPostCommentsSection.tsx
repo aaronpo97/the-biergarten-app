@@ -1,35 +1,41 @@
+/* eslint-disable no-nested-ternary */
 import UserContext from '@/contexts/userContext';
-import { BeerCommentQueryResultArrayT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
-import { useRouter } from 'next/router';
+
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+
 import { FC, useContext } from 'react';
+import { z } from 'zod';
+import useBeerPostComments from '@/hooks/useBeerPostComments';
+import { useRouter } from 'next/router';
 import BeerCommentForm from './BeerCommentForm';
 import BeerCommentsPaginationBar from './BeerPostCommentsPaginationBar';
-import CommentCard from './CommentCard';
+import CommentCardBody from './CommentCardBody';
+import NoCommentsCard from './NoCommentsCard';
+import CommentLoadingCardBody from './CommentLoadingCardBody';
 
 interface BeerPostCommentsSectionProps {
-  beerPost: BeerPostQueryResult;
-  comments: BeerCommentQueryResultArrayT;
-  commentsPageCount: number;
+  beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
-const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({
-  beerPost,
-
-  comments,
-  commentsPageCount,
-}) => {
+const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost }) => {
   const { user } = useContext(UserContext);
   const router = useRouter();
+  const { id } = beerPost;
+  const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
+  const pageSize = 5;
 
-  const commentsPageNum = parseInt(router.query.comments_page as string, 10) || 1;
+  const { comments, commentsPageCount, isLoading, mutate } = useBeerPostComments({
+    id,
+    pageNum,
+    pageSize,
+  });
 
   return (
     <div className="w-full space-y-3 md:w-[60%]">
       <div className="card h-96 bg-base-300">
         <div className="card-body h-full">
           {user ? (
-            <BeerCommentForm beerPost={beerPost} />
+            <BeerCommentForm beerPost={beerPost} mutate={mutate} />
           ) : (
             <div className="flex h-full flex-col items-center justify-center">
               <span className="text-lg font-bold">Log in to leave a comment.</span>
@@ -37,23 +43,34 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({
           )}
         </div>
       </div>
-      {comments.length ? (
+
+      {comments && !!comments.length && !!commentsPageCount && !isLoading && (
         <div className="card bg-base-300 pb-6">
           {comments.map((comment) => (
-            <CommentCard key={comment.id} comment={comment} beerPostId={beerPost.id} />
+            <CommentCardBody key={comment.id} comment={comment} mutate={mutate} />
           ))}
 
           <BeerCommentsPaginationBar
-            commentsPageNum={commentsPageNum}
+            commentsPageNum={pageNum}
             commentsPageCount={commentsPageCount}
             beerPost={beerPost}
           />
         </div>
-      ) : (
-        <div className="card items-center bg-base-300">
-          <div className="card-body">
-            <span className="text-lg font-bold">No comments yet.</span>
-          </div>
+      )}
+
+      {!comments?.length && !isLoading && <NoCommentsCard />}
+
+      {isLoading && (
+        <div className="card bg-base-300 pb-6">
+          {Array.from({ length: pageSize }).map((_, i) => (
+            <CommentLoadingCardBody key={i} />
+          ))}
+
+          <BeerCommentsPaginationBar
+            commentsPageNum={pageNum}
+            commentsPageCount={20}
+            beerPost={beerPost}
+          />
         </div>
       )}
     </div>

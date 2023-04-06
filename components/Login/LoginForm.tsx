@@ -29,9 +29,8 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<LoginT> = async (data) => {
     try {
-      const response = await sendLoginUserRequest(data);
-
-      router.push(`/users/${response.id}`);
+      await sendLoginUserRequest(data);
+      router.push(`/user/current`);
     } catch (error) {
       if (error instanceof Error) {
         setResponseError(error.message);
@@ -74,7 +73,7 @@ const LoginForm = () => {
 
       {responseError && <ErrorAlert error={responseError} setError={setResponseError} />}
       <div className="w-full">
-        <button type="submit" className="btn btn-primary w-full">
+        <button type="submit" className="btn-primary btn w-full">
           Login
         </button>
       </div>

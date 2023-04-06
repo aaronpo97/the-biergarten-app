@@ -18,8 +18,3 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-
-      - name: Prettier Action
-        # You may pin to the exact commit or the version.
-        # uses: creyD/prettier_action@6602189cf8bac1ce73ffe601925f6127ab7f21ac
-        uses: creyD/prettier_action@v4.2

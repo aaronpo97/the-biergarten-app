@@ -133,7 +133,7 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
           {isSubmitting ? 'Submitting...' : 'Submit'}
         </Button>
         <button
-          className={`btn-primary btn w-full rounded-xl ${isSubmitting ? 'loading' : ''}`}
+          className={`btn btn-primary w-full rounded-xl ${isSubmitting ? 'loading' : ''}`}
           type="button"
           onClick={onDelete}
         >

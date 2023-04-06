@@ -1,18 +1,22 @@
 import UserContext from '@/contexts/userContext';
-import { BeerCommentQueryResultT } from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import { format, formatDistanceStrict } from 'date-fns';
+import useTimeDistance from '@/hooks/useTimeDistance';
+import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import format from 'date-fns/format';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Rating } from 'react-daisyui';
 
 import { FaEllipsisH } from 'react-icons/fa';
+import { KeyedMutator } from 'swr';
+import { z } from 'zod';
 
 const CommentCardDropdown: React.FC<{
-  comment: BeerCommentQueryResultT;
-  beerPostId: string;
-}> = ({ comment, beerPostId }) => {
-  const router = useRouter();
+  comment: z.infer<typeof BeerCommentQueryResult>;
+  mutate: KeyedMutator<{
+    comments: z.infer<typeof BeerCommentQueryResult>[];
+    pageCount: number;
+  }>;
+}> = ({ comment, mutate }) => {
   const { user } = useContext(UserContext);
 
   const isCommentOwner = user?.id === comment.postedBy.id;
@@ -21,16 +25,17 @@ const CommentCardDropdown: React.FC<{
     const response = await fetch(`/api/beer-comments/${comment.id}`, {
       method: 'DELETE',
     });
+
     if (!response.ok) {
       throw new Error('Failed to delete comment');
     }
 
-    router.replace(`/beers/${beerPostId}?comments_page=1`, undefined, { scroll: false });
+    await mutate();
   };
 
   return (
     <div className="dropdown">
-      <label tabIndex={0} className="btn btn-ghost btn-sm m-1">
+      <label tabIndex={0} className="btn-ghost btn-sm btn m-1">
         <FaEllipsisH />
       </label>
       <ul
@@ -51,19 +56,20 @@ const CommentCardDropdown: React.FC<{
   );
 };
 
-const CommentCard: React.FC<{
-  comment: BeerCommentQueryResultT;
-  beerPostId: string;
-}> = ({ comment, beerPostId }) => {
-  const [timeDistance, setTimeDistance] = useState('');
+const CommentCardBody: React.FC<{
+  comment: z.infer<typeof BeerCommentQueryResult>;
+
+  mutate: KeyedMutator<{
+    comments: z.infer<typeof BeerCommentQueryResult>[];
+    pageCount: number;
+  }>;
+}> = ({ comment, mutate }) => {
   const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    setTimeDistance(formatDistanceStrict(new Date(comment.createdAt), new Date()));
-  }, [comment.createdAt]);
+  const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
-    <div className="card-body">
+    <div className="card-body animate-in fade-in-10">
       <div className="flex flex-col justify-between sm:flex-row">
         <div>
           <h3 className="font-semibold sm:text-2xl">
@@ -83,7 +89,7 @@ const CommentCard: React.FC<{
           </h4>
         </div>
 
-        {user && <CommentCardDropdown comment={comment} beerPostId={beerPostId} />}
+        {user && <CommentCardDropdown comment={comment} mutate={mutate} />}
       </div>
 
       <div className="space-y-1">
@@ -104,4 +110,4 @@ const CommentCard: React.FC<{
   );
 };
 
-export default CommentCard;
+export default CommentCardBody;

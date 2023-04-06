@@ -1,11 +1,14 @@
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { FC } from 'react';
 import Link from 'next/link';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { z } from 'zod';
+
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface BeerCommentsPaginationBarProps {
   commentsPageNum: number;
   commentsPageCount: number;
-  beerPost: BeerPostQueryResult;
+  beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
 const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
@@ -14,9 +17,9 @@ const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
   beerPost,
 }) => (
   <div className="flex items-center justify-center" id="comments-pagination">
-    <div className="btn-group grid w-6/12 grid-cols-2">
+    <div className="btn-group">
       <Link
-        className={`btn-outline btn ${
+        className={`btn btn-ghost ${
           commentsPageNum === 1
             ? 'btn-disabled pointer-events-none'
             : 'pointer-events-auto'
@@ -27,10 +30,11 @@ const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
         }}
         scroll={false}
       >
-        Next Comments
+        <FaArrowLeft />
       </Link>
+      <button className="btn btn-ghost pointer-events-none">{commentsPageNum}</button>
       <Link
-        className={`btn-outline btn ${
+        className={`btn btn-ghost ${
           commentsPageNum === commentsPageCount
             ? 'btn-disabled pointer-events-none'
             : 'pointer-events-auto'
@@ -41,7 +45,7 @@ const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
         }}
         scroll={false}
       >
-        Previous Comments
+        <FaArrowRight />
       </Link>
     </div>
   </div>

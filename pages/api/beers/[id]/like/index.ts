@@ -4,13 +4,14 @@ import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import { NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import ServerError from '@/config/util/ServerError';
 import createBeerPostLike from '@/services/BeerPostLike/createBeerPostLike';
 import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeById';
 import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
+import DBClient from '@/prisma/DBClient';
 
 const sendLikeRequest = async (
   req: UserExtendedNextApiRequest,
@@ -43,6 +44,24 @@ const sendLikeRequest = async (
   res.status(200).json(jsonResponse);
 };
 
+const getLikeCount = async (
+  req: NextApiRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const id = req.query.id as string;
+
+  const likes = await DBClient.instance.beerPostLike.count({
+    where: { beerPostId: id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Successfully retrieved like count.',
+    statusCode: 200,
+    payload: { likeCount: likes },
+  });
+};
+
 const router = createRouter<
   UserExtendedNextApiRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
@@ -54,5 +73,11 @@ router.post(
   sendLikeRequest,
 );
 
+router.get(
+  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
+  getLikeCount,
+);
+
 const handler = router.handler(NextConnectOptions);
+
 export default handler;

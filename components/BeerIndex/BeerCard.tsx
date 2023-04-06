@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { FC } from 'react';
 import Image from 'next/image';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import { z } from 'zod';
 
-const BeerCard: FC<{ post: BeerPostQueryResult }> = ({ post }) => {
+const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) => {
   return (
     <div className="card bg-base-300" key={post.id}>
       <figure className="card-image h-96">

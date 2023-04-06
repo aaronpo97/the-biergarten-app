@@ -1,12 +1,12 @@
 import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
 import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
 import router from 'next/router';
 import { FunctionComponent, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
+import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import ErrorAlert from './ui/alerts/ErrorAlert';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
@@ -20,7 +20,7 @@ import FormTextInput from './ui/forms/FormTextInput';
 type CreateBeerPostSchema = z.infer<typeof CreateBeerPostValidationSchema>;
 
 interface BeerFormProps {
-  breweries: BreweryPostQueryResult[];
+  breweries: z.infer<typeof BreweryPostQueryResult>[];
   types: BeerType[];
 }
 

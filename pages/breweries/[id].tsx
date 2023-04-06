@@ -1,10 +1,12 @@
 import Layout from '@/components/ui/Layout';
-import { BeerPostQueryResult } from '@/services/BeerPost/schema/BeerPostQueryResult';
+
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
+import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { GetServerSideProps, NextPage } from 'next';
+import { z } from 'zod';
 
 interface BreweryPageProps {
-  breweryPost: BeerPostQueryResult;
+  breweryPost: z.infer<typeof BreweryPostQueryResult>;
 }
 
 const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
