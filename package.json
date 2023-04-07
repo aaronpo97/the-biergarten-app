@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "format": "npx prettier . --write",
-    "prestart": "npm run build",
     "seed": "npx ts-node ./prisma/seed/index.ts"
   },
   "dependencies": {
@@ -22,6 +21,7 @@
     "cloudinary": "^1.35.0",
     "cookie": "^0.5.0",
     "date-fns": "^2.29.3",
+    "dotenv": "^16.0.3",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "multer": "^2.0.0-rc.4",

@@ -1,12 +1,7 @@
 import { BasicUserInfoSchema } from '@/config/auth/types';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-
-const { CONFIRMATION_TOKEN_SECRET } = process.env;
-
-if (!CONFIRMATION_TOKEN_SECRET) {
-  throw new Error('CONFIRMATION_TOKEN_SECRET is not defined');
-}
+import { CONFIRMATION_TOKEN_SECRET } from '../env';
 
 type User = z.infer<typeof BasicUserInfoSchema>;
 

@@ -1,15 +1,13 @@
 import { NextApiResponse } from 'next';
 import { serialize, parse } from 'cookie';
 import { SessionRequest } from './types';
-
-const TOKEN_NAME = 'token';
-export const MAX_AGE = 60 * 60 * 8; // 8 hours
+import { NODE_ENV, SESSION_MAX_AGE, SESSION_TOKEN_NAME } from '../env';
 
 export function setTokenCookie(res: NextApiResponse, token: string) {
-  const cookie = serialize(TOKEN_NAME, token, {
-    maxAge: MAX_AGE,
+  const cookie = serialize(SESSION_TOKEN_NAME, token, {
+    maxAge: SESSION_MAX_AGE,
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
     path: '/',
     sameSite: 'lax',
   });
@@ -18,7 +16,7 @@ export function setTokenCookie(res: NextApiResponse, token: string) {
 }
 
 export function removeTokenCookie(res: NextApiResponse) {
-  const cookie = serialize(TOKEN_NAME, '', { maxAge: -1, path: '/' });
+  const cookie = serialize(SESSION_TOKEN_NAME, '', { maxAge: -1, path: '/' });
   res.setHeader('Set-Cookie', cookie);
 }
 
@@ -33,5 +31,5 @@ export function parseCookies(req: SessionRequest) {
 
 export function getTokenCookie(req: SessionRequest) {
   const cookies = parseCookies(req);
-  return cookies[TOKEN_NAME];
+  return cookies[SESSION_TOKEN_NAME];
 }

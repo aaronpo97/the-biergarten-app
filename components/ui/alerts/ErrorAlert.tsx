@@ -16,7 +16,7 @@ const ErrorAlert: FC<ErrorAlertProps> = ({ error, setError }) => {
 
       <div className="flex-none">
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn-ghost btn-sm btn"
           type="button"
           onClick={() => {
             setError('');

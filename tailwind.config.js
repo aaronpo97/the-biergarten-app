@@ -9,10 +9,7 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [
-    require('daisyui'), 
-    require('tailwindcss-animate')
-  ],
+  plugins: [require('daisyui'), require('tailwindcss-animate')],
 
   daisyui: {
     logs: false,

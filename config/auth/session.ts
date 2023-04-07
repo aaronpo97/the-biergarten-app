@@ -6,10 +6,9 @@ import {
   UserSessionSchema,
 } from '@/config/auth/types';
 import { z } from 'zod';
-import { MAX_AGE, setTokenCookie, getTokenCookie } from './cookie';
+import { SESSION_MAX_AGE, SESSION_SECRET } from '@/config/env';
+import { setTokenCookie, getTokenCookie } from './cookie';
 import ServerError from '../util/ServerError';
-
-const { SESSION_SECRET } = process.env;
 
 export async function setLoginSession(
   res: NextApiResponse,
@@ -19,7 +18,7 @@ export async function setLoginSession(
     throw new ServerError('Authentication is not configured.', 500);
   }
   const createdAt = Date.now();
-  const obj = { ...session, createdAt, maxAge: MAX_AGE };
+  const obj = { ...session, createdAt, maxAge: SESSION_MAX_AGE };
   const token = await Iron.seal(obj, SESSION_SECRET, Iron.defaults);
 
   setTokenCookie(res, token);

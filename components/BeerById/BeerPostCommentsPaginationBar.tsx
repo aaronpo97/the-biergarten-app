@@ -19,7 +19,7 @@ const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
   <div className="flex items-center justify-center" id="comments-pagination">
     <div className="btn-group">
       <Link
-        className={`btn btn-ghost ${
+        className={`btn-ghost btn ${
           commentsPageNum === 1
             ? 'btn-disabled pointer-events-none'
             : 'pointer-events-auto'
@@ -32,9 +32,9 @@ const BeerCommentsPaginationBar: FC<BeerCommentsPaginationBarProps> = ({
       >
         <FaArrowLeft />
       </Link>
-      <button className="btn btn-ghost pointer-events-none">{commentsPageNum}</button>
+      <button className="btn-ghost btn pointer-events-none">{commentsPageNum}</button>
       <Link
-        className={`btn btn-ghost ${
+        className={`btn-ghost btn ${
           commentsPageNum === commentsPageCount
             ? 'btn-disabled pointer-events-none'
             : 'pointer-events-auto'
