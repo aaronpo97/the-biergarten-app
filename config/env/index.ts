@@ -1,12 +1,16 @@
 /* eslint-disable prefer-destructuring */
 import { z } from 'zod';
-import process from 'process';
+import { env } from 'process';
 import ServerError from '../util/ServerError';
 
 import 'dotenv/config';
 
+/**
+ * Environment variables are validated at runtime to ensure that they are present and have
+ * the correct type. This is done using the zod library.
+ */
 const envSchema = z.object({
-  BASE_URL: z.string(),
+  BASE_URL: z.string().url(),
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_KEY: z.string(),
   CLOUDINARY_SECRET: z.string(),
@@ -14,17 +18,18 @@ const envSchema = z.object({
   SESSION_SECRET: z.string(),
   SESSION_TOKEN_NAME: z.string(),
   SESSION_MAX_AGE: z.coerce.number().positive(),
-  DATABASE_URL: z.string(),
+  DATABASE_URL: z.string().url(),
   NODE_ENV: z.enum(['development', 'production', 'test']),
   SPARKPOST_API_KEY: z.string(),
   SPARKPOST_SENDER_ADDRESS: z.string().email(),
 });
 
-const parsed = envSchema.safeParse(process.env);
+const parsed = envSchema.safeParse(env);
 
 if (!parsed.success) {
   throw new ServerError('Invalid environment variables', 500);
 }
+
 /**
  * Base URL of the application.
  *
@@ -68,10 +73,12 @@ export const CLOUDINARY_KEY = parsed.data.CLOUDINARY_KEY;
 export const CLOUDINARY_SECRET = parsed.data.CLOUDINARY_SECRET;
 
 /**
- * Fsd Fds Secret key for signing confirmation tokens.
+ * Secret key for signing confirmation tokens.
  *
  * @example
  *   'abcdefghijklmnopqrstuvwxyz123456';
+ *
+ * @see README.md for instructions on generating a secret key.
  */
 export const CONFIRMATION_TOKEN_SECRET = parsed.data.CONFIRMATION_TOKEN_SECRET;
 
@@ -80,6 +87,8 @@ export const CONFIRMATION_TOKEN_SECRET = parsed.data.CONFIRMATION_TOKEN_SECRET;
  *
  * @example
  *   'abcdefghijklmnopqrstuvwxyz123456';
+ *
+ * @see README.md for instructions on generating a secret key.
  */
 export const SESSION_SECRET = parsed.data.SESSION_SECRET;
 
@@ -132,5 +141,7 @@ export const SPARKPOST_API_KEY = parsed.data.SPARKPOST_API_KEY;
  *
  * @example
  *   'noreply@example.com';
+ *
+ * @see https://app.sparkpost.com/domains/list/sending
  */
 export const SPARKPOST_SENDER_ADDRESS = parsed.data.SPARKPOST_SENDER_ADDRESS;
