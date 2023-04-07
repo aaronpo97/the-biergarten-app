@@ -6,6 +6,7 @@ import { z } from 'zod';
 import logger from '../pino/logger';
 
 import ServerError from '../util/ServerError';
+import { NODE_ENV } from '../env';
 
 type NextConnectOptionsT = HandlerOptions<
   RequestHandler<
@@ -23,7 +24,7 @@ const NextConnectOptions: NextConnectOptionsT = {
     });
   },
   onError(error, req, res) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (NODE_ENV !== 'production') {
       logger.error(error);
     }
 

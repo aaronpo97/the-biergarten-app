@@ -1,3 +1,4 @@
+import { NODE_ENV } from '@/config/env';
 import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -10,7 +11,7 @@ const DBClient = {
     }),
 };
 
-if (process.env.NODE_ENV !== 'production') {
+if (NODE_ENV !== 'production') {
   globalForPrisma.prisma = DBClient.instance;
 }
 

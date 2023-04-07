@@ -1,16 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import ServerError from '../util/ServerError';
 
-const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_KEY, CLOUDINARY_SECRET } = process.env;
-
-if (!(CLOUDINARY_CLOUD_NAME && CLOUDINARY_KEY && CLOUDINARY_SECRET)) {
-  throw new ServerError(
-    'The cloudinary credentials were not found in the environment variables.',
-    500,
-  );
-}
+import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_KEY, CLOUDINARY_SECRET } from '../env';
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,

@@ -83,7 +83,7 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_KEY`, and `CLOUDINARY_SECRET` are the credentials for your Cloudinary account.
   - You can create a free account [here](https://cloudinary.com/users/register/free).
 - `CONFIRMATION_TOKEN_SECRET` is the secret used to sign the confirmation token used for email confirmation.
-  - You can generate a random string using the`openssl rand -hex 32` command.
+  - You can generate a random string using the`openssl rand -base64 127` command.
 - `SESSION_SECRET` is the secret used to sign the session cookie.
   - Use the same command as above to generate a random string.
 - `DATABASE_URL` is the URL of your CockroachDB database.
@@ -118,10 +118,10 @@ npm run dev
 
 The Biergarten App is licensed under the GNU General Public License v3.0. This means that anyone is free to use, modify, and distribute the code as long as they also distribute their modifications under the same license.
 
-I encourage anyone who uses this code for educational purposes to attribute the original author (i.e. me) and provide a link to the original repository.
+I encourage anyone who uses this code for educational purposes to attribute me as the original author, and to provide a link to this repository.
 
 By contributing to this repository, you agree to license your contributions under the same license as the project.
 
-If you have any questions or concerns about the license, please feel free to reach out to me..
+If you have any questions or concerns about the license, please feel free to submit an issue to this repository.
 
 I hope that this project will be useful to other developers and beer enthusiasts who are interested in learning about web development with Next.js, Prisma, CockroachDB, and other technologies.

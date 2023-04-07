@@ -1,3 +1,4 @@
+import { SPARKPOST_SENDER_ADDRESS } from '../env';
 import client from './client';
 
 interface EmailParams {
@@ -5,12 +6,6 @@ interface EmailParams {
   text: string;
   html: string;
   subject: string;
-}
-
-const { SPARKPOST_SENDER_ADDRESS } = process.env;
-
-if (!SPARKPOST_SENDER_ADDRESS) {
-  throw new Error('SPARKPOST_SENDER_ADDRESS env variable is not set.');
 }
 
 const sendEmail = async ({ address, text, html, subject }: EmailParams) => {
