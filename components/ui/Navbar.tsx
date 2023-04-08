@@ -42,10 +42,10 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="navbar bg-primary text-primary-content">
+    <nav className="navbar sticky top-0 z-50 bg-primary text-primary-content">
       <div className="flex-1">
-        <Link className="btn-ghost btn text-3xl normal-case" href="/">
-          <span className="cursor-pointer text-xl font-bold">The Biergarten App</span>
+        <Link className="btn-ghost btn normal-case" href="/">
+          <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
         </Link>
       </div>
       <div className="hidden flex-none lg:block">
@@ -68,7 +68,7 @@ const Navbar = () => {
         </ul>
       </div>
       <div className="flex-none lg:hidden">
-        <div className="dropdown dropdown-end">
+        <div className="dropdown-end dropdown">
           <label tabIndex={0} className="btn-ghost btn-circle btn">
             <span className="w-10 rounded-full">
               <svg
