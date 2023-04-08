@@ -3,26 +3,25 @@ import useUser from '@/hooks/useUser';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 
-import { Roboto } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 
-const roboto = Roboto({
-  weight: ['100', '300', '400', '500', '700', '900'],
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { user, isLoading, error } = useUser();
+  const { user, isLoading, error, mutate } = useUser();
 
   return (
     <>
       <style jsx global>
         {`
           html {
-            font-family: ${roboto.style.fontFamily};
+            font-family: ${spaceGrotesk.style.fontFamily};
           }
         `}
       </style>
-      <UserContext.Provider value={{ user, isLoading, error }}>
+      <UserContext.Provider value={{ user, isLoading, error, mutate }}>
         <Component {...pageProps} />
       </UserContext.Provider>
     </>

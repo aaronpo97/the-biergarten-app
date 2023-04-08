@@ -2,9 +2,10 @@ import sendLoginUserRequest from '@/requests/sendLoginUserRequest';
 import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
+import UserContext from '@/contexts/userContext';
 import ErrorAlert from '../ui/alerts/ErrorAlert';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -28,10 +29,13 @@ const LoginForm = () => {
 
   const [responseError, setResponseError] = useState<string>('');
 
+  const { mutate } = useContext(UserContext);
+
   const onSubmit: SubmitHandler<LoginT> = async (data) => {
     try {
       await sendLoginUserRequest(data);
-      router.push(`/user/current`);
+      await mutate!();
+      await router.push(`/user/current`);
     } catch (error) {
       if (error instanceof Error) {
         setResponseError(error.message);
