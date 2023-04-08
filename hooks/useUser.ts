@@ -16,6 +16,7 @@ const useUser = () => {
     data: user,
     error,
     isLoading,
+    mutate,
   } = useSWR('/api/users/current', async (url) => {
     if (!document.cookie.includes('token')) {
       throw new Error('No token cookie found');
@@ -43,7 +44,7 @@ const useUser = () => {
     return parsedPayload.data;
   });
 
-  return { user, isLoading, error: error as unknown };
+  return { user, isLoading, error: error as unknown, mutate };
 };
 
 export default useUser;

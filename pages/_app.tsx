@@ -10,7 +10,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { user, isLoading, error } = useUser();
+  const { user, isLoading, error, mutate } = useUser();
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         `}
       </style>
-      <UserContext.Provider value={{ user, isLoading, error }}>
+      <UserContext.Provider value={{ user, isLoading, error, mutate }}>
         <Component {...pageProps} />
       </UserContext.Provider>
     </>
