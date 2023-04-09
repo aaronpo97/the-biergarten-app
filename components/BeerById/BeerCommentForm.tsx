@@ -8,7 +8,6 @@ import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
-
 import { useRouter } from 'next/router';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import Button from '../ui/forms/Button';
@@ -18,10 +17,9 @@ import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 
-
 interface BeerCommentFormProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
-  mutate: ReturnType<typeof useBeerPostComments>['mutate']
+  mutate: ReturnType<typeof useBeerPostComments>['mutate'];
 }
 
 const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
@@ -43,7 +41,6 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     reset({ rating: 0, content: '' });
   }, [reset]);
 
-  const router = useRouter();
   const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
     data,
   ) => {
@@ -54,14 +51,8 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
       rating: data.rating,
       beerPostId: beerPost.id,
     });
+    await mutate();
     reset();
-
-    const submitTasks: Promise<unknown>[] = [
-      router.push(`/beers/${beerPost.id}`, undefined, { scroll: false }),
-      mutate(),
-    ];
-
-    await Promise.all(submitTasks);
   };
 
   const { errors } = formState;

@@ -18,7 +18,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfUsers; i++) {
-    const randomValue = crypto.randomBytes(4).toString('hex');
+    const randomValue = crypto.randomBytes(8).toString('hex');
     const firstName = faker.name.firstName();
     const lastName = faker.name.lastName();
     const username = `${firstName[0]}.${lastName}.${randomValue}`;
