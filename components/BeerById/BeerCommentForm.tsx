@@ -8,7 +8,6 @@ import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useRouter } from 'next/router';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import Button from '../ui/forms/Button';
 import FormError from '../ui/forms/FormError';
