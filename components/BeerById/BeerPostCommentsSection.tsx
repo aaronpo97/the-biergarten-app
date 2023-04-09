@@ -8,7 +8,7 @@ import { z } from 'zod';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import { useRouter } from 'next/router';
 import BeerCommentForm from './BeerCommentForm';
-import BeerCommentsPaginationBar from './BeerPostCommentsPaginationBar';
+
 import CommentCardBody from './CommentCardBody';
 import NoCommentsCard from './NoCommentsCard';
 import CommentLoadingCardBody from './CommentLoadingCardBody';
@@ -22,13 +22,14 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
   const router = useRouter();
   const { id } = beerPost;
   const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
-  const pageSize = 5;
+  const PAGE_SIZE = 6;
 
-  const { comments, commentsPageCount, isLoading, mutate } = useBeerPostComments({
-    id,
-    pageNum,
-    pageSize,
-  });
+  const { comments, isLoading, mutate, setSize, size, isLoadingMore } =
+    useBeerPostComments({
+      id,
+      pageNum,
+      pageSize: PAGE_SIZE,
+    });
 
   return (
     <div className="w-full space-y-3 md:w-[60%]">
@@ -44,17 +45,20 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
         </div>
       </div>
 
-      {comments && !!comments.length && !!commentsPageCount && !isLoading && (
+      {comments && !!comments.length && !isLoading && (
         <div className="card bg-base-300 pb-6">
           {comments.map((comment) => (
             <CommentCardBody key={comment.id} comment={comment} mutate={mutate} />
           ))}
 
-          <BeerCommentsPaginationBar
-            commentsPageNum={pageNum}
-            commentsPageCount={commentsPageCount}
-            beerPost={beerPost}
-          />
+          {isLoadingMore &&
+            Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <CommentLoadingCardBody key={i} />
+            ))}
+
+          <button type="button" onClick={() => setSize(size + 1)}>
+            load more
+          </button>
         </div>
       )}
 
@@ -62,15 +66,9 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
 
       {isLoading && (
         <div className="card bg-base-300 pb-6">
-          {Array.from({ length: pageSize }).map((_, i) => (
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <CommentLoadingCardBody key={i} />
           ))}
-
-          <BeerCommentsPaginationBar
-            commentsPageNum={pageNum}
-            commentsPageCount={20}
-            beerPost={beerPost}
-          />
         </div>
       )}
     </div>

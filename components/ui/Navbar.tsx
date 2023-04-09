@@ -68,7 +68,7 @@ const Navbar = () => {
         </ul>
       </div>
       <div className="flex-none lg:hidden">
-        <div className="dropdown-end dropdown">
+        <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn-ghost btn-circle btn">
             <span className="w-10 rounded-full">
               <svg

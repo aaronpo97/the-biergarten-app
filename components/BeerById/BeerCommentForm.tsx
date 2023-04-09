@@ -8,9 +8,9 @@ import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
-import { KeyedMutator } from 'swr';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+
 import { useRouter } from 'next/router';
+import useBeerPostComments from '@/hooks/useBeerPostComments';
 import Button from '../ui/forms/Button';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -18,12 +18,10 @@ import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 
+
 interface BeerCommentFormProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
-  mutate: KeyedMutator<{
-    comments: z.infer<typeof BeerCommentQueryResult>[];
-    pageCount: number;
-  }>;
+  mutate: ReturnType<typeof useBeerPostComments>['mutate']
 }
 
 const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({

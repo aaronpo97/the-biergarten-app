@@ -13,7 +13,7 @@ const ProtectedPage: NextPage = () => {
 
   const isMorning = currentTime > 4 && currentTime < 12;
   const isAfternoon = currentTime > 12 && currentTime < 18;
-  const isEvening = currentTime > 18 && currentTime < 24 || currentTime <4
+  const isEvening = (currentTime > 18 && currentTime < 24) || currentTime < 4;
 
   return (
     <Layout>

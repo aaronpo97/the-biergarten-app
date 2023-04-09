@@ -1,7 +1,7 @@
 import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
-import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 
 interface UseBeerPostCommentsProps {
   pageNum: number;
@@ -20,9 +20,9 @@ interface UseBeerPostCommentsProps {
  *   a boolean indicating if the request is currently loading, and a function to mutate
  *   the data.
  */
-const useBeerPostComments = ({ pageNum, id, pageSize }: UseBeerPostCommentsProps) => {
-  const { data, error, isLoading, mutate } = useSWR(
-    `/api/beers/${id}/comments?page_num=${pageNum}&page_size=${pageSize}`,
+const useBeerPostComments = ({ id, pageSize }: UseBeerPostCommentsProps) => {
+  const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite(
+    (index) => `/api/beers/${id}/comments?page_num=${index + 1}&page_size=${pageSize}`,
     async (url) => {
       const response = await fetch(url);
       const json = await response.json();
@@ -33,6 +33,7 @@ const useBeerPostComments = ({ pageNum, id, pageSize }: UseBeerPostCommentsProps
         throw new Error(parsed.error.message);
       }
       const parsedPayload = z
+
         .array(BeerCommentQueryResult)
         .safeParse(parsed.data.payload);
 
@@ -44,12 +45,20 @@ const useBeerPostComments = ({ pageNum, id, pageSize }: UseBeerPostCommentsProps
       return { comments: parsedPayload.data, pageCount };
     },
   );
+
+  const comments = data?.flatMap((d) => d.comments) ?? [];
+
+  const isLoadingMore =
+    isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined');
+
   return {
-    comments: data?.comments,
-    commentsPageCount: data?.pageCount,
+    comments,
     isLoading,
     error: error as undefined,
     mutate,
+    size,
+    setSize,
+    isLoadingMore,
   };
 };
 
