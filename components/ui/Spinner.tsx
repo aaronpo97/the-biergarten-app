@@ -6,8 +6,8 @@ interface SpinnerProps {
 
 const Spinner: FC<SpinnerProps> = ({ size = 'md' }) => {
   const spinnerWidths: Record<NonNullable<SpinnerProps['size']>, `w-[${number}px]`> = {
-    xs: 'w-[10px]',
-    sm: 'w-[20px]',
+    xs: 'w-[45px]',
+    sm: 'w-[60px]',
     md: 'w-[100px]',
     lg: 'w-[150px]',
     xl: 'w-[200px]',

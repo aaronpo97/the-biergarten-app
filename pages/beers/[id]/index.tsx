@@ -25,35 +25,37 @@ interface BeerPageProps {
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }) => {
   return (
-    <Layout>
+    <>
       <Head>
         <title>{beerPost.name}</title>
         <meta name="description" content={beerPost.description} />
       </Head>
-      <div>
-        {beerPost.beerImages[0] && (
-          <Image
-            alt={beerPost.beerImages[0].alt}
-            src={beerPost.beerImages[0].path}
-            height={1080}
-            width={1920}
-            className="h-[42rem] w-full object-cover"
-          />
-        )}
+      <Layout>
+        <div>
+          {beerPost.beerImages[0] && (
+            <Image
+              alt={beerPost.beerImages[0].alt}
+              src={beerPost.beerImages[0].path}
+              height={1080}
+              width={1920}
+              className="h-[42rem] w-full object-cover"
+            />
+          )}
 
-        <div className="my-12 flex w-full items-center justify-center ">
-          <div className="w-11/12 space-y-3 xl:w-9/12">
-            <BeerInfoHeader beerPost={beerPost} />
-            <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0">
-              <BeerPostCommentsSection beerPost={beerPost} />
-              <div className="md:w-[40%]">
-                <BeerRecommendations beerRecommendations={beerRecommendations} />
+          <div className="my-12 flex w-full items-center justify-center ">
+            <div className="w-11/12 space-y-3 xl:w-9/12">
+              <BeerInfoHeader beerPost={beerPost} />
+              <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0">
+                <BeerPostCommentsSection beerPost={beerPost} />
+                <div className="md:w-[40%]">
+                  <BeerRecommendations beerRecommendations={beerRecommendations} />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

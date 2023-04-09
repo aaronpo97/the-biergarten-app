@@ -3,33 +3,58 @@ import UserContext from '@/contexts/userContext';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
-import { FC, useContext } from 'react';
+import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import { useRouter } from 'next/router';
+import { useInView } from 'react-intersection-observer';
 import BeerCommentForm from './BeerCommentForm';
-import BeerCommentsPaginationBar from './BeerPostCommentsPaginationBar';
+
 import CommentCardBody from './CommentCardBody';
 import NoCommentsCard from './NoCommentsCard';
 import CommentLoadingCardBody from './CommentLoadingCardBody';
+import Spinner from '../ui/Spinner';
 
 interface BeerPostCommentsSectionProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
 }
+
+const LoadingComponent: FC<{ length: number }> = ({ length }) => {
+  return (
+    <>
+      {Array.from({ length }).map((_, i) => (
+        <CommentLoadingCardBody key={i} />
+      ))}
+      <div className="p-1">
+        <Spinner size="sm" />
+      </div>
+    </>
+  );
+};
 
 const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost }) => {
   const { user } = useContext(UserContext);
   const router = useRouter();
   const { id } = beerPost;
   const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
-  const pageSize = 5;
+  const PAGE_SIZE = 6;
 
-  const { comments, commentsPageCount, isLoading, mutate } = useBeerPostComments({
-    id,
-    pageNum,
-    pageSize,
+  const { comments, isLoading, mutate, setSize, size, isLoadingMore, isAtEnd } =
+    useBeerPostComments({
+      id,
+      pageNum,
+      pageSize: PAGE_SIZE,
+    });
+
+  const { ref } = useInView({
+    delay: 3000,
+    onChange: (visible) => {
+      if (!visible || isAtEnd) return;
+      setSize(size + 1);
+    },
   });
 
+  const sectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   return (
     <div className="w-full space-y-3 md:w-[60%]">
       <div className="card h-96 bg-base-300">
@@ -44,17 +69,37 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
         </div>
       </div>
 
-      {comments && !!comments.length && !!commentsPageCount && !isLoading && (
-        <div className="card bg-base-300 pb-6">
-          {comments.map((comment) => (
-            <CommentCardBody key={comment.id} comment={comment} mutate={mutate} />
-          ))}
+      {comments && !!comments.length && !isLoading && (
+        <div className="card bg-base-300 pb-6" ref={sectionRef}>
+          {comments.map((comment, index) => {
+            const isLastComment = index === comments.length - 1;
 
-          <BeerCommentsPaginationBar
-            commentsPageNum={pageNum}
-            commentsPageCount={commentsPageCount}
-            beerPost={beerPost}
-          />
+            return (
+              <div ref={isLastComment ? ref : undefined} key={comment.id}>
+                <CommentCardBody comment={comment} mutate={mutate} />
+              </div>
+            );
+          })}
+
+          {!!isLoadingMore && (
+            <div>
+              <LoadingComponent length={Math.floor(PAGE_SIZE / 2)} />
+            </div>
+          )}
+
+          {isAtEnd && (
+            <div className="flex h-10 items-center justify-center text-center">
+              <button
+                className="btn-ghost btn-sm btn"
+                type="button"
+                onClick={() => {
+                  sectionRef.current!.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Scroll to top of comments
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -62,15 +107,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
 
       {isLoading && (
         <div className="card bg-base-300 pb-6">
-          {Array.from({ length: pageSize }).map((_, i) => (
-            <CommentLoadingCardBody key={i} />
-          ))}
-
-          <BeerCommentsPaginationBar
-            commentsPageNum={pageNum}
-            commentsPageCount={20}
-            beerPost={beerPost}
-          />
+          <LoadingComponent length={PAGE_SIZE} />
         </div>
       )}
     </div>

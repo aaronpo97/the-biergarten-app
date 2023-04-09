@@ -2,11 +2,12 @@ import useCheckIfUserLikesBeerPost from '@/hooks/useCheckIfUserLikesBeerPost';
 import sendLikeRequest from '@/requests/sendLikeRequest';
 import { FC, useEffect, useState } from 'react';
 import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
-import { KeyedMutator } from 'swr';
+
+import useGetLikeCount from '@/hooks/useGetLikeCount';
 
 const BeerPostLikeButton: FC<{
   beerPostId: string;
-  mutateCount: KeyedMutator<number>;
+  mutateCount: ReturnType<typeof useGetLikeCount>['mutate'];
 }> = ({ beerPostId, mutateCount }) => {
   const { isLiked, mutate: mutateLikeStatus } = useCheckIfUserLikesBeerPost(beerPostId);
   const [loading, setLoading] = useState(true);
