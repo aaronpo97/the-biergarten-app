@@ -56,6 +56,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="firstName"
                 type="text"
                 formValidationSchema={register('firstName')}
@@ -72,6 +73,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="lastName"
                 type="text"
                 formValidationSchema={register('lastName')}
@@ -90,6 +92,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="email"
                 type="email"
                 formValidationSchema={register('email')}
@@ -105,6 +108,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="username"
                 type="text"
                 formValidationSchema={register('username')}
@@ -123,6 +127,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="password"
                 type="password"
                 formValidationSchema={register('password')}
@@ -138,6 +143,7 @@ const RegisterUserForm: FC = () => {
             </FormInfo>
             <FormSegment>
               <FormTextInput
+                disabled={formState.isSubmitting}
                 id="confirmPassword"
                 type="password"
                 formValidationSchema={register('confirmPassword')}
@@ -154,6 +160,7 @@ const RegisterUserForm: FC = () => {
         <FormSegment>
           <FormTextInput
             id="dateOfBirth"
+            disabled={formState.isSubmitting}
             type="date"
             formValidationSchema={register('dateOfBirth')}
             error={!!errors.dateOfBirth}
@@ -161,7 +168,9 @@ const RegisterUserForm: FC = () => {
           />
         </FormSegment>
         <div className="mt-6 w-full">
-          <Button type="submit">Register User</Button>
+          <Button type="submit" isSubmitting={formState.isSubmitting}>
+            Register User
+          </Button>
         </div>
       </div>
     </form>
