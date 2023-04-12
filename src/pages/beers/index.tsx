@@ -9,6 +9,9 @@ import BeerCard from '@/components/BeerIndex/BeerCard';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
 import { z } from 'zod';
+import Link from 'next/link';
+import UserContext from '@/contexts/userContext';
+import { useContext } from 'react';
 
 interface BeerPageProps {
   initialBeerPosts: z.infer<typeof beerPostQueryResult>[];
@@ -19,6 +22,8 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
   const router = useRouter();
   const { query } = router;
 
+  const { user } = useContext(UserContext);
+
   const pageNum = parseInt(query.page_num as string, 10) || 1;
   return (
     <Layout>
@@ -28,13 +33,20 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
       </Head>
       <div className="flex items-center justify-center bg-base-100">
         <div className="my-10 flex w-10/12 flex-col space-y-4">
-          <header className="my-10">
+          <header className="my-10 flex justify-between">
             <div className="space-y-2">
               <h1 className="text-6xl font-bold">The Biergarten Index</h1>
               <h2 className="text-2xl font-bold">
                 Page {pageNum} of {pageCount}
               </h2>
             </div>
+            {!!user && (
+              <div>
+                <Link href="/beers/create" className="btn-primary btn">
+                  Create a new beer post
+                </Link>
+              </div>
+            )}
           </header>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {initialBeerPosts.map((post) => {

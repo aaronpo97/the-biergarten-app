@@ -20,12 +20,15 @@ const createNewBeerImages = async ({
   for (let i = 0; i < numberOfImages; i++) {
     const beerPost = beerPosts[Math.floor(Math.random() * beerPosts.length)];
     const user = users[Math.floor(Math.random() * users.length)];
+    const caption = faker.lorem.sentence();
+    const alt = faker.lorem.sentence();
+
     beerImagesPromises.push(
       prisma.beerImage.create({
         data: {
           path: 'https://picsum.photos/5000/5000',
-          alt: 'Placeholder beer image.',
-          caption: 'Placeholder beer image caption.',
+          alt,
+          caption,
           beerPost: { connect: { id: beerPost.id } },
           postedBy: { connect: { id: user.id } },
           createdAt,

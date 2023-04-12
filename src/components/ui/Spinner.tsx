@@ -7,17 +7,22 @@ interface SpinnerProps {
 const Spinner: FC<SpinnerProps> = ({ size = 'md' }) => {
   const spinnerWidths: Record<NonNullable<SpinnerProps['size']>, `w-[${number}px]`> = {
     xs: 'w-[45px]',
-    sm: 'w-[60px]',
-    md: 'w-[100px]',
-    lg: 'w-[150px]',
-    xl: 'w-[200px]',
+    sm: 'w-[90px]',
+    md: 'w-[135px]',
+    lg: 'w-[180px]',
+    xl: 'w-[225px]',
   };
 
   return (
-    <div role="status" className="flex flex-col items-center justify-center rounded-3xl">
+    <div
+      role="alert"
+      aria-busy="true"
+      aria-live="polite"
+      className="flex flex-col items-center justify-center rounded-3xl text-primary"
+    >
       <svg
         aria-hidden="true"
-        className={`${spinnerWidths[size]} animate-spin fill-secondary text-primary`}
+        className={`${spinnerWidths[size]} animate-spin fill-base-content`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
