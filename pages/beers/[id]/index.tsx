@@ -15,6 +15,9 @@ import { BeerPost } from '@prisma/client';
 
 import { z } from 'zod';
 
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import { Carousel } from 'react-responsive-carousel';
+
 interface BeerPageProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
   beerRecommendations: (BeerPost & {
@@ -32,17 +35,28 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
       </Head>
       <Layout>
         <div>
-          {beerPost.beerImages[0] && (
-            <Image
-              alt={beerPost.beerImages[0].alt}
-              src={beerPost.beerImages[0].path}
-              height={1080}
-              width={1920}
-              className="h-[42rem] w-full object-cover"
-            />
-          )}
+          <Carousel
+            className="w-full"
+            useKeyboardArrows
+            autoPlay
+            interval={10000}
+            infiniteLoop
+            showThumbs={false}
+          >
+            {beerPost.beerImages.map((image, index) => (
+              <div key={image.id} id={`image-${index}}`} className="w-full">
+                <Image
+                  alt={image.alt}
+                  src={image.path}
+                  height={1080}
+                  width={1920}
+                  className="h-[42rem] w-full object-cover"
+                />
+              </div>
+            ))}
+          </Carousel>
 
-          <div className="my-12 flex w-full items-center justify-center ">
+          <div className="mb-12 mt-10 flex w-full items-center justify-center ">
             <div className="w-11/12 space-y-3 xl:w-9/12">
               <BeerInfoHeader beerPost={beerPost} />
               <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0">
