@@ -46,7 +46,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
 
   const sectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   return (
-    <div className="w-full space-y-3 md:w-[60%]">
+    <div className="w-full space-y-3">
       <div className="card h-96 bg-base-300">
         <div className="card-body h-full" ref={sectionRef}>
           {user ? (

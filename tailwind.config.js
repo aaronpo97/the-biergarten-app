@@ -48,7 +48,11 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require('daisyui'), require('tailwindcss-animate')],
+  plugins: [
+    require('@headlessui/tailwindcss'),
+    require('daisyui'),
+    require('tailwindcss-animate'),
+  ],
 
   daisyui: {
     logs: false,

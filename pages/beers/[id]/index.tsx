@@ -17,6 +17,8 @@ import { z } from 'zod';
 
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import { Tab } from '@headlessui/react';
 
 interface BeerPageProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
@@ -27,6 +29,8 @@ interface BeerPageProps {
 }
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }) => {
+  const isMd = useMediaQuery('(min-width: 768px)');
+
   return (
     <>
       <Head>
@@ -59,12 +63,36 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
           <div className="mb-12 mt-10 flex w-full items-center justify-center ">
             <div className="w-11/12 space-y-3 xl:w-9/12">
               <BeerInfoHeader beerPost={beerPost} />
-              <div className="mt-4 flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0">
-                <BeerPostCommentsSection beerPost={beerPost} />
-                <div className="md:w-[40%]">
-                  <BeerRecommendations beerRecommendations={beerRecommendations} />
+
+              {isMd ? (
+                <div className="mt-4 flex flex-row space-x-3 space-y-0">
+                  <div className="w-[60%]">
+                    <BeerPostCommentsSection beerPost={beerPost} />
+                  </div>
+                  <div className="w-[40%]">
+                    <BeerRecommendations beerRecommendations={beerRecommendations} />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <Tab.Group>
+                  <Tab.List className="card flex flex-row bg-base-300">
+                    <Tab className="ui-selected:bg-gray w-1/2 p-3 uppercase">
+                      Comments
+                    </Tab>
+                    <Tab className="ui-selected:bg-gray w-1/2 p-3 uppercase">
+                      Recommendations
+                    </Tab>
+                  </Tab.List>
+                  <Tab.Panels className="mt-2">
+                    <Tab.Panel>
+                      <BeerPostCommentsSection beerPost={beerPost} />
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <BeerRecommendations beerRecommendations={beerRecommendations} />
+                    </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
+              )}
             </div>
           </div>
         </div>
