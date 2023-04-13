@@ -33,7 +33,7 @@ The [International Bitterness Units](https://en.wikipedia.org/wiki/Beer_measurem
 Before you can run this application locally, you will need to have the following installed on your machine:
 
 - [Node.js](https://nodejs.org/en/)
-- [npm (version 6 or higher)](https://www.npmjs.com/get-npm)
+- [npm (version 8 or higher)](https://www.npmjs.com/get-npm)
 
 You will also need to create a free account with the following services:
 
