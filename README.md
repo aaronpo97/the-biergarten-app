@@ -4,13 +4,13 @@
 
 The Biergarten App is a web application designed for beer lovers to share their favorite brews and breweries with like-minded people online.
 
-I'm using Next.js, Prisma, and CockroachDB to build this app, and I'm motivated to learn more about these technologies while exploring my passion for beer.
+This application's stack consists of Next.js, Prisma and CockroachDB, and I'm motivated to learn more about these technologies while exploring my passion for beer.
 
-I've also incorporated different APIs into the application, such as the Cloudinary API for image uploading and SparkPost for email services.
+I've also incorporated different APIs into the application, such as the Cloudinary API for image uploading and the SparkPost API for email services.
 
 To handle serverless functions (API routes), I use the next-connect package.
 
-On the client-side, I'm using React, Tailwind CSS, and DaisyUI for styling to create a visually appealing and user-friendly interface.
+On the client-side, I use Tailwind CSS, Headless UI and Daisy UI for styling to create a visually appealing and user-friendly interface.
 
 I'm sharing my code publicly so that others can learn from it and use it as a reference for their own projects.
 
@@ -93,13 +93,12 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `SPARKPOST_API_KEY` is the API key for your SparkPost account.
   - You can create a free account [here](https://www.sparkpost.com/).
 - `SPARKPOST_SENDER_ADDRESS` is the email address that will be used to send emails.
-  - This email address must be verified in your SparkPost account.
 
 4. Initialize the database and run the migrations.
 
 ```bash
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma migrate dev
 ```
 
 5. Seed the database with some initial data.
