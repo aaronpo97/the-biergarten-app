@@ -29,7 +29,7 @@ interface BeerPageProps {
 }
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }) => {
-  const isMd = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   return (
     <>
@@ -64,7 +64,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
             <div className="w-11/12 space-y-3 xl:w-9/12">
               <BeerInfoHeader beerPost={beerPost} />
 
-              {isMd ? (
+              {isDesktop ? (
                 <div className="mt-4 flex flex-row space-x-3 space-y-0">
                   <div className="w-[60%]">
                     <BeerPostCommentsSection beerPost={beerPost} />
@@ -75,12 +75,12 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
                 </div>
               ) : (
                 <Tab.Group>
-                  <Tab.List className="card flex flex-row bg-base-300">
-                    <Tab className="ui-selected:bg-gray w-1/2 p-3 uppercase">
+                  <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl bg-base-300">
+                    <Tab className="tab tab-lg w-1/2 uppercase ui-selected:tab-active">
                       Comments
                     </Tab>
-                    <Tab className="ui-selected:bg-gray w-1/2 p-3 uppercase">
-                      Recommendations
+                    <Tab className="tab tab-lg w-1/2 uppercase ui-selected:tab-active">
+                      Other Beers
                     </Tab>
                   </Tab.List>
                   <Tab.Panels className="mt-2">

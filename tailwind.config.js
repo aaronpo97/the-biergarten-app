@@ -1,6 +1,6 @@
 //themes
 
-const myTheme = {
+const darkTheme = {
   default: {
     primary: 'hsl(227, 23%, 20%)',
     secondary: 'hsl(255, 9%, 69%)',
@@ -20,7 +20,7 @@ const myTheme = {
 
 const pastelTheme = {
   default: {
-    primary: 'hsl(180, 28%, 65%)',
+    primary: 'hsl(180, 15%, 60%)',
     secondary: 'hsl(21, 54%, 83%)',
     error: 'hsl(4, 87%, 74%)',
     accent: 'hsl(93, 27%, 73%)',
@@ -33,7 +33,6 @@ const pastelTheme = {
     'base-100': 'hsl(0, 0%, 85%)',
     'base-200': 'hsl(0, 0%, 82%)',
     'base-300': 'hsl(0, 0%, 78%)',
-    'base-400': 'hsl(0, 0%, 75%)',
   },
 };
 
@@ -55,6 +54,6 @@ module.exports = {
 
   daisyui: {
     logs: false,
-    themes: [myTheme],
+    themes: [darkTheme, pastelTheme],
   },
 };
