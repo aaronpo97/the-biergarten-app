@@ -20,8 +20,8 @@ const BeerPostLikeButton: FC<{
     try {
       setLoading(true);
       await sendLikeRequest(beerPostId);
-      await mutateCount();
-      await mutateLikeStatus();
+
+      await Promise.all([mutateCount(), mutateLikeStatus()]);
       setLoading(false);
     } catch (e) {
       setLoading(false);
