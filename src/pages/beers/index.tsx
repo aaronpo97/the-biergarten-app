@@ -8,24 +8,23 @@ import { MutableRefObject, useContext, useRef } from 'react';
 
 import { useInView } from 'react-intersection-observer';
 import Spinner from '@/components/ui/Spinner';
-import useMediaQuery from '@/hooks/useMediaQuery';
-import useGetBeerPosts from '@/hooks/useGetBeerPosts';
+
+import useBeerPosts from '@/hooks/useBeerPosts';
 import BeerPostLoadingCard from '@/components/BeerIndex/BeerPostLoadingCard';
 import { FaArrowUp } from 'react-icons/fa';
 
 const BeerPage: NextPage = () => {
   const { user } = useContext(UserContext);
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
-  const PAGE_SIZE = isDesktop ? 3 : 1;
+  const PAGE_SIZE = 2;
 
-  const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useGetBeerPosts(
-    { pageSize: PAGE_SIZE },
-  );
+  const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useBeerPosts({
+    pageSize: PAGE_SIZE,
+  });
 
   const { ref: lastBeerPostRef } = useInView({
     onChange: (visible) => {
-      if (!visible) return;
+      if (!visible || isAtEnd) return;
       setSize(size + 1);
     },
   });
@@ -39,7 +38,7 @@ const BeerPage: NextPage = () => {
         <meta name="description" content="Beer posts" />
       </Head>
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
-        <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12">
+        <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
           <header className="my-10 flex justify-between">
             <div className="space-y-2">
               <h1 className="text-6xl font-bold">The Biergarten Index</h1>
@@ -52,7 +51,7 @@ const BeerPage: NextPage = () => {
               </div>
             )}
           </header>
-          <div className="grid gap-6 xl:grid-cols-2 2xl:grid-cols-3">
+          <div className="grid gap-6 xl:grid-cols-2">
             {!!beerPosts.length && !isLoading && (
               <>
                 {beerPosts.map((beerPost, i) => {
@@ -67,7 +66,7 @@ const BeerPage: NextPage = () => {
                 })}
               </>
             )}
-            {isLoadingMore && (
+            {(isLoading || isLoadingMore) && (
               <>
                 {Array.from({ length: PAGE_SIZE }, (_, i) => (
                   <BeerPostLoadingCard key={i} />
@@ -76,13 +75,13 @@ const BeerPage: NextPage = () => {
             )}
           </div>
 
-          {isLoadingMore && (
-            <div className="mt-1 flex h-52 w-full items-center justify-center">
-              <Spinner size={isDesktop ? 'lg' : 'md'} />
+          {(isLoading || isLoadingMore) && (
+            <div className="flex h-32 w-full items-center justify-center">
+              <Spinner size="sm" />
             </div>
           )}
 
-          {!isLoadingMore && isAtEnd && (
+          {isAtEnd && !isLoading && (
             <div className="flex h-20 items-center justify-center text-center">
               <div
                 className="tooltip tooltip-bottom"

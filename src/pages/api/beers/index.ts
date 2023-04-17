@@ -1,4 +1,5 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import DBClient from '@/prisma/DBClient';
 import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
@@ -21,6 +22,9 @@ const getBeerPosts = async (
   const pageSize = parseInt(req.query.pageSize, 10);
 
   const beerPosts = await getAllBeerPosts(pageNum, pageSize);
+  const beerPostCount = await DBClient.instance.beerPost.count();
+
+  res.setHeader('X-Total-Count', beerPostCount);
 
   res.status(200).json({
     message: 'Beer posts retrieved successfully',

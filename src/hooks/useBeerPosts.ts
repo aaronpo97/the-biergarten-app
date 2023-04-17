@@ -3,7 +3,14 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
-const useGetBeerPosts = ({ pageSize }: { pageSize: number }) => {
+/**
+ * A custom hook using SWR to fetch beer posts from the API.
+ *
+ * @param options The options to use when fetching beer posts.
+ * @param options.pageSize The number of beer posts to fetch per page.
+ * @returns An object containing the beer posts, page count, and loading state.
+ */
+const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) {
@@ -37,8 +44,7 @@ const useGetBeerPosts = ({ pageSize }: { pageSize: number }) => {
 
   const beerPosts = data?.flatMap((d) => d.beerPosts) ?? [];
   const pageCount = data?.[0].pageCount ?? 0;
-  const isLoadingMore =
-    isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined');
+  const isLoadingMore = size > 0 && data && typeof data[size - 1] === 'undefined';
   const isAtEnd = !(size < data?.[0].pageCount!);
 
   return {
@@ -53,4 +59,4 @@ const useGetBeerPosts = ({ pageSize }: { pageSize: number }) => {
   };
 };
 
-export default useGetBeerPosts;
+export default useBeerPosts;

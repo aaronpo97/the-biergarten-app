@@ -61,7 +61,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
           </Carousel>
 
           <div className="mb-12 mt-10 flex w-full items-center justify-center ">
-            <div className="w-11/12 space-y-3 xl:w-9/12">
+            <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
               <BeerInfoHeader beerPost={beerPost} />
 
               {isDesktop ? (
