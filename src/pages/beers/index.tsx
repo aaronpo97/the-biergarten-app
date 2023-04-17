@@ -1,44 +1,48 @@
-import { GetServerSideProps, NextPage } from 'next';
-import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
-
-import { useRouter } from 'next/router';
-import DBClient from '@/prisma/DBClient';
+import { NextPage } from 'next';
 import Layout from '@/components/ui/Layout';
-import BeerIndexPaginationBar from '@/components/BeerIndex/BeerIndexPaginationBar';
 import BeerCard from '@/components/BeerIndex/BeerCard';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import Head from 'next/head';
-import { z } from 'zod';
 import Link from 'next/link';
 import UserContext from '@/contexts/userContext';
-import { useContext } from 'react';
+import { MutableRefObject, useContext, useRef } from 'react';
 
-interface BeerPageProps {
-  initialBeerPosts: z.infer<typeof beerPostQueryResult>[];
-  pageCount: number;
-}
+import { useInView } from 'react-intersection-observer';
+import Spinner from '@/components/ui/Spinner';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import useGetBeerPosts from '@/hooks/useGetBeerPosts';
+import BeerPostLoadingCard from '@/components/BeerIndex/BeerPostLoadingCard';
+import { FaArrowUp } from 'react-icons/fa';
 
-const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
-  const router = useRouter();
-  const { query } = router;
-
+const BeerPage: NextPage = () => {
   const { user } = useContext(UserContext);
 
-  const pageNum = parseInt(query.page_num as string, 10) || 1;
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const PAGE_SIZE = isDesktop ? 3 : 1;
+
+  const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useGetBeerPosts(
+    { pageSize: PAGE_SIZE },
+  );
+
+  const { ref: lastBeerPostRef } = useInView({
+    onChange: (visible) => {
+      if (!visible) return;
+      setSize(size + 1);
+    },
+  });
+
+  const pageRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+
   return (
     <Layout>
       <Head>
         <title>Beer</title>
         <meta name="description" content="Beer posts" />
       </Head>
-      <div className="flex items-center justify-center bg-base-100">
-        <div className="my-10 flex w-10/12 flex-col space-y-4">
+      <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
+        <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12">
           <header className="my-10 flex justify-between">
             <div className="space-y-2">
               <h1 className="text-6xl font-bold">The Biergarten Index</h1>
-              <h2 className="text-2xl font-bold">
-                Page {pageNum} of {pageCount}
-              </h2>
             </div>
             {!!user && (
               <div>
@@ -48,31 +52,61 @@ const BeerPage: NextPage<BeerPageProps> = ({ initialBeerPosts, pageCount }) => {
               </div>
             )}
           </header>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {initialBeerPosts.map((post) => {
-              return <BeerCard post={post} key={post.id} />;
-            })}
+          <div className="grid gap-6 xl:grid-cols-2 2xl:grid-cols-3">
+            {!!beerPosts.length && !isLoading && (
+              <>
+                {beerPosts.map((beerPost, i) => {
+                  return (
+                    <div
+                      key={beerPost.id}
+                      ref={beerPosts.length === i + 1 ? lastBeerPostRef : undefined}
+                    >
+                      <BeerCard post={beerPost} />
+                    </div>
+                  );
+                })}
+              </>
+            )}
+            {isLoadingMore && (
+              <>
+                {Array.from({ length: PAGE_SIZE }, (_, i) => (
+                  <BeerPostLoadingCard key={i} />
+                ))}
+              </>
+            )}
           </div>
-          <div className="flex justify-center">
-            <BeerIndexPaginationBar pageNum={pageNum} pageCount={pageCount} />
-          </div>
+
+          {isLoadingMore && (
+            <div className="mt-1 flex h-52 w-full items-center justify-center">
+              <Spinner size={isDesktop ? 'lg' : 'md'} />
+            </div>
+          )}
+
+          {!isLoadingMore && isAtEnd && (
+            <div className="flex h-20 items-center justify-center text-center">
+              <div
+                className="tooltip tooltip-bottom"
+                data-tip="Scroll back to top of page."
+              >
+                <button
+                  type="button"
+                  className="btn-ghost btn-sm btn"
+                  aria-label="Scroll back to top of page."
+                  onClick={() => {
+                    pageRef.current?.scrollIntoView({
+                      behavior: 'smooth',
+                    });
+                  }}
+                >
+                  <FaArrowUp />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (context) => {
-  const { query } = context;
-  const pageNumber = parseInt(query.page_num as string, 10) || 1;
-  const pageSize = 12;
-  const numberOfPosts = await DBClient.instance.beerPost.count();
-  const pageCount = numberOfPosts ? Math.ceil(numberOfPosts / pageSize) : 0;
-  const beerPosts = await getAllBeerPosts(pageNumber, pageSize);
-
-  return {
-    props: { initialBeerPosts: JSON.parse(JSON.stringify(beerPosts)), pageCount },
-  };
 };
 
 export default BeerPage;
