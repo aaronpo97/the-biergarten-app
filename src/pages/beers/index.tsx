@@ -16,7 +16,7 @@ import { FaArrowUp } from 'react-icons/fa';
 const BeerPage: NextPage = () => {
   const { user } = useContext(UserContext);
 
-  const PAGE_SIZE = 2;
+  const PAGE_SIZE = 6;
 
   const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useBeerPosts({
     pageSize: PAGE_SIZE,
