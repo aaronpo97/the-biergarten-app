@@ -39,12 +39,12 @@ const BeerPage: NextPage = () => {
       </Head>
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
         <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
-          <header className="my-10 flex justify-between">
+          <header className="my-10 flex flex-col justify-between lg:flex-row">
             <div className="space-y-2">
               <h1 className="text-6xl font-bold">The Biergarten Index</h1>
             </div>
             {!!user && (
-              <div>
+              <div className="mt-6 lg:mt-0">
                 <Link href="/beers/create" className="btn-primary btn">
                   Create a new beer post
                 </Link>

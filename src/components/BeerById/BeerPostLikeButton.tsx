@@ -31,7 +31,7 @@ const BeerPostLikeButton: FC<{
   return (
     <button
       type="button"
-      className={`btn gap-2 rounded-2xl ${
+      className={`btn-sm btn gap-2 rounded-2xl lg:btn-md ${
         !isLiked ? 'btn-ghost outline' : 'btn-primary'
       }`}
       onClick={() => {
@@ -41,12 +41,12 @@ const BeerPostLikeButton: FC<{
     >
       {isLiked ? (
         <>
-          <FaThumbsUp className="text-2xl" />
+          <FaThumbsUp className="lg:text-2xl" />
           Liked
         </>
       ) : (
         <>
-          <FaRegThumbsUp className="text-2xl" />
+          <FaRegThumbsUp className="lg:text-2xl" />
           Like
         </>
       )}
