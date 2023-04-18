@@ -27,12 +27,12 @@ const BeerInfoHeader: FC<{
       <article className="card-body">
         <div className="flex justify-between">
           <header>
-            <h1 className="text-4xl font-bold">{beerPost.name}</h1>
-            <h2 className="text-2xl font-semibold">
+            <h1 className="text-2xl font-bold lg:text-4xl">{beerPost.name}</h1>
+            <h2 className="text-lg font-semibold lg:text-2xl">
               by{' '}
               <Link
                 href={`/breweries/${beerPost.brewery.id}`}
-                className="link-hover link text-2xl font-semibold"
+                className="link-hover link font-semibold"
               >
                 {beerPost.brewery.name}
               </Link>

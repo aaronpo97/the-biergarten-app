@@ -15,15 +15,21 @@ const BeerRecommendations: FunctionComponent<BeerRecommendationsProps> = ({
           <div key={beerPost.id} className="w-full">
             <div>
               <Link className="link-hover" href={`/beers/${beerPost.id}`} scroll={false}>
-                <h2 className="text-2xl font-bold">{beerPost.name}</h2>
+                <h2 className="truncate text-lg font-bold lg:text-2xl">
+                  {beerPost.name}
+                </h2>
               </Link>
               <Link href={`/breweries/${beerPost.brewery.id}`} className="link-hover">
-                <p className="text-lg font-semibold">{beerPost.brewery.name}</p>
+                <p className="truncate text-lg font-semibold lg:text-xl">
+                  {beerPost.brewery.name}
+                </p>
               </Link>
             </div>
 
-            <p>{beerPost.abv}% ABV</p>
-            <p>{beerPost.ibu} IBU</p>
+            <div className="text-md space-x-3 lg:text-lg">
+              <span>{beerPost.abv}% ABV</span>
+              <span>{beerPost.ibu} IBU</span>
+            </div>
           </div>
         ))}
       </div>

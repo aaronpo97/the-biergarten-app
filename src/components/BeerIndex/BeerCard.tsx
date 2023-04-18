@@ -27,12 +27,12 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
       <div className="card-body justify-between">
         <div className="space-y-1">
           <Link href={`/beers/${post.id}`}>
-            <h2 className="link-hover link truncate text-2xl font-bold lg:text-3xl">
+            <h2 className="link-hover link overflow-hidden text-ellipsis whitespace-normal text-2xl font-bold lg:text-3xl">
               {post.name}
             </h2>
           </Link>
           <Link href={`/breweries/${post.brewery.id}`}>
-            <h3 className="text-md link-hover link truncate lg:text-xl">
+            <h3 className="text-md link-hover link overflow-hidden text-ellipsis lg:text-xl">
               {post.brewery.name}
             </h3>
           </Link>

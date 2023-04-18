@@ -62,7 +62,7 @@ const CommentCardBody: FC<CommentCardProps> = ({ comment, mutate, ref }) => {
 
   return (
     <div className="card-body animate-in fade-in-10" ref={ref}>
-      <div className="flex flex-col justify-between sm:flex-row">
+      <div className="flex flex-row justify-between">
         <div>
           <h3 className="font-semibold sm:text-2xl">
             <Link href={`/users/${comment.postedBy.id}`} className="link-hover link">
