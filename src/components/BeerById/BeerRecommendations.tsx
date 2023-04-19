@@ -20,13 +20,13 @@ const BeerRecommendations: FunctionComponent<BeerRecommendationsProps> = ({
                 </h2>
               </Link>
               <Link href={`/breweries/${beerPost.brewery.id}`} className="link-hover">
-                <p className="truncate text-lg font-semibold lg:text-xl">
+                <p className="text-md truncate font-semibold lg:text-xl">
                   {beerPost.brewery.name}
                 </p>
               </Link>
             </div>
 
-            <div className="text-md space-x-3 lg:text-lg">
+            <div className="space-x-3 text-sm lg:text-lg">
               <span>{beerPost.abv}% ABV</span>
               <span>{beerPost.ibu} IBU</span>
             </div>

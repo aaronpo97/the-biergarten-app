@@ -52,7 +52,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
           {user ? (
             <BeerCommentForm beerPost={beerPost} mutate={mutate} />
           ) : (
-            <div className="flex h-full flex-col items-center justify-center">
+            <div className="flex h-52 flex-col items-center justify-center">
               <span className="text-lg font-bold">Log in to leave a comment.</span>
             </div>
           )}
@@ -73,7 +73,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
             {!!comments.length && (
               <div className="card bg-base-300 pb-6">
                 {comments.map((comment, index) => {
-                  const isLastComment = index === comments.length - 1;
+                  const isPenulitmateComment = index === comments.length - 2;
 
                   /**
                    * Attach a ref to the last comment in the list. When it comes into
@@ -81,7 +81,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
                    */
                   return (
                     <div
-                      ref={isLastComment ? lastCommentRef : undefined}
+                      ref={isPenulitmateComment ? lastCommentRef : undefined}
                       key={comment.id}
                     >
                       <CommentCardBody comment={comment} mutate={mutate} />
@@ -94,9 +94,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
                    * If there are more comments to load, show a loading component with a
                    * skeleton loader and a loading spinner.
                    */
-                  !!isLoadingMore && (
-                    <LoadingComponent length={Math.floor(PAGE_SIZE / 2)} />
-                  )
+                  !!isLoadingMore && <LoadingComponent length={PAGE_SIZE} />
                 }
 
                 {

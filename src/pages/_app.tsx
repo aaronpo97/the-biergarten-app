@@ -21,6 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         `}
       </style>
+
       <UserContext.Provider value={{ user, isLoading, error, mutate }}>
         <Component {...pageProps} />
       </UserContext.Provider>
