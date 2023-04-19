@@ -47,17 +47,21 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
             infiniteLoop
             showThumbs={false}
           >
-            {beerPost.beerImages.map((image, index) => (
-              <div key={image.id} id={`image-${index}}`} className="w-full">
-                <Image
-                  alt={image.alt}
-                  src={image.path}
-                  height={1080}
-                  width={1920}
-                  className="h-[42rem] w-full object-cover"
-                />
-              </div>
-            ))}
+            {beerPost.beerImages.length
+              ? beerPost.beerImages.map((image, index) => (
+                  <div key={image.id} id={`image-${index}}`} className="w-full">
+                    <Image
+                      alt={image.alt}
+                      src={image.path}
+                      height={1080}
+                      width={1920}
+                      className="h-[42rem] w-full object-cover"
+                    />
+                  </div>
+                ))
+              : Array.from({ length: 1 }).map((_, i) => (
+                  <div className="h-[42rem] bg-base-300" key={i} />
+                ))}
           </Carousel>
 
           <div className="mb-12 mt-10 flex w-full items-center justify-center ">

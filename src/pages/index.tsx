@@ -16,7 +16,7 @@ const Home: NextPage = () => {
               The Biergarten App
             </h1>
             <p className="mt-4 text-lg lg:text-2xl">
-              An app for beer lovers to share their favorite brews and breweries with
+              An app for beer lovers to share their favourite brews and breweries with
               like-minded people online.
             </p>
           </div>

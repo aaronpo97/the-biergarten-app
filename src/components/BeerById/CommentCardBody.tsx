@@ -35,7 +35,7 @@ const CommentCardDropdown: FC<CommentCardProps> = ({ comment, mutate }) => {
   };
 
   return (
-    <div className="dropdown">
+    <div className="dropdown dropdown-end">
       <label tabIndex={0} className="btn-ghost btn-sm btn m-1">
         <FaEllipsisH />
       </label>
@@ -45,7 +45,12 @@ const CommentCardDropdown: FC<CommentCardProps> = ({ comment, mutate }) => {
       >
         <li>
           {isCommentOwner ? (
-            <button onClick={handleDelete}>Delete</button>
+            <>
+              <button type="button">Edit</button>
+              <button type="button" onClick={handleDelete}>
+                Delete
+              </button>
+            </>
           ) : (
             <button>Report</button>
           )}

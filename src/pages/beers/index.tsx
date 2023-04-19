@@ -11,7 +11,7 @@ import Spinner from '@/components/ui/Spinner';
 
 import useBeerPosts from '@/hooks/useBeerPosts';
 import BeerPostLoadingCard from '@/components/BeerIndex/BeerPostLoadingCard';
-import { FaArrowUp } from 'react-icons/fa';
+import { FaArrowUp, FaPlus } from 'react-icons/fa';
 
 const BeerPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -39,14 +39,15 @@ const BeerPage: NextPage = () => {
       </Head>
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
         <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
-          <header className="my-10 flex flex-col justify-between lg:flex-row">
-            <div className="space-y-2">
-              <h1 className="text-6xl font-bold">The Biergarten Index</h1>
-            </div>
+          <header className="my-10 flex justify-between lg:flex-row">
+            <h1 className="text-6xl font-bold">The Biergarten Index</h1>
             {!!user && (
-              <div className="mt-6 lg:mt-0">
-                <Link href="/beers/create" className="btn-primary btn">
-                  Create a new beer post
+              <div
+                className="tooltip tooltip-left h-full"
+                data-tip="Create a new beer post"
+              >
+                <Link href="/beers/create" className="btn-ghost btn-sm btn">
+                  <FaPlus />
                 </Link>
               </div>
             )}

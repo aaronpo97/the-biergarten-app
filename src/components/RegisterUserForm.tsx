@@ -48,8 +48,8 @@ const RegisterUserForm: FC = () => {
         )}
       </div>
       <div>
-        <div className="flex flex-row space-x-3">
-          <div className="w-[50%]">
+        <div className="flex flex-col lg:flex-row lg:space-x-3">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="firstName">First name</FormLabel>
               <FormError>{errors.firstName?.message}</FormError>
@@ -66,7 +66,7 @@ const RegisterUserForm: FC = () => {
             </FormSegment>
           </div>
 
-          <div className="w-[50%]">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="lastName">Last name</FormLabel>
               <FormError>{errors.lastName?.message}</FormError>
@@ -84,8 +84,8 @@ const RegisterUserForm: FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-row space-x-3">
-          <div className="w-[50%]">
+        <div className="flex flex-col lg:flex-row lg:space-x-3">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="email">email</FormLabel>
               <FormError>{errors.email?.message}</FormError>
@@ -101,7 +101,7 @@ const RegisterUserForm: FC = () => {
               />
             </FormSegment>
           </div>
-          <div className="w-[50%]">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="username">username</FormLabel>
               <FormError>{errors.username?.message}</FormError>
@@ -119,8 +119,8 @@ const RegisterUserForm: FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-row space-x-3">
-          <div className="w-[50%]">
+        <div className="flex flex-col lg:flex-row lg:space-x-3">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="password">password</FormLabel>
               <FormError>{errors.password?.message}</FormError>
@@ -136,7 +136,7 @@ const RegisterUserForm: FC = () => {
               />
             </FormSegment>
           </div>
-          <div className="w-[50%]">
+          <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="confirmPassword">confirm password</FormLabel>
               <FormError>{errors.confirmPassword?.message}</FormError>

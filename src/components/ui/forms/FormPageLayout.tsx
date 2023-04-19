@@ -19,9 +19,9 @@ const FormPageLayout: FC<FormPageLayoutProps> = ({
   backLinkText,
 }) => {
   return (
-    <div className="align-center my-20 flex h-fit flex-col items-center justify-center">
-      <div className="w-8/12">
-        <div className="tooltip tooltip-bottom absolute" data-tip={backLinkText}>
+    <div className="align-center my-20 flex flex-col items-center justify-center">
+      <div className="w-10/12 lg:w-8/12 2xl:w-6/12">
+        <div className="tooltip tooltip-right" data-tip={backLinkText}>
           <Link href={backLink} className="btn-ghost btn-sm btn p-0">
             <BiArrowBack className="text-xl" />
           </Link>
@@ -30,7 +30,7 @@ const FormPageLayout: FC<FormPageLayoutProps> = ({
           {headingIcon({ className: 'text-4xl' })}{' '}
           <h1 className="text-3xl font-bold">{headingText}</h1>
         </div>
-        <div>{FormComponent}</div>
+        <div className="mt-3">{FormComponent}</div>
       </div>
     </div>
   );
