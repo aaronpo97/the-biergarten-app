@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .card {
-    @apply shadow-md card-compact bg-base-300
+  @apply card-compact bg-base-300;
 }

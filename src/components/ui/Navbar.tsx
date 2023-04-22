@@ -1,8 +1,8 @@
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useNavbar from '@/hooks/useNavbar';
 import Link from 'next/link';
-import { FC } from 'react';
-
+import { FC, useEffect, useState } from 'react';
+import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
 
 const DesktopLinks: FC = () => {
@@ -56,8 +56,28 @@ const MobileLinks: FC = () => {
   );
 };
 
+const useTheme = () => {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (prefersDarkMode && !savedTheme) {
+      setTheme('dark');
+      localStorage.setItem('theme', 'dark');
+      return;
+    }
+    setTheme(savedTheme as 'light' | 'dark');
+  }, [prefersDarkMode, theme]);
+
+  return { theme, setTheme };
+};
+
 const Navbar = () => {
   const isDesktopView = useMediaQuery('(min-width: 1024px)');
+
+  const { theme, setTheme } = useTheme();
 
   return (
     <nav className="navbar sticky top-0 z-50 bg-primary text-primary-content">
@@ -66,7 +86,28 @@ const Navbar = () => {
           <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
         </Link>
       </div>
-      <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
+      <div>
+        <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>{' '}
+        {theme === 'light' ? (
+          <button
+            className="btn-ghost btn-md btn-circle btn"
+            data-set-theme="dark"
+            data-act-class="ACTIVECLASS"
+            onClick={() => setTheme('dark')}
+          >
+            <MdLightMode className="text-xl" />
+          </button>
+        ) : (
+          <button
+            className="btn-ghost btn-md btn-circle btn"
+            data-set-theme="light"
+            data-act-class="ACTIVECLASS"
+            onClick={() => setTheme('light')}
+          >
+            <MdDarkMode className="text-xl" />
+          </button>
+        )}
+      </div>
     </nav>
   );
 };
