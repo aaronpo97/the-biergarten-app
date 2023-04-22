@@ -40,7 +40,7 @@ const FormTextArea: FunctionComponent<FormTextAreaProps> = ({
   <textarea
     id={id}
     placeholder={placeholder}
-    className={`textarea-bordered textarea m-0 w-full  resize-none rounded-lg border border-solid bg-clip-padding transition ease-in-out  ${
+    className={`text-md textarea-bordered textarea m-0 w-full resize-none rounded-lg border border-solid transition ease-in-out  ${
       error ? 'textarea-error' : ''
     }`}
     {...formValidationSchema}

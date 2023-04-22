@@ -86,28 +86,34 @@ const Navbar = () => {
           <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
         </Link>
       </div>
-      <div>
-        <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>{' '}
-        {theme === 'light' ? (
-          <button
-            className="btn-ghost btn-md btn-circle btn"
-            data-set-theme="dark"
-            data-act-class="ACTIVECLASS"
-            onClick={() => setTheme('dark')}
-          >
-            <MdLightMode className="text-xl" />
-          </button>
-        ) : (
-          <button
-            className="btn-ghost btn-md btn-circle btn"
-            data-set-theme="light"
-            data-act-class="ACTIVECLASS"
-            onClick={() => setTheme('light')}
-          >
-            <MdDarkMode className="text-xl" />
-          </button>
-        )}
+
+      <div
+        className="tooltip tooltip-left"
+        data-tip={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      >
+        <div>
+          {theme === 'light' ? (
+            <button
+              className="btn-ghost btn-md btn-circle btn"
+              data-set-theme="dark"
+              data-act-class="ACTIVECLASS"
+              onClick={() => setTheme('dark')}
+            >
+              <MdLightMode className="text-xl" />
+            </button>
+          ) : (
+            <button
+              className="btn-ghost btn-md btn-circle btn"
+              data-set-theme="light"
+              data-act-class="ACTIVECLASS"
+              onClick={() => setTheme('light')}
+            >
+              <MdDarkMode className="text-xl" />
+            </button>
+          )}
+        </div>
       </div>
+      <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
     </nav>
   );
 };

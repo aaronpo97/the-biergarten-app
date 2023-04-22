@@ -38,9 +38,9 @@ const BeerPage: NextPage = () => {
         <meta name="description" content="Beer posts" />
       </Head>
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
-        <div className="my-10 flex w-11/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
+        <div className="my-10 flex w-10/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
           <header className="my-10 flex justify-between lg:flex-row">
-            <h1 className="text-6xl font-bold">The Biergarten Index</h1>
+            <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten Index</h1>
             {!!user && (
               <div
                 className="tooltip tooltip-left h-full"

@@ -16,7 +16,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
   brewery,
 }) => {
   return (
-    <div className="card bg-base-300" key={brewery.id}>
+    <div className="card" key={brewery.id}>
       <figure className="card-image h-96">
         {brewery.breweryImages.length > 0 && (
           <Image

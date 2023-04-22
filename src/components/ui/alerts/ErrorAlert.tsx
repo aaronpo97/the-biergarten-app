@@ -8,8 +8,8 @@ interface ErrorAlertProps {
 
 const ErrorAlert: FC<ErrorAlertProps> = ({ error, setError }) => {
   return (
-    <div className="alert alert-error shadow-lg">
-      <div>
+    <div className="alert alert-error flex-row shadow-lg">
+      <div className="space-x-1">
         <FiAlertTriangle className="h-6 w-6" />
         <span>{error}</span>
       </div>

@@ -16,7 +16,7 @@ interface EditPageProps {
 }
 
 const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
-  const pageTitle = `Edit "${beerPost.name}"`;
+  const pageTitle = `Edit \u201c${beerPost.name}\u201d`;
 
   return (
     <Layout>

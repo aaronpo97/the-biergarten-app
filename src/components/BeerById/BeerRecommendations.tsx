@@ -9,7 +9,7 @@ const BeerRecommendations: FunctionComponent<BeerRecommendationsProps> = ({
   beerRecommendations,
 }) => {
   return (
-    <div className="card sticky top-2 h-full overflow-y-scroll bg-base-300">
+    <div className="card sticky top-2 h-full overflow-y-scroll">
       <div className="card-body space-y-3">
         {beerRecommendations.map((beerPost) => (
           <div key={beerPost.id} className="w-full">

@@ -7,7 +7,10 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>The Biergarten App</title>
-        <meta name="description" content="Home" />
+        <meta
+          name="description"
+          content="The Biergarten App is an app for beer lovers to share their favourite brews and breweries with like-minded people online."
+        />
       </Head>
       <Layout>
         <div className="flex h-full w-full items-center justify-center bg-primary">

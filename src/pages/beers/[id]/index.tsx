@@ -55,12 +55,12 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
                       src={image.path}
                       height={1080}
                       width={1920}
-                      className="h-[42rem] w-full object-cover"
+                      className="h-96 w-full object-cover lg:h-[42rem]"
                     />
                   </div>
                 ))
               : Array.from({ length: 1 }).map((_, i) => (
-                  <div className="h-[42rem] bg-base-300" key={i} />
+                  <div className="h-96 lg:h-[42rem]" key={i} />
                 ))}
           </Carousel>
 
@@ -79,7 +79,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
                 </div>
               ) : (
                 <Tab.Group>
-                  <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl bg-base-300">
+                  <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
                     <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
                       Comments
                     </Tab>
