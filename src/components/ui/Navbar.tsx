@@ -1,9 +1,10 @@
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useNavbar from '@/hooks/useNavbar';
 import Link from 'next/link';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
+import useTheme from '@/hooks/useTheme';
 
 const DesktopLinks: FC = () => {
   const { pages, currentURL } = useNavbar();
@@ -54,24 +55,6 @@ const MobileLinks: FC = () => {
       </div>
     </div>
   );
-};
-
-const useTheme = () => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (prefersDarkMode && !savedTheme) {
-      setTheme('dark');
-      localStorage.setItem('theme', 'dark');
-      return;
-    }
-    setTheme(savedTheme as 'light' | 'dark');
-  }, [prefersDarkMode, theme]);
-
-  return { theme, setTheme };
 };
 
 const Navbar = () => {
