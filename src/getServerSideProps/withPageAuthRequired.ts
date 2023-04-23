@@ -27,8 +27,8 @@ export type ExtendedGetServerSideProps<
 ) => Promise<GetServerSidePropsResult<P>>;
 
 /**
- * A Higher Order Function that adds authentication requirement to a Next.js server-side
- * page component.
+ * A Higher Order Function that adds an authentication requirement to a Next.js
+ * server-side page component.
  *
  * @param fn An async function that receives the GetServerSidePropsContext and
  *   authenticated session as arguments and returns a GetServerSidePropsResult with props

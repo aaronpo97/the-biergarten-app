@@ -1,18 +1,10 @@
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { z } from 'zod';
 import useSWR from 'swr';
+import { z } from 'zod';
 
-/**
- * Custom hook to fetch the like count for a beer post from the server.
- *
- * @param beerPostId - The ID of the beer post to fetch the like count for.
- * @returns An object with the current like count, as well as metadata about the current
- *   state of the request.
- */
-
-const useGetLikeCount = (beerPostId: string) => {
+const useGetBreweryPostLikeCount = (breweryPostId: string) => {
   const { error, mutate, data, isLoading } = useSWR(
-    `/api/beers/${beerPostId}/like`,
+    `/api/breweries/${breweryPostId}/like`,
     async (url) => {
       const response = await fetch(url);
       const json = await response.json();
@@ -45,4 +37,4 @@ const useGetLikeCount = (beerPostId: string) => {
   };
 };
 
-export default useGetLikeCount;
+export default useGetBreweryPostLikeCount;

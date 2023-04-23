@@ -11,15 +11,15 @@ datasource db {
 }
 
 model User {
-  id                String           @id @default(uuid())
-  username          String           @unique
+  id                String            @id @default(uuid())
+  username          String            @unique
   firstName         String
   lastName          String
   hash              String
-  email             String           @unique
-  createdAt         DateTime         @default(now()) @db.Timestamptz(3)
-  updatedAt         DateTime?        @updatedAt @db.Timestamptz(3)
-  isAccountVerified Boolean          @default(false)
+  email             String            @unique
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime?         @updatedAt @db.Timestamptz(3)
+  isAccountVerified Boolean           @default(false)
   dateOfBirth       DateTime
   beerPosts         BeerPost[]
   beerTypes         BeerType[]
@@ -29,6 +29,7 @@ model User {
   BeerPostLikes     BeerPostLike[]
   BeerImage         BeerImage[]
   BreweryImage      BreweryImage[]
+  BreweryPostLike   BreweryPostLike[]
 }
 
 model BeerPost {
@@ -60,6 +61,16 @@ model BeerPostLike {
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }
 
+model BreweryPostLike {
+  id            String      @id @default(uuid())
+  breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
+  breweryPostId String
+  likedBy       User        @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById     String
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime?   @updatedAt @db.Timestamptz(3)
+}
+
 model BeerComment {
   id         String    @id @default(uuid())
   rating     Int
@@ -83,17 +94,18 @@ model BeerType {
 }
 
 model BreweryPost {
-  id              String           @id @default(uuid())
+  id              String            @id @default(uuid())
   name            String
   location        String
   beers           BeerPost[]
   description     String
-  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime?        @updatedAt @db.Timestamptz(3)
-  postedBy        User             @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime?         @updatedAt @db.Timestamptz(3)
+  postedBy        User              @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById      String
   breweryComments BreweryComment[]
   breweryImages   BreweryImage[]
+  BreweryPostLike BreweryPostLike[]
 }
 
 model BreweryComment {

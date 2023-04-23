@@ -6,7 +6,7 @@ import UserContext from '@/contexts/userContext';
 import { FaRegEdit } from 'react-icons/fa';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
-import useGetLikeCount from '@/hooks/useGetLikeCount';
+import useGetBeerPostLikeCount from '@/hooks/useBeerPostLikeCount';
 import useTimeDistance from '@/hooks/useTimeDistance';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
@@ -20,7 +20,7 @@ const BeerInfoHeader: FC<{
   const idMatches = user && beerPost.postedBy.id === user.id;
   const isPostOwner = !!(user && idMatches);
 
-  const { likeCount, mutate } = useGetLikeCount(beerPost.id);
+  const { likeCount, mutate } = useGetBeerPostLikeCount(beerPost.id);
 
   return (
     <main className="card flex flex-col justify-center bg-base-300">

@@ -13,6 +13,7 @@ import createNewBreweryImages from './create/createNewBreweryImages';
 import createNewBreweryPostComments from './create/createNewBreweryPostComments';
 import createNewBreweryPosts from './create/createNewBreweryPosts';
 import createNewUsers from './create/createNewUsers';
+import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
 
 (async () => {
   try {
@@ -51,6 +52,10 @@ import createNewUsers from './create/createNewUsers';
       createNewBeerPostLikes({
         numberOfLikes: 10000,
         joinData: { beerPosts, users },
+      }),
+      createNewBreweryPostLikes({
+        numberOfLikes: 10000,
+        joinData: { breweryPosts, users },
       }),
       createNewBeerImages({
         numberOfImages: 1000,

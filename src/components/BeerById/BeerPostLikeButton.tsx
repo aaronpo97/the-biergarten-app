@@ -1,13 +1,13 @@
 import useCheckIfUserLikesBeerPost from '@/hooks/useCheckIfUserLikesBeerPost';
-import sendLikeRequest from '@/requests/sendLikeRequest';
+import sendBeerPostLikeRequest from '@/requests/sendBeerPostLikeRequest';
 import { FC, useEffect, useState } from 'react';
-import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
 
-import useGetLikeCount from '@/hooks/useGetLikeCount';
+import useGetBeerPostLikeCount from '@/hooks/useBeerPostLikeCount';
+import LikeButton from '../ui/LikeButton';
 
 const BeerPostLikeButton: FC<{
   beerPostId: string;
-  mutateCount: ReturnType<typeof useGetLikeCount>['mutate'];
+  mutateCount: ReturnType<typeof useGetBeerPostLikeCount>['mutate'];
 }> = ({ beerPostId, mutateCount }) => {
   const { isLiked, mutate: mutateLikeStatus } = useCheckIfUserLikesBeerPost(beerPostId);
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,7 @@ const BeerPostLikeButton: FC<{
   const handleLike = async () => {
     try {
       setLoading(true);
-      await sendLikeRequest(beerPostId);
+      await sendBeerPostLikeRequest(beerPostId);
 
       await Promise.all([mutateCount(), mutateLikeStatus()]);
       setLoading(false);
@@ -28,30 +28,7 @@ const BeerPostLikeButton: FC<{
     }
   };
 
-  return (
-    <button
-      type="button"
-      className={`btn-sm btn gap-2 rounded-2xl lg:btn-md ${
-        !isLiked ? 'btn-ghost outline' : 'btn-primary'
-      }`}
-      onClick={() => {
-        handleLike();
-      }}
-      disabled={loading}
-    >
-      {isLiked ? (
-        <>
-          <FaThumbsUp className="lg:text-2xl" />
-          Liked
-        </>
-      ) : (
-        <>
-          <FaRegThumbsUp className="lg:text-2xl" />
-          Like
-        </>
-      )}
-    </button>
-  );
+  return <LikeButton isLiked={!!isLiked} handleLike={handleLike} loading={loading} />;
 };
 
 export default BeerPostLikeButton;
