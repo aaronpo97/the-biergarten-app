@@ -3,7 +3,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
-import Layout from '@/components/ui/Layout';
+
 import { FC } from 'react';
 import Image from 'next/image';
 import { z } from 'zod';
@@ -41,7 +41,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
 
 const BreweryPage: NextPage<BreweryPageProps> = ({ breweryPosts }) => {
   return (
-    <Layout>
+    <>
       <div className="flex items-center justify-center bg-base-100">
         <div className="my-10 flex w-10/12 flex-col space-y-4">
           <header className="my-10">
@@ -56,7 +56,7 @@ const BreweryPage: NextPage<BreweryPageProps> = ({ breweryPosts }) => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

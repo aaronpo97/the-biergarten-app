@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import Layout from '@/components/ui/Layout';
+
 import BeerCard from '@/components/BeerIndex/BeerCard';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -32,7 +32,7 @@ const BeerPage: NextPage = () => {
   const pageRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>Beer</title>
         <meta name="description" content="Beer posts" />
@@ -105,7 +105,7 @@ const BeerPage: NextPage = () => {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

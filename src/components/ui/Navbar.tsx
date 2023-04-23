@@ -18,7 +18,7 @@ const DesktopLinks: FC = () => {
               <Link tabIndex={0} href={page.slug}>
                 <span
                   className={`text-lg uppercase ${
-                    currentURL === page.slug ? 'font-extrabold' : 'font-semibold'
+                    currentURL === page.slug ? 'font-black' : 'font-medium'
                   } text-primary-content`}
                 >
                   {page.name}

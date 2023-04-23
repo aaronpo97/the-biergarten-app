@@ -5,7 +5,6 @@ import Image from 'next/image';
 import BeerInfoHeader from '@/components/BeerById/BeerInfoHeader';
 import BeerPostCommentsSection from '@/components/BeerById/BeerPostCommentsSection';
 import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
-import Layout from '@/components/ui/Layout';
 
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
@@ -37,7 +36,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
         <title>{beerPost.name}</title>
         <meta name="description" content={beerPost.description} />
       </Head>
-      <Layout>
+      <>
         <div>
           <Carousel
             className="w-full"
@@ -100,7 +99,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
             </div>
           </div>
         </div>
-      </Layout>
+      </>
     </>
   );
 };

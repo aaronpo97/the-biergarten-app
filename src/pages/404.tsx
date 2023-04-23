@@ -1,12 +1,11 @@
 // create a 404 next js page using tailwind
 
-import Layout from '@/components/ui/Layout';
 import { NextPage } from 'next';
 import Head from 'next/head';
 
 const NotFound: NextPage = () => {
   return (
-    <Layout>
+    <>
       <Head>
         <title>404 Page Not Found</title>
         <meta name="description" content="404 Page Not Found" />
@@ -17,7 +16,7 @@ const NotFound: NextPage = () => {
           Sorry, the page you are looking for does not exist.
         </h2>
       </div>
-    </Layout>
+    </>
   );
 };
 

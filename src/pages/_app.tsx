@@ -7,6 +7,7 @@ import { themeChange } from 'theme-change';
 
 import { Space_Grotesk } from 'next/font/google';
 import Head from 'next/head';
+import Layout from '@/components/ui/Layout';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -34,7 +35,9 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <UserContext.Provider value={{ user, isLoading, error, mutate }}>
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </UserContext.Provider>
     </>
   );

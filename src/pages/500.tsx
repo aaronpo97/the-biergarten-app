@@ -1,10 +1,9 @@
-import Layout from '@/components/ui/Layout';
 import { NextPage } from 'next';
 import Head from 'next/head';
 
 const ServerErrorPage: NextPage = () => {
   return (
-    <Layout>
+    <>
       <Head>
         <title>500 Internal Server Error</title>
         <meta name="description" content="500 Internal Server Error" />
@@ -15,7 +14,7 @@ const ServerErrorPage: NextPage = () => {
           Please try again later or contact us if the problem persists.
         </h2>
       </div>
-    </Layout>
+    </>
   );
 };
 
