@@ -46,7 +46,7 @@ const FormTextInput: FunctionComponent<FormInputProps> = ({
     id={id}
     type={type}
     placeholder={placeholder}
-    className={`input-bordered input w-full rounded-lg transition ease-in-out ${
+    className={`input-bordered input w-full appearance-none rounded-lg transition ease-in-out ${
       error ? 'input-error' : ''
     }`}
     {...formValidationSchema}

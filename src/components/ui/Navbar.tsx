@@ -2,8 +2,9 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 import useNavbar from '@/hooks/useNavbar';
 import Link from 'next/link';
 import { FC } from 'react';
-
+import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
+import useTheme from '@/hooks/useTheme';
 
 const DesktopLinks: FC = () => {
   const { pages, currentURL } = useNavbar();
@@ -17,7 +18,7 @@ const DesktopLinks: FC = () => {
               <Link tabIndex={0} href={page.slug}>
                 <span
                   className={`text-lg uppercase ${
-                    currentURL === page.slug ? 'font-extrabold' : 'font-semibold'
+                    currentURL === page.slug ? 'font-black' : 'font-medium'
                   } text-primary-content`}
                 >
                   {page.name}
@@ -59,12 +60,41 @@ const MobileLinks: FC = () => {
 const Navbar = () => {
   const isDesktopView = useMediaQuery('(min-width: 1024px)');
 
+  const { theme, setTheme } = useTheme();
+
   return (
     <nav className="navbar sticky top-0 z-50 bg-primary text-primary-content">
       <div className="flex-1">
         <Link className="btn-ghost btn normal-case" href="/">
           <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
         </Link>
+      </div>
+
+      <div
+        className="tooltip tooltip-left"
+        data-tip={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      >
+        <div>
+          {theme === 'light' ? (
+            <button
+              className="btn-ghost btn-md btn-circle btn"
+              data-set-theme="dark"
+              data-act-class="ACTIVECLASS"
+              onClick={() => setTheme('dark')}
+            >
+              <MdLightMode className="text-xl" />
+            </button>
+          ) : (
+            <button
+              className="btn-ghost btn-md btn-circle btn"
+              data-set-theme="light"
+              data-act-class="ACTIVECLASS"
+              onClick={() => setTheme('light')}
+            >
+              <MdDarkMode className="text-xl" />
+            </button>
+          )}
+        </div>
       </div>
       <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
     </nav>

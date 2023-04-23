@@ -1,7 +1,7 @@
 //themes
 
-const darkTheme = {
-  default: {
+const myThemes = {
+  dark: {
     primary: 'hsl(227, 23%, 20%)',
     secondary: 'hsl(255, 9%, 69%)',
     error: 'hsl(9, 52%, 57%)',
@@ -12,14 +12,11 @@ const darkTheme = {
     warning: 'hsl(50, 98%, 50%)',
     'primary-content': 'hsl(0, 0%, 98%)',
     'error-content': 'hsl(0, 0%, 98%)',
-    'base-100': 'hsl(190, 4%, 11%)',
-    'base-200': 'hsl(190, 4%, 8%)',
-    'base-300': 'hsl(190, 4%, 5%)',
+    'base-100': 'hsl(227, 20%, 11%)',
+    'base-200': 'hsl(227, 20%, 8%)',
+    'base-300': 'hsl(227, 20%, 5%)',
   },
-};
-
-const pastelTheme = {
-  default: {
+  light: {
     primary: 'hsl(180, 15%, 60%)',
     secondary: 'hsl(21, 54%, 83%)',
     error: 'hsl(4, 87%, 74%)',
@@ -30,9 +27,9 @@ const pastelTheme = {
     warning: 'hsl(40, 76%, 73%)',
     'primary-content': 'hsl(0, 0%, 0%)',
     'error-content': 'hsl(0, 0%, 0%)',
-    'base-100': 'hsl(0, 0%, 94%)',
-    'base-200': 'hsl(0, 0%, 90%)',
-    'base-300': 'hsl(0, 0%, 85%)',
+    'base-100': 'hsl(180, 8%, 94%)',
+    'base-200': 'hsl(180, 8%, 92%)',
+    'base-300': 'hsl(180, 8%, 88%)',
   },
 };
 
@@ -50,10 +47,11 @@ module.exports = {
     require('@headlessui/tailwindcss'),
     require('daisyui'),
     require('tailwindcss-animate'),
+    require('autoprefixer'),
   ],
 
   daisyui: {
     logs: false,
-    themes: [darkTheme, pastelTheme],
+    themes: [myThemes],
   },
 };

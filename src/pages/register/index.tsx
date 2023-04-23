@@ -1,6 +1,5 @@
 import RegisterUserForm from '@/components/RegisterUserForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
-import Layout from '@/components/ui/Layout';
 
 import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
 import { NextPage } from 'next';
@@ -11,7 +10,7 @@ const RegisterUserPage: NextPage = () => {
   useRedirectWhenLoggedIn();
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>Register User</title>
         <meta name="description" content="Register a new user" />
@@ -24,7 +23,7 @@ const RegisterUserPage: NextPage = () => {
       >
         <RegisterUserForm />
       </FormPageLayout>
-    </Layout>
+    </>
   );
 };
 

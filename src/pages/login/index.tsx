@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import Layout from '@/components/ui/Layout';
+
 import LoginForm from '@/components/Login/LoginForm';
 import Image from 'next/image';
 
@@ -12,7 +12,7 @@ import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
 const LoginPage: NextPage = () => {
   useRedirectWhenLoggedIn();
   return (
-    <Layout>
+    <>
       <Head>
         <title>Login</title>
         <meta name="description" content="Login to your account" />
@@ -49,7 +49,7 @@ const LoginPage: NextPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

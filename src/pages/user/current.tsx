@@ -1,4 +1,3 @@
-import Layout from '@/components/ui/Layout';
 import Spinner from '@/components/ui/Spinner';
 import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import UserContext from '@/contexts/userContext';
@@ -18,24 +17,22 @@ const ProtectedPage: NextPage = () => {
 
   const isDesktop = useMediaQuery('(min-width: 768px)');
   return (
-    <Layout>
-      <div className="flex h-full flex-col items-center justify-center space-y-3 text-center">
-        {isLoading && <Spinner size={isDesktop ? 'xl' : 'md'} />}
-        {user && !isLoading && (
-          <>
-            <h1 className="text-2xl font-bold lg:text-7xl">
-              Good {isMorning && 'morning'}
-              {isAfternoon && 'afternoon'}
-              {isEvening && 'evening'}
-              {`, ${user?.firstName}!`}
-            </h1>
-            <h2 className="text-xl font-bold lg:text-4xl">
-              Welcome to the Biergarten App!
-            </h2>
-          </>
-        )}
-      </div>
-    </Layout>
+    <div className="flex h-full flex-col items-center justify-center space-y-3 text-center">
+      {isLoading && <Spinner size={isDesktop ? 'xl' : 'md'} />}
+      {user && !isLoading && (
+        <>
+          <h1 className="text-2xl font-bold lg:text-7xl">
+            Good {isMorning && 'morning'}
+            {isAfternoon && 'afternoon'}
+            {isEvening && 'evening'}
+            {`, ${user?.firstName}!`}
+          </h1>
+          <h2 className="text-xl font-bold lg:text-4xl">
+            Welcome to the Biergarten App!
+          </h2>
+        </>
+      )}
+    </div>
   );
 };
 

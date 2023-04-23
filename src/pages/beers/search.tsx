@@ -1,4 +1,3 @@
-import Layout from '@/components/ui/Layout';
 import { NextPage } from 'next';
 
 import { useRouter } from 'next/router';
@@ -43,36 +42,34 @@ const SearchPage: NextPage = () => {
   const showSearchResults = !isLoading && searchResults && !searchError;
 
   return (
-    <Layout>
-      <div className="flex h-full w-full flex-col items-center justify-center">
-        <div className="h-full w-full space-y-20">
-          <div className="flex h-[50%] w-full items-center justify-center bg-base-200">
-            <div className="w-8/12">
-              <FormLabel htmlFor="search">What are you looking for?</FormLabel>
-              <input
-                type="text"
-                id="search"
-                className="input-bordered input w-full rounded-lg"
-                onChange={onChange}
-                value={searchValue}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center">
-            {!showSearchResults ? (
-              <Spinner size="lg" />
-            ) : (
-              <div className="grid w-8/12 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {searchResults.map((result) => {
-                  return <BeerCard key={result.id} post={result} />;
-                })}
-              </div>
-            )}
+    <div className="flex h-full w-full flex-col items-center justify-center">
+      <div className="h-full w-full space-y-20">
+        <div className="flex h-[50%] w-full items-center justify-center bg-base-200">
+          <div className="w-8/12">
+            <FormLabel htmlFor="search">What are you looking for?</FormLabel>
+            <input
+              type="text"
+              id="search"
+              className="input-bordered input w-full rounded-lg"
+              onChange={onChange}
+              value={searchValue}
+            />
           </div>
         </div>
+
+        <div className="flex flex-col items-center justify-center">
+          {!showSearchResults ? (
+            <Spinner size="lg" />
+          ) : (
+            <div className="grid w-8/12 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {searchResults.map((result) => {
+                return <BeerCard key={result.id} post={result} />;
+              })}
+            </div>
+          )}
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 

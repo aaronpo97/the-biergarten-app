@@ -2,7 +2,6 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import React from 'react';
 
-import Layout from '@/components/ui/Layout';
 import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
@@ -16,10 +15,10 @@ interface EditPageProps {
 }
 
 const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
-  const pageTitle = `Edit "${beerPost.name}"`;
+  const pageTitle = `Edit \u201c${beerPost.name}\u201d`;
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageTitle} />
@@ -41,7 +40,7 @@ const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
           }}
         />
       </FormPageLayout>
-    </Layout>
+    </>
   );
 };
 
