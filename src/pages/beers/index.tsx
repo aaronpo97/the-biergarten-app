@@ -34,14 +34,17 @@ const BeerPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Beer</title>
-        <meta name="description" content="Beer posts" />
+        <title>Beers | The Biergarten App</title>
+        <meta
+          name="description"
+          content="Find beers made by breweries near you and around the world."
+        />
       </Head>
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
         <div className="my-10 flex w-10/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
           <header className="my-10 flex justify-between lg:flex-row">
             <div>
-              <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten Index</h1>
+              <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
               <h2 className="text-2xl font-bold lg:text-4xl">Beers</h2>
             </div>
             {!!user && (

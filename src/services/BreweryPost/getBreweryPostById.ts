@@ -13,6 +13,8 @@ const getBreweryPostById = async (id: string) => {
         name: true,
         breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
         postedBy: { select: { username: true, id: true } },
+        createdAt: true,
+        dateEstablished: true,
       },
       where: { id },
     });

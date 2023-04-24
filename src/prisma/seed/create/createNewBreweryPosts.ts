@@ -24,6 +24,8 @@ const createNewBreweryPosts = async ({
     const description = faker.lorem.lines(5);
     const user = users[Math.floor(Math.random() * users.length)];
     const createdAt = faker.date.past(1);
+    const dateEstablished = faker.date.past(40);
+
     breweryPromises.push(
       prisma.breweryPost.create({
         data: {
@@ -32,6 +34,7 @@ const createNewBreweryPosts = async ({
           description,
           postedBy: { connect: { id: user.id } },
           createdAt,
+          dateEstablished,
         },
       }),
     );

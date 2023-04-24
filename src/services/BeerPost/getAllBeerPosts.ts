@@ -23,6 +23,7 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
       },
       take: pageSize,
       skip,
+      orderBy: { createdAt: 'desc' },
     },
   );
 

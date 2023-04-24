@@ -8,6 +8,8 @@ const BreweryPostQueryResult = z.object({
   breweryImages: z.array(
     z.object({ path: z.string(), caption: z.string(), id: z.string(), alt: z.string() }),
   ),
+  createdAt: z.coerce.date(),
+  dateEstablished: z.coerce.date(),
 });
 
 export default BreweryPostQueryResult;

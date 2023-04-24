@@ -105,7 +105,8 @@ model BreweryPost {
   postedById      String
   breweryComments BreweryComment[]
   breweryImages   BreweryImage[]
-  BreweryPostLike BreweryPostLike[]
+  breweryPostLike BreweryPostLike[]
+  dateEstablished DateTime          @default(now()) @db.Timestamptz(3)
 }
 
 model BreweryComment {

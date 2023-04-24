@@ -46,7 +46,7 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
             </div>
           </div>
           <div className="flex justify-between">
-            liked by {likeCount} users
+            <span>liked by {likeCount} users</span>
             {user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}
           </div>
         </div>

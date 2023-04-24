@@ -18,7 +18,10 @@ const getAllBreweryPosts = async (pageNum?: number, pageSize?: number) => {
         name: true,
         postedBy: { select: { username: true, id: true } },
         breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
+        createdAt: true,
+        dateEstablished: true,
       },
+      orderBy: { createdAt: 'desc' },
     });
 
   return breweryPosts;
