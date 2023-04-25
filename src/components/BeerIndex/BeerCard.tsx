@@ -37,16 +37,16 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
             </h4>
           </Link>
         </div>
-        <div>
+        <div className="flex items-end justify-between">
           <div>
             <p className="text-md lg:text-xl">{post.type.name}</p>
             <div className="space-x-3">
               <span className="text-sm lg:text-lg">{post.abv}% ABV</span>
               <span className="text-sm lg:text-lg">{post.ibu} IBU</span>
             </div>
-          </div>
-          <div className="flex justify-between">
             <span>liked by {likeCount} users</span>
+          </div>
+          <div>
             {user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}
           </div>
         </div>

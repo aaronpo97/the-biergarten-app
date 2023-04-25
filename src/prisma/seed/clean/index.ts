@@ -1,4 +1,4 @@
-import logger from '@/config/pino/logger';
+import logger from '../../../config/pino/logger';
 import cleanDatabase from './cleanDatabase';
 
 cleanDatabase().then(() => {

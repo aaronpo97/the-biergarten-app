@@ -96,7 +96,11 @@ model BeerType {
 model BreweryPost {
   id              String            @id @default(uuid())
   name            String
-  location        String
+  city            String
+  stateOrProvince String?
+  country         String?
+  coordinates     Float[]
+  address         String
   beers           BeerPost[]
   description     String
   createdAt       DateTime          @default(now()) @db.Timestamptz(3)

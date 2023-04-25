@@ -14,7 +14,12 @@ const getAllBreweryPosts = async (pageNum?: number, pageSize?: number) => {
       take,
       select: {
         id: true,
-        location: true,
+        coordinates: true,
+        address: true,
+        city: true,
+        stateOrProvince: true,
+        country: true,
+        description: true,
         name: true,
         postedBy: { select: { username: true, id: true } },
         breweryImages: { select: { path: true, caption: true, id: true, alt: true } },

@@ -9,7 +9,12 @@ const getBreweryPostById = async (id: string) => {
     await prisma.breweryPost.findFirst({
       select: {
         id: true,
-        location: true,
+        coordinates: true,
+        address: true,
+        city: true,
+        stateOrProvince: true,
+        country: true,
+        description: true,
         name: true,
         breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
         postedBy: { select: { username: true, id: true } },
