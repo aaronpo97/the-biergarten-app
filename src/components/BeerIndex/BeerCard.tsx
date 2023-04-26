@@ -44,7 +44,9 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
               <span className="text-sm lg:text-lg">{post.abv}% ABV</span>
               <span className="text-sm lg:text-lg">{post.ibu} IBU</span>
             </div>
-            <span>liked by {likeCount} users</span>
+            <span>
+              liked by {likeCount} user{likeCount === 1 ? '' : 's'}
+            </span>
           </div>
           <div>
             {user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}

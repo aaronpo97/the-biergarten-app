@@ -32,7 +32,8 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
             </Link>
           </h2>
           <h3 className="text-xl font-normal lg:text-2xl">
-            located in {brewery.city}, {brewery.stateOrProvince || brewery.country}
+            located in {brewery.location.city},{' '}
+            {brewery.location.stateOrProvince || brewery.location.country}
           </h3>
           <h4 className="text-lg lg:text-xl">
             est. {brewery.dateEstablished.getFullYear()}

@@ -1,4 +1,4 @@
-import DBClient from '@/prisma/DBClient';
+import DBClient from '../../prisma/DBClient';
 
 const findUserByEmail = async (email: string) =>
   DBClient.instance.user.findFirst({

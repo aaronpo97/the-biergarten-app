@@ -43,8 +43,8 @@ const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
               <h1 className="text-2xl font-bold lg:text-4xl">{breweryPost.name}</h1>
               <h2 className="text-lg font-semibold lg:text-2xl">
                 Located in
-                {` ${breweryPost.city}, ${
-                  breweryPost.stateOrProvince || breweryPost.country
+                {` ${breweryPost.location.city}, ${
+                  breweryPost.location.stateOrProvince || breweryPost.location.country
                 }`}
               </h2>
             </div>
@@ -130,7 +130,7 @@ const BreweryMap: FC<BreweryMapProps> = ({ latitude, longitude }) => {
 };
 
 const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
-  const [longitude, latitude] = breweryPost.coordinates;
+  const [longitude, latitude] = breweryPost.location.coordinates;
   return (
     <>
       <Head>

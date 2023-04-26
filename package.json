@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "npx prettier . --write",
-    "seed": "npx ts-node ./src/prisma/seed/index.ts"
+    "seed": "npx --max-old-space-size=4096 ts-node ./src/prisma/seed/index.ts"
   },
   "dependencies": {
     "@hapi/iron": "^7.0.1",

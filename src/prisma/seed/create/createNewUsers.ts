@@ -16,6 +16,9 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     Array.from({ length: numberOfUsers }, () => argon2.hash(faker.internet.password())),
   );
 
+  const takenEmails: string[] = [];
+  const takenUsernames: string[] = [];
+
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfUsers; i++) {
     const randomValue = crypto.randomBytes(10).toString('hex');
@@ -23,6 +26,18 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     const lastName = faker.name.lastName();
     const username = `${firstName[0]}.${lastName}.${randomValue}`;
     const email = faker.internet.email(firstName, randomValue, 'example.com');
+
+    const usernameTaken = takenUsernames.includes(username);
+    const emailTaken = takenEmails.includes(email);
+
+    if (usernameTaken || emailTaken) {
+      i -= 1;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    takenEmails.push(email);
+    takenUsernames.push(username);
 
     const hash = hashedPasswords[i];
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });

@@ -1,5 +1,6 @@
 import DBClient from '@/prisma/DBClient';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+
 import { z } from 'zod';
 
 const prisma = DBClient.instance;
@@ -14,11 +15,15 @@ const getAllBreweryPosts = async (pageNum?: number, pageSize?: number) => {
       take,
       select: {
         id: true,
-        coordinates: true,
-        address: true,
-        city: true,
-        stateOrProvince: true,
-        country: true,
+        location: {
+          select: {
+            city: true,
+            address: true,
+            coordinates: true,
+            country: true,
+            stateOrProvince: true,
+          },
+        },
         description: true,
         name: true,
         postedBy: { select: { username: true, id: true } },

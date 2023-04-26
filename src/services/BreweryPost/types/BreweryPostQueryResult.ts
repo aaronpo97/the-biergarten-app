@@ -4,11 +4,13 @@ const BreweryPostQueryResult = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
-  address: z.string(),
-  city: z.string(),
-  stateOrProvince: z.string().or(z.null()),
-  coordinates: z.array(z.number()),
-  country: z.string().or(z.null()),
+  location: z.object({
+    city: z.string(),
+    address: z.string(),
+    coordinates: z.array(z.number()),
+    country: z.string().nullable(),
+    stateOrProvince: z.string().nullable(),
+  }),
   postedBy: z.object({ id: z.string(), username: z.string() }),
   breweryImages: z.array(
     z.object({ path: z.string(), caption: z.string(), id: z.string(), alt: z.string() }),

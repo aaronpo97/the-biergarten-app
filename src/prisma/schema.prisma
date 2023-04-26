@@ -30,6 +30,7 @@ model User {
   BeerImage         BeerImage[]
   BreweryImage      BreweryImage[]
   BreweryPostLike   BreweryPostLike[]
+  Location          Location[]
 }
 
 model BeerPost {
@@ -93,14 +94,23 @@ model BeerType {
   beerPosts  BeerPost[]
 }
 
-model BreweryPost {
-  id              String            @id @default(uuid())
-  name            String
+model Location {
+  id              String       @id @default(uuid())
   city            String
   stateOrProvince String?
   country         String?
   coordinates     Float[]
   address         String
+  postedBy        User         @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById      String
+  BreweryPost     BreweryPost?
+}
+
+model BreweryPost {
+  id              String            @id @default(uuid())
+  name            String
+  location        Location          @relation(fields: [locationId], references: [id])
+  locationId      String            @unique
   beers           BeerPost[]
   description     String
   createdAt       DateTime          @default(now()) @db.Timestamptz(3)

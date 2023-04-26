@@ -14,6 +14,7 @@ import createNewBreweryPostComments from './create/createNewBreweryPostComments'
 import createNewBreweryPosts from './create/createNewBreweryPosts';
 import createNewUsers from './create/createNewUsers';
 import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
+import createNewLocations from './create/createNewLocations';
 
 (async () => {
   try {
@@ -25,15 +26,25 @@ import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
     logger.info('Database cleared successfully, preparing to seed.');
 
     const users = await createNewUsers({ numberOfUsers: 1000 });
+    logger.info('Users created successfully.');
+    console.log(users);
+
+    const locations = await createNewLocations({
+      numberOfLocations: 1500,
+      joinData: { users },
+    });
+    logger.info('Locations created successfully.');
+
     const [breweryPosts, beerTypes] = await Promise.all([
-      createNewBreweryPosts({ numberOfPosts: 30, joinData: { users } }),
+      createNewBreweryPosts({ numberOfPosts: 1300, joinData: { users, locations } }),
       createNewBeerTypes({ joinData: { users } }),
     ]);
+    logger.info('Brewery posts and beer types created successfully.');
     const beerPosts = await createNewBeerPosts({
       numberOfPosts: 200,
       joinData: { breweryPosts, beerTypes, users },
     });
-
+    logger.info('Beer posts created successfully.');
     const [
       beerPostComments,
       breweryPostComments,
@@ -66,6 +77,10 @@ import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
         joinData: { breweryPosts, users },
       }),
     ]);
+
+    logger.info(
+      'Beer post comments, brewery post comments, beer post likes, beer images, and brewery images created successfully.',
+    );
 
     const end = performance.now();
     const timeElapsed = (end - start) / 1000;

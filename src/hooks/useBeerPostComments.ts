@@ -54,6 +54,8 @@ const useBeerPostComments = ({ id, pageSize }: UseBeerPostCommentsProps) => {
 
   const isAtEnd = !(size < data?.[0].pageCount!);
 
+  console.log(comments);
+
   return {
     comments,
     isLoading,

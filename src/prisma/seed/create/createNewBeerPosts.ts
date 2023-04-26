@@ -26,17 +26,23 @@ const createNewBeerPosts = async ({
     const beerType = beerTypes[Math.floor(Math.random() * beerTypes.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const createdAt = faker.date.past(1);
+
+    const abv = Math.floor(Math.random() * (12 - 4) + 4);
+    const ibu = Math.floor(Math.random() * (60 - 10) + 10);
+    const name = faker.commerce.productName();
+    const description = faker.lorem.lines(20).replace(/(\r\n|\n|\r)/gm, ' ');
+
     beerPostPromises.push(
       prisma.beerPost.create({
         data: {
-          abv: Math.floor(Math.random() * (12 - 4) + 4),
-          ibu: Math.floor(Math.random() * (60 - 10) + 10),
-          name: faker.commerce.productName(),
-          description: faker.lorem.lines(12).replace(/(\r\n|\n|\r)/gm, ' '),
+          abv,
+          ibu,
+          name,
+          description,
+          createdAt,
           brewery: { connect: { id: breweryPost.id } },
           postedBy: { connect: { id: user.id } },
           type: { connect: { id: beerType.id } },
-          createdAt,
         },
       }),
     );
