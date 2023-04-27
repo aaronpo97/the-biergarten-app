@@ -1,5 +1,10 @@
-import type { BreweryPost, BreweryPostLike, User } from '@prisma/client';
+import type { BreweryPost, User } from '@prisma/client';
 import DBClient from '../../DBClient';
+
+interface BreweryPostLikeData {
+  breweryPostId: string;
+  likedById: string;
+}
 
 const createNewBreweryPostLikes = async ({
   joinData: { breweryPosts, users },
@@ -11,23 +16,22 @@ const createNewBreweryPostLikes = async ({
   };
   numberOfLikes: number;
 }) => {
-  const breweryPostLikePromises: Promise<BreweryPostLike>[] = [];
+  const breweryPostLikeData: BreweryPostLikeData[] = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfLikes; i++) {
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const user = users[Math.floor(Math.random() * users.length)];
 
-    breweryPostLikePromises.push(
-      DBClient.instance.breweryPostLike.create({
-        data: {
-          breweryPost: { connect: { id: breweryPost.id } },
-          likedBy: { connect: { id: user.id } },
-        },
-      }),
-    );
+    breweryPostLikeData.push({
+      breweryPostId: breweryPost.id,
+      likedById: user.id,
+    });
   }
+  await DBClient.instance.breweryPostLike.createMany({
+    data: breweryPostLikeData,
+  });
 
-  return Promise.all(breweryPostLikePromises);
+  return DBClient.instance.breweryPostLike.findMany();
 };
 
 export default createNewBreweryPostLikes;

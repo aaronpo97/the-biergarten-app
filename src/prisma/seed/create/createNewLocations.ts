@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { faker } from '@faker-js/faker';
-import { User, Location } from '@prisma/client';
+import { User } from '@prisma/client';
 import { GeocodeFeature } from '@mapbox/mapbox-sdk/services/geocoding';
 import DBClient from '../../DBClient';
 import geocode from '../../../config/mapbox/geocoder';
@@ -10,6 +10,15 @@ interface CreateNewLocationsArgs {
   joinData: {
     users: User[];
   };
+}
+
+interface LocationData {
+  city: string;
+  stateOrProvince?: string;
+  country?: string;
+  coordinates: number[];
+  address: string;
+  postedById: string;
 }
 
 const createNewLocations = async ({
@@ -33,31 +42,31 @@ const createNewLocations = async ({
 
   const geocodedLocations = await Promise.all(geocodePromises);
 
-  const locationPromises: Promise<Location>[] = [];
+  const locationData: LocationData[] = [];
 
   geocodedLocations.forEach((geodata) => {
+    const randomUser = joinData.users[Math.floor(Math.random() * joinData.users.length)];
+
     const city = geodata.text;
-    const user = joinData.users[Math.floor(Math.random() * joinData.users.length)];
+    const postedById = randomUser.id;
     const stateOrProvince = geodata.context?.find((c) => c.id.startsWith('region'))?.text;
     const country = geodata.context?.find((c) => c.id.startsWith('country'))?.text;
     const coordinates = geodata.center;
     const address = geodata.place_name;
 
-    locationPromises.push(
-      prisma.location.create({
-        data: {
-          city,
-          stateOrProvince,
-          country,
-          coordinates,
-          address,
-          postedBy: { connect: { id: user.id } },
-        },
-      }),
-    );
+    locationData.push({
+      city,
+      stateOrProvince,
+      country,
+      coordinates,
+      address,
+      postedById,
+    });
   });
 
-  return Promise.all(locationPromises);
+  await prisma.location.createMany({ data: locationData, skipDuplicates: true });
+
+  return prisma.location.findMany();
 };
 
 export default createNewLocations;

@@ -8,55 +8,42 @@ interface CreateNewUsersArgs {
   numberOfUsers: number;
 }
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  dateOfBirth: Date;
+  createdAt: Date;
+  hash: string;
+}
+
 const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
   const prisma = DBClient.instance;
-  const userPromises = [];
 
   const hashedPasswords = await Promise.all(
     Array.from({ length: numberOfUsers }, () => argon2.hash(faker.internet.password())),
   );
 
-  const takenEmails: string[] = [];
-  const takenUsernames: string[] = [];
+  const data: UserData[] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfUsers; i++) {
-    const randomValue = crypto.randomBytes(10).toString('hex');
+    const randomValue = crypto.randomBytes(4).toString('hex');
     const firstName = faker.name.firstName();
     const lastName = faker.name.lastName();
     const username = `${firstName[0]}.${lastName}.${randomValue}`;
     const email = faker.internet.email(firstName, randomValue, 'example.com');
-
-    const usernameTaken = takenUsernames.includes(username);
-    const emailTaken = takenEmails.includes(email);
-
-    if (usernameTaken || emailTaken) {
-      i -= 1;
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    takenEmails.push(email);
-    takenUsernames.push(username);
-
     const hash = hashedPasswords[i];
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
     const createdAt = faker.date.past(1);
-    userPromises.push(
-      prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          username,
-          dateOfBirth,
-          createdAt,
-          hash,
-        },
-      }),
-    );
+
+    const user = { firstName, lastName, email, username, dateOfBirth, createdAt, hash };
+    data.push(user);
   }
-  return Promise.all(userPromises);
+
+  await prisma.user.createMany({ data, skipDuplicates: true });
+  return prisma.user.findMany();
 };
 
 export default createNewUsers;

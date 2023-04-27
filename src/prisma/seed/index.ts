@@ -1,6 +1,5 @@
 import { performance } from 'perf_hooks';
-
-import logger from '../../config/pino/logger';
+import { exit } from 'process';
 
 import cleanDatabase from './clean/cleanDatabase';
 
@@ -15,6 +14,7 @@ import createNewBreweryPosts from './create/createNewBreweryPosts';
 import createNewUsers from './create/createNewUsers';
 import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
 import createNewLocations from './create/createNewLocations';
+import logger from '../../config/pino/logger';
 
 (async () => {
   try {
@@ -22,36 +22,30 @@ import createNewLocations from './create/createNewLocations';
 
     logger.info('Clearing database.');
     await cleanDatabase();
-
     logger.info('Database cleared successfully, preparing to seed.');
 
-    const users = await createNewUsers({ numberOfUsers: 1000 });
+    const users = await createNewUsers({ numberOfUsers: 10000 });
     logger.info('Users created successfully.');
-    console.log(users);
 
     const locations = await createNewLocations({
-      numberOfLocations: 1500,
+      numberOfLocations: 150,
       joinData: { users },
     });
     logger.info('Locations created successfully.');
 
     const [breweryPosts, beerTypes] = await Promise.all([
-      createNewBreweryPosts({ numberOfPosts: 1300, joinData: { users, locations } }),
+      createNewBreweryPosts({ numberOfPosts: 130, joinData: { users, locations } }),
       createNewBeerTypes({ joinData: { users } }),
     ]);
     logger.info('Brewery posts and beer types created successfully.');
+
     const beerPosts = await createNewBeerPosts({
       numberOfPosts: 200,
       joinData: { breweryPosts, beerTypes, users },
     });
     logger.info('Beer posts created successfully.');
-    const [
-      beerPostComments,
-      breweryPostComments,
-      beerPostLikes,
-      beerImages,
-      breweryImages,
-    ] = await Promise.all([
+
+    const [beerPostComments, breweryPostComments] = await Promise.all([
       createNewBeerPostComments({
         numberOfComments: 45000,
         joinData: { beerPosts, users },
@@ -60,6 +54,10 @@ import createNewLocations from './create/createNewLocations';
         numberOfComments: 45000,
         joinData: { breweryPosts, users },
       }),
+    ]);
+    logger.info('Created beer post comments and brewery post comments.');
+
+    const [beerPostLikes, breweryPostLikes] = await Promise.all([
       createNewBeerPostLikes({
         numberOfLikes: 10000,
         joinData: { beerPosts, users },
@@ -68,43 +66,43 @@ import createNewLocations from './create/createNewLocations';
         numberOfLikes: 10000,
         joinData: { breweryPosts, users },
       }),
+    ]);
+    logger.info('Created beer post likes, and brewery post likes.');
+
+    const [beerImages, breweryImages] = await Promise.all([
       createNewBeerImages({
-        numberOfImages: 1000,
+        numberOfImages: 100000,
         joinData: { beerPosts, users },
       }),
       createNewBreweryImages({
-        numberOfImages: 1000,
+        numberOfImages: 100000,
         joinData: { breweryPosts, users },
       }),
     ]);
-
-    logger.info(
-      'Beer post comments, brewery post comments, beer post likes, beer images, and brewery images created successfully.',
-    );
+    logger.info('Created beer images and brewery images.');
 
     const end = performance.now();
     const timeElapsed = (end - start) / 1000;
 
     logger.info('Database seeded successfully.');
-
     logger.info({
       numberOfUsers: users.length,
       numberOfBreweryPosts: breweryPosts.length,
       numberOfBeerPosts: beerPosts.length,
       numberOfBeerTypes: beerTypes.length,
       numberOfBeerPostLikes: beerPostLikes.length,
+      numberofBreweryPostLikes: breweryPostLikes.length,
       numberOfBeerPostComments: beerPostComments.length,
       numberOfBreweryPostComments: breweryPostComments.length,
       numberOfBeerImages: beerImages.length,
       numberOfBreweryImages: breweryImages.length,
     });
-
     logger.info(`Database seeded in ${timeElapsed.toFixed(2)} seconds.`);
 
-    process.exit(0);
+    exit(0);
   } catch (error) {
     logger.error('Error seeding database.');
     logger.error(error);
-    process.exit(1);
+    exit(1);
   }
 })();

@@ -11,6 +11,15 @@ interface CreateNewBreweryPostsArgs {
   };
 }
 
+interface BreweryData {
+  name: string;
+  locationId: string;
+  description: string;
+  postedById: string;
+  createdAt: Date;
+  dateEstablished: Date;
+}
+
 const createNewBreweryPosts = async ({
   numberOfPosts,
   joinData,
@@ -18,7 +27,7 @@ const createNewBreweryPosts = async ({
   const { users, locations } = joinData;
 
   const prisma = DBClient.instance;
-  const breweryPromises = [];
+  const breweryData: BreweryData[] = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfPosts; i++) {
     const name = `${faker.commerce.productName()} Brewing Company`;
@@ -30,20 +39,18 @@ const createNewBreweryPosts = async ({
     const createdAt = faker.date.past(1);
     const dateEstablished = faker.date.past(40);
 
-    breweryPromises.push(
-      prisma.breweryPost.create({
-        data: {
-          name,
-          description,
-          createdAt,
-          dateEstablished,
-          postedBy: { connect: { id: user.id } },
-          location: { connect: { id: location.id } },
-        },
-      }),
-    );
+    breweryData.push({
+      name,
+      locationId: location.id,
+      description,
+      postedById: user.id,
+      createdAt,
+      dateEstablished,
+    });
   }
-  return Promise.all(breweryPromises);
+  await prisma.breweryPost.createMany({ data: breweryData, skipDuplicates: true });
+
+  return prisma.breweryPost.findMany();
 };
 
 export default createNewBreweryPosts;

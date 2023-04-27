@@ -13,13 +13,24 @@ interface CreateNewBeerPostsArgs {
   };
 }
 
+interface BeerPostData {
+  abv: number;
+  ibu: number;
+  name: string;
+  description: string;
+  createdAt: Date;
+  breweryId: string;
+  postedById: string;
+  typeId: string;
+}
+
 const createNewBeerPosts = async ({
   numberOfPosts,
   joinData,
 }: CreateNewBeerPostsArgs) => {
   const { users, breweryPosts, beerTypes } = joinData;
   const prisma = DBClient.instance;
-  const beerPostPromises = [];
+  const beerPostData: BeerPostData[] = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfPosts; i++) {
     const user = users[Math.floor(Math.random() * users.length)];
@@ -32,22 +43,20 @@ const createNewBeerPosts = async ({
     const name = faker.commerce.productName();
     const description = faker.lorem.lines(20).replace(/(\r\n|\n|\r)/gm, ' ');
 
-    beerPostPromises.push(
-      prisma.beerPost.create({
-        data: {
-          abv,
-          ibu,
-          name,
-          description,
-          createdAt,
-          brewery: { connect: { id: breweryPost.id } },
-          postedBy: { connect: { id: user.id } },
-          type: { connect: { id: beerType.id } },
-        },
-      }),
-    );
+    beerPostData.push({
+      postedById: user.id,
+      typeId: beerType.id,
+      breweryId: breweryPost.id,
+      createdAt,
+      abv,
+      ibu,
+      name,
+      description,
+    });
   }
-  return Promise.all(beerPostPromises);
+
+  await prisma.beerPost.createMany({ data: beerPostData });
+  return prisma.beerPost.findMany();
 };
 
 export default createNewBeerPosts;
