@@ -1,8 +1,8 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import BeerCommentValidationSchema from './schema/CreateBeerCommentValidationSchema';
+import CreateCommentValidationSchema from '../types/CommentSchema/CreateCommentValidationSchema';
 
-const CreateNewBeerCommentServiceSchema = BeerCommentValidationSchema.extend({
+const CreateNewBeerCommentServiceSchema = CreateCommentValidationSchema.extend({
   userId: z.string().uuid(),
   beerPostId: z.string().uuid(),
 });

@@ -3,16 +3,16 @@ import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult'
 import { z } from 'zod';
 import CommentQueryResult from '../types/CommentSchema/CommentQueryResult';
 
-const getAllBeerComments = async (
+const getAllBreweryComments = async (
   { id }: Pick<z.infer<typeof beerPostQueryResult>, 'id'>,
   { pageSize, pageNum = 0 }: { pageSize: number; pageNum?: number },
 ) => {
   const skip = (pageNum - 1) * pageSize;
-  const beerComments: z.infer<typeof CommentQueryResult>[] =
-    await DBClient.instance.beerComment.findMany({
+  const breweryComments: z.infer<typeof CommentQueryResult>[] =
+    await DBClient.instance.breweryComment.findMany({
       skip,
       take: pageSize,
-      where: { beerPostId: id },
+      where: { breweryPostId: id },
       select: {
         id: true,
         content: true,
@@ -22,7 +22,7 @@ const getAllBeerComments = async (
       },
       orderBy: { createdAt: 'desc' },
     });
-  return beerComments;
+  return breweryComments;
 };
 
-export default getAllBeerComments;
+export default getAllBreweryComments;

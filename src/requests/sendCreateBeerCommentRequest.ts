@@ -1,9 +1,10 @@
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
-import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 
-const BeerCommentValidationSchemaWithId = BeerCommentValidationSchema.extend({
+const BeerCommentValidationSchemaWithId = CreateCommentValidationSchema.extend({
   beerPostId: z.string().uuid(),
 });
 
@@ -30,7 +31,7 @@ const sendCreateBeerCommentRequest = async ({
     throw new Error('Invalid API response');
   }
 
-  const parsedPayload = BeerCommentQueryResult.safeParse(parsedResponse.data.payload);
+  const parsedPayload = CommentQueryResult.safeParse(parsedResponse.data.payload);
 
   if (!parsedPayload.success) {
     throw new Error('Invalid API response payload');

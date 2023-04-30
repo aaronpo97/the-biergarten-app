@@ -2,135 +2,26 @@ import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { GetServerSideProps, NextPage } from 'next';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import MapGL, { Marker } from 'react-map-gl';
+
 import { z } from 'zod';
-import { FC, useContext } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import useGetBreweryPostLikeCount from '@/hooks/useGetBreweryPostLikeCount';
-import useTimeDistance from '@/hooks/useTimeDistance';
-import UserContext from '@/contexts/userContext';
-import Link from 'next/link';
-import { FaRegEdit } from 'react-icons/fa';
-import format from 'date-fns/format';
-import BreweryPostLikeButton from '@/components/BreweryIndex/BreweryPostLikeButton';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import { Tab } from '@headlessui/react';
+import BreweryInfoHeader from '@/components/BreweryById/BreweryInfoHeader';
+import BreweryMap from '@/components/BreweryById/BreweryMap';
+import BreweryBeersSection from '@/components/BreweryById/BreweryBeerSection.tsx';
+import BreweryCommentsSection from '@/components/BreweryById/BreweryCommentsSection';
 
 interface BreweryPageProps {
   breweryPost: z.infer<typeof BreweryPostQueryResult>;
 }
 
-interface BreweryInfoHeaderProps {
-  breweryPost: z.infer<typeof BreweryPostQueryResult>;
-}
-const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
-  const createdAt = new Date(breweryPost.createdAt);
-  const timeDistance = useTimeDistance(createdAt);
-
-  const { user } = useContext(UserContext);
-  const idMatches = user && breweryPost.postedBy.id === user.id;
-  const isPostOwner = !!(user && idMatches);
-
-  const { likeCount, mutate } = useGetBreweryPostLikeCount(breweryPost.id);
-
-  return (
-    <article className="card flex flex-col justify-center bg-base-300">
-      <div className="card-body">
-        <header className="flex justify-between">
-          <div className="space-y-2">
-            <div>
-              <h1 className="text-2xl font-bold lg:text-4xl">{breweryPost.name}</h1>
-              <h2 className="text-lg font-semibold lg:text-2xl">
-                Located in
-                {` ${breweryPost.location.city}, ${
-                  breweryPost.location.stateOrProvince || breweryPost.location.country
-                }`}
-              </h2>
-            </div>
-            <div>
-              <h3 className="italic">
-                {' posted by '}
-                <Link
-                  href={`/users/${breweryPost.postedBy.id}`}
-                  className="link-hover link"
-                >
-                  {`${breweryPost.postedBy.username} `}
-                </Link>
-                {timeDistance && (
-                  <span
-                    className="tooltip tooltip-right"
-                    data-tip={format(createdAt, 'MM/dd/yyyy')}
-                  >{`${timeDistance} ago`}</span>
-                )}
-              </h3>
-            </div>
-          </div>
-          {isPostOwner && (
-            <div className="tooltip tooltip-left" data-tip={`Edit '${breweryPost.name}'`}>
-              <Link
-                href={`/breweries/${breweryPost.id}/edit`}
-                className="btn-ghost btn-xs btn"
-              >
-                <FaRegEdit className="text-xl" />
-              </Link>
-            </div>
-          )}
-        </header>
-        <div className="space-y-2">
-          <p>{breweryPost.description}</p>
-          <div className="flex items-end justify-between">
-            <div className="space-y-1">
-              <div>
-                {(!!likeCount || likeCount === 0) && (
-                  <span>
-                    Liked by {likeCount} user{likeCount !== 1 && 's'}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="card-actions">
-              {user && (
-                <BreweryPostLikeButton
-                  breweryPostId={breweryPost.id}
-                  mutateCount={mutate}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-};
-
-interface BreweryMapProps {
-  latitude: number;
-  longitude: number;
-}
-const BreweryMap: FC<BreweryMapProps> = ({ latitude, longitude }) => {
-  return (
-    <MapGL
-      initialViewState={{
-        latitude,
-        longitude,
-        zoom: 17,
-      }}
-      style={{
-        width: '100%',
-        height: 450,
-      }}
-      mapStyle="mapbox://styles/mapbox/streets-v12"
-      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string}
-      scrollZoom={true}
-    >
-      <Marker latitude={latitude} longitude={longitude} />
-    </MapGL>
-  );
-};
-
 const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
   const [longitude, latitude] = breweryPost.location.coordinates;
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   return (
     <>
       <Head>
@@ -166,8 +57,39 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
         <div className="mb-12 mt-10 flex w-full items-center justify-center">
           <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
             <BreweryInfoHeader breweryPost={breweryPost} />
-
-            <BreweryMap latitude={latitude} longitude={longitude} />
+            {isDesktop ? (
+              <div className="mt-4 flex flex-row space-x-3 space-y-0">
+                <div className="w-[60%]">
+                  <BreweryCommentsSection breweryPost={breweryPost} />
+                </div>
+                <div className="w-[40%] space-y-3">
+                  <BreweryMap latitude={latitude} longitude={longitude} />
+                  <BreweryBeersSection />
+                </div>
+              </div>
+            ) : (
+              <>
+                <BreweryMap latitude={latitude} longitude={longitude} />
+                <Tab.Group>
+                  <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
+                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                      Comments
+                    </Tab>
+                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                      Beers
+                    </Tab>
+                  </Tab.List>
+                  <Tab.Panels className="mt-2">
+                    <Tab.Panel>
+                      <BreweryCommentsSection breweryPost={breweryPost} />
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <BreweryBeersSection />
+                    </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
+              </>
+            )}
           </div>
         </div>
       </>

@@ -28,30 +28,32 @@ import logger from '../../config/pino/logger';
     logger.info('Users created successfully.');
 
     const locations = await createNewLocations({
-      numberOfLocations: 150,
+      numberOfLocations: 1600,
       joinData: { users },
     });
+
     logger.info('Locations created successfully.');
 
     const [breweryPosts, beerTypes] = await Promise.all([
-      createNewBreweryPosts({ numberOfPosts: 130, joinData: { users, locations } }),
+      createNewBreweryPosts({ numberOfPosts: 1500, joinData: { users, locations } }),
       createNewBeerTypes({ joinData: { users } }),
     ]);
     logger.info('Brewery posts and beer types created successfully.');
 
     const beerPosts = await createNewBeerPosts({
-      numberOfPosts: 200,
+      numberOfPosts: 3000,
       joinData: { breweryPosts, beerTypes, users },
     });
+
     logger.info('Beer posts created successfully.');
 
     const [beerPostComments, breweryPostComments] = await Promise.all([
       createNewBeerPostComments({
-        numberOfComments: 45000,
+        numberOfComments: 100000,
         joinData: { beerPosts, users },
       }),
       createNewBreweryPostComments({
-        numberOfComments: 45000,
+        numberOfComments: 100000,
         joinData: { breweryPosts, users },
       }),
     ]);
@@ -59,11 +61,11 @@ import logger from '../../config/pino/logger';
 
     const [beerPostLikes, breweryPostLikes] = await Promise.all([
       createNewBeerPostLikes({
-        numberOfLikes: 10000,
+        numberOfLikes: 100000,
         joinData: { beerPosts, users },
       }),
       createNewBreweryPostLikes({
-        numberOfLikes: 10000,
+        numberOfLikes: 100000,
         joinData: { breweryPosts, users },
       }),
     ]);
@@ -71,11 +73,11 @@ import logger from '../../config/pino/logger';
 
     const [beerImages, breweryImages] = await Promise.all([
       createNewBeerImages({
-        numberOfImages: 100000,
+        numberOfImages: 20000,
         joinData: { beerPosts, users },
       }),
       createNewBreweryImages({
-        numberOfImages: 100000,
+        numberOfImages: 20000,
         joinData: { breweryPosts, users },
       }),
     ]);

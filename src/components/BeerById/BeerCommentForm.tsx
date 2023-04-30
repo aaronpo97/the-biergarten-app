@@ -1,5 +1,5 @@
 import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentRequest';
-import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
+
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -9,6 +9,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
 import useBeerPostComments from '@/hooks/useBeerPostComments';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import Button from '../ui/forms/Button';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -26,12 +27,12 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   mutate,
 }) => {
   const { register, handleSubmit, formState, reset, setValue } = useForm<
-    z.infer<typeof BeerCommentValidationSchema>
+    z.infer<typeof CreateCommentValidationSchema>
   >({
     defaultValues: {
       rating: 0,
     },
-    resolver: zodResolver(BeerCommentValidationSchema),
+    resolver: zodResolver(CreateCommentValidationSchema),
   });
 
   const [rating, setRating] = useState(0);
@@ -40,7 +41,7 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     reset({ rating: 0, content: '' });
   }, [reset]);
 
-  const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
     setValue('rating', 0);

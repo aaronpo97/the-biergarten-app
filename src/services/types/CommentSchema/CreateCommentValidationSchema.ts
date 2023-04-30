@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const BeerCommentValidationSchema = z.object({
+const CreateCommentValidationSchema = z.object({
   content: z
     .string()
     .min(1, { message: 'Comment must not be empty.' })
@@ -12,4 +12,4 @@ const BeerCommentValidationSchema = z.object({
     .max(5, { message: 'Rating must be less than 5.' }),
 });
 
-export default BeerCommentValidationSchema;
+export default CreateCommentValidationSchema;

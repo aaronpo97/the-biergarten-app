@@ -3,13 +3,13 @@ import useTimeDistance from '@/hooks/useTimeDistance';
 import { format } from 'date-fns';
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Link, Rating } from 'react-daisyui';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import CommentCardDropdown from './CommentCardDropdown';
 
 interface CommentContentBodyProps {
-  comment: z.infer<typeof BeerCommentQueryResult>;
+  comment: z.infer<typeof CommentQueryResult>;
   ref: ReturnType<typeof useInView>['ref'] | undefined;
   setInEditMode: Dispatch<SetStateAction<boolean>>;
 }

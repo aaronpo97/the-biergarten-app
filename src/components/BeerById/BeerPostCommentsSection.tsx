@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import UserContext from '@/contexts/userContext';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
@@ -7,13 +6,10 @@ import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import { useRouter } from 'next/router';
-import { useInView } from 'react-intersection-observer';
-import { FaArrowUp } from 'react-icons/fa';
 import BeerCommentForm from './BeerCommentForm';
 
-import CommentCardBody from './CommentCardBody';
-import NoCommentsCard from './NoCommentsCard';
 import LoadingComponent from './LoadingComponent';
+import CommentsComponent from '../ui/CommentsComponent';
 
 interface BeerPostCommentsSectionProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
@@ -33,20 +29,9 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
       pageSize: PAGE_SIZE,
     });
 
-  const { ref: lastCommentRef } = useInView({
-    /**
-     * When the last comment comes into view, call setSize from useBeerPostComments to
-     * load more comments.
-     */
-    onChange: (visible) => {
-      if (!visible || isAtEnd) return;
-      setSize(size + 1);
-    },
-  });
-
-  const sectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   return (
-    <div className="w-full space-y-3" ref={sectionRef}>
+    <div className="w-full space-y-3" ref={commentSectionRef}>
       <div className="card bg-base-300">
         <div className="card-body h-full">
           {user ? (
@@ -69,66 +54,15 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
             <LoadingComponent length={PAGE_SIZE} />
           </div>
         ) : (
-          <>
-            {!!comments.length && (
-              <div className="card bg-base-300 pb-6">
-                {comments.map((comment, index) => {
-                  const isPenulitmateComment = index === comments.length - 2;
-
-                  /**
-                   * Attach a ref to the last comment in the list. When it comes into
-                   * view, the component will call setSize to load more comments.
-                   */
-                  return (
-                    <div
-                      ref={isPenulitmateComment ? lastCommentRef : undefined}
-                      key={comment.id}
-                    >
-                      <CommentCardBody comment={comment} mutate={mutate} />
-                    </div>
-                  );
-                })}
-
-                {
-                  /**
-                   * If there are more comments to load, show a loading component with a
-                   * skeleton loader and a loading spinner.
-                   */
-                  !!isLoadingMore && <LoadingComponent length={PAGE_SIZE} />
-                }
-
-                {
-                  /**
-                   * If the user has scrolled to the end of the comments, show a button
-                   * that will scroll them back to the top of the comments section.
-                   */
-                  !!isAtEnd && (
-                    <div className="flex h-20 items-center justify-center text-center">
-                      <div
-                        className="tooltip tooltip-bottom"
-                        data-tip="Scroll back to top of comments."
-                      >
-                        <button
-                          type="button"
-                          className="btn-ghost btn-sm btn"
-                          aria-label="Scroll back to top of comments"
-                          onClick={() => {
-                            sectionRef.current?.scrollIntoView({
-                              behavior: 'smooth',
-                            });
-                          }}
-                        >
-                          <FaArrowUp />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                }
-              </div>
-            )}
-
-            {!comments.length && <NoCommentsCard />}
-          </>
+          <CommentsComponent
+            commentSectionRef={commentSectionRef}
+            comments={comments}
+            isLoadingMore={isLoadingMore}
+            isAtEnd={isAtEnd}
+            pageSize={PAGE_SIZE}
+            setSize={setSize}
+            size={size}
+          />
         )
       }
     </div>

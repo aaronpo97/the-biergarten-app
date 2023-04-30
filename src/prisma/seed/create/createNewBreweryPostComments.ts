@@ -30,7 +30,7 @@ const createNewBreweryPostComments = async ({
   const rating = Math.floor(Math.random() * 5) + 1;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfComments; i++) {
-    const content = faker.lorem.lines(5);
+    const content = faker.lorem.lines(3).replace(/\n/g, ' ');
     const user = users[Math.floor(Math.random() * users.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
 
