@@ -47,7 +47,7 @@ const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
                 </Link>
                 {timeDistance && (
                   <span
-                    className="tooltip tooltip-right"
+                    className="tooltip tooltip-bottom"
                     data-tip={format(createdAt, 'MM/dd/yyyy')}
                   >{`${timeDistance} ago`}</span>
                 )}

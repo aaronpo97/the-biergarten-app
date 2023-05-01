@@ -46,9 +46,19 @@ const BreweryPage: NextPage<BreweryPageProps> = () => {
       <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
         <div className="my-10 flex w-10/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
           <header className="my-10 flex justify-between lg:flex-row">
-            <div>
-              <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
-              <h2 className="text-2xl font-bold lg:text-4xl">Breweries</h2>
+            <div className="space-y-2">
+              <div>
+                <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
+                <h2 className="text-2xl font-bold lg:text-4xl">Breweries</h2>
+              </div>
+              <div>
+                <Link
+                  className="link-hover link text-xl font-bold lg:text-2xl"
+                  href="/breweries/map"
+                >
+                  View map
+                </Link>
+              </div>
             </div>
             {!!user && (
               <div

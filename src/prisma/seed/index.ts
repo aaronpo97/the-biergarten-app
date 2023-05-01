@@ -28,14 +28,14 @@ import logger from '../../config/pino/logger';
     logger.info('Users created successfully.');
 
     const locations = await createNewLocations({
-      numberOfLocations: 1600,
+      numberOfLocations: 500,
       joinData: { users },
     });
 
     logger.info('Locations created successfully.');
 
     const [breweryPosts, beerTypes] = await Promise.all([
-      createNewBreweryPosts({ numberOfPosts: 1500, joinData: { users, locations } }),
+      createNewBreweryPosts({ numberOfPosts: 450, joinData: { users, locations } }),
       createNewBeerTypes({ joinData: { users } }),
     ]);
     logger.info('Brewery posts and beer types created successfully.');
