@@ -12,6 +12,7 @@ import DBClient from '@/prisma/DBClient';
 
 import LocationMarker from '@/components/ui/LocationMarker';
 import Link from 'next/link';
+import Head from 'next/head';
 
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 
@@ -69,44 +70,53 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
     [breweries],
   );
   return (
-    <div className="h-full">
-      <Map
-        initialViewState={{ zoom: 2 }}
-        style={{ width: '100%', height: '100%' }}
-        mapStyle={mapStyles[theme]}
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        scrollZoom
-      >
-        <FullscreenControl position="top-left" />
-        <NavigationControl position="top-left" />
-        <ScaleControl />
-        {pins}
-        {popupInfo && (
-          <Popup
-            anchor="bottom"
-            longitude={popupInfo.location.coordinates[0]}
-            latitude={popupInfo.location.coordinates[1]}
-            onClose={() => setPopupInfo(null)}
-          >
-            <div className="flex flex-col text-black ">
-              <Link
-                className="link-hover link text-base font-bold"
-                href={`/breweries/${popupInfo.id}`}
-              >
-                {popupInfo.name}
-              </Link>
-              <p className="text-base">
-                {popupInfo.location.city}
-                {popupInfo.location.stateOrProvince
-                  ? `, ${popupInfo.location.stateOrProvince}`
-                  : ''}
-                {popupInfo.location.country ? `, ${popupInfo.location.country}` : ''}
-              </p>
-            </div>
-          </Popup>
-        )}
-      </Map>
-    </div>
+    <>
+      <Head>
+        <title>Brewery Map | The Biergarten App</title>
+        <meta
+          name="description"
+          content="Find breweries near you and around the world."
+        />
+      </Head>
+      <div className="h-full">
+        <Map
+          initialViewState={{ zoom: 2 }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle={mapStyles[theme]}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+          scrollZoom
+        >
+          <FullscreenControl position="top-left" />
+          <NavigationControl position="top-left" />
+          <ScaleControl />
+          {pins}
+          {popupInfo && (
+            <Popup
+              anchor="bottom"
+              longitude={popupInfo.location.coordinates[0]}
+              latitude={popupInfo.location.coordinates[1]}
+              onClose={() => setPopupInfo(null)}
+            >
+              <div className="flex flex-col text-black ">
+                <Link
+                  className="link-hover link text-base font-bold"
+                  href={`/breweries/${popupInfo.id}`}
+                >
+                  {popupInfo.name}
+                </Link>
+                <p className="text-base">
+                  {popupInfo.location.city}
+                  {popupInfo.location.stateOrProvince
+                    ? `, ${popupInfo.location.stateOrProvince}`
+                    : ''}
+                  {popupInfo.location.country ? `, ${popupInfo.location.country}` : ''}
+                </p>
+              </div>
+            </Popup>
+          )}
+        </Map>
+      </div>
+    </>
   );
 };
 

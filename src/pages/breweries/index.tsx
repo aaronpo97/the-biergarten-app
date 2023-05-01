@@ -7,7 +7,7 @@ import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQuer
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, MutableRefObject, useRef } from 'react';
-import { Link } from 'react-daisyui';
+import Link from 'next/link';
 import { FaPlus, FaArrowUp } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
