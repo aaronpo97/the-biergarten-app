@@ -3,19 +3,13 @@ import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentReques
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { FunctionComponent, useState, useEffect } from 'react';
-import { Rating } from 'react-daisyui';
+import { FunctionComponent } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
 import useBeerPostComments from '@/hooks/useBeerPostComments';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
-import Button from '../ui/forms/Button';
-import FormError from '../ui/forms/FormError';
-import FormInfo from '../ui/forms/FormInfo';
-import FormLabel from '../ui/forms/FormLabel';
-import FormSegment from '../ui/forms/FormSegment';
-import FormTextArea from '../ui/forms/FormTextArea';
+import CommentForm from '../ui/CommentForm';
 
 interface BeerCommentFormProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
@@ -26,26 +20,16 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   beerPost,
   mutate,
 }) => {
-  const { register, handleSubmit, formState, reset, setValue } = useForm<
+  const { register, handleSubmit, formState, watch, reset, setValue } = useForm<
     z.infer<typeof CreateCommentValidationSchema>
   >({
-    defaultValues: {
-      rating: 0,
-    },
+    defaultValues: { rating: 0 },
     resolver: zodResolver(CreateCommentValidationSchema),
   });
-
-  const [rating, setRating] = useState(0);
-  useEffect(() => {
-    setRating(0);
-    reset({ rating: 0, content: '' });
-  }, [reset]);
 
   const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
-    setValue('rating', 0);
-    setRating(0);
     await sendCreateBeerCommentRequest({
       content: data.content,
       rating: data.rating,
@@ -55,50 +39,15 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     reset();
   };
 
-  const { errors } = formState;
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div>
-        <FormInfo>
-          <FormLabel htmlFor="content">Leave a comment</FormLabel>
-          <FormError>{errors.content?.message}</FormError>
-        </FormInfo>
-        <FormSegment>
-          <FormTextArea
-            id="content"
-            formValidationSchema={register('content')}
-            placeholder="Comment"
-            rows={5}
-            error={!!errors.content?.message}
-            disabled={formState.isSubmitting}
-          />
-        </FormSegment>
-        <FormInfo>
-          <FormLabel htmlFor="rating">Rating</FormLabel>
-          <FormError>{errors.rating?.message}</FormError>
-        </FormInfo>
-        <Rating
-          value={rating}
-          onChange={(value) => {
-            setRating(value);
-            setValue('rating', value);
-          }}
-        >
-          <Rating.Item name="rating-1" className="mask mask-star" />
-          <Rating.Item name="rating-1" className="mask mask-star" />
-          <Rating.Item name="rating-1" className="mask mask-star" />
-          <Rating.Item name="rating-1" className="mask mask-star" />
-          <Rating.Item name="rating-1" className="mask mask-star" />
-        </Rating>
-      </div>
-
-      <div>
-        <Button type="submit" isSubmitting={formState.isSubmitting}>
-          Submit
-        </Button>
-      </div>
-    </form>
+    <CommentForm
+      handleSubmit={handleSubmit}
+      onSubmit={onSubmit}
+      watch={watch}
+      setValue={setValue}
+      formState={formState}
+      register={register}
+    />
   );
 };
 

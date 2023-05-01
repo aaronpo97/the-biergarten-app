@@ -8,18 +8,11 @@ const sendBreweryPostLikeRequest = async (breweryPostId: string) => {
   const json = await response.json();
 
   const parsed = APIResponseValidationSchema.safeParse(json);
-
   if (!parsed.success) {
     throw new Error('Invalid API response.');
   }
 
-  if (!parsed.success) {
-    throw new Error('Invalid API response.');
-  }
-
-  const { success, message } = parsed.data;
-
-  return { success, message };
+  return parsed.data;
 };
 
 export default sendBreweryPostLikeRequest;

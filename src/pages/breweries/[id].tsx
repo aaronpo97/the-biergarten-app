@@ -1,7 +1,6 @@
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { GetServerSideProps, NextPage } from 'next';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { z } from 'zod';
 import Head from 'next/head';
@@ -11,7 +10,7 @@ import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Tab } from '@headlessui/react';
 import BreweryInfoHeader from '@/components/BreweryById/BreweryInfoHeader';
-import BreweryMap from '@/components/BreweryById/BreweryMap';
+import BreweryPostMap from '@/components/BreweryById/BreweryPostMap';
 import BreweryBeersSection from '@/components/BreweryById/BreweryBeerSection.tsx';
 import BreweryCommentsSection from '@/components/BreweryById/BreweryCommentsSection';
 
@@ -63,13 +62,13 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
                   <BreweryCommentsSection breweryPost={breweryPost} />
                 </div>
                 <div className="w-[40%] space-y-3">
-                  <BreweryMap latitude={latitude} longitude={longitude} />
+                  <BreweryPostMap latitude={latitude} longitude={longitude} />
                   <BreweryBeersSection />
                 </div>
               </div>
             ) : (
               <>
-                <BreweryMap latitude={latitude} longitude={longitude} />
+                <BreweryPostMap latitude={latitude} longitude={longitude} />
                 <Tab.Group>
                   <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
                     <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">

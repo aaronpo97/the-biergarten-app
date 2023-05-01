@@ -14,7 +14,7 @@ import { BeerPost } from '@prisma/client';
 
 import { z } from 'zod';
 
-import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Tab } from '@headlessui/react';

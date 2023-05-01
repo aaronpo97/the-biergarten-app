@@ -16,6 +16,7 @@ import { NextApiResponse } from 'next';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import getAllBreweryComments from '@/services/BreweryComment/getAllBreweryComments';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import createNewBreweryComment from '@/services/BreweryComment/createNewBreweryComment';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
   body: z.infer<typeof CreateCommentValidationSchema>;
@@ -26,29 +27,31 @@ interface GetAllCommentsRequest extends UserExtendedNextApiRequest {
   query: { id: string; page_size: string; page_num: string };
 }
 
-// const createComment = async (
-//   req: CreateCommentRequest,
-//   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
-// ) => {
-//   const { content, rating } = req.body;
+const createComment = async (
+  req: CreateCommentRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { content, rating } = req.body;
 
-//   const beerPostId = req.query.id;
+  const breweryPostId = req.query.id;
 
-//   const newBeerComment: z.infer<typeof BeerCommentQueryResult> =
-//     await createNewBeerComment({
-//       content,
-//       rating,
-//       beerPostId,
-//       userId: req.user!.id,
-//     });
+  const user = req.user!;
 
-//   res.status(201).json({
-//     message: 'Beer comment created successfully',
-//     statusCode: 201,
-//     payload: newBeerComment,
-//     success: true,
-//   });
-// };
+  const newBreweryComment: z.infer<typeof CommentQueryResult> =
+    await createNewBreweryComment({
+      content,
+      rating,
+      breweryPostId,
+      userId: user.id,
+    });
+
+  res.status(201).json({
+    message: 'Beer comment created successfully',
+    statusCode: 201,
+    payload: newBreweryComment,
+    success: true,
+  });
+};
 
 const getAll = async (
   req: GetAllCommentsRequest,
@@ -83,14 +86,14 @@ const router = createRouter<
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
-// router.post(
-//   validateRequest({
-//     bodySchema: CreateBeerCommentValidationSchema,
-//     querySchema: z.object({ id: z.string().uuid() }),
-//   }),
-//   getCurrentUser,
-//   createComment,
-// );
+router.post(
+  validateRequest({
+    bodySchema: CreateCommentValidationSchema,
+    querySchema: z.object({ id: z.string().uuid() }),
+  }),
+  getCurrentUser,
+  createComment,
+);
 
 router.get(
   validateRequest({

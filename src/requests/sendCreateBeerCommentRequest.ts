@@ -18,12 +18,11 @@ const sendCreateBeerCommentRequest = async ({
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ beerPostId, content, rating }),
   });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
 
   const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
 
   const parsedResponse = APIResponseValidationSchema.safeParse(data);
 
