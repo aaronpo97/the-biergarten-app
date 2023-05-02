@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const BeerCommentQueryResult = z.object({
+const CommentQueryResult = z.object({
   id: z.string().uuid(),
   content: z.string().min(1).max(500),
   rating: z.number().int().min(1).max(5),
@@ -11,4 +11,4 @@ const BeerCommentQueryResult = z.object({
   }),
 });
 
-export default BeerCommentQueryResult;
+export default CommentQueryResult;

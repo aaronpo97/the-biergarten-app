@@ -22,6 +22,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
   SPARKPOST_API_KEY: z.string(),
   SPARKPOST_SENDER_ADDRESS: z.string().email(),
+  MAPBOX_ACCESS_TOKEN: z.string()
 });
 
 const parsed = envSchema.safeParse(env);
@@ -145,3 +146,14 @@ export const SPARKPOST_API_KEY = parsed.data.SPARKPOST_API_KEY;
  * @see https://app.sparkpost.com/domains/list/sending
  */
 export const SPARKPOST_SENDER_ADDRESS = parsed.data.SPARKPOST_SENDER_ADDRESS;
+
+/**
+ * Your Mapbox access token.
+ * 
+ * @example
+ *  'pk.abcdefghijklmnopqrstuvwxyz123456';
+ * 
+ * @see https://docs.mapbox.com/help/how-mapbox-works/access-tokens/
+ */
+
+export const MAPBOX_ACCESS_TOKEN = parsed.data.MAPBOX_ACCESS_TOKEN;

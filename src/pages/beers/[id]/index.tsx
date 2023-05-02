@@ -14,7 +14,7 @@ import { BeerPost } from '@prisma/client';
 
 import { z } from 'zod';
 
-import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Tab } from '@headlessui/react';
@@ -37,68 +37,66 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
         <meta name="description" content={beerPost.description} />
       </Head>
       <>
-        <div>
-          <Carousel
-            className="w-full"
-            useKeyboardArrows
-            autoPlay
-            interval={10000}
-            infiniteLoop
-            showThumbs={false}
-          >
-            {beerPost.beerImages.length
-              ? beerPost.beerImages.map((image, index) => (
-                  <div key={image.id} id={`image-${index}}`} className="w-full">
-                    <Image
-                      alt={image.alt}
-                      src={image.path}
-                      height={1080}
-                      width={1920}
-                      className="h-96 w-full object-cover lg:h-[42rem]"
-                    />
-                  </div>
-                ))
-              : Array.from({ length: 1 }).map((_, i) => (
-                  <div className="h-96 lg:h-[42rem]" key={i} />
-                ))}
-          </Carousel>
-
-          <div className="mb-12 mt-10 flex w-full items-center justify-center ">
-            <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
-              <BeerInfoHeader beerPost={beerPost} />
-
-              {isDesktop ? (
-                <div className="mt-4 flex flex-row space-x-3 space-y-0">
-                  <div className="w-[60%]">
-                    <BeerPostCommentsSection beerPost={beerPost} />
-                  </div>
-                  <div className="w-[40%]">
-                    <BeerRecommendations beerRecommendations={beerRecommendations} />
-                  </div>
+        <Carousel
+          className="w-full"
+          useKeyboardArrows
+          autoPlay
+          interval={10000}
+          infiniteLoop
+          showThumbs={false}
+        >
+          {beerPost.beerImages.length
+            ? beerPost.beerImages.map((image, index) => (
+                <div key={image.id} id={`image-${index}}`} className="w-full">
+                  <Image
+                    alt={image.alt}
+                    src={image.path}
+                    height={1080}
+                    width={1920}
+                    className="h-96 w-full object-cover lg:h-[42rem]"
+                  />
                 </div>
-              ) : (
-                <Tab.Group>
-                  <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
-                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-                      Comments
-                    </Tab>
-                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-                      Other Beers
-                    </Tab>
-                  </Tab.List>
-                  <Tab.Panels className="mt-2">
-                    <Tab.Panel>
-                      <BeerPostCommentsSection beerPost={beerPost} />
-                    </Tab.Panel>
-                    <Tab.Panel>
-                      <BeerRecommendations beerRecommendations={beerRecommendations} />
-                    </Tab.Panel>
-                  </Tab.Panels>
-                </Tab.Group>
-              )}
-            </div>
+              ))
+            : Array.from({ length: 1 }).map((_, i) => (
+                <div className="h-96 lg:h-[42rem]" key={i} />
+              ))}
+        </Carousel>
+
+        <main className="mb-12 mt-10 flex w-full items-center justify-center">
+          <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
+            <BeerInfoHeader beerPost={beerPost} />
+
+            {isDesktop ? (
+              <div className="mt-4 flex flex-row space-x-3 space-y-0">
+                <div className="w-[60%]">
+                  <BeerPostCommentsSection beerPost={beerPost} />
+                </div>
+                <div className="w-[40%]">
+                  <BeerRecommendations beerRecommendations={beerRecommendations} />
+                </div>
+              </div>
+            ) : (
+              <Tab.Group>
+                <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
+                  <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                    Comments
+                  </Tab>
+                  <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                    Other Beers
+                  </Tab>
+                </Tab.List>
+                <Tab.Panels className="mt-2">
+                  <Tab.Panel>
+                    <BeerPostCommentsSection beerPost={beerPost} />
+                  </Tab.Panel>
+                  <Tab.Panel>
+                    <BeerRecommendations beerRecommendations={beerRecommendations} />
+                  </Tab.Panel>
+                </Tab.Panels>
+              </Tab.Group>
+            )}
           </div>
-        </div>
+        </main>
       </>
     </>
   );

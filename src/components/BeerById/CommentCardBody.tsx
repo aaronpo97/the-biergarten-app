@@ -1,5 +1,5 @@
 import useBeerPostComments from '@/hooks/useBeerPostComments';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';
 
 interface CommentCardProps {
-  comment: z.infer<typeof BeerCommentQueryResult>;
+  comment: z.infer<typeof CommentQueryResult>;
   mutate: ReturnType<typeof useBeerPostComments>['mutate'];
   ref?: ReturnType<typeof useInView>['ref'];
 }

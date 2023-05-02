@@ -1,12 +1,12 @@
-import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/useBeerPostComments';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { useInView } from 'react-intersection-observer';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
@@ -14,7 +14,7 @@ import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 
 interface CommentCardDropdownProps {
-  comment: z.infer<typeof BeerCommentQueryResult>;
+  comment: z.infer<typeof CommentQueryResult>;
   setInEditMode: Dispatch<SetStateAction<boolean>>;
   ref: ReturnType<typeof useInView>['ref'] | undefined;
   mutate: ReturnType<typeof useBeerPostComments>['mutate'];
@@ -27,13 +27,13 @@ const EditCommentBody: FC<CommentCardDropdownProps> = ({
   mutate,
 }) => {
   const { register, handleSubmit, formState, setValue, watch } = useForm<
-    z.infer<typeof BeerCommentValidationSchema>
+    z.infer<typeof CreateCommentValidationSchema>
   >({
     defaultValues: {
       content: comment.content,
       rating: comment.rating,
     },
-    resolver: zodResolver(BeerCommentValidationSchema),
+    resolver: zodResolver(CreateCommentValidationSchema),
   });
 
   const { errors } = formState;
@@ -59,7 +59,7 @@ const EditCommentBody: FC<CommentCardDropdownProps> = ({
     await mutate();
   };
 
-  const onSubmit: SubmitHandler<z.infer<typeof BeerCommentValidationSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
     const response = await fetch(`/api/beer-comments/${comment.id}`, {

@@ -6,16 +6,15 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import createNewBeerComment from '@/services/BeerComment/createNewBeerComment';
 
-import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
-
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
-  body: z.infer<typeof BeerCommentValidationSchema>;
+  body: z.infer<typeof CreateCommentValidationSchema>;
   query: { id: string };
 }
 
@@ -31,13 +30,12 @@ const createComment = async (
 
   const beerPostId = req.query.id;
 
-  const newBeerComment: z.infer<typeof BeerCommentQueryResult> =
-    await createNewBeerComment({
-      content,
-      rating,
-      beerPostId,
-      userId: req.user!.id,
-    });
+  const newBeerComment: z.infer<typeof CommentQueryResult> = await createNewBeerComment({
+    content,
+    rating,
+    beerPostId,
+    userId: req.user!.id,
+  });
 
   res.status(201).json({
     message: 'Beer comment created successfully',
@@ -80,7 +78,7 @@ const router = createRouter<
 
 router.post(
   validateRequest({
-    bodySchema: BeerCommentValidationSchema,
+    bodySchema: CreateCommentValidationSchema,
     querySchema: z.object({ id: z.string().uuid() }),
   }),
   getCurrentUser,

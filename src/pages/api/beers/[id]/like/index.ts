@@ -50,7 +50,7 @@ const getLikeCount = async (
 ) => {
   const id = req.query.id as string;
 
-  const likes = await DBClient.instance.beerPostLike.count({
+  const likeCount = await DBClient.instance.beerPostLike.count({
     where: { beerPostId: id },
   });
 
@@ -58,7 +58,7 @@ const getLikeCount = async (
     success: true,
     message: 'Successfully retrieved like count.',
     statusCode: 200,
-    payload: { likeCount: likes },
+    payload: { likeCount },
   });
 };
 

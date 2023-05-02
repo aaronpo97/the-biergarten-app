@@ -1,4 +1,4 @@
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 import useSWRInfinite from 'swr/infinite';
@@ -30,7 +30,7 @@ const useBeerPostComments = ({ id, pageSize }: UseBeerPostCommentsProps) => {
     if (!parsed.success) {
       throw new Error(parsed.error.message);
     }
-    const parsedPayload = z.array(BeerCommentQueryResult).safeParse(parsed.data.payload);
+    const parsedPayload = z.array(CommentQueryResult).safeParse(parsed.data.payload);
 
     if (!parsedPayload.success) {
       throw new Error(parsedPayload.error.message);

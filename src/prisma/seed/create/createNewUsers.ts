@@ -1,47 +1,65 @@
-import argon2 from 'argon2';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 import crypto from 'crypto';
 import DBClient from '../../DBClient';
+import { hashPassword } from '../../../config/auth/passwordFns';
 
 interface CreateNewUsersArgs {
   numberOfUsers: number;
 }
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  dateOfBirth: Date;
+  createdAt: Date;
+  hash: string;
+}
+
 const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
   const prisma = DBClient.instance;
-  const userPromises = [];
 
-  const hashedPasswords = await Promise.all(
-    Array.from({ length: numberOfUsers }, () => argon2.hash(faker.internet.password())),
-  );
+  const password = 'passwoRd!3';
+  const hash = await hashPassword(password);
+  const data: UserData[] = [];
+
+  const takenUsernames: string[] = [];
+  const takenEmails: string[] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfUsers; i++) {
-    const randomValue = crypto.randomBytes(10).toString('hex');
+    const randomValue = crypto.randomBytes(1).toString('hex');
     const firstName = faker.name.firstName();
     const lastName = faker.name.lastName();
-    const username = `${firstName[0]}.${lastName}.${randomValue}`;
-    const email = faker.internet.email(firstName, randomValue, 'example.com');
+    const username = `${firstName[0]}.${lastName}.${randomValue}`.toLowerCase();
+    const email = faker.internet
+      .email(firstName, randomValue, 'example.com')
+      .toLowerCase();
 
-    const hash = hashedPasswords[i];
+    const userAvailable =
+      !takenUsernames.includes(username) && !takenEmails.includes(email);
+
+    if (!userAvailable) {
+      i -= 1;
+
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    takenUsernames.push(username);
+    takenEmails.push(email);
+
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
     const createdAt = faker.date.past(1);
-    userPromises.push(
-      prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          username,
-          dateOfBirth,
-          createdAt,
-          hash,
-        },
-      }),
-    );
+
+    const user = { firstName, lastName, email, username, dateOfBirth, createdAt, hash };
+
+    data.push(user);
   }
-  return Promise.all(userPromises);
+
+  await prisma.user.createMany({ data, skipDuplicates: true });
+  return prisma.user.findMany();
 };
 
 export default createNewUsers;

@@ -13,35 +13,50 @@ interface CreateNewBeerPostsArgs {
   };
 }
 
+interface BeerPostData {
+  abv: number;
+  ibu: number;
+  name: string;
+  description: string;
+  createdAt: Date;
+  breweryId: string;
+  postedById: string;
+  typeId: string;
+}
+
 const createNewBeerPosts = async ({
   numberOfPosts,
   joinData,
 }: CreateNewBeerPostsArgs) => {
   const { users, breweryPosts, beerTypes } = joinData;
   const prisma = DBClient.instance;
-  const beerPostPromises = [];
+  const beerPostData: BeerPostData[] = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfPosts; i++) {
     const user = users[Math.floor(Math.random() * users.length)];
     const beerType = beerTypes[Math.floor(Math.random() * beerTypes.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const createdAt = faker.date.past(1);
-    beerPostPromises.push(
-      prisma.beerPost.create({
-        data: {
-          abv: Math.floor(Math.random() * (12 - 4) + 4),
-          ibu: Math.floor(Math.random() * (60 - 10) + 10),
-          name: faker.commerce.productName(),
-          description: faker.lorem.lines(12).replace(/(\r\n|\n|\r)/gm, ' '),
-          brewery: { connect: { id: breweryPost.id } },
-          postedBy: { connect: { id: user.id } },
-          type: { connect: { id: beerType.id } },
-          createdAt,
-        },
-      }),
-    );
+
+    const abv = Math.floor(Math.random() * (12 - 4) + 4);
+    const ibu = Math.floor(Math.random() * (60 - 10) + 10);
+    const name = faker.commerce.productName();
+    const description = faker.lorem.lines(20).replace(/(\r\n|\n|\r)/gm, ' ');
+
+    beerPostData.push({
+      postedById: user.id,
+      typeId: beerType.id,
+      breweryId: breweryPost.id,
+      createdAt,
+      abv,
+      ibu,
+      name,
+      description,
+    });
   }
-  return Promise.all(beerPostPromises);
+
+  await prisma.beerPost.createMany({ data: beerPostData });
+  return prisma.beerPost.findMany();
 };
 
 export default createNewBeerPosts;

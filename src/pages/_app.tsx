@@ -5,6 +5,8 @@ import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import { themeChange } from 'theme-change';
 
+import { Analytics } from '@vercel/analytics/react';
+
 import { Space_Grotesk } from 'next/font/google';
 import Head from 'next/head';
 import Layout from '@/components/ui/Layout';
@@ -39,6 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
         </Layout>
       </UserContext.Provider>
+      <Analytics />
     </>
   );
 }

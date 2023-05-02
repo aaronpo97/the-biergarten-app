@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
-import { User, BeerType } from '@prisma/client';
+import { User } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 interface CreateNewBeerTypesArgs {
@@ -9,10 +9,17 @@ interface CreateNewBeerTypesArgs {
   };
 }
 
+interface BeerTypeData {
+  name: string;
+  postedById: string;
+  createdAt: Date;
+}
+
 const createNewBeerTypes = async ({ joinData }: CreateNewBeerTypesArgs) => {
   const { users } = joinData;
   const prisma = DBClient.instance;
-  const beerTypePromises: Promise<BeerType>[] = [];
+
+  const beerTypeData: BeerTypeData[] = [];
 
   const types = [
     'IPA',
@@ -39,14 +46,16 @@ const createNewBeerTypes = async ({ joinData }: CreateNewBeerTypesArgs) => {
   types.forEach((type) => {
     const user = users[Math.floor(Math.random() * users.length)];
     const createdAt = faker.date.past(1);
-    beerTypePromises.push(
-      prisma.beerType.create({
-        data: { name: type, postedBy: { connect: { id: user.id } }, createdAt },
-      }),
-    );
+
+    beerTypeData.push({
+      name: type,
+      postedById: user.id,
+      createdAt,
+    });
   });
 
-  return Promise.all(beerTypePromises);
+  await prisma.beerType.createMany({ data: beerTypeData, skipDuplicates: true });
+  return prisma.beerType.findMany();
 };
 
 export default createNewBeerTypes;

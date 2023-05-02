@@ -15,7 +15,7 @@ interface CreateBeerPageProps {
   types: BeerType[];
 }
 
-const Create: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
+const CreateBeerPost: NextPage<CreateBeerPageProps> = ({ breweries, types }) => {
   return (
     <FormPageLayout
       headingText="Create a new beer"
@@ -40,4 +40,4 @@ export const getServerSideProps = withPageAuthRequired<CreateBeerPageProps>(asyn
   };
 });
 
-export default Create;
+export default CreateBeerPost;

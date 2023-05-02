@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
-import { BeerPost, BeerImage, User } from '@prisma/client';
+import { BeerPost, User } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 interface CreateNewBeerImagesArgs {
@@ -8,13 +8,22 @@ interface CreateNewBeerImagesArgs {
   joinData: { beerPosts: BeerPost[]; users: User[] };
 }
 
+interface BeerImageData {
+  path: string;
+  alt: string;
+  caption: string;
+  beerPostId: string;
+  postedById: string;
+  createdAt: Date;
+}
 const createNewBeerImages = async ({
   numberOfImages,
   joinData: { beerPosts, users },
 }: CreateNewBeerImagesArgs) => {
   const prisma = DBClient.instance;
   const createdAt = faker.date.past(1);
-  const beerImagesPromises: Promise<BeerImage>[] = [];
+
+  const beerImageData: BeerImageData[] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfImages; i++) {
@@ -23,21 +32,18 @@ const createNewBeerImages = async ({
     const caption = faker.lorem.sentence();
     const alt = faker.lorem.sentence();
 
-    beerImagesPromises.push(
-      prisma.beerImage.create({
-        data: {
-          path: 'https://picsum.photos/5000/5000',
-          alt,
-          caption,
-          beerPost: { connect: { id: beerPost.id } },
-          postedBy: { connect: { id: user.id } },
-          createdAt,
-        },
-      }),
-    );
+    beerImageData.push({
+      path: 'https://picsum.photos/5000/5000',
+      alt,
+      caption,
+      beerPostId: beerPost.id,
+      postedById: user.id,
+      createdAt,
+    });
   }
 
-  return Promise.all(beerImagesPromises);
+  await prisma.beerImage.createMany({ data: beerImageData });
+  return prisma.beerImage.findMany();
 };
 
 export default createNewBeerImages;

@@ -1,11 +1,11 @@
 import UserContext from '@/contexts/userContext';
 import { Dispatch, SetStateAction, FC, useContext } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
-import BeerCommentQueryResult from '@/services/BeerComment/schema/BeerCommentQueryResult';
+import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { z } from 'zod';
 
 interface CommentCardDropdownProps {
-  comment: z.infer<typeof BeerCommentQueryResult>;
+  comment: z.infer<typeof CommentQueryResult>;
   setInEditMode: Dispatch<SetStateAction<boolean>>;
 }
 

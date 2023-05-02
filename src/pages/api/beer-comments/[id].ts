@@ -4,7 +4,8 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import BeerCommentValidationSchema from '@/services/BeerComment/schema/CreateBeerCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter, NextHandler } from 'next-connect';
@@ -16,7 +17,7 @@ interface DeleteCommentRequest extends UserExtendedNextApiRequest {
 
 interface EditCommentRequest extends UserExtendedNextApiRequest {
   query: { id: string };
-  body: z.infer<typeof BeerCommentValidationSchema>;
+  body: z.infer<typeof CreateCommentValidationSchema>;
 }
 
 const checkIfCommentOwner = async (
@@ -96,7 +97,7 @@ router
   .put(
     validateRequest({
       querySchema: z.object({ id: z.string().uuid() }),
-      bodySchema: BeerCommentValidationSchema,
+      bodySchema: CreateCommentValidationSchema,
     }),
     getCurrentUser,
     checkIfCommentOwner,

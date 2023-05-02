@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-const BeerPostLoadingCard: FC = () => {
+const LoadingCard: FC = () => {
   return (
     <div className="card bg-base-300">
       <figure className="h-96 border-8 border-base-300 bg-base-300">
@@ -23,4 +23,4 @@ const BeerPostLoadingCard: FC = () => {
   );
 };
 
-export default BeerPostLoadingCard;
+export default LoadingCard;
