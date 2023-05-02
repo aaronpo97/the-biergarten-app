@@ -11,7 +11,7 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 import { Tab } from '@headlessui/react';
 import BreweryInfoHeader from '@/components/BreweryById/BreweryInfoHeader';
 import BreweryPostMap from '@/components/BreweryById/BreweryPostMap';
-import BreweryBeersSection from '@/components/BreweryById/BreweryBeerSection.tsx';
+import BreweryBeersSection from '@/components/BreweryById/BreweryBeerSection';
 import BreweryCommentsSection from '@/components/BreweryById/BreweryCommentsSection';
 
 interface BreweryPageProps {
@@ -63,7 +63,7 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
                 </div>
                 <div className="w-[40%] space-y-3">
                   <BreweryPostMap latitude={latitude} longitude={longitude} />
-                  <BreweryBeersSection />
+                  <BreweryBeersSection breweryPost={breweryPost} />
                 </div>
               </div>
             ) : (
@@ -83,7 +83,7 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
                       <BreweryCommentsSection breweryPost={breweryPost} />
                     </Tab.Panel>
                     <Tab.Panel>
-                      <BreweryBeersSection />
+                      <BreweryBeersSection breweryPost={breweryPost} />
                     </Tab.Panel>
                   </Tab.Panels>
                 </Tab.Group>

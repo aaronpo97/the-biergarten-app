@@ -36,10 +36,10 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   setSize,
   size,
 }) => {
-  const { ref: lastCommentRef } = useInView({
+  const { ref: penultimateCommentRef } = useInView({
     /**
-     * When the last comment comes into view, call setSize from useBeerPostComments to
-     * load more comments.
+     * When the second last comment comes into view, call setSize from useBeerPostComments
+     * to load more comments.
      */
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
@@ -52,7 +52,7 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
       {!!comments.length && (
         <div className="card bg-base-300 pb-6">
           {comments.map((comment, index) => {
-            const isPenulitmateComment = index === comments.length - 2;
+            const isPenultimateComment = index === comments.length - 2;
 
             /**
              * Attach a ref to the last comment in the list. When it comes into view, the
@@ -60,7 +60,7 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
              */
             return (
               <div
-                ref={isPenulitmateComment ? lastCommentRef : undefined}
+                ref={isPenultimateComment ? penultimateCommentRef : undefined}
                 key={comment.id}
               >
                 <CommentCardBody comment={comment} mutate={mutate} />

@@ -13,6 +13,7 @@ import DBClient from '@/prisma/DBClient';
 import LocationMarker from '@/components/ui/LocationMarker';
 import Link from 'next/link';
 import Head from 'next/head';
+import useGeolocation from '@/hooks/useGeolocation';
 
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 
@@ -61,7 +62,7 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
                 setPopupInfo(brewery);
               }}
             >
-              <LocationMarker />
+              <LocationMarker size="md" color="blue" />
             </Marker>
           );
         })}
@@ -69,6 +70,19 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
     ),
     [breweries],
   );
+
+  const { coords, error } = useGeolocation();
+
+  const userLocationPin = useMemo(
+    () =>
+      coords && !error ? (
+        <Marker latitude={coords.latitude} longitude={coords.longitude}>
+          <LocationMarker size="lg" color="red" />
+        </Marker>
+      ) : null,
+    [coords, error],
+  );
+
   return (
     <>
       <Head>
@@ -90,6 +104,7 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
           <NavigationControl position="top-left" />
           <ScaleControl />
           {pins}
+          {userLocationPin}
           {popupInfo && (
             <Popup
               anchor="bottom"
