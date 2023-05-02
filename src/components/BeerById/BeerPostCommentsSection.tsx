@@ -62,6 +62,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
             pageSize={PAGE_SIZE}
             setSize={setSize}
             size={size}
+            mutate={mutate}
           />
         )
       }

@@ -1,6 +1,6 @@
 import { FC, MutableRefObject } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
-import { mutate } from 'swr';
+
 import { useInView } from 'react-intersection-observer';
 
 import useBeerPostComments from '@/hooks/useBeerPostComments';
@@ -25,6 +25,9 @@ interface CommentsComponentProps {
   isLoadingMore: ReturnType<
     typeof useBeerPostComments | typeof useBreweryPostComments
   >['isLoadingMore'];
+  mutate: ReturnType<
+    typeof useBeerPostComments | typeof useBreweryPostComments
+  >['mutate'];
 }
 
 const CommentsComponent: FC<CommentsComponentProps> = ({
@@ -35,6 +38,7 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   pageSize,
   setSize,
   size,
+  mutate,
 }) => {
   const { ref: penultimateCommentRef } = useInView({
     /**

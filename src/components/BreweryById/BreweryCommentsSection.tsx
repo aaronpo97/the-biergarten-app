@@ -134,6 +134,7 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
             setSize={setSize}
             size={size}
             commentSectionRef={commentSectionRef}
+            mutate={mutate}
           />
         )
       }
