@@ -53,7 +53,7 @@ import logger from '../../config/pino/logger';
         joinData: { beerPosts, users },
       }),
       createNewBreweryPostComments({
-        numberOfComments: 100000,
+        numberOfComments: 50000,
         joinData: { breweryPosts, users },
       }),
     ]);
@@ -61,7 +61,7 @@ import logger from '../../config/pino/logger';
 
     const [beerPostLikes, breweryPostLikes] = await Promise.all([
       createNewBeerPostLikes({
-        numberOfLikes: 100000,
+        numberOfLikes: 500000,
         joinData: { beerPosts, users },
       }),
       createNewBreweryPostLikes({
@@ -77,7 +77,7 @@ import logger from '../../config/pino/logger';
         joinData: { beerPosts, users },
       }),
       createNewBreweryImages({
-        numberOfImages: 20000,
+        numberOfImages: 5000,
         joinData: { breweryPosts, users },
       }),
     ]);
