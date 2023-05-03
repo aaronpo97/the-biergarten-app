@@ -9,22 +9,23 @@ import { z } from 'zod';
  * data from the server.
  *
  * @param beerPostId The ID of the beer post to check for likes.
- * @returns An object containing a boolean indicating if the user has liked the beer post,
- *   an error object if an error occurred during the request, and a boolean indicating if
- *   the request is currently loading.
- * @throws When the user is not logged in, the server returns an error status code, or if
- *   the response data fails to validate against the expected schema.
+ * @returns An object with the following properties:
+ *
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `mutate`: A function to mutate the data.
+ *   - `isLiked`: A boolean indicating whether the current user has liked the beer post.
  */
 const useCheckIfUserLikesBeerPost = (beerPostId: string) => {
   const { user } = useContext(UserContext);
   const { data, error, isLoading, mutate } = useSWR(
     `/api/beers/${beerPostId}/like/is-liked`,
-    async () => {
+    async (url) => {
       if (!user) {
         throw new Error('User is not logged in.');
       }
 
-      const response = await fetch(`/api/beers/${beerPostId}/like/is-liked`);
+      const response = await fetch(url);
       const json = await response.json();
       const parsed = APIResponseValidationSchema.safeParse(json);
 

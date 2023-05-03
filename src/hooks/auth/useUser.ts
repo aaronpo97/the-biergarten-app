@@ -5,11 +5,13 @@ import useSWR from 'swr';
 /**
  * A custom React hook that fetches the current user's data from the server.
  *
- * @returns An object containing the current user's data, a boolean indicating if the
- *   request is currently loading, and an error object if an error occurred during the
- *   request.
- * @throws When the user is not logged in, the server returns an error status code, or if
- *   the response data fails to validate against the expected schema.
+ * @returns An object with the following properties:
+ *
+ *   - `user`: The current user's data.
+ *   - `isLoading`: A boolean indicating whether the request is still in progress.
+ *   - `error`: An error object if the user is not logged in, if the response data fails to
+ *       validate against the expected schema, or if the server returns an error.
+ *   - `mutate`: A function that can be used to mutate the current user's data.
  */
 const useUser = () => {
   const {

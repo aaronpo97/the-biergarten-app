@@ -8,7 +8,16 @@ import { z } from 'zod';
  *
  * @param options The options to use when fetching beer posts.
  * @param options.pageSize The number of beer posts to fetch per page.
- * @returns An object containing the beer posts, page count, and loading state.
+ * @returns An object with the following properties:
+ *
+ *   - `beerPosts`: The beer posts fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
  */
 const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
   const fetcher = async (url: string) => {
@@ -49,13 +58,13 @@ const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
 
   return {
     beerPosts,
-    pageCount,
-    size,
-    setSize,
+    error: error as unknown,
+    isAtEnd,
     isLoading,
     isLoadingMore,
-    isAtEnd,
-    error: error as unknown,
+    pageCount,
+    setSize,
+    size,
   };
 };
 

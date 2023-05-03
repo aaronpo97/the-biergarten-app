@@ -8,7 +8,16 @@ import { z } from 'zod';
  *
  * @param options The options to use when fetching brewery posts.
  * @param options.pageSize The number of brewery posts to fetch per page.
- * @returns An object containing the brewery posts, page count, and loading state.
+ * @returns An object with the following properties:
+ *
+ *   - `breweryPosts`: The brewery posts fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
  */
 const useBreweryPosts = ({ pageSize }: { pageSize: number }) => {
   const fetcher = async (url: string) => {
@@ -31,10 +40,7 @@ const useBreweryPosts = ({ pageSize }: { pageSize: number }) => {
     }
 
     const pageCount = Math.ceil(parseInt(count as string, 10) / pageSize);
-    return {
-      breweryPosts: parsedPayload.data,
-      pageCount,
-    };
+    return { breweryPosts: parsedPayload.data, pageCount };
   };
 
   const { data, error, isLoading, setSize, size } = useSWRInfinite(

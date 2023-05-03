@@ -15,28 +15,35 @@ interface UseBreweryPostCommentsProps {
  * @param props.pageNum - The page number of the comments to fetch.
  * @param props.id - The ID of the brewery post to fetch comments for.
  * @param props.pageSize - The number of comments to fetch per page.
- * @returns An object containing the fetched comments, the total number of comment pages,
- *   a boolean indicating if the request is currently loading, and a function to mutate
- *   the data.
+ * @returns An object with the following properties:
+ *
+ *   - `comments`: The comments fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `mutate`: A function to mutate the data.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
  */
 const useBreweryPostComments = ({ id, pageSize }: UseBreweryPostCommentsProps) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
     const json = await response.json();
     const count = response.headers.get('X-Total-Count');
-    const parsed = APIResponseValidationSchema.safeParse(json);
 
+    const parsed = APIResponseValidationSchema.safeParse(json);
     if (!parsed.success) {
       throw new Error(parsed.error.message);
     }
-    const parsedPayload = z.array(CommentQueryResult).safeParse(parsed.data.payload);
 
+    const parsedPayload = z.array(CommentQueryResult).safeParse(parsed.data.payload);
     if (!parsedPayload.success) {
       throw new Error(parsedPayload.error.message);
     }
 
     const pageCount = Math.ceil(parseInt(count as string, 10) / pageSize);
-
     return { comments: parsedPayload.data, pageCount };
   };
 

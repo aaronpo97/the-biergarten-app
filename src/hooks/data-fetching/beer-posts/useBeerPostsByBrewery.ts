@@ -14,7 +14,16 @@ interface UseBeerPostsByBreweryParams {
  * @param options The options to use when fetching beer posts.
  * @param options.pageSize The number of beer posts to fetch per page.
  * @param options.breweryId The ID of the brewery to fetch beer posts for.
- * @returns An object containing the beer posts, page count, and loading state.
+ * @returns An object with the following properties:
+ *
+ *   - `beerPosts`: The beer posts fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
  */
 const UseBeerPostsByBrewery = ({ pageSize, breweryId }: UseBeerPostsByBreweryParams) => {
   const fetcher = async (url: string) => {

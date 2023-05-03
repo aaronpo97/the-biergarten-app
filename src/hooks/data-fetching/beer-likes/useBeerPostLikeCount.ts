@@ -6,8 +6,12 @@ import useSWR from 'swr';
  * Custom hook to fetch the like count for a beer post from the server.
  *
  * @param beerPostId - The ID of the beer post to fetch the like count for.
- * @returns An object with the current like count, as well as metadata about the current
- *   state of the request.
+ * @returns An object with the following properties:
+ *
+ *   - `error`: The error that occurred while fetching the like count.
+ *   - `isLoading`: A boolean indicating whether the like count is being fetched.
+ *   - `mutate`: A function to mutate the like count.
+ *   - `likeCount`: The like count for the beer post.
  */
 
 const useGetBeerPostLikeCount = (beerPostId: string) => {
