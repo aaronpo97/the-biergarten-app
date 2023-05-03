@@ -72,7 +72,7 @@ const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
               <div>
                 {(!!likeCount || likeCount === 0) && (
                   <span>
-                    Liked by {likeCount} user{likeCount !== 1 && 's'}
+                    Liked by {likeCount} {likeCount === 1 ? 'user' : 'users'}
                   </span>
                 )}
               </div>
