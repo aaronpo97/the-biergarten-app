@@ -7,7 +7,7 @@ import { FunctionComponent } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
-import useBeerPostComments from '@/hooks/useBeerPostComments';
+import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import CommentForm from '../ui/CommentForm';
 

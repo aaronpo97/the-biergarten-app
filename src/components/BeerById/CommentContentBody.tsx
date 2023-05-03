@@ -1,5 +1,5 @@
 import UserContext from '@/contexts/userContext';
-import useTimeDistance from '@/hooks/useTimeDistance';
+import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import { format } from 'date-fns';
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Link, Rating } from 'react-daisyui';

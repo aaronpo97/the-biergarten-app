@@ -4,7 +4,7 @@ import UserContext from '@/contexts/userContext';
 
 import { GetServerSideProps, NextPage } from 'next';
 import { useContext } from 'react';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 
 const ProtectedPage: NextPage = () => {
   const { user, isLoading } = useContext(UserContext);

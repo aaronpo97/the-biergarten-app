@@ -4,7 +4,7 @@ import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult'
 
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
-import useBeerPostComments from '@/hooks/useBeerPostComments';
+import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import { useRouter } from 'next/router';
 import BeerCommentForm from './BeerCommentForm';
 

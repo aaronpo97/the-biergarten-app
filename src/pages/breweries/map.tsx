@@ -13,7 +13,7 @@ import DBClient from '@/prisma/DBClient';
 import LocationMarker from '@/components/ui/LocationMarker';
 import Link from 'next/link';
 import Head from 'next/head';
-import useGeolocation from '@/hooks/useGeolocation';
+import useGeolocation from '@/hooks/utilities/useGeolocation';
 
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 

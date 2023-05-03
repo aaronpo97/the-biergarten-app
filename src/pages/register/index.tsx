@@ -1,7 +1,7 @@
 import RegisterUserForm from '@/components/RegisterUserForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 
-import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
+import useRedirectWhenLoggedIn from '@/hooks/auth/useRedirectIfLoggedIn';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { BiUser } from 'react-icons/bi';

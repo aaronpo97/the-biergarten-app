@@ -1,4 +1,4 @@
-import UseBeerPostsByBrewery from '@/hooks/useBeerPostsByBrewery';
+import UseBeerPostsByBrewery from '@/hooks/data-fetching/beer-posts/useBeerPostsByBrewery';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import Link from 'next/link';
 import { FC } from 'react';

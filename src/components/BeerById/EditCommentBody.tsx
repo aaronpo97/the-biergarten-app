@@ -3,7 +3,7 @@ import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
-import useBeerPostComments from '@/hooks/useBeerPostComments';
+import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { useInView } from 'react-intersection-observer';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';

@@ -3,8 +3,9 @@ import { FaArrowUp } from 'react-icons/fa';
 
 import { useInView } from 'react-intersection-observer';
 
-import useBeerPostComments from '@/hooks/useBeerPostComments';
-import useBreweryPostComments from '@/hooks/useBreweryPostComments';
+import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
+
+import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
 import NoCommentsCard from '../BeerById/NoCommentsCard';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentCardBody from '../BeerById/CommentCardBody';

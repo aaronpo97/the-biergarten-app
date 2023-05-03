@@ -1,4 +1,4 @@
-import useUser from '@/hooks/useUser';
+import useUser from '@/hooks/auth/useUser';
 import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import { createContext } from 'react';
 import { z } from 'zod';

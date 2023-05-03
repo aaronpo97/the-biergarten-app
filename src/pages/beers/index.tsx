@@ -9,7 +9,7 @@ import { MutableRefObject, useContext, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Spinner from '@/components/ui/Spinner';
 
-import useBeerPosts from '@/hooks/useBeerPosts';
+import useBeerPosts from '@/hooks/data-fetching/beer-posts/useBeerPosts';
 import { FaArrowUp, FaPlus } from 'react-icons/fa';
 import LoadingCard from '@/components/ui/LoadingCard';
 

@@ -7,7 +7,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import Head from 'next/head';
 import Link from 'next/link';
 
-import useRedirectWhenLoggedIn from '@/hooks/useRedirectIfLoggedIn';
+import useRedirectWhenLoggedIn from '@/hooks/auth/useRedirectIfLoggedIn';
 
 const LoginPage: NextPage = () => {
   useRedirectWhenLoggedIn();

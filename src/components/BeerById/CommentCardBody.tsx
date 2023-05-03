@@ -1,4 +1,4 @@
-import useBeerPostComments from '@/hooks/useBeerPostComments';
+import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';

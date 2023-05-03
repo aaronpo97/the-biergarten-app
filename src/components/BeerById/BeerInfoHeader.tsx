@@ -6,8 +6,8 @@ import UserContext from '@/contexts/userContext';
 import { FaRegEdit } from 'react-icons/fa';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
-import useGetBeerPostLikeCount from '@/hooks/useBeerPostLikeCount';
-import useTimeDistance from '@/hooks/useTimeDistance';
+import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
+import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
 interface BeerInfoHeaderProps {

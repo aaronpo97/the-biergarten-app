@@ -16,7 +16,7 @@ import { z } from 'zod';
 
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
 
 interface BeerPageProps {
