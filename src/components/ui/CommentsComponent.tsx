@@ -1,7 +1,7 @@
-import {FC, MutableRefObject} from 'react';
-import {FaArrowUp} from 'react-icons/fa';
+import { FC, MutableRefObject } from 'react';
+import { FaArrowUp } from 'react-icons/fa';
 
-import {useInView} from 'react-intersection-observer';
+import { useInView } from 'react-intersection-observer';
 
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 
@@ -41,7 +41,7 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   size,
   mutate,
 }) => {
-  const {ref: penultimateCommentRef} = useInView({
+  const { ref: penultimateCommentRef } = useInView({
     /**
      * When the second last comment comes into view, call setSize from useBeerPostComments
      * to load more comments.

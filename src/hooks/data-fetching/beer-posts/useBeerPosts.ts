@@ -38,7 +38,7 @@ const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
   };
 
   const { data, error, isLoading, setSize, size } = useSWRInfinite(
-    (index) => `/api/beers?pageNum=${index + 1}&pageSize=${pageSize}`,
+    (index) => `/api/beers?page_num=${index + 1}&page_size=${pageSize}`,
     fetcher,
   );
 

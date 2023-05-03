@@ -38,7 +38,7 @@ const useBreweryPosts = ({ pageSize }: { pageSize: number }) => {
   };
 
   const { data, error, isLoading, setSize, size } = useSWRInfinite(
-    (index) => `/api/breweries?pageNum=${index + 1}&pageSize=${pageSize}`,
+    (index) => `/api/breweries?page_num=${index + 1}&page_size=${pageSize}`,
     fetcher,
   );
 

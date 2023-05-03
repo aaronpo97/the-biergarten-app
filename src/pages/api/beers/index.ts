@@ -9,8 +9,8 @@ import { z } from 'zod';
 
 interface GetBeerPostsRequest extends NextApiRequest {
   query: {
-    pageNum: string;
-    pageSize: string;
+    page_num: string;
+    page_size: string;
   };
 }
 
@@ -18,8 +18,8 @@ const getBeerPosts = async (
   req: GetBeerPostsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const pageNum = parseInt(req.query.pageNum, 10);
-  const pageSize = parseInt(req.query.pageSize, 10);
+  const pageNum = parseInt(req.query.page_num, 10);
+  const pageSize = parseInt(req.query.page_size, 10);
 
   const beerPosts = await getAllBeerPosts(pageNum, pageSize);
   const beerPostCount = await DBClient.instance.beerPost.count();
@@ -42,8 +42,8 @@ const router = createRouter<
 router.get(
   validateRequest({
     querySchema: z.object({
-      pageNum: z.string().regex(/^\d+$/),
-      pageSize: z.string().regex(/^\d+$/),
+      page_num: z.string().regex(/^\d+$/),
+      page_size: z.string().regex(/^\d+$/),
     }),
   }),
   getBeerPosts,
