@@ -18,11 +18,19 @@ const envSchema = z.object({
   SESSION_SECRET: z.string(),
   SESSION_TOKEN_NAME: z.string(),
   SESSION_MAX_AGE: z.coerce.number().positive(),
-  DATABASE_URL: z.string().url(),
+
+  POSTGRES_URL: z.string().url(),
+  POSTGRES_PRISMA_URL: z.string().url(),
+  POSTGRES_URL_NON_POOLING: z.string().url(),
+  POSTGRES_USER: z.string(),
+  POSTGRES_PASSWORD: z.string(),
+  POSTGRES_DATABASE: z.string(),
+  POSTGRES_HOST: z.string(),
+
   NODE_ENV: z.enum(['development', 'production', 'test']),
   SPARKPOST_API_KEY: z.string(),
   SPARKPOST_SENDER_ADDRESS: z.string().email(),
-  MAPBOX_ACCESS_TOKEN: z.string()
+  MAPBOX_ACCESS_TOKEN: z.string(),
 });
 
 const parsed = envSchema.safeParse(env);
@@ -110,12 +118,74 @@ export const SESSION_TOKEN_NAME = parsed.data.SESSION_TOKEN_NAME;
 export const SESSION_MAX_AGE = parsed.data.SESSION_MAX_AGE;
 
 /**
- * URL of the CockroachDB database. CockroachDB uses the PostgreSQL wire protocol.
+ * PostgreSQL connection URL taken from Vercel.
  *
  * @example
- *   'postgres://username:password@localhost/my-database';
+ *   'postgresql://user:password@host:5432/database';
+ *
+ * @see https://vercel.com/dashboard/stores
  */
-export const DATABASE_URL = parsed.data.DATABASE_URL;
+export const POSTGRES_URL = parsed.data.POSTGRES_URL;
+
+/**
+ * PostgreSQL connection URL for Prisma taken from Vercel.
+ *
+ * @example
+ *   'postgresql://user:password@host:5432/database';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_PRISMA_URL = parsed.data.POSTGRES_PRISMA_URL;
+
+/**
+ * Non-pooling PostgreSQL connection URL taken from Vercel.
+ *
+ * @example
+ *   'postgresql://user:password@host:5432/database';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_URL_NON_POOLING = parsed.data.POSTGRES_URL_NON_POOLING;
+
+/**
+ * The PostgreSQL user from Vercel.
+ *
+ * @example
+ *   'user';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_USER = parsed.data.POSTGRES_USER;
+
+/**
+ * The PostgreSQL password from Vercel.
+ *
+ * @example
+ *   'password';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_PASSWORD = parsed.data.POSTGRES_PASSWORD;
+
+/**
+ * The PostgreSQL database from Vercel.
+ *
+ * @example
+ *   'database';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_DATABASE = parsed.data.POSTGRES_DATABASE;
+
+/**
+ * The PostgreSQL host from Vercel.
+ *
+ * @example
+ *   'ep-sweet-pineapple.us-east-1.postgres.vercel-storage.com';
+ *
+ * @see https://vercel.com/dashboard/stores
+ */
+export const POSTGRES_HOST = parsed.data.POSTGRES_HOST;
 
 /**
  * Node environment.
@@ -149,11 +219,10 @@ export const SPARKPOST_SENDER_ADDRESS = parsed.data.SPARKPOST_SENDER_ADDRESS;
 
 /**
  * Your Mapbox access token.
- * 
+ *
  * @example
- *  'pk.abcdefghijklmnopqrstuvwxyz123456';
- * 
+ *   'pk.abcdefghijklmnopqrstuvwxyz123456';
+ *
  * @see https://docs.mapbox.com/help/how-mapbox-works/access-tokens/
  */
-
 export const MAPBOX_ACCESS_TOKEN = parsed.data.MAPBOX_ACCESS_TOKEN;

@@ -4,9 +4,9 @@
 
 The Biergarten App is a web application designed for beer lovers to share their favorite brews and breweries with like-minded people online.
 
-This application's stack consists of Next.js, Prisma and CockroachDB, and I'm motivated to learn more about these technologies while exploring my passion for beer.
+This application's stack consists of Next.js, Prisma and Vercel Postgres. I'm motivated to learn more about these technologies while exploring my passion for beer.
 
-I've also incorporated different APIs into the application, such as the Cloudinary API for image uploading and the SparkPost API for email services.
+I've also incorporated different APIs into the application, such as the Cloudinary API for image uploading, the SparkPost API for email services as well as Mapbox for geolocation and map data.
 
 To handle serverless functions (API routes), I use the next-connect package.
 
@@ -26,6 +26,39 @@ In this app you will encounter various beer related terms. Here is a list of ter
 
 The [International Bitterness Units](https://en.wikipedia.org/wiki/Beer_measurement#Bitterness) scale, or IBU, is used to approximately quantify the bitterness of beer. This scale is not measured on the perceived bitterness of the beer, but rather the amount of a component of beer known as iso-alpha acids.
 
+## Technologies
+
+### General
+
+- [Next.js](https://nextjs.org/)
+  - A React based framework for building web applications offering several features such as server side rendering, static site generation and API routes.
+
+### Client
+
+- [SWR](https://swr.vercel.app/)
+  - A React Hooks library for fetching data with support for caching, revalidation and error handling.
+- [Tailwind CSS](https://tailwindcss.com/)
+  - A popular open-source utility-first CSS framework that provides pre-defined classes to style HTML elements.
+- [Headless UI](https://headlessui.dev/)
+  - A set of completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.
+- [Daisy UI](https://daisyui.com/)
+  - A component library for Tailwind CSS that provides ready-to-use components for building user interfaces.
+
+### Server
+
+- [Prisma](https://www.prisma.io/)
+  - An open-source ORM for Node.js and TypeScript applications.
+- [Vercel Postgres](https://vercel.com/dashboard/stores)
+  - A managed PostgreSQL database service provided by Vercel.
+- [Cloudinary](https://cloudinary.com/)
+  - A cloud-based image and video management service that provides developers with an easy way to upload, store, and manipulate media assets.
+- [SparkPost](https://www.sparkpost.com/)
+  - A cloud-based email delivery service that provides developers with an easy way to send transactional and marketing emails.
+- [Mapbox](https://www.mapbox.com/)
+  - A suite of open-source mapping tools that allows developers to add custom maps, search, and navigation into their applications.
+- [next-connect](https://github.com/hoangvvo/next-connect#readme)
+  - A promise-based method routing and middleware layer for Next.js.
+
 ## How to run locally
 
 ### Prerequisites
@@ -39,7 +72,8 @@ You will also need to create a free account with the following services:
 
 - [Cloudinary](https://cloudinary.com/users/register/free)
 - [SparkPost](https://www.sparkpost.com/)
-- [CockroachDB](https://www.cockroachlabs.com/)
+- [Vercel Postgres](https://vercel.com/dashboard/stores)
+- [Mapbox](https://account.mapbox.com/auth/signup/)
 
 ### Setup
 
@@ -60,23 +94,28 @@ npm install
 
 ```bash
 echo "BASE_URL=
-
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_KEY=
 CLOUDINARY_SECRET=
-
 CONFIRMATION_TOKEN_SECRET=
 SESSION_SECRET=
-
-DATABASE_URL=
+SESSION_TOKEN_NAME=
+SESSION_MAX_AGE=
 NODE_ENV=
-
+POSTGRES_URL=
+POSTGRES_PRISMA_URL=
+POSTGRES_URL_NON_POOLING=
+POSTGRES_USER=
+POSTGRES_HOST=
+POSTGRES_PASSWORD=
+POSTGRES_DATABASE=
+MAPBOX_ACCESS_TOKEN=
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
 SPARKPOST_API_KEY=
 SPARKPOST_SENDER_ADDRESS=" > .env
-
 ```
 
-## Explanation of environment variables
+### Explanation of environment variables
 
 - `BASE_URL` is the base URL of the application.
   - For example, if you are running the application locally, you can set this to `http://localhost:3000`.
@@ -86,8 +125,15 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   - You can generate a random string using the`openssl rand -base64 127` command.
 - `SESSION_SECRET` is the secret used to sign the session cookie.
   - Use the same command as above to generate a random string.
-- `DATABASE_URL` is the URL of your CockroachDB database.
-  - You can find this in the connection string in the CockroachDB Admin UI.
+- `SESSION_TOKEN_NAME` is the name of the session cookie.
+  - You can set this to `biergarten`.
+- `SESSION_MAX_AGE` is the maximum age of the session cookie in milliseconds.
+  - You can set this to `604800000` (1 week).
+- `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, `POSTGRES_USER`, `POSTGRES_HOST`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` are the credentials for your Vercel Postgres database.
+  - You can create a free account [here](https://vercel.com/dashboard/stores).
+- `MAPBOX_ACCESS_TOKEN` and `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` are the access tokens for your Mapbox account.
+  - You can create a free account [here](https://account.mapbox.com/auth/signup/).
+  - You will need to create two access tokens, one for the server-side and one for the client-side.
 - `NODE_ENV` is the environment in which the application is running.
   - You can set this to `development` or `production`.
 - `SPARKPOST_API_KEY` is the API key for your SparkPost account.
@@ -113,7 +159,7 @@ npm run seed
 npm run dev
 ```
 
-# License
+## License
 
 The Biergarten App is licensed under the GNU General Public License v3.0. This means that anyone is free to use, modify, and distribute the code as long as they also distribute their modifications under the same license.
 
@@ -123,4 +169,4 @@ By contributing to this repository, you agree to license your contributions unde
 
 If you have any questions or concerns about the license, please feel free to submit an issue to this repository.
 
-I hope that this project will be useful to other developers and beer enthusiasts who are interested in learning about web development with Next.js, Prisma, CockroachDB, and other technologies.
+I hope that this project will be useful to other developers and beer enthusiasts who are interested in learning about web development with Next.js, Prisma, Postgres, and other technologies.

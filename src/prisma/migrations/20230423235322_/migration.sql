@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "BreweryPost" ADD COLUMN     "dateEstablished" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
