@@ -1,10 +1,11 @@
-import useMediaQuery from '@/hooks/useMediaQuery';
-import useNavbar from '@/hooks/useNavbar';
+import useMediaQuery from '@/hooks/utilities/useMediaQuery';
+import useNavbar from '@/hooks/utilities/useNavbar';
+import useTheme from '@/hooks/utilities/useTheme';
+
 import Link from 'next/link';
 import { FC } from 'react';
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import useTheme from '@/hooks/useTheme';
 
 const DesktopLinks: FC = () => {
   const { pages, currentURL } = useNavbar();

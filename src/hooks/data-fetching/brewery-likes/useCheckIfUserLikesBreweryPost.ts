@@ -5,29 +5,30 @@ import useSWR from 'swr';
 import { z } from 'zod';
 
 /**
- * A custom React hook that checks if the current user has liked a beer post by fetching
- * data from the server.
+ * A custom React hook that checks if the current user likes a given brewery post.
  *
- * @param beerPostId The ID of the beer post to check for likes.
- * @returns An object containing a boolean indicating if the user has liked the beer post,
- *   an error object if an error occurred during the request, and a boolean indicating if
- *   the request is currently loading.
- * @throws When the user is not logged in, the server returns an error status code, or if
- *   the response data fails to validate against the expected schema.
+ * @param breweryPostId - The ID of the brewery post to check.
+ * @returns An object with the following properties:
+ *
+ *   - `isLiked`: A boolean indicating whether the current user likes the brewery post.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `mutate`: A function to mutate the data.
  */
-const useCheckIfUserLikesBeerPost = (beerPostId: string) => {
+
+const useCheckIfUserLikesBreweryPost = (breweryPostId: string) => {
   const { user } = useContext(UserContext);
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/beers/${beerPostId}/like/is-liked`,
+    `/api/breweries/${breweryPostId}/like/is-liked`,
     async () => {
       if (!user) {
         throw new Error('User is not logged in.');
       }
 
-      const response = await fetch(`/api/beers/${beerPostId}/like/is-liked`);
+      const response = await fetch(`/api/breweries/${breweryPostId}/like/is-liked`);
       const json = await response.json();
+      
       const parsed = APIResponseValidationSchema.safeParse(json);
-
       if (!parsed.success) {
         throw new Error('Invalid API response.');
       }
@@ -53,4 +54,4 @@ const useCheckIfUserLikesBeerPost = (beerPostId: string) => {
   };
 };
 
-export default useCheckIfUserLikesBeerPost;
+export default useCheckIfUserLikesBreweryPost;

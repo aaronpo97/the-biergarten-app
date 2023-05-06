@@ -11,7 +11,10 @@ interface Page {
  * A custom hook that returns the current URL and the pages to display in the navbar. It
  * uses the user context to determine whether the user is authenticated or not.
  *
- * @returns An object containing the current URL and the pages to display in the navbar.
+ * @returns An object with the following properties:
+ *
+ *   - `currentURL`: The current URL.
+ *   - `pages`: The pages to display in the navbar.
  */
 const useNavbar = () => {
   const router = useRouter();

@@ -1,10 +1,22 @@
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import useSWR from 'swr';
 import { z } from 'zod';
+import useSWR from 'swr';
 
-const useGetBreweryPostLikeCount = (breweryPostId: string) => {
+/**
+ * Custom hook to fetch the like count for a beer post from the server.
+ *
+ * @param beerPostId - The ID of the beer post to fetch the like count for.
+ * @returns An object with the following properties:
+ *
+ *   - `error`: The error that occurred while fetching the like count.
+ *   - `isLoading`: A boolean indicating whether the like count is being fetched.
+ *   - `mutate`: A function to mutate the like count.
+ *   - `likeCount`: The like count for the beer post.
+ */
+
+const useGetBeerPostLikeCount = (beerPostId: string) => {
   const { error, mutate, data, isLoading } = useSWR(
-    `/api/breweries/${breweryPostId}/like`,
+    `/api/beers/${beerPostId}/like`,
     async (url) => {
       const response = await fetch(url);
       const json = await response.json();
@@ -37,4 +49,4 @@ const useGetBreweryPostLikeCount = (breweryPostId: string) => {
   };
 };
 
-export default useGetBreweryPostLikeCount;
+export default useGetBeerPostLikeCount;

@@ -1,29 +1,24 @@
 import UserContext from '@/contexts/userContext';
-import useTimeDistance from '@/hooks/useTimeDistance';
+import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import { format } from 'date-fns';
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Link, Rating } from 'react-daisyui';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
-import { useInView } from 'react-intersection-observer';
+
 import { z } from 'zod';
 import CommentCardDropdown from './CommentCardDropdown';
 
 interface CommentContentBodyProps {
   comment: z.infer<typeof CommentQueryResult>;
-  ref: ReturnType<typeof useInView>['ref'] | undefined;
   setInEditMode: Dispatch<SetStateAction<boolean>>;
 }
 
-const CommentContentBody: FC<CommentContentBodyProps> = ({
-  comment,
-  ref,
-  setInEditMode,
-}) => {
+const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMode }) => {
   const { user } = useContext(UserContext);
   const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
-    <div className="card-body animate-in fade-in-10" ref={ref}>
+    <div className="card-body animate-in fade-in-10">
       <div className="flex flex-row justify-between">
         <div>
           <h3 className="font-semibold sm:text-2xl">

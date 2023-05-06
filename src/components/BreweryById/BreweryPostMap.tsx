@@ -1,4 +1,4 @@
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { FC, useMemo } from 'react';
 import Map, { Marker } from 'react-map-gl';

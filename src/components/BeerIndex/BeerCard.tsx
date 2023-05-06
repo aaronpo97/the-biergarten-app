@@ -4,7 +4,7 @@ import Image from 'next/image';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import UserContext from '@/contexts/userContext';
-import useGetBeerPostLikeCount from '@/hooks/useBeerPostLikeCount';
+import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
 import BeerPostLikeButton from '../BeerById/BeerPostLikeButton';
 
 const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) => {

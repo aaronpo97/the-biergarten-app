@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import Spinner from '../ui/Spinner';
-import CommentLoadingCardBody from './CommentLoadingCardBody';
+import CommentLoadingCardBody from '../BeerBreweryComments/CommentLoadingCardBody';
 
 interface LoadingComponentProps {
   length: number;

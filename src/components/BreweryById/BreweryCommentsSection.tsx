@@ -2,12 +2,13 @@ import UserContext from '@/contexts/userContext';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
-import useBreweryPostComments from '@/hooks/useBreweryPostComments';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+
+import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';
 import CommentForm from '../ui/CommentForm';
@@ -103,6 +104,31 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
+  const handleDeleteRequest = async (commentId: string) => {
+    const response = await fetch(`/api/brewery-comments/${commentId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  };
+
+  const handleEditRequest = async (
+    commentId: string,
+    data: z.infer<typeof CreateCommentValidationSchema>,
+  ) => {
+    const response = await fetch(`/api/brewery-comments/${commentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: data.content, rating: data.rating }),
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  };
+
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
       <div className="card">
@@ -135,6 +161,8 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
             size={size}
             commentSectionRef={commentSectionRef}
             mutate={mutate}
+            handleDeleteRequest={handleDeleteRequest}
+            handleEditRequest={handleEditRequest}
           />
         )
       }

@@ -6,7 +6,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import Spinner from '@/components/ui/Spinner';
 
 import debounce from 'lodash/debounce';
-import useBeerPostSearch from '@/hooks/useBeerPostSearch';
+import useBeerPostSearch from '@/hooks/data-fetching/beer-posts/useBeerPostSearch';
 import FormLabel from '@/components/ui/forms/FormLabel';
 
 const DEBOUNCE_DELAY = 300;

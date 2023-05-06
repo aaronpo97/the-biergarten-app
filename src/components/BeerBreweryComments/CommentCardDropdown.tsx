@@ -36,7 +36,14 @@ const CommentCardDropdown: FC<CommentCardDropdownProps> = ({
               Edit
             </button>
           ) : (
-            <button>Report</button>
+            <button
+              type="button"
+              onClick={() => {
+                alert('This feature is not yet implemented.');
+              }}
+            >
+              Report
+            </button>
           )}
         </li>
       </ul>

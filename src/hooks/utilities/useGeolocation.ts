@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
  * A custom React Hook that retrieves and monitors the user's geolocation using the
  * browser's built-in `navigator.geolocation` API.
  *
- * @returns An object containing the user's geolocation information and any errors that
- *   might occur. The object has the following properties:
+ * @returns An object with the following properties:
  *
  *   - `coords` - The user's current geolocation coordinates, or null if the geolocation could
  *       not be retrieved.

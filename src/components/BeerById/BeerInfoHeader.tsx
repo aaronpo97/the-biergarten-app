@@ -6,8 +6,8 @@ import UserContext from '@/contexts/userContext';
 import { FaRegEdit } from 'react-icons/fa';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
-import useGetBeerPostLikeCount from '@/hooks/useBeerPostLikeCount';
-import useTimeDistance from '@/hooks/useTimeDistance';
+import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
+import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
 interface BeerInfoHeaderProps {
@@ -86,7 +86,8 @@ const BeerInfoHeader: FC<BeerInfoHeaderProps> = ({ beerPost }) => {
               <div>
                 {(!!likeCount || likeCount === 0) && (
                   <span>
-                    Liked by {likeCount} user{likeCount !== 1 && 's'}
+                    Liked by {likeCount}
+                    {likeCount !== 1 ? ' users' : ' user'}
                   </span>
                 )}
               </div>

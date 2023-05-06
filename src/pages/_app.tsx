@@ -1,5 +1,5 @@
 import UserContext from '@/contexts/userContext';
-import useUser from '@/hooks/useUser';
+
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
@@ -10,6 +10,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { Space_Grotesk } from 'next/font/google';
 import Head from 'next/head';
 import Layout from '@/components/ui/Layout';
+import useUser from '@/hooks/auth/useUser';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
