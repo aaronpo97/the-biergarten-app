@@ -18,18 +18,42 @@ interface BeerPostCommentsSectionProps {
 const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost }) => {
   const { user } = useContext(UserContext);
   const router = useRouter();
-  const { id } = beerPost;
+
   const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
   const PAGE_SIZE = 4;
 
   const { comments, isLoading, mutate, setSize, size, isLoadingMore, isAtEnd } =
     useBeerPostComments({
-      id,
+      id: beerPost.id,
       pageNum,
       pageSize: PAGE_SIZE,
     });
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+
+  async function handleDeleteRequest(id: string) {
+    const response = await fetch(`/api/beer-comments/${id}`, { method: 'DELETE' });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete comment.');
+    }
+  }
+
+  async function handleEditRequest(
+    id: string,
+    data: { content: string; rating: number },
+  ) {
+    const response = await fetch(`/api/beer-comments/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: data.content, rating: data.rating }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update comment.');
+    }
+  }
+
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
       <div className="card bg-base-300">
@@ -63,6 +87,8 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
             setSize={setSize}
             size={size}
             mutate={mutate}
+            handleDeleteRequest={handleDeleteRequest}
+            handleEditRequest={handleEditRequest}
           />
         )
       }

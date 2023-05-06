@@ -104,6 +104,31 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
+  const handleDeleteRequest = async (commentId: string) => {
+    const response = await fetch(`/api/brewery-comments/${commentId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  };
+
+  const handleEditRequest = async (
+    commentId: string,
+    data: z.infer<typeof CreateCommentValidationSchema>,
+  ) => {
+    const response = await fetch(`/api/brewery-comments/${commentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: data.content, rating: data.rating }),
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  };
+
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
       <div className="card">
@@ -136,6 +161,8 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
             size={size}
             commentSectionRef={commentSectionRef}
             mutate={mutate}
+            handleDeleteRequest={handleDeleteRequest}
+            handleEditRequest={handleEditRequest}
           />
         )
       }

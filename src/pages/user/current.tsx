@@ -1,5 +1,5 @@
 import Spinner from '@/components/ui/Spinner';
-import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
+import withPageAuthRequired from '@/util/withPageAuthRequired';
 import UserContext from '@/contexts/userContext';
 
 import { GetServerSideProps, NextPage } from 'next';

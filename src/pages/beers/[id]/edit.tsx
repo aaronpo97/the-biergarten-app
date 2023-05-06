@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import React from 'react';
 
-import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
+import withPageAuthRequired from '@/util/withPageAuthRequired';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import EditBeerPostForm from '@/components/EditBeerPostForm';

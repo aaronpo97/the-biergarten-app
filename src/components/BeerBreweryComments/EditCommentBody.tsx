@@ -1,38 +1,44 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { FC, useState, Dispatch, SetStateAction } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
-import { useInView } from 'react-intersection-observer';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 
-interface CommentCardDropdownProps {
+interface EditCommentBodyProps {
   comment: z.infer<typeof CommentQueryResult>;
   setInEditMode: Dispatch<SetStateAction<boolean>>;
-  ref: ReturnType<typeof useInView>['ref'] | undefined;
-  mutate: ReturnType<typeof useBeerPostComments>['mutate'];
+
+  mutate: ReturnType<
+    typeof useBeerPostComments | typeof useBreweryPostComments
+  >['mutate'];
+  handleDeleteRequest: (id: string) => Promise<void>;
+  handleEditRequest: (
+    id: string,
+    data: z.infer<typeof CreateCommentValidationSchema>,
+  ) => Promise<void>;
 }
 
-const EditCommentBody: FC<CommentCardDropdownProps> = ({
+const EditCommentBody: FC<EditCommentBodyProps> = ({
   comment,
   setInEditMode,
-  ref,
+
   mutate,
+  handleDeleteRequest,
+  handleEditRequest,
 }) => {
   const { register, handleSubmit, formState, setValue, watch } = useForm<
     z.infer<typeof CreateCommentValidationSchema>
   >({
-    defaultValues: {
-      content: comment.content,
-      rating: comment.rating,
-    },
+    defaultValues: { content: comment.content, rating: comment.rating },
     resolver: zodResolver(CreateCommentValidationSchema),
   });
 
@@ -40,49 +46,24 @@ const EditCommentBody: FC<CommentCardDropdownProps> = ({
 
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      setIsDeleting(false);
-    };
-  }, []);
-
-  const handleDelete = async () => {
+  const onDelete = async () => {
     setIsDeleting(true);
-    const response = await fetch(`/api/beer-comments/${comment.id}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete comment');
-    }
-
+    await handleDeleteRequest(comment.id);
     await mutate();
   };
 
-  const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
+  const onEdit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
-    const response = await fetch(`/api/beer-comments/${comment.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content: data.content,
-        rating: data.rating,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update comment');
-    }
-
+    setInEditMode(true);
+    await handleEditRequest(comment.id, data);
     await mutate();
     setInEditMode(false);
   };
+
   return (
-    <div className="card-body animate-in fade-in-10" ref={ref}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+    <div className="card-body animate-in fade-in-10">
+      <form onSubmit={handleSubmit(onEdit)} className="space-y-3">
         <div>
           <FormInfo>
             <FormLabel htmlFor="content">Edit your comment</FormLabel>
@@ -142,7 +123,7 @@ const EditCommentBody: FC<CommentCardDropdownProps> = ({
               <button
                 type="button"
                 className="btn-xs btn lg:btn-sm"
-                onClick={handleDelete}
+                onClick={onDelete}
                 disabled={isDeleting || formState.isSubmitting}
               >
                 Delete

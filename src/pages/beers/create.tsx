@@ -1,7 +1,7 @@
 import CreateBeerPostForm from '@/components/CreateBeerPostForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 
-import withPageAuthRequired from '@/getServerSideProps/withPageAuthRequired';
+import withPageAuthRequired from '@/util/withPageAuthRequired';
 import DBClient from '@/prisma/DBClient';
 import getAllBreweryPosts from '@/services/BreweryPost/getAllBreweryPosts';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';

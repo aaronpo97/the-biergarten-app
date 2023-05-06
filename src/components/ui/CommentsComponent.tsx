@@ -29,6 +29,11 @@ interface CommentsComponentProps {
   mutate: ReturnType<
     typeof useBeerPostComments | typeof useBreweryPostComments
   >['mutate'];
+  handleDeleteRequest: (id: string) => Promise<void>;
+  handleEditRequest: (
+    id: string,
+    data: { content: string; rating: number },
+  ) => Promise<void>;
 }
 
 const CommentsComponent: FC<CommentsComponentProps> = ({
@@ -40,6 +45,8 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   setSize,
   size,
   mutate,
+  handleDeleteRequest,
+  handleEditRequest,
 }) => {
   const { ref: penultimateCommentRef } = useInView({
     /**
@@ -68,7 +75,12 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
                 ref={isPenultimateComment ? penultimateCommentRef : undefined}
                 key={comment.id}
               >
-                <CommentCardBody comment={comment} mutate={mutate} />
+                <CommentCardBody
+                  comment={comment}
+                  mutate={mutate}
+                  handleDeleteRequest={handleDeleteRequest}
+                  handleEditRequest={handleEditRequest}
+                />
               </div>
             );
           })}
