@@ -39,6 +39,7 @@ const CommentCardDropdown: FC<CommentCardDropdownProps> = ({
             <button
               type="button"
               onClick={() => {
+                // eslint-disable-next-line no-alert
                 alert('This feature is not yet implemented.');
               }}
             >

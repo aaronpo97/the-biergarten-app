@@ -2,6 +2,7 @@
 import { faker } from '@faker-js/faker';
 import { BeerPost, User } from '@prisma/client';
 import DBClient from '../../DBClient';
+import imageUrls from '../util/imageUrls';
 
 interface CreateNewBeerImagesArgs {
   numberOfImages: number;
@@ -31,9 +32,10 @@ const createNewBeerImages = async ({
     const user = users[Math.floor(Math.random() * users.length)];
     const caption = faker.lorem.sentence();
     const alt = faker.lorem.sentence();
+    const path = imageUrls[Math.floor(Math.random() * imageUrls.length)];
 
     beerImageData.push({
-      path: 'https://picsum.photos/5000/5000',
+      path,
       alt,
       caption,
       beerPostId: beerPost.id,

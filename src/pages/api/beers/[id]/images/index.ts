@@ -29,7 +29,9 @@ const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
 };
 
 const uploadMiddleware = expressWrapper(
-  multer({ storage, fileFilter, limits: { files: 3 } }).array('images'),
+  multer({ storage, fileFilter, limits: { files: 5, fileSize: 15 * 1024 * 1024 } }).array(
+    'images',
+  ),
 );
 
 const BeerPostImageValidationSchema = z.object({

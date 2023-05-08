@@ -59,7 +59,11 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
         router.push('/beers');
       }
     } catch (e) {
-      console.error(e);
+      if (!(e instanceof Error)) {
+        setError('Something went wrong');
+        return;
+      }
+      setError(e.message);
     }
   };
   return (
