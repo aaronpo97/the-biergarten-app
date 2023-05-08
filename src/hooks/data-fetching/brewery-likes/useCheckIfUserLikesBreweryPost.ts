@@ -27,7 +27,7 @@ const useCheckIfUserLikesBreweryPost = (breweryPostId: string) => {
 
       const response = await fetch(`/api/breweries/${breweryPostId}/like/is-liked`);
       const json = await response.json();
-      
+
       const parsed = APIResponseValidationSchema.safeParse(json);
       if (!parsed.success) {
         throw new Error('Invalid API response.');

@@ -27,7 +27,9 @@ const ProtectedPage: NextPage = () => {
             {isEvening && 'evening'}
             {`, ${user?.firstName}!`}
           </h1>
-          <h2 className="text-xl font-bold lg:text-4xl">Welcome to the Biergarten App!</h2>
+          <h2 className="text-xl font-bold lg:text-4xl">
+            Welcome to the Biergarten App!
+          </h2>
         </>
       )}
     </div>
