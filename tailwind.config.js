@@ -2,7 +2,7 @@
 
 const myThemes = {
   dark: {
-    primary: 'hsl(227, 23%, 20%)',
+    primary: 'hsl(227, 25%, 30%)',
     secondary: 'hsl(255, 9%, 69%)',
     error: 'hsl(9, 52%, 57%)',
     accent: 'hsl(316, 96%, 60%)',
@@ -12,8 +12,8 @@ const myThemes = {
     warning: 'hsl(50, 98%, 50%)',
     'primary-content': 'hsl(0, 0%, 98%)',
     'error-content': 'hsl(0, 0%, 98%)',
-    'base-100': 'hsl(227, 20%, 11%)',
-    'base-200': 'hsl(227, 20%, 8%)',
+    'base-100': 'hsl(227, 20%, 15%)',
+    'base-200': 'hsl(227, 20%, 11%)',
     'base-300': 'hsl(227, 20%, 5%)',
   },
   light: {
