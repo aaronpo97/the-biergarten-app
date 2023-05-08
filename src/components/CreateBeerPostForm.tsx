@@ -1,12 +1,14 @@
-import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
-import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
 import router from 'next/router';
 import { FunctionComponent, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
 import { z } from 'zod';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
+import UploadImageValidationSchema from '@/services/types/ImageSchema/UploadImageValidationSchema';
+import sendUploadBeerImagesRequest from '@/requests/sendUploadBeerImageRequest';
 import ErrorAlert from './ui/alerts/ErrorAlert';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
@@ -17,32 +19,52 @@ import FormSelect from './ui/forms/FormSelect';
 import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
-type CreateBeerPostSchema = z.infer<typeof CreateBeerPostValidationSchema>;
-
 interface BeerFormProps {
   breweries: z.infer<typeof BreweryPostQueryResult>[];
   types: BeerType[];
 }
 
+const CreateBeerPostWithImagesValidationSchema = CreateBeerPostValidationSchema.merge(
+  UploadImageValidationSchema,
+);
+
 const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
   breweries = [],
   types = [],
 }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CreateBeerPostSchema>({
-    resolver: zodResolver(CreateBeerPostValidationSchema),
+  const { register, handleSubmit, formState } = useForm<
+    z.infer<typeof CreateBeerPostWithImagesValidationSchema>
+  >({
+    resolver: zodResolver(CreateBeerPostWithImagesValidationSchema),
   });
 
+  const { errors, isSubmitting } = formState;
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit: SubmitHandler<CreateBeerPostSchema> = async (data) => {
+  const onSubmit: SubmitHandler<
+    z.infer<typeof CreateBeerPostWithImagesValidationSchema>
+  > = async (data) => {
+    if (!(data.images instanceof FileList)) {
+      return;
+    }
+
+    const { breweryId, typeId, name, abv, ibu, description } = data;
+
     try {
-      setIsSubmitting(true);
-      const response = await sendCreateBeerPostRequest(data);
+      const response = await sendCreateBeerPostRequest({
+        breweryId,
+        typeId,
+        name,
+        abv,
+        ibu,
+        description,
+      });
+
+      await sendUploadBeerImagesRequest({
+        beerPost: response,
+        images: data.images,
+      });
+
       router.push(`/beers/${response.id}`);
     } catch (e) {
       if (!(e instanceof Error)) {
@@ -157,6 +179,19 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
           formValidationSchema={register('description')}
           id="description"
           rows={8}
+        />
+      </FormSegment>
+
+      <FormInfo>
+        <FormLabel htmlFor="images">Images</FormLabel>
+        <FormError>{(errors.images as FieldError | undefined)?.message}</FormError>
+      </FormInfo>
+      <FormSegment>
+        <input
+          type="file"
+          {...register('images')}
+          multiple
+          className="file-input-bordered file-input w-full"
         />
       </FormSegment>
 

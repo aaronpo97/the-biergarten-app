@@ -46,9 +46,9 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
 
   await sendConfirmationEmail(user);
 
-  res.status(200).json({
+  res.status(201).json({
     success: true,
-    statusCode: 200,
+    statusCode: 201,
     message: 'User registered successfully.',
     payload: user,
   });

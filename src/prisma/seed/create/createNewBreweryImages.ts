@@ -2,6 +2,7 @@
 import { faker } from '@faker-js/faker';
 import { BreweryPost, User } from '@prisma/client';
 import DBClient from '../../DBClient';
+import imageUrls from '../util/imageUrls';
 
 interface CreateBreweryImagesArgs {
   numberOfImages: number;
@@ -32,9 +33,10 @@ const createNewBreweryImages = async ({
   for (let i = 0; i < numberOfImages; i++) {
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const user = users[Math.floor(Math.random() * users.length)];
+    const path = imageUrls[Math.floor(Math.random() * imageUrls.length)];
 
     breweryImageData.push({
-      path: 'https://picsum.photos/5000/5000',
+      path,
       alt: 'Placeholder brewery image.',
       caption: 'Placeholder brewery image caption.',
       breweryPostId: breweryPost.id,
