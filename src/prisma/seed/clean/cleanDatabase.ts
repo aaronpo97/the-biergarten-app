@@ -13,8 +13,9 @@ const cleanDatabase = async () => {
       DO $$
       DECLARE
           statements CURSOR FOR
-              SELECT tablename FROM pg_tables
-              WHERE schemaname = 'public';
+            SELECT tablename FROM pg_tables
+            WHERE schemaname = 'public'
+            AND tablename != '_prisma_migrations';
       BEGIN
           FOR statement IN statements LOOP
               EXECUTE 'TRUNCATE TABLE ' || quote_ident(statement.tablename) || ' CASCADE;';
