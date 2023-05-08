@@ -26,6 +26,7 @@ const envSchema = z.object({
   POSTGRES_PASSWORD: z.string(),
   POSTGRES_DATABASE: z.string(),
   POSTGRES_HOST: z.string(),
+  SHADOW_DATABASE_URL: z.string().url(),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
   SPARKPOST_API_KEY: z.string(),
@@ -186,6 +187,14 @@ export const POSTGRES_DATABASE = parsed.data.POSTGRES_DATABASE;
  * @see https://vercel.com/dashboard/stores
  */
 export const POSTGRES_HOST = parsed.data.POSTGRES_HOST;
+
+/**
+ * The URL of another PostgreSQL database to shadow.
+ *
+ * @example
+ *   'postgresql://user:password@host:5432/database';
+ */
+export const SHADOW_DATABASE_URL = parsed.data.SHADOW_DATABASE_URL;
 
 /**
  * Node environment.
