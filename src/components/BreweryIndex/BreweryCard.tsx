@@ -11,7 +11,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
   brewery,
 }) => {
   const { user } = useContext(UserContext);
-  const { likeCount, mutate } = useGetBreweryPostLikeCount(brewery.id);
+  const { likeCount, mutate, isLoading } = useGetBreweryPostLikeCount(brewery.id);
   return (
     <div className="card" key={brewery.id}>
       <figure className="card-image h-96">
@@ -40,7 +40,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
           </h4>
         </div>
         <div className="flex justify-between">
-          <span>liked by {likeCount} users</span>
+          {!isLoading && <span>liked by {likeCount} users</span>}
           {user && (
             <BreweryPostLikeButton breweryPostId={brewery.id} mutateCount={mutate} />
           )}
