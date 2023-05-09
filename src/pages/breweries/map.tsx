@@ -1,46 +1,31 @@
-import { GetServerSideProps, NextPage } from 'next';
-import { useMemo, useState } from 'react';
-import Map, {
-  FullscreenControl,
-  Marker,
-  NavigationControl,
-  Popup,
-  ScaleControl,
-} from 'react-map-gl';
+import { NextPage } from 'next';
+import { useEffect, useMemo, useState } from 'react';
+import Map, { Marker, Popup } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import DBClient from '@/prisma/DBClient';
 
 import LocationMarker from '@/components/ui/LocationMarker';
 import Link from 'next/link';
 import Head from 'next/head';
 import useGeolocation from '@/hooks/utilities/useGeolocation';
+import BreweryPostMapQueryResult from '@/services/BreweryPost/types/BreweryPostMapQueryResult';
+import { z } from 'zod';
+import useBreweryMapPagePosts from '@/hooks/data-fetching/brewery-posts/useBreweryMapPagePosts';
+import ControlPanel from '@/components/ui/maps/ControlPanel';
 
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 
-interface BreweryMapPageProps {
-  breweries: {
-    location: {
-      city: string;
-      stateOrProvince: string | null;
-      country: string | null;
-      coordinates: number[];
-    };
-    id: string;
-    name: string;
-  }[];
-}
+const BreweryMapPage: NextPage = () => {
+  const [popupInfo, setPopupInfo] = useState<z.infer<
+    typeof BreweryPostMapQueryResult
+  > | null>(null);
 
-const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
-  const windowIsDefined = typeof window !== 'undefined';
-  const themeIsDefined = windowIsDefined && !!window.localStorage.getItem('theme');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const [popupInfo, setPopupInfo] = useState<BreweryMapPageProps['breweries'][0] | null>(
-    null,
-  );
+  useEffect(() => {
+    setTheme(localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
+  }, []);
 
-  const theme = (
-    windowIsDefined && themeIsDefined ? window.localStorage.getItem('theme') : 'light'
-  ) as 'light' | 'dark';
+  const { breweries } = useBreweryMapPagePosts({ pageSize: 50 });
 
   const mapStyles: MapStyles = {
     light: 'mapbox://styles/mapbox/light-v10',
@@ -52,11 +37,12 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
       <>
         {breweries.map((brewery) => {
           const [longitude, latitude] = brewery.location.coordinates;
+
           return (
             <Marker
+              key={brewery.id}
               latitude={latitude}
               longitude={longitude}
-              key={brewery.id}
               onClick={(e) => {
                 e.originalEvent.stopPropagation();
                 setPopupInfo(brewery);
@@ -71,16 +57,16 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
     [breweries],
   );
 
-  const { coords, error } = useGeolocation();
+  const { coords, error: geoError } = useGeolocation();
 
   const userLocationPin = useMemo(
     () =>
-      coords && !error ? (
+      coords && !geoError ? (
         <Marker latitude={coords.latitude} longitude={coords.longitude}>
           <LocationMarker size="lg" color="red" />
         </Marker>
       ) : null,
-    [coords, error],
+    [coords, geoError],
   );
 
   return (
@@ -94,15 +80,14 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
       </Head>
       <div className="h-full">
         <Map
-          initialViewState={{ zoom: 2 }}
+          // center the map on North America
+          initialViewState={{ zoom: 3, latitude: 48.3544, longitude: -99.9981 }}
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyles[theme]}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
           scrollZoom
         >
-          <FullscreenControl position="top-left" />
-          <NavigationControl position="top-left" />
-          <ScaleControl />
+          <ControlPanel />
           {pins}
           {userLocationPin}
           {popupInfo && (
@@ -112,7 +97,7 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
               latitude={popupInfo.location.coordinates[1]}
               onClose={() => setPopupInfo(null)}
             >
-              <div className="flex flex-col text-black ">
+              <div className="flex flex-col text-black">
                 <Link
                   className="link-hover link text-base font-bold"
                   href={`/breweries/${popupInfo.id}`}
@@ -136,17 +121,3 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ breweries }) => {
 };
 
 export default BreweryMapPage;
-
-export const getServerSideProps: GetServerSideProps<BreweryMapPageProps> = async () => {
-  const breweries = await DBClient.instance.breweryPost.findMany({
-    select: {
-      location: {
-        select: { coordinates: true, city: true, country: true, stateOrProvince: true },
-      },
-      id: true,
-      name: true,
-    },
-  });
-
-  return { props: { breweries } };
-};
