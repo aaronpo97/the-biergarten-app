@@ -9,7 +9,7 @@ import BeerPostLikeButton from '../BeerById/BeerPostLikeButton';
 
 const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) => {
   const { user } = useContext(UserContext);
-  const { mutate, likeCount } = useGetBeerPostLikeCount(post.id);
+  const { mutate, likeCount, isLoading } = useGetBeerPostLikeCount(post.id);
 
   return (
     <div className="card card-compact bg-base-300" key={post.id}>
@@ -44,12 +44,14 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
               <span className="text-sm lg:text-lg">{post.abv}% ABV</span>
               <span className="text-sm lg:text-lg">{post.ibu} IBU</span>
             </div>
-            <span>
-              liked by {likeCount} user{likeCount === 1 ? '' : 's'}
-            </span>
+            {!isLoading && (
+              <span>
+                liked by {likeCount} user{likeCount === 1 ? '' : 's'}
+              </span>
+            )}
           </div>
           <div>
-            {user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}
+            {!!user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}
           </div>
         </div>
       </div>
