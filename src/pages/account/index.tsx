@@ -26,11 +26,11 @@ const AccountInfo: FC<{
   >({
     resolver: zodResolver(GetUserSchema),
     defaultValues: {
-      username: 'test',
-      email: 'test@example.com',
-      firstName: 'test',
-      lastName: 'icle',
-      dateOfBirth: new Date(),
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dateOfBirth: user.dateOfBirth,
     },
   });
 

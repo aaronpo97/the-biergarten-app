@@ -53,7 +53,16 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
     const createdAt = faker.date.past(1);
 
-    const user = { firstName, lastName, email, username, dateOfBirth, createdAt, hash };
+    const user = {
+      firstName,
+      lastName,
+      email,
+      username,
+      dateOfBirth,
+      createdAt,
+      hash,
+      accountIsVerified: true,
+    };
 
     data.push(user);
   }
