@@ -7,14 +7,14 @@ interface LocationMarkerProps {
 }
 
 const sizeClasses: Record<NonNullable<LocationMarkerProps['size']>, `text-${string}`> = {
-  sm: 'text-2xl',
-  md: 'text-3xl',
-  lg: 'text-4xl',
-  xl: 'text-5xl',
+  sm: 'text-lg',
+  md: 'text-xl',
+  lg: 'text-2xl',
+  xl: 'text-3xl',
 };
 
 const LocationMarker: FC<LocationMarkerProps> = ({ size = 'md', color = 'blue' }) => {
-  return <HiLocationMarker className={`${sizeClasses[size]} text-${color}-400`} />;
+  return <HiLocationMarker className={`${sizeClasses[size]} text-${color}-600`} />;
 };
 
 export default React.memo(LocationMarker);

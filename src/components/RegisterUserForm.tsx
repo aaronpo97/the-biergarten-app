@@ -1,5 +1,7 @@
 import sendRegisterUserRequest from '@/requests/sendRegisterUserRequest';
-import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
+import CreateUserValidationSchema, {
+  CreateUserValidationSchemaWithUsernameAndEmailCheck,
+} from '@/services/User/schema/CreateUserValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { FC, useState } from 'react';
@@ -18,7 +20,7 @@ const RegisterUserForm: FC = () => {
   const router = useRouter();
   const { reset, register, handleSubmit, formState } = useForm<
     z.infer<typeof CreateUserValidationSchema>
-  >({ resolver: zodResolver(CreateUserValidationSchema) });
+  >({ resolver: zodResolver(CreateUserValidationSchemaWithUsernameAndEmailCheck) });
 
   const { errors } = formState;
   const [serverResponseError, setServerResponseError] = useState('');

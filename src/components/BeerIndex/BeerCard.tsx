@@ -51,7 +51,9 @@ const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) =
             )}
           </div>
           <div>
-            {!!user && <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />}
+            {!!user && !isLoading && (
+              <BeerPostLikeButton beerPostId={post.id} mutateCount={mutate} />
+            )}
           </div>
         </div>
       </div>

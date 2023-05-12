@@ -4,6 +4,7 @@ import { FC, useMemo } from 'react';
 import Map, { Marker } from 'react-map-gl';
 
 import LocationMarker from '../ui/LocationMarker';
+import ControlPanel from '../ui/maps/ControlPanel';
 
 interface BreweryMapProps {
   latitude: number;
@@ -45,6 +46,7 @@ const BreweryPostMap: FC<BreweryMapProps> = ({ latitude, longitude }) => {
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string}
           scrollZoom
         >
+          <ControlPanel />
           {pin}
         </Map>
       </div>

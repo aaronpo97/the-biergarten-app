@@ -41,7 +41,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
         </div>
         <div className="flex justify-between">
           {!isLoading && <span>liked by {likeCount} users</span>}
-          {user && (
+          {!!user && !isLoading && (
             <BreweryPostLikeButton breweryPostId={brewery.id} mutateCount={mutate} />
           )}
         </div>

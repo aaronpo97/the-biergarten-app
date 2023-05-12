@@ -3,6 +3,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
 
+interface ValidateRequestArgs {
+  bodySchema?: z.ZodSchema<any>;
+  querySchema?: z.ZodSchema<any>;
+}
+
 /**
  * Middleware to validate the request body and/or query against a zod schema.
  *
@@ -18,15 +23,8 @@ import { z } from 'zod';
  * @param args.querySchema The query schema to validate against.
  * @throws ServerError with status code 400 if the request body or query is invalid.
  */
-const validateRequest =
-  ({
-    bodySchema,
-    querySchema,
-  }: {
-    bodySchema?: z.ZodSchema<any>;
-    querySchema?: z.ZodSchema<any>;
-  }) =>
-  async (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
+const validateRequest = ({ bodySchema, querySchema }: ValidateRequestArgs) => {
+  return (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
     if (bodySchema) {
       const parsed = bodySchema.safeParse(JSON.parse(JSON.stringify(req.body)));
       if (!parsed.success) {
@@ -42,8 +40,8 @@ const validateRequest =
       }
       req.query = parsed.data;
     }
-
     return next();
   };
+};
 
 export default validateRequest;
