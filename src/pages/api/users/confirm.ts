@@ -27,7 +27,7 @@ const confirmUser = async (req: ConfirmUserRequest, res: NextApiResponse) => {
     throw new ServerError('Could not confirm user.', 401);
   }
 
-  if (user.isAccountVerified) {
+  if (user.accountIsVerified) {
     throw new ServerError('User is already verified.', 400);
   }
 

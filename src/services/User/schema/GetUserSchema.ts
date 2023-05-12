@@ -9,7 +9,7 @@ const GetUserSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   dateOfBirth: z.coerce.date(),
-  isAccountVerified: z.boolean(),
+  accountIsVerified: z.boolean(),
 });
 
 export default GetUserSchema;
