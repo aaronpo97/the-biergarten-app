@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FC } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
+import { FaPlus } from 'react-icons/fa';
 import BeerRecommendationLoadingComponent from '../BeerById/BeerRecommendationLoadingComponent';
 
 interface BreweryCommentsSectionProps {
@@ -31,7 +32,21 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
     <div className="card">
       <div className="card-body">
         <>
-          <h3 className="text-2xl font-bold">Brews</h3>
+          <div className="my-2 flex flex-row items-center justify-between">
+            <div>
+              <h3 className="text-3xl font-bold">Brews</h3>
+            </div>
+            <div>
+              <Link
+                className={`btn-ghost btn-sm btn gap-2 rounded-2xl outline`}
+                href={`/breweries/${breweryPost.id}/beers/create`}
+              >
+                <FaPlus className="text-xl" />
+                Add Beer
+              </Link>
+            </div>
+          </div>
+
           {!!beerPosts.length && (
             <div className="space-y-5">
               {beerPosts.map((beerPost, index) => {

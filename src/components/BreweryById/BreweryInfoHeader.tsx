@@ -4,9 +4,11 @@ import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { format } from 'date-fns';
 import { FC, useContext } from 'react';
-import { Link } from 'react-daisyui';
+
 import { FaRegEdit } from 'react-icons/fa';
+
 import { z } from 'zod';
+import Link from 'next/link';
 import BreweryPostLikeButton from '../BreweryIndex/BreweryPostLikeButton';
 
 interface BreweryInfoHeaderProps {
@@ -26,16 +28,19 @@ const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
     <article className="card flex flex-col justify-center bg-base-300">
       <div className="card-body">
         <header className="flex justify-between">
-          <div className="space-y-2">
-            <div>
-              <h1 className="text-2xl font-bold lg:text-4xl">{breweryPost.name}</h1>
-              <h2 className="text-lg font-semibold lg:text-2xl">
-                Located in
-                {` ${breweryPost.location.city}, ${
-                  breweryPost.location.stateOrProvince || breweryPost.location.country
-                }`}
-              </h2>
+          <div className="w-full space-y-2">
+            <div className="flex w-full flex-row justify-between">
+              <div>
+                <h1 className="text-2xl font-bold lg:text-4xl">{breweryPost.name}</h1>
+                <h2 className="text-lg font-semibold lg:text-2xl">
+                  Located in
+                  {` ${breweryPost.location.city}, ${
+                    breweryPost.location.stateOrProvince || breweryPost.location.country
+                  }`}
+                </h2>
+              </div>
             </div>
+
             <div>
               <h3 className="italic">
                 {' posted by '}

@@ -20,7 +20,7 @@ import FormTextArea from './ui/forms/FormTextArea';
 import FormTextInput from './ui/forms/FormTextInput';
 
 interface BeerFormProps {
-  breweries: z.infer<typeof BreweryPostQueryResult>[];
+  brewery: z.infer<typeof BreweryPostQueryResult>;
   types: BeerType[];
 }
 
@@ -29,13 +29,14 @@ const CreateBeerPostWithImagesValidationSchema = CreateBeerPostValidationSchema.
 );
 
 const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
-  breweries = [],
   types = [],
+  brewery,
 }) => {
   const { register, handleSubmit, formState } = useForm<
     z.infer<typeof CreateBeerPostWithImagesValidationSchema>
   >({
     resolver: zodResolver(CreateBeerPostWithImagesValidationSchema),
+    defaultValues: { breweryId: brewery.id },
   });
 
   const { errors, isSubmitting } = formState;
@@ -48,23 +49,9 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
       return;
     }
 
-    const { breweryId, typeId, name, abv, ibu, description } = data;
-
     try {
-      const response = await sendCreateBeerPostRequest({
-        breweryId,
-        typeId,
-        name,
-        abv,
-        ibu,
-        description,
-      });
-
-      await sendUploadBeerImagesRequest({
-        beerPost: response,
-        images: data.images,
-      });
-
+      const response = await sendCreateBeerPostRequest(data);
+      await sendUploadBeerImagesRequest({ beerPost: response, images: data.images });
       router.push(`/beers/${response.id}`);
     } catch (e) {
       if (!(e instanceof Error)) {
@@ -93,48 +80,24 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
         />
       </FormSegment>
 
-      <div className="flex flex-wrap">
-        <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pr-3">
-          <FormInfo>
-            <FormLabel htmlFor="breweryId">Brewery</FormLabel>
-            <FormError>{errors.breweryId?.message}</FormError>
-          </FormInfo>
-          <FormSegment>
-            <FormSelect
-              disabled={isSubmitting}
-              formRegister={register('breweryId')}
-              error={!!errors.breweryId}
-              id="breweryId"
-              options={breweries.map((brewery) => ({
-                value: brewery.id,
-                text: brewery.name,
-              }))}
-              placeholder="Brewery"
-              message="Pick a brewery"
-            />
-          </FormSegment>
-        </div>
-        <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pl-3">
-          <FormInfo>
-            <FormLabel htmlFor="typeId">Type</FormLabel>
-            <FormError>{errors.typeId?.message}</FormError>
-          </FormInfo>
-          <FormSegment>
-            <FormSelect
-              disabled={isSubmitting}
-              formRegister={register('typeId')}
-              error={!!errors.typeId}
-              id="typeId"
-              options={types.map((beerType) => ({
-                value: beerType.id,
-                text: beerType.name,
-              }))}
-              placeholder="Beer type"
-              message="Pick a beer type"
-            />
-          </FormSegment>
-        </div>
-      </div>
+      <FormInfo>
+        <FormLabel htmlFor="typeId">Type</FormLabel>
+        <FormError>{errors.typeId?.message}</FormError>
+      </FormInfo>
+      <FormSegment>
+        <FormSelect
+          disabled={isSubmitting}
+          formRegister={register('typeId')}
+          error={!!errors.typeId}
+          id="typeId"
+          options={types.map((beerType) => ({
+            value: beerType.id,
+            text: beerType.name,
+          }))}
+          placeholder="Beer type"
+          message="Pick a beer type"
+        />
+      </FormSegment>
 
       <div className="flex flex-wrap md:mb-3">
         <div className="mb-2 w-full md:mb-0 md:w-1/2 md:pr-3">
@@ -192,6 +155,7 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
           {...register('images')}
           multiple
           className="file-input-bordered file-input w-full"
+          disabled={isSubmitting}
         />
       </FormSegment>
 
