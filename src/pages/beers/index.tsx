@@ -47,16 +47,6 @@ const BeerPage: NextPage = () => {
               <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
               <h2 className="text-2xl font-bold lg:text-4xl">Beers</h2>
             </div>
-            {!!user && (
-              <div
-                className="tooltip tooltip-left h-full"
-                data-tip="Create a new beer post"
-              >
-                <Link href="/beers/create" className="btn-ghost btn-sm btn">
-                  <FaPlus />
-                </Link>
-              </div>
-            )}
           </header>
           <div className="grid gap-6 xl:grid-cols-2">
             {!!beerPosts.length && !isLoading && (
