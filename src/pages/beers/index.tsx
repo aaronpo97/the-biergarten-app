@@ -1,21 +1,14 @@
 import { NextPage } from 'next';
-
 import BeerCard from '@/components/BeerIndex/BeerCard';
 import Head from 'next/head';
-import Link from 'next/link';
-import UserContext from '@/contexts/userContext';
-import { MutableRefObject, useContext, useRef } from 'react';
-
+import { MutableRefObject, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Spinner from '@/components/ui/Spinner';
-
 import useBeerPosts from '@/hooks/data-fetching/beer-posts/useBeerPosts';
-import { FaArrowUp, FaPlus } from 'react-icons/fa';
+import { FaArrowUp } from 'react-icons/fa';
 import LoadingCard from '@/components/ui/LoadingCard';
 
 const BeerPage: NextPage = () => {
-  const { user } = useContext(UserContext);
-
   const PAGE_SIZE = 6;
 
   const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useBeerPosts({
