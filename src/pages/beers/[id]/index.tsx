@@ -7,10 +7,8 @@ import BeerPostCommentsSection from '@/components/BeerById/BeerPostCommentsSecti
 import BeerRecommendations from '@/components/BeerById/BeerRecommendations';
 
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
-import { BeerPost } from '@prisma/client';
 
 import { z } from 'zod';
 
@@ -21,13 +19,9 @@ import { Tab } from '@headlessui/react';
 
 interface BeerPageProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
-  beerRecommendations: (BeerPost & {
-    brewery: { id: string; name: string };
-    beerImages: { id: string; alt: string; url: string }[];
-  })[];
 }
 
-const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }) => {
+const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   return (
@@ -72,7 +66,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
                   <BeerPostCommentsSection beerPost={beerPost} />
                 </div>
                 <div className="w-[40%]">
-                  <BeerRecommendations beerRecommendations={beerRecommendations} />
+                  <BeerRecommendations beerPost={beerPost} />
                 </div>
               </div>
             ) : (
@@ -90,7 +84,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost, beerRecommendations }
                     <BeerPostCommentsSection beerPost={beerPost} />
                   </Tab.Panel>
                   <Tab.Panel>
-                    <BeerRecommendations beerRecommendations={beerRecommendations} />
+                    <BeerRecommendations beerPost={beerPost} />
                   </Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>
@@ -109,12 +103,8 @@ export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (cont
     return { notFound: true };
   }
 
-  const { type, brewery, id } = beerPost;
-  const beerRecommendations = await getBeerRecommendations({ type, brewery, id });
-
   const props = {
     beerPost: JSON.parse(JSON.stringify(beerPost)),
-    beerRecommendations: JSON.parse(JSON.stringify(beerRecommendations)),
   };
 
   return { props };

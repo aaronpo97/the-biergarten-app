@@ -1,10 +1,11 @@
 import UseBeerPostsByBrewery from '@/hooks/data-fetching/beer-posts/useBeerPostsByBrewery';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import Link from 'next/link';
-import { FC } from 'react';
+import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import { FaPlus } from 'react-icons/fa';
+import UserContext from '@/contexts/userContext';
 import BeerRecommendationLoadingComponent from '../BeerById/BeerRecommendationLoadingComponent';
 
 interface BreweryCommentsSectionProps {
@@ -13,6 +14,8 @@ interface BreweryCommentsSectionProps {
 
 const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) => {
   const PAGE_SIZE = 2;
+  const { user } = useContext(UserContext);
+
   const { beerPosts, isAtEnd, isLoadingMore, setSize, size } = UseBeerPostsByBrewery({
     breweryId: breweryPost.id,
     pageSize: PAGE_SIZE,
@@ -28,8 +31,10 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
     },
   });
 
+  const beerRecommendationsRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+
   return (
-    <div className="card">
+    <div className="card h-full" ref={beerRecommendationsRef}>
       <div className="card-body">
         <>
           <div className="my-2 flex flex-row items-center justify-between">
@@ -37,13 +42,15 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
               <h3 className="text-3xl font-bold">Brews</h3>
             </div>
             <div>
-              <Link
-                className={`btn-ghost btn-sm btn gap-2 rounded-2xl outline`}
-                href={`/breweries/${breweryPost.id}/beers/create`}
-              >
-                <FaPlus className="text-xl" />
-                Add Beer
-              </Link>
+              {user && (
+                <Link
+                  className={`btn-ghost btn-sm btn gap-2 rounded-2xl outline`}
+                  href={`/breweries/${breweryPost.id}/beers/create`}
+                >
+                  <FaPlus className="text-xl" />
+                  Add Beer
+                </Link>
+              )}
             </div>
           </div>
 

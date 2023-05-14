@@ -17,7 +17,7 @@ interface BreweryPageProps {
 }
 
 const BreweryPage: NextPage<BreweryPageProps> = () => {
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 20;
 
   const { breweryPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } =
     useBreweryPosts({
