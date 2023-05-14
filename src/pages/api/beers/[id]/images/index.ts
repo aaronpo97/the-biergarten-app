@@ -1,5 +1,3 @@
-import DBClient from '@/prisma/DBClient';
-import { BeerImage } from '@prisma/client';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
@@ -14,6 +12,8 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import processImageDataIntoDB from '@/services/BeerImage/processImageDataIntoDB';
+import ImageMetadataValidationSchema from '@/services/types/ImageSchema/ImageMetadataValidationSchema';
 
 const { storage } = cloudinaryConfig;
 
@@ -34,15 +34,10 @@ const uploadMiddleware = expressWrapper(
   ),
 );
 
-const BeerPostImageValidationSchema = z.object({
-  caption: z.string(),
-  alt: z.string(),
-});
-
 interface UploadBeerPostImagesRequest extends UserExtendedNextApiRequest {
   files?: Express.Multer.File[];
   query: { id: string };
-  body: z.infer<typeof BeerPostImageValidationSchema>;
+  body: z.infer<typeof ImageMetadataValidationSchema>;
 }
 
 const processImageData = async (
@@ -54,23 +49,14 @@ const processImageData = async (
   if (!files || !files.length) {
     throw new ServerError('No images uploaded', 400);
   }
-  const beerImagePromises: Promise<BeerImage>[] = [];
 
-  files.forEach((file) => {
-    beerImagePromises.push(
-      DBClient.instance.beerImage.create({
-        data: {
-          alt: body.alt,
-          postedBy: { connect: { id: user!.id } },
-          beerPost: { connect: { id: req.query.id } },
-          path: file.path,
-          caption: body.caption,
-        },
-      }),
-    );
+  const beerImages = await processImageDataIntoDB({
+    alt: body.alt,
+    caption: body.caption,
+    beerPostId: req.query.id,
+    userId: user!.id,
+    files,
   });
-
-  const beerImages = await Promise.all(beerImagePromises);
 
   res.status(200).json({
     success: true,
@@ -90,7 +76,7 @@ router.post(
   getCurrentUser,
   // @ts-expect-error
   uploadMiddleware,
-  validateRequest({ bodySchema: BeerPostImageValidationSchema }),
+  validateRequest({ bodySchema: ImageMetadataValidationSchema }),
   processImageData,
 );
 

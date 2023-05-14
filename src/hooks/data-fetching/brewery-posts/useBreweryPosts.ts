@@ -46,6 +46,7 @@ const useBreweryPosts = ({ pageSize }: { pageSize: number }) => {
   const { data, error, isLoading, setSize, size } = useSWRInfinite(
     (index) => `/api/breweries?page_num=${index + 1}&page_size=${pageSize}`,
     fetcher,
+    { parallel: true },
   );
 
   const breweryPosts = data?.flatMap((d) => d.breweryPosts) ?? [];

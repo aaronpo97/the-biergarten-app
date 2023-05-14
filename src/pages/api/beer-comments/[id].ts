@@ -4,8 +4,9 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
+import findBeerCommentById from '@/services/BeerComment/findBeerCommentById';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
-
+import editBeerCommentById from '@/services/BeerComment/editBeerCommentById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter, NextHandler } from 'next-connect';
@@ -27,9 +28,7 @@ const checkIfCommentOwner = async (
 ) => {
   const { id } = req.query;
   const user = req.user!;
-  const comment = await DBClient.instance.beerComment.findUnique({
-    where: { id },
-  });
+  const comment = await findBeerCommentById(id);
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
@@ -48,13 +47,10 @@ const editComment = async (
 ) => {
   const { id } = req.query;
 
-  const updated = await DBClient.instance.beerComment.update({
-    where: { id },
-    data: {
-      content: req.body.content,
-      rating: req.body.rating,
-      updatedAt: new Date(),
-    },
+  const updated = await editBeerCommentById({
+    content: req.body.content,
+    rating: req.body.rating,
+    id,
   });
 
   return res.status(200).json({
