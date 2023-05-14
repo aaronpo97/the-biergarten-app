@@ -5,7 +5,7 @@
 The Biergarten App is a web application designed for beer lovers to share their favorite
 brews and breweries with like-minded people online.
 
-This application's stack consists of Next.js, Prisma and Vercel Postgres. I'm motivated to
+This application's stack consists of Next.js, Prisma and Neon Postgres. I'm motivated to
 learn more about these technologies while exploring my passion for beer.
 
 I've also incorporated different APIs into the application, such as the Cloudinary API for
@@ -66,8 +66,8 @@ beer known as iso-alpha acids.
 
 - [Prisma](https://www.prisma.io/)
   - An open-source ORM for Node.js and TypeScript applications.
-- [Vercel Postgres](https://vercel.com/dashboard/stores)
-  - A managed PostgreSQL database service provided by Vercel.
+- [Neon Postgres](https://neon.tech/)
+  - A managed PostgreSQL database service powered by Neon.
 - [Cloudinary](https://cloudinary.com/)
   - A cloud-based image and video management service that provides developers with an easy
     way to upload, store, and manipulate media assets.
@@ -94,7 +94,7 @@ You will also need to create a free account with the following services:
 
 - [Cloudinary](https://cloudinary.com/users/register/free)
 - [SparkPost](https://www.sparkpost.com/)
-- [Vercel Postgres](https://vercel.com/dashboard/stores)
+- [Neon Postgres](https://neon.tech/)
 - [Mapbox](https://account.mapbox.com/auth/signup/)
 
 ### Setup
@@ -126,13 +126,11 @@ SESSION_SECRET=
 SESSION_TOKEN_NAME=
 SESSION_MAX_AGE=
 NODE_ENV=
-POSTGRES_URL=
+
 POSTGRES_PRISMA_URL=
 POSTGRES_URL_NON_POOLING=
-POSTGRES_USER=
-POSTGRES_HOST=
-POSTGRES_PASSWORD=
-POSTGRES_DATABASE=
+SHADOW_DATABASE_URL=
+
 MAPBOX_ACCESS_TOKEN=
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
 SPARKPOST_API_KEY=
@@ -156,10 +154,11 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   - You can set this to `biergarten`.
 - `SESSION_MAX_AGE` is the maximum age of the session cookie in milliseconds.
   - You can set this to `604800000` (1 week).
-- `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, `POSTGRES_USER`,
-  `POSTGRES_HOST`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` are the credentials for
-  your Vercel Postgres database.
-  - You can create a free account [here](https://vercel.com/dashboard/stores).
+- `POSTGRES_PRISMA_URL`is a pooled connection string for your Neon Postgres database.
+- `POSTGRES_URL_NON_POOLING` is a non-pooled connection string for your Neon Postgres database used for migrations.
+- `SHADOW_DATABASE_URL` is a connection string for a secondary database used for migrations to detect schema drift.
+  - You can create a free account [here](https://neon.tech)
+  - Consult the [docs](https://neon.tech/docs/guides/prisma) for more information.
 - `MAPBOX_ACCESS_TOKEN` and `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` are the access tokens for
   your Mapbox account.
   - You can create a free account [here](https://account.mapbox.com/auth/signup/).
@@ -171,7 +170,7 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   - You can create a free account [here](https://www.sparkpost.com/).
 - `SPARKPOST_SENDER_ADDRESS` is the email address that will be used to send emails.
 
-4. Initialize the database and run the migrations.
+1. Initialize the database and run the migrations.
 
 ```bash
 npx prisma generate
