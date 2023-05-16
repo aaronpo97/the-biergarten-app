@@ -12,14 +12,14 @@ const validateEmail = async (email: string) => {
   }
 
   const parsedPayload = z
-    .object({ usernameIsTaken: z.boolean() })
+    .object({ emailIsTaken: z.boolean() })
     .safeParse(parsed.data.payload);
 
   if (!parsedPayload.success) {
     return false;
   }
 
-  return !parsedPayload.data.usernameIsTaken;
+  return !parsedPayload.data.emailIsTaken;
 };
 
 export default validateEmail;

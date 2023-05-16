@@ -1,7 +1,7 @@
 import { hashPassword } from '@/config/auth/passwordFns';
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import CreateUserValidationSchema from './schema/CreateUserValidationSchema';
+import { CreateUserValidationSchema } from './schema/CreateUserValidationSchemas';
 import GetUserSchema from './schema/GetUserSchema';
 
 const createNewUser = async ({

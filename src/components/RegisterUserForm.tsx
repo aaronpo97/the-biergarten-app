@@ -1,7 +1,5 @@
 import sendRegisterUserRequest from '@/requests/sendRegisterUserRequest';
-import CreateUserValidationSchema, {
-  CreateUserValidationSchemaWithUsernameAndEmailCheck,
-} from '@/services/User/schema/CreateUserValidationSchema';
+import { CreateUserValidationSchemaWithUsernameAndEmailCheck } from '@/services/User/schema/CreateUserValidationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { FC, useState } from 'react';
@@ -19,13 +17,15 @@ import FormTextInput from './ui/forms/FormTextInput';
 const RegisterUserForm: FC = () => {
   const router = useRouter();
   const { reset, register, handleSubmit, formState } = useForm<
-    z.infer<typeof CreateUserValidationSchema>
+    z.infer<typeof CreateUserValidationSchemaWithUsernameAndEmailCheck>
   >({ resolver: zodResolver(CreateUserValidationSchemaWithUsernameAndEmailCheck) });
 
   const { errors } = formState;
   const [serverResponseError, setServerResponseError] = useState('');
 
-  const onSubmit = async (data: z.infer<typeof CreateUserValidationSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof CreateUserValidationSchemaWithUsernameAndEmailCheck>,
+  ) => {
     try {
       await sendRegisterUserRequest(data);
       reset();
