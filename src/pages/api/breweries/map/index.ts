@@ -28,7 +28,12 @@ const getBreweryPosts = async (
     await DBClient.instance.breweryPost.findMany({
       select: {
         location: {
-          select: { coordinates: true, city: true, country: true, stateOrProvince: true },
+          select: {
+            coordinates: true,
+            city: true,
+            country: true,
+            stateOrProvince: true,
+          },
         },
         id: true,
         name: true,

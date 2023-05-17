@@ -155,8 +155,10 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `SESSION_MAX_AGE` is the maximum age of the session cookie in milliseconds.
   - You can set this to `604800000` (1 week).
 - `POSTGRES_PRISMA_URL`is a pooled connection string for your Neon Postgres database.
-- `POSTGRES_URL_NON_POOLING` is a non-pooled connection string for your Neon Postgres database used for migrations.
-- `SHADOW_DATABASE_URL` is a connection string for a secondary database used for migrations to detect schema drift.
+- `POSTGRES_URL_NON_POOLING` is a non-pooled connection string for your Neon Postgres
+  database used for migrations.
+- `SHADOW_DATABASE_URL` is a connection string for a secondary database used for
+  migrations to detect schema drift.
   - You can create a free account [here](https://neon.tech)
   - Consult the [docs](https://neon.tech/docs/guides/prisma) for more information.
 - `MAPBOX_ACCESS_TOKEN` and `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` are the access tokens for
