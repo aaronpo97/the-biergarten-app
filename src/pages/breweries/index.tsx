@@ -1,7 +1,7 @@
 import BreweryCard from '@/components/BreweryIndex/BreweryCard';
 import LoadingCard from '@/components/ui/LoadingCard';
 import Spinner from '@/components/ui/Spinner';
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import useBreweryPosts from '@/hooks/data-fetching/brewery-posts/useBreweryPosts';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { NextPage } from 'next';

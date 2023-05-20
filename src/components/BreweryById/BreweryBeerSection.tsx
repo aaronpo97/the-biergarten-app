@@ -5,7 +5,7 @@ import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import { FaPlus } from 'react-icons/fa';
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import BeerRecommendationLoadingComponent from '../BeerById/BeerRecommendationLoadingComponent';
 
 interface BreweryCommentsSectionProps {

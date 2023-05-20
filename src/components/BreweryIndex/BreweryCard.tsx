@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import useGetBreweryPostLikeCount from '@/hooks/data-fetching/brewery-likes/useGetBreweryPostLikeCount';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import { FC, useContext } from 'react';

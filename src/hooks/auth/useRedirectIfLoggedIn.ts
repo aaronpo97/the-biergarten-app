@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 

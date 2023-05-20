@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
+import ToastContext from '@/contexts/ToastContext';
 import ErrorAlert from '../ui/alerts/ErrorAlert';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
@@ -30,12 +31,15 @@ const LoginForm = () => {
   const [responseError, setResponseError] = useState<string>('');
 
   const { mutate } = useContext(UserContext);
+  const { toast } = useContext(ToastContext);
 
   const onSubmit: SubmitHandler<LoginT> = async (data) => {
     try {
+      const id = toast.loading('Logging in.');
       await sendLoginUserRequest(data);
       await mutate!();
       await router.push(`/user/current`);
+      toast.remove(id);
     } catch (error) {
       if (error instanceof Error) {
         setResponseError(error.message);

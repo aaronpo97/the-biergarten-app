@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FC, useState, Dispatch, SetStateAction } from 'react';
+import { FC, useState, Dispatch, SetStateAction, useContext } from 'react';
 import { Rating } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,6 +7,7 @@ import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPost
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
+import ToastContext from '@/contexts/ToastContext';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
@@ -42,6 +43,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
     resolver: zodResolver(CreateCommentValidationSchema),
   });
 
+  const { toast } = useContext(ToastContext);
   const { errors } = formState;
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -58,6 +60,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
     setInEditMode(true);
     await handleEditRequest(comment.id, data);
     await mutate();
+    toast.success('Submitted edits');
     setInEditMode(false);
   };
 
