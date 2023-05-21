@@ -9,7 +9,7 @@ import { FaArrowUp } from 'react-icons/fa';
 import LoadingCard from '@/components/ui/LoadingCard';
 
 const BeerPage: NextPage = () => {
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 20;
 
   const { beerPosts, setSize, size, isLoading, isLoadingMore, isAtEnd } = useBeerPosts({
     pageSize: PAGE_SIZE,

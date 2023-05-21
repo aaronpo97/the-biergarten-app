@@ -49,9 +49,10 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   handleEditRequest,
 }) => {
   const { ref: penultimateCommentRef } = useInView({
+    threshold: 0.1,
     /**
-     * When the second last comment comes into view, call setSize from useBeerPostComments
-     * to load more comments.
+     * When the last comment comes into view, call setSize from useBeerPostComments to
+     * load more comments.
      */
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
@@ -62,9 +63,9 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
   return (
     <>
       {!!comments.length && (
-        <div className="card bg-base-300 pb-6">
+        <div className="card h-full bg-base-300 pb-6">
           {comments.map((comment, index) => {
-            const isPenultimateComment = index === comments.length - 2;
+            const isLastComment = index === comments.length - 1;
 
             /**
              * Attach a ref to the last comment in the list. When it comes into view, the
@@ -72,7 +73,7 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
              */
             return (
               <div
-                ref={isPenultimateComment ? penultimateCommentRef : undefined}
+                ref={isLastComment ? penultimateCommentRef : undefined}
                 key={comment.id}
               >
                 <CommentCardBody

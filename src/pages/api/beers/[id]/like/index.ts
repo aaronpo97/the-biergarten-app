@@ -11,7 +11,7 @@ import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeBy
 import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
-import DBClient from '@/prisma/DBClient';
+import getBeerPostLikeCount from '@/services/BeerPostLike/getBeerPostLikeCount';
 
 const sendLikeRequest = async (
   req: UserExtendedNextApiRequest,
@@ -25,7 +25,10 @@ const sendLikeRequest = async (
     throw new ServerError('Could not find a beer post with that id', 404);
   }
 
-  const alreadyLiked = await findBeerPostLikeById(beer.id, user.id);
+  const alreadyLiked = await findBeerPostLikeById({
+    beerPostId: beer.id,
+    likedById: user.id,
+  });
 
   const jsonResponse = {
     success: true as const,
@@ -50,9 +53,7 @@ const getLikeCount = async (
 ) => {
   const id = req.query.id as string;
 
-  const likeCount = await DBClient.instance.beerPostLike.count({
-    where: { beerPostId: id },
-  });
+  const likeCount = await getBeerPostLikeCount(id);
 
   res.status(200).json({
     success: true,

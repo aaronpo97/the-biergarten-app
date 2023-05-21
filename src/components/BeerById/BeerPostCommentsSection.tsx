@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
@@ -6,6 +6,7 @@ import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import { useRouter } from 'next/router';
+import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import BeerCommentForm from './BeerCommentForm';
 
 import LoadingComponent from './LoadingComponent';
@@ -20,29 +21,25 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
   const router = useRouter();
 
   const pageNum = parseInt(router.query.comments_page as string, 10) || 1;
-  const PAGE_SIZE = 4;
+  const PAGE_SIZE = 15;
 
   const { comments, isLoading, mutate, setSize, size, isLoadingMore, isAtEnd } =
-    useBeerPostComments({
-      id: beerPost.id,
-      pageNum,
-      pageSize: PAGE_SIZE,
-    });
+    useBeerPostComments({ id: beerPost.id, pageNum, pageSize: PAGE_SIZE });
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  async function handleDeleteRequest(id: string) {
+  const handleDeleteRequest = async (id: string) => {
     const response = await fetch(`/api/beer-comments/${id}`, { method: 'DELETE' });
 
     if (!response.ok) {
       throw new Error('Failed to delete comment.');
     }
-  }
+  };
 
-  async function handleEditRequest(
+  const handleEditRequest = async (
     id: string,
-    data: { content: string; rating: number },
-  ) {
+    data: z.infer<typeof CreateCommentValidationSchema>,
+  ) => {
     const response = await fetch(`/api/beer-comments/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -52,7 +49,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
     if (!response.ok) {
       throw new Error('Failed to update comment.');
     }
-  }
+  };
 
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>

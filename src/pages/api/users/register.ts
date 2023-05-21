@@ -4,7 +4,7 @@ import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import { createRouter } from 'next-connect';
 import createNewUser from '@/services/User/createNewUser';
-import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
+import { CreateUserValidationSchema } from '@/services/User/schema/CreateUserValidationSchemas';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import findUserByUsername from '@/services/User/findUserByUsername';
 import findUserByEmail from '@/services/User/findUserByEmail';

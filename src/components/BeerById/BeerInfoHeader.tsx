@@ -2,7 +2,7 @@ import Link from 'next/link';
 import format from 'date-fns/format';
 import { FC, useContext } from 'react';
 
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import { FaRegEdit } from 'react-icons/fa';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';

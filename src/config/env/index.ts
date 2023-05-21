@@ -19,13 +19,8 @@ const envSchema = z.object({
   SESSION_TOKEN_NAME: z.string(),
   SESSION_MAX_AGE: z.coerce.number().positive(),
 
-  POSTGRES_URL: z.string().url(),
   POSTGRES_PRISMA_URL: z.string().url(),
   POSTGRES_URL_NON_POOLING: z.string().url(),
-  POSTGRES_USER: z.string(),
-  POSTGRES_PASSWORD: z.string(),
-  POSTGRES_DATABASE: z.string(),
-  POSTGRES_HOST: z.string(),
   SHADOW_DATABASE_URL: z.string().url(),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
@@ -119,80 +114,32 @@ export const SESSION_TOKEN_NAME = parsed.data.SESSION_TOKEN_NAME;
 export const SESSION_MAX_AGE = parsed.data.SESSION_MAX_AGE;
 
 /**
- * PostgreSQL connection URL taken from Vercel.
+ * PostgreSQL connection URL for Prisma taken from Neon.
  *
  * @example
  *   'postgresql://user:password@host:5432/database';
  *
- * @see https://vercel.com/dashboard/stores
- */
-export const POSTGRES_URL = parsed.data.POSTGRES_URL;
-
-/**
- * PostgreSQL connection URL for Prisma taken from Vercel.
- *
- * @example
- *   'postgresql://user:password@host:5432/database';
- *
- * @see https://vercel.com/dashboard/stores
+ * @see https://neon.tech/docs/guides/prisma
  */
 export const POSTGRES_PRISMA_URL = parsed.data.POSTGRES_PRISMA_URL;
 
 /**
- * Non-pooling PostgreSQL connection URL taken from Vercel.
+ * Non-pooling PostgreSQL connection URL taken from Neon.
  *
  * @example
  *   'postgresql://user:password@host:5432/database';
  *
- * @see https://vercel.com/dashboard/stores
+ * @see https://neon.tech/docs/guides/prisma
  */
 export const POSTGRES_URL_NON_POOLING = parsed.data.POSTGRES_URL_NON_POOLING;
 
 /**
- * The PostgreSQL user from Vercel.
- *
- * @example
- *   'user';
- *
- * @see https://vercel.com/dashboard/stores
- */
-export const POSTGRES_USER = parsed.data.POSTGRES_USER;
-
-/**
- * The PostgreSQL password from Vercel.
- *
- * @example
- *   'password';
- *
- * @see https://vercel.com/dashboard/stores
- */
-export const POSTGRES_PASSWORD = parsed.data.POSTGRES_PASSWORD;
-
-/**
- * The PostgreSQL database from Vercel.
- *
- * @example
- *   'database';
- *
- * @see https://vercel.com/dashboard/stores
- */
-export const POSTGRES_DATABASE = parsed.data.POSTGRES_DATABASE;
-
-/**
- * The PostgreSQL host from Vercel.
- *
- * @example
- *   'ep-sweet-pineapple.us-east-1.postgres.vercel-storage.com';
- *
- * @see https://vercel.com/dashboard/stores
- */
-export const POSTGRES_HOST = parsed.data.POSTGRES_HOST;
-
-/**
- * The URL of another PostgreSQL database to shadow.
+ * The URL of another Neon PostgreSQL database to shadow for migrations.
  *
  * @example
  *   'postgresql://user:password@host:5432/database';
+ *
+ * @see https://neon.tech/docs/guides/prisma-migrate
  */
 export const SHADOW_DATABASE_URL = parsed.data.SHADOW_DATABASE_URL;
 

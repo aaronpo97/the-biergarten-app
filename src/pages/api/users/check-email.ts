@@ -29,7 +29,7 @@ const checkEmail = async (req: NextApiRequest, res: NextApiResponse) => {
     success: true,
     payload: { emailIsTaken: !!email },
     statusCode: 200,
-    message: 'Getting username availability.',
+    message: 'Getting email availability.',
   });
 };
 

@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import { Dispatch, SetStateAction, FC, useContext } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';

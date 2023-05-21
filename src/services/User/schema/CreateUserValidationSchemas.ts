@@ -3,9 +3,9 @@ import validateUsername from '@/requests/validateUsername';
 import sub from 'date-fns/sub';
 import { z } from 'zod';
 
-const minimumDateOfBirth = sub(new Date(), { years: 19 });
-const CreateUserValidationSchema = z.object({
-  // use special characters, numbers, and uppercase letters
+const MINIMUM_DATE_OF_BIRTH = sub(new Date(), { years: 19 });
+
+export const BaseCreateUserSchema = z.object({
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters.' })
@@ -33,29 +33,25 @@ const CreateUserValidationSchema = z.object({
     .refine((lastName) => /^[a-zA-Z]+$/.test(lastName), {
       message: 'Last name must only contain letters.',
     }),
-  dateOfBirth: z.string().refine(
-    (dateOfBirth) => {
-      const parsedDateOfBirth = new Date(dateOfBirth);
-      return parsedDateOfBirth <= minimumDateOfBirth;
-    },
-    { message: 'You must be at least 19 years old to register.' },
-  ),
-});
-
-export default CreateUserValidationSchema.extend({
+  dateOfBirth: z
+    .string()
+    .refine((dateOfBirth) => new Date(dateOfBirth) <= MINIMUM_DATE_OF_BIRTH, {
+      message: 'You must be at least 19 years old to register.',
+    }),
   username: z
     .string()
     .min(1, { message: 'Username must not be empty.' })
     .max(20, { message: 'Username must be less than 20 characters.' }),
-
   email: z.string().email({ message: 'Email must be a valid email address.' }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match.',
-  path: ['confirmPassword'],
 });
 
+export const CreateUserValidationSchema = BaseCreateUserSchema.refine(
+  (data) => data.password === data.confirmPassword,
+  { message: 'Passwords do not match.', path: ['confirmPassword'] },
+);
+
 export const CreateUserValidationSchemaWithUsernameAndEmailCheck =
-  CreateUserValidationSchema.extend({
+  BaseCreateUserSchema.extend({
     email: z
       .string()
       .email({ message: 'Email must be a valid email address.' })

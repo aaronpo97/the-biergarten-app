@@ -1,6 +1,6 @@
 import Spinner from '@/components/ui/Spinner';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 
 import { GetServerSideProps, NextPage } from 'next';
 import { useContext } from 'react';

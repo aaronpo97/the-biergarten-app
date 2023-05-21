@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useContext } from 'react';
 
@@ -34,8 +34,8 @@ const useNavbar = () => {
 
   /** These pages are accessible to both authenticated and unauthenticated users. */
   const otherPages: readonly Page[] = [
-    { slug: '/breweries', name: 'Breweries' },
     { slug: '/beers', name: 'Beers' },
+    { slug: '/breweries', name: 'Breweries' },
   ];
 
   /**

@@ -3,7 +3,7 @@ import { FC, useContext } from 'react';
 import Image from 'next/image';
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
 import BeerPostLikeButton from '../BeerById/BeerPostLikeButton';
 

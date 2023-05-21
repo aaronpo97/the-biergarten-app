@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/userContext';
+import UserContext from '@/contexts/UserContext';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { useContext } from 'react';
 import useSWR from 'swr';

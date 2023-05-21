@@ -9,10 +9,15 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
-import BreweryInfoHeader from '@/components/BreweryById/BreweryInfoHeader';
-import BreweryPostMap from '@/components/BreweryById/BreweryPostMap';
-import BreweryBeersSection from '@/components/BreweryById/BreweryBeerSection';
-import BreweryCommentsSection from '@/components/BreweryById/BreweryCommentsSection';
+
+import dynamic from 'next/dynamic';
+
+const [BreweryInfoHeader, BreweryBeersSection, BreweryCommentsSection, BreweryPostMap] = [
+  dynamic(() => import('@/components/BreweryById/BreweryInfoHeader')),
+  dynamic(() => import('@/components/BreweryById/BreweryBeerSection')),
+  dynamic(() => import('@/components/BreweryById/BreweryCommentsSection')),
+  dynamic(() => import('@/components/BreweryById/BreweryPostMap')),
+];
 
 interface BreweryPageProps {
   breweryPost: z.infer<typeof BreweryPostQueryResult>;

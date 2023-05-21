@@ -3,11 +3,17 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
+interface UseBeerRecommendationsParams {
+  pageSize: number;
+  beerPost: z.infer<typeof beerPostQueryResult>;
+}
+
 /**
- * A custom hook using SWR to fetch beer posts from the API.
+ * A custom hook using SWR to fetch beer recommendations from the API.
  *
- * @param options The options to use when fetching beer posts.
- * @param options.pageSize The number of beer posts to fetch per page.
+ * @param options The options to use when fetching beer recommendations.
+ * @param options.pageSize The number of beer recommendations to fetch per page.
+ * @param options.beerPost The beer post to fetch recommendations for.
  * @returns An object with the following properties:
  *
  *   - `beerPosts`: The beer posts fetched from the API.
@@ -19,7 +25,7 @@ import { z } from 'zod';
  *   - `setSize`: A function to set the size of the data.
  *   - `size`: The size of the data.
  */
-const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
+const UseBeerPostsByBrewery = ({ pageSize, beerPost }: UseBeerRecommendationsParams) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) {
@@ -47,9 +53,11 @@ const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
   };
 
   const { data, error, isLoading, setSize, size } = useSWRInfinite(
-    (index) => `/api/beers?page_num=${index + 1}&page_size=${pageSize}`,
+    (index) =>
+      `/api/beers/${beerPost.id}/recommendations/?page_num=${
+        index + 1
+      }&page_size=${pageSize}`,
     fetcher,
-    { parallel: true },
   );
 
   const beerPosts = data?.flatMap((d) => d.beerPosts) ?? [];
@@ -59,14 +67,14 @@ const useBeerPosts = ({ pageSize }: { pageSize: number }) => {
 
   return {
     beerPosts,
-    error: error as unknown,
-    isAtEnd,
+    pageCount,
+    size,
+    setSize,
     isLoading,
     isLoadingMore,
-    pageCount,
-    setSize,
-    size,
+    isAtEnd,
+    error: error as unknown,
   };
 };
 
-export default useBeerPosts;
+export default UseBeerPostsByBrewery;

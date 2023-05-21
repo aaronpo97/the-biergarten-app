@@ -1,4 +1,4 @@
-import CreateUserValidationSchema from '@/services/User/schema/CreateUserValidationSchema';
+import { CreateUserValidationSchema } from '@/services/User/schema/CreateUserValidationSchemas';
 import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
@@ -6,9 +6,7 @@ import { z } from 'zod';
 async function sendRegisterUserRequest(data: z.infer<typeof CreateUserValidationSchema>) {
   const response = await fetch('/api/users/register', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
