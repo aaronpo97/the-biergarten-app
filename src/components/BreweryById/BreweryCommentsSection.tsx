@@ -9,7 +9,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
-import ToastContext from '@/contexts/ToastContext';
+import toast from 'react-hot-toast';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';
 import CommentForm from '../ui/CommentForm';
@@ -64,7 +64,6 @@ const BreweryCommentForm: FC<BreweryCommentFormProps> = ({ breweryPost, mutate }
     resolver: zodResolver(CreateCommentValidationSchema),
   });
 
-  const { toast } = useContext(ToastContext);
   const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {

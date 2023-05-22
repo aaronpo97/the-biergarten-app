@@ -1,4 +1,4 @@
-import sendCreateBeerCommentRequest from '@/requests/sendCreateBeerCommentRequest';
+import sendCreateBeerCommentRequest from '@/requests/BeerComment/sendCreateBeerCommentRequest';
 
 import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import toast from 'react-hot-toast';
 import CommentForm from '../ui/CommentForm';
 
 interface BeerCommentFormProps {
@@ -30,13 +31,22 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
-    await sendCreateBeerCommentRequest({
-      content: data.content,
-      rating: data.rating,
-      beerPostId: beerPost.id,
-    });
-    await mutate();
-    reset();
+    try {
+      await sendCreateBeerCommentRequest({
+        content: data.content,
+        rating: data.rating,
+        beerPostId: beerPost.id,
+      });
+      await mutate();
+      reset();
+      toast.success('Created a new comment!');
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Something went wrong.';
+      toast.error(errorMessage);
+
+      reset();
+    }
   };
 
   return (

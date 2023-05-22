@@ -1,12 +1,14 @@
-import sendEditBeerPostRequest from '@/requests/sendEditBeerPostRequest';
-import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { FC } from 'react';
 
 import { useRouter } from 'next/router';
-import { FC, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { z } from 'zod';
-import ErrorAlert from './ui/alerts/ErrorAlert';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import deleteBeerPostRequest from '@/requests/BeerPost/deleteBeerPostRequest';
+import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
+import sendEditBeerPostRequest from '@/requests/BeerPost/sendEditBeerPostRequest';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -23,54 +25,36 @@ interface EditBeerPostFormProps {
 
 const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<EditBeerPostSchema>({
+  const { register, handleSubmit, formState } = useForm<EditBeerPostSchema>({
     resolver: zodResolver(EditBeerPostValidationSchema),
     defaultValues: previousValues,
   });
 
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { isSubmitting, errors } = formState;
   const onSubmit: SubmitHandler<EditBeerPostSchema> = async (data) => {
     try {
-      setIsSubmitting(true);
       await sendEditBeerPostRequest(data);
-      router.push(`/beers/${data.id}`);
+      await router.push(`/beers/${data.id}`);
+      toast.success('Edited beer post.');
     } catch (e) {
-      setIsSubmitting(false);
-      if (!(e instanceof Error)) {
-        setError('Something went wrong');
-        return;
-      }
-      setError(e.message);
+      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
+      toast.error(errorMessage);
+      await router.push(`/beers/${data.id}`);
     }
   };
 
   const onDelete = async () => {
     try {
-      const response = await fetch(`/api/beers/${previousValues.id}`, {
-        method: 'DELETE',
-      });
-      if (response.status === 200) {
-        router.push('/beers');
-      }
+      await deleteBeerPostRequest(previousValues.id);
+      await router.push('/beers');
     } catch (e) {
-      if (!(e instanceof Error)) {
-        setError('Something went wrong');
-        return;
-      }
-      setError(e.message);
+      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
+      toast.error(errorMessage);
+      await router.push(`/beers`);
     }
   };
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-5">
-        {error && <ErrorAlert error={error} setError={setError} />}
-      </div>
       <FormInfo>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormError>{errors.name?.message}</FormError>

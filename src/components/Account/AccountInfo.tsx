@@ -1,5 +1,5 @@
-import validateEmail from '@/requests/valdiateEmail';
-import validateUsername from '@/requests/validateUsername';
+import validateEmailRequest from '@/requests/User/validateEmailRequest';
+import validateUsernameRequest from '@/requests/validateUsernameRequest';
 import { BaseCreateUserSchema } from '@/services/User/schema/CreateUserValidationSchemas';
 import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import { Switch } from '@headlessui/react';
@@ -31,7 +31,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
       .refine(
         async (email) => {
           if (user.email === email) return true;
-          return validateEmail(email);
+          return validateEmailRequest(email);
         },
         { message: 'Email is already taken.' },
       ),
@@ -42,7 +42,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
       .refine(
         async (username) => {
           if (user.username === username) return true;
-          return validateUsername(username);
+          return validateUsernameRequest(username);
         },
         { message: 'Username is already taken.' },
       ),

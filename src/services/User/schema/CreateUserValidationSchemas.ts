@@ -1,5 +1,5 @@
-import validateEmail from '@/requests/valdiateEmail';
-import validateUsername from '@/requests/validateUsername';
+import validateEmailRequest from '@/requests/User/validateEmailRequest';
+import validateUsernameRequest from '@/requests/validateUsernameRequest';
 import sub from 'date-fns/sub';
 import { z } from 'zod';
 
@@ -55,14 +55,14 @@ export const CreateUserValidationSchemaWithUsernameAndEmailCheck =
     email: z
       .string()
       .email({ message: 'Email must be a valid email address.' })
-      .refine(async (email) => validateEmail(email), {
+      .refine(async (email) => validateEmailRequest(email), {
         message: 'Email is already taken.',
       }),
     username: z
       .string()
       .min(1, { message: 'Username must not be empty.' })
       .max(20, { message: 'Username must be less than 20 characters.' })
-      .refine(async (username) => validateUsername(username), {
+      .refine(async (username) => validateUsernameRequest(username), {
         message: 'Username is already taken.',
       }),
   }).refine((data) => data.password === data.confirmPassword, {

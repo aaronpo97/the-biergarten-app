@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerType } from '@prisma/client';
 import router from 'next/router';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
 import { z } from 'zod';
 import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
-import sendCreateBeerPostRequest from '@/requests/sendCreateBeerPostRequest';
+import sendCreateBeerPostRequest from '@/requests/BeerPost/sendCreateBeerPostRequest';
 import UploadImageValidationSchema from '@/services/types/ImageSchema/UploadImageValidationSchema';
-import sendUploadBeerImagesRequest from '@/requests/sendUploadBeerImageRequest';
-import ErrorAlert from './ui/alerts/ErrorAlert';
+import sendUploadBeerImagesRequest from '@/requests/BeerImage/sendUploadBeerImageRequest';
+
+import toast from 'react-hot-toast';
+
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -40,7 +42,6 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
   });
 
   const { errors, isSubmitting } = formState;
-  const [error, setError] = useState('');
 
   const onSubmit: SubmitHandler<
     z.infer<typeof CreateBeerPostWithImagesValidationSchema>
@@ -52,19 +53,17 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
     try {
       const response = await sendCreateBeerPostRequest(data);
       await sendUploadBeerImagesRequest({ beerPost: response, images: data.images });
-      router.push(`/beers/${response.id}`);
+      await router.push(`/beers/${response.id}`);
+      toast.success('Created beer post.');
     } catch (e) {
-      if (!(e instanceof Error)) {
-        setError('Something went wrong');
-        return;
-      }
-      setError(e.message);
+      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
+
+      toast.error(errorMessage);
     }
   };
 
   return (
     <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
-      <div>{error && <ErrorAlert error={error} setError={setError} />}</div>
       <FormInfo>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormError>{errors.name?.message}</FormError>
