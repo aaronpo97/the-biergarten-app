@@ -8,6 +8,7 @@ import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResul
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
 import toast from 'react-hot-toast';
+import createErrorToast from '@/util/createErrorToast';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
@@ -31,7 +32,6 @@ interface EditCommentBodyProps {
 const EditCommentBody: FC<EditCommentBodyProps> = ({
   comment,
   setInEditMode,
-
   mutate,
   handleDeleteRequest,
   handleEditRequest,
@@ -43,24 +43,41 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
     resolver: zodResolver(CreateCommentValidationSchema),
   });
 
-  const { errors } = formState;
+  const { errors, isSubmitting } = formState;
 
   const [isDeleting, setIsDeleting] = useState(false);
 
   const onDelete = async () => {
+    const loadingToast = toast.loading('Deleting comment...');
     setIsDeleting(true);
-    await handleDeleteRequest(comment.id);
-    await mutate();
+    try {
+      await handleDeleteRequest(comment.id);
+      await mutate();
+      toast.remove(loadingToast);
+      toast.success('Deleted comment.');
+    } catch (error) {
+      toast.remove(loadingToast);
+      createErrorToast(error);
+    }
   };
 
   const onEdit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
     data,
   ) => {
-    setInEditMode(true);
-    await handleEditRequest(comment.id, data);
-    await mutate();
-    toast.success('Submitted edits');
-    setInEditMode(false);
+    const loadingToast = toast.loading('Submitting comment edits...');
+
+    try {
+      setInEditMode(true);
+      await handleEditRequest(comment.id, data);
+      await mutate();
+      toast.remove(loadingToast);
+      toast.success('Comment edits submitted successfully.');
+      setInEditMode(false);
+    } catch (error) {
+      toast.remove(loadingToast);
+      createErrorToast(error);
+      setInEditMode(false);
+    }
   };
 
   return (
@@ -78,7 +95,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               placeholder="Comment"
               rows={2}
               error={!!errors.content?.message}
-              disabled={formState.isSubmitting || isDeleting}
+              disabled={isSubmitting || isDeleting}
             />
           </FormSegment>
           <div className="flex flex-row items-center justify-between">
@@ -97,8 +114,8 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
                   <Rating.Item
                     name="rating-1"
                     className="mask mask-star cursor-default"
-                    disabled={formState.isSubmitting || isDeleting}
-                    aria-disabled={formState.isSubmitting || isDeleting}
+                    disabled={isSubmitting || isDeleting}
+                    aria-disabled={isSubmitting || isDeleting}
                     key={index}
                   />
                 ))}
@@ -108,7 +125,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               <button
                 type="button"
                 className="btn-xs btn lg:btn-sm"
-                disabled={formState.isSubmitting || isDeleting}
+                disabled={isSubmitting || isDeleting}
                 onClick={() => {
                   setInEditMode(false);
                 }}
@@ -117,7 +134,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               </button>
               <button
                 type="submit"
-                disabled={formState.isSubmitting || isDeleting}
+                disabled={isSubmitting || isDeleting}
                 className="btn-xs btn lg:btn-sm"
               >
                 Save

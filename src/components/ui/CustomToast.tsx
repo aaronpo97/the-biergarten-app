@@ -22,7 +22,7 @@ const toastToClassName = (toastType: Toast['type']) => {
 const CustomToast: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <>
-      <Toaster>
+      <Toaster position="bottom-center">
         {(t) => {
           const alertType = toastToClassName(t.type);
           return (

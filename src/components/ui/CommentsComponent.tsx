@@ -68,8 +68,9 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
             const isLastComment = index === comments.length - 1;
 
             /**
-             * Attach a ref to the last comment in the list. When it comes into view, the
-             * component will call setSize to load more comments.
+             * Attach a ref to the last comment in the list. When it comes
+             * into view, the component will call setSize to load more
+             * comments.
              */
             return (
               <div
@@ -88,16 +89,17 @@ const CommentsComponent: FC<CommentsComponentProps> = ({
 
           {
             /**
-             * If there are more comments to load, show a loading component with a
-             * skeleton loader and a loading spinner.
+             * If there are more comments to load, show a loading component
+             * with a skeleton loader and a loading spinner.
              */
             !!isLoadingMore && <LoadingComponent length={pageSize} />
           }
 
           {
             /**
-             * If the user has scrolled to the end of the comments, show a button that
-             * will scroll them back to the top of the comments section.
+             * If the user has scrolled to the end of the comments, show a
+             * button that will scroll them back to the top of the comments
+             * section.
              */
             !!isAtEnd && (
               <div className="flex h-20 items-center justify-center text-center">

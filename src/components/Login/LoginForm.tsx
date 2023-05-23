@@ -32,15 +32,15 @@ const LoginForm = () => {
   const { mutate } = useContext(UserContext);
 
   const onSubmit: SubmitHandler<LoginT> = async (data) => {
-    const id = toast.loading('Logging in.');
+    const loadingToast = toast.loading('Logging in...');
     try {
       await sendLoginUserRequest(data);
       await mutate!();
-      toast.remove(id);
+      toast.remove(loadingToast);
       toast.success('Logged in!');
       await router.push(`/user/current`);
     } catch (error) {
-      toast.remove(id);
+      toast.remove(loadingToast);
       createErrorToast(error);
       reset();
     }

@@ -1,24 +1,23 @@
 import validateEmailRequest from '@/requests/User/validateEmailRequest';
 import validateUsernameRequest from '@/requests/validateUsernameRequest';
 import { BaseCreateUserSchema } from '@/services/User/schema/CreateUserValidationSchemas';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import { Switch } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/router';
-import { FC, useState } from 'react';
+import { FC, useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import UserContext from '@/contexts/UserContext';
+import sendEditUserRequest from '@/requests/User/sendEditUserRequest';
+import createErrorToast from '@/util/createErrorToast';
+import { toast } from 'react-hot-toast';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormTextInput from '../ui/forms/FormTextInput';
 
-interface AccountInfoProps {
-  user: z.infer<typeof GetUserSchema>;
-}
+const AccountInfo: FC = () => {
+  const { user, mutate } = useContext(UserContext);
 
-const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
-  const router = useRouter();
   const EditUserSchema = BaseCreateUserSchema.pick({
     username: true,
     email: true,
@@ -30,7 +29,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
       .email({ message: 'Email must be a valid email address.' })
       .refine(
         async (email) => {
-          if (user.email === email) return true;
+          if (user!.email === email) return true;
           return validateEmailRequest(email);
         },
         { message: 'Email is already taken.' },
@@ -41,7 +40,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
       .max(20, { message: 'Username must be less than 20 characters.' })
       .refine(
         async (username) => {
-          if (user.username === username) return true;
+          if (user!.username === username) return true;
           return validateUsernameRequest(username);
         },
         { message: 'Username is already taken.' },
@@ -53,29 +52,29 @@ const AccountInfo: FC<AccountInfoProps> = ({ user }) => {
   >({
     resolver: zodResolver(EditUserSchema),
     defaultValues: {
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      username: user!.username,
+      email: user!.email,
+      firstName: user!.firstName,
+      lastName: user!.lastName,
     },
   });
 
   const [inEditMode, setInEditMode] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof EditUserSchema>) => {
-    const response = await fetch(`/api/users/${user.id}/edit`, {
-      body: JSON.stringify(data),
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) {
-      throw new Error('Something went wrong.');
+    const loadingToast = toast.loading('Submitting edits...');
+    try {
+      await sendEditUserRequest({ user: user!, data });
+      await mutate!();
+      setInEditMode(false);
+      toast.remove(loadingToast);
+      toast.success('Edits submitted successfully.');
+    } catch (error) {
+      setInEditMode(false);
+      toast.remove(loadingToast);
+      createErrorToast(error);
+      await mutate!();
     }
-
-    await response.json();
-
-    router.reload();
   };
 
   return (
