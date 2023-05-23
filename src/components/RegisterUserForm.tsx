@@ -1,12 +1,14 @@
-import sendRegisterUserRequest from '@/requests/sendRegisterUserRequest';
+import sendRegisterUserRequest from '@/requests/User/sendRegisterUserRequest';
 import { CreateUserValidationSchemaWithUsernameAndEmailCheck } from '@/services/User/schema/CreateUserValidationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import ErrorAlert from './ui/alerts/ErrorAlert';
+
+import createErrorToast from '@/util/createErrorToast';
+import toast from 'react-hot-toast';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -21,7 +23,6 @@ const RegisterUserForm: FC = () => {
   >({ resolver: zodResolver(CreateUserValidationSchemaWithUsernameAndEmailCheck) });
 
   const { errors } = formState;
-  const [serverResponseError, setServerResponseError] = useState('');
 
   const onSubmit = async (
     data: z.infer<typeof CreateUserValidationSchemaWithUsernameAndEmailCheck>,
@@ -31,11 +32,10 @@ const RegisterUserForm: FC = () => {
       reset();
       router.push('/', undefined, { shallow: true });
     } catch (error) {
-      setServerResponseError(
-        error instanceof Error
-          ? error.message
-          : 'Something went wrong. We could not register your account.',
-      );
+      createErrorToast({
+        toast,
+        error,
+      });
     }
   };
   return (
@@ -44,11 +44,6 @@ const RegisterUserForm: FC = () => {
       noValidate
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div>
-        {serverResponseError && (
-          <ErrorAlert error={serverResponseError} setError={setServerResponseError} />
-        )}
-      </div>
       <div>
         <div className="flex flex-col lg:flex-row lg:space-x-3">
           <div className="lg:w-[50%]">

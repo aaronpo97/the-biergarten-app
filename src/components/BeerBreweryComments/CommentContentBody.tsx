@@ -2,7 +2,8 @@ import UserContext from '@/contexts/UserContext';
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import { format } from 'date-fns';
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
-import { Link, Rating } from 'react-daisyui';
+import { Rating } from 'react-daisyui';
+import Link from 'next/link';
 import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 
 import { z } from 'zod';

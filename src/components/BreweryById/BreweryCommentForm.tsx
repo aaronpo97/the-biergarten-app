@@ -1,27 +1,21 @@
-import sendCreateBeerCommentRequest from '@/requests/BeerComment/sendCreateBeerCommentRequest';
-
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-import { FunctionComponent } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { z } from 'zod';
-
-import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
+import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
+import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FC } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { z } from 'zod';
+import sendCreateBreweryCommentRequest from '@/requests/BreweryComment/sendCreateBreweryCommentRequest';
 import createErrorToast from '@/util/createErrorToast';
 import CommentForm from '../ui/CommentForm';
 
-interface BeerCommentFormProps {
-  beerPost: z.infer<typeof beerPostQueryResult>;
-  mutate: ReturnType<typeof useBeerPostComments>['mutate'];
+interface BreweryCommentFormProps {
+  breweryPost: z.infer<typeof BreweryPostQueryResult>;
+  mutate: ReturnType<typeof useBreweryPostComments>['mutate'];
 }
 
-const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
-  beerPost,
-  mutate,
-}) => {
+const BreweryCommentForm: FC<BreweryCommentFormProps> = ({ breweryPost, mutate }) => {
   const { register, handleSubmit, formState, watch, reset, setValue } = useForm<
     z.infer<typeof CreateCommentValidationSchema>
   >({
@@ -34,10 +28,10 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   ) => {
     const loadingToast = toast.loading('Posting a new comment...');
     try {
-      await sendCreateBeerCommentRequest({
+      await sendCreateBreweryCommentRequest({
         content: data.content,
         rating: data.rating,
-        beerPostId: beerPost.id,
+        breweryPostId: breweryPost.id,
       });
       reset();
       toast.remove(loadingToast);
@@ -63,4 +57,4 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   );
 };
 
-export default BeerCommentForm;
+export default BreweryCommentForm;

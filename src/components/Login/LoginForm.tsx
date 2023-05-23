@@ -1,13 +1,14 @@
-import sendLoginUserRequest from '@/requests/sendLoginUserRequest';
+import sendLoginUserRequest from '@/requests/User/sendLoginUserRequest';
 import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
-import ToastContext from '@/contexts/ToastContext';
-import ErrorAlert from '../ui/alerts/ErrorAlert';
+import toast from 'react-hot-toast';
+
+import createErrorToast from '@/util/createErrorToast';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
@@ -28,23 +29,20 @@ const LoginForm = () => {
 
   const { errors } = formState;
 
-  const [responseError, setResponseError] = useState<string>('');
-
   const { mutate } = useContext(UserContext);
-  const { toast } = useContext(ToastContext);
 
   const onSubmit: SubmitHandler<LoginT> = async (data) => {
+    const loadingToast = toast.loading('Logging in...');
     try {
-      const id = toast.loading('Logging in.');
       await sendLoginUserRequest(data);
       await mutate!();
+      toast.remove(loadingToast);
+      toast.success('Logged in!');
       await router.push(`/user/current`);
-      toast.remove(id);
     } catch (error) {
-      if (error instanceof Error) {
-        setResponseError(error.message);
-        reset();
-      }
+      toast.remove(loadingToast);
+      createErrorToast(error);
+      reset();
     }
   };
 
@@ -82,7 +80,6 @@ const LoginForm = () => {
         </FormSegment>
       </div>
 
-      {responseError && <ErrorAlert error={responseError} setError={setResponseError} />}
       <div className="w-full">
         <Button type="submit" isSubmitting={formState.isSubmitting}>
           Login

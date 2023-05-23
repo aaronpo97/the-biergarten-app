@@ -1,8 +1,8 @@
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 
-const validateUsername = async (username: string) => {
-  const response = await fetch(`/api/users/check-username?username=${username}`);
+const validateEmailRequest = async (email: string) => {
+  const response = await fetch(`/api/users/check-email?email=${email}`);
   const json = await response.json();
 
   const parsed = APIResponseValidationSchema.safeParse(json);
@@ -12,14 +12,14 @@ const validateUsername = async (username: string) => {
   }
 
   const parsedPayload = z
-    .object({ usernameIsTaken: z.boolean() })
+    .object({ emailIsTaken: z.boolean() })
     .safeParse(parsed.data.payload);
 
   if (!parsedPayload.success) {
     return false;
   }
 
-  return !parsedPayload.data.usernameIsTaken;
+  return !parsedPayload.data.emailIsTaken;
 };
 
-export default validateUsername;
+export default validateEmailRequest;

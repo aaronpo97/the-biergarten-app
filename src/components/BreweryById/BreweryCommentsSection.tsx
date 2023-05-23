@@ -3,92 +3,15 @@ import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQuer
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
 
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
-import ToastContext from '@/contexts/ToastContext';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';
-import CommentForm from '../ui/CommentForm';
+import BreweryCommentForm from './BreweryCommentForm';
 
 interface BreweryBeerSectionProps {
   breweryPost: z.infer<typeof BreweryPostQueryResult>;
 }
-
-interface BreweryCommentFormProps {
-  breweryPost: z.infer<typeof BreweryPostQueryResult>;
-  mutate: ReturnType<typeof useBreweryPostComments>['mutate'];
-}
-
-const BreweryCommentValidationSchemaWithId = CreateCommentValidationSchema.extend({
-  breweryPostId: z.string(),
-});
-
-const sendCreateBreweryCommentRequest = async ({
-  content,
-  rating,
-  breweryPostId,
-}: z.infer<typeof BreweryCommentValidationSchemaWithId>) => {
-  const response = await fetch(`/api/breweries/${breweryPostId}/comments`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content, rating }),
-  });
-
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-
-  const data = await response.json();
-  const parsedResponse = APIResponseValidationSchema.safeParse(data);
-  if (!parsedResponse.success) {
-    throw new Error('Invalid API response');
-  }
-
-  const parsedPayload = CommentQueryResult.safeParse(parsedResponse.data.payload);
-  if (!parsedPayload.success) {
-    throw new Error('Invalid API response payload');
-  }
-
-  return parsedPayload.data;
-};
-
-const BreweryCommentForm: FC<BreweryCommentFormProps> = ({ breweryPost, mutate }) => {
-  const { register, handleSubmit, formState, watch, reset, setValue } = useForm<
-    z.infer<typeof CreateCommentValidationSchema>
-  >({
-    defaultValues: { rating: 0 },
-    resolver: zodResolver(CreateCommentValidationSchema),
-  });
-
-  const { toast } = useContext(ToastContext);
-  const onSubmit: SubmitHandler<z.infer<typeof CreateCommentValidationSchema>> = async (
-    data,
-  ) => {
-    await sendCreateBreweryCommentRequest({
-      content: data.content,
-      rating: data.rating,
-      breweryPostId: breweryPost.id,
-    });
-    await mutate();
-    toast.loading('Created new comment.');
-    reset();
-  };
-
-  return (
-    <CommentForm
-      handleSubmit={handleSubmit}
-      onSubmit={onSubmit}
-      watch={watch}
-      setValue={setValue}
-      formState={formState}
-      register={register}
-    />
-  );
-};
 
 const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) => {
   const { user } = useContext(UserContext);

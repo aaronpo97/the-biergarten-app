@@ -3,16 +3,14 @@ import { NextPage } from 'next';
 
 import { Tab } from '@headlessui/react';
 import Head from 'next/head';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
-import { z } from 'zod';
-import DBClient from '@/prisma/DBClient';
 import AccountInfo from '@/components/Account/AccountInfo';
+import { useContext } from 'react';
+import UserContext from '@/contexts/UserContext';
 
-interface AccountPageProps {
-  user: z.infer<typeof GetUserSchema>;
-}
+const AccountPage: NextPage = () => {
+  const { user } = useContext(UserContext);
+  if (!user) return null;
 
-const AccountPage: NextPage<AccountPageProps> = ({ user }) => {
   return (
     <>
       <Head>
@@ -30,7 +28,7 @@ const AccountPage: NextPage<AccountPageProps> = ({ user }) => {
             </div>
 
             <div className="flex flex-col items-center space-y-1">
-              <p className="text-3xl font-bold">Hello, {user.username}!</p>
+              <p className="text-3xl font-bold">Hello, {user!.username}!</p>
               <p className="text-lg">Welcome to your account page.</p>
             </div>
           </div>
@@ -50,7 +48,7 @@ const AccountPage: NextPage<AccountPageProps> = ({ user }) => {
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
-                  <AccountInfo user={user} />
+                  <AccountInfo />
                 </Tab.Panel>
                 <Tab.Panel>Content 3</Tab.Panel>
               </Tab.Panels>
@@ -64,30 +62,4 @@ const AccountPage: NextPage<AccountPageProps> = ({ user }) => {
 
 export default AccountPage;
 
-export const getServerSideProps = withPageAuthRequired(async (context, session) => {
-  const { id } = session;
-
-  const user: z.infer<typeof GetUserSchema> | null =
-    await DBClient.instance.user.findUnique({
-      where: { id },
-      select: {
-        username: true,
-        email: true,
-        accountIsVerified: true,
-        firstName: true,
-        lastName: true,
-        dateOfBirth: true,
-        id: true,
-        createdAt: true,
-      },
-    });
-
-  if (!user) {
-    return { redirect: { destination: '/login', permanent: false } };
-  }
-  return {
-    props: {
-      user: JSON.parse(JSON.stringify(user)),
-    },
-  };
-});
+export const getServerSideProps = withPageAuthRequired();

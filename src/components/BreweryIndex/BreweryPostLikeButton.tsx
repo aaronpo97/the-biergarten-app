@@ -1,6 +1,6 @@
 import useCheckIfUserLikesBreweryPost from '@/hooks/data-fetching/brewery-likes/useCheckIfUserLikesBreweryPost';
 import useGetBreweryPostLikeCount from '@/hooks/data-fetching/brewery-likes/useGetBreweryPostLikeCount';
-import sendBreweryPostLikeRequest from '@/requests/sendBreweryPostLikeRequest';
+import sendBreweryPostLikeRequest from '@/requests/BreweryPostLike/sendBreweryPostLikeRequest';
 import { FC, useState } from 'react';
 import LikeButton from '../ui/LikeButton';
 
