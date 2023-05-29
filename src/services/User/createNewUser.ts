@@ -31,6 +31,7 @@ const createNewUser = async ({
       dateOfBirth: true,
       createdAt: true,
       accountIsVerified: true,
+      updatedAt: true,
     },
   });
 
