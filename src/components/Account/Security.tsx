@@ -19,7 +19,7 @@ const Security: FunctionComponent = () => {
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof UpdatePasswordSchema>> = async (data) => {
-    await sendUpdatePasswordRequest(data)
+    await sendUpdatePasswordRequest(data);
 
     reset();
   };

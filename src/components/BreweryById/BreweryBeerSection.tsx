@@ -22,8 +22,8 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
   });
   const { ref: penultimateBeerPostRef } = useInView({
     /**
-     * When the last beer post comes into view, call setSize from
-     * useBeerPostsByBrewery to load more beer posts.
+     * When the last beer post comes into view, call setSize from useBeerPostsByBrewery to
+     * load more beer posts.
      */
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
@@ -60,9 +60,8 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
                 const isPenultimateBeerPost = index === beerPosts.length - 2;
 
                 /**
-                 * Attach a ref to the second last beer post in the list.
-                 * When it comes into view, the component will call
-                 * setSize to load more beer posts.
+                 * Attach a ref to the second last beer post in the list. When it comes
+                 * into view, the component will call setSize to load more beer posts.
                  */
 
                 return (
@@ -91,8 +90,8 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
 
           {
             /**
-             * If there are more beer posts to load, show a loading component
-             * with a skeleton loader and a loading spinner.
+             * If there are more beer posts to load, show a loading component with a
+             * skeleton loader and a loading spinner.
              */
             !!isLoadingMore && !isAtEnd && (
               <BeerRecommendationLoadingComponent length={PAGE_SIZE} />

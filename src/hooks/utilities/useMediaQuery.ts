@@ -18,9 +18,8 @@ import { useState, useEffect } from 'react';
  */
 const useMediaQuery = (query: `(${string})`) => {
   /**
-   * Initialize the matches state variable to false. This is updated whenever the
-   * viewport size changes (i.e. when the component is mounted and when the window is
-   * resized)
+   * Initialize the matches state variable to false. This is updated whenever the viewport
+   * size changes (i.e. when the component is mounted and when the window is resized)
    */
   const [matches, setMatches] = useState(false);
 
@@ -35,8 +34,8 @@ const useMediaQuery = (query: `(${string})`) => {
     }
 
     /**
-     * Add a resize event listener to the window object, and update the `matches`
-     * state variable whenever the viewport size changes.
+     * Add a resize event listener to the window object, and update the `matches` state
+     * variable whenever the viewport size changes.
      */
     const listener = () => setMatches(media.matches);
     window.addEventListener('resize', listener);

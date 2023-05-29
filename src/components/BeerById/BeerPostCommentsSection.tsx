@@ -67,8 +67,8 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
 
       {
         /**
-         * If the comments are loading, show a loading component. Otherwise, show
-         * the comments.
+         * If the comments are loading, show a loading component. Otherwise, show the
+         * comments.
          */
         isLoading ? (
           <div className="card bg-base-300 pb-6">
