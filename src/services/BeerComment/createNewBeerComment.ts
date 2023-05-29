@@ -3,8 +3,8 @@ import { z } from 'zod';
 import CreateCommentValidationSchema from '../types/CommentSchema/CreateCommentValidationSchema';
 
 const CreateNewBeerCommentServiceSchema = CreateCommentValidationSchema.extend({
-  userId: z.string().uuid(),
-  beerPostId: z.string().uuid(),
+  userId: z.string().cuid(),
+  beerPostId: z.string().cuid(),
 });
 
 const createNewBeerComment = async ({

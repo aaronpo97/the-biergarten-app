@@ -38,7 +38,7 @@ const LoginForm = () => {
       await mutate!();
       toast.remove(loadingToast);
       toast.success('Logged in!');
-      await router.push(`/user/current`);
+      await router.push(`/users/current`);
     } catch (error) {
       toast.remove(loadingToast);
       createErrorToast(error);

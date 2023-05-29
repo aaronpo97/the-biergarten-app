@@ -14,6 +14,7 @@ const updateUserToBeConfirmedById = async (id: string) => {
       createdAt: true,
       firstName: true,
       lastName: true,
+      updatedAt: true,
       dateOfBirth: true,
     },
   });

@@ -83,12 +83,12 @@ const router = createRouter<
 
 router.post(
   getCurrentUser,
-  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
+  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
   sendLikeRequest,
 );
 
 router.get(
-  validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
+  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
   getLikeCount,
 );
 

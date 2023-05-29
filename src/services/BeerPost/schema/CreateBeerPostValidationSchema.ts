@@ -31,13 +31,13 @@ const CreateBeerPostValidationSchema = z.object({
       required_error: 'Type id is required.',
       invalid_type_error: 'Type id must be a string.',
     })
-    .uuid({ message: 'Invalid type id.' }),
+    .cuid({ message: 'Invalid type id.' }),
   breweryId: z
     .string({
       required_error: 'Brewery id is required.',
       invalid_type_error: 'Brewery id must be a string.',
     })
-    .uuid({ message: 'Invalid brewery id.' }),
+    .cuid({ message: 'Invalid brewery id.' }),
 });
 
 export default CreateBeerPostValidationSchema;

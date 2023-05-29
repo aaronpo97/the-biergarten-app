@@ -5,7 +5,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { z } from 'zod';
 
 const BeerCommentValidationSchemaWithId = CreateCommentValidationSchema.extend({
-  beerPostId: z.string().uuid(),
+  beerPostId: z.string().cuid(),
 });
 
 const sendCreateBeerCommentRequest = async ({

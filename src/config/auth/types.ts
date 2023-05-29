@@ -4,7 +4,7 @@ import { NextApiRequest } from 'next';
 import { z } from 'zod';
 
 export const BasicUserInfoSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   username: z.string(),
 });
 

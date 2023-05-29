@@ -87,14 +87,14 @@ const router = createRouter<
 
 router
   .delete(
-    validateRequest({ querySchema: z.object({ id: z.string().uuid() }) }),
+    validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
     getCurrentUser,
     checkIfCommentOwner,
     deleteComment,
   )
   .put(
     validateRequest({
-      querySchema: z.object({ id: z.string().uuid() }),
+      querySchema: z.object({ id: z.string().cuid() }),
       bodySchema: CreateCommentValidationSchema,
     }),
     getCurrentUser,
