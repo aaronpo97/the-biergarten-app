@@ -21,14 +21,14 @@ const confirmUser = async (req: ConfirmUserRequest, res: NextApiResponse) => {
   const { token } = req.query;
 
   const user = req.user!;
-  const { id } = verifyConfirmationToken(token);
+  const { id } = await verifyConfirmationToken(token);
+
+  if (user.accountIsVerified) {
+    throw new ServerError('Your account is already verified.', 400);
+  }
 
   if (user.id !== id) {
     throw new ServerError('Could not confirm user.', 401);
-  }
-
-  if (user.accountIsVerified) {
-    throw new ServerError('User is already verified.', 400);
   }
 
   await updateUserToBeConfirmedById(id);

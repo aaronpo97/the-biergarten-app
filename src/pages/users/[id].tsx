@@ -1,6 +1,5 @@
-import { FC } from "react"
+import { FC } from 'react';
 
-const UserInfoPage: FC = () => null
+const UserInfoPage: FC = () => null;
 
-
-export default UserInfoPage
+export default UserInfoPage;

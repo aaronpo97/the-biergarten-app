@@ -39,14 +39,12 @@ const useUser = () => {
 
     const parsedPayload = GetUserSchema.safeParse(parsed.data.payload);
 
-    console.log(parsedPayload)
     if (!parsedPayload.success) {
       throw new Error(parsedPayload.error.message);
     }
 
     return parsedPayload.data;
   });
-
 
   return { user, isLoading, error: error as unknown, mutate };
 };
