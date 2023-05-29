@@ -6,6 +6,7 @@ import Head from 'next/head';
 import AccountInfo from '@/components/Account/AccountInfo';
 import { useContext } from 'react';
 import UserContext from '@/contexts/UserContext';
+import Security from '@/components/Account/Security';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -50,7 +51,10 @@ const AccountPage: NextPage = () => {
                 <Tab.Panel>
                   <AccountInfo />
                 </Tab.Panel>
-                <Tab.Panel>Content 3</Tab.Panel>
+                <Tab.Panel>
+                  <Security />
+                </Tab.Panel>
+                <Tab.Panel>Your posts!</Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
           </div>

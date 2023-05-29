@@ -4,7 +4,7 @@ import beerPostQueryResult from './schema/BeerPostQueryResult';
 import CreateBeerPostValidationSchema from './schema/CreateBeerPostValidationSchema';
 
 const CreateBeerPostWithUserSchema = CreateBeerPostValidationSchema.extend({
-  userId: z.string().uuid(),
+  userId: z.string().cuid(),
 });
 
 const createNewBeerPost = async ({

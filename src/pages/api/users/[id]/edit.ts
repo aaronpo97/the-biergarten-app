@@ -97,7 +97,7 @@ router.put(
   getCurrentUser,
   validateRequest({
     bodySchema: EditUserSchema,
-    querySchema: z.object({ id: z.string().uuid() }),
+    querySchema: z.object({ id: z.string().cuid() }),
   }),
   checkIfUserCanEditUser,
   editUser,

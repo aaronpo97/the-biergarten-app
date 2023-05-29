@@ -39,7 +39,7 @@ router.get(
   getCurrentUser,
   validateRequest({
     querySchema: z.object({
-      id: z.string().uuid(),
+      id: z.string().cuid(),
     }),
   }),
   checkIfLiked,

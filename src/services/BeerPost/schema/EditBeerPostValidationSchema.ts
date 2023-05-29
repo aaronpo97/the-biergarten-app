@@ -4,6 +4,6 @@ import CreateBeerPostValidationSchema from './CreateBeerPostValidationSchema';
 const EditBeerPostValidationSchema = CreateBeerPostValidationSchema.omit({
   breweryId: true,
   typeId: true,
-}).extend({ id: z.string().uuid() });
+}).extend({ id: z.string().cuid() });
 
 export default EditBeerPostValidationSchema;

@@ -50,7 +50,7 @@ const getBeerRecommendationsRequest = async (
 router.get(
   validateRequest({
     querySchema: z.object({
-      id: z.string().uuid(),
+      id: z.string().cuid(),
       page_num: z.string().regex(/^[0-9]+$/),
       page_size: z.string().regex(/^[0-9]+$/),
     }),

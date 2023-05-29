@@ -79,7 +79,7 @@ const router = createRouter<
 router.post(
   validateRequest({
     bodySchema: CreateCommentValidationSchema,
-    querySchema: z.object({ id: z.string().uuid() }),
+    querySchema: z.object({ id: z.string().cuid() }),
   }),
   getCurrentUser,
   createComment,
@@ -88,7 +88,7 @@ router.post(
 router.get(
   validateRequest({
     querySchema: z.object({
-      id: z.string().uuid(),
+      id: z.string().cuid(),
       page_size: z.coerce.number().int().positive(),
       page_num: z.coerce.number().int().positive(),
     }),

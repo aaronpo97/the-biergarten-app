@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id                String            @id @default(uuid())
+  id                String            @id @default(cuid())
   username          String            @unique
   firstName         String
   lastName          String
@@ -36,7 +36,7 @@ model User {
 }
 
 model BeerPost {
-  id            String         @id @default(uuid())
+  id            String         @id @default(cuid())
   name          String
   ibu           Float
   abv           Float
@@ -55,7 +55,7 @@ model BeerPost {
 }
 
 model BeerPostLike {
-  id         String    @id @default(uuid())
+  id         String    @id @default(cuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
   likedBy    User      @relation(fields: [likedById], references: [id], onDelete: Cascade)
@@ -65,7 +65,7 @@ model BeerPostLike {
 }
 
 model BreweryPostLike {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
   likedBy       User        @relation(fields: [likedById], references: [id], onDelete: Cascade)
@@ -75,7 +75,7 @@ model BreweryPostLike {
 }
 
 model BeerComment {
-  id         String    @id @default(uuid())
+  id         String    @id @default(cuid())
   rating     Int
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
@@ -87,7 +87,7 @@ model BeerComment {
 }
 
 model BeerType {
-  id         String     @id @default(uuid())
+  id         String     @id @default(cuid())
   name       String
   createdAt  DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime?  @updatedAt @db.Timestamptz(3)
@@ -97,7 +97,7 @@ model BeerType {
 }
 
 model Location {
-  id              String       @id @default(uuid())
+  id              String       @id @default(cuid())
   city            String
   stateOrProvince String?
   country         String?
@@ -109,7 +109,7 @@ model Location {
 }
 
 model BreweryPost {
-  id              String            @id @default(uuid())
+  id              String            @id @default(cuid())
   name            String
   location        Location          @relation(fields: [locationId], references: [id])
   locationId      String            @unique
@@ -126,7 +126,7 @@ model BreweryPost {
 }
 
 model BreweryComment {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   rating        Int
   breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
@@ -138,7 +138,7 @@ model BreweryComment {
 }
 
 model BeerImage {
-  id         String    @id @default(uuid())
+  id         String    @id @default(cuid())
   beerPost   BeerPost  @relation(fields: [beerPostId], references: [id], onDelete: Cascade)
   beerPostId String
   path       String
@@ -151,7 +151,7 @@ model BeerImage {
 }
 
 model BreweryImage {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   breweryPost   BreweryPost @relation(fields: [breweryPostId], references: [id], onDelete: Cascade)
   breweryPostId String
   path          String

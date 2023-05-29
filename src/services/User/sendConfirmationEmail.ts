@@ -14,7 +14,7 @@ const sendConfirmationEmail = async ({ id, username, email }: UserSchema) => {
 
   const subject = 'Confirm your email';
   const name = username;
-  const url = `${BASE_URL}/api/users/confirm?token=${confirmationToken}`;
+  const url = `${BASE_URL}/users/confirm?token=${confirmationToken}`;
   const address = email;
 
   const html = render(Welcome({ name, url, subject })!);

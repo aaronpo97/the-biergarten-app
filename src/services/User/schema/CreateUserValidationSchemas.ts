@@ -69,3 +69,11 @@ export const CreateUserValidationSchemaWithUsernameAndEmailCheck =
     message: 'Passwords do not match.',
     path: ['confirmPassword'],
   });
+
+export const UpdatePasswordSchema = BaseCreateUserSchema.pick({
+  password: true,
+  confirmPassword: true,
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match.',
+  path: ['confirmPassword'],
+});
