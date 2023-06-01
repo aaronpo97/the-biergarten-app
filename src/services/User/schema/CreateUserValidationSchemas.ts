@@ -4,6 +4,8 @@ import sub from 'date-fns/sub';
 import { z } from 'zod';
 
 const MINIMUM_DATE_OF_BIRTH = sub(new Date(), { years: 19 });
+const NAME_REGEX =
+  /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ðæ ,.'-]+$/u;
 
 export const BaseCreateUserSchema = z.object({
   password: z
@@ -23,14 +25,14 @@ export const BaseCreateUserSchema = z.object({
     .string()
     .min(1, { message: 'First name must not be empty.' })
     .max(20, { message: 'First name must be less than 20 characters.' })
-    .refine((firstName) => /^[a-zA-Z]+$/.test(firstName), {
-      message: 'First name must only contain letters.',
+    .refine((firstName) => NAME_REGEX.test(firstName), {
+      message: 'First name must only contain letters or hyphens.',
     }),
   lastName: z
     .string()
     .min(1, { message: 'Last name must not be empty.' })
     .max(20, { message: 'Last name must be less than 20 characters.' })
-    .refine((lastName) => /^[a-zA-Z]+$/.test(lastName), {
+    .refine((lastName) => NAME_REGEX.test(lastName), {
       message: 'Last name must only contain letters.',
     }),
   dateOfBirth: z

@@ -21,7 +21,7 @@ const AccountPage: NextPage = () => {
           content="Your account page. Here you can view your account information, change your settings, and view your posts."
         />
       </Head>
-      <div className="flex h-full flex-col items-center bg-base-300">
+      <div className="flex flex-col items-center">
         <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-7/12">
           <div className="flex flex-col items-center space-y-3">
             <div className="avatar">
@@ -34,24 +34,19 @@ const AccountPage: NextPage = () => {
             </div>
           </div>
 
-          <div className="w-full">
+          <div className="h-full w-full">
             <Tab.Group>
               <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
-                <Tab className="tab tab-md w-1/3 uppercase ui-selected:tab-active">
-                  Account Info
+                <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                  Account Info and Security
                 </Tab>
-                <Tab className="tab tab-md w-1/3 uppercase ui-selected:tab-active">
-                  Security
-                </Tab>
-                <Tab className="tab tab-md w-1/3 uppercase ui-selected:tab-active">
+                <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
                   Your Posts
                 </Tab>
               </Tab.List>
               <Tab.Panels>
-                <Tab.Panel>
+                <Tab.Panel className="h-full space-y-5">
                   <AccountInfo />
-                </Tab.Panel>
-                <Tab.Panel>
                   <Security />
                 </Tab.Panel>
                 <Tab.Panel>Your posts!</Tab.Panel>

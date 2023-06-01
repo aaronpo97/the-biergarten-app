@@ -22,14 +22,14 @@ const toastToClassName = (toastType: Toast['type']) => {
 const CustomToast: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <>
-      <Toaster position="bottom-center">
+      <Toaster position="bottom-right">
         {(t) => {
           const alertType = toastToClassName(t.type);
           return (
             <div
-              className={`alert ${alertType} w-11/12 flex-row items-center shadow-lg animate-in fade-in duration-200 lg:w-6/12`}
+              className={`alert ${alertType} w-11/12 flex-row items-center shadow-lg animate-in fade-in duration-200 lg:w-2/12`}
             >
-              <p>{resolveValue(t.message, t)}</p>
+              <p className='text-sm'>{resolveValue(t.message, t)}</p>
               {t.type !== 'loading' && (
                 <div>
                   <button
