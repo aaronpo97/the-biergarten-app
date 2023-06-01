@@ -7,6 +7,7 @@ import AccountInfo from '@/components/Account/AccountInfo';
 import { useContext } from 'react';
 import UserContext from '@/contexts/UserContext';
 import Security from '@/components/Account/Security';
+import DeleteAccount from '@/components/Account/DeleteAccount';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -48,6 +49,7 @@ const AccountPage: NextPage = () => {
                 <Tab.Panel className="h-full space-y-5">
                   <AccountInfo />
                   <Security />
+                  <DeleteAccount />
                 </Tab.Panel>
                 <Tab.Panel>Your posts!</Tab.Panel>
               </Tab.Panels>

@@ -12,7 +12,7 @@ const DesktopLinks: FC = () => {
 
   return (
     <div className="block flex-none">
-      <ul className="menu menu-horizontal p-0">
+      <ul className="menu menu-horizontal menu-sm px-1">
         {pages.map((page) => {
           return (
             <li key={page.slug}>
@@ -43,7 +43,7 @@ const MobileLinks: FC = () => {
         </label>
         <ul
           tabIndex={0}
-          className="dropdown-content menu rounded-box menu-compact mt-3 w-48 bg-base-100 p-2 shadow"
+          className="menu-compact dropdown-content menu rounded-box mt-3 w-48 bg-base-100 p-2 shadow"
         >
           {pages.map((page) => (
             <li key={page.slug}>

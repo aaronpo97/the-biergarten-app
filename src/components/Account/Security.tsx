@@ -20,7 +20,7 @@ const Security: FunctionComponent = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof UpdatePasswordSchema>> = async (data) => {
     await sendUpdatePasswordRequest(data);
-    setEditToggled(value => !value)
+    setEditToggled((value) => !value);
     reset();
   };
 
