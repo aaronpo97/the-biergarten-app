@@ -47,116 +47,123 @@ const AccountInfo: FC = () => {
       ),
   });
 
-  const { register, handleSubmit, formState, reset } = useForm<
-    z.infer<typeof EditUserSchema>
-  >({
-    resolver: zodResolver(EditUserSchema),
-    defaultValues: {
-      username: user!.username,
-      email: user!.email,
-      firstName: user!.firstName,
-      lastName: user!.lastName,
-    },
-  });
-
-  const [inEditMode, setInEditMode] = useState(false);
+  const [editToggled, setEditToggled] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof EditUserSchema>) => {
     const loadingToast = toast.loading('Submitting edits...');
     try {
       await sendEditUserRequest({ user: user!, data });
-      await mutate!();
-      setInEditMode(false);
       toast.remove(loadingToast);
       toast.success('Edits submitted successfully.');
+      setEditToggled(false);
+      await mutate!();
     } catch (error) {
-      setInEditMode(false);
+      setEditToggled(false);
       toast.remove(loadingToast);
       createErrorToast(error);
       await mutate!();
     }
   };
+  const { register, handleSubmit, formState, reset } = useForm<
+    z.infer<typeof EditUserSchema>
+  >({
+    resolver: zodResolver(EditUserSchema),
+  });
 
   return (
-    <div className="mt-8">
-      <div className="flex flex-col space-y-3">
-        <form
-          className="form-control space-y-5"
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-        >
-          <label className="label w-36 cursor-pointer p-0">
-            <span className="label-text font-bold uppercase">Enable Edit</span>
-            <Switch
-              checked={inEditMode}
-              className="toggle"
-              onClick={() => {
-                setInEditMode((editMode) => !editMode);
-                reset();
-              }}
-              id="edit-toggle"
-            />
-          </label>
-
-          <div>
-            <FormInfo>
-              <FormLabel htmlFor="username">Username</FormLabel>
-              <FormError>{formState.errors.username?.message}</FormError>
-            </FormInfo>
-            <FormTextInput
-              type="text"
-              disabled={!inEditMode || formState.isSubmitting}
-              error={!!formState.errors.username}
-              id="username"
-              formValidationSchema={register('username')}
-            />
-            <FormInfo>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <FormError>{formState.errors.email?.message}</FormError>
-            </FormInfo>
-            <FormTextInput
-              type="email"
-              disabled={!inEditMode || formState.isSubmitting}
-              error={!!formState.errors.email}
-              id="email"
-              formValidationSchema={register('email')}
-            />
-
-            <div className="flex space-x-3">
-              <div className="w-1/2">
-                <FormInfo>
-                  <FormLabel htmlFor="firstName">First Name</FormLabel>
-                  <FormError>{formState.errors.firstName?.message}</FormError>
-                </FormInfo>
-                <FormTextInput
-                  type="text"
-                  disabled={!inEditMode || formState.isSubmitting}
-                  error={!!formState.errors.firstName}
-                  id="firstName"
-                  formValidationSchema={register('firstName')}
-                />
-              </div>
-              <div className="w-1/2">
-                <FormInfo>
-                  <FormLabel htmlFor="lastName">Last Name</FormLabel>
-                  <FormError>{formState.errors.lastName?.message}</FormError>
-                </FormInfo>
-                <FormTextInput
-                  type="text"
-                  disabled={!inEditMode || formState.isSubmitting}
-                  error={!!formState.errors.lastName}
-                  id="lastName"
-                  formValidationSchema={register('lastName')}
-                />
-              </div>
-            </div>
+    <div className="card mt-8">
+      <div className="card-body flex flex-col space-y-3">
+        <div className="flex w-full items-center justify-between space-x-5">
+          <div className="">
+            <h1 className="text-lg font-bold">Edit Your Account Info</h1>
+            <p>Update your personal account information.</p>
           </div>
-          {inEditMode && (
-            <button className="btn-primary btn w-full" type="submit">
-              Save Changes
-            </button>
-          )}
-        </form>
+          <div>
+            <Switch
+              className="toggle"
+              id="edit-toggle"
+              checked={editToggled}
+              onClick={async () => {
+                setEditToggled((val) => !val);
+                await mutate!();
+                reset({
+                  username: user!.username,
+                  email: user!.email,
+                  firstName: user!.firstName,
+                  lastName: user!.lastName,
+                });
+              }}
+            />
+          </div>
+        </div>
+        {editToggled && (
+          <form
+            className="form-control space-y-5"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
+            <div>
+              <FormInfo>
+                <FormLabel htmlFor="username">Username</FormLabel>
+                <FormError>{formState.errors.username?.message}</FormError>
+              </FormInfo>
+              <FormTextInput
+                type="text"
+                disabled={!editToggled || formState.isSubmitting}
+                error={!!formState.errors.username}
+                id="username"
+                formValidationSchema={register('username')}
+              />
+              <FormInfo>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <FormError>{formState.errors.email?.message}</FormError>
+              </FormInfo>
+              <FormTextInput
+                type="email"
+                disabled={!editToggled || formState.isSubmitting}
+                error={!!formState.errors.email}
+                id="email"
+                formValidationSchema={register('email')}
+              />
+
+              <div className="flex space-x-3">
+                <div className="w-1/2">
+                  <FormInfo>
+                    <FormLabel htmlFor="firstName">First Name</FormLabel>
+                    <FormError>{formState.errors.firstName?.message}</FormError>
+                  </FormInfo>
+                  <FormTextInput
+                    type="text"
+                    disabled={!editToggled || formState.isSubmitting}
+                    error={!!formState.errors.firstName}
+                    id="firstName"
+                    formValidationSchema={register('firstName')}
+                  />
+                </div>
+                <div className="w-1/2">
+                  <FormInfo>
+                    <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                    <FormError>{formState.errors.lastName?.message}</FormError>
+                  </FormInfo>
+                  <FormTextInput
+                    type="text"
+                    disabled={!editToggled || formState.isSubmitting}
+                    error={!!formState.errors.lastName}
+                    id="lastName"
+                    formValidationSchema={register('lastName')}
+                  />
+                </div>
+              </div>
+              <button
+                className="btn-primary btn my-5 w-full"
+                type="submit"
+                disabled={!editToggled || formState.isSubmitting}
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

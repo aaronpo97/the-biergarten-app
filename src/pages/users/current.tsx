@@ -20,7 +20,7 @@ const ProtectedPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Hello, {user?.firstName}! | The Biergarten App</title>
+        <title>Hello! | The Biergarten App</title>
       </Head>
       <div className="flex h-full flex-col items-center justify-center space-y-3 bg-primary text-center">
         {isLoading && <Spinner size={isDesktop ? 'xl' : 'md'} />}
