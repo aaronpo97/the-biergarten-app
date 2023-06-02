@@ -1,17 +1,24 @@
 import { Switch } from '@headlessui/react';
-import { FunctionComponent, useState } from 'react';
+import { Dispatch, FunctionComponent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { UpdatePasswordSchema } from '@/services/User/schema/CreateUserValidationSchemas';
 import sendUpdatePasswordRequest from '@/requests/User/sendUpdatePasswordRequest';
+import { AccountPageState, AccountPageAction } from '@/reducers/accountPageReducer';
+import toast from 'react-hot-toast';
+import createErrorToast from '@/util/createErrorToast';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormTextInput from '../ui/forms/FormTextInput';
 
-const Security: FunctionComponent = () => {
-  const [editToggled, setEditToggled] = useState(false);
+interface SecurityProps {
+  pageState: AccountPageState;
+  dispatch: Dispatch<AccountPageAction>;
+}
+
+const Security: FunctionComponent<SecurityProps> = ({ dispatch, pageState }) => {
   const { register, handleSubmit, formState, reset } = useForm<
     z.infer<typeof UpdatePasswordSchema>
   >({
@@ -19,9 +26,16 @@ const Security: FunctionComponent = () => {
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof UpdatePasswordSchema>> = async (data) => {
-    await sendUpdatePasswordRequest(data);
-    setEditToggled((value) => !value);
-    reset();
+    const loadingToast = toast.loading('Changing password.');
+    try {
+      await sendUpdatePasswordRequest(data);
+      toast.remove(loadingToast);
+      toast.success('Password changed successfully.');
+      dispatch({ type: 'CLOSE_ALL' });
+    } catch (error) {
+      dispatch({ type: 'CLOSE_ALL' });
+      createErrorToast(error);
+    }
   };
 
   return (
@@ -36,15 +50,15 @@ const Security: FunctionComponent = () => {
             <Switch
               className="toggle"
               id="edit-toggle"
-              checked={editToggled}
+              checked={pageState.securityOpen}
               onClick={() => {
-                setEditToggled((val) => !val);
+                dispatch({ type: 'TOGGLE_SECURITY_VISIBILITY' });
                 reset();
               }}
             />
           </div>
         </div>
-        {editToggled && (
+        {pageState.securityOpen && (
           <form className="form-control" noValidate onSubmit={handleSubmit(onSubmit)}>
             <FormInfo>
               <FormLabel htmlFor="password">New Password</FormLabel>
@@ -52,7 +66,7 @@ const Security: FunctionComponent = () => {
             </FormInfo>
             <FormTextInput
               type="password"
-              disabled={!editToggled || formState.isSubmitting}
+              disabled={!pageState.securityOpen || formState.isSubmitting}
               error={!!formState.errors.password}
               id="password"
               formValidationSchema={register('password')}
@@ -63,7 +77,7 @@ const Security: FunctionComponent = () => {
             </FormInfo>
             <FormTextInput
               type="password"
-              disabled={!editToggled || formState.isSubmitting}
+              disabled={!pageState.securityOpen || formState.isSubmitting}
               error={!!formState.errors.confirmPassword}
               id="password"
               formValidationSchema={register('confirmPassword')}
@@ -71,7 +85,7 @@ const Security: FunctionComponent = () => {
 
             <button
               className="btn-primary btn mt-5"
-              disabled={!editToggled || formState.isSubmitting}
+              disabled={!pageState.securityOpen || formState.isSubmitting}
               type="submit"
             >
               Update

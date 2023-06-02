@@ -1,10 +1,16 @@
+import { AccountPageState, AccountPageAction } from '@/reducers/accountPageReducer';
 import { Switch } from '@headlessui/react';
 import { useRouter } from 'next/router';
-import { FunctionComponent, useRef, useState } from 'react';
+import { Dispatch, FunctionComponent, useRef } from 'react';
 
-const DeleteAccount: FunctionComponent = () => {
-  const [deleteToggled, setDeleteToggled] = useState(false);
-
+interface DeleteAccountProps {
+  pageState: AccountPageState;
+  dispatch: Dispatch<AccountPageAction>;
+}
+const DeleteAccount: FunctionComponent<DeleteAccountProps> = ({
+  dispatch,
+  pageState,
+}) => {
   const deleteRef = useRef<null | HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -20,14 +26,14 @@ const DeleteAccount: FunctionComponent = () => {
             <Switch
               className="toggle"
               id="edit-toggle"
-              checked={deleteToggled}
+              checked={pageState.deleteAccountOpen}
               onClick={() => {
-                setDeleteToggled((val) => !val);
+                dispatch({ type: 'TOGGLE_DELETE_ACCOUNT_VISIBILITY' });
               }}
             />
           </div>
         </div>
-        {deleteToggled && (
+        {pageState.deleteAccountOpen && (
           <>
             <div className="mt-3">
               <button

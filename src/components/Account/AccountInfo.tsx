@@ -3,19 +3,25 @@ import validateUsernameRequest from '@/requests/validateUsernameRequest';
 import { BaseCreateUserSchema } from '@/services/User/schema/CreateUserValidationSchemas';
 import { Switch } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FC, useContext, useState } from 'react';
+import { Dispatch, FC, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
 import sendEditUserRequest from '@/requests/User/sendEditUserRequest';
 import createErrorToast from '@/util/createErrorToast';
 import { toast } from 'react-hot-toast';
+import { AccountPageAction, AccountPageState } from '@/reducers/accountPageReducer';
 import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormTextInput from '../ui/forms/FormTextInput';
 
-const AccountInfo: FC = () => {
+interface AccountInfoProps {
+  pageState: AccountPageState;
+  dispatch: Dispatch<AccountPageAction>;
+}
+
+const AccountInfo: FC<AccountInfoProps> = ({ pageState, dispatch }) => {
   const { user, mutate } = useContext(UserContext);
 
   const EditUserSchema = BaseCreateUserSchema.pick({
@@ -47,18 +53,16 @@ const AccountInfo: FC = () => {
       ),
   });
 
-  const [editToggled, setEditToggled] = useState(false);
-
   const onSubmit = async (data: z.infer<typeof EditUserSchema>) => {
     const loadingToast = toast.loading('Submitting edits...');
     try {
       await sendEditUserRequest({ user: user!, data });
       toast.remove(loadingToast);
       toast.success('Edits submitted successfully.');
-      setEditToggled(false);
+      dispatch({ type: 'CLOSE_ALL' });
       await mutate!();
     } catch (error) {
-      setEditToggled(false);
+      dispatch({ type: 'CLOSE_ALL' });
       toast.remove(loadingToast);
       createErrorToast(error);
       await mutate!();
@@ -82,9 +86,9 @@ const AccountInfo: FC = () => {
             <Switch
               className="toggle"
               id="edit-toggle"
-              checked={editToggled}
+              checked={pageState.accountInfoOpen}
               onClick={async () => {
-                setEditToggled((val) => !val);
+                dispatch({ type: 'TOGGLE_ACCOUNT_INFO_VISIBILITY' });
                 await mutate!();
                 reset({
                   username: user!.username,
@@ -96,7 +100,7 @@ const AccountInfo: FC = () => {
             />
           </div>
         </div>
-        {editToggled && (
+        {pageState.accountInfoOpen && (
           <form
             className="form-control space-y-5"
             onSubmit={handleSubmit(onSubmit)}
@@ -109,7 +113,7 @@ const AccountInfo: FC = () => {
               </FormInfo>
               <FormTextInput
                 type="text"
-                disabled={!editToggled || formState.isSubmitting}
+                disabled={!pageState.accountInfoOpen || formState.isSubmitting}
                 error={!!formState.errors.username}
                 id="username"
                 formValidationSchema={register('username')}
@@ -120,7 +124,7 @@ const AccountInfo: FC = () => {
               </FormInfo>
               <FormTextInput
                 type="email"
-                disabled={!editToggled || formState.isSubmitting}
+                disabled={!pageState.accountInfoOpen || formState.isSubmitting}
                 error={!!formState.errors.email}
                 id="email"
                 formValidationSchema={register('email')}
@@ -134,7 +138,7 @@ const AccountInfo: FC = () => {
                   </FormInfo>
                   <FormTextInput
                     type="text"
-                    disabled={!editToggled || formState.isSubmitting}
+                    disabled={!pageState.accountInfoOpen || formState.isSubmitting}
                     error={!!formState.errors.firstName}
                     id="firstName"
                     formValidationSchema={register('firstName')}
@@ -147,7 +151,7 @@ const AccountInfo: FC = () => {
                   </FormInfo>
                   <FormTextInput
                     type="text"
-                    disabled={!editToggled || formState.isSubmitting}
+                    disabled={!pageState.accountInfoOpen || formState.isSubmitting}
                     error={!!formState.errors.lastName}
                     id="lastName"
                     formValidationSchema={register('lastName')}
@@ -157,7 +161,7 @@ const AccountInfo: FC = () => {
               <button
                 className="btn-primary btn my-5 w-full"
                 type="submit"
-                disabled={!editToggled || formState.isSubmitting}
+                disabled={!pageState.accountInfoOpen || formState.isSubmitting}
               >
                 Save Changes
               </button>
