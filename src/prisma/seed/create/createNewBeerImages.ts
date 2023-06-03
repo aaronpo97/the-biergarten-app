@@ -22,7 +22,6 @@ const createNewBeerImages = async ({
   joinData: { beerPosts, users },
 }: CreateNewBeerImagesArgs) => {
   const prisma = DBClient.instance;
-  const createdAt = faker.date.past(1);
 
   const beerImageData: BeerImageData[] = [];
 
@@ -33,6 +32,7 @@ const createNewBeerImages = async ({
     const caption = faker.lorem.sentence();
     const alt = faker.lorem.sentence();
     const path = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+    const createdAt = faker.date.past({ years: 1 });
 
     beerImageData.push({
       path,

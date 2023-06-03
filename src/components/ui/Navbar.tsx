@@ -12,11 +12,11 @@ const DesktopLinks: FC = () => {
 
   return (
     <div className="block flex-none">
-      <ul className="menu menu-horizontal p-0">
+      <ul className="menu menu-horizontal menu-sm">
         {pages.map((page) => {
           return (
             <li key={page.slug}>
-              <Link tabIndex={0} href={page.slug}>
+              <Link tabIndex={0} href={page.slug} className="hover:bg-primary-focus">
                 <span
                   className={`text-lg uppercase ${
                     currentURL === page.slug ? 'font-black' : 'font-medium'
@@ -43,7 +43,7 @@ const MobileLinks: FC = () => {
         </label>
         <ul
           tabIndex={0}
-          className="dropdown-content menu rounded-box menu-compact mt-3 w-48 bg-base-100 p-2 shadow"
+          className="menu-compact dropdown-content menu rounded-box mt-3 w-48 bg-base-100 p-2 shadow"
         >
           {pages.map((page) => (
             <li key={page.slug}>
@@ -64,7 +64,7 @@ const Navbar = () => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <nav className="navbar sticky top-0 z-50 bg-primary text-primary-content">
+    <div className="navbar sticky top-0 z-50 bg-primary text-primary-content">
       <div className="flex-1">
         <Link className="btn-ghost btn normal-case" href="/">
           <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
@@ -98,7 +98,7 @@ const Navbar = () => {
         </div>
       </div>
       <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
-    </nav>
+    </div>
   );
 };
 export default Navbar;

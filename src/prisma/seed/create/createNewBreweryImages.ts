@@ -26,7 +26,7 @@ const createNewBreweryImages = async ({
   joinData: { breweryPosts, users },
 }: CreateBreweryImagesArgs) => {
   const prisma = DBClient.instance;
-  const createdAt = faker.date.past(1);
+  const createdAt = faker.date.past({ years: 1 });
   const breweryImageData: BreweryImageData[] = [];
 
   // eslint-disable-next-line no-plusplus

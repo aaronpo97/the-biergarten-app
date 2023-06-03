@@ -4,12 +4,21 @@ import { NextPage } from 'next';
 import { Tab } from '@headlessui/react';
 import Head from 'next/head';
 import AccountInfo from '@/components/Account/AccountInfo';
-import { useContext } from 'react';
+import { useContext, useReducer } from 'react';
 import UserContext from '@/contexts/UserContext';
 import Security from '@/components/Account/Security';
+import DeleteAccount from '@/components/Account/DeleteAccount';
+import accountPageReducer from '@/reducers/accountPageReducer';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
+
+  const [pageState, dispatch] = useReducer(accountPageReducer, {
+    accountInfoOpen: false,
+    securityOpen: false,
+    deleteAccountOpen: false,
+  });
+
   if (!user) return null;
 
   return (
@@ -46,8 +55,9 @@ const AccountPage: NextPage = () => {
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel className="h-full space-y-5">
-                  <AccountInfo />
-                  <Security />
+                  <AccountInfo pageState={pageState} dispatch={dispatch} />
+                  <Security pageState={pageState} dispatch={dispatch} />
+                  <DeleteAccount pageState={pageState} dispatch={dispatch} />
                 </Tab.Panel>
                 <Tab.Panel>Your posts!</Tab.Panel>
               </Tab.Panels>

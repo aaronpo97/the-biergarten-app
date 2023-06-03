@@ -121,10 +121,10 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
                 ))}
               </Rating>
             </div>
-            <div className="btn-group btn-group-horizontal">
+            <div className="join">
               <button
                 type="button"
-                className="btn-xs btn lg:btn-sm"
+                className="btn-xs join-item btn lg:btn-sm"
                 disabled={isSubmitting || isDeleting}
                 onClick={() => {
                   setInEditMode(false);
@@ -135,13 +135,13 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || isDeleting}
-                className="btn-xs btn lg:btn-sm"
+                className="btn-xs join-item btn lg:btn-sm"
               >
                 Save
               </button>
               <button
                 type="button"
-                className="btn-xs btn lg:btn-sm"
+                className="btn-xs join-item btn lg:btn-sm"
                 onClick={onDelete}
                 disabled={isDeleting || formState.isSubmitting}
               >

@@ -45,7 +45,7 @@ const createNewBeerTypes = async ({ joinData }: CreateNewBeerTypesArgs) => {
 
   types.forEach((type) => {
     const user = users[Math.floor(Math.random() * users.length)];
-    const createdAt = faker.date.past(1);
+    const createdAt = faker.date.past({ years: 1 });
 
     beerTypeData.push({
       name: type,
