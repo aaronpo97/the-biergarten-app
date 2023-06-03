@@ -1,9 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { faker } from '@faker-js/faker';
 import { User } from '@prisma/client';
-import { GeocodeFeature } from '@mapbox/mapbox-sdk/services/geocoding';
 import DBClient from '../../DBClient';
-import geocode from '../../../config/mapbox/geocoder';
+import canadianCities from '../util/canadianCities';
 
 interface CreateNewLocationsArgs {
   numberOfLocations: number;
@@ -19,6 +18,7 @@ interface LocationData {
   coordinates: number[];
   address: string;
   postedById: string;
+  createdAt: Date;
 }
 
 const createNewLocations = async ({
@@ -27,42 +27,25 @@ const createNewLocations = async ({
 }: CreateNewLocationsArgs) => {
   const prisma = DBClient.instance;
 
-  const locationNames: string[] = [];
+  const locationData: LocationData[] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfLocations; i++) {
-    locationNames.push(faker.address.cityName());
-  }
-
-  const geocodePromises: Promise<GeocodeFeature>[] = [];
-
-  locationNames.forEach((locationName) => {
-    geocodePromises.push(geocode(locationName));
-  });
-
-  const geocodedLocations = await Promise.all(geocodePromises);
-
-  const locationData: LocationData[] = [];
-
-  geocodedLocations.forEach((geodata) => {
+    const randomIndex = Math.floor(Math.random() * canadianCities.length);
+    const randomCity = canadianCities[randomIndex];
     const randomUser = joinData.users[Math.floor(Math.random() * joinData.users.length)];
-
-    const city = geodata.text;
-    const postedById = randomUser.id;
-    const stateOrProvince = geodata.context?.find((c) => c.id.startsWith('region'))?.text;
-    const country = geodata.context?.find((c) => c.id.startsWith('country'))?.text;
-    const coordinates = geodata.center;
-    const address = geodata.place_name;
+    canadianCities.splice(randomIndex, 1);
 
     locationData.push({
-      city,
-      stateOrProvince,
-      country,
-      coordinates,
-      address,
-      postedById,
+      address: randomCity.city,
+      city: randomCity.city,
+      coordinates: [randomCity.longitude, randomCity.latitude],
+      createdAt: faker.date.past({ years: 1 }),
+      postedById: randomUser.id,
+      stateOrProvince: randomCity.province,
+      country: 'Canada',
     });
-  });
+  }
 
   await prisma.location.createMany({ data: locationData, skipDuplicates: true });
 

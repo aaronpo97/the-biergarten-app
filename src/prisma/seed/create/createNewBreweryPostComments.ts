@@ -26,13 +26,14 @@ const createNewBreweryPostComments = async ({
   const { breweryPosts, users } = joinData;
   const prisma = DBClient.instance;
   const breweryPostCommentData: BreweryPostCommentData[] = [];
-  const createdAt = faker.date.past(1);
-  const rating = Math.floor(Math.random() * 5) + 1;
+
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfComments; i++) {
     const content = faker.lorem.lines(3).replace(/\n/g, ' ');
     const user = users[Math.floor(Math.random() * users.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
+    const createdAt = faker.date.past({ years: 1 });
+    const rating = Math.floor(Math.random() * 5) + 1;
 
     breweryPostCommentData.push({
       content,

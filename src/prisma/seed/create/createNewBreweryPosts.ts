@@ -36,8 +36,8 @@ const createNewBreweryPosts = async ({
     locations.splice(locationIndex, 1); // Remove the location from the array
     const description = faker.lorem.lines(20).replace(/(\r\n|\n|\r)/gm, ' ');
     const user = users[Math.floor(Math.random() * users.length)];
-    const createdAt = faker.date.past(1);
-    const dateEstablished = faker.date.past(40);
+    const createdAt = faker.date.past({ years: 1 });
+    const dateEstablished = faker.date.past({ years: 40 });
 
     breweryData.push({
       name,

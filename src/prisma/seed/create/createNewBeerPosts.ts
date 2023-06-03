@@ -36,7 +36,7 @@ const createNewBeerPosts = async ({
     const user = users[Math.floor(Math.random() * users.length)];
     const beerType = beerTypes[Math.floor(Math.random() * beerTypes.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
-    const createdAt = faker.date.past(1);
+    const createdAt = faker.date.past({ years: 1 });
 
     const abv = Math.floor(Math.random() * (12 - 4) + 4);
     const ibu = Math.floor(Math.random() * (60 - 10) + 10);

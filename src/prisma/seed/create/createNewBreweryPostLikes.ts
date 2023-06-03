@@ -1,9 +1,12 @@
 import type { BreweryPost, User } from '@prisma/client';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { faker } from '@faker-js/faker';
 import DBClient from '../../DBClient';
 
 interface BreweryPostLikeData {
   breweryPostId: string;
   likedById: string;
+  createdAt: Date;
 }
 
 const createNewBreweryPostLikes = async ({
@@ -21,10 +24,12 @@ const createNewBreweryPostLikes = async ({
   for (let i = 0; i < numberOfLikes; i++) {
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const user = users[Math.floor(Math.random() * users.length)];
+    const createdAt = faker.date.past({ years: 1 });
 
     breweryPostLikeData.push({
       breweryPostId: breweryPost.id,
       likedById: user.id,
+      createdAt,
     });
   }
   await DBClient.instance.breweryPostLike.createMany({

@@ -31,11 +31,11 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfUsers; i++) {
     const randomValue = crypto.randomBytes(1).toString('hex');
-    const firstName = faker.name.firstName();
-    const lastName = faker.name.lastName();
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
     const username = `${firstName[0]}.${lastName}.${randomValue}`.toLowerCase();
     const email = faker.internet
-      .email(firstName, randomValue, 'example.com')
+      .email({ firstName, lastName, provider: 'example.com' })
       .toLowerCase();
 
     const userAvailable =
@@ -51,7 +51,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     takenEmails.push(email);
 
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
-    const createdAt = faker.date.past(1);
+    const createdAt = faker.date.past({ years: 4 });
 
     const user = {
       firstName,

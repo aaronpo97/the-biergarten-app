@@ -15,7 +15,7 @@ const DesktopLinks: FC = () => {
       <ul className="menu menu-horizontal menu-sm">
         {pages.map((page) => {
           return (
-            <li key={page.slug} >
+            <li key={page.slug}>
               <Link tabIndex={0} href={page.slug} className="hover:bg-primary-focus">
                 <span
                   className={`text-lg uppercase ${
