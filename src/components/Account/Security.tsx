@@ -72,14 +72,14 @@ const Security: FunctionComponent<SecurityProps> = ({ dispatch, pageState }) => 
               formValidationSchema={register('password')}
             />
             <FormInfo>
-              <FormLabel htmlFor="password">Confirm Password</FormLabel>
+              <FormLabel htmlFor="confirm-password">Confirm Password</FormLabel>
               <FormError>{formState.errors.confirmPassword?.message}</FormError>
             </FormInfo>
             <FormTextInput
               type="password"
               disabled={!pageState.securityOpen || formState.isSubmitting}
               error={!!formState.errors.confirmPassword}
-              id="password"
+              id="confirm-password"
               formValidationSchema={register('confirmPassword')}
             />
 

@@ -13,7 +13,7 @@ interface SendEditUserRequestArgs {
 }
 
 const sendEditUserRequest = async ({ user, data }: SendEditUserRequestArgs) => {
-  const response = await fetch(`/api/users/${user!.id}/edit`, {
+  const response = await fetch(`/api/users/${user!.id}`, {
     body: JSON.stringify(data),
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

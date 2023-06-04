@@ -46,7 +46,12 @@ const useUser = () => {
     return parsedPayload.data;
   });
 
-  return { user, isLoading, error: error as unknown, mutate };
+  return {
+    mutate,
+    isLoading,
+    user: error ? undefined : user,
+    error: error as unknown,
+  };
 };
 
 export default useUser;

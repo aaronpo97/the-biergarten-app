@@ -1,4 +1,4 @@
-import UserContext from '@/contexts/UserContext';
+import UserContext, { AuthProvider } from '@/contexts/UserContext';
 
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
@@ -13,15 +13,12 @@ import Layout from '@/components/ui/Layout';
 import useUser from '@/hooks/auth/useUser';
 import CustomToast from '@/components/ui/CustomToast';
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-});
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
-export default function App({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
     themeChange(false);
   }, []);
-  const { user, isLoading, error, mutate } = useUser();
 
   return (
     <>
@@ -38,15 +35,17 @@ export default function App({ Component, pageProps }: AppProps) {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
         />
       </Head>
-      <UserContext.Provider value={{ user, isLoading, error, mutate }}>
+      <AuthProvider>
         <Layout>
           <CustomToast>
             <Component {...pageProps} />
           </CustomToast>
         </Layout>
-      </UserContext.Provider>
+      </AuthProvider>
 
       <Analytics />
     </>
   );
-}
+};
+
+export default App;
