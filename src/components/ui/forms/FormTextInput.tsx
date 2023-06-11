@@ -11,6 +11,7 @@ interface FormInputProps {
   id: string;
   height?: string;
   disabled?: boolean;
+  autoComplete?: string;
 }
 
 /**
@@ -33,6 +34,7 @@ interface FormInputProps {
  * @param param0.id The id of the input.
  * @param param0.height The height of the input.
  * @param param0.disabled Whether or not the input is disabled.
+ * @param param0.autoComplete The autocomplete value for the input.
  */
 const FormTextInput: FunctionComponent<FormInputProps> = ({
   placeholder = '',
