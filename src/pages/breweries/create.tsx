@@ -26,7 +26,6 @@ import UploadImageValidationSchema from '@/services/types/ImageSchema/UploadImag
 import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
 
 const AddressAutofill = dynamic(
-  // @ts-expect-error
   () => import('@mapbox/search-js-react').then((mod) => mod.AddressAutofill),
   { ssr: false },
 );
