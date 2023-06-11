@@ -37,6 +37,9 @@ export const BaseCreateUserSchema = z.object({
     }),
   dateOfBirth: z
     .string()
+    .refine((val) => !Number.isNaN(Date.parse(val)), {
+      message: 'Date is invalid.',
+    })
     .refine((dateOfBirth) => new Date(dateOfBirth) <= MINIMUM_DATE_OF_BIRTH, {
       message: 'You must be at least 19 years old to register.',
     }),

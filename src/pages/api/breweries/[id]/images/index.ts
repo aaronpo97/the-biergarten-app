@@ -12,8 +12,8 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import addBeerImageToDB from '@/services/BeerImage/addBeerImageToDB';
 import ImageMetadataValidationSchema from '@/services/types/ImageSchema/ImageMetadataValidationSchema';
+import addBreweryImageToDB from '@/services/BreweryImage/addBreweryImageToDB';
 
 const { storage } = cloudinaryConfig;
 
@@ -34,14 +34,14 @@ const uploadMiddleware = expressWrapper(
   ),
 );
 
-interface UploadBeerPostImagesRequest extends UserExtendedNextApiRequest {
+interface UploadBreweryPostImagesRequest extends UserExtendedNextApiRequest {
   files?: Express.Multer.File[];
   query: { id: string };
   body: z.infer<typeof ImageMetadataValidationSchema>;
 }
 
 const processImageData = async (
-  req: UploadBeerPostImagesRequest,
+  req: UploadBreweryPostImagesRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const { files, user, body } = req;
@@ -50,25 +50,25 @@ const processImageData = async (
     throw new ServerError('No images uploaded', 400);
   }
 
-  const beerImages = await addBeerImageToDB({
+  const breweryImages = await addBreweryImageToDB({
     alt: body.alt,
     caption: body.caption,
-    beerPostId: req.query.id,
+    breweryPostId: req.query.id,
     userId: user!.id,
     files,
   });
 
   res.status(200).json({
     success: true,
-    message: `Successfully uploaded ${beerImages.length} image${
-      beerImages.length > 1 ? 's' : ''
+    message: `Successfully uploaded ${breweryImages.length} image${
+      breweryImages.length > 1 ? 's' : ''
     }`,
     statusCode: 200,
   });
 };
 
 const router = createRouter<
-  UploadBeerPostImagesRequest,
+  UploadBreweryPostImagesRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 

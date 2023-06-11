@@ -11,7 +11,7 @@ interface ProcessImageDataArgs {
   userId: string;
 }
 
-const processImageDataIntoDB = ({
+const addBeerImageToDB = ({
   alt,
   caption,
   files,
@@ -36,4 +36,4 @@ const processImageDataIntoDB = ({
   return Promise.all(beerImagePromises);
 };
 
-export default processImageDataIntoDB;
+export default addBeerImageToDB;

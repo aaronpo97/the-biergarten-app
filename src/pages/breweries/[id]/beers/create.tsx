@@ -33,7 +33,6 @@ export const getServerSideProps = withPageAuthRequired<CreateBeerPageProps>(
     const id = context.params?.id as string;
 
     const breweryPost = await getBreweryPostById(id);
-
     const beerTypes = await DBClient.instance.beerType.findMany();
 
     return {

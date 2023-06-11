@@ -34,14 +34,14 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
   types = [],
   brewery,
 }) => {
-  const { register, handleSubmit, formState } = useForm<
-    z.infer<typeof CreateBeerPostWithImagesValidationSchema>
-  >({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<z.infer<typeof CreateBeerPostWithImagesValidationSchema>>({
     resolver: zodResolver(CreateBeerPostWithImagesValidationSchema),
     defaultValues: { breweryId: brewery.id },
   });
-
-  const { errors, isSubmitting } = formState;
 
   const onSubmit: SubmitHandler<
     z.infer<typeof CreateBeerPostWithImagesValidationSchema>
@@ -51,9 +51,9 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
     }
 
     try {
-      const response = await sendCreateBeerPostRequest(data);
-      await sendUploadBeerImagesRequest({ beerPost: response, images: data.images });
-      await router.push(`/beers/${response.id}`);
+      const beerPost = await sendCreateBeerPostRequest(data);
+      await sendUploadBeerImagesRequest({ beerPost, images: data.images });
+      await router.push(`/beers/${beerPost.id}`);
       toast.success('Created beer post.');
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';

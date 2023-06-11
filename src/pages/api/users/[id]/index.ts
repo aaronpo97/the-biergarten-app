@@ -4,6 +4,7 @@ import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
+import deleteUserById from '@/services/User/deleteUserById';
 import findUserByEmail from '@/services/User/findUserByEmail';
 import findUserById from '@/services/User/findUserById';
 import findUserByUsername from '@/services/User/findUserByUsername';
@@ -21,11 +22,12 @@ const EditUserSchema = BaseCreateUserSchema.pick({
   lastName: true,
 });
 
-interface EditUserRequest extends UserExtendedNextApiRequest {
+interface UserRouteRequest extends UserExtendedNextApiRequest {
+  query: { id: string };
+}
+
+interface EditUserRequest extends UserRouteRequest {
   body: z.infer<typeof EditUserSchema>;
-  query: {
-    id: string;
-  };
 }
 
 const checkIfUserCanEditUser = async (
@@ -41,7 +43,7 @@ const checkIfUserCanEditUser = async (
   }
 
   if (authenticatedUser.id !== userToUpdate.id) {
-    throw new ServerError('You are not permitted to edit this user', 403);
+    throw new ServerError('You are not permitted to modify this user', 403);
   }
 
   await next();
@@ -88,6 +90,24 @@ const editUser = async (
   });
 };
 
+const deleteUser = async (
+  req: UserRouteRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { id } = req.query;
+  const deletedUser = await deleteUserById(id);
+
+  if (!deletedUser) {
+    throw new ServerError('Could not find a user with that id.', 400);
+  }
+
+  res.send({
+    message: 'Successfully deleted user.',
+    statusCode: 200,
+    success: true,
+  });
+};
+
 const router = createRouter<
   EditUserRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
@@ -101,6 +121,15 @@ router.put(
   }),
   checkIfUserCanEditUser,
   editUser,
+);
+
+router.delete(
+  getCurrentUser,
+  validateRequest({
+    querySchema: z.object({ id: z.string().cuid() }),
+  }),
+  checkIfUserCanEditUser,
+  deleteUser,
 );
 
 const handler = router.handler(NextConnectOptions);

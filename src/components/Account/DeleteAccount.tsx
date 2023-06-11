@@ -1,7 +1,10 @@
+import UserContext from '@/contexts/UserContext';
 import { AccountPageState, AccountPageAction } from '@/reducers/accountPageReducer';
+
 import { Switch } from '@headlessui/react';
 import { useRouter } from 'next/router';
-import { Dispatch, FunctionComponent, useRef } from 'react';
+import { Dispatch, FunctionComponent, useContext, useRef } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface DeleteAccountProps {
   pageState: AccountPageState;
@@ -13,6 +16,26 @@ const DeleteAccount: FunctionComponent<DeleteAccountProps> = ({
 }) => {
   const deleteRef = useRef<null | HTMLDialogElement>(null);
   const router = useRouter();
+  const { user, mutate } = useContext(UserContext);
+
+  const onDeleteSubmit = async () => {
+    deleteRef.current!.close();
+    const loadingToast = toast.loading(
+      'Deleting your account. We are sad to see you go. 😭',
+    );
+    const request = await fetch(`/api/users/${user?.id}`, {
+      method: 'DELETE',
+    });
+
+    if (!request.ok) {
+      throw new Error('Could not delete that user.');
+    }
+
+    toast.remove(loadingToast);
+    toast.success('Deleted your account. Goodbye. 😓');
+    await mutate!();
+    router.push('/');
+  };
 
   return (
     <div className="card w-full space-y-4">
@@ -49,10 +72,7 @@ const DeleteAccount: FunctionComponent<DeleteAccountProps> = ({
                   <div className="modal-action flex-col space-x-0 space-y-3">
                     <button
                       className="btn-error btn-sm btn w-full"
-                      onClick={async () => {
-                        deleteRef.current!.close();
-                        await router.replace('/api/users/logout');
-                      }}
+                      onClick={onDeleteSubmit}
                     >
                       Okay, delete my account
                     </button>
