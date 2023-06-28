@@ -4,7 +4,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 
 import { FaBeer } from 'react-icons/fa';
-import CreateBreweryPostForm from '@/components/CreateBreweryPostForm';
+import CreateBreweryPostForm from '@/components/BreweryPost/CreateBreweryPostForm';
 
 const CreateBreweryPage: NextPage = () => {
   return (
