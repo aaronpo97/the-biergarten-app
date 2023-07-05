@@ -14,7 +14,7 @@ interface EditPageProps {
   beerPost: z.infer<typeof beerPostQueryResult>;
 }
 
-const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
+const EditBeerPostPage: NextPage<EditPageProps> = ({ beerPost }) => {
   const pageTitle = `Edit \u201c${beerPost.name}\u201d`;
 
   return (
@@ -44,7 +44,7 @@ const EditPage: NextPage<EditPageProps> = ({ beerPost }) => {
   );
 };
 
-export default EditPage;
+export default EditBeerPostPage;
 
 export const getServerSideProps = withPageAuthRequired<EditPageProps>(
   async (context, session) => {
