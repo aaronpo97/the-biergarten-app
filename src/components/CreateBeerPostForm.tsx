@@ -4,10 +4,10 @@ import router from 'next/router';
 import { FunctionComponent } from 'react';
 import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
 import { z } from 'zod';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import sendCreateBeerPostRequest from '@/requests/BeerPost/sendCreateBeerPostRequest';
-import UploadImageValidationSchema from '@/services/types/ImageSchema/UploadImageValidationSchema';
+import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import sendUploadBeerImagesRequest from '@/requests/BeerImage/sendUploadBeerImageRequest';
 
 import toast from 'react-hot-toast';

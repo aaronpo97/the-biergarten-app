@@ -4,7 +4,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';

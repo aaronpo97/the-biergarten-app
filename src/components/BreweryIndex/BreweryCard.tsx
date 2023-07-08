@@ -1,6 +1,6 @@
 import UserContext from '@/contexts/UserContext';
 import useGetBreweryPostLikeCount from '@/hooks/data-fetching/brewery-likes/useGetBreweryPostLikeCount';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 import { FC, useContext } from 'react';
 import Link from 'next/link';
 import { z } from 'zod';

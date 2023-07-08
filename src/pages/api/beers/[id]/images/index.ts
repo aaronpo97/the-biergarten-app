@@ -13,7 +13,7 @@ import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import addBeerImageToDB from '@/services/BeerImage/addBeerImageToDB';
-import ImageMetadataValidationSchema from '@/services/types/ImageSchema/ImageMetadataValidationSchema';
+import ImageMetadataValidationSchema from '@/services/schema/ImageSchema/ImageMetadataValidationSchema';
 
 const { storage } = cloudinaryConfig;
 

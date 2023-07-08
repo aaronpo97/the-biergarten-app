@@ -13,9 +13,9 @@ import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
 
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 import getAllBreweryComments from '@/services/BreweryComment/getAllBreweryComments';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import createNewBreweryComment from '@/services/BreweryComment/createNewBreweryComment';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {

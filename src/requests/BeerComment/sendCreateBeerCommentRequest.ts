@@ -1,5 +1,5 @@
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';

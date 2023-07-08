@@ -1,6 +1,6 @@
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';

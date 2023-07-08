@@ -8,7 +8,7 @@ import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
-import EditBreweryPostValidationSchema from '@/services/BreweryPost/types/EditBreweryPostValidationSchema';
+import EditBreweryPostValidationSchema from '@/services/BreweryPost/schema/EditBreweryPostValidationSchema';
 
 interface BreweryPostRequest extends UserExtendedNextApiRequest {
   query: { id: string };

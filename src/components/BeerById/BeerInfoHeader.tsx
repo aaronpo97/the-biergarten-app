@@ -4,14 +4,14 @@ import { FC, useContext } from 'react';
 
 import UserContext from '@/contexts/UserContext';
 import { FaRegEdit } from 'react-icons/fa';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import BeerPostLikeButton from './BeerPostLikeButton';
 
 interface BeerInfoHeaderProps {
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
 }
 
 const BeerInfoHeader: FC<BeerInfoHeaderProps> = ({ beerPost }) => {

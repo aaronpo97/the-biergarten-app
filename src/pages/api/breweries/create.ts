@@ -6,7 +6,7 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
-import CreateBreweryPostSchema from '@/services/BreweryPost/types/CreateBreweryPostSchema';
+import CreateBreweryPostSchema from '@/services/BreweryPost/schema/CreateBreweryPostSchema';
 import createNewBreweryPost from '@/services/BreweryPost/createNewBreweryPost';
 import geocode from '@/config/mapbox/geocoder';
 import ServerError from '@/config/util/ServerError';

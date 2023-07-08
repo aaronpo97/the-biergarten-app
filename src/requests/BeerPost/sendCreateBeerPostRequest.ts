@@ -1,4 +1,4 @@
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
@@ -24,7 +24,7 @@ const sendCreateBeerPostRequest = async (
     throw new Error(message);
   }
 
-  const parsedPayload = beerPostQueryResult.safeParse(payload);
+  const parsedPayload = BeerPostQueryResult.safeParse(payload);
 
   if (!parsedPayload.success) {
     throw new Error('Invalid API response payload');

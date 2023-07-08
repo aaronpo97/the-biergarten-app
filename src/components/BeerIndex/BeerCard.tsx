@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { FC, useContext } from 'react';
 import Image from 'next/image';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
 import BeerPostLikeButton from '../BeerById/BeerPostLikeButton';
 
-const BeerCard: FC<{ post: z.infer<typeof beerPostQueryResult> }> = ({ post }) => {
+const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) => {
   const { user } = useContext(UserContext);
   const { mutate, likeCount, isLoading } = useGetBeerPostLikeCount(post.id);
 

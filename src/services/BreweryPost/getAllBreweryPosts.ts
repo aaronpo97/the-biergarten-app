@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 
 import { z } from 'zod';
 

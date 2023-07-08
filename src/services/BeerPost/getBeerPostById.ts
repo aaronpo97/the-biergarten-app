@@ -1,11 +1,11 @@
 import DBClient from '@/prisma/DBClient';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 
 const prisma = DBClient.instance;
 
 const getBeerPostById = async (id: string) => {
-  const beerPost: z.infer<typeof beerPostQueryResult> | null =
+  const beerPost: z.infer<typeof BeerPostQueryResult> | null =
     await prisma.beerPost.findFirst({
       select: {
         id: true,

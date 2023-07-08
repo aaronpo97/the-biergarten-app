@@ -1,4 +1,4 @@
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import useSWR from 'swr';
 import { z } from 'zod';
 /**
@@ -23,7 +23,7 @@ const useBeerPostSearch = (query: string | undefined) => {
       }
 
       const json = await response.json();
-      const result = z.array(beerPostQueryResult).parse(json);
+      const result = z.array(BeerPostQueryResult).parse(json);
 
       return result;
     },

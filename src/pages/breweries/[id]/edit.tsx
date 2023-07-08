@@ -1,6 +1,6 @@
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import { NextPage } from 'next';
 import Head from 'next/head';

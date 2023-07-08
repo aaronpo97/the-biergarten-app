@@ -1,7 +1,7 @@
 import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
 import sendCreateBreweryPostRequest from '@/requests/BreweryPost/sendCreateBreweryPostRequest';
-import CreateBreweryPostSchema from '@/services/BreweryPost/types/CreateBreweryPostSchema';
-import UploadImageValidationSchema from '@/services/types/ImageSchema/UploadImageValidationSchema';
+import CreateBreweryPostSchema from '@/services/BreweryPost/schema/CreateBreweryPostSchema';
+import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';
 import { Tab } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';

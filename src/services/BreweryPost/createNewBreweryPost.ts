@@ -1,7 +1,7 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import CreateBreweryPostSchema from './types/CreateBreweryPostSchema';
-import BreweryPostQueryResult from './types/BreweryPostQueryResult';
+import CreateBreweryPostSchema from './schema/CreateBreweryPostSchema';
+import BreweryPostQueryResult from './schema/BreweryPostQueryResult';
 
 const CreateNewBreweryPostWithUserAndLocationSchema = CreateBreweryPostSchema.omit({
   address: true,

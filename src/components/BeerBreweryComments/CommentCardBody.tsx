@@ -1,9 +1,9 @@
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';

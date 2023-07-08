@@ -1,7 +1,7 @@
 import DBClient from '@/prisma/DBClient';
 import { BreweryImage } from '@prisma/client';
 import { z } from 'zod';
-import ImageMetadataValidationSchema from '../types/ImageSchema/ImageMetadataValidationSchema';
+import ImageMetadataValidationSchema from '../schema/ImageSchema/ImageMetadataValidationSchema';
 
 interface ProcessImageDataArgs {
   files: Express.Multer.File[];

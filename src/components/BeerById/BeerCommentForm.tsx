@@ -1,6 +1,6 @@
 import sendCreateBeerCommentRequest from '@/requests/BeerComment/sendCreateBeerCommentRequest';
 
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { FunctionComponent } from 'react';
@@ -8,13 +8,13 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';
 import CommentForm from '../ui/CommentForm';
 
 interface BeerCommentFormProps {
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
   mutate: ReturnType<typeof useBeerPostComments>['mutate'];
 }
 
