@@ -1,4 +1,4 @@
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 import useSWRInfinite from 'swr/infinite';

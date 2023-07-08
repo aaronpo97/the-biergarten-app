@@ -1,19 +1,19 @@
 import UserContext from '@/contexts/UserContext';
 
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import { useRouter } from 'next/router';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import BeerCommentForm from './BeerCommentForm';
 
 import LoadingComponent from './LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';
 
 interface BeerPostCommentsSectionProps {
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
 }
 
 const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost }) => {

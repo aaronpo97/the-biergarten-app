@@ -5,7 +5,7 @@ import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
 import findBeerCommentById from '@/services/BeerComment/findBeerCommentById';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import editBeerCommentById from '@/services/BeerComment/editBeerCommentById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';

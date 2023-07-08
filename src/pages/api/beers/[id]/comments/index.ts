@@ -10,8 +10,8 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
   body: z.infer<typeof CreateCommentValidationSchema>;

@@ -1,7 +1,7 @@
 import UserContext from '@/contexts/UserContext';
 import { Dispatch, SetStateAction, FC, useContext } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 import { z } from 'zod';
 
 interface CommentCardDropdownProps {

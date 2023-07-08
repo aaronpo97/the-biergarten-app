@@ -12,7 +12,7 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import ImageMetadataValidationSchema from '@/services/types/ImageSchema/ImageMetadataValidationSchema';
+import ImageMetadataValidationSchema from '@/services/schema/ImageSchema/ImageMetadataValidationSchema';
 import addBreweryImageToDB from '@/services/BreweryImage/addBreweryImageToDB';
 
 const { storage } = cloudinaryConfig;

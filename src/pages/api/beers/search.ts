@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import DBClient from '@/prisma/DBClient';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 const SearchSchema = z.object({
   search: z.string().min(1),
@@ -18,7 +18,7 @@ interface SearchAPIRequest extends NextApiRequest {
 const search = async (req: SearchAPIRequest, res: NextApiResponse) => {
   const { search: query } = req.query;
 
-  const beers: z.infer<typeof beerPostQueryResult>[] =
+  const beers: z.infer<typeof BeerPostQueryResult>[] =
     await DBClient.instance.beerPost.findMany({
       select: {
         id: true,

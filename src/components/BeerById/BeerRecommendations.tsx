@@ -3,12 +3,12 @@ import { FC, MutableRefObject, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import useBeerRecommendations from '@/hooks/data-fetching/beer-posts/useBeerRecommendations';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import debounce from 'lodash/debounce';
 import BeerRecommendationLoadingComponent from './BeerRecommendationLoadingComponent';
 
 const BeerRecommendationsSection: FC<{
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
 }> = ({ beerPost }) => {
   const PAGE_SIZE = 10;
 

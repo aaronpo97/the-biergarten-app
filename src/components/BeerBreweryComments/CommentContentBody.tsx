@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Rating } from 'react-daisyui';
 import Link from 'next/link';
-import CommentQueryResult from '@/services/types/CommentSchema/CommentQueryResult';
+import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 
 import { z } from 'zod';
 import CommentCardDropdown from './CommentCardDropdown';

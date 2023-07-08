@@ -1,6 +1,6 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import beerPostQueryResult from './schema/BeerPostQueryResult';
+import BeerPostQueryResult from './schema/BeerPostQueryResult';
 import CreateBeerPostValidationSchema from './schema/CreateBeerPostValidationSchema';
 
 const CreateBeerPostWithUserSchema = CreateBeerPostValidationSchema.extend({
@@ -16,7 +16,7 @@ const createNewBeerPost = async ({
   breweryId,
   userId,
 }: z.infer<typeof CreateBeerPostWithUserSchema>) => {
-  const newBeerPost: z.infer<typeof beerPostQueryResult> =
+  const newBeerPost: z.infer<typeof BeerPostQueryResult> =
     await DBClient.instance.beerPost.create({
       data: {
         name,

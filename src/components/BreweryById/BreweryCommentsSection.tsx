@@ -1,8 +1,8 @@
 import UserContext from '@/contexts/UserContext';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
-import CreateCommentValidationSchema from '@/services/types/CommentSchema/CreateCommentValidationSchema';
+import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
 import LoadingComponent from '../BeerById/LoadingComponent';

@@ -3,7 +3,7 @@ import LoadingCard from '@/components/ui/LoadingCard';
 import Spinner from '@/components/ui/Spinner';
 import UserContext from '@/contexts/UserContext';
 import useBreweryPosts from '@/hooks/data-fetching/brewery-posts/useBreweryPosts';
-import BreweryPostQueryResult from '@/services/BreweryPost/types/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, MutableRefObject, useRef } from 'react';

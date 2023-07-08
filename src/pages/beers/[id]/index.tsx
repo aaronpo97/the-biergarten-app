@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 
 import { z } from 'zod';
 
@@ -21,7 +21,7 @@ const [BeerInfoHeader, BeerPostCommentsSection, BeerRecommendations] = [
 ];
 
 interface BeerPageProps {
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
 }
 
 const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {

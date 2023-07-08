@@ -1,5 +1,5 @@
 import DBClient from '@/prisma/DBClient';
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 
 const prisma = DBClient.instance;
@@ -7,7 +7,7 @@ const prisma = DBClient.instance;
 const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
   const skip = (pageNum - 1) * pageSize;
 
-  const beerPosts: z.infer<typeof beerPostQueryResult>[] = await prisma.beerPost.findMany(
+  const beerPosts: z.infer<typeof BeerPostQueryResult>[] = await prisma.beerPost.findMany(
     {
       select: {
         id: true,

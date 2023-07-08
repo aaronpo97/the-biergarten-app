@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const beerPostQueryResult = z.object({
+const BeerPostQueryResult = z.object({
   id: z.string(),
   name: z.string(),
   brewery: z.object({ id: z.string(), name: z.string() }),
@@ -15,4 +15,4 @@ const beerPostQueryResult = z.object({
   createdAt: z.coerce.date(),
 });
 
-export default beerPostQueryResult;
+export default BeerPostQueryResult;

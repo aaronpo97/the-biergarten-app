@@ -1,11 +1,11 @@
-import beerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
 interface UseBeerRecommendationsParams {
   pageSize: number;
-  beerPost: z.infer<typeof beerPostQueryResult>;
+  beerPost: z.infer<typeof BeerPostQueryResult>;
 }
 
 /**
@@ -40,7 +40,7 @@ const UseBeerPostsByBrewery = ({ pageSize, beerPost }: UseBeerRecommendationsPar
       throw new Error('API response validation failed');
     }
 
-    const parsedPayload = z.array(beerPostQueryResult).safeParse(parsed.data.payload);
+    const parsedPayload = z.array(BeerPostQueryResult).safeParse(parsed.data.payload);
     if (!parsedPayload.success) {
       throw new Error('API response validation failed');
     }
