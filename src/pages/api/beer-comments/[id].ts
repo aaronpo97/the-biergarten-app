@@ -38,7 +38,7 @@ const checkIfCommentOwner = async (
     throw new ServerError('You are not authorized to modify this comment', 403);
   }
 
-  await next();
+  return next();
 };
 
 const editComment = async (
@@ -53,7 +53,7 @@ const editComment = async (
     id,
   });
 
-  return res.status(200).json({
+  res.status(200).json({
     success: true,
     message: 'Comment updated successfully',
     statusCode: 200,

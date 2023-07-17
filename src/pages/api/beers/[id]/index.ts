@@ -1,7 +1,6 @@
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import editBeerPostById from '@/services/BeerPost/editBeerPostById';
 import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
@@ -10,6 +9,8 @@ import { createRouter, NextHandler } from 'next-connect';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
+import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 
 interface BeerPostRequest extends UserExtendedNextApiRequest {
   query: { id: string };
@@ -37,7 +38,7 @@ const checkIfBeerPostOwner = async (
     throw new ServerError('You cannot edit that beer post.', 403);
   }
 
-  next();
+  return next();
 };
 
 const editBeerPost = async (
@@ -82,8 +83,21 @@ const router = createRouter<
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
-router.put(getCurrentUser, checkIfBeerPostOwner, editBeerPost);
-router.delete(getCurrentUser, checkIfBeerPostOwner, deleteBeerPost);
+router.put(
+  validateRequest({
+    bodySchema: EditBeerPostValidationSchema,
+    querySchema: z.object({ id: z.string() }),
+  }),
+  getCurrentUser,
+  checkIfBeerPostOwner,
+  editBeerPost,
+);
+router.delete(
+  validateRequest({ querySchema: z.object({ id: z.string() }) }),
+  getCurrentUser,
+  checkIfBeerPostOwner,
+  deleteBeerPost,
+);
 
 const handler = router.handler(NextConnectOptions);
 

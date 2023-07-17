@@ -15,14 +15,14 @@ const CreateBreweryPostSchema = z.object({
       invalid_type_error: 'Description must be a string.',
     })
     .min(1, { message: 'Description is required.' })
-    .max(500, { message: 'Description is too long.' }),
+    .max(1500, { message: 'Description is too long.' }),
   address: z
     .string({
       required_error: 'Address is required.',
       invalid_type_error: 'Address must be a string.',
     })
     .min(1, { message: 'Address is required.' })
-    .max(100, { message: 'Address is too long.' }),
+    .max(300, { message: 'Address is too long.' }),
 
   city: z
     .string({
