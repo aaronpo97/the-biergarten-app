@@ -12,7 +12,7 @@ async function sendEditBeerPostRequest(
   });
 
   if (!response.ok) {
-    throw new Error('something went wrong');
+    throw new Error(`${response.status}: ${response.statusText}`);
   }
 
   const json = await response.json();

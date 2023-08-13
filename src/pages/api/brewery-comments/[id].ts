@@ -39,7 +39,7 @@ const checkIfCommentOwner = async (
     throw new ServerError('You are not authorized to modify this comment', 403);
   }
 
-  await next();
+  return next();
 };
 
 const editComment = async (

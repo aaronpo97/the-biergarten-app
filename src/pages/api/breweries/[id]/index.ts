@@ -35,7 +35,7 @@ const checkIfBreweryPostOwner = async (
     throw new ServerError('You are not the owner of this brewery post', 403);
   }
 
-  next();
+  return next();
 };
 
 const editBreweryPost = async (
@@ -64,9 +64,7 @@ const deleteBreweryPost = async (req: BreweryPostRequest, res: NextApiResponse) 
     query: { id },
   } = req;
 
-  const deleted = await DBClient.instance.beerPost.delete({
-    where: { id },
-  });
+  const deleted = await DBClient.instance.breweryPost.delete({ where: { id } });
 
   if (!deleted) {
     throw new ServerError('Brewery post not found', 404);

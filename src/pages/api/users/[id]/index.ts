@@ -46,7 +46,7 @@ const checkIfUserCanEditUser = async (
     throw new ServerError('You are not permitted to modify this user', 403);
   }
 
-  await next();
+  return next();
 };
 
 const editUser = async (
