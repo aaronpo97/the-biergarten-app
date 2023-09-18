@@ -53,7 +53,7 @@ const editComment = async (
     id,
   });
 
-   res.status(200).json({
+  res.status(200).json({
     success: true,
     message: 'Comment updated successfully',
     statusCode: 200,
