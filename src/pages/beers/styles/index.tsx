@@ -1,6 +1,7 @@
+import BeerStyleCard from '@/components/BeerStyle/BeerStyleCard';
 import LoadingCard from '@/components/ui/LoadingCard';
 import Spinner from '@/components/ui/Spinner';
-import useBeerTypes from '@/hooks/data-fetching/beer-types/useBeerTypes';
+import useBeerStyles from '@/hooks/data-fetching/beer-styles/useBeerStyles';
 
 import { NextPage } from 'next';
 import Head from 'next/head';
@@ -8,25 +9,22 @@ import { MutableRefObject, useRef } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 
-const BeerTypePage: NextPage = () => {
+const BeerStylePage: NextPage = () => {
   const PAGE_SIZE = 20;
   const pageRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  const { beerTypes, isLoading, isLoadingMore, isAtEnd, size, setSize, error } =
-    useBeerTypes({
-      pageSize: PAGE_SIZE,
-    });
+  const { beerStyles, isLoading, isLoadingMore, isAtEnd, size, setSize } = useBeerStyles({
+    pageSize: PAGE_SIZE,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { ref: lastBeerTypeRef } = useInView({
+  const { ref: lastBeerStyleRef } = useInView({
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
       setSize(size + 1);
     },
   });
 
-  console.log(error);
-  console.log(beerTypes);
   return (
     <>
       <Head>
@@ -41,19 +39,19 @@ const BeerTypePage: NextPage = () => {
           <header className="my-10 flex justify-between lg:flex-row">
             <div>
               <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
-              <h2 className="text-2xl font-bold lg:text-4xl">Beers</h2>
+              <h2 className="text-2xl font-bold lg:text-4xl">Types</h2>
             </div>
           </header>
           <div className="grid gap-6 xl:grid-cols-2">
-            {!!beerTypes.length && !isLoading && (
+            {!!beerStyles.length && !isLoading && (
               <>
-                {beerTypes.map((beerType, i) => {
+                {beerStyles.map((beerStyle, i) => {
                   return (
                     <div
-                      key={beerType.id}
-                      ref={beerTypes.length === i + 1 ? lastBeerTypeRef : undefined}
+                      key={beerStyle.id}
+                      ref={beerStyles.length === i + 1 ? lastBeerStyleRef : undefined}
                     >
-                      {beerType.name}
+                      <BeerStyleCard beerStyle={beerStyle} />
                     </div>
                   );
                 })}
@@ -101,4 +99,4 @@ const BeerTypePage: NextPage = () => {
   );
 };
 
-export default BeerTypePage;
+export default BeerStylePage;

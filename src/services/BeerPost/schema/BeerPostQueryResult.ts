@@ -10,7 +10,7 @@ const BeerPostQueryResult = z.object({
   ),
   ibu: z.number(),
   abv: z.number(),
-  type: z.object({ id: z.string(), name: z.string() }),
+  style: z.object({ id: z.string(), name: z.string(), description: z.string() }),
   postedBy: z.object({ id: z.string(), username: z.string() }),
   createdAt: z.coerce.date(),
 });

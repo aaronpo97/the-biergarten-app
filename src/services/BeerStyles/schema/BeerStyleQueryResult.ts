@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const BeerTypeQueryResult = z.object({
+const BeerStyleQueryResult = z.object({
   id: z.string().cuid(),
   name: z.string(),
   postedBy: z.object({
@@ -11,4 +11,4 @@ const BeerTypeQueryResult = z.object({
   updatedAt: z.coerce.date().nullable(),
 });
 
-export default BeerTypeQueryResult;
+export default BeerStyleQueryResult;

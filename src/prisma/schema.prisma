@@ -24,7 +24,7 @@ model User {
   accountIsVerified Boolean           @default(false)
   dateOfBirth       DateTime
   beerPosts         BeerPost[]
-  beerTypes         BeerType[]
+  beerStyles        BeerStyle[]
   breweryPosts      BreweryPost[]
   beerComments      BeerComment[]
   breweryComments   BreweryComment[]
@@ -45,8 +45,8 @@ model BeerPost {
   postedById    String
   brewery       BreweryPost    @relation(fields: [breweryId], references: [id], onDelete: Cascade)
   breweryId     String
-  type          BeerType       @relation(fields: [typeId], references: [id], onDelete: Cascade)
-  typeId        String
+  style         BeerStyle      @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId       String
   createdAt     DateTime       @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime?      @updatedAt @db.Timestamptz(3)
   beerComments  BeerComment[]
@@ -86,14 +86,15 @@ model BeerComment {
   updatedAt  DateTime? @updatedAt @db.Timestamptz(3)
 }
 
-model BeerType {
-  id         String     @id @default(cuid())
-  name       String
-  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime?  @updatedAt @db.Timestamptz(3)
-  postedBy   User       @relation(fields: [postedById], references: [id], onDelete: Cascade)
-  postedById String
-  beerPosts  BeerPost[]
+model BeerStyle {
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime?  @updatedAt @db.Timestamptz(3)
+  postedBy    User       @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById  String
+  beerPosts   BeerPost[]
 }
 
 model Location {

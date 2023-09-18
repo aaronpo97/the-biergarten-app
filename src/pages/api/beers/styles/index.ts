@@ -1,38 +1,38 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
-import getAllBeerTypes from '@/services/BeerTypes/getAllBeerTypes';
+import getAllBeerStyles from '@/services/BeerStyles/getAllBeerStyles';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
-interface GetBeerTypesRequest extends NextApiRequest {
+interface GetBeerStylesRequest extends NextApiRequest {
   query: { page_num: string; page_size: string };
 }
 
-const getBeerTypes = async (
-  req: GetBeerTypesRequest,
+const getBeerStyles = async (
+  req: GetBeerStylesRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const beerTypes = await getAllBeerTypes(pageNum, pageSize);
-  const beerTypeCount = await DBClient.instance.beerType.count();
+  const beerStyles = await getAllBeerStyles(pageNum, pageSize);
+  const beerStyleCount = await DBClient.instance.beerStyle.count();
 
-  res.setHeader('X-Total-Count', beerTypeCount);
+  res.setHeader('X-Total-Count', beerStyleCount);
 
   res.status(200).json({
     message: 'Beer types retrieved successfully',
     statusCode: 200,
-    payload: beerTypes,
+    payload: beerStyles,
     success: true,
   });
 };
 
 const router = createRouter<
-  GetBeerTypesRequest,
+  GetBeerStylesRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
@@ -43,7 +43,7 @@ router.get(
       page_size: z.string().regex(/^\d+$/),
     }),
   }),
-  getBeerTypes,
+  getBeerStyles,
 );
 
 const handler = router.handler();

@@ -37,6 +37,7 @@ const EditBeerPostPage: NextPage<EditPageProps> = ({ beerPost }) => {
             ibu: beerPost.ibu,
             description: beerPost.description,
             id: beerPost.id,
+            styleId: beerPost.style.id,
           }}
         />
       </FormPageLayout>

@@ -1,4 +1,4 @@
-import BeerTypeQueryResult from '@/services/BeerTypes/schema/BeerTypeQueryResult';
+import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
@@ -10,7 +10,7 @@ import { z } from 'zod';
  * @param options.pageSize The number of beer types to fetch per page.
  * @returns An object with the following properties:
  *
- *   - `beerTypes`: The beer types fetched from the API.
+ *   - `beerStyles`: The beer styles fetched from the API.
  *   - `error`: The error that occurred while fetching the data.
  *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
  *   - `isLoading`: A boolean indicating whether the data is being fetched.
@@ -19,7 +19,7 @@ import { z } from 'zod';
  *   - `setSize`: A function to set the size of the data.
  *   - `size`: The size of the data.
  */
-const useBeerTypes = ({ pageSize }: { pageSize: number }) => {
+const useBeerStyles = ({ pageSize }: { pageSize: number }) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) {
@@ -35,32 +35,31 @@ const useBeerTypes = ({ pageSize }: { pageSize: number }) => {
       throw new Error('API response validation failed');
     }
 
-    const parsedPayload = z.array(BeerTypeQueryResult).safeParse(parsed.data.payload);
+    const parsedPayload = z.array(BeerStyleQueryResult).safeParse(parsed.data.payload);
     if (!parsedPayload.success) {
-      console.log(parsedPayload.error);
       throw new Error('API response validation failed');
     }
 
     const pageCount = Math.ceil(parseInt(count as string, 10) / pageSize);
     return {
-      beerTypes: parsedPayload.data,
+      beerStyles: parsedPayload.data,
       pageCount,
     };
   };
 
   const { data, error, isLoading, setSize, size } = useSWRInfinite(
-    (index) => `/api/beers/types?page_num=${index + 1}&page_size=${pageSize}`,
+    (index) => `/api/beers/styles?page_num=${index + 1}&page_size=${pageSize}`,
     fetcher,
     { parallel: true },
   );
 
-  const beerTypes = data?.flatMap((d) => d.beerTypes) ?? [];
+  const beerStyles = data?.flatMap((d) => d.beerStyles) ?? [];
   const pageCount = data?.[0].pageCount ?? 0;
   const isLoadingMore = size > 0 && data && typeof data[size - 1] === 'undefined';
   const isAtEnd = !(size < data?.[0].pageCount!);
 
   return {
-    beerTypes,
+    beerStyles,
     error: error as unknown,
     isAtEnd,
     isLoading,
@@ -71,4 +70,4 @@ const useBeerTypes = ({ pageSize }: { pageSize: number }) => {
   };
 };
 
-export default useBeerTypes;
+export default useBeerStyles;

@@ -8,44 +8,46 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
-const BeerTypeValidationSchema = z.object({
+const BeerStyleValidationSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   postedBy: z.object({
     id: z.string().cuid(),
     username: z.string(),
   }),
+  description: z.string(),
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
 });
 
-const CreateBeerTypeValidationSchema = BeerTypeValidationSchema.omit({
+const CreateBeerStyleValidationSchema = BeerStyleValidationSchema.omit({
   id: true,
   postedBy: true,
   createdAt: true,
   updatedAt: true,
 });
 
-interface CreateBeerTypeRequest extends UserExtendedNextApiRequest {
-  body: z.infer<typeof CreateBeerTypeValidationSchema>;
+interface CreateBeerStyleRequest extends UserExtendedNextApiRequest {
+  body: z.infer<typeof CreateBeerStyleValidationSchema>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface GetBeerTypeRequest extends NextApiRequest {
+interface GetBeerStyleRequest extends NextApiRequest {
   query: {
     id: string;
   };
 }
 
-const createBeerType = async (
-  req: CreateBeerTypeRequest,
+const createBeerStyle = async (
+  req: CreateBeerStyleRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
-  const { name } = req.body;
+  const { name, description } = req.body;
 
-  const newBeerType = await DBClient.instance.beerType.create({
+  const newBeerStyle = await DBClient.instance.beerStyle.create({
     data: {
+      description,
       name,
       postedBy: { connect: { id: user.id } },
     },
@@ -61,20 +63,20 @@ const createBeerType = async (
   res.status(200).json({
     message: 'Beer posts retrieved successfully',
     statusCode: 200,
-    payload: newBeerType,
+    payload: newBeerStyle,
     success: true,
   });
 };
 
 const router = createRouter<
-  CreateBeerTypeRequest,
+  CreateBeerStyleRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
 router.get(
-  validateRequest({ bodySchema: CreateBeerTypeValidationSchema }),
+  validateRequest({ bodySchema: CreateBeerStyleValidationSchema }),
   getCurrentUser,
-  createBeerType,
+  createBeerStyle,
 );
 
 const handler = router.handler();

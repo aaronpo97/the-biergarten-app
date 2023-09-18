@@ -12,7 +12,7 @@ const createNewBeerPost = async ({
   description,
   abv,
   ibu,
-  typeId,
+  styleId,
   breweryId,
   userId,
 }: z.infer<typeof CreateBeerPostWithUserSchema>) => {
@@ -23,7 +23,7 @@ const createNewBeerPost = async ({
         description,
         abv,
         ibu,
-        type: { connect: { id: typeId } },
+        style: { connect: { id: styleId } },
         postedBy: { connect: { id: userId } },
         brewery: { connect: { id: breweryId } },
       },
@@ -36,7 +36,7 @@ const createNewBeerPost = async ({
         createdAt: true,
         beerImages: { select: { id: true, path: true, caption: true, alt: true } },
         brewery: { select: { id: true, name: true } },
-        type: { select: { id: true, name: true } },
+        style: { select: { id: true, name: true, description: true } },
         postedBy: { select: { id: true, username: true } },
       },
     });

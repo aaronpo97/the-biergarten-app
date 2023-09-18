@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
-import { User, BeerType, BreweryPost } from '@prisma/client';
+import { User, BeerStyle, BreweryPost } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 interface CreateNewBeerPostsArgs {
@@ -9,7 +9,7 @@ interface CreateNewBeerPostsArgs {
   joinData: {
     users: User[];
     breweryPosts: BreweryPost[];
-    beerTypes: BeerType[];
+    beerStyles: BeerStyle[];
   };
 }
 
@@ -21,20 +21,20 @@ interface BeerPostData {
   createdAt: Date;
   breweryId: string;
   postedById: string;
-  typeId: string;
+  styleId: string;
 }
 
 const createNewBeerPosts = async ({
   numberOfPosts,
   joinData,
 }: CreateNewBeerPostsArgs) => {
-  const { users, breweryPosts, beerTypes } = joinData;
+  const { users, breweryPosts, beerStyles } = joinData;
   const prisma = DBClient.instance;
   const beerPostData: BeerPostData[] = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numberOfPosts; i++) {
     const user = users[Math.floor(Math.random() * users.length)];
-    const beerType = beerTypes[Math.floor(Math.random() * beerTypes.length)];
+    const beerStyle = beerStyles[Math.floor(Math.random() * beerStyles.length)];
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const createdAt = faker.date.past({ years: 1 });
 
@@ -45,7 +45,7 @@ const createNewBeerPosts = async ({
 
     beerPostData.push({
       postedById: user.id,
-      typeId: beerType.id,
+      styleId: beerStyle.id,
       breweryId: breweryPost.id,
       createdAt,
       abv,

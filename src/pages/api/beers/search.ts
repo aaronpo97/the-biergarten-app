@@ -29,16 +29,15 @@ const search = async (req: SearchAPIRequest, res: NextApiResponse) => {
         description: true,
         postedBy: { select: { username: true, id: true } },
         brewery: { select: { name: true, id: true } },
-        type: { select: { name: true, id: true } },
+        style: { select: { name: true, id: true, description: true } },
         beerImages: { select: { alt: true, path: true, caption: true, id: true } },
       },
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
-
           { brewery: { name: { contains: query, mode: 'insensitive' } } },
-          { type: { name: { contains: query, mode: 'insensitive' } } },
+          { style: { name: { contains: query, mode: 'insensitive' } } },
         ],
       },
     });

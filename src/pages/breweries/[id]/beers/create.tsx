@@ -4,7 +4,7 @@ import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import DBClient from '@/prisma/DBClient';
 import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
-import { BeerType } from '@prisma/client';
+import { BeerStyle } from '@prisma/client';
 import { NextPage } from 'next';
 import { BiBeer } from 'react-icons/bi';
 import { z } from 'zod';
@@ -12,10 +12,10 @@ import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
 
 interface CreateBeerPageProps {
   brewery: z.infer<typeof BreweryPostQueryResult>;
-  types: BeerType[];
+  styles: BeerStyle[];
 }
 
-const CreateBeerPost: NextPage<CreateBeerPageProps> = ({ brewery, types }) => {
+const CreateBeerPost: NextPage<CreateBeerPageProps> = ({ brewery, styles }) => {
   return (
     <FormPageLayout
       headingText="Create a new beer"
@@ -23,7 +23,7 @@ const CreateBeerPost: NextPage<CreateBeerPageProps> = ({ brewery, types }) => {
       backLink="/beers"
       backLinkText="Back to beers"
     >
-      <CreateBeerPostForm brewery={brewery} types={types} />
+      <CreateBeerPostForm brewery={brewery} styles={styles} />
     </FormPageLayout>
   );
 };
@@ -33,12 +33,12 @@ export const getServerSideProps = withPageAuthRequired<CreateBeerPageProps>(
     const id = context.params?.id as string;
 
     const breweryPost = await getBreweryPostById(id);
-    const beerTypes = await DBClient.instance.beerType.findMany();
+    const beerStyles = await DBClient.instance.beerStyle.findMany();
 
     return {
       props: {
         brewery: JSON.parse(JSON.stringify(breweryPost)),
-        types: JSON.parse(JSON.stringify(beerTypes)),
+        styles: JSON.parse(JSON.stringify(beerStyles)),
       },
     };
   },

@@ -19,7 +19,7 @@ const getBeerRecommendations = async ({
   const beerRecommendations: z.infer<typeof BeerPostQueryResult>[] =
     await DBClient.instance.beerPost.findMany({
       where: {
-        OR: [{ typeId: beerPost.type.id }, { breweryId: beerPost.brewery.id }],
+        OR: [{ styleId: beerPost.style.id }, { breweryId: beerPost.brewery.id }],
         NOT: { id: beerPost.id },
       },
       select: {
@@ -29,7 +29,7 @@ const getBeerRecommendations = async ({
         abv: true,
         description: true,
         createdAt: true,
-        type: { select: { name: true, id: true } },
+        style: { select: { name: true, id: true, description: true } },
         brewery: { select: { name: true, id: true } },
         postedBy: { select: { id: true, username: true } },
         beerImages: { select: { path: true, caption: true, id: true, alt: true } },
@@ -40,7 +40,7 @@ const getBeerRecommendations = async ({
 
   const count = await DBClient.instance.beerPost.count({
     where: {
-      OR: [{ typeId: beerPost.type.id }, { breweryId: beerPost.brewery.id }],
+      OR: [{ styleId: beerPost.style.id }, { breweryId: beerPost.brewery.id }],
       NOT: { id: beerPost.id },
     },
   });

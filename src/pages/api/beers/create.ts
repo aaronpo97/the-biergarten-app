@@ -17,14 +17,14 @@ const createBeerPost = async (
   req: CreateBeerPostRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { name, description, typeId, abv, ibu, breweryId } = req.body;
+  const { name, description, styleId: typeId, abv, ibu, breweryId } = req.body;
 
   const newBeerPost = await createNewBeerPost({
     name,
     description,
     abv,
     ibu,
-    typeId,
+    styleId: typeId,
     breweryId,
     userId: req.user!.id,
   });
