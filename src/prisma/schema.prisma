@@ -33,6 +33,7 @@ model User {
   BreweryImage      BreweryImage[]
   BreweryPostLike   BreweryPostLike[]
   Location          Location[]
+  Glassware         Glassware[]
 }
 
 model BeerPost {
@@ -93,8 +94,23 @@ model BeerStyle {
   createdAt   DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime?  @updatedAt @db.Timestamptz(3)
   postedBy    User       @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  glassware   Glassware  @relation(fields: [glasswareId], references: [id], onDelete: Cascade)
+  glasswareId String
   postedById  String
+  abvRange    Float[]
+  ibuRange    Float[]
   beerPosts   BeerPost[]
+}
+
+model Glassware {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  createdAt   DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime?   @updatedAt @db.Timestamptz(3)
+  postedBy    User        @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  postedById  String
+  BeerStyle   BeerStyle[]
 }
 
 model Location {
