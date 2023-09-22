@@ -21,7 +21,7 @@ const createNewBreweryPost = async ({
   userId,
 }: z.infer<typeof CreateNewBreweryPostWithUserAndLocationSchema>) => {
   const breweryPost: z.infer<typeof BreweryPostQueryResult> =
-    await DBClient.instance.breweryPost.create({
+    (await DBClient.instance.breweryPost.create({
       data: {
         name,
         description,
@@ -47,7 +47,7 @@ const createNewBreweryPost = async ({
           },
         },
       },
-    });
+    })) as z.infer<typeof BreweryPostQueryResult>;
 
   return breweryPost;
 };

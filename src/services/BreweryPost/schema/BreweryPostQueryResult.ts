@@ -7,7 +7,7 @@ const BreweryPostQueryResult = z.object({
   location: z.object({
     city: z.string(),
     address: z.string(),
-    coordinates: z.array(z.number()),
+    coordinates: z.tuple([z.number(), z.number()]),
     country: z.string().nullable(),
     stateOrProvince: z.string().nullable(),
   }),

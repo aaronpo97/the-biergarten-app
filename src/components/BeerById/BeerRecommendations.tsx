@@ -73,8 +73,8 @@ const BeerRecommendationsSection: FC<{
                         <span className="text-lg font-medium">{post.style.name}</span>
                       </div>
                       <div className="space-x-2">
-                        <span>{post.abv}% ABV</span>
-                        <span>{post.ibu} IBU</span>
+                        <span>{post.abv.toFixed(1)}% ABV</span>
+                        <span>{post.ibu.toFixed(1)} IBU</span>
                       </div>
                     </div>
                   </div>

@@ -6,7 +6,7 @@ const prisma = DBClient.instance;
 
 const getBreweryPostById = async (id: string) => {
   const breweryPost: z.infer<typeof BreweryPostQueryResult> | null =
-    await prisma.breweryPost.findFirst({
+    (await prisma.breweryPost.findFirst({
       select: {
         id: true,
         location: {
@@ -26,7 +26,7 @@ const getBreweryPostById = async (id: string) => {
         dateEstablished: true,
       },
       where: { id },
-    });
+    })) as z.infer<typeof BreweryPostQueryResult> | null;
 
   return breweryPost;
 };

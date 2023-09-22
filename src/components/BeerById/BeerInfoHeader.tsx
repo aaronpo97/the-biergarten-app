@@ -80,8 +80,10 @@ const BeerInfoHeader: FC<BeerInfoHeaderProps> = ({ beerPost }) => {
                 </Link>
               </div>
               <div>
-                <span className="mr-4 text-lg font-medium">{beerPost.abv}% ABV</span>
-                <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
+                <span className="mr-4 text-lg font-medium">
+                  {beerPost.abv.toFixed(1)}% ABV
+                </span>
+                <span className="text-lg font-medium">{beerPost.ibu.toFixed(1)} IBU</span>
               </div>
               <div>
                 {(!!likeCount || likeCount === 0) && (

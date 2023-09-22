@@ -38,8 +38,12 @@ const createNewBeerPosts = async ({
     const breweryPost = breweryPosts[Math.floor(Math.random() * breweryPosts.length)];
     const createdAt = faker.date.past({ years: 1 });
 
-    const abv = Math.floor(Math.random() * (12 - 4) + 4);
-    const ibu = Math.floor(Math.random() * (60 - 10) + 10);
+    const [minABV, maxABV] = beerStyle.abvRange;
+    const [minIBU, maxIBU] = beerStyle.ibuRange;
+
+    const abv = parseFloat((Math.random() * (maxABV - minABV) + minABV).toFixed(1));
+    const ibu = Math.floor(Math.random() * (maxIBU - minIBU) + minIBU);
+
     const name = faker.commerce.productName();
     const description = faker.lorem.lines(20).replace(/(\r\n|\n|\r)/gm, ' ');
 
