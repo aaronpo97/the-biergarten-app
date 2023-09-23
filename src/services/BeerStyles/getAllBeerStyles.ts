@@ -17,6 +17,8 @@ const getAllBeerStyles = async (
       updatedAt: true,
       abvRange: true,
       ibuRange: true,
+      description: true,
+      glassware: { select: { id: true, name: true } },
     },
   })) as z.infer<typeof BeerStyleQueryResult>[];
 

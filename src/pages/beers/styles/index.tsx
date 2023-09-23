@@ -1,13 +1,13 @@
-import BeerStyleCard from '@/components/BeerStyle/BeerStyleCard';
-import LoadingCard from '@/components/ui/LoadingCard';
-import Spinner from '@/components/ui/Spinner';
-import useBeerStyles from '@/hooks/data-fetching/beer-styles/useBeerStyles';
-
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { MutableRefObject, useRef } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
+
+import BeerStyleCard from '@/components/BeerStyle/BeerStyleCard';
+import SmLoadingCard from '@/components/ui/SmLoadingCard';
+import Spinner from '@/components/ui/Spinner';
+import useBeerStyles from '@/hooks/data-fetching/beer-styles/useBeerStyles';
 
 const BeerStylePage: NextPage = () => {
   const PAGE_SIZE = 20;
@@ -17,7 +17,6 @@ const BeerStylePage: NextPage = () => {
     pageSize: PAGE_SIZE,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { ref: lastBeerStyleRef } = useInView({
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
@@ -28,7 +27,7 @@ const BeerStylePage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Beer Types | The Biergarten App</title>
+        <title>Beer Styles | The Biergarten App</title>
         <meta
           name="description"
           content="Find beers made by breweries near you and around the world."
@@ -60,7 +59,7 @@ const BeerStylePage: NextPage = () => {
             {(isLoading || isLoadingMore) && (
               <>
                 {Array.from({ length: PAGE_SIZE }, (_, i) => (
-                  <LoadingCard key={i} />
+                  <SmLoadingCard key={i} />
                 ))}
               </>
             )}

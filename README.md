@@ -39,6 +39,10 @@ scale, or IBU, is used to approximately quantify the bitterness of beer. This sc
 measured on the perceived bitterness of the beer, but rather the amount of a component of
 beer known as iso-alpha acids.
 
+## Database Schema
+
+![Schema](./schema.svg)
+
 ## Technologies
 
 ### General
