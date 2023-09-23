@@ -16,6 +16,8 @@ interface UserData {
   dateOfBirth: Date;
   createdAt: Date;
   hash: string;
+  accountIsVerified: boolean;
+  role: 'USER' | 'ADMIN';
 }
 
 const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
@@ -53,7 +55,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
     const dateOfBirth = faker.date.birthdate({ mode: 'age', min: 19 });
     const createdAt = faker.date.past({ years: 4 });
 
-    const user = {
+    const user: UserData = {
       firstName,
       lastName,
       email,
@@ -62,6 +64,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
       createdAt,
       hash,
       accountIsVerified: true,
+      role: 'USER',
     };
 
     data.push(user);
