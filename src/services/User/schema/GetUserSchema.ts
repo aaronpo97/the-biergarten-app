@@ -10,6 +10,7 @@ const GetUserSchema = z.object({
   lastName: z.string(),
   dateOfBirth: z.coerce.date(),
   accountIsVerified: z.boolean(),
+  role: z.enum(['USER', 'ADMIN']),
 });
 
 export default GetUserSchema;

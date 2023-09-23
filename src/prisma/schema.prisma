@@ -12,6 +12,11 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id                String            @id @default(cuid())
   username          String            @unique
@@ -23,6 +28,7 @@ model User {
   updatedAt         DateTime?         @updatedAt @db.Timestamptz(3)
   accountIsVerified Boolean           @default(false)
   dateOfBirth       DateTime
+  role              Role              @default(USER)
   beerPosts         BeerPost[]
   beerStyles        BeerStyle[]
   breweryPosts      BreweryPost[]

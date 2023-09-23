@@ -15,6 +15,7 @@ import createNewUsers from './create/createNewUsers';
 import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
 import createNewLocations from './create/createNewLocations';
 import logger from '../../config/pino/logger';
+import createAdminUser from './create/createAdminUser';
 
 (async () => {
   try {
@@ -23,6 +24,9 @@ import logger from '../../config/pino/logger';
     logger.info('Clearing database.');
     await cleanDatabase();
     logger.info('Database cleared successfully, preparing to seed.');
+
+    await createAdminUser();
+    logger.info('Admin user created successfully.');
 
     const users = await createNewUsers({ numberOfUsers: 10000 });
     logger.info('Users created successfully.');

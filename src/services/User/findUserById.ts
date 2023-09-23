@@ -16,6 +16,7 @@ const findUserById = async (id: string) => {
         createdAt: true,
         accountIsVerified: true,
         updatedAt: true,
+        role: true,
       },
     });
 

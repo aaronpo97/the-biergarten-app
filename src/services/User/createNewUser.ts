@@ -32,6 +32,7 @@ const createNewUser = async ({
       createdAt: true,
       accountIsVerified: true,
       updatedAt: true,
+      role: true,
     },
   });
 
