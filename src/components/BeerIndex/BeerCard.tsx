@@ -39,10 +39,10 @@ const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) =
         </div>
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-md lg:text-xl">{post.type.name}</p>
+            <p className="text-md lg:text-xl">{post.style.name}</p>
             <div className="space-x-3">
-              <span className="text-sm lg:text-lg">{post.abv}% ABV</span>
-              <span className="text-sm lg:text-lg">{post.ibu} IBU</span>
+              <span className="text-sm lg:text-lg">{post.abv.toFixed(1)}% ABV</span>
+              <span className="text-sm lg:text-lg">{post.ibu.toFixed(1)} IBU</span>
             </div>
             {!isLoading && (
               <span>

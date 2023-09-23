@@ -32,7 +32,7 @@ const getAllBeersByBrewery = async (
         description: true,
         postedBy: { select: { username: true, id: true } },
         brewery: { select: { name: true, id: true } },
-        type: { select: { name: true, id: true } },
+        style: { select: { name: true, id: true, description: true } },
         beerImages: { select: { alt: true, path: true, caption: true, id: true } },
       },
     });

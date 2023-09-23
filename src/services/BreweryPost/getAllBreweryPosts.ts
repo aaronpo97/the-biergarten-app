@@ -10,7 +10,7 @@ const getAllBreweryPosts = async (pageNum?: number, pageSize?: number) => {
   const take = pageNum && pageSize ? pageSize : undefined;
 
   const breweryPosts: z.infer<typeof BreweryPostQueryResult>[] =
-    await prisma.breweryPost.findMany({
+    (await prisma.breweryPost.findMany({
       skip,
       take,
       select: {
@@ -32,7 +32,7 @@ const getAllBreweryPosts = async (pageNum?: number, pageSize?: number) => {
         dateEstablished: true,
       },
       orderBy: { createdAt: 'desc' },
-    });
+    })) as z.infer<typeof BreweryPostQueryResult>[];
 
   return breweryPosts;
 };

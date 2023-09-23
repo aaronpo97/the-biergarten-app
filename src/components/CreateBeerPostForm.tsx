@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BeerType } from '@prisma/client';
+import { BeerStyle } from '@prisma/client';
 import router from 'next/router';
 import { FunctionComponent } from 'react';
 import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
@@ -23,7 +23,7 @@ import FormTextInput from './ui/forms/FormTextInput';
 
 interface BeerFormProps {
   brewery: z.infer<typeof BreweryPostQueryResult>;
-  types: BeerType[];
+  styles: BeerStyle[];
 }
 
 const CreateBeerPostWithImagesValidationSchema = CreateBeerPostValidationSchema.merge(
@@ -31,7 +31,7 @@ const CreateBeerPostWithImagesValidationSchema = CreateBeerPostValidationSchema.
 );
 
 const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
-  types = [],
+  styles = [],
   brewery,
 }) => {
   const {
@@ -80,21 +80,21 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
       </FormSegment>
 
       <FormInfo>
-        <FormLabel htmlFor="typeId">Type</FormLabel>
-        <FormError>{errors.typeId?.message}</FormError>
+        <FormLabel htmlFor="typeId">Style</FormLabel>
+        <FormError>{errors.styleId?.message}</FormError>
       </FormInfo>
       <FormSegment>
         <FormSelect
           disabled={isSubmitting}
-          formRegister={register('typeId')}
-          error={!!errors.typeId}
-          id="typeId"
-          options={types.map((beerType) => ({
-            value: beerType.id,
-            text: beerType.name,
+          formRegister={register('styleId')}
+          error={!!errors.styleId}
+          id="styleId"
+          options={styles.map((style) => ({
+            value: style.id,
+            text: style.name,
           }))}
-          placeholder="Beer type"
-          message="Pick a beer type"
+          placeholder="Beer style"
+          message="Pick a beer style"
         />
       </FormSegment>
 

@@ -7,7 +7,7 @@ import createNewBeerImages from './create/createNewBeerImages';
 import createNewBeerPostComments from './create/createNewBeerPostComments';
 import createNewBeerPostLikes from './create/createNewBeerPostLikes';
 import createNewBeerPosts from './create/createNewBeerPosts';
-import createNewBeerTypes from './create/createNewBeerTypes';
+import createNewBeerStyles from './create/createNewBeerStyles';
 import createNewBreweryImages from './create/createNewBreweryImages';
 import createNewBreweryPostComments from './create/createNewBreweryPostComments';
 import createNewBreweryPosts from './create/createNewBreweryPosts';
@@ -34,15 +34,15 @@ import logger from '../../config/pino/logger';
 
     logger.info('Locations created successfully.');
 
-    const [breweryPosts, beerTypes] = await Promise.all([
+    const [breweryPosts, beerStyles] = await Promise.all([
       createNewBreweryPosts({ numberOfPosts: 450, joinData: { users, locations } }),
-      createNewBeerTypes({ joinData: { users } }),
+      createNewBeerStyles({ joinData: { users } }),
     ]);
     logger.info('Brewery posts and beer types created successfully.');
 
     const beerPosts = await createNewBeerPosts({
       numberOfPosts: 3000,
-      joinData: { breweryPosts, beerTypes, users },
+      joinData: { breweryPosts, beerStyles, users },
     });
 
     logger.info('Beer posts created successfully.');
@@ -91,9 +91,9 @@ import logger from '../../config/pino/logger';
       numberOfUsers: users.length,
       numberOfBreweryPosts: breweryPosts.length,
       numberOfBeerPosts: beerPosts.length,
-      numberOfBeerTypes: beerTypes.length,
+      numberOfBeerStyles: beerStyles.length,
       numberOfBeerPostLikes: beerPostLikes.length,
-      numberofBreweryPostLikes: breweryPostLikes.length,
+      numberOfBreweryPostLikes: breweryPostLikes.length,
       numberOfBeerPostComments: beerPostComments.length,
       numberOfBreweryPostComments: breweryPostComments.length,
       numberOfBeerImages: beerImages.length,

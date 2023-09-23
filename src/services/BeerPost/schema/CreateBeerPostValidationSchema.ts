@@ -26,10 +26,10 @@ const CreateBeerPostValidationSchema = z.object({
     })
     .min(2, { message: 'IBU must be greater than 2.' })
     .max(100, { message: 'IBU must be less than 100.' }),
-  typeId: z
+  styleId: z
     .string({
-      required_error: 'Type id is required.',
-      invalid_type_error: 'Type id must be a string.',
+      required_error: 'Style id is required.',
+      invalid_type_error: 'Style id must be a string.',
     })
     .cuid({ message: 'Invalid type id.' }),
   breweryId: z

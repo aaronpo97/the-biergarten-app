@@ -16,7 +16,7 @@ const getAllBeerPosts = async (pageNum: number, pageSize: number) => {
         abv: true,
         description: true,
         createdAt: true,
-        type: { select: { name: true, id: true } },
+        style: { select: { name: true, id: true, description: true } },
         brewery: { select: { name: true, id: true } },
         postedBy: { select: { id: true, username: true } },
         beerImages: { select: { path: true, caption: true, id: true, alt: true } },

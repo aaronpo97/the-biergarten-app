@@ -74,14 +74,16 @@ const BeerInfoHeader: FC<BeerInfoHeaderProps> = ({ beerPost }) => {
               <div>
                 <Link
                   className="link-hover link text-lg font-bold"
-                  href={`/beers/types/${beerPost.type.id}`}
+                  href={`/beers/types/${beerPost.style.id}`}
                 >
-                  {beerPost.type.name}
+                  {beerPost.style.name}
                 </Link>
               </div>
               <div>
-                <span className="mr-4 text-lg font-medium">{beerPost.abv}% ABV</span>
-                <span className="text-lg font-medium">{beerPost.ibu} IBU</span>
+                <span className="mr-4 text-lg font-medium">
+                  {beerPost.abv.toFixed(1)}% ABV
+                </span>
+                <span className="text-lg font-medium">{beerPost.ibu.toFixed(1)} IBU</span>
               </div>
               <div>
                 {(!!likeCount || likeCount === 0) && (
