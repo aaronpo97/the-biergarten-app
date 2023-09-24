@@ -6,7 +6,7 @@ const getAllBeerStyles = async (
   pageNum: number,
   pageSize: number,
 ): Promise<z.infer<typeof BeerStyleQueryResult>[]> => {
-  const styles = (await DBClient.instance.beerStyle.findMany({
+  const styles = await DBClient.instance.beerStyle.findMany({
     take: pageSize,
     skip: (pageNum - 1) * pageSize,
     select: {
@@ -20,9 +20,9 @@ const getAllBeerStyles = async (
       description: true,
       glassware: { select: { id: true, name: true } },
     },
-  })) as z.infer<typeof BeerStyleQueryResult>[];
+  });
 
-  return styles;
+  return styles as z.infer<typeof BeerStyleQueryResult>[];
 };
 
 export default getAllBeerStyles;

@@ -8,9 +8,9 @@ import { NextApiResponse } from 'next';
 import { createRouter, NextHandler } from 'next-connect';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
-import DBClient from '@/prisma/DBClient';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
+import deleteBeerPostById from '@/services/BeerPost/deleteBeerPostById';
 
 interface BeerPostRequest extends UserExtendedNextApiRequest {
   query: { id: string };
@@ -60,13 +60,9 @@ const editBeerPost = async (
 };
 
 const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
-  const {
-    query: { id },
-  } = req;
+  const { id } = req.query;
 
-  const deleted = await DBClient.instance.beerPost.delete({
-    where: { id },
-  });
+  const deleted = deleteBeerPostById(id);
 
   if (!deleted) {
     throw new ServerError('Beer post not found', 404);
