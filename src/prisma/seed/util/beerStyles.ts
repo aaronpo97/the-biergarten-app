@@ -1,4 +1,4 @@
-interface IBeerStyle {
+interface BeerStyle {
   name: string;
   description: string;
   glassware: string;
@@ -6,7 +6,7 @@ interface IBeerStyle {
   ibuRange: [number, number];
 }
 
-const beerStyles: IBeerStyle[] = [
+const beerStyles: BeerStyle[] = [
   {
     name: 'Bock',
     description:

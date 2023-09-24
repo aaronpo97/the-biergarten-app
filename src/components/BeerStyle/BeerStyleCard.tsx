@@ -11,7 +11,7 @@ const BeerStyleCard: FC<{ beerStyle: z.infer<typeof BeerStyleQueryResult> }> = (
     <div className="card card-compact bg-base-300">
       <div className="card-body justify-between">
         <div className="space-y-1">
-          <Link href={`/beers/types/${beerStyle.id}`}>
+          <Link href={`/beers/styles/${beerStyle.id}`}>
             <h3 className="link-hover link overflow-hidden whitespace-normal text-2xl font-bold lg:truncate lg:text-3xl">
               {beerStyle.name}
             </h3>
@@ -20,7 +20,7 @@ const BeerStyleCard: FC<{ beerStyle: z.infer<typeof BeerStyleQueryResult> }> = (
             <div className="text-sm font-bold">
               ABV Range:{' '}
               <span>
-                {beerStyle.abvRange[0].toFixed(1)}% - {beerStyle.abvRange[1].toFixed(1)}%
+                {beerStyle.abvRange[0].toFixed(1)}% - {beerStyle.abvRange[0].toFixed(1)}%
               </span>
             </div>
             <div className="text-sm font-bold">
@@ -31,8 +31,8 @@ const BeerStyleCard: FC<{ beerStyle: z.infer<typeof BeerStyleQueryResult> }> = (
             </div>
           </div>
 
-          <div>
-            <p>{beerStyle.description}</p>
+          <div className="h-20">
+            <p className="overflow-ellipsis line-clamp-3">{beerStyle.description}</p>
           </div>
 
           <div className="font-semibold">

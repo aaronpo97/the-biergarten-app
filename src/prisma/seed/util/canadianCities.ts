@@ -1,4 +1,11 @@
-export default [
+interface City {
+  city: string;
+  province: string;
+  latitude: number;
+  longitude: number;
+}
+
+const canadianCities: City[] = [
   {
     city: 'Toronto',
     province: 'Ontario',
@@ -10423,3 +10430,5 @@ export default [
     longitude: -110.4739,
   },
 ];
+
+export default canadianCities;
