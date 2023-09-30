@@ -28,13 +28,13 @@ const checkIfCommentOwner = async (
 ) => {
   const { id } = req.query;
   const user = req.user!;
-  const comment = await findBeerCommentById(id);
+  const comment = await findBeerCommentById({ beerCommentId: id });
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
   }
 
-  if (comment.postedById !== user.id) {
+  if (comment.postedBy.id !== user.id) {
     throw new ServerError('You are not authorized to modify this comment', 403);
   }
 

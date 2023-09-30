@@ -37,7 +37,7 @@ const sendLikeRequest = async (
   };
 
   if (alreadyLiked) {
-    await removeBeerPostLikeById(alreadyLiked.id);
+    await removeBeerPostLikeById({ beerLikeId: alreadyLiked.id });
     jsonResponse.message = 'Successfully unliked beer post';
   } else {
     await createBeerPostLike({ id, user });
@@ -53,7 +53,7 @@ const getLikeCount = async (
 ) => {
   const id = req.query.id as string;
 
-  const likeCount = await getBeerPostLikeCount(id);
+  const likeCount = await getBeerPostLikeCount({ beerPostId: id });
 
   res.status(200).json({
     success: true,

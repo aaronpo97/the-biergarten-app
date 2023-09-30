@@ -1,11 +1,13 @@
 import DBClient from '@/prisma/DBClient';
 
-const getBeerCommentCount = async (beerPostId: string) => {
-  const count = await DBClient.instance.beerComment.count({
-    where: { beerPostId },
-  });
+interface GetBeerCommentCountArgs {
+  beerPostId: string;
+}
 
-  return count;
+const getBeerCommentCount = async ({
+  beerPostId,
+}: GetBeerCommentCountArgs): Promise<number> => {
+  return DBClient.instance.beerComment.count({ where: { beerPostId } });
 };
 
 export default getBeerCommentCount;

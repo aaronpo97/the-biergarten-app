@@ -1,6 +1,7 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
 import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -8,10 +9,7 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 interface GetBeerPostsRequest extends NextApiRequest {
-  query: {
-    page_num: string;
-    page_size: string;
-  };
+  query: z.infer<typeof PaginatedQueryResponseSchema>;
 }
 
 const getBeerPosts = async (
@@ -41,10 +39,7 @@ const router = createRouter<
 
 router.get(
   validateRequest({
-    querySchema: z.object({
-      page_num: z.string().regex(/^\d+$/),
-      page_size: z.string().regex(/^\d+$/),
-    }),
+    querySchema: PaginatedQueryResponseSchema,
   }),
   getBeerPosts,
 );

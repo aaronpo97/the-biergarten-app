@@ -19,6 +19,7 @@ const addBeerImageToDB = ({
   userId,
 }: ProcessImageDataArgs) => {
   const beerImagePromises: Promise<BeerImage>[] = [];
+
   files.forEach((file) => {
     beerImagePromises.push(
       DBClient.instance.beerImage.create({
