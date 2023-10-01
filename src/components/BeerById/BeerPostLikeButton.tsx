@@ -3,7 +3,7 @@ import useCheckIfUserLikesBeerPost from '@/hooks/data-fetching/beer-likes/useChe
 import { FC, useEffect, useState } from 'react';
 
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
-import sendBeerPostLikeRequest from '@/requests/BeerPost/sendBeerPostLikeRequest';
+import sendBeerPostLikeRequest from '@/requests/BeerPostLike/sendBeerPostLikeRequest';
 import LikeButton from '../ui/LikeButton';
 
 const BeerPostLikeButton: FC<{

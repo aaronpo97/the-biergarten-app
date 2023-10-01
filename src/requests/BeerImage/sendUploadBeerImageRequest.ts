@@ -1,10 +1,20 @@
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 
 interface SendUploadBeerImagesRequestArgs {
   beerPost: z.infer<typeof BeerPostQueryResult>;
   images: FileList;
 }
+
+/**
+ * Sends a POST request to the server to upload images for a beer post.
+ *
+ * @param beerPost The beer post object.
+ * @param images The list of images to upload.
+ * @returns A promise that resolves to the response from the server.
+ * @throws An error if the upload fails or the API response is invalid.
+ */
 
 const sendUploadBeerImagesRequest = async ({
   beerPost,
@@ -28,7 +38,14 @@ const sendUploadBeerImagesRequest = async ({
     throw new Error('Failed to upload images');
   }
 
-  return uploadResponse.json();
+  const json = await uploadResponse.json();
+  const parsed = APIResponseValidationSchema.safeParse(json);
+
+  if (!parsed.success) {
+    throw new Error('Invalid API response');
+  }
+
+  return parsed.data;
 };
 
 export default sendUploadBeerImagesRequest;

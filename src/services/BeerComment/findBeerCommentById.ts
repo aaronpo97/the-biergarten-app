@@ -1,11 +1,25 @@
 import DBClient from '@/prisma/DBClient';
+import { z } from 'zod';
+import BeerCommentQueryResult from './schema/BeerCommentQueryResult';
 
-const findBeerCommentById = async (id: string) => {
-  const comment = await DBClient.instance.beerComment.findUnique({
-    where: { id },
+interface FindBeerCommentArgs {
+  beerCommentId: string;
+}
+
+const findBeerCommentById = async ({
+  beerCommentId,
+}: FindBeerCommentArgs): Promise<z.infer<typeof BeerCommentQueryResult> | null> => {
+  return DBClient.instance.beerComment.findUnique({
+    where: { id: beerCommentId },
+    select: {
+      id: true,
+      content: true,
+      rating: true,
+      createdAt: true,
+      updatedAt: true,
+      postedBy: { select: { id: true, username: true, createdAt: true } },
+    },
   });
-
-  return comment;
 };
 
 export default findBeerCommentById;
