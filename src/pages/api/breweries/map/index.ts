@@ -1,6 +1,7 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
 import BreweryPostMapQueryResult from '@/services/BreweryPost/schema/BreweryPostMapQueryResult';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -8,10 +9,7 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 interface GetBreweryPostsRequest extends NextApiRequest {
-  query: {
-    page_num: string;
-    page_size: string;
-  };
+  query: z.infer<typeof PaginatedQueryResponseSchema>;
 }
 
 const getBreweryPosts = async (
@@ -28,12 +26,7 @@ const getBreweryPosts = async (
     await DBClient.instance.breweryPost.findMany({
       select: {
         location: {
-          select: {
-            coordinates: true,
-            city: true,
-            country: true,
-            stateOrProvince: true,
-          },
+          select: { coordinates: true, city: true, country: true, stateOrProvince: true },
         },
         id: true,
         name: true,
@@ -59,12 +52,7 @@ const router = createRouter<
 >();
 
 router.get(
-  validateRequest({
-    querySchema: z.object({
-      page_num: z.string().regex(/^\d+$/),
-      page_size: z.string().regex(/^\d+$/),
-    }),
-  }),
+  validateRequest({ querySchema: PaginatedQueryResponseSchema }),
   getBreweryPosts,
 );
 

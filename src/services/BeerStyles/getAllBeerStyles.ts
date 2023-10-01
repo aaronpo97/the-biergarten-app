@@ -2,11 +2,14 @@ import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
 import BeerStyleQueryResult from './schema/BeerStyleQueryResult';
 
-const getAllBeerStyles = async (
-  pageNum: number,
-  pageSize: number,
-): Promise<z.infer<typeof BeerStyleQueryResult>[]> => {
-  const styles = await DBClient.instance.beerStyle.findMany({
+const getAllBeerStyles = async ({
+  pageNum,
+  pageSize,
+}: {
+  pageNum: number;
+  pageSize: number;
+}): Promise<z.infer<typeof BeerStyleQueryResult>[]> =>
+  DBClient.instance.beerStyle.findMany({
     take: pageSize,
     skip: (pageNum - 1) * pageSize,
     select: {
@@ -20,9 +23,6 @@ const getAllBeerStyles = async (
       description: true,
       glassware: { select: { id: true, name: true } },
     },
-  });
-
-  return styles as z.infer<typeof BeerStyleQueryResult>[];
-};
+  }) as ReturnType<typeof getAllBeerStyles>;
 
 export default getAllBeerStyles;

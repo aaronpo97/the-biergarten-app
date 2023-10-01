@@ -16,6 +16,7 @@ const getBeerRecommendations = async ({
 }: GetBeerRecommendationsArgs) => {
   const skip = (pageNum - 1) * pageSize;
   const take = pageSize;
+
   const beerRecommendations: z.infer<typeof BeerPostQueryResult>[] =
     await DBClient.instance.beerPost.findMany({
       where: {

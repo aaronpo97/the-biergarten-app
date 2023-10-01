@@ -5,10 +5,6 @@ import EditBeerPostValidationSchema from './schema/EditBeerPostValidationSchema'
 const schema = EditBeerPostValidationSchema.omit({ id: true });
 
 export default async function editBeerPostById(id: string, data: z.infer<typeof schema>) {
-  const beerPost = await DBClient.instance.beerPost.update({
-    where: { id },
-    data,
-  });
-
+  const beerPost = await DBClient.instance.beerPost.update({ where: { id }, data });
   return beerPost;
 }
