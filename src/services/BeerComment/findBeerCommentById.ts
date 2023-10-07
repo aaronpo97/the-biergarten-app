@@ -1,6 +1,6 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import BeerCommentQueryResult from './schema/BeerCommentQueryResult';
+import CommentQueryResult from '../schema/CommentSchema/CommentQueryResult';
 
 interface FindBeerCommentArgs {
   beerCommentId: string;
@@ -8,7 +8,7 @@ interface FindBeerCommentArgs {
 
 const findBeerCommentById = async ({
   beerCommentId,
-}: FindBeerCommentArgs): Promise<z.infer<typeof BeerCommentQueryResult> | null> => {
+}: FindBeerCommentArgs): Promise<z.infer<typeof CommentQueryResult> | null> => {
   return DBClient.instance.beerComment.findUnique({
     where: { id: beerCommentId },
     select: {

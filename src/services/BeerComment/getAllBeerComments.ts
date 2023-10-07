@@ -23,6 +23,7 @@ const getAllBeerComments = async ({
       content: true,
       rating: true,
       createdAt: true,
+      updatedAt: true,
       postedBy: { select: { id: true, username: true, createdAt: true } },
     },
   });

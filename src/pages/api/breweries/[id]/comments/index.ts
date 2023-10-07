@@ -61,10 +61,11 @@ const getAll = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
-  const comments = await getAllBreweryComments(
-    { id: breweryPostId },
-    { pageSize: parseInt(page_size, 10), pageNum: parseInt(page_num, 10) },
-  );
+  const comments = await getAllBreweryComments({
+    id: breweryPostId,
+    pageNum: parseInt(page_num, 10),
+    pageSize: parseInt(page_size, 10),
+  });
 
   const pageCount = await DBClient.instance.breweryComment.count({
     where: { breweryPostId },

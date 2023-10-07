@@ -1,6 +1,6 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
-import BeerCommentQueryResult from './schema/BeerCommentQueryResult';
+import CommentQueryResult from '../schema/CommentSchema/CommentQueryResult';
 
 interface EditBeerCommentByIdArgs {
   id: string;
@@ -12,7 +12,7 @@ const editBeerCommentById = async ({
   id,
   content,
   rating,
-}: EditBeerCommentByIdArgs): Promise<z.infer<typeof BeerCommentQueryResult>> => {
+}: EditBeerCommentByIdArgs): Promise<z.infer<typeof CommentQueryResult>> => {
   return DBClient.instance.beerComment.update({
     where: { id },
     data: { content, rating, updatedAt: new Date() },
