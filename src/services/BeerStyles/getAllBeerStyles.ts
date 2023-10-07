@@ -2,14 +2,16 @@ import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
 import BeerStyleQueryResult from './schema/BeerStyleQueryResult';
 
+interface GetAllBeerStylesArgs {
+  pageNum: number;
+  pageSize: number;
+}
+
 const getAllBeerStyles = async ({
   pageNum,
   pageSize,
-}: {
-  pageNum: number;
-  pageSize: number;
-}): Promise<z.infer<typeof BeerStyleQueryResult>[]> =>
-  DBClient.instance.beerStyle.findMany({
+}: GetAllBeerStylesArgs): Promise<z.infer<typeof BeerStyleQueryResult>[]> => {
+  const beerStyles = await DBClient.instance.beerStyle.findMany({
     take: pageSize,
     skip: (pageNum - 1) * pageSize,
     select: {
@@ -23,6 +25,13 @@ const getAllBeerStyles = async ({
       description: true,
       glassware: { select: { id: true, name: true } },
     },
-  }) as ReturnType<typeof getAllBeerStyles>;
+  });
+
+  /**
+   * Prisma does not support tuples, so we have to typecast the ibuRange and abvRange
+   * fields to [number, number] in order to satisfy the zod schema.
+   */
+  return beerStyles as Awaited<ReturnType<typeof getAllBeerStyles>>;
+};
 
 export default getAllBeerStyles;

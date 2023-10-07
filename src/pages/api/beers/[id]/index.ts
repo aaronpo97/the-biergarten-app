@@ -45,12 +45,7 @@ const editBeerPost = async (
   req: EditBeerPostRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const {
-    body,
-    query: { id },
-  } = req;
-
-  await editBeerPostById(id, body);
+  await editBeerPostById({ id: req.query.id, data: req.body });
 
   res.status(200).json({
     message: 'Beer post updated successfully',
@@ -62,8 +57,7 @@ const editBeerPost = async (
 const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const deleted = deleteBeerPostById(id);
-
+  const deleted = deleteBeerPostById({ beerPostId: id });
   if (!deleted) {
     throw new ServerError('Beer post not found', 404);
   }
@@ -74,26 +68,28 @@ const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
     statusCode: 200,
   });
 };
+
 const router = createRouter<
   EditBeerPostRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 
-router.put(
-  validateRequest({
-    bodySchema: EditBeerPostValidationSchema,
-    querySchema: z.object({ id: z.string() }),
-  }),
-  getCurrentUser,
-  checkIfBeerPostOwner,
-  editBeerPost,
-);
-router.delete(
-  validateRequest({ querySchema: z.object({ id: z.string() }) }),
-  getCurrentUser,
-  checkIfBeerPostOwner,
-  deleteBeerPost,
-);
+router
+  .put(
+    validateRequest({
+      bodySchema: EditBeerPostValidationSchema,
+      querySchema: z.object({ id: z.string() }),
+    }),
+    getCurrentUser,
+    checkIfBeerPostOwner,
+    editBeerPost,
+  )
+  .delete(
+    validateRequest({ querySchema: z.object({ id: z.string() }) }),
+    getCurrentUser,
+    checkIfBeerPostOwner,
+    deleteBeerPost,
+  );
 
 const handler = router.handler(NextConnectOptions);
 
