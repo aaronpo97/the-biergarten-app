@@ -70,7 +70,12 @@ const BeerRecommendationsSection: FC<{
 
                     <div>
                       <div>
-                        <span className="text-lg font-medium">{post.style.name}</span>
+                        <Link
+                          className="link link-hover"
+                          href={`/beers/styles/${post.style.id}`}
+                        >
+                          <span className="text-lg font-medium">{post.style.name}</span>
+                        </Link>
                       </div>
                       <div className="space-x-2">
                         <span>{post.abv.toFixed(1)}% ABV</span>

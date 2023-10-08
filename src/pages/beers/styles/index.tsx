@@ -4,7 +4,7 @@ import { MutableRefObject, useRef } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 
-import BeerStyleCard from '@/components/BeerStyle/BeerStyleCard';
+import BeerStyleCard from '@/components/BeerStyleIndex/BeerStyleCard';
 import SmLoadingCard from '@/components/ui/SmLoadingCard';
 import Spinner from '@/components/ui/Spinner';
 import useBeerStyles from '@/hooks/data-fetching/beer-styles/useBeerStyles';
