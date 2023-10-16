@@ -18,17 +18,17 @@ enum Role {
 }
 
 model User {
-  id                String            @id @default(cuid())
-  username          String            @unique
+  id                String             @id @default(cuid())
+  username          String             @unique
   firstName         String
   lastName          String
   hash              String
-  email             String            @unique
-  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
-  updatedAt         DateTime?         @updatedAt @db.Timestamptz(3)
-  accountIsVerified Boolean           @default(false)
+  email             String             @unique
+  createdAt         DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime?          @updatedAt @db.Timestamptz(3)
+  accountIsVerified Boolean            @default(false)
   dateOfBirth       DateTime
-  role              Role              @default(USER)
+  role              Role               @default(USER)
   beerPosts         BeerPost[]
   beerStyles        BeerStyle[]
   breweryPosts      BreweryPost[]
@@ -40,6 +40,8 @@ model User {
   BreweryPostLike   BreweryPostLike[]
   Location          Location[]
   Glassware         Glassware[]
+  BeerStyleLike     BeerStyleLike[]
+  BeerStyleComment  BeerStyleComment[]
 }
 
 model BeerPost {
@@ -94,18 +96,42 @@ model BeerComment {
 }
 
 model BeerStyle {
-  id          String     @id @default(cuid())
-  name        String
-  description String
-  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime?  @updatedAt @db.Timestamptz(3)
-  postedBy    User       @relation(fields: [postedById], references: [id], onDelete: Cascade)
-  glassware   Glassware  @relation(fields: [glasswareId], references: [id], onDelete: Cascade)
-  glasswareId String
+  id               String             @id @default(cuid())
+  name             String
+  description      String
+  createdAt        DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime?          @updatedAt @db.Timestamptz(3)
+  postedBy         User               @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  glassware        Glassware          @relation(fields: [glasswareId], references: [id], onDelete: Cascade)
+  glasswareId      String
+  postedById       String
+  abvRange         Float[]
+  ibuRange         Float[]
+  beerPosts        BeerPost[]
+  BeerStyleLike    BeerStyleLike[]
+  BeerStyleComment BeerStyleComment[]
+}
+
+model BeerStyleLike {
+  id          String    @id @default(cuid())
+  beerStyle   BeerStyle @relation(fields: [beerStyleId], references: [id], onDelete: Cascade)
+  beerStyleId String
+  likedBy     User      @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById   String
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime? @updatedAt @db.Timestamptz(3)
+}
+
+model BeerStyleComment {
+  id          String    @id @default(cuid())
+  rating      Int
+  beerStyle   BeerStyle @relation(fields: [beerStyleId], references: [id], onDelete: Cascade)
+  beerStyleId String
+  postedBy    User      @relation(fields: [postedById], references: [id], onDelete: Cascade)
   postedById  String
-  abvRange    Float[]
-  ibuRange    Float[]
-  beerPosts   BeerPost[]
+  content     String
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime? @updatedAt @db.Timestamptz(3)
 }
 
 model Glassware {

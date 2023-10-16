@@ -8,12 +8,13 @@ import { Tab } from '@headlessui/react';
 import getBeerStyleById from '@/services/BeerStyles/getBeerStyleById';
 import BeerStyleHeader from '@/components/BeerStyleById/BeerStyleHeader';
 import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleCommentSection from '@/components/BeerStyleById/BeerStyleCommentSection';
 
 interface BeerStylePageProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
 }
 
-const BeerByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
+const BeerStyleByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   return (
@@ -29,8 +30,10 @@ const BeerByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
 
             {isDesktop ? (
               <div className="mt-4 flex flex-row space-x-3 space-y-0">
-                <div className="w-[60%]">{/* Comments go here */}</div>
-                <div className="w-[40%]">{/* Recommendations go here */}</div>
+                <div className="w-[60%]">
+                  <BeerStyleCommentSection beerStyle={beerStyle} />
+                </div>
+                <div className="w-[40%]">{/* Beers of this style go here */}</div>
               </div>
             ) : (
               <Tab.Group>
@@ -43,8 +46,10 @@ const BeerByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
                   </Tab>
                 </Tab.List>
                 <Tab.Panels className="mt-2">
-                  <Tab.Panel>{/* Comments go here */}</Tab.Panel>
-                  <Tab.Panel>{/* Recommendations go here */}</Tab.Panel>
+                  <Tab.Panel>
+                    <BeerStyleCommentSection beerStyle={beerStyle} />
+                  </Tab.Panel>
+                  <Tab.Panel>{/* Beers of this style go here */}</Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>
             )}
@@ -55,7 +60,7 @@ const BeerByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
   );
 };
 
-export default BeerByIdPage;
+export default BeerStyleByIdPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const id = params!.id as string;
