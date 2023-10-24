@@ -8,6 +8,8 @@ import { FaRegEdit } from 'react-icons/fa';
 import { z } from 'zod';
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
+import useBeerStyleLikeCount from '@/hooks/data-fetching/beer-style-likes/useBeerStyleLikeCount';
+import BeerStyleLikeButton from './BeerStyleLikeButton';
 
 interface BeerInfoHeaderProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -21,7 +23,7 @@ const BeerStyleHeader: FC<BeerInfoHeaderProps> = ({ beerStyle }) => {
   const idMatches = user && beerStyle.postedBy.id === user.id;
   const isPostOwner = !!(user && idMatches);
 
-  // const { likeCount, mutate } = useBeerStyleLikeCount(beerStyle.id);
+  const { likeCount, mutate } = useBeerStyleLikeCount(beerStyle.id);
 
   return (
     <article className="card flex flex-col justify-center bg-base-300">
@@ -82,14 +84,18 @@ const BeerStyleHeader: FC<BeerInfoHeaderProps> = ({ beerStyle }) => {
             <span className="text-sm font-bold italic">{beerStyle.glassware.name}</span>
           </div>
           <div className="flex justify-between">
+            <div>
+              {(!!likeCount || likeCount === 0) && (
+                <span>
+                  Liked by {likeCount}
+                  {likeCount !== 1 ? ' users' : ' user'}
+                </span>
+              )}
+            </div>
             <div className="card-actions items-end">
-              {/* {user && (
-                <BeerStyleLikeButton
-                  beerStyle={beerStyle}
-                  likeCount={likeCount}
-                  mutate={mutate}
-                />
-              )} */}
+              {user && (
+                <BeerStyleLikeButton beerStyleId={beerStyle.id} mutateCount={mutate} />
+              )}
             </div>
           </div>
         </div>
