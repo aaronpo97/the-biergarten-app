@@ -13,7 +13,7 @@ const BeerPostQueryResult = z.object({
   style: z.object({ id: z.string(), name: z.string(), description: z.string() }),
   postedBy: z.object({ id: z.string(), username: z.string() }),
   createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().nullable(),
 });
 
 export default BeerPostQueryResult;

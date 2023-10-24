@@ -4,25 +4,25 @@ import { z } from 'zod';
 
 const prisma = DBClient.instance;
 
-const getBeerPostById = async (id: string) => {
-  const beerPost: z.infer<typeof BeerPostQueryResult> | null =
-    await prisma.beerPost.findFirst({
-      select: {
-        id: true,
-        name: true,
-        ibu: true,
-        abv: true,
-        createdAt: true,
-        description: true,
-        postedBy: { select: { username: true, id: true } },
-        brewery: { select: { name: true, id: true } },
-        style: { select: { name: true, id: true, description: true } },
-        beerImages: { select: { alt: true, path: true, caption: true, id: true } },
-      },
-      where: { id },
-    });
-
-  return beerPost;
+const getBeerPostById = async (
+  id: string,
+): Promise<z.infer<typeof BeerPostQueryResult> | null> => {
+  return prisma.beerPost.findFirst({
+    select: {
+      id: true,
+      name: true,
+      ibu: true,
+      abv: true,
+      createdAt: true,
+      updatedAt: true,
+      description: true,
+      postedBy: { select: { username: true, id: true } },
+      brewery: { select: { name: true, id: true } },
+      style: { select: { name: true, id: true, description: true } },
+      beerImages: { select: { alt: true, path: true, caption: true, id: true } },
+    },
+    where: { id },
+  });
 };
 
 export default getBeerPostById;

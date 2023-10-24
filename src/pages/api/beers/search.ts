@@ -26,6 +26,7 @@ const search = async (req: SearchAPIRequest, res: NextApiResponse) => {
         ibu: true,
         abv: true,
         createdAt: true,
+        updatedAt: true,
         description: true,
         postedBy: { select: { username: true, id: true } },
         brewery: { select: { name: true, id: true } },

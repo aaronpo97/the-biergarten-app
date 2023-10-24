@@ -4,7 +4,7 @@ import { MutableRefObject, useRef } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 
-import BeerStyleCard from '@/components/BeerStyle/BeerStyleCard';
+import BeerStyleCard from '@/components/BeerStyleIndex/BeerStyleCard';
 import SmLoadingCard from '@/components/ui/SmLoadingCard';
 import Spinner from '@/components/ui/Spinner';
 import useBeerStyles from '@/hooks/data-fetching/beer-styles/useBeerStyles';
@@ -38,7 +38,7 @@ const BeerStylePage: NextPage = () => {
           <header className="my-10 flex justify-between lg:flex-row">
             <div>
               <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
-              <h2 className="text-2xl font-bold lg:text-4xl">Types</h2>
+              <h2 className="text-2xl font-bold lg:text-4xl">Styles</h2>
             </div>
           </header>
           <div className="grid gap-6 xl:grid-cols-2">

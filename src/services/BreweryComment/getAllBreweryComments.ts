@@ -1,12 +1,16 @@
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import CommentQueryResult from '../schema/CommentSchema/CommentQueryResult';
 
-const getAllBreweryComments = async (
-  { id }: Pick<z.infer<typeof BeerPostQueryResult>, 'id'>,
-  { pageSize, pageNum = 0 }: { pageSize: number; pageNum?: number },
-) => {
+const getAllBreweryComments = async ({
+  id,
+  pageNum,
+  pageSize,
+}: {
+  id: string;
+  pageNum: number;
+  pageSize: number;
+}) => {
   const skip = (pageNum - 1) * pageSize;
   const breweryComments: z.infer<typeof CommentQueryResult>[] =
     await DBClient.instance.breweryComment.findMany({
@@ -18,6 +22,7 @@ const getAllBreweryComments = async (
         content: true,
         rating: true,
         createdAt: true,
+        updatedAt: true,
         postedBy: { select: { id: true, username: true, createdAt: true } },
       },
       orderBy: { createdAt: 'desc' },

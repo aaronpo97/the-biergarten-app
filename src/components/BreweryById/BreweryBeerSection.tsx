@@ -76,7 +76,12 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
                     </div>
 
                     <div>
-                      <span className="text-lg font-medium">{beerPost.style.name}</span>
+                      <Link
+                        className="text-lg font-medium link link-hover"
+                        href={`/beers/styles/${beerPost.style.id}`}
+                      >
+                        {beerPost.style.name}
+                      </Link>
                     </div>
                     <div className="space-x-2">
                       <span>{beerPost.abv}% ABV</span>

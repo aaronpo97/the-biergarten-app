@@ -13,7 +13,10 @@ const getBeerRecommendations = async ({
   beerPost,
   pageNum,
   pageSize,
-}: GetBeerRecommendationsArgs) => {
+}: GetBeerRecommendationsArgs): Promise<{
+  beerRecommendations: z.infer<typeof BeerPostQueryResult>[];
+  count: number;
+}> => {
   const skip = (pageNum - 1) * pageSize;
   const take = pageSize;
 
@@ -30,6 +33,7 @@ const getBeerRecommendations = async ({
         abv: true,
         description: true,
         createdAt: true,
+        updatedAt: true,
         style: { select: { name: true, id: true, description: true } },
         brewery: { select: { name: true, id: true } },
         postedBy: { select: { id: true, username: true } },

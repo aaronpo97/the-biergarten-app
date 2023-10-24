@@ -16,6 +16,8 @@ import createNewBreweryPostLikes from './create/createNewBreweryPostLikes';
 import createNewLocations from './create/createNewLocations';
 import logger from '../../config/pino/logger';
 import createAdminUser from './create/createAdminUser';
+import createNewBeerStyleComments from './create/createNewBeerStyleComments';
+import createNewBeerStyleLikes from './create/createNewBeerStyleLikes';
 
 (async () => {
   try {
@@ -51,10 +53,14 @@ import createAdminUser from './create/createAdminUser';
 
     logger.info('Beer posts created successfully.');
 
-    const [beerPostComments, breweryPostComments] = await Promise.all([
+    const [beerPostComments, beerStyleComments, breweryPostComments] = await Promise.all([
       createNewBeerPostComments({
         numberOfComments: 100000,
         joinData: { beerPosts, users },
+      }),
+      createNewBeerStyleComments({
+        numberOfComments: 5000,
+        joinData: { beerStyles, users },
       }),
       createNewBreweryPostComments({
         numberOfComments: 50000,
@@ -63,10 +69,14 @@ import createAdminUser from './create/createAdminUser';
     ]);
     logger.info('Created beer post comments and brewery post comments.');
 
-    const [beerPostLikes, breweryPostLikes] = await Promise.all([
+    const [beerPostLikes, beerStyleLikes, breweryPostLikes] = await Promise.all([
       createNewBeerPostLikes({
         numberOfLikes: 500000,
         joinData: { beerPosts, users },
+      }),
+      createNewBeerStyleLikes({
+        numberOfLikes: 50000,
+        joinData: { beerStyles, users },
       }),
       createNewBreweryPostLikes({
         numberOfLikes: 100000,
@@ -96,6 +106,8 @@ import createAdminUser from './create/createAdminUser';
       numberOfBreweryPosts: breweryPosts.length,
       numberOfBeerPosts: beerPosts.length,
       numberOfBeerStyles: beerStyles.length,
+      numberOfBeerStyleLikes: beerStyleLikes.length,
+      numberOfBeerStyleComments: beerStyleComments.length,
       numberOfBeerPostLikes: beerPostLikes.length,
       numberOfBreweryPostLikes: breweryPostLikes.length,
       numberOfBeerPostComments: beerPostComments.length,

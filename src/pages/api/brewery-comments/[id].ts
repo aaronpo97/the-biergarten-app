@@ -4,6 +4,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
+import getBreweryCommentById from '@/services/BreweryComment/getBreweryCommentById';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
@@ -27,9 +28,7 @@ const checkIfCommentOwner = async (
 ) => {
   const { id } = req.query;
   const user = req.user!;
-  const comment = await DBClient.instance.breweryComment.findUnique({
-    where: { id },
-  });
+  const comment = await getBreweryCommentById(id);
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
@@ -87,7 +86,9 @@ const router = createRouter<
 
 router
   .delete(
-    validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
+    validateRequest({
+      querySchema: z.object({ id: z.string().cuid() }),
+    }),
     getCurrentUser,
     checkIfCommentOwner,
     deleteComment,

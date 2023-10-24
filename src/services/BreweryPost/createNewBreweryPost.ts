@@ -19,37 +19,37 @@ const createNewBreweryPost = async ({
   locationId,
   name,
   userId,
-}: z.infer<typeof CreateNewBreweryPostWithUserAndLocationSchema>) => {
-  const breweryPost: z.infer<typeof BreweryPostQueryResult> =
-    (await DBClient.instance.breweryPost.create({
-      data: {
-        name,
-        description,
-        dateEstablished,
-        location: { connect: { id: locationId } },
-        postedBy: { connect: { id: userId } },
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        dateEstablished: true,
-        postedBy: { select: { id: true, username: true } },
-        breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
-        location: {
-          select: {
-            city: true,
-            address: true,
-            coordinates: true,
-            country: true,
-            stateOrProvince: true,
-          },
+}: z.infer<typeof CreateNewBreweryPostWithUserAndLocationSchema>): Promise<
+  z.infer<typeof BreweryPostQueryResult>
+> => {
+  const post = (await DBClient.instance.breweryPost.create({
+    data: {
+      name,
+      description,
+      dateEstablished,
+      location: { connect: { id: locationId } },
+      postedBy: { connect: { id: userId } },
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      dateEstablished: true,
+      postedBy: { select: { id: true, username: true } },
+      breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
+      location: {
+        select: {
+          city: true,
+          address: true,
+          coordinates: true,
+          country: true,
+          stateOrProvince: true,
         },
       },
-    })) as z.infer<typeof BreweryPostQueryResult>;
+    },
+  })) as Awaited<ReturnType<typeof createNewBreweryPost>>;
 
-  return breweryPost;
+  return post;
 };
-
 export default createNewBreweryPost;

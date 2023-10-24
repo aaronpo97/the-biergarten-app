@@ -74,7 +74,7 @@ const BeerInfoHeader: FC<BeerInfoHeaderProps> = ({ beerPost }) => {
               <div>
                 <Link
                   className="link-hover link text-lg font-bold"
-                  href={`/beers/types/${beerPost.style.id}`}
+                  href={`/beers/styles/${beerPost.style.id}`}
                 >
                   {beerPost.style.name}
                 </Link>

@@ -19,7 +19,7 @@ const getBeerPosts = async (
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const beerPosts = await getAllBeerPosts(pageNum, pageSize);
+  const beerPosts = await getAllBeerPosts({ pageNum, pageSize });
   const beerPostCount = await DBClient.instance.beerPost.count();
 
   res.setHeader('X-Total-Count', beerPostCount);

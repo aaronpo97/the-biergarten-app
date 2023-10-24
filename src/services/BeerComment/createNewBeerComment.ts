@@ -1,7 +1,7 @@
 import DBClient from '@/prisma/DBClient';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '../schema/CommentSchema/CreateCommentValidationSchema';
-import BeerCommentQueryResult from './schema/BeerCommentQueryResult';
+import CommentQueryResult from '../schema/CommentSchema/CommentQueryResult';
 
 const CreateNewBeerCommentServiceSchema = CreateCommentValidationSchema.extend({
   userId: z.string().cuid(),
@@ -15,7 +15,7 @@ const createNewBeerComment = async ({
   rating,
   beerPostId,
   userId,
-}: CreateNewBeerCommentArgs): Promise<z.infer<typeof BeerCommentQueryResult>> => {
+}: CreateNewBeerCommentArgs): Promise<z.infer<typeof CommentQueryResult>> => {
   return DBClient.instance.beerComment.create({
     data: {
       content,

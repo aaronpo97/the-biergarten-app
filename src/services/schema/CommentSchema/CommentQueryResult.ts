@@ -9,6 +9,7 @@ const CommentQueryResult = z.object({
     id: z.string().cuid(),
     username: z.string().min(1).max(50),
   }),
+  updatedAt: z.coerce.date().nullable(),
 });
 
 export default CommentQueryResult;
