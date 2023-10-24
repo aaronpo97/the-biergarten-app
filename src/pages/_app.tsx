@@ -4,15 +4,14 @@ import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import { themeChange } from 'theme-change';
-
 import { Analytics } from '@vercel/analytics/react';
 
-import { Space_Grotesk } from 'next/font/google';
+import { Nunito_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Layout from '@/components/ui/Layout';
 import CustomToast from '@/components/ui/CustomToast';
 
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
+const font = Nunito_Sans({ subsets: ['latin-ext'] });
 
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
@@ -24,7 +23,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       <style jsx global>
         {`
           html {
-            font-family: ${spaceGrotesk.style.fontFamily};
+            font-family: ${font.style.fontFamily};
           }
         `}
       </style>

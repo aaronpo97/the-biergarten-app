@@ -62,41 +62,46 @@ const BeerStyleHeader: FC<BeerInfoHeaderProps> = ({ beerStyle }) => {
             </div>
           )}
         </header>
-        <div className="space-y-2">
+        <div>
           <p>{beerStyle.description}</p>
-          <div className="flex w-25 space-x-3 flex-row">
-            <div className="text-sm font-bold">
-              ABV Range:{' '}
-              <span>
-                {beerStyle.abvRange[0].toFixed(1)}% - {beerStyle.abvRange[0].toFixed(1)}%
-              </span>
-            </div>
-            <div className="text-sm font-bold">
-              IBU Range:{' '}
-              <span>
-                {beerStyle.ibuRange[0].toFixed(1)} - {beerStyle.ibuRange[1].toFixed(1)}
-              </span>
-            </div>
-          </div>
+        </div>
 
-          <div className="font-semibold">
-            Recommended Glassware:{' '}
-            <span className="text-sm font-bold italic">{beerStyle.glassware.name}</span>
-          </div>
-          <div className="flex justify-between">
-            <div>
-              {(!!likeCount || likeCount === 0) && (
+        <div className="flex justify-between">
+          <div className="space-y-2">
+            <div className="flex w-25 space-x-3 flex-row">
+              <div className="text-sm font-bold">
+                ABV Range:{' '}
                 <span>
-                  Liked by {likeCount}
-                  {likeCount !== 1 ? ' users' : ' user'}
+                  {beerStyle.abvRange[0].toFixed(1)}% - {beerStyle.abvRange[0].toFixed(1)}
+                  %
                 </span>
-              )}
+              </div>
+              <div className="text-sm font-bold">
+                IBU Range:{' '}
+                <span>
+                  {beerStyle.ibuRange[0].toFixed(1)} - {beerStyle.ibuRange[1].toFixed(1)}
+                </span>
+              </div>
             </div>
-            <div className="card-actions items-end">
-              {user && (
-                <BeerStyleLikeButton beerStyleId={beerStyle.id} mutateCount={mutate} />
-              )}
+            <div className="font-semibold">
+              Recommended Glassware:{' '}
+              <span className="text-sm font-bold italic">{beerStyle.glassware.name}</span>
             </div>
+            <div className="flex justify-between">
+              <div>
+                {(!!likeCount || likeCount === 0) && (
+                  <span>
+                    Liked by {likeCount}
+                    {likeCount !== 1 ? ' users' : ' user'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="card-actions items-end">
+            {user && (
+              <BeerStyleLikeButton beerStyleId={beerStyle.id} mutateCount={mutate} />
+            )}
           </div>
         </div>
       </div>

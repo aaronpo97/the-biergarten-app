@@ -57,7 +57,7 @@ const BeerRecommendationsSection: FC<{
                   >
                     <div className="flex flex-col">
                       <Link className="link-hover link" href={`/beers/${post.id}`}>
-                        <span className="text-xl font-semibold">{post.name}</span>
+                        <span className="text-xl font-bold">{post.name}</span>
                       </Link>
 
                       <Link
@@ -74,7 +74,7 @@ const BeerRecommendationsSection: FC<{
                           className="link link-hover"
                           href={`/beers/styles/${post.style.id}`}
                         >
-                          <span className="text-lg font-medium">{post.style.name}</span>
+                          <span className="font-medium">{post.style.name}</span>
                         </Link>
                       </div>
                       <div className="space-x-2">
