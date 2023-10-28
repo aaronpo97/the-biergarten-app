@@ -22,12 +22,12 @@ const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMod
     <div className="card-body animate-in fade-in-10">
       <div className="flex flex-row justify-between">
         <div>
-          <h3 className="font-semibold sm:text-2xl">
+          <p className="font-semibold sm:text-2xl">
             <Link href={`/users/${comment.postedBy.id}`} className="link-hover link">
               {comment.postedBy.username}
             </Link>
-          </h3>
-          <h4 className="italic">
+          </p>
+          <span className="italic">
             posted{' '}
             <time
               className="tooltip tooltip-bottom"
@@ -36,7 +36,7 @@ const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMod
               {timeDistance}
             </time>{' '}
             ago
-          </h4>
+          </span>
         </div>
 
         {user && <CommentCardDropdown comment={comment} setInEditMode={setInEditMode} />}
