@@ -19,7 +19,7 @@ const getAllBeersByBeerStyle = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
-  const beers = await getBeerPostsByBeerStyleId({
+  const beers = getBeerPostsByBeerStyleId({
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
     styleId: id,
