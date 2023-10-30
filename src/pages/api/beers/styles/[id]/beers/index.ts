@@ -1,7 +1,7 @@
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import getBeerPostsByBeerStyleId from '@/services/BeerPost/getBeerPostsByBeerStyleId';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
@@ -18,25 +18,11 @@ const getAllBeersByBeerStyle = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
-  const beers: z.infer<typeof BeerPostQueryResult>[] =
-    await DBClient.instance.beerPost.findMany({
-      where: { styleId: id },
-      take: parseInt(page_size, 10),
-      skip: parseInt(page_num, 10) * parseInt(page_size, 10),
-      select: {
-        id: true,
-        name: true,
-        ibu: true,
-        abv: true,
-        createdAt: true,
-        updatedAt: true,
-        description: true,
-        postedBy: { select: { username: true, id: true } },
-        brewery: { select: { name: true, id: true } },
-        style: { select: { name: true, id: true, description: true } },
-        beerImages: { select: { alt: true, path: true, caption: true, id: true } },
-      },
-    });
+  const beers = getBeerPostsByBeerStyleId({
+    pageNum: parseInt(page_num, 10),
+    pageSize: parseInt(page_size, 10),
+    styleId: id,
+  });
 
   const pageCount = await DBClient.instance.beerPost.count({ where: { styleId: id } });
 
