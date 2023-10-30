@@ -2,13 +2,13 @@
 
 const myThemes = {
   dark: {
-    primary: 'hsl(227, 25%, 14%)',
+    primary: 'hsl(227, 25%, 25%)',
     secondary: 'hsl(255, 9%, 69%)',
     error: 'hsl(9, 52%, 57%)',
     accent: 'hsl(316, 96%, 60%)',
     neutral: 'hsl(240, 11%, 8%)',
-    info: 'hsl(207, 100%, 50%)',
-    success: 'hsl(100, 57%, 53%)',
+    info: 'hsl(187, 11%, 60%)',
+    success: 'hsl(117, 25%, 80%)',
     warning: 'hsl(50, 98%, 50%)',
     'primary-content': 'hsl(0, 0%, 98%)',
     'error-content': 'hsl(0, 0%, 98%)',

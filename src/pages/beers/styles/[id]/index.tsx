@@ -9,6 +9,7 @@ import getBeerStyleById from '@/services/BeerStyles/getBeerStyleById';
 import BeerStyleHeader from '@/components/BeerStyleById/BeerStyleHeader';
 import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
 import BeerStyleCommentSection from '@/components/BeerStyleById/BeerStyleCommentSection';
+import BeerStyleBeerSection from '@/components/BeerStyleById/BeerStyleBeerSection';
 
 interface BeerStylePageProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -33,7 +34,9 @@ const BeerStyleByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
                 <div className="w-[60%]">
                   <BeerStyleCommentSection beerStyle={beerStyle} />
                 </div>
-                <div className="w-[40%]">{/* Beers of this style go here */}</div>
+                <div className="w-[40%]">
+                  <BeerStyleBeerSection beerStyle={beerStyle} />
+                </div>
               </div>
             ) : (
               <Tab.Group>
@@ -49,7 +52,9 @@ const BeerStyleByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
                   <Tab.Panel>
                     <BeerStyleCommentSection beerStyle={beerStyle} />
                   </Tab.Panel>
-                  <Tab.Panel>{/* Beers of this style go here */}</Tab.Panel>
+                  <Tab.Panel>
+                    <BeerStyleBeerSection beerStyle={beerStyle} />
+                  </Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>
             )}
