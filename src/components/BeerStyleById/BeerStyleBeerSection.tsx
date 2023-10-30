@@ -20,8 +20,8 @@ const BeerStyleBeerSection: FC<BeerStyleBeerSectionProps> = ({ beerStyle }) => {
   });
   const { ref: penultimateBeerPostRef } = useInView({
     /**
-     * When the last beer post comes into view, call setSize from useBeerPostsByBrewery to
-     * load more beer posts.
+     * When the last beer post comes into view, call setSize from useBeerPostsByBeerStyle
+     * to load more beer posts.
      */
     onChange: (visible) => {
       if (!visible || isAtEnd) return;
