@@ -65,6 +65,9 @@ export default BeerStyleByIdPage;
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const id = params!.id as string;
   const beerStyle = await getBeerStyleById(id);
+  if (!beerStyle) {
+    return { notFound: true };
+  }
 
   return { props: { beerStyle: JSON.parse(JSON.stringify(beerStyle)) } };
 };
