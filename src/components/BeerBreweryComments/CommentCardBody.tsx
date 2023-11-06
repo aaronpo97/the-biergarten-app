@@ -4,7 +4,7 @@ import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
-
+import Image from 'next/image';
 import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';
 
@@ -28,19 +28,36 @@ const CommentCardBody: FC<CommentCardProps> = ({
 }) => {
   const [inEditMode, setInEditMode] = useState(false);
 
+  const { userAvatar } = comment.postedBy;
   return (
-    <div ref={ref}>
-      {!inEditMode ? (
-        <CommentContentBody comment={comment} setInEditMode={setInEditMode} />
-      ) : (
-        <EditCommentBody
-          comment={comment}
-          mutate={mutate}
-          setInEditMode={setInEditMode}
-          handleDeleteRequest={handleDeleteRequest}
-          handleEditRequest={handleEditRequest}
-        />
-      )}
+    <div ref={ref} className="flex">
+      <div className="w-[12%] py-4 justify-center">
+        <div className="px-1 mask mask-circle">
+          {!userAvatar ? null : (
+            <Image
+              src={userAvatar.path}
+              alt="user avatar"
+              width={1000}
+              height={1000}
+              className="h-full w-full"
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="w-[88%] h-full">
+        {!inEditMode ? (
+          <CommentContentBody comment={comment} setInEditMode={setInEditMode} />
+        ) : (
+          <EditCommentBody
+            comment={comment}
+            mutate={mutate}
+            setInEditMode={setInEditMode}
+            handleDeleteRequest={handleDeleteRequest}
+            handleEditRequest={handleEditRequest}
+          />
+        )}
+      </div>
     </div>
   );
 };

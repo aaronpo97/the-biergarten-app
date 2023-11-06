@@ -18,8 +18,9 @@ const createNewUserAvatars = async ({
 }: CreateNewUserAvatarsArgs) => {
   const userAvatars: UserAvatarData[] = [];
 
-  const path = imageUrls[Math.floor(Math.random() * imageUrls.length)];
   users.forEach((user) => {
+    const path = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+
     userAvatars.push({
       path,
       alt: `${user.firstName} ${user.lastName}`,
