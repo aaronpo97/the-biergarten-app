@@ -163,7 +163,7 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   database used for migrations.
 - `SHADOW_DATABASE_URL` is a connection string for a secondary database used for
   migrations to detect schema drift.
-  - You can create a free account [here](https://neon.tech)
+  - You can create a free account [here](https://neon.tech).
   - Consult the [docs](https://neon.tech/docs/guides/prisma) for more information.
 - `MAPBOX_ACCESS_TOKEN` and `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` are the access tokens for
   your Mapbox account.
