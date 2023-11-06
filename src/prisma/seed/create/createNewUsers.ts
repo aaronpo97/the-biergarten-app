@@ -71,7 +71,9 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
   }
 
   await prisma.user.createMany({ data, skipDuplicates: true });
-  return prisma.user.findMany();
+  return prisma.user.findMany({
+    where: { role: { not: 'ADMIN' } },
+  });
 };
 
 export default createNewUsers;

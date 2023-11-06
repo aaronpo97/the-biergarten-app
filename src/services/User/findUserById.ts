@@ -17,6 +17,17 @@ const findUserById = async (id: string) => {
         accountIsVerified: true,
         updatedAt: true,
         role: true,
+        userAvatar: {
+          select: {
+            path: true,
+            alt: true,
+            caption: true,
+            createdAt: true,
+            id: true,
+            updatedAt: true,
+          },
+        },
+        bio: true,
       },
     });
 

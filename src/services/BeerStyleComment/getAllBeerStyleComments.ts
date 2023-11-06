@@ -24,7 +24,9 @@ const getAllBeerStyleComments = async ({
       rating: true,
       createdAt: true,
       updatedAt: true,
-      postedBy: { select: { id: true, username: true, createdAt: true } },
+      postedBy: {
+        select: { id: true, username: true, createdAt: true, userAvatar: true },
+      },
     },
   });
 };

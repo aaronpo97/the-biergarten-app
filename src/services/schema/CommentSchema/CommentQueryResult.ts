@@ -8,6 +8,14 @@ const CommentQueryResult = z.object({
   postedBy: z.object({
     id: z.string().cuid(),
     username: z.string().min(1).max(50),
+    userAvatar: z
+      .object({
+        id: z.string().cuid(),
+        path: z.string().url(),
+        alt: z.string().min(1).max(50),
+        caption: z.string().min(1).max(50),
+      })
+      .nullable(),
   }),
   updatedAt: z.coerce.date().nullable(),
 });
