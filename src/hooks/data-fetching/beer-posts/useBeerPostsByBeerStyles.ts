@@ -46,8 +46,6 @@ const useBeerPostsByBeerStyle = ({
     fetcher,
   );
 
-  console.log(error);
-
   const beerPosts = data?.flatMap((d) => d.beerPosts) ?? [];
   const pageCount = data?.[0].pageCount ?? 0;
   const isLoadingMore = size > 0 && data && typeof data[size - 1] === 'undefined';
