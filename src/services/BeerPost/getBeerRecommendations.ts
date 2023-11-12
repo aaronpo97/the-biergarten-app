@@ -37,7 +37,16 @@ const getBeerRecommendations = async ({
         style: { select: { name: true, id: true, description: true } },
         brewery: { select: { name: true, id: true } },
         postedBy: { select: { id: true, username: true } },
-        beerImages: { select: { path: true, caption: true, id: true, alt: true } },
+        beerImages: {
+          select: {
+            alt: true,
+            path: true,
+            caption: true,
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       take,
       skip,

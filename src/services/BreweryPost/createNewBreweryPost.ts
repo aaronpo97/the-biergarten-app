@@ -37,7 +37,16 @@ const createNewBreweryPost = async ({
       createdAt: true,
       dateEstablished: true,
       postedBy: { select: { id: true, username: true } },
-      breweryImages: { select: { path: true, caption: true, id: true, alt: true } },
+      breweryImages: {
+        select: {
+          path: true,
+          caption: true,
+          id: true,
+          alt: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       location: {
         select: {
           city: true,

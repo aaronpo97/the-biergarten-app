@@ -1,3 +1,4 @@
+import ImageQueryValidationSchema from '@/services/schema/ImageSchema/ImageQueryValidationSchema';
 import { z } from 'zod';
 
 const BeerPostQueryResult = z.object({
@@ -5,9 +6,7 @@ const BeerPostQueryResult = z.object({
   name: z.string(),
   brewery: z.object({ id: z.string(), name: z.string() }),
   description: z.string(),
-  beerImages: z.array(
-    z.object({ path: z.string(), caption: z.string(), id: z.string(), alt: z.string() }),
-  ),
+  beerImages: z.array(ImageQueryValidationSchema),
   ibu: z.number(),
   abv: z.number(),
   style: z.object({ id: z.string(), name: z.string(), description: z.string() }),

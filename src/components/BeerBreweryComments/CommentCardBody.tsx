@@ -4,9 +4,9 @@ import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
-import Image from 'next/image';
 import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';
+import UserAvatar from '../Account/UserAvatar';
 
 interface CommentCardProps {
   comment: z.infer<typeof CommentQueryResult>;
@@ -28,20 +28,11 @@ const CommentCardBody: FC<CommentCardProps> = ({
 }) => {
   const [inEditMode, setInEditMode] = useState(false);
 
-  const { userAvatar } = comment.postedBy;
   return (
     <div ref={ref} className="flex">
       <div className="w-[12%] py-4 justify-center">
         <div className="px-1 mask mask-circle">
-          {!userAvatar ? null : (
-            <Image
-              src={userAvatar.path}
-              alt="user avatar"
-              width={1000}
-              height={1000}
-              className="h-full w-full"
-            />
-          )}
+          <UserAvatar user={comment.postedBy} />
         </div>
       </div>
 
