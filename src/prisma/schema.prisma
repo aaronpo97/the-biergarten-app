@@ -44,6 +44,18 @@ model User {
   beerStyleLikes    BeerStyleLike[]
   beerStyleComments BeerStyleComment[]
   userAvatar        UserAvatar?
+  followedBy        UserFollow[]       @relation("following")
+  following         UserFollow[]       @relation("follower")
+}
+
+model UserFollow {
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  followerId  String
+  following   User     @relation("following", fields: [followingId], references: [id])
+  followingId String
+  followedAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  @@id([followerId, followingId])
 }
 
 model UserAvatar {
