@@ -24,19 +24,14 @@ const createNewUserFollows = async ({
     const randomUsers = users
       .filter((randomUser) => randomUser.id !== user.id)
       .sort(() => Math.random() - Math.random())
-      .slice(0, 20);
+      .slice(0, 100);
 
-    // Get the user to follow the random users, and the random users to follow the user.
+    // Get the user to follow the random users
     const data = randomUsers.flatMap((randomUser) => [
       {
         followerId: user.id,
         followingId: randomUser.id,
         followedAt: faker.date.between({ from: user.createdAt, to: new Date() }),
-      },
-      {
-        followerId: randomUser.id,
-        followingId: user.id,
-        followedAt: faker.date.between({ from: randomUser.createdAt, to: new Date() }),
       },
     ]);
 

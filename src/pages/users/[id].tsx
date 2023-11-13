@@ -7,7 +7,9 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { FC } from 'react';
 import { z } from 'zod';
-import Image from 'next/image';
+import UserAvatar from '@/components/Account/UserAvatar';
+import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
+import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 
 interface UserInfoPageProps {
   user: z.infer<typeof GetUserSchema>;
@@ -16,50 +18,63 @@ interface UserInfoPageProps {
 const UserHeader: FC<{ user: z.infer<typeof GetUserSchema> }> = ({ user }) => {
   const timeDistance = useTimeDistance(new Date(user.createdAt));
 
-  return (
-    <article className="card flex flex-col justify-center bg-base-300">
-      <div className="card-body">
-        <header className="flex justify-between">
-          <div className="space-y-2">
-            <div>
-              <h1 className="text-2xl font-bold lg:text-4xl">
-                {user.firstName} {user.lastName}
-              </h1>
+  const { followingCount } = useGetUsersFollowedByUser({
+    userId: user.id,
+    pageSize: 10,
+  });
 
-              <h3 className="italic">
-                joined{' '}
-                {timeDistance && (
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip={format(new Date(user.createdAt), 'MM/dd/yyyy')}
-                  >
-                    {`${timeDistance} ago`}
-                  </span>
-                )}
-              </h3>
-            </div>
-          </div>
-        </header>
+  const { followerCount } = useGetUsersFollowingUser({
+    userId: user.id,
+    pageSize: 10,
+  });
+
+  return (
+    <header className="card text-center items-center">
+      <div className="card-body items-center w-full">
+        <div className="w-40 h-40">
+          <UserAvatar user={user} />
+        </div>
+
+        <div>
+          <h1 className="text-2xl font-bold lg:text-4xl">{user.username}</h1>
+        </div>
+
+        <div className="flex space-x-3 text-lg font-bold">
+          <span>{followingCount} Following</span>
+          <span>{followerCount} Followers</span>
+        </div>
+
+        <span className="italic">
+          joined{' '}
+          {timeDistance && (
+            <span
+              className="tooltip tooltip-bottom"
+              data-tip={format(new Date(user.createdAt), 'MM/dd/yyyy')}
+            >
+              {`${timeDistance} ago`}
+            </span>
+          )}
+        </span>
       </div>
-    </article>
+    </header>
   );
 };
 
 const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const title = `${user.username} | The Biergarten App`;
+
   return (
     <>
       <Head>
-        <title>{user ? `${user.firstName} ${user.lastName}` : 'User Info'}</title>
+        <title>{title}</title>
         <meta name="description" content="User information" />
       </Head>
       <>
         <main className="mb-12 mt-10 flex w-full items-center justify-center">
-          <Image src={user.userAvatar!.path} alt="avatar" width={200} height={200} />
           <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
             <UserHeader user={user} />
-
-            {isDesktop ? <></> : <> </>}
           </div>
         </main>
       </>

@@ -19,7 +19,7 @@ const UserAvatar: FC<UserAvatarProps> = ({ user }) => {
       alt="user avatar"
       width={1000}
       height={1000}
-      className="h-full w-full"
+      className="h-full w-full object-cover mask mask-circle ring ring-primary ring-offset-base-100 ring-offset-2"
     />
   );
 };
