@@ -47,11 +47,11 @@ const getAllBeersByBrewery = async (
       },
     });
 
-  const pageCount = await DBClient.instance.beerPost.count({
+  const count = await DBClient.instance.beerPost.count({
     where: { breweryId: id },
   });
 
-  res.setHeader('X-Total-Count', pageCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Beers fetched successfully',
