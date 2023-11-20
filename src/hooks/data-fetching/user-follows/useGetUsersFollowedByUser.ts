@@ -3,7 +3,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
-const useGetUsersFollowingUser = ({
+const useGetUsersFollowedByUser = ({
   pageSize,
   userId,
 }: {
@@ -61,4 +61,4 @@ const useGetUsersFollowingUser = ({
   };
 };
 
-export default useGetUsersFollowingUser;
+export default useGetUsersFollowedByUser;
