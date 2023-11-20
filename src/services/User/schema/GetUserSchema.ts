@@ -1,3 +1,4 @@
+import ImageQueryValidationSchema from '@/services/schema/ImageSchema/ImageQueryValidationSchema';
 import { z } from 'zod';
 
 const GetUserSchema = z.object({
@@ -11,6 +12,8 @@ const GetUserSchema = z.object({
   dateOfBirth: z.coerce.date(),
   accountIsVerified: z.boolean(),
   role: z.enum(['USER', 'ADMIN']),
+  bio: z.string().nullable(),
+  userAvatar: ImageQueryValidationSchema.nullable(),
 });
 
 export default GetUserSchema;

@@ -17,6 +17,17 @@ const updateUserToBeConfirmedById = async (id: string) => {
       updatedAt: true,
       dateOfBirth: true,
       role: true,
+      bio: true,
+      userAvatar: {
+        select: {
+          id: true,
+          path: true,
+          alt: true,
+          caption: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
     },
   });
 

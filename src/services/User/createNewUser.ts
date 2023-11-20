@@ -33,6 +33,8 @@ const createNewUser = async ({
       accountIsVerified: true,
       updatedAt: true,
       role: true,
+      userAvatar: true,
+      bio: true,
     },
   });
 

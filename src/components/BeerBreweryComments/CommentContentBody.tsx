@@ -19,42 +19,47 @@ const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMod
   const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
-    <div className="card-body animate-in fade-in-10">
-      <div className="flex flex-row justify-between">
-        <div>
-          <p className="font-semibold sm:text-2xl">
-            <Link href={`/users/${comment.postedBy.id}`} className="link-hover link">
-              {comment.postedBy.username}
-            </Link>
-          </p>
-          <span className="italic">
-            posted{' '}
-            <time
-              className="tooltip tooltip-bottom"
-              data-tip={format(new Date(comment.createdAt), 'MM/dd/yyyy')}
-            >
-              {timeDistance}
-            </time>{' '}
-            ago
-          </span>
+    <div className="pr-3 py-4 animate-in fade-in-10 space-y-1">
+      <div className="space-y-2">
+        <div className="flex flex-row justify-between">
+          <div>
+            <p className="font-semibold sm:text-2xl">
+              <Link href={`/users/${comment.postedBy.id}`} className="link-hover link">
+                {comment.postedBy.username}
+              </Link>
+            </p>
+            <span className="italic">
+              posted{' '}
+              <time
+                className="tooltip tooltip-bottom"
+                data-tip={format(new Date(comment.createdAt), 'MM/dd/yyyy')}
+              >
+                {timeDistance}
+              </time>{' '}
+              ago
+            </span>
+          </div>
+
+          {user && (
+            <CommentCardDropdown comment={comment} setInEditMode={setInEditMode} />
+          )}
         </div>
-
-        {user && <CommentCardDropdown comment={comment} setInEditMode={setInEditMode} />}
+        <div className="space-y-1">
+          <Rating value={comment.rating}>
+            {Array.from({ length: 5 }).map((val, index) => (
+              <Rating.Item
+                name="rating-1"
+                className="mask mask-star cursor-default"
+                disabled
+                aria-disabled
+                key={index}
+              />
+            ))}
+          </Rating>
+        </div>
       </div>
-
-      <div className="space-y-1">
-        <Rating value={comment.rating}>
-          {Array.from({ length: 5 }).map((val, index) => (
-            <Rating.Item
-              name="rating-1"
-              className="mask mask-star cursor-default"
-              disabled
-              aria-disabled
-              key={index}
-            />
-          ))}
-        </Rating>
-        <p>{comment.content}</p>
+      <div>
+        <p className="text-sm">{comment.content}</p>
       </div>
     </div>
   );

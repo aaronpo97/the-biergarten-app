@@ -31,7 +31,16 @@ const search = async (req: SearchAPIRequest, res: NextApiResponse) => {
         postedBy: { select: { username: true, id: true } },
         brewery: { select: { name: true, id: true } },
         style: { select: { name: true, id: true, description: true } },
-        beerImages: { select: { alt: true, path: true, caption: true, id: true } },
+        beerImages: {
+          select: {
+            alt: true,
+            path: true,
+            caption: true,
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       where: {
         OR: [

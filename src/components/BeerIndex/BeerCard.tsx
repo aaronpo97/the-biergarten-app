@@ -18,8 +18,9 @@ const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) =
           <Image
             src={post.beerImages[0].path}
             alt={post.name}
-            width="1029"
-            height="110"
+            width="3000"
+            height="3000"
+            className="h-full object-cover"
           />
         )}
       </figure>

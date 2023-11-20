@@ -34,15 +34,24 @@ const getAllBeersByBrewery = async (
         postedBy: { select: { username: true, id: true } },
         brewery: { select: { name: true, id: true } },
         style: { select: { name: true, id: true, description: true } },
-        beerImages: { select: { alt: true, path: true, caption: true, id: true } },
+        beerImages: {
+          select: {
+            alt: true,
+            path: true,
+            caption: true,
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 
-  const pageCount = await DBClient.instance.beerPost.count({
+  const count = await DBClient.instance.beerPost.count({
     where: { breweryId: id },
   });
 
-  res.setHeader('X-Total-Count', pageCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Beers fetched successfully',

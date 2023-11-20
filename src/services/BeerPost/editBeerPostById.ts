@@ -25,7 +25,16 @@ const editBeerPostById = ({
       ibu: true,
       createdAt: true,
       updatedAt: true,
-      beerImages: { select: { id: true, path: true, caption: true, alt: true } },
+      beerImages: {
+        select: {
+          alt: true,
+          path: true,
+          caption: true,
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       brewery: { select: { id: true, name: true } },
       style: { select: { id: true, name: true, description: true } },
       postedBy: { select: { id: true, username: true } },

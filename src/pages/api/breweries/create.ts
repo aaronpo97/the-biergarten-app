@@ -33,7 +33,7 @@ const createBreweryPost = async (
 
   const [latitude, longitude] = geocoded.center;
 
-  const location = await DBClient.instance.location.create({
+  const location = await DBClient.instance.breweryLocation.create({
     data: {
       address,
       city,

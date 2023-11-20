@@ -1,13 +1,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
-import { Location, User } from '@prisma/client';
+import { BreweryLocation, User } from '@prisma/client';
 import DBClient from '../../DBClient';
 
 interface CreateNewBreweryPostsArgs {
   numberOfPosts: number;
   joinData: {
     users: User[];
-    locations: Location[];
+    locations: BreweryLocation[];
   };
 }
 

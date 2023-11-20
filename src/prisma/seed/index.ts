@@ -18,6 +18,8 @@ import logger from '../../config/pino/logger';
 import createAdminUser from './create/createAdminUser';
 import createNewBeerStyleComments from './create/createNewBeerStyleComments';
 import createNewBeerStyleLikes from './create/createNewBeerStyleLikes';
+import createNewUserAvatars from './create/createNewUserAvatars';
+import createNewUserFollows from './create/createNewUserFollows';
 
 (async () => {
   try {
@@ -32,6 +34,12 @@ import createNewBeerStyleLikes from './create/createNewBeerStyleLikes';
 
     const users = await createNewUsers({ numberOfUsers: 10000 });
     logger.info('Users created successfully.');
+
+    const userAvatars = await createNewUserAvatars({ joinData: { users } });
+    logger.info('User avatars created successfully.');
+
+    const userFollows = await createNewUserFollows({ joinData: { users } });
+    logger.info('User follows created successfully.');
 
     const locations = await createNewLocations({
       numberOfLocations: 500,
@@ -103,6 +111,8 @@ import createNewBeerStyleLikes from './create/createNewBeerStyleLikes';
     logger.info('Database seeded successfully.');
     logger.info({
       numberOfUsers: users.length,
+      numberOfUserAvatars: userAvatars.length,
+      numberOfUserFollows: userFollows.length,
       numberOfBreweryPosts: breweryPosts.length,
       numberOfBeerPosts: beerPosts.length,
       numberOfBeerStyles: beerStyles.length,

@@ -59,9 +59,9 @@ const getAll = async (
     pageSize: parseInt(page_size, 10),
   });
 
-  const pageCount = await DBClient.instance.beerComment.count({ where: { beerPostId } });
+  const count = await DBClient.instance.beerComment.count({ where: { beerPostId } });
 
-  res.setHeader('X-Total-Count', pageCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Beer comments fetched successfully',

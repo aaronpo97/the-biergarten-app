@@ -47,9 +47,9 @@ const createNewLocations = async ({
     });
   }
 
-  await prisma.location.createMany({ data: locationData, skipDuplicates: true });
+  await prisma.breweryLocation.createMany({ data: locationData, skipDuplicates: true });
 
-  return prisma.location.findMany();
+  return prisma.breweryLocation.findMany();
 };
 
 export default createNewLocations;

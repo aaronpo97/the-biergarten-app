@@ -81,7 +81,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
   };
 
   return (
-    <div className="card-body animate-in fade-in-10">
+    <div className="pr-3 py-4 animate-in fade-in-10">
       <form onSubmit={handleSubmit(onEdit)} className="space-y-3">
         <div>
           <FormInfo>

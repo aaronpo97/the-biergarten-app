@@ -19,15 +19,15 @@ const getAllBeersByBeerStyle = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
-  const beers = getBeerPostsByBeerStyleId({
+  const beers = await getBeerPostsByBeerStyleId({
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
     styleId: id,
   });
 
-  const pageCount = await DBClient.instance.beerPost.count({ where: { styleId: id } });
+  const count = await DBClient.instance.beerPost.count({ where: { styleId: id } });
 
-  res.setHeader('X-Total-Count', pageCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Beers fetched successfully',

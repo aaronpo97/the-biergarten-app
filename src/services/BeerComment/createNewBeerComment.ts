@@ -27,7 +27,7 @@ const createNewBeerComment = async ({
       id: true,
       content: true,
       rating: true,
-      postedBy: { select: { id: true, username: true } },
+      postedBy: { select: { id: true, username: true, userAvatar: true } },
       createdAt: true,
       updatedAt: true,
     },

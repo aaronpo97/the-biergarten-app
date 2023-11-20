@@ -27,9 +27,11 @@ const createNewBreweryComment = async ({
       id: true,
       content: true,
       rating: true,
-      postedBy: { select: { id: true, username: true } },
       createdAt: true,
       updatedAt: true,
+      postedBy: {
+        select: { id: true, username: true, createdAt: true, userAvatar: true },
+      },
     },
   });
 };

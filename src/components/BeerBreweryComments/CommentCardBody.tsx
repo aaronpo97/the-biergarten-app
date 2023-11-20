@@ -4,9 +4,9 @@ import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
-
 import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';
+import UserAvatar from '../Account/UserAvatar';
 
 interface CommentCardProps {
   comment: z.infer<typeof CommentQueryResult>;
@@ -29,18 +29,26 @@ const CommentCardBody: FC<CommentCardProps> = ({
   const [inEditMode, setInEditMode] = useState(false);
 
   return (
-    <div ref={ref}>
-      {!inEditMode ? (
-        <CommentContentBody comment={comment} setInEditMode={setInEditMode} />
-      ) : (
-        <EditCommentBody
-          comment={comment}
-          mutate={mutate}
-          setInEditMode={setInEditMode}
-          handleDeleteRequest={handleDeleteRequest}
-          handleEditRequest={handleEditRequest}
-        />
-      )}
+    <div ref={ref} className="flex">
+      <div className="w-[12%] py-4 justify-center">
+        <div className="px-1">
+          <UserAvatar user={comment.postedBy} />
+        </div>
+      </div>
+
+      <div className="w-[88%] h-full">
+        {!inEditMode ? (
+          <CommentContentBody comment={comment} setInEditMode={setInEditMode} />
+        ) : (
+          <EditCommentBody
+            comment={comment}
+            mutate={mutate}
+            setInEditMode={setInEditMode}
+            handleDeleteRequest={handleDeleteRequest}
+            handleEditRequest={handleEditRequest}
+          />
+        )}
+      </div>
     </div>
   );
 };

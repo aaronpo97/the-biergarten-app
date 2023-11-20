@@ -17,6 +17,8 @@ const deleteUserById = async (id: string) => {
         accountIsVerified: true,
         updatedAt: true,
         role: true,
+        userAvatar: true,
+        bio: true,
       },
     });
 
