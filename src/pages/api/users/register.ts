@@ -11,7 +11,6 @@ import findUserByEmail from '@/services/User/findUserByEmail';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
-import { NODE_ENV } from '@/config/env';
 import sendConfirmationEmail from '@/services/User/sendConfirmationEmail';
 
 interface RegisterUserRequest extends NextApiRequest {
@@ -45,9 +44,7 @@ const registerUser = async (req: RegisterUserRequest, res: NextApiResponse) => {
     username: user.username,
   });
 
-  if (NODE_ENV === 'production') {
-    await sendConfirmationEmail(user);
-  }
+  await sendConfirmationEmail(user);
 
   res.status(201).json({
     success: true,

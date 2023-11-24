@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "clear-db": "npx ts-node ./src/prisma/seed/clear/index.ts",
     "format": "npx prettier . --write",
     "format-watch": "npx onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
     "seed": "npx --max-old-space-size=4096 ts-node ./src/prisma/seed/index.ts"
@@ -19,8 +20,8 @@
     "@mapbox/mapbox-sdk": "^0.15.2",
     "@mapbox/search-js-core": "^1.0.0-beta.17",
     "@mapbox/search-js-react": "^1.0.0-beta.17",
-    "@next/bundle-analyzer": "^13.4.10",
-    "@prisma/client": "^5.0.0",
+    "@next/bundle-analyzer": "^14.0.3",
+    "@prisma/client": "^5.6.0",
     "@react-email/components": "^0.0.11",
     "@react-email/render": "^0.0.9",
     "@react-email/tailwind": "^0.0.12",
@@ -40,9 +41,8 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pino": "^8.14.1",
-    "pino-pretty": "^10.0.1",
     "react": "^18.2.0",
-    "react-daisyui": "^4.0.0",
+    "react-daisyui": "^4.1.2",
     "react-dom": "^18.2.0",
     "react-email": "^1.9.5",
     "react-hook-form": "^7.45.2",
@@ -82,11 +82,11 @@
     "prettier": "^3.0.0",
     "prettier-plugin-jsdoc": "^1.0.2",
     "prettier-plugin-tailwindcss": "^0.4.1",
-    "prisma": "^5.0.0",
+    "prisma": "^5.6.0",
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.2"
   },
   "prisma": {
     "schema": "./src/prisma/schema.prisma",

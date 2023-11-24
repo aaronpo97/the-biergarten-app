@@ -40,7 +40,7 @@ const LoginPage: NextPage = () => {
                 Don&apos;t have an account?
               </Link>
               <Link
-                href="/reset-password"
+                href="/users/forgot-password"
                 className="text-primary-500 link-hover link italic"
               >
                 Forgot password?
