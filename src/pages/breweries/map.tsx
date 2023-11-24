@@ -1,4 +1,4 @@
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { useEffect, useMemo, useState } from 'react';
 import Map, { Marker, Popup } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -11,10 +11,15 @@ import BreweryPostMapQueryResult from '@/services/BreweryPost/schema/BreweryPost
 import { z } from 'zod';
 import useBreweryMapPagePosts from '@/hooks/data-fetching/brewery-posts/useBreweryMapPagePosts';
 import ControlPanel from '@/components/ui/maps/ControlPanel';
+import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 
-const BreweryMapPage: NextPage = () => {
+interface BreweryMapPageProps {
+  token: string;
+}
+
+const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ token }) => {
   const [popupInfo, setPopupInfo] = useState<z.infer<
     typeof BreweryPostMapQueryResult
   > | null>(null);
@@ -84,7 +89,7 @@ const BreweryMapPage: NextPage = () => {
           initialViewState={{ zoom: 3, latitude: 48.3544, longitude: -99.9981 }}
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyles[theme]}
-          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+          mapboxAccessToken={token}
           scrollZoom
         >
           <ControlPanel />
@@ -121,3 +126,7 @@ const BreweryMapPage: NextPage = () => {
 };
 
 export default BreweryMapPage;
+
+export const getServerSideProps: GetServerSideProps<BreweryMapPageProps> = async () => ({
+  props: { token: MAPBOX_ACCESS_TOKEN },
+});

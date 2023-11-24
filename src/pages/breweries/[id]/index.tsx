@@ -11,6 +11,7 @@ import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
 
 import dynamic from 'next/dynamic';
+import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 
 const [BreweryInfoHeader, BreweryBeersSection, BreweryCommentsSection, BreweryPostMap] = [
   dynamic(() => import('@/components/BreweryById/BreweryInfoHeader')),
@@ -21,9 +22,10 @@ const [BreweryInfoHeader, BreweryBeersSection, BreweryCommentsSection, BreweryPo
 
 interface BreweryPageProps {
   breweryPost: z.infer<typeof BreweryPostQueryResult>;
+  mapboxToken: string;
 }
 
-const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
+const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken }) => {
   const [longitude, latitude] = breweryPost.location.coordinates;
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   return (
@@ -67,13 +69,19 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost }) => {
                   <BreweryCommentsSection breweryPost={breweryPost} />
                 </div>
                 <div className="w-[40%] space-y-3">
-                  <BreweryPostMap latitude={latitude} longitude={longitude} />
+                  <BreweryPostMap
+                    coordinates={{ latitude, longitude }}
+                    token={mapboxToken}
+                  />
                   <BreweryBeersSection breweryPost={breweryPost} />
                 </div>
               </div>
             ) : (
               <>
-                <BreweryPostMap latitude={latitude} longitude={longitude} />
+                <BreweryPostMap
+                  coordinates={{ latitude, longitude }}
+                  token={mapboxToken}
+                />
                 <Tab.Group>
                   <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
                     <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
@@ -105,9 +113,11 @@ export const getServerSideProps: GetServerSideProps<BreweryPageProps> = async (
   context,
 ) => {
   const breweryPost = await getBreweryPostById(context.params!.id! as string);
+  const mapboxToken = MAPBOX_ACCESS_TOKEN;
+
   return !breweryPost
     ? { notFound: true }
-    : { props: { breweryPost: JSON.parse(JSON.stringify(breweryPost)) } };
+    : { props: { breweryPost: JSON.parse(JSON.stringify(breweryPost)), mapboxToken } };
 };
 
 export default BreweryByIdPage;

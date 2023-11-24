@@ -168,11 +168,8 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   migrations to detect schema drift.
   - You can create a free account [here](https://neon.tech).
   - Consult the [docs](https://neon.tech/docs/guides/prisma) for more information.
-- `MAPBOX_ACCESS_TOKEN` and `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` are the access tokens for
-  your Mapbox account.
+- `MAPBOX_ACCESS_TOKEN` is the access token for your Mapbox account.
   - You can create a free account [here](https://account.mapbox.com/auth/signup/).
-  - You will need to create two access tokens, one for the server-side and one for the
-    client-side.
 - `NODE_ENV` is the environment in which the application is running.
   - You can set this to `development` or `production`.
 - `SPARKPOST_API_KEY` is the API key for your SparkPost account.
