@@ -7,12 +7,15 @@ import LocationMarker from '../ui/LocationMarker';
 import ControlPanel from '../ui/maps/ControlPanel';
 
 interface BreweryMapProps {
-  latitude: number;
-  longitude: number;
+  coordinates: { latitude: number; longitude: number };
+  token: string;
 }
 type MapStyles = Record<'light' | 'dark', `mapbox://styles/mapbox/${string}`>;
 
-const BreweryPostMap: FC<BreweryMapProps> = ({ latitude, longitude }) => {
+const BreweryPostMap: FC<BreweryMapProps> = ({
+  coordinates: { latitude, longitude },
+  token,
+}) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const windowIsDefined = typeof window !== 'undefined';
@@ -43,7 +46,7 @@ const BreweryPostMap: FC<BreweryMapProps> = ({ latitude, longitude }) => {
           initialViewState={{ latitude, longitude, zoom: 17 }}
           style={{ width: '100%', height: isDesktop ? 480 : 240 }}
           mapStyle={mapStyles[theme]}
-          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string}
+          mapboxAccessToken={token}
           scrollZoom
         >
           <ControlPanel />
