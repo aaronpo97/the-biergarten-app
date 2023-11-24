@@ -2,9 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['picsum.photos', 'res.cloudinary.com'],
+    remotePatterns: [
+      { hostname: 'picsum.photos', protocol: 'https', pathname: '**' },
+      { hostname: 'res.cloudinary.com', protocol: 'https', pathname: '**' },
+    ],
   },
-  swcMinify: true,
 };
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',

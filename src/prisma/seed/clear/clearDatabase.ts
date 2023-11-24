@@ -1,6 +1,6 @@
 import DBClient from '../../DBClient';
 
-const cleanDatabase = async () => {
+const clearDatabase = async () => {
   const prisma = DBClient.instance;
 
   /**
@@ -27,4 +27,4 @@ const cleanDatabase = async () => {
   await prisma.$disconnect();
 };
 
-export default cleanDatabase;
+export default clearDatabase;

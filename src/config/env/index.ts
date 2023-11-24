@@ -14,6 +14,7 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_KEY: z.string(),
   CLOUDINARY_SECRET: z.string(),
+  RESET_PASSWORD_TOKEN_SECRET: z.string(),
   CONFIRMATION_TOKEN_SECRET: z.string(),
   SESSION_SECRET: z.string(),
   SESSION_TOKEN_NAME: z.string(),
@@ -86,6 +87,17 @@ export const CLOUDINARY_SECRET = parsed.data.CLOUDINARY_SECRET;
  * @see README.md for instructions on generating a secret key.
  */
 export const CONFIRMATION_TOKEN_SECRET = parsed.data.CONFIRMATION_TOKEN_SECRET;
+
+/**
+ * Secret key for signing reset password tokens.
+ *
+ * @example
+ *   'abcdefghijklmnopqrstuvwxyz123456';
+ *
+ * @see README.md for instructions on generating a secret key.
+ */
+
+export const RESET_PASSWORD_TOKEN_SECRET = parsed.data.RESET_PASSWORD_TOKEN_SECRET;
 
 /**
  * Secret key for signing session cookies.
