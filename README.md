@@ -126,6 +126,7 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_KEY=
 CLOUDINARY_SECRET=
 CONFIRMATION_TOKEN_SECRET=
+RESET_PASSWORD_TOKEN_SECRET=
 SESSION_SECRET=
 SESSION_TOKEN_NAME=
 SESSION_MAX_AGE=
@@ -152,6 +153,8 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `CONFIRMATION_TOKEN_SECRET` is the secret used to sign the confirmation token used for
   email confirmation.
   - You can generate a random string using the`openssl rand -base64 127` command.
+- `RESET_PASSWORD_TOKEN_SECRET` is the secret used to sign the reset password token.
+  - You can generate a random string using the `openssl rand -base64 127` command.
 - `SESSION_SECRET` is the secret used to sign the session cookie.
   - Use the same command as above to generate a random string.
 - `SESSION_TOKEN_NAME` is the name of the session cookie.

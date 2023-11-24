@@ -1,7 +1,7 @@
 import { performance } from 'perf_hooks';
 import { exit } from 'process';
 
-import cleanDatabase from './clean/cleanDatabase';
+import clearDatabase from './clear/clearDatabase';
 
 import createNewBeerImages from './create/createNewBeerImages';
 import createNewBeerPostComments from './create/createNewBeerPostComments';
@@ -26,7 +26,7 @@ import createNewUserFollows from './create/createNewUserFollows';
     const start = performance.now();
 
     logger.info('Clearing database.');
-    await cleanDatabase();
+    await clearDatabase();
     logger.info('Database cleared successfully, preparing to seed.');
 
     await createAdminUser();
