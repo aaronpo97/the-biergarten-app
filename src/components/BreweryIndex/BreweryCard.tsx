@@ -14,36 +14,43 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
   const { likeCount, mutate, isLoading } = useGetBreweryPostLikeCount(brewery.id);
   return (
     <div className="card" key={brewery.id}>
-      <figure className="card-image h-96">
-        {brewery.breweryImages.length > 0 && (
-          <Image
-            src={brewery.breweryImages[0].path}
-            alt={brewery.name}
-            width="1029"
-            height="110"
-          />
-        )}
-      </figure>
-      <div className="card-body">
-        <div>
-          <h2 className="mb-2 text-2xl font-bold lg:text-3xl">
-            <Link href={`/breweries/${brewery.id}`} className="link-hover link">
-              {brewery.name}
-            </Link>
-          </h2>
-          <h3 className="text-xl font-normal lg:text-2xl">
-            located in {brewery.location.city},{' '}
-            {brewery.location.stateOrProvince || brewery.location.country}
-          </h3>
-          <h4 className="text-lg lg:text-xl">
-            est. {brewery.dateEstablished.getFullYear()}
-          </h4>
-        </div>
-        <div className="flex justify-between">
-          {!isLoading && <span>liked by {likeCount} users</span>}
-          {!!user && !isLoading && (
-            <BreweryPostLikeButton breweryPostId={brewery.id} mutateCount={mutate} />
+      <Link href={`/breweries/${brewery.id}`}>
+        <figure className="card-image h-96">
+          {brewery.breweryImages.length > 0 && (
+            <Image
+              src={brewery.breweryImages[0].path}
+              alt={brewery.name}
+              width="1029"
+              height="110"
+              className="h-full object-cover"
+            />
           )}
+        </figure>
+      </Link>
+      <div className="card-body justify-between">
+        <div>
+          <Link href={`/breweries/${brewery.id}`} className="link-hover link">
+            <h2 className="text-xl truncate font-bold lg:text-2xl">{brewery.name}</h2>
+          </Link>
+        </div>
+        <div className="flex items-end justify-between">
+          <div className="w-9/12">
+            <h3 className="text-lg font-semibold lg:text-xl truncate">
+              {brewery.location.city},{' '}
+              {brewery.location.stateOrProvince || brewery.location.country}
+            </h3>
+            <h4 className="text-lg font-semibold lg:text-xl">
+              est. {brewery.dateEstablished.getFullYear()}
+            </h4>
+            <div className="mt-2">
+              {!isLoading && <span>liked by {likeCount} users</span>}
+            </div>
+          </div>
+          <div>
+            {!!user && !isLoading && (
+              <BreweryPostLikeButton breweryPostId={brewery.id} mutateCount={mutate} />
+            )}
+          </div>
         </div>
       </div>
     </div>

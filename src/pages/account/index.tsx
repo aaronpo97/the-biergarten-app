@@ -9,6 +9,7 @@ import UserContext from '@/contexts/UserContext';
 import Security from '@/components/Account/Security';
 import DeleteAccount from '@/components/Account/DeleteAccount';
 import accountPageReducer from '@/reducers/accountPageReducer';
+import UserAvatar from '@/components/Account/UserAvatar';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -33,9 +34,7 @@ const AccountPage: NextPage = () => {
       <div className="flex flex-col items-center">
         <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-7/12">
           <div className="flex flex-col items-center space-y-3">
-            <div className="avatar">
-              <div className="bg-base-black w-24 rounded-full bg-slate-700" />
-            </div>
+            <UserAvatar user={user} />
 
             <div className="flex flex-col items-center space-y-1">
               <p className="text-3xl font-bold">Hello, {user!.username}!</p>
