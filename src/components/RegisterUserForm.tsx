@@ -28,9 +28,14 @@ const RegisterUserForm: FC = () => {
     data: z.infer<typeof CreateUserValidationSchemaWithUsernameAndEmailCheck>,
   ) => {
     try {
+      const loadingToast = toast.loading('Registering user...');
       await sendRegisterUserRequest(data);
       reset();
       router.push('/', undefined, { shallow: true });
+
+      toast.remove(loadingToast);
+
+      toast.success('User registered!');
     } catch (error) {
       createErrorToast({
         toast,

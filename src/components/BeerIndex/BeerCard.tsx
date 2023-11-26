@@ -13,18 +13,19 @@ const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) =
 
   return (
     <div className="card card-compact bg-base-300" key={post.id}>
-      <figure className="h-96">
-        {post.beerImages.length > 0 && (
-          <Image
-            src={post.beerImages[0].path}
-            alt={post.name}
-            width="3000"
-            height="3000"
-            className="h-full object-cover"
-          />
-        )}
-      </figure>
-
+      <Link href={`/beers/${post.id}`}>
+        <figure className="h-96">
+          {post.beerImages.length > 0 && (
+            <Image
+              src={post.beerImages[0].path}
+              alt={post.name}
+              width="3000"
+              height="3000"
+              className="h-full object-cover"
+            />
+          )}
+        </figure>
+      </Link>
       <div className="card-body justify-between">
         <div className="space-y-1">
           <Link href={`/beers/${post.id}`}>
