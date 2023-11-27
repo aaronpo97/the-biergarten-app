@@ -36,7 +36,7 @@ const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
         <meta name="description" content="User information" />
       </Head>
       <>
-        <main className="h-full mb-12 mt-10 flex w-full items-center justify-center">
+        <main className="mb-12 mt-10 flex w-full items-center justify-center">
           <div className="h-full w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
             <UserHeader
               user={user}
