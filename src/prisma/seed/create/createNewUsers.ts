@@ -1,8 +1,11 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import { faker } from '@faker-js/faker';
+import generator from 'generate-password';
+
 import crypto from 'crypto';
 import DBClient from '../../DBClient';
 import { hashPassword } from '../../../config/auth/passwordFns';
+import logger from '../../../config/pino/logger';
 
 interface CreateNewUsersArgs {
   numberOfUsers: number;
@@ -23,9 +26,25 @@ interface UserData {
 
 const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
   const prisma = DBClient.instance;
+  await DBClient.instance.$disconnect();
 
-  const password = 'passwoRd!3';
-  const hash = await hashPassword(password);
+  const passwords = Array.from({ length: numberOfUsers }, () =>
+    generator.generate({
+      length: 20,
+      symbols: true,
+      numbers: true,
+      uppercase: true,
+      strict: true,
+    }),
+  );
+
+  logger.info('Hashing passwords. This may take a while...');
+  const hashedPasswords = await Promise.all(
+    passwords.map((password) => hashPassword(password)),
+  );
+
+  logger.info('Creating new users. This may take a while...');
+
   const data: UserData[] = [];
 
   const takenUsernames: string[] = [];
@@ -41,6 +60,7 @@ const createNewUsers = async ({ numberOfUsers }: CreateNewUsersArgs) => {
       .email({ firstName, lastName, provider: 'example.com' })
       .toLowerCase();
 
+    const hash = hashedPasswords[i];
     const userAvailable =
       !takenUsernames.includes(username) && !takenEmails.includes(email);
 

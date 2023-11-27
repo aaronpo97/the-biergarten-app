@@ -28,6 +28,8 @@ const envSchema = z.object({
   SPARKPOST_API_KEY: z.string(),
   SPARKPOST_SENDER_ADDRESS: z.string().email(),
   MAPBOX_ACCESS_TOKEN: z.string(),
+
+  ADMIN_PASSWORD: z.string().regex(/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/),
 });
 
 const parsed = envSchema.safeParse(env);
@@ -194,3 +196,14 @@ export const SPARKPOST_SENDER_ADDRESS = parsed.data.SPARKPOST_SENDER_ADDRESS;
  * @see https://docs.mapbox.com/help/how-mapbox-works/access-tokens/
  */
 export const MAPBOX_ACCESS_TOKEN = parsed.data.MAPBOX_ACCESS_TOKEN;
+
+/**
+ * Admin password for seeding the database.
+ *
+ * @example
+ *   'abcdefghijklmnopqrstuvwxyz123456';
+ *
+ * @see README.md for instructions on generating a secret key.
+ */
+
+export const ADMIN_PASSWORD = parsed.data.ADMIN_PASSWORD;
