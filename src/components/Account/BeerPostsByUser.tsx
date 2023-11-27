@@ -36,7 +36,7 @@ const BeerPostsByUser: FC = () => {
             })}
           </>
         )}
-        {(isLoading || isLoadingMore) && (
+        {isLoadingMore && (
           <>
             {Array.from({ length: PAGE_SIZE }, (_, i) => (
               <LoadingCard key={i} />
