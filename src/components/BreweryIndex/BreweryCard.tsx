@@ -14,8 +14,8 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
   const { likeCount, mutate, isLoading } = useGetBreweryPostLikeCount(brewery.id);
   return (
     <div className="card" key={brewery.id}>
-      <Link href={`/breweries/${brewery.id}`}>
-        <figure className="card-image h-96">
+      <figure className="card-image h-96">
+        <Link href={`/breweries/${brewery.id}`} className="h-full object-cover">
           {brewery.breweryImages.length > 0 && (
             <Image
               src={brewery.breweryImages[0].path}
@@ -25,8 +25,8 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
               className="h-full object-cover"
             />
           )}
-        </figure>
-      </Link>
+        </Link>
+      </figure>
       <div className="card-body justify-between">
         <div>
           <Link href={`/breweries/${brewery.id}`} className="link-hover link">
