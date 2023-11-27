@@ -37,12 +37,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# http requests
+# HTTP playground
 *.http
-
-# uploaded images
-public/uploads
 
 # vscode
 .vscode
+
+/cloudinary-images
 

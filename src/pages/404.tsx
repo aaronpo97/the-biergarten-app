@@ -1,5 +1,3 @@
-// create a 404 next js page using tailwind
-
 import { NextPage } from 'next';
 import Head from 'next/head';
 

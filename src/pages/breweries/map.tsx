@@ -34,7 +34,7 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ token }) => {
 
   const mapStyles: MapStyles = {
     light: 'mapbox://styles/mapbox/light-v10',
-    dark: 'mapbox://styles/mapbox/dark-v11',
+    dark: 'mapbox://styles/mapbox/dark-v10',
   };
 
   const pins = useMemo(

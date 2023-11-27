@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
 import { hashPassword } from '../../../config/auth/passwordFns';
+import { ADMIN_PASSWORD } from '../../../config/env';
+
 import DBClient from '../../DBClient';
 import GetUserSchema from '../../../services/User/schema/GetUserSchema';
 import imageUrls from '../util/imageUrls';
 
 const createAdminUser = async () => {
-  const hash = await hashPassword('Pas!3word');
+  const hash = await hashPassword(ADMIN_PASSWORD);
   const adminUser: z.infer<typeof GetUserSchema> = await DBClient.instance.user.create({
     data: {
       username: 'admin',

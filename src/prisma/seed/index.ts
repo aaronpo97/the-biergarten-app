@@ -32,7 +32,7 @@ import createNewUserFollows from './create/createNewUserFollows';
     await createAdminUser();
     logger.info('Admin user created successfully.');
 
-    const users = await createNewUsers({ numberOfUsers: 10000 });
+    const users = await createNewUsers({ numberOfUsers: 1000 });
     logger.info('Users created successfully.');
 
     const userAvatars = await createNewUserAvatars({ joinData: { users } });

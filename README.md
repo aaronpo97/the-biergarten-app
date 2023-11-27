@@ -136,8 +136,10 @@ POSTGRES_PRISMA_URL=
 POSTGRES_URL_NON_POOLING=
 SHADOW_DATABASE_URL=
 
+ADMIN_PASSWORD=
+
 MAPBOX_ACCESS_TOKEN=
-NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
+
 SPARKPOST_API_KEY=
 SPARKPOST_SENDER_ADDRESS=" > .env
 ```
@@ -175,6 +177,8 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `SPARKPOST_API_KEY` is the API key for your SparkPost account.
   - You can create a free account [here](https://www.sparkpost.com/).
 - `SPARKPOST_SENDER_ADDRESS` is the email address that will be used to send emails.
+- `ADMIN_PASSWORD` is the password for the admin account created when seeding the
+  database.
 
 1. Initialize the database and run the migrations.
 
