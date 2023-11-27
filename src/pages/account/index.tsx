@@ -10,6 +10,7 @@ import Security from '@/components/Account/Security';
 import DeleteAccount from '@/components/Account/DeleteAccount';
 import accountPageReducer from '@/reducers/accountPageReducer';
 import UserAvatar from '@/components/Account/UserAvatar';
+import UserPosts from '@/components/Account/UserPosts';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -32,9 +33,11 @@ const AccountPage: NextPage = () => {
         />
       </Head>
       <div className="flex flex-col items-center">
-        <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-7/12">
+        <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-8/12">
           <div className="flex flex-col items-center space-y-3">
-            <UserAvatar user={user} />
+            <div className="h-32">
+              <UserAvatar user={user} />
+            </div>
 
             <div className="flex flex-col items-center space-y-1">
               <p className="text-3xl font-bold">Hello, {user!.username}!</p>
@@ -58,7 +61,9 @@ const AccountPage: NextPage = () => {
                   <Security pageState={pageState} dispatch={dispatch} />
                   <DeleteAccount pageState={pageState} dispatch={dispatch} />
                 </Tab.Panel>
-                <Tab.Panel>Your posts!</Tab.Panel>
+                <Tab.Panel className="h-full space-y-5">
+                  <UserPosts />
+                </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
           </div>
