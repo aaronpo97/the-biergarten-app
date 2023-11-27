@@ -8,7 +8,7 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, MutableRefObject, useRef } from 'react';
 import Link from 'next/link';
-import { FaPlus, FaArrowUp } from 'react-icons/fa';
+import { FaPlus, FaArrowUp, FaMap } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 
@@ -51,25 +51,24 @@ const BreweryPage: NextPage<BreweryPageProps> = () => {
                 <h1 className="text-4xl font-bold lg:text-6xl">The Biergarten App</h1>
                 <h2 className="text-2xl font-bold lg:text-4xl">Breweries</h2>
               </div>
-              <div>
-                <Link
-                  className="link-hover link text-xl font-bold lg:text-2xl"
-                  href="/breweries/map"
+            </div>
+            <div className="flex flex-col">
+              {!!user && (
+                <div
+                  className="tooltip tooltip-left"
+                  data-tip="Create a new brewery post"
                 >
-                  View map
+                  <Link href="/breweries/create" className="btn-ghost btn-sm btn">
+                    <FaPlus className="text-lg" />
+                  </Link>
+                </div>
+              )}
+              <div className="tooltip tooltip-left" data-tip="View map">
+                <Link className="btn-ghost btn-sm btn" href="/breweries/map">
+                  <FaMap className="text-lg" />
                 </Link>
               </div>
             </div>
-            {!!user && (
-              <div
-                className="tooltip tooltip-left h-full"
-                data-tip="Create a new brewery post"
-              >
-                <Link href="/breweries/create" className="btn-ghost btn-sm btn">
-                  <FaPlus />
-                </Link>
-              </div>
-            )}
           </header>
           <div className="grid gap-6 xl:grid-cols-2">
             {!!breweryPosts.length && !isLoading && (

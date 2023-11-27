@@ -31,7 +31,7 @@ const CommentCardBody: FC<CommentCardProps> = ({
   return (
     <div ref={ref} className="flex">
       <div className="w-[12%] py-4 justify-center">
-        <div className="px-1">
+        <div className="px-3 h-20">
           <UserAvatar user={comment.postedBy} />
         </div>
       </div>
