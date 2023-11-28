@@ -52,6 +52,9 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
             </span>
           )}
         </span>
+        <div className="w-6/12">
+          <p className="text-sm">{user.bio}</p>
+        </div>
         <div className="h-20 flex items-center justify-center">
           <UserFollowButton
             mutateFollowerCount={mutateFollowerCount}
