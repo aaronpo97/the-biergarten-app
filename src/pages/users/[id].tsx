@@ -7,8 +7,6 @@ import { FC } from 'react';
 import { z } from 'zod';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import UserHeader from '@/components/UserPage/UserHeader';
-import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
-import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 
 interface UserInfoPageProps {
   user: z.infer<typeof GetUserSchema>;
@@ -19,16 +17,6 @@ const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const title = `${user.username} | The Biergarten App`;
 
-  const { followingCount } = useGetUsersFollowedByUser({
-    userId: user.id,
-    pageSize: 10,
-  });
-
-  const { followerCount } = useGetUsersFollowingUser({
-    userId: user.id,
-    pageSize: 10,
-  });
-
   return (
     <>
       <Head>
@@ -38,11 +26,7 @@ const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
       <>
         <main className="mb-12 mt-10 flex w-full items-center justify-center">
           <div className="h-full w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
-            <UserHeader
-              user={user}
-              followerCount={followerCount}
-              followingCount={followingCount}
-            />
+            <UserHeader user={user} />
 
             {isDesktop ? (
               <div className="h-64 flex space-x-3">

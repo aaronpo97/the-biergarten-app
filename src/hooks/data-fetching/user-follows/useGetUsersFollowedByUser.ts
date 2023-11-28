@@ -34,7 +34,7 @@ const useGetUsersFollowedByUser = ({
     return { following: parsedPayload.data, pageCount, followingCount: count };
   };
 
-  const { data, error, isLoading, setSize, size } = useSWRInfinite(
+  const { data, error, isLoading, setSize, size, mutate } = useSWRInfinite(
     (index) =>
       `/api/users/${userId}/following?page_num=${index + 1}&page_size=${pageSize}`,
     fetcher,
@@ -57,6 +57,7 @@ const useGetUsersFollowedByUser = ({
     isLoading,
     isLoadingMore,
     isAtEnd,
+    mutate,
     error: error as unknown,
   };
 };

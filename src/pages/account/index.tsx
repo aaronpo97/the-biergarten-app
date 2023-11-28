@@ -35,7 +35,7 @@ const AccountPage: NextPage = () => {
       <div className="flex flex-col items-center">
         <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-8/12">
           <div className="flex flex-col items-center space-y-3">
-            <div className="h-20 mb-10 w-20">
+            <div className="h-28 mb-1 w-28">
               <UserAvatar user={user} />
             </div>
 
