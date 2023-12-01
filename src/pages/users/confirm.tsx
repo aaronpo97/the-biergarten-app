@@ -48,7 +48,7 @@ const ConfirmUserPage: FC = () => {
               Your confirmation token is invalid or is expired.
             </p>
             <button
-              className="btn-outline btn-sm btn normal-case"
+              className="btn btn-outline btn-sm normal-case"
               onClick={onClick}
               type="button"
             >

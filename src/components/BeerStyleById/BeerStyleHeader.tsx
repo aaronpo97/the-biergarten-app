@@ -56,7 +56,7 @@ const BeerStyleHeader: FC<BeerInfoHeaderProps> = ({ beerStyle }) => {
 
           {isPostOwner && (
             <div className="tooltip tooltip-left" data-tip={`Edit '${beerStyle.name}'`}>
-              <Link href={`/beers/${beerStyle.id}/edit`} className="btn-ghost btn-xs btn">
+              <Link href={`/beers/${beerStyle.id}/edit`} className="btn btn-ghost btn-xs">
                 <FaRegEdit className="text-xl" />
               </Link>
             </div>
@@ -68,7 +68,7 @@ const BeerStyleHeader: FC<BeerInfoHeaderProps> = ({ beerStyle }) => {
 
         <div className="flex justify-between">
           <div className="space-y-2">
-            <div className="flex w-25 space-x-3 flex-row">
+            <div className="w-25 flex flex-row space-x-3">
               <div className="text-sm font-bold">
                 ABV Range:{' '}
                 <span>

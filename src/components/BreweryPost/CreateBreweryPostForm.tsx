@@ -95,7 +95,7 @@ const InfoSection: FC<{
           type="file"
           {...register('images')}
           multiple
-          className="file-input-bordered file-input w-full"
+          className="file-input file-input-bordered w-full"
           disabled={isSubmitting}
         />
       </FormSegment>
@@ -141,7 +141,7 @@ const LocationSection: FC<{
             id="address"
             type="text"
             placeholder="1234 Main St"
-            className={`input-bordered input w-full appearance-none rounded-lg transition ease-in-out ${
+            className={`input input-bordered w-full appearance-none rounded-lg transition ease-in-out ${
               errors.address?.message ? 'input-error' : ''
             }`}
             {...register('address')}
@@ -246,7 +246,7 @@ const CreateBreweryPostForm: FC = () => {
       autoComplete="off"
     >
       <Tab.Group as={Fragment}>
-        <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
+        <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
           <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
             Information
           </Tab>

@@ -117,14 +117,14 @@ const EditBreweryPostPage: NextPage<EditPageProps> = ({ breweryPost }) => {
             <div className="w-full space-y-3">
               <button
                 disabled={isSubmitting}
-                className="btn-primary btn w-full"
+                className="btn btn-primary w-full"
                 type="submit"
               >
                 {isSubmitting ? 'Saving...' : 'Save'}
               </button>
 
               <button
-                className="btn-primary btn w-full"
+                className="btn btn-primary w-full"
                 type="button"
                 onClick={handleDelete}
               >

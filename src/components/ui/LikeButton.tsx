@@ -11,7 +11,7 @@ const LikeButton: FC<LikeButtonProps> = ({ isLiked, handleLike, loading }) => {
   return (
     <button
       type="button"
-      className={`btn-sm btn gap-2 rounded-2xl lg:btn-md ${
+      className={`btn btn-sm gap-2 rounded-2xl lg:btn-md ${
         !isLiked ? 'btn-ghost outline' : 'btn-primary'
       }`}
       onClick={() => {

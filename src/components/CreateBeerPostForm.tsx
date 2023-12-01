@@ -154,7 +154,7 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
           type="file"
           {...register('images')}
           multiple
-          className="file-input-bordered file-input w-full"
+          className="file-input file-input-bordered w-full"
           disabled={isSubmitting}
         />
       </FormSegment>

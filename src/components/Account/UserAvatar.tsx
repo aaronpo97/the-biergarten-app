@@ -16,11 +16,11 @@ const UserAvatar: FC<UserAvatarProps> = ({ user }) => {
   const { userAvatar } = user;
   return !userAvatar ? (
     <div
-      className="h-32 w-full bg-primary mask mask-circle flex items-center justify-center"
+      className="mask mask-circle flex h-32 w-full items-center justify-center bg-primary"
       aria-label="Default user avatar"
       role="img"
     >
-      <span className="text-2xl font-bold text-base-content h-full">
+      <span className="h-full text-2xl font-bold text-base-content">
         <FaUser className="h-full" />
       </span>
     </div>
@@ -31,7 +31,7 @@ const UserAvatar: FC<UserAvatarProps> = ({ user }) => {
       width={1000}
       height={1000}
       crop="fill"
-      className="h-full w-full object-cover mask mask-circle"
+      className="mask mask-circle h-full w-full object-cover"
     />
   );
 };

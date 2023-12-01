@@ -41,10 +41,10 @@ const ForgotPasswordPage: NextPage<ForgotPasswordPageProps> = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-full">
-      <div className="xl:w-6/12 w-10/12 mt-64 text-center flex flex-col space-y-3">
+    <div className="flex h-full flex-col items-center">
+      <div className="mt-64 flex w-10/12 flex-col space-y-3 text-center xl:w-6/12">
         <div className="space-y-1">
-          <div className="flex flex-col items-center justify-center my-2">
+          <div className="my-2 flex flex-col items-center justify-center">
             <FaUserCircle className="text-3xl" />
             <h1 className="text-3xl font-bold">Forgot Your Password?</h1>
           </div>

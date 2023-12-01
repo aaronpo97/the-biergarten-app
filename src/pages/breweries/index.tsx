@@ -58,13 +58,13 @@ const BreweryPage: NextPage<BreweryPageProps> = () => {
                   className="tooltip tooltip-left"
                   data-tip="Create a new brewery post"
                 >
-                  <Link href="/breweries/create" className="btn-ghost btn-sm btn">
+                  <Link href="/breweries/create" className="btn btn-ghost btn-sm">
                     <FaPlus className="text-lg" />
                   </Link>
                 </div>
               )}
               <div className="tooltip tooltip-left" data-tip="View map">
-                <Link className="btn-ghost btn-sm btn" href="/breweries/map">
+                <Link className="btn btn-ghost btn-sm" href="/breweries/map">
                   <FaMap className="text-lg" />
                 </Link>
               </div>
@@ -111,7 +111,7 @@ const BreweryPage: NextPage<BreweryPageProps> = () => {
               >
                 <button
                   type="button"
-                  className="btn-ghost btn-sm btn"
+                  className="btn btn-ghost btn-sm"
                   aria-label="Scroll back to top of page."
                   onClick={() => {
                     pageRef.current?.scrollIntoView({

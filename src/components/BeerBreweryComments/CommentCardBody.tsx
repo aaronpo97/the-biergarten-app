@@ -30,13 +30,13 @@ const CommentCardBody: FC<CommentCardProps> = ({
 
   return (
     <div ref={ref} className="flex">
-      <div className="w-[12%] py-4 justify-center">
-        <div className="px-3 h-20">
+      <div className="w-[12%] justify-center py-4">
+        <div className="h-20 px-3">
           <UserAvatar user={comment.postedBy} />
         </div>
       </div>
 
-      <div className="w-[88%] h-full">
+      <div className="h-full w-[88%]">
         {!inEditMode ? (
           <CommentContentBody comment={comment} setInEditMode={setInEditMode} />
         ) : (

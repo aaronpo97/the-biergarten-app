@@ -60,7 +60,7 @@ const DeleteAccount: FunctionComponent<DeleteAccountProps> = ({
           <>
             <div className="mt-3">
               <button
-                className="btn-primary btn w-full"
+                className="btn btn-primary w-full"
                 onClick={() => deleteRef.current!.showModal()}
               >
                 Delete my account
@@ -71,13 +71,13 @@ const DeleteAccount: FunctionComponent<DeleteAccountProps> = ({
                   <p className="">This action is permanent and cannot be reversed.</p>
                   <div className="modal-action flex-col space-x-0 space-y-3">
                     <button
-                      className="btn-error btn-sm btn w-full"
+                      className="btn btn-error btn-sm w-full"
                       onClick={onDeleteSubmit}
                     >
                       Okay, delete my account
                     </button>
                     <button
-                      className="btn-success btn-sm btn w-full"
+                      className="btn btn-success btn-sm w-full"
                       onClick={() => deleteRef.current!.close()}
                     >
                       Go back

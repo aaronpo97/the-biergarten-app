@@ -30,9 +30,9 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
   const { user: currentUser } = useContext(UserContext);
 
   return (
-    <header className="card text-center items-center">
-      <div className="card-body items-center w-full">
-        <div className="w-40 h-40">
+    <header className="card items-center text-center">
+      <div className="card-body w-full items-center">
+        <div className="h-40 w-40">
           <UserAvatar user={user} />
         </div>
 
