@@ -33,6 +33,7 @@ const UseBeerPostsByBrewery = ({ pageSize, breweryId }: UseBeerPostsByBreweryPar
     }
 
     const json = await response.json();
+
     const count = response.headers.get('X-Total-Count');
 
     const parsed = APIResponseValidationSchema.safeParse(json);

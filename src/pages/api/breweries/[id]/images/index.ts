@@ -1,38 +1,17 @@
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import { createRouter, expressWrapper } from 'next-connect';
+import { createRouter } from 'next-connect';
 
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 
-import multer from 'multer';
-
-import cloudinaryConfig from '@/config/cloudinary';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import ImageMetadataValidationSchema from '@/services/schema/ImageSchema/ImageMetadataValidationSchema';
 import addBreweryImageToDB from '@/services/BreweryImage/addBreweryImageToDB';
-
-const { storage } = cloudinaryConfig;
-
-const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
-  const { mimetype } = file;
-
-  const isImage = mimetype.startsWith('image/');
-
-  if (!isImage) {
-    cb(null, false);
-  }
-  cb(null, true);
-};
-
-const uploadMiddleware = expressWrapper(
-  multer({ storage, fileFilter, limits: { files: 5, fileSize: 15 * 1024 * 1024 } }).array(
-    'images',
-  ),
-);
+import { uploadMiddlewareMultiple } from '@/config/multer/uploadMiddleware';
 
 interface UploadBreweryPostImagesRequest extends UserExtendedNextApiRequest {
   files?: Express.Multer.File[];
@@ -75,7 +54,7 @@ const router = createRouter<
 router.post(
   getCurrentUser,
   // @ts-expect-error
-  uploadMiddleware,
+  uploadMiddlewareMultiple,
   validateRequest({ bodySchema: ImageMetadataValidationSchema }),
   processImageData,
 );
