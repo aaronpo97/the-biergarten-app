@@ -12,6 +12,7 @@ import sendUploadBeerImagesRequest from '@/requests/BeerImage/sendUploadBeerImag
 
 import toast from 'react-hot-toast';
 
+import createErrorToast from '@/util/createErrorToast';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -51,14 +52,14 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
     }
 
     try {
+      const loadingToast = toast.loading('Creating beer post...');
       const beerPost = await sendCreateBeerPostRequest(data);
       await sendUploadBeerImagesRequest({ beerPost, images: data.images });
       await router.push(`/beers/${beerPost.id}`);
+      toast.dismiss(loadingToast);
       toast.success('Created beer post.');
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
-
-      toast.error(errorMessage);
+      createErrorToast(e);
     }
   };
 
