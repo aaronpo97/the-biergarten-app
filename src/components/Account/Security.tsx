@@ -84,7 +84,7 @@ const Security: FunctionComponent<SecurityProps> = ({ dispatch, pageState }) => 
             />
 
             <button
-              className="btn-primary btn mt-5"
+              className="btn btn-primary mt-5"
               disabled={!pageState.securityOpen || formState.isSubmitting}
               type="submit"
             >

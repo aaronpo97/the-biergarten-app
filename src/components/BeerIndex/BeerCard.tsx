@@ -44,7 +44,7 @@ const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) =
         <div className="flex items-end justify-between">
           <div>
             <Link
-              className="text-md lg:text-xl hover:underline"
+              className="text-md hover:underline lg:text-xl"
               href={`/beers/styles/${post.style.id}`}
             >
               {post.style.name}

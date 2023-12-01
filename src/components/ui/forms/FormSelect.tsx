@@ -45,7 +45,7 @@ const FormSelect: FunctionComponent<FormSelectProps> = ({
 }) => (
   <select
     id={id}
-    className={`select-bordered select block w-full rounded-lg ${
+    className={`select select-bordered block w-full rounded-lg ${
       error ? 'select-error' : ''
     }`}
     placeholder={placeholder}

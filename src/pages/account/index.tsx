@@ -35,7 +35,7 @@ const AccountPage: NextPage = () => {
       <div className="flex flex-col items-center">
         <div className="m-12 flex w-11/12 flex-col items-center justify-center space-y-3 lg:w-8/12">
           <div className="flex flex-col items-center space-y-3">
-            <div className="h-28 mb-1 w-28">
+            <div className="mb-1 h-28 w-28">
               <UserAvatar user={user} />
             </div>
 
@@ -47,7 +47,7 @@ const AccountPage: NextPage = () => {
 
           <div className="h-full w-full">
             <Tab.Group>
-              <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
+              <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
                 <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
                   Account Info and Security
                 </Tab>

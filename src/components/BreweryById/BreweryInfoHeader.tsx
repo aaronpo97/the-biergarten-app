@@ -63,7 +63,7 @@ const BreweryInfoHeader: FC<BreweryInfoHeaderProps> = ({ breweryPost }) => {
             <div className="tooltip tooltip-left" data-tip={`Edit '${breweryPost.name}'`}>
               <Link
                 href={`/breweries/${breweryPost.id}/edit`}
-                className="btn-ghost btn-xs btn"
+                className="btn btn-ghost btn-xs"
               >
                 <FaRegEdit className="text-xl" />
               </Link>

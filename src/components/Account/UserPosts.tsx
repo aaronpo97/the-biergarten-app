@@ -8,9 +8,9 @@ const UserPosts: FC = () => {
     <div className="mt-4">
       <div>
         <Tab.Group>
-          <Tab.List className="tabs tabs-boxed items-center justify-center rounded-2xl">
-            <Tab className="tab tab-xl w-1/2 uppercase ui-selected:tab-active">Beers</Tab>
-            <Tab className="tab tab-xl w-1/2 uppercase ui-selected:tab-active">
+          <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
+            <Tab className="tab-xl tab w-1/2 uppercase ui-selected:tab-active">Beers</Tab>
+            <Tab className="tab-xl tab w-1/2 uppercase ui-selected:tab-active">
               Breweries
             </Tab>
           </Tab.List>

@@ -125,7 +125,7 @@ const ProfilePage: NextPage<ProfilePageProps> = ({ user }) => {
               disabled={isSubmitting}
               type="file"
               id="userAvatar"
-              className="file-input-bordered file-input w-full"
+              className="file-input file-input-bordered w-full"
               {...register('userAvatar')}
             />
           </FormSegment>

@@ -16,7 +16,7 @@ const BeerStyleCard: FC<{ beerStyle: z.infer<typeof BeerStyleQueryResult> }> = (
               {beerStyle.name}
             </h3>
           </Link>
-          <div className="flex w-25 space-x-3 flex-row">
+          <div className="w-25 flex flex-row space-x-3">
             <div className="text-sm font-bold">
               ABV Range:{' '}
               <span>
@@ -32,7 +32,7 @@ const BeerStyleCard: FC<{ beerStyle: z.infer<typeof BeerStyleQueryResult> }> = (
           </div>
 
           <div className="h-20">
-            <p className="overflow-ellipsis line-clamp-3">{beerStyle.description}</p>
+            <p className="line-clamp-3 overflow-ellipsis">{beerStyle.description}</p>
           </div>
 
           <div className="font-semibold">

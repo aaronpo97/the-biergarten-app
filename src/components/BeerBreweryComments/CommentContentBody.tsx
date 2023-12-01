@@ -19,7 +19,7 @@ const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMod
   const timeDistance = useTimeDistance(new Date(comment.createdAt));
 
   return (
-    <div className="pr-3 py-4 animate-in fade-in-10 space-y-1">
+    <div className="space-y-1 py-4 pr-3 animate-in fade-in-10">
       <div className="space-y-2">
         <div className="flex flex-row justify-between">
           <div>

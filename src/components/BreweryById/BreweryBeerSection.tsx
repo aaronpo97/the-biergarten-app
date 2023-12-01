@@ -44,7 +44,7 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
             <div>
               {user && (
                 <Link
-                  className={`btn-ghost btn-sm btn gap-2 rounded-2xl outline`}
+                  className={`btn btn-ghost btn-sm gap-2 rounded-2xl outline`}
                   href={`/breweries/${breweryPost.id}/beers/create`}
                 >
                   <FaPlus className="text-xl" />
@@ -77,7 +77,7 @@ const BreweryBeersSection: FC<BreweryCommentsSectionProps> = ({ breweryPost }) =
 
                     <div>
                       <Link
-                        className="text-lg font-medium link link-hover"
+                        className="link-hover link text-lg font-medium"
                         href={`/beers/styles/${beerPost.style.id}`}
                       >
                         {beerPost.style.name}

@@ -58,7 +58,7 @@ const BreweryPostsByUser: FC = () => {
           <div className="tooltip tooltip-bottom" data-tip="Scroll back to top of page.">
             <button
               type="button"
-              className="btn-ghost btn-sm btn"
+              className="btn btn-ghost btn-sm"
               aria-label="Scroll back to top of page."
               onClick={() => {
                 pageRef.current?.scrollIntoView({

@@ -50,7 +50,7 @@ const SearchPage: NextPage = () => {
             <input
               type="text"
               id="search"
-              className="input-bordered input w-full rounded-lg"
+              className="input input-bordered w-full rounded-lg"
               onChange={onChange}
               value={searchValue}
             />

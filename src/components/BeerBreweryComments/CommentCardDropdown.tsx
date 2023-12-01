@@ -17,13 +17,13 @@ const CommentCardDropdown: FC<CommentCardDropdownProps> = ({
   const isCommentOwner = user?.id === comment.postedBy.id;
 
   return (
-    <div className="dropdown-end dropdown">
-      <label tabIndex={0} className="btn-ghost btn-sm btn m-1">
+    <div className="dropdown dropdown-end">
+      <label tabIndex={0} className="btn btn-ghost btn-sm m-1">
         <FaEllipsisH />
       </label>
       <ul
         tabIndex={0}
-        className="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
+        className="menu dropdown-content rounded-box w-52 bg-base-100 p-2 shadow"
       >
         <li>
           {isCommentOwner ? (

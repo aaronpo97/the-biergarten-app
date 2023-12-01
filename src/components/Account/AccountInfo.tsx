@@ -159,7 +159,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ pageState, dispatch }) => {
                 </div>
               </div>
               <button
-                className="btn-primary btn my-5 w-full"
+                className="btn btn-primary my-5 w-full"
                 type="submit"
                 disabled={!pageState.accountInfoOpen || formState.isSubmitting}
               >

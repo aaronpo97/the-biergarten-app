@@ -71,7 +71,7 @@ const BeerRecommendationsSection: FC<{
                     <div>
                       <div>
                         <Link
-                          className="link link-hover"
+                          className="link-hover link"
                           href={`/beers/styles/${post.style.id}`}
                         >
                           <span className="font-medium">{post.style.name}</span>

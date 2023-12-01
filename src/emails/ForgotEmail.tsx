@@ -12,7 +12,7 @@ const ForgotEmail: FC<ForgotEmailProps> = ({ name, url }) => {
   return (
     <Tailwind>
       <Container className="mx-auto">
-        <Section className="p-4 flex flex-col justify-center items-center">
+        <Section className="flex flex-col items-center justify-center p-4">
           <Heading className="text-2xl font-bold">Forgot Password</Heading>
           <Text className="my-4">Hi {name},</Text>
           <Text className="my-4">
@@ -23,7 +23,7 @@ const ForgotEmail: FC<ForgotEmailProps> = ({ name, url }) => {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
           >
             Reset Password
           </Button>

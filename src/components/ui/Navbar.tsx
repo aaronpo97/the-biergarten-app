@@ -38,12 +38,12 @@ const MobileLinks: FC = () => {
   return (
     <div className="flex-none lg:hidden">
       <div className="dropdown-end dropdown">
-        <label tabIndex={0} className="btn-ghost btn-circle btn">
+        <label tabIndex={0} className="btn btn-circle btn-ghost">
           <GiHamburgerMenu />
         </label>
         <ul
           tabIndex={0}
-          className="menu-compact dropdown-content menu rounded-box mt-3 w-48 bg-base-100 p-2 shadow"
+          className="menu-compact menu dropdown-content rounded-box mt-3 w-48 bg-base-100 p-2 shadow"
         >
           {pages.map((page) => (
             <li key={page.slug}>
@@ -66,7 +66,7 @@ const Navbar = () => {
   return (
     <div className="navbar sticky top-0 z-50 bg-primary text-primary-content">
       <div className="flex-1">
-        <Link className="btn-ghost btn normal-case" href="/">
+        <Link className="btn btn-ghost normal-case" href="/">
           <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
         </Link>
       </div>
@@ -78,7 +78,7 @@ const Navbar = () => {
         <div>
           {theme === 'light' ? (
             <button
-              className="btn-ghost btn-md btn-circle btn"
+              className="btn btn-circle btn-ghost btn-md"
               data-set-theme="dark"
               data-act-class="ACTIVECLASS"
               onClick={() => setTheme('dark')}
@@ -87,7 +87,7 @@ const Navbar = () => {
             </button>
           ) : (
             <button
-              className="btn-ghost btn-md btn-circle btn"
+              className="btn btn-circle btn-ghost btn-md"
               data-set-theme="light"
               data-act-class="ACTIVECLASS"
               onClick={() => setTheme('light')}

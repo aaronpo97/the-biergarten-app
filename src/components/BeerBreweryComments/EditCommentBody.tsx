@@ -81,7 +81,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
   };
 
   return (
-    <div className="pr-3 py-4 animate-in fade-in-10">
+    <div className="py-4 pr-3 animate-in fade-in-10">
       <form onSubmit={handleSubmit(onEdit)} className="space-y-3">
         <div>
           <FormInfo>
@@ -124,7 +124,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
             <div className="join">
               <button
                 type="button"
-                className="btn-xs join-item btn lg:btn-sm"
+                className="btn join-item btn-xs lg:btn-sm"
                 disabled={isSubmitting || isDeleting}
                 onClick={() => {
                   setInEditMode(false);
@@ -135,13 +135,13 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || isDeleting}
-                className="btn-xs join-item btn lg:btn-sm"
+                className="btn join-item btn-xs lg:btn-sm"
               >
                 Save
               </button>
               <button
                 type="button"
-                className="btn-xs join-item btn lg:btn-sm"
+                className="btn join-item btn-xs lg:btn-sm"
                 onClick={onDelete}
                 disabled={isDeleting || formState.isSubmitting}
               >
