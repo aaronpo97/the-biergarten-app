@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { FC, useContext } from 'react';
-import Image from 'next/image';
+
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
+import { CldImage } from 'next-cloudinary';
 import BeerPostLikeButton from '../BeerById/BeerPostLikeButton';
 
 const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) => {
@@ -16,9 +17,10 @@ const BeerCard: FC<{ post: z.infer<typeof BeerPostQueryResult> }> = ({ post }) =
       <figure className="h-96">
         <Link href={`/beers/${post.id}`} className="h-full object-cover">
           {post.beerImages.length > 0 && (
-            <Image
+            <CldImage
               src={post.beerImages[0].path}
               alt={post.name}
+              crop="fill"
               width="3000"
               height="3000"
               className="h-full object-cover"

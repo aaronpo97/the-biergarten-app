@@ -4,7 +4,7 @@ import { GetServerSideProps, NextPage } from 'next';
 
 import { z } from 'zod';
 import Head from 'next/head';
-import Image from 'next/image';
+
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
@@ -12,6 +12,7 @@ import { Tab } from '@headlessui/react';
 
 import dynamic from 'next/dynamic';
 import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
+import { CldImage } from 'next-cloudinary';
 
 const [BreweryInfoHeader, BreweryBeersSection, BreweryCommentsSection, BreweryPostMap] = [
   dynamic(() => import('@/components/BreweryById/BreweryInfoHeader')),
@@ -47,9 +48,10 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken 
           {breweryPost.breweryImages.length
             ? breweryPost.breweryImages.map((image, index) => (
                 <div key={image.id} id={`image-${index}}`} className="w-full">
-                  <Image
+                  <CldImage
                     alt={image.alt}
                     src={image.path}
+                    crop="fill"
                     height={1080}
                     width={1920}
                     className="h-96 w-full object-cover lg:h-[42rem]"

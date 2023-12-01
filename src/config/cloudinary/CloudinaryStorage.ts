@@ -40,11 +40,7 @@ class CloudinaryStorage implements StorageEngine {
    * @param file - The file to be removed.
    * @param callback - The callback function to be called if an error occurs.
    */
-  public _removeFile(
-    req: Request,
-    file: Express.Multer.File,
-    callback: (error: Error) => void,
-  ) {
+  _removeFile(req: Request, file: Express.Multer.File, callback: (error: Error) => void) {
     this.cloudinary.uploader.destroy(file.filename, { invalidate: true }, callback);
   }
 
@@ -55,7 +51,7 @@ class CloudinaryStorage implements StorageEngine {
    * @param file - The file to be uploaded.
    * @param callback - The callback function to be called after the file is uploaded.
    */
-  public _handleFile(
+  _handleFile(
     req: Request,
     file: Express.Multer.File,
     callback: (error?: unknown, info?: Partial<Express.Multer.File>) => void,
