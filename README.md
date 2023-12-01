@@ -122,7 +122,7 @@ npm install
 
 ```bash
 echo "BASE_URL=
-CLOUDINARY_CLOUD_NAME=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_KEY=
 CLOUDINARY_SECRET=
 CONFIRMATION_TOKEN_SECRET=
@@ -149,8 +149,8 @@ SPARKPOST_SENDER_ADDRESS=" > .env
 - `BASE_URL` is the base URL of the application.
   - For example, if you are running the application locally, you can set this to
     `http://localhost:3000`.
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_KEY`, and `CLOUDINARY_SECRET` are the credentials
-  for your Cloudinary account.
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_KEY`, and `CLOUDINARY_SECRET` are the
+  credentials for your Cloudinary account.
   - You can create a free account [here](https://cloudinary.com/users/register/free).
 - `CONFIRMATION_TOKEN_SECRET` is the secret used to sign the confirmation token used for
   email confirmation.
