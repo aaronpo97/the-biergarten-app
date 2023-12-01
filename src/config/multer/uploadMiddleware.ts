@@ -1,8 +1,6 @@
 import multer from 'multer';
 import { expressWrapper } from 'next-connect';
-import cloudinaryConfig from '../cloudinary';
-
-const { storage } = cloudinaryConfig;
+import { storage } from '../cloudinary';
 
 const fileFilter: multer.Options['fileFilter'] = (req, file, callback) => {
   const { mimetype } = file;
