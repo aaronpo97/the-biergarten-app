@@ -18,11 +18,14 @@ const getAllBeersByBrewery = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
+  const pageNum = parseInt(page_num, 10);
+  const pageSize = parseInt(page_size, 10);
+
   const beers: z.infer<typeof BeerPostQueryResult>[] =
     await DBClient.instance.beerPost.findMany({
       where: { breweryId: id },
-      take: parseInt(page_size, 10),
-      skip: parseInt(page_num, 10) * parseInt(page_size, 10),
+      skip: (pageNum - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         name: true,

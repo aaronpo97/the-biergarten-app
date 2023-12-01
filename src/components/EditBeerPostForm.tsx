@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import deleteBeerPostRequest from '@/requests/BeerPost/deleteBeerPostRequest';
 import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
 import sendEditBeerPostRequest from '@/requests/BeerPost/sendEditBeerPostRequest';
+import createErrorToast from '@/util/createErrorToast';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -33,23 +34,26 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
   const { isSubmitting, errors } = formState;
   const onSubmit: SubmitHandler<EditBeerPostSchema> = async (data) => {
     try {
+      const loadingToast = toast.loading('Editing beer post...');
       await sendEditBeerPostRequest(data);
       await router.push(`/beers/${data.id}`);
       toast.success('Edited beer post.');
+      toast.dismiss(loadingToast);
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
-      toast.error(errorMessage);
+      createErrorToast(e);
       await router.push(`/beers/${data.id}`);
     }
   };
 
   const onDelete = async () => {
     try {
+      const loadingToast = toast.loading('Deleting beer post...');
       await deleteBeerPostRequest(previousValues.id);
+      toast.dismiss(loadingToast);
       await router.push('/beers');
+      toast.success('Deleted beer post.');
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Something went wrong.';
-      toast.error(errorMessage);
+      createErrorToast(e);
       await router.push(`/beers`);
     }
   };

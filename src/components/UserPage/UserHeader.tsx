@@ -1,19 +1,33 @@
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
-import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
-import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
-import { FC } from 'react';
+
+import { FC, useContext } from 'react';
 import { z } from 'zod';
 import { format } from 'date-fns';
 import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
+import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
+import UserContext from '@/contexts/UserContext';
+import Link from 'next/link';
 import UserAvatar from '../Account/UserAvatar';
+import UserFollowButton from './UserFollowButton';
 
 interface UserHeaderProps {
   user: z.infer<typeof GetUserSchema>;
-  followerCount: ReturnType<typeof useGetUsersFollowingUser>['followerCount'];
-  followingCount: ReturnType<typeof useGetUsersFollowedByUser>['followingCount'];
 }
-const UserHeader: FC<UserHeaderProps> = ({ user, followerCount, followingCount }) => {
+const UserHeader: FC<UserHeaderProps> = ({ user }) => {
   const timeDistance = useTimeDistance(new Date(user.createdAt));
+
+  const { followingCount, mutate: mutateFollowingCount } = useGetUsersFollowedByUser({
+    userId: user.id,
+    pageSize: 10,
+  });
+
+  const { followerCount, mutate: mutateFollowerCount } = useGetUsersFollowingUser({
+    userId: user.id,
+    pageSize: 10,
+  });
+
+  const { user: currentUser } = useContext(UserContext);
 
   return (
     <header className="card text-center items-center">
@@ -42,6 +56,25 @@ const UserHeader: FC<UserHeaderProps> = ({ user, followerCount, followingCount }
             </span>
           )}
         </span>
+        <div className="w-6/12">
+          <p className="text-sm">{user.bio}</p>
+        </div>
+
+        {currentUser?.id !== user.id ? (
+          <div className="flex items-center justify-center">
+            <UserFollowButton
+              mutateFollowerCount={mutateFollowerCount}
+              user={user}
+              mutateFollowingCount={mutateFollowingCount}
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <Link href={`/account/profile`} className="btn btn-primary">
+              Edit Profile
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

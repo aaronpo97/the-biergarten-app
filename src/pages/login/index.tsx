@@ -1,13 +1,13 @@
 import { NextPage } from 'next';
 
 import LoginForm from '@/components/Login/LoginForm';
-import Image from 'next/image';
 
 import { FaUserCircle } from 'react-icons/fa';
 import Head from 'next/head';
 import Link from 'next/link';
 
 import useRedirectWhenLoggedIn from '@/hooks/auth/useRedirectIfLoggedIn';
+import { CldImage } from 'next-cloudinary';
 
 const LoginPage: NextPage = () => {
   useRedirectWhenLoggedIn();
@@ -20,11 +20,11 @@ const LoginPage: NextPage = () => {
 
       <div className="flex h-full flex-row">
         <div className="hidden h-full flex-col items-center justify-center bg-base-100 lg:flex lg:w-[55%]">
-          <Image
-            src="https://picsum.photos/5000/5000"
+          <CldImage
+            src="https://res.cloudinary.com/dxie9b7na/image/upload/v1701056793/cloudinary-images/pexels-elevate-1267700_jrno3s.jpg"
             alt="Login Image"
-            width={4920}
-            height={4080}
+            width={5000}
+            height={5000}
             className="h-full w-full object-cover"
           />
         </div>

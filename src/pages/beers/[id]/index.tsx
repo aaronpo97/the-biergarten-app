@@ -1,7 +1,5 @@
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
-
 import getBeerPostById from '@/services/BeerPost/getBeerPostById';
 
 import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
@@ -13,6 +11,7 @@ import { Carousel } from 'react-responsive-carousel';
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
 import dynamic from 'next/dynamic';
+import { CldImage } from 'next-cloudinary';
 
 const [BeerInfoHeader, BeerPostCommentsSection, BeerRecommendations] = [
   dynamic(() => import('@/components/BeerById/BeerInfoHeader')),
@@ -45,10 +44,11 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
           {beerPost.beerImages.length
             ? beerPost.beerImages.map((image, index) => (
                 <div key={image.id} id={`image-${index}}`} className="w-full">
-                  <Image
+                  <CldImage
                     alt={image.alt}
                     src={image.path}
                     height={1080}
+                    crop="fill"
                     width={1920}
                     className="h-96 w-full object-cover lg:h-[42rem]"
                   />

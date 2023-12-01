@@ -4,7 +4,8 @@ import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQue
 import { FC, useContext } from 'react';
 import Link from 'next/link';
 import { z } from 'zod';
-import Image from 'next/image';
+
+import { CldImage } from 'next-cloudinary';
 import BreweryPostLikeButton from './BreweryPostLikeButton';
 
 const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
@@ -17,11 +18,12 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
       <figure className="card-image h-96">
         <Link href={`/breweries/${brewery.id}`} className="h-full object-cover">
           {brewery.breweryImages.length > 0 && (
-            <Image
+            <CldImage
               src={brewery.breweryImages[0].path}
               alt={brewery.name}
               width="1029"
               height="110"
+              crop="fill"
               className="h-full object-cover"
             />
           )}

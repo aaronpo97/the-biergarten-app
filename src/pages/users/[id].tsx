@@ -7,8 +7,6 @@ import { FC } from 'react';
 import { z } from 'zod';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import UserHeader from '@/components/UserPage/UserHeader';
-import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
-import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 
 interface UserInfoPageProps {
   user: z.infer<typeof GetUserSchema>;
@@ -19,16 +17,6 @@ const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const title = `${user.username} | The Biergarten App`;
 
-  const { followingCount } = useGetUsersFollowedByUser({
-    userId: user.id,
-    pageSize: 10,
-  });
-
-  const { followerCount } = useGetUsersFollowingUser({
-    userId: user.id,
-    pageSize: 10,
-  });
-
   return (
     <>
       <Head>
@@ -36,34 +24,9 @@ const UserInfoPage: FC<UserInfoPageProps> = ({ user }) => {
         <meta name="description" content="User information" />
       </Head>
       <>
-        <main className="mb-12 mt-10 flex w-full items-center justify-center">
-          <div className="h-full w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
-            <UserHeader
-              user={user}
-              followerCount={followerCount}
-              followingCount={followingCount}
-            />
-
-            {isDesktop ? (
-              <div className="h-64 flex space-x-3">
-                <div className="h-full w-5/12">
-                  <div className="h-full card">
-                    <div className="card-body">
-                      <h2 className="text-2xl font-bold">About Me</h2>
-                      <p>{user.bio}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-7/12">
-                  <div className="h-full card">
-                    <div className="h-full card-body"></div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <></>
-            )}
+        <main className="mb-12 mt-10 flex flex-col w-full items-center justify-center">
+          <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
+            <UserHeader user={user} />
           </div>
         </main>
       </>

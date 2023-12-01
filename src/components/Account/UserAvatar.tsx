@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { z } from 'zod';
 import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import { FaUser } from 'react-icons/fa';
@@ -25,11 +25,12 @@ const UserAvatar: FC<UserAvatarProps> = ({ user }) => {
       </span>
     </div>
   ) : (
-    <Image
+    <CldImage
       src={userAvatar.path}
       alt="user avatar"
       width={1000}
       height={1000}
+      crop="fill"
       className="h-full w-full object-cover mask mask-circle"
     />
   );

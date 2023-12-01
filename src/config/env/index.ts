@@ -11,7 +11,7 @@ import 'dotenv/config';
  */
 const envSchema = z.object({
   BASE_URL: z.string().url(),
-  CLOUDINARY_CLOUD_NAME: z.string(),
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_KEY: z.string(),
   CLOUDINARY_SECRET: z.string(),
   RESET_PASSWORD_TOKEN_SECRET: z.string(),
@@ -56,7 +56,8 @@ export const BASE_URL = parsed.data.BASE_URL;
  * @see https://cloudinary.com/console
  */
 
-export const CLOUDINARY_CLOUD_NAME = parsed.data.CLOUDINARY_CLOUD_NAME;
+export const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME =
+  parsed.data.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 /**
  * Cloudinary API key.

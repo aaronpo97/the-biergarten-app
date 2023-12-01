@@ -57,7 +57,7 @@ const editBeerPost = async (
 const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const deleted = deleteBeerPostById({ beerPostId: id });
+  const deleted = await deleteBeerPostById({ beerPostId: id });
   if (!deleted) {
     throw new ServerError('Beer post not found', 404);
   }
