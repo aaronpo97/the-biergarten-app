@@ -22,7 +22,7 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
               src={brewery.breweryImages[0].path}
               alt={brewery.name}
               width="1029"
-              height="110"
+              height="1029"
               crop="fill"
               className="h-full object-cover"
             />

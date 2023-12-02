@@ -36,6 +36,7 @@ const useNavbar = () => {
   /** These pages are accessible to both authenticated and unauthenticated users. */
   const otherPages: readonly Page[] = [
     { slug: '/beers', name: 'Beers' },
+    { slug: '/beers/styles', name: 'Beer Styles' },
     { slug: '/breweries', name: 'Breweries' },
   ];
 
