@@ -1,10 +1,3 @@
-import FormError from '@/components/ui/forms/FormError';
-import FormInfo from '@/components/ui/forms/FormInfo';
-import FormLabel from '@/components/ui/forms/FormLabel';
-import FormSegment from '@/components/ui/forms/FormSegment';
-import FormTextInput from '@/components/ui/forms/FormTextInput';
-import findUserById from '@/services/User/findUserById';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import { GetServerSideProps, NextPage } from 'next';
 import { z } from 'zod';
@@ -13,73 +6,41 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';
-import Button from '@/components/ui/forms/Button';
 
-interface ProfilePageProps {
-  user: z.infer<typeof GetUserSchema>;
-}
+import UserAvatar from '@/components/Account/UserAvatar';
+import { useContext, useEffect } from 'react';
+import UserContext from '@/contexts/UserContext';
 
-const UpdateProfileSchema = z.object({
-  bio: z.string().min(1, 'Bio cannot be empty'),
-  userAvatar: z
-    .instanceof(typeof FileList !== 'undefined' ? FileList : Object)
-    .refine((fileList) => fileList instanceof FileList, {
-      message: 'You must submit this form in a web browser.',
-    })
-    .refine((fileList) => (fileList as FileList).length === 1, {
-      message: 'You must upload exactly one file.',
-    })
-    .refine(
-      (fileList) =>
-        [...(fileList as FileList)]
-          .map((file) => file.type)
-          .every((fileType) => fileType.startsWith('image/')),
-      { message: 'You must upload only images.' },
-    )
-    .refine(
-      (fileList) =>
-        [...(fileList as FileList)]
-          .map((file) => file.size)
-          .every((fileSize) => fileSize < 15 * 1024 * 1024),
-      { message: 'You must upload images smaller than 15MB.' },
-    ),
-});
+import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
+import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
+import Head from 'next/head';
 
-const sendUpdateProfileRequest = async (data: z.infer<typeof UpdateProfileSchema>) => {
-  if (!(data.userAvatar instanceof FileList)) {
-    throw new Error('You must submit this form in a web browser.');
-  }
+import UpdateProfileSchema from '../../services/User/schema/UpdateProfileSchema';
+import sendUpdateProfileRequest from '../../requests/Account/sendUpdateProfileRequest';
+import UpdateProfileForm from '../../components/Account/UpdateProfileForm';
 
-  const { bio, userAvatar } = data;
+const ProfilePage: NextPage = () => {
+  const { user, mutate: mutateUser } = useContext(UserContext);
 
-  const formData = new FormData();
-  formData.append('image', userAvatar[0]);
-  formData.append('bio', bio);
-
-  const response = await fetch(`/api/users/profile`, {
-    method: 'PUT',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error('Something went wrong.');
-  }
-
-  const updatedUser = await response.json();
-
-  return updatedUser;
-};
-
-const ProfilePage: NextPage<ProfilePageProps> = ({ user }) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    watch,
+
     reset,
   } = useForm<z.infer<typeof UpdateProfileSchema>>({
     resolver: zodResolver(UpdateProfileSchema),
+    defaultValues: {
+      bio: user?.bio ?? '',
+    },
   });
+
+  useEffect(() => {
+    if (!user || !user.bio) return;
+    setValue('bio', user.bio);
+  }, [user, setValue]);
 
   const onSubmit: SubmitHandler<z.infer<typeof UpdateProfileSchema>> = async (data) => {
     try {
@@ -89,69 +50,103 @@ const ProfilePage: NextPage<ProfilePageProps> = ({ user }) => {
         setTimeout(resolve, 1000);
       });
       toast.remove(loadingToast);
-      // reset();
+      reset();
+      mutateUser!();
       toast.success('Profile updated!');
     } catch (error) {
       createErrorToast(error);
     }
   };
+  const { followingCount } = useGetUsersFollowedByUser({
+    userId: user?.id,
+  });
+
+  const { followerCount } = useGetUsersFollowingUser({
+    userId: user?.id,
+  });
+
+  const getUserAvatarPath = () => {
+    const watchedInput = watch('userAvatar');
+
+    if (
+      !(watchedInput instanceof FileList) ||
+      watchedInput.length !== 1 ||
+      !watchedInput[0].type.startsWith('image/')
+    ) {
+      return '';
+    }
+
+    const [avatar] = watchedInput;
+
+    return URL.createObjectURL(avatar);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="w-9/12">
-        <pre>{JSON.stringify(user, null, 2)}</pre>
-        <form className="form-control" noValidate onSubmit={handleSubmit(onSubmit)}>
-          <FormInfo>
-            <FormLabel htmlFor="bio">Bio</FormLabel>
-            <FormError>{errors.bio?.message}</FormError>
-          </FormInfo>
+    <>
+      <Head>
+        <title>The Biergarten App || Update Your Profile</title>
+        <meta name="description" content="Update your user profile." />
+      </Head>
+      <div className="mt-20 flex flex-col items-center justify-center">
+        {user && (
+          <div className="w-10/12 lg:w-7/12">
+            <div className="card">
+              <div className="card-body">
+                <div className="my-10 flex flex-col items-center justify-center">
+                  <div className="my-5 h-52">
+                    <UserAvatar
+                      user={{
+                        ...user,
+                        userAvatar:
+                          // Render the user's avatar if they have one and then switch to the preview it's being updated.
+                          user.userAvatar && !getUserAvatarPath()
+                            ? user.userAvatar
+                            : {
+                                id: 'preview',
+                                alt: 'User Avatar',
+                                caption: 'User Avatar',
+                                path: getUserAvatarPath(),
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                              },
+                      }}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h2 className="text-3xl font-bold">{user.username}</h2>
 
-          <FormSegment>
-            <FormTextInput
-              disabled={isSubmitting}
-              id="bio"
-              type="text"
-              formValidationSchema={register('bio')}
-              error={!!errors.bio}
-              placeholder="Bio"
-            />
-          </FormSegment>
+                    <div className="flex space-x-3 text-lg font-bold">
+                      <span>{followingCount} Following</span>
+                      <span>{followerCount} Followers</span>
+                    </div>
+                  </div>
 
-          <FormInfo>
-            <FormLabel htmlFor="userAvatar">Avatar</FormLabel>
-            <FormError>{errors.userAvatar?.message}</FormError>
-          </FormInfo>
-          <FormSegment>
-            <input
-              disabled={isSubmitting}
-              type="file"
-              id="userAvatar"
-              className="file-input file-input-bordered w-full"
-              {...register('userAvatar')}
-            />
-          </FormSegment>
+                  <div>
+                    <p className="text-lg">
+                      {watch('bio') || (
+                        <span className="italic">Your bio will appear here.</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
 
-          <div className="mt-6">
-            <Button type="submit" isSubmitting={isSubmitting}>
-              Update Profile
-            </Button>
+                <UpdateProfileForm
+                  handleSubmit={handleSubmit}
+                  onSubmit={onSubmit}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                  register={register}
+                  user={user}
+                />
+              </div>
+            </div>
           </div>
-        </form>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 
 export default ProfilePage;
 
-export const getServerSideProps: GetServerSideProps =
-  withPageAuthRequired<ProfilePageProps>(async (context, session) => {
-    const { id } = session;
-
-    const user = await findUserById(id);
-
-    if (!user) {
-      return { notFound: true };
-    }
-
-    return { props: { user: JSON.parse(JSON.stringify(user)) } };
-  });
+export const getServerSideProps: GetServerSideProps = withPageAuthRequired();

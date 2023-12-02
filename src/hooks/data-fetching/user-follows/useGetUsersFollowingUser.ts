@@ -3,13 +3,35 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
-const useGetUsersFollowingUser = ({
-  pageSize,
-  userId,
-}: {
-  pageSize: number;
-  userId: string;
-}) => {
+interface UseGetUsersFollowingUser {
+  pageSize?: number;
+  userId?: string;
+}
+
+/**
+ * Custom hook using SWR for fetching users followed by a specific user.
+ *
+ * @example
+ *   const { followers, followerCount } = useGetUsersFollowingUser({ userId: '123' });
+ *
+ * @param options - The options for fetching users.
+ * @param [options.pageSize=5] - The number of users to fetch per page. Default is `5`
+ * @param options.userId - The ID of the user.
+ * @returns An object with the following properties:
+ *
+ *   - `followers` The list of users following the specified user.
+ *   - `followerCount` The total count of users following the specified user.
+ *   - `pageCount` The total number of pages.
+ *   - `size` The current page size.
+ *   - `setSize` A function to set the page size.
+ *   - `isLoading` Indicates if the data is currently being loaded.
+ *   - `isLoadingMore` Indicates if there are more pages to load.
+ *   - `isAtEnd` Indicates if the current page is the last page.
+ *   - `mutate` A function to mutate the data.
+ *   - `error` The error object, if any.
+ */
+
+const useGetUsersFollowingUser = ({ pageSize = 5, userId }: UseGetUsersFollowingUser) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) {

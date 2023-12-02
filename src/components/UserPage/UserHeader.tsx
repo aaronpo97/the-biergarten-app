@@ -31,50 +31,50 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
 
   return (
     <header className="card items-center text-center">
-      <div className="card-body w-full items-center">
+      <div className="card-body w-full items-center justify-center">
         <div className="h-40 w-40">
           <UserAvatar user={user} />
         </div>
 
         <div>
           <h1 className="text-2xl font-bold lg:text-4xl">{user.username}</h1>
+
+          <div className="flex space-x-3 text-lg font-bold">
+            <span>{followingCount} Following</span>
+            <span>{followerCount} Followers</span>
+          </div>
+        </div>
+        <div>
+          <span className="italic">
+            joined{' '}
+            {timeDistance && (
+              <span
+                className="tooltip tooltip-bottom"
+                data-tip={format(new Date(user.createdAt), 'MM/dd/yyyy')}
+              >
+                {`${timeDistance} ago`}
+              </span>
+            )}
+          </span>
         </div>
 
-        <div className="flex space-x-3 text-lg font-bold">
-          <span>{followingCount} Following</span>
-          <span>{followerCount} Followers</span>
-        </div>
-
-        <span className="italic">
-          joined{' '}
-          {timeDistance && (
-            <span
-              className="tooltip tooltip-bottom"
-              data-tip={format(new Date(user.createdAt), 'MM/dd/yyyy')}
-            >
-              {`${timeDistance} ago`}
-            </span>
-          )}
-        </span>
-        <div className="w-6/12">
+        <div className="my-2 w-6/12">
           <p className="text-sm">{user.bio}</p>
         </div>
 
-        {currentUser?.id !== user.id ? (
-          <div className="flex items-center justify-center">
+        <div className="my-2 flex items-center justify-center">
+          {currentUser?.id !== user.id ? (
             <UserFollowButton
               mutateFollowerCount={mutateFollowerCount}
               user={user}
               mutateFollowingCount={mutateFollowingCount}
             />
-          </div>
-        ) : (
-          <div className="flex items-center justify-center">
+          ) : (
             <Link href={`/account/profile`} className="btn btn-primary">
               Edit Profile
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );

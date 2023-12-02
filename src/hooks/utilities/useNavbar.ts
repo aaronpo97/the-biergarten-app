@@ -24,6 +24,7 @@ const useNavbar = () => {
 
   const authenticatedPages: readonly Page[] = [
     { slug: '/account', name: 'Account' },
+    { slug: `/users/${user?.id}`, name: 'Profile' },
     { slug: '/api/users/logout', name: 'Logout' },
   ];
 

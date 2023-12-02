@@ -11,7 +11,7 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 interface UpdateProfileRequest extends UserExtendedNextApiRequest {
-  file?: Express.Multer.File;
+  file: Express.Multer.File;
   body: {
     bio: string;
   };
@@ -30,14 +30,26 @@ interface UpdateUserProfileByIdParams {
 }
 
 const updateUserProfileById = async ({ id, data }: UpdateUserProfileByIdParams) => {
-  const { alt, path, caption } = data.avatar;
   const user: z.infer<typeof GetUserSchema> = await DBClient.instance.user.update({
     where: { id },
     data: {
       bio: data.bio,
-      userAvatar: {
-        upsert: { create: { alt, path, caption }, update: { alt, path, caption } },
-      },
+      userAvatar: data.avatar
+        ? {
+            upsert: {
+              create: {
+                alt: data.avatar.alt,
+                path: data.avatar.path,
+                caption: data.avatar.caption,
+              },
+              update: {
+                alt: data.avatar.alt,
+                path: data.avatar.path,
+                caption: data.avatar.caption,
+              },
+            },
+          }
+        : undefined,
     },
     select: {
       id: true,
@@ -61,10 +73,6 @@ const updateUserProfileById = async ({ id, data }: UpdateUserProfileByIdParams) 
 const updateProfile = async (req: UpdateProfileRequest, res: NextApiResponse) => {
   const { file, body, user } = req;
 
-  if (!file) {
-    throw new Error('No file uploaded');
-  }
-
   await updateUserProfileById({
     id: user!.id,
     data: {
@@ -86,10 +94,11 @@ const router = createRouter<
 
 router.put(
   getCurrentUser,
+
   // @ts-expect-error
   singleUploadMiddleware,
-
   validateRequest({ bodySchema: z.object({ bio: z.string().max(1000) }) }),
+
   updateProfile,
 );
 
