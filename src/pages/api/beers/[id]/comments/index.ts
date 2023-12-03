@@ -10,7 +10,7 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
-import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
+
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 interface CreateCommentRequest extends UserExtendedNextApiRequest {
@@ -30,7 +30,7 @@ const createComment = async (
 
   const beerPostId = req.query.id;
 
-  const newBeerComment: z.infer<typeof CommentQueryResult> = await createNewBeerComment({
+  const newBeerComment = await createNewBeerComment({
     content,
     rating,
     beerPostId,

@@ -20,8 +20,8 @@ interface EditBeerPostRequest extends BeerPostRequest {
   body: z.infer<typeof EditBeerPostValidationSchema>;
 }
 
-const checkIfBeerPostOwner = async (
-  req: BeerPostRequest,
+const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostRequest>(
+  req: BeerPostRequestType,
   res: NextApiResponse,
   next: NextHandler,
 ) => {

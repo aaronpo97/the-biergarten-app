@@ -3,13 +3,14 @@ import { singleUploadMiddleware } from '@/config/multer/uploadMiddleware';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 
 import ServerError from '@/config/util/ServerError';
-import DBClient from '@/prisma/DBClient';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler, createRouter } from 'next-connect';
 import { z } from 'zod';
+import updateUserAvatarById, {
+  UpdateUserAvatarByIdParams,
+} from '@/services/UserAccount/UpdateUserAvatarByIdParams';
 
 interface UpdateProfileRequest extends UserExtendedNextApiRequest {
   file: Express.Multer.File;
@@ -17,57 +18,6 @@ interface UpdateProfileRequest extends UserExtendedNextApiRequest {
     bio: string;
   };
 }
-
-interface UpdateUserProfileByIdParams {
-  id: string;
-  data: {
-    avatar: {
-      alt: string;
-      path: string;
-      caption: string;
-    };
-  };
-}
-
-const updateUserAvatarById = async ({ id, data }: UpdateUserProfileByIdParams) => {
-  const user: z.infer<typeof GetUserSchema> = await DBClient.instance.user.update({
-    where: { id },
-    data: {
-      userAvatar: data.avatar
-        ? {
-            upsert: {
-              create: {
-                alt: data.avatar.alt,
-                path: data.avatar.path,
-                caption: data.avatar.caption,
-              },
-              update: {
-                alt: data.avatar.alt,
-                path: data.avatar.path,
-                caption: data.avatar.caption,
-              },
-            },
-          }
-        : undefined,
-    },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      userAvatar: true,
-      accountIsVerified: true,
-      createdAt: true,
-      firstName: true,
-      lastName: true,
-      updatedAt: true,
-      dateOfBirth: true,
-      role: true,
-    },
-  });
-
-  return user;
-};
 
 const checkIfUserCanUpdateProfile = async (
   req: UpdateProfileRequest,
@@ -86,12 +36,13 @@ const checkIfUserCanUpdateProfile = async (
 const updateProfile = async (req: UpdateProfileRequest, res: NextApiResponse) => {
   const { file, user } = req;
 
-  await updateUserAvatarById({
-    id: user!.id,
-    data: {
-      avatar: { alt: file.originalname, path: file.path, caption: '' },
-    },
-  });
+  const avatar: UpdateUserAvatarByIdParams['data']['avatar'] = {
+    alt: file.originalname,
+    path: file.path,
+    caption: '',
+  };
+
+  await updateUserAvatarById({ id: user!.id, data: { avatar } });
   res.status(200).json({
     message: 'User avatar updated successfully.',
     statusCode: 200,

@@ -35,10 +35,7 @@ const checkIfUserIsFollowedBySessionUser = async (
   const currentUser = req.user!;
 
   const userIsFollowedBySessionUser = await DBClient.instance.userFollow.findFirst({
-    where: {
-      followerId: currentUser.id,
-      followingId: id,
-    },
+    where: { followerId: currentUser.id, followingId: id },
   });
 
   if (!userIsFollowedBySessionUser) {

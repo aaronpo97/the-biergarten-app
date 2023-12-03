@@ -12,9 +12,7 @@ import { NextHandler, createRouter } from 'next-connect';
 import { z } from 'zod';
 
 interface UpdateProfileRequest extends UserExtendedNextApiRequest {
-  body: {
-    bio: string;
-  };
+  body: { bio: string };
 }
 
 interface UpdateUserProfileByIdParams {

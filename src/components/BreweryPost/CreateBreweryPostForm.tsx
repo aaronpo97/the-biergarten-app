@@ -29,7 +29,7 @@ import FormTextInput from '../ui/forms/FormTextInput';
 import Button from '../ui/forms/Button';
 
 const AddressAutofill = dynamic(
-  // @ts-ignore
+  // @ts-expect-error
   () => import('@mapbox/search-js-react').then((mod) => mod.AddressAutofill),
   { ssr: false },
 );
