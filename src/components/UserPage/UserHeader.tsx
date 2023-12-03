@@ -58,9 +58,11 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
           </span>
         </div>
 
-        <div className="my-2 w-6/12">
-          <p className="text-sm">{user.bio}</p>
-        </div>
+        {user.bio && (
+          <div className="my-2 w-6/12">
+            <p className="text-sm">{user.bio}</p>
+          </div>
+        )}
 
         <div className="my-2 flex items-center justify-center">
           {currentUser?.id !== user.id ? (
@@ -70,7 +72,7 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
               mutateFollowingCount={mutateFollowingCount}
             />
           ) : (
-            <Link href={`/users/account/edit-profile`} className="btn btn-primary">
+            <Link href={`/users/account/edit-profile`} className="btn btn-primary btn-sm">
               Edit Profile
             </Link>
           )}
