@@ -3,7 +3,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWR from 'swr';
 
 /**
- * A custom React hook that fetches the current user's data from the server.
+ * A custom hook to fetch the current user's data.
  *
  * @returns An object with the following properties:
  *

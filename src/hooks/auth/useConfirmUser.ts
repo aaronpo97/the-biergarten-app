@@ -5,6 +5,14 @@ import { useState, useContext, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import useSWR from 'swr';
 
+/**
+ * A custom hook to confirm a user's account.
+ *
+ * @returns An object with the following properties:
+ *
+ *   - `needsToLogin`: A boolean indicating whether the user needs to log in.
+ *   - `tokenInvalid`: A boolean indicating whether the token is invalid.
+ */
 const useConfirmUser = () => {
   const router = useRouter();
   const { user, mutate } = useContext(UserContext);
