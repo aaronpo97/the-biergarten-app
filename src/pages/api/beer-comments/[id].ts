@@ -8,12 +8,12 @@ import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
-import { CommentRequest } from '@/controllers/requestTypes';
+import { CommentRequest } from '@/controllers/comments/types';
 import {
   checkIfBeerCommentOwner,
   deleteBeerPostComment,
   editBeerPostComment,
-} from '@/controllers/beerComments';
+} from '@/controllers/comments/beerComments';
 
 const router = createRouter<
   CommentRequest,

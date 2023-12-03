@@ -6,7 +6,13 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
-import { CommentRequest, EditCommentRequest } from '../requestTypes';
+import createNewBeerComment from '@/services/BeerComment/createNewBeerComment';
+import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
+import {
+  CommentRequest,
+  EditAndCreateCommentRequest,
+  GetAllCommentsRequest,
+} from '../types';
 
 export const checkIfBeerCommentOwner = async <T extends CommentRequest>(
   req: T,
@@ -29,7 +35,7 @@ export const checkIfBeerCommentOwner = async <T extends CommentRequest>(
 };
 
 export const editBeerPostComment = async (
-  req: EditCommentRequest,
+  req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const { id } = req.query;
@@ -62,5 +68,54 @@ export const deleteBeerPostComment = async (
     success: true,
     message: 'Comment deleted successfully',
     statusCode: 200,
+  });
+};
+
+export const createBeerPostComment = async (
+  req: EditAndCreateCommentRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { content, rating } = req.body;
+
+  const beerPostId = req.query.id;
+
+  const newBeerComment = await createNewBeerComment({
+    content,
+    rating,
+    beerPostId,
+    userId: req.user!.id,
+  });
+
+  res.status(201).json({
+    message: 'Beer comment created successfully',
+    statusCode: 201,
+    payload: newBeerComment,
+    success: true,
+  });
+};
+
+export const getAllBeerPostComments = async (
+  req: GetAllCommentsRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const beerPostId = req.query.id;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { page_size, page_num } = req.query;
+
+  const comments = await getAllBeerComments({
+    beerPostId,
+    pageNum: parseInt(page_num, 10),
+    pageSize: parseInt(page_size, 10),
+  });
+
+  const count = await DBClient.instance.beerComment.count({ where: { beerPostId } });
+
+  res.setHeader('X-Total-Count', count);
+
+  res.status(200).json({
+    message: 'Beer comments fetched successfully',
+    statusCode: 200,
+    payload: comments,
+    success: true,
   });
 };

@@ -5,8 +5,8 @@ import {
   checkIfBeerStyleCommentOwner,
   deleteBeerStyleComment,
   editBeerStyleComment,
-} from '@/controllers/beerStyleComments';
-import { CommentRequest } from '@/controllers/requestTypes';
+} from '@/controllers/comments/beerStyleComments';
+import { CommentRequest } from '@/controllers/comments/types';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';

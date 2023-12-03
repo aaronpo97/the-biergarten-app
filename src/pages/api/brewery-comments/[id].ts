@@ -1,12 +1,13 @@
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
-import { checkIfBeerCommentOwner } from '@/controllers/beerComments';
+
 import {
+  checkIfBreweryCommentOwner,
   deleteBreweryPostComment,
   editBreweryPostComment,
-} from '@/controllers/breweryComments';
-import { CommentRequest } from '@/controllers/requestTypes';
+} from '@/controllers/comments/breweryComments';
+import { CommentRequest } from '@/controllers/comments/types';
 
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
@@ -26,7 +27,7 @@ router
       querySchema: z.object({ id: z.string().cuid() }),
     }),
     getCurrentUser,
-    checkIfBeerCommentOwner,
+    checkIfBreweryCommentOwner,
     deleteBreweryPostComment,
   )
   .put(
@@ -35,7 +36,7 @@ router
       bodySchema: CreateCommentValidationSchema,
     }),
     getCurrentUser,
-    checkIfBeerCommentOwner,
+    checkIfBreweryCommentOwner,
     editBreweryPostComment,
   );
 
