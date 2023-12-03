@@ -50,7 +50,7 @@ const AccountPage: NextPage = () => {
             <Tab.Group>
               <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
                 <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-                  Account Info and Security
+                  Account
                 </Tab>
                 <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
                   Your Posts

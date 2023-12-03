@@ -32,12 +32,14 @@ const BreweryCard: FC<{ brewery: z.infer<typeof BreweryPostQueryResult> }> = ({
       <div className="card-body justify-between">
         <div>
           <Link href={`/breweries/${brewery.id}`} className="link-hover link">
-            <h2 className="truncate text-xl font-bold lg:text-2xl">{brewery.name}</h2>
+            <span className="text-lg font-bold lg:text-xl xl:truncate">
+              {brewery.name}
+            </span>
           </Link>
         </div>
-        <div className="flex items-end justify-between">
+        <div className="flex w-full items-end justify-between">
           <div className="w-9/12">
-            <h3 className="truncate text-lg font-semibold lg:text-xl">
+            <h3 className="text-lg font-semibold lg:text-xl xl:truncate">
               {brewery.location.city},{' '}
               {brewery.location.stateOrProvince || brewery.location.country}
             </h3>

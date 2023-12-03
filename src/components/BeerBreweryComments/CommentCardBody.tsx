@@ -29,9 +29,9 @@ const CommentCardBody: FC<CommentCardProps> = ({
   const [inEditMode, setInEditMode] = useState(false);
 
   return (
-    <div ref={ref} className="flex">
-      <div className="w-[12%] justify-center py-4">
-        <div className="h-20 px-3">
+    <div ref={ref} className="flex items-start">
+      <div className="mx-3 w-[20%] justify-center sm:w-[12%]">
+        <div className="h-20 pt-4">
           <UserAvatar user={comment.postedBy} />
         </div>
       </div>
