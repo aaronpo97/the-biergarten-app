@@ -1,16 +1,38 @@
+/**
+ * Custom hook using SWR for fetching users followed by a specific user.
+ *
+ * @param options - The options for fetching users.
+ * @param [options.pageSize=5] - The number of users to fetch per page. Default is `5`
+ * @param options.userId - The ID of the user.
+ * @returns An object with the following properties:
+ *
+ *   - `following` The list of users followed by the specified user.
+ *   - `followingCount` The total count of users followed by the specified user.
+ *   - `pageCount` The total number of pages.
+ *   - `size` The current page size.
+ *   - `setSize` A function to set the page size.
+ *   - `isLoading` Indicates if the data is currently being loaded.
+ *   - `isLoadingMore` Indicates if there are more pages to load.
+ *   - `isAtEnd` Indicates if the current page is the last page.
+ *   - `mutate` A function to mutate the data.
+ *   - `error` The error object, if any.
+ */
 import FollowInfoSchema from '@/services/UserFollows/schema/FollowInfoSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
 const useGetUsersFollowedByUser = ({
-  pageSize,
+  pageSize = 5,
   userId,
 }: {
-  pageSize: number;
-  userId: string;
+  pageSize?: number;
+  userId: string | undefined;
 }) => {
   const fetcher = async (url: string) => {
+    if (!userId) {
+      throw new Error('User ID is undefined');
+    }
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(response.statusText);

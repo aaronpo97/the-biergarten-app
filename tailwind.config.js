@@ -17,8 +17,8 @@ const myThemes = {
     'base-300': 'hsl(227, 20%, 10%)',
   },
   light: {
-    primary: 'hsl(180, 15%, 70%)',
-    secondary: 'hsl(21, 54%, 83%)',
+    primary: 'hsl(180, 20%, 70%)',
+    secondary: 'hsl(120, 10%, 70%)',
     error: 'hsl(4, 87%, 74%)',
     accent: 'hsl(93, 27%, 73%)',
     neutral: 'hsl(38, 31%, 91%)',

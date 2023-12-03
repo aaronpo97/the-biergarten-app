@@ -23,7 +23,8 @@ const useNavbar = () => {
   const { user } = useContext(UserContext);
 
   const authenticatedPages: readonly Page[] = [
-    { slug: '/account', name: 'Account' },
+    { slug: '/users/account', name: 'Account' },
+    { slug: `/users/${user?.id}`, name: 'Profile' },
     { slug: '/api/users/logout', name: 'Logout' },
   ];
 
@@ -35,6 +36,7 @@ const useNavbar = () => {
   /** These pages are accessible to both authenticated and unauthenticated users. */
   const otherPages: readonly Page[] = [
     { slug: '/beers', name: 'Beers' },
+    { slug: '/beers/styles', name: 'Beer Styles' },
     { slug: '/breweries', name: 'Breweries' },
   ];
 

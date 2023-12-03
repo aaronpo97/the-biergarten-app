@@ -11,6 +11,7 @@ import DeleteAccount from '@/components/Account/DeleteAccount';
 import accountPageReducer from '@/reducers/accountPageReducer';
 import UserAvatar from '@/components/Account/UserAvatar';
 import UserPosts from '@/components/Account/UserPosts';
+import UpdateProfileLink from '@/components/Account/UpdateProfileLink';
 
 const AccountPage: NextPage = () => {
   const { user } = useContext(UserContext);
@@ -57,6 +58,7 @@ const AccountPage: NextPage = () => {
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel className="h-full space-y-5">
+                  <UpdateProfileLink />
                   <AccountInfo pageState={pageState} dispatch={dispatch} />
                   <Security pageState={pageState} dispatch={dispatch} />
                   <DeleteAccount pageState={pageState} dispatch={dispatch} />
