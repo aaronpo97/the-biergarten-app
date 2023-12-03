@@ -29,9 +29,9 @@ const useGetUsersFollowedByUser = ({
   pageSize?: number;
   userId: string | undefined;
 }) => {
-  const fetcher = async (url: string | undefined) => {
-    if (!url) {
-      throw new Error('URL is undefined');
+  const fetcher = async (url: string) => {
+    if (!userId) {
+      throw new Error('User ID is undefined');
     }
     const response = await fetch(url);
     if (!response.ok) {

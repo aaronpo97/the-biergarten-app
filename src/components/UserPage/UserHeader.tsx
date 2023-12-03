@@ -70,7 +70,7 @@ const UserHeader: FC<UserHeaderProps> = ({ user }) => {
               mutateFollowingCount={mutateFollowingCount}
             />
           ) : (
-            <Link href={`/account/profile`} className="btn btn-primary">
+            <Link href={`/users/account/edit-profile`} className="btn btn-primary">
               Edit Profile
             </Link>
           )}

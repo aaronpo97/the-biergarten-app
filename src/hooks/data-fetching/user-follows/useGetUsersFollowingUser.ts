@@ -33,6 +33,10 @@ interface UseGetUsersFollowingUser {
 
 const useGetUsersFollowingUser = ({ pageSize = 5, userId }: UseGetUsersFollowingUser) => {
   const fetcher = async (url: string) => {
+    if (!userId) {
+      throw new Error('User ID is undefined');
+    }
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(response.statusText);

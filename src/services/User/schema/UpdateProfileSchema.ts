@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 const UpdateProfileSchema = z.object({
-  bio: z.string().min(1, 'Bio cannot be empty'),
+  bio: z.string(),
   userAvatar: z
     .instanceof(typeof FileList !== 'undefined' ? FileList : Object)
     .refine((fileList) => fileList instanceof FileList, {
       message: 'You must submit this form in a web browser.',
     })
-    .refine((fileList) => [...(fileList as FileList)].length === 1, {
-      message: 'You must upload one file.',
+    .refine((fileList) => [...(fileList as FileList)].length <= 1, {
+      message: 'You must upload only one or zero files.',
     })
     .refine(
       (fileList) =>

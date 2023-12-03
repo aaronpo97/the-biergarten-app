@@ -1,23 +1,30 @@
-import withPageAuthRequired from '@/util/withPageAuthRequired';
-import { GetServerSideProps, NextPage } from 'next';
-import { z } from 'zod';
+import { useContext, useEffect } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { GetServerSideProps, NextPage } from 'next';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import toast from 'react-hot-toast';
+
+import withPageAuthRequired from '@/util/withPageAuthRequired';
 import createErrorToast from '@/util/createErrorToast';
 
-import UserAvatar from '@/components/Account/UserAvatar';
-import { useContext, useEffect } from 'react';
 import UserContext from '@/contexts/UserContext';
+
+import UserAvatar from '@/components/Account/UserAvatar';
+import UpdateProfileForm from '@/components/Account/UpdateProfileForm';
 
 import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
 import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
-import Head from 'next/head';
 
-import UpdateProfileSchema from '../../services/User/schema/UpdateProfileSchema';
-import sendUpdateProfileRequest from '../../requests/Account/sendUpdateProfileRequest';
-import UpdateProfileForm from '../../components/Account/UpdateProfileForm';
+import UpdateProfileSchema from '@/services/User/schema/UpdateProfileSchema';
+import sendUpdateUserAvatarRequest from '@/requests/Account/sendUpdateUserAvatarRequest';
+import sendUpdateUserProfileRequest from '@/requests/Account/sendUpdateUserProfileRequest.ts';
+import Spinner from '@/components/ui/Spinner';
 
 const ProfilePage: NextPage = () => {
   const { user, mutate: mutateUser } = useContext(UserContext);
@@ -28,31 +35,43 @@ const ProfilePage: NextPage = () => {
     setValue,
     formState: { errors, isSubmitting },
     watch,
-
-    reset,
   } = useForm<z.infer<typeof UpdateProfileSchema>>({
     resolver: zodResolver(UpdateProfileSchema),
-    defaultValues: {
-      bio: user?.bio ?? '',
-    },
   });
 
   useEffect(() => {
-    if (!user || !user.bio) return;
+    if (!user || !user.bio) {
+      return;
+    }
+
     setValue('bio', user.bio);
   }, [user, setValue]);
 
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<z.infer<typeof UpdateProfileSchema>> = async (data) => {
     try {
-      await sendUpdateProfileRequest(data);
       const loadingToast = toast.loading('Updating profile...');
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
+      if (!user) {
+        throw new Error('User is not logged in.');
+      }
+
+      if (data.userAvatar instanceof FileList && data.userAvatar.length === 1) {
+        await sendUpdateUserAvatarRequest({
+          userId: user.id,
+          file: data.userAvatar[0],
+        });
+      }
+
+      await sendUpdateUserProfileRequest({
+        userId: user.id,
+        bio: data.bio,
       });
+
       toast.remove(loadingToast);
-      reset();
-      mutateUser!();
-      toast.success('Profile updated!');
+      await mutateUser!();
+      await router.push(`/users/${user.id}`);
+      toast.success('Profile updated.');
     } catch (error) {
       createErrorToast(error);
     }
@@ -69,9 +88,11 @@ const ProfilePage: NextPage = () => {
     const watchedInput = watch('userAvatar');
 
     if (
-      !(watchedInput instanceof FileList) ||
-      watchedInput.length !== 1 ||
-      !watchedInput[0].type.startsWith('image/')
+      !(
+        watchedInput instanceof FileList &&
+        watchedInput.length === 1 &&
+        watchedInput[0].type.startsWith('image/')
+      )
     ) {
       return '';
     }
@@ -87,13 +108,13 @@ const ProfilePage: NextPage = () => {
         <title>The Biergarten App || Update Your Profile</title>
         <meta name="description" content="Update your user profile." />
       </Head>
-      <div className="mt-20 flex flex-col items-center justify-center">
-        {user && (
+      <div className="my-10 flex flex-col items-center justify-center">
+        {user ? (
           <div className="w-10/12 lg:w-7/12">
             <div className="card">
               <div className="card-body">
                 <div className="my-10 flex flex-col items-center justify-center">
-                  <div className="my-5 h-52">
+                  <div className="my-2 h-40 xl:my-5 xl:h-52">
                     <UserAvatar
                       user={{
                         ...user,
@@ -113,17 +134,21 @@ const ProfilePage: NextPage = () => {
                     />
                   </div>
                   <div className="text-center">
-                    <h2 className="text-3xl font-bold">{user.username}</h2>
+                    <h2 className="my-1 text-2xl font-bold xl:text-3xl">
+                      {user.username}
+                    </h2>
 
-                    <div className="flex space-x-3 text-lg font-bold">
+                    <div className="flex space-x-3 font-bold xl:text-lg">
                       <span>{followingCount} Following</span>
                       <span>{followerCount} Followers</span>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-lg">
-                      {watch('bio') || (
+                    <p className="hyphens-auto text-center xl:text-lg">
+                      {watch('bio') ? (
+                        <span className="hyphens-manual">{watch('bio')}</span>
+                      ) : (
                         <span className="italic">Your bio will appear here.</span>
                       )}
                     </p>
@@ -140,6 +165,10 @@ const ProfilePage: NextPage = () => {
                 />
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="flex h-96 items-center justify-center">
+            <Spinner />
           </div>
         )}
       </div>

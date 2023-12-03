@@ -23,7 +23,7 @@ const useNavbar = () => {
   const { user } = useContext(UserContext);
 
   const authenticatedPages: readonly Page[] = [
-    { slug: '/account', name: 'Account' },
+    { slug: '/users/account', name: 'Account' },
     { slug: `/users/${user?.id}`, name: 'Profile' },
     { slug: '/api/users/logout', name: 'Logout' },
   ];
