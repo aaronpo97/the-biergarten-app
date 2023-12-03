@@ -8,6 +8,23 @@ interface UseBeerPostsByBeerStyleParams {
   beerStyleId: string;
 }
 
+/**
+ * A custom hook to fetch beer posts by beer style.
+ *
+ * @param options The options for fetching beer posts.
+ * @param options.pageSize The number of beer posts to fetch per page.
+ * @param options.beerStyleId The ID of the beer style to fetch beer posts for.
+ * @returns An object with the following properties:
+ *
+ *   - `beerPosts`: The beer posts fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.`
+ */
 const useBeerPostsByBeerStyle = ({
   pageSize,
   beerStyleId,

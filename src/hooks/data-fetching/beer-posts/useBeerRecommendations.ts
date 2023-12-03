@@ -9,7 +9,7 @@ interface UseBeerRecommendationsParams {
 }
 
 /**
- * A custom hook using SWR to fetch beer recommendations from the API.
+ * A custom hook to fetch beer recommendations from the API.
  *
  * @param options The options to use when fetching beer recommendations.
  * @param options.pageSize The number of beer recommendations to fetch per page.

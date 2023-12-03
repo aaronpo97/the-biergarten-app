@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import { z } from 'zod';
 
 /**
- * A custom React hook that checks if the current user likes a given brewery post.
+ * A custom hook to check if the current user likes a given brewery post.
  *
  * @param breweryPostId - The ID of the brewery post to check.
  * @returns An object with the following properties:

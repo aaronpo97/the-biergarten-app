@@ -9,10 +9,7 @@ interface UseGetUsersFollowingUser {
 }
 
 /**
- * Custom hook using SWR for fetching users followed by a specific user.
- *
- * @example
- *   const { followers, followerCount } = useGetUsersFollowingUser({ userId: '123' });
+ * A custom hook to fetch users following a user.
  *
  * @param options - The options for fetching users.
  * @param [options.pageSize=5] - The number of users to fetch per page. Default is `5`

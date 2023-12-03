@@ -9,7 +9,7 @@ interface UseBreweryPostCommentsProps {
 }
 
 /**
- * A custom React hook that fetches comments for a specific brewery post.
+ * A custom hook to fetch comments for a specific brewery post.
  *
  * @param props - The props object.
  * @param props.pageNum - The page number of the comments to fetch.

@@ -3,6 +3,22 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
+/**
+ * A custom hook to fetch brewery posts for the map.
+ *
+ * @param options The options to use when fetching brewery posts.
+ * @param options.pageSize The number of brewery posts to fetch per page.
+ * @returns An object with the following properties:
+ *
+ *   - `breweryPosts`: The brewery posts fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
+ */
 const useBreweryMapPagePosts = ({ pageSize }: { pageSize: number }) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
