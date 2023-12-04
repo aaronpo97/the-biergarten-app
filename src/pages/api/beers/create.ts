@@ -7,8 +7,8 @@ import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
-import { createBeerPost } from '@/controllers/beerPosts';
-import { CreateBeerPostRequest } from '@/controllers/beerPosts/types';
+import { createBeerPost } from '@/controllers/posts/beerPosts';
+import { CreateBeerPostRequest } from '@/controllers/posts/beerPosts/types';
 
 const router = createRouter<
   CreateBeerPostRequest,

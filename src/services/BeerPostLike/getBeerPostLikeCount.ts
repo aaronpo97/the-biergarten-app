@@ -1,6 +1,6 @@
 import DBClient from '@/prisma/DBClient';
 
-const getBeerPostLikeCount = async ({ beerPostId }: { beerPostId: string }) =>
+const getBeerPostLikeCountByBeerPostId = async ({ beerPostId }: { beerPostId: string }) =>
   DBClient.instance.beerPostLike.count({ where: { beerPostId } });
 
-export default getBeerPostLikeCount;
+export default getBeerPostLikeCountByBeerPostId;

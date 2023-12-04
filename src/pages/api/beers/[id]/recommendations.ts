@@ -1,7 +1,7 @@
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { getBeerPostRecommendations } from '@/controllers/beerPosts';
-import { GetBeerRecommendationsRequest } from '@/controllers/beerPosts/types';
+import { getBeerPostRecommendations } from '@/controllers/posts/beerPosts';
+import { GetBeerRecommendationsRequest } from '@/controllers/posts/beerPosts/types';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';

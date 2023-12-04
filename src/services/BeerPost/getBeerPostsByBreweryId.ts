@@ -8,7 +8,7 @@ interface GetBeerPostsByBeerStyleIdArgs {
   pageNum: number;
 }
 
-const getBeerPostsByBeerStyleId = async ({
+const getAllBeerPostsByBreweryId = async ({
   pageNum,
   pageSize,
   breweryId,
@@ -44,4 +44,4 @@ const getBeerPostsByBeerStyleId = async ({
   return beers;
 };
 
-export default getBeerPostsByBeerStyleId;
+export default getAllBeerPostsByBreweryId;

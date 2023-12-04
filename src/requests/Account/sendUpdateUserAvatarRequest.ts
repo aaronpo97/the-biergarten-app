@@ -8,9 +8,9 @@ const sendUpdateUserAvatarRequest = async ({
   userId,
 }: UpdateProfileRequestParams) => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('image', file);
 
-  const response = await fetch(`/api/users/${userId}/`, {
+  const response = await fetch(`/api/users/${userId}/profile/update-avatar`, {
     method: 'PUT',
     body: formData,
   });

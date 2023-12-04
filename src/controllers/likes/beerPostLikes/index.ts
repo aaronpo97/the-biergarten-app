@@ -1,16 +1,17 @@
-import { UserExtendedNextApiRequest } from "@/config/auth/types";
-import ServerError from "@/config/util/ServerError";
-import getBeerPostById from "@/services/BeerPost/getBeerPostById";
-import createBeerPostLike from "@/services/BeerPostLike/createBeerPostLike";
-import findBeerPostLikeById from "@/services/BeerPostLike/findBeerPostLikeById";
-import getBeerPostLikeCount from "@/services/BeerPostLike/getBeerPostLikeCount";
-import removeBeerPostLikeById from "@/services/BeerPostLike/removeBeerPostLikeById";
-import APIResponseValidationSchema from "@/validation/APIResponseValidationSchema";
-import { NextApiResponse, NextApiRequest } from "next";
-import { z } from "zod";
+import { UserExtendedNextApiRequest } from '@/config/auth/types';
+import ServerError from '@/config/util/ServerError';
+import getBeerPostById from '@/services/BeerPost/getBeerPostById';
+import createBeerPostLike from '@/services/BeerPostLike/createBeerPostLike';
+import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
+import getBeerPostLikeCountByBeerPostId from '@/services/BeerPostLike/getBeerPostLikeCount';
+import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeById';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
+import { NextApiResponse, NextApiRequest } from 'next';
+import { z } from 'zod';
+import { LikeRequest } from '../types';
 
-export const sendLikeRequest = async (
-  req: UserExtendedNextApiRequest,
+export const sendBeerPostLikeRequest = async (
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
@@ -43,13 +44,13 @@ export const sendLikeRequest = async (
   res.status(200).json(jsonResponse);
 };
 
-export const getLikeCount = async (
+export const getBeerPostLikeCount = async (
   req: NextApiRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const id = req.query.id as string;
 
-  const likeCount = await getBeerPostLikeCount({ beerPostId: id });
+  const likeCount = await getBeerPostLikeCountByBeerPostId({ beerPostId: id });
 
   res.status(200).json({
     success: true,
@@ -59,7 +60,7 @@ export const getLikeCount = async (
   });
 };
 
-export const checkIfLiked = async (
+export const checkIfBeerPostIsLiked = async (
   req: UserExtendedNextApiRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {

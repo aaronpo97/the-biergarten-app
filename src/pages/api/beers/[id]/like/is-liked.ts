@@ -7,7 +7,7 @@ import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
-import { checkIfLiked } from '@/controllers/beerPostLikes';
+import { checkIfBeerPostIsLiked } from '@/controllers/likes/beerPostLikes';
 
 const router = createRouter<
   UserExtendedNextApiRequest,
@@ -17,7 +17,7 @@ const router = createRouter<
 router.get(
   getCurrentUser,
   validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
-  checkIfLiked,
+  checkIfBeerPostIsLiked,
 );
 
 const handler = router.handler(NextConnectOptions);
