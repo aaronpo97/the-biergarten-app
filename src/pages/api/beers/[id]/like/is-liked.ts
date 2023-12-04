@@ -6,24 +6,8 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
 
-const checkIfLiked = async (
-  req: UserExtendedNextApiRequest,
-  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
-) => {
-  const user = req.user!;
-  const beerPostId = req.query.id as string;
-
-  const alreadyLiked = await findBeerPostLikeById({ beerPostId, likedById: user.id });
-
-  res.status(200).json({
-    success: true,
-    message: alreadyLiked ? 'Beer post is liked.' : 'Beer post is not liked.',
-    statusCode: 200,
-    payload: { isLiked: !!alreadyLiked },
-  });
-};
+import { checkIfLiked } from '@/controllers/beerPostLikes';
 
 const router = createRouter<
   UserExtendedNextApiRequest,
