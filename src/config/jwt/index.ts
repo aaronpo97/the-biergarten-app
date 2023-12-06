@@ -15,7 +15,7 @@ export const verifyConfirmationToken = async (token: string) => {
     const parsed = BasicUserInfoSchema.safeParse(decoded);
 
     if (!parsed.success) {
-      throw new Error('Invalid token');
+      throw new ServerError('Invalid token.', 401);
     }
 
     return parsed.data;
