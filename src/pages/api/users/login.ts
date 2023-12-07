@@ -6,7 +6,7 @@ import { z } from 'zod';
 import LoginValidationSchema from '@/services/User/schema/LoginValidationSchema';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { authenticateUser, loginUser } from '@/controllers/auth';
+import { authenticateUser, loginUser } from '@/controllers/users/auth';
 
 const router = createRouter<
   UserExtendedNextApiRequest,

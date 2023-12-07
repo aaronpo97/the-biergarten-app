@@ -5,8 +5,8 @@ import { CreateUserValidationSchema } from '@/services/User/schema/CreateUserVal
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { registerUser } from '@/controllers/auth';
-import { RegisterUserRequest } from '@/controllers/auth/types';
+import { registerUser } from '@/controllers/users/auth';
+import { RegisterUserRequest } from '@/controllers/users/auth/types';
 
 const router = createRouter<
   RegisterUserRequest,

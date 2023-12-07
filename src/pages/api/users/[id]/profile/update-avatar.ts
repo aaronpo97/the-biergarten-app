@@ -33,7 +33,7 @@ const checkIfUserCanUpdateProfile = async (
   await next();
 };
 
-const updateProfile = async (req: UpdateProfileRequest, res: NextApiResponse) => {
+const updateAvatar = async (req: UpdateProfileRequest, res: NextApiResponse) => {
   const { file, user } = req;
 
   const avatar: UpdateUserAvatarByIdParams['data']['avatar'] = {
@@ -60,7 +60,7 @@ router.put(
   checkIfUserCanUpdateProfile,
   // @ts-expect-error
   singleUploadMiddleware,
-  updateProfile,
+  updateAvatar,
 );
 
 const handler = router.handler();

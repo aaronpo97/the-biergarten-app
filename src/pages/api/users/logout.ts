@@ -3,7 +3,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import { logoutUser } from '@/controllers/auth';
+import { logoutUser } from '@/controllers/users/auth';
 
 const router = createRouter<
   NextApiRequest,

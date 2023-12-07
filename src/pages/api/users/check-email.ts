@@ -1,37 +1,17 @@
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import findUserByEmail from '@/services/User/findUserByEmail';
-
-const CheckEmailRequestQuerySchema = z.object({
-  email: z.string(),
-});
-
-interface CheckEmailRequestSchema extends NextApiRequest {
-  query: z.infer<typeof CheckEmailRequestQuerySchema>;
-}
+import { CheckEmailRequest } from '@/controllers/users/auth/types';
+import { checkEmail } from '@/controllers/users/auth';
 
 const router = createRouter<
-  CheckEmailRequestSchema,
+  CheckEmailRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
-
-const checkEmail = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { email: emailToCheck } = req.query;
-
-  const email = await findUserByEmail(emailToCheck as string);
-
-  res.json({
-    success: true,
-    payload: { emailIsTaken: !!email },
-    statusCode: 200,
-    message: 'Getting email availability.',
-  });
-};
 
 router.get(
   validateRequest({ querySchema: z.object({ email: z.string().email() }) }),

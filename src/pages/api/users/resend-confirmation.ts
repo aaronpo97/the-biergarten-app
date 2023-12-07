@@ -5,21 +5,7 @@ import { NextApiResponse } from 'next';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import sendConfirmationEmail from '@/services/User/sendConfirmationEmail';
-
-const resendConfirmation = async (
-  req: UserExtendedNextApiRequest,
-  res: NextApiResponse,
-) => {
-  const user = req.user!;
-
-  await sendConfirmationEmail(user);
-  res.status(200).json({
-    message: `Resent the confirmation email for ${user.username}.`,
-    statusCode: 200,
-    success: true,
-  });
-};
+import { resendConfirmation } from '@/controllers/users/auth';
 
 const router = createRouter<
   UserExtendedNextApiRequest,

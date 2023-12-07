@@ -10,6 +10,7 @@ import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
 import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
 import DBClient from '@/prisma/DBClient';
 import createNewBeerPost from '@/services/BeerPost/createNewBeerPost';
+import getBeerPostsByPostedById from '@/services/BeerPost/getBeerPostsByPostedById';
 import {
   BeerPostRequest,
   CreateBeerPostRequest,
@@ -17,6 +18,7 @@ import {
   GetAllBeerPostsRequest,
   GetBeerRecommendationsRequest,
 } from './types';
+import { GetPostsByUserIdRequest } from '../types';
 
 export const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostRequest>(
   req: BeerPostRequestType,
@@ -138,6 +140,35 @@ export const createBeerPost = async (
     message: 'Beer post created successfully',
     statusCode: 201,
     payload: newBeerPost,
+    success: true,
+  });
+};
+
+export const getBeerPostsByUserId = async (
+  req: GetPostsByUserIdRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const pageNum = parseInt(req.query.page_num, 10);
+  const pageSize = parseInt(req.query.page_size, 10);
+
+  const { id } = req.query;
+
+  const beerPosts = await getBeerPostsByPostedById({
+    pageNum,
+    pageSize,
+    postedById: id,
+  });
+
+  const beerPostCount = await DBClient.instance.beerPost.count({
+    where: { postedBy: { id } },
+  });
+
+  res.setHeader('X-Total-Count', beerPostCount);
+
+  res.status(200).json({
+    message: `Beer posts by user ${id} fetched successfully`,
+    statusCode: 200,
+    payload: beerPosts,
     success: true,
   });
 };

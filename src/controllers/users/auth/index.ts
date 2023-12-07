@@ -19,11 +19,17 @@ import { verifyConfirmationToken } from '@/config/jwt';
 import updateUserToBeConfirmedById from '@/services/User/updateUserToBeConfirmedById';
 import DBClient from '@/prisma/DBClient';
 import sendResetPasswordEmail from '@/services/User/sendResetPasswordEmail';
+import { hashPassword } from '@/config/auth/passwordFns';
+import deleteUserById from '@/services/User/deleteUserById';
 import {
+  CheckEmailRequest,
+  CheckUsernameRequest,
   RegisterUserRequest,
   ResetPasswordRequest,
   TokenValidationRequest,
+  UpdatePasswordRequest,
 } from './types';
+import { EditUserRequest, UserRouteRequest } from '../profile/types';
 
 export const authenticateUser = expressWrapper(
   async (
@@ -163,5 +169,137 @@ export const resetPassword = async (
     success: true,
     message:
       'If an account with that email exists, we have sent you an email to reset your password.',
+  });
+};
+
+export const sendCurrentUser = async (
+  req: UserExtendedNextApiRequest,
+  res: NextApiResponse,
+) => {
+  const { user } = req;
+  res.status(200).json({
+    message: `Currently logged in as ${user!.username}`,
+    statusCode: 200,
+    success: true,
+    payload: user,
+  });
+};
+
+export const checkEmail = async (req: CheckEmailRequest, res: NextApiResponse) => {
+  const { email: emailToCheck } = req.query;
+
+  const email = await findUserByEmail(emailToCheck);
+
+  res.json({
+    success: true,
+    payload: { emailIsTaken: !!email },
+    statusCode: 200,
+    message: 'Getting email availability.',
+  });
+};
+
+export const checkUsername = async (req: CheckUsernameRequest, res: NextApiResponse) => {
+  const { username: usernameToCheck } = req.query;
+
+  const username = await findUserByUsername(usernameToCheck);
+
+  res.json({
+    success: true,
+    payload: { usernameIsTaken: !!username },
+    statusCode: 200,
+    message: username ? 'Username is taken.' : 'Username is available.',
+  });
+};
+
+export const updatePassword = async (
+  req: UpdatePasswordRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { password } = req.body;
+  const hash = await hashPassword(password);
+
+  const user = req.user!;
+  await DBClient.instance.user.update({
+    data: { hash },
+    where: { id: user.id },
+  });
+
+  res.json({
+    message: 'Updated user password.',
+    statusCode: 200,
+    success: true,
+  });
+};
+
+export const resendConfirmation = async (
+  req: UserExtendedNextApiRequest,
+  res: NextApiResponse,
+) => {
+  const user = req.user!;
+
+  await sendConfirmationEmail(user);
+  res.status(200).json({
+    message: `Resent the confirmation email for ${user.username}.`,
+    statusCode: 200,
+    success: true,
+  });
+};
+
+export const editUserInfo = async (
+  req: EditUserRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { email, firstName, lastName, username } = req.body;
+
+  const [usernameIsTaken, emailIsTaken] = await Promise.all([
+    findUserByUsername(username),
+    findUserByEmail(email),
+  ]);
+
+  const emailChanged = req.user!.email !== email;
+  const usernameChanged = req.user!.username !== username;
+
+  if (emailIsTaken && emailChanged) {
+    throw new ServerError('Email is already taken', 400);
+  }
+
+  if (usernameIsTaken && usernameChanged) {
+    throw new ServerError('Username is already taken', 400);
+  }
+
+  const updatedUser = await DBClient.instance.user.update({
+    where: { id: req.user!.id },
+    data: {
+      email,
+      firstName,
+      lastName,
+      username,
+      accountIsVerified: emailChanged ? false : undefined,
+    },
+  });
+
+  res.json({
+    message: 'User edited successfully',
+    payload: updatedUser,
+    success: true,
+    statusCode: 200,
+  });
+};
+
+export const deleteAccount = async (
+  req: UserRouteRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const { id } = req.query;
+  const deletedUser = await deleteUserById(id);
+
+  if (!deletedUser) {
+    throw new ServerError('Could not find a user with that id.', 400);
+  }
+
+  res.send({
+    message: 'Successfully deleted user.',
+    statusCode: 200,
+    success: true,
   });
 };

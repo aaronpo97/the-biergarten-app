@@ -16,7 +16,7 @@ const getAllBeerPostsByBreweryId = async ({
   const beers = await DBClient.instance.beerPost.findMany({
     where: { breweryId },
     take: pageSize,
-    skip: pageNum * pageSize,
+    skip: (pageNum - 1) * pageSize,
     select: {
       id: true,
       name: true,

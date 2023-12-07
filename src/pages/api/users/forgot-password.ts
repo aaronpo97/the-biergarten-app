@@ -5,8 +5,8 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { resetPassword } from '@/controllers/auth';
-import { ResetPasswordRequest } from '@/controllers/auth/types';
+import { resetPassword } from '@/controllers/users/auth';
+import { ResetPasswordRequest } from '@/controllers/users/auth/types';
 
 const router = createRouter<
   ResetPasswordRequest,

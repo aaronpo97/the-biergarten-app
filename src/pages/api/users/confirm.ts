@@ -7,8 +7,8 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 
-import { TokenValidationRequest } from '@/controllers/auth/types';
-import { confirmUser } from '@/controllers/auth';
+import { TokenValidationRequest } from '@/controllers/users/auth/types';
+import { confirmUser } from '@/controllers/users/auth';
 import TokenValidationSchema from '@/services/User/schema/TokenValidationSchema';
 
 const router = createRouter<
