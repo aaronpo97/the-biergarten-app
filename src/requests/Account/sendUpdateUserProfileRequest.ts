@@ -10,7 +10,7 @@ const sendUpdateUserProfileRequest = async ({
   bio,
   userId,
 }: UpdateProfileRequestParams) => {
-  const response = await fetch(`/api/users/${userId}/profile/update-bio`, {
+  const response = await fetch(`/api/users/${userId}/profile/update-profile`, {
     method: 'PUT',
     body: JSON.stringify({ bio }),
     headers: { 'Content-Type': 'application/json' },

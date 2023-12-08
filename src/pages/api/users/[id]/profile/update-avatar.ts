@@ -1,54 +1,12 @@
-import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import { singleUploadMiddleware } from '@/config/multer/uploadMiddleware';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
-
-import ServerError from '@/config/util/ServerError';
+import { checkIfUserCanUpdateProfile, updateAvatar } from '@/controllers/users/profile';
+import { UpdateProfileRequest } from '@/controllers/users/profile/types';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
-import { NextHandler, createRouter } from 'next-connect';
+import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import updateUserAvatarById, {
-  UpdateUserAvatarByIdParams,
-} from '@/services/UserAccount/UpdateUserAvatarByIdParams';
-
-interface UpdateProfileRequest extends UserExtendedNextApiRequest {
-  file: Express.Multer.File;
-  body: {
-    bio: string;
-  };
-}
-
-const checkIfUserCanUpdateProfile = async (
-  req: UpdateProfileRequest,
-  res: NextApiResponse,
-  next: NextHandler,
-) => {
-  const user = req.user!;
-
-  if (user.id !== req.query.id) {
-    throw new ServerError('You can only update your own profile.', 403);
-  }
-
-  await next();
-};
-
-const updateAvatar = async (req: UpdateProfileRequest, res: NextApiResponse) => {
-  const { file, user } = req;
-
-  const avatar: UpdateUserAvatarByIdParams['data']['avatar'] = {
-    alt: file.originalname,
-    path: file.path,
-    caption: '',
-  };
-
-  await updateUserAvatarById({ id: user!.id, data: { avatar } });
-  res.status(200).json({
-    message: 'User avatar updated successfully.',
-    statusCode: 200,
-    success: true,
-  });
-};
 
 const router = createRouter<
   UpdateProfileRequest,
