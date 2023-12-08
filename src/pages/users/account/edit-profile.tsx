@@ -23,7 +23,7 @@ import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetU
 
 import UpdateProfileSchema from '@/services/User/schema/UpdateProfileSchema';
 import sendUpdateUserAvatarRequest from '@/requests/Account/sendUpdateUserAvatarRequest';
-import sendUpdateUserProfileRequest from '@/requests/Account/sendUpdateUserProfileRequest.ts';
+import sendUpdateUserProfileRequest from '@/requests/Account/sendUpdateUserProfileRequest';
 import Spinner from '@/components/ui/Spinner';
 
 const ProfilePage: NextPage = () => {

@@ -108,7 +108,8 @@ const LocationSection: FC<{
   errors: FieldErrors<z.infer<typeof CreateBreweryPostWithImagesSchema>>;
   isSubmitting: boolean;
   setValue: UseFormSetValue<z.infer<typeof CreateBreweryPostWithImagesSchema>>;
-}> = ({ register, errors, isSubmitting, setValue }) => {
+  mapboxAccessToken: string;
+}> = ({ register, errors, isSubmitting, setValue, mapboxAccessToken }) => {
   const onAutoCompleteChange = (address: string) => {
     setValue('address', address);
   };
@@ -133,7 +134,7 @@ const LocationSection: FC<{
       </FormInfo>
       <FormSegment>
         <AddressAutofill
-          accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
+          accessToken={mapboxAccessToken}
           onRetrieve={onAutoCompleteRetrieve}
           onChange={onAutoCompleteChange}
         >
@@ -201,7 +202,9 @@ const LocationSection: FC<{
   );
 };
 
-const CreateBreweryPostForm: FC = () => {
+const CreateBreweryPostForm: FC<{
+  mapboxAccessToken: string;
+}> = ({ mapboxAccessToken }) => {
   const {
     register,
     handleSubmit,
@@ -268,6 +271,7 @@ const CreateBreweryPostForm: FC = () => {
               register={register}
               errors={errors}
               isSubmitting={isSubmitting}
+              mapboxAccessToken={mapboxAccessToken}
             />
           </Tab.Panel>
         </Tab.Panels>
