@@ -1,6 +1,6 @@
 import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
 import sendCreateBreweryPostRequest from '@/requests/BreweryPost/sendCreateBreweryPostRequest';
-import CreateBreweryPostSchema from '@/services/BreweryPost/schema/CreateBreweryPostSchema';
+import CreateBreweryPostSchema from '@/services/posts/BreweryPost/schema/CreateBreweryPostSchema';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';
 import { Tab } from '@headlessui/react';

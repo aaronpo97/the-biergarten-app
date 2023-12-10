@@ -1,4 +1,4 @@
-import BreweryPostMapQueryResult from '@/services/BreweryPost/schema/BreweryPostMapQueryResult';
+import BreweryPostMapQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostMapQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';

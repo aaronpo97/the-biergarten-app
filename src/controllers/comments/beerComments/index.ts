@@ -1,13 +1,13 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import editBeerCommentById from '@/services/BeerComment/editBeerCommentById';
-import findBeerCommentById from '@/services/BeerComment/findBeerCommentById';
+import editBeerCommentById from '@/services/comments/BeerComment/editBeerCommentById';
+import findBeerCommentById from '@/services/comments/BeerComment/findBeerCommentById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
-import createNewBeerComment from '@/services/BeerComment/createNewBeerComment';
-import getAllBeerComments from '@/services/BeerComment/getAllBeerComments';
+import createNewBeerComment from '@/services/comments/BeerComment/createNewBeerComment';
+import getAllBeerComments from '@/services/comments/BeerComment/getAllBeerComments';
 import {
   CommentRequest,
   EditAndCreateCommentRequest,

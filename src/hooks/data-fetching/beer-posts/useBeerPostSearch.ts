@@ -1,4 +1,4 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
 import useSWR from 'swr';
 import { z } from 'zod';
 

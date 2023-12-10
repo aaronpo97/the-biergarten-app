@@ -2,7 +2,7 @@ import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { createBeerStyle } from '@/controllers/posts/beerStyles';
 import { CreateBeerStyleRequest } from '@/controllers/posts/beerStyles/types';
-import CreateBeerStyleValidationSchema from '@/services/BeerStyles/schema/CreateBeerStyleValidationSchema';
+import CreateBeerStyleValidationSchema from '@/services/posts/BeerStyles/schema/CreateBeerStyleValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';

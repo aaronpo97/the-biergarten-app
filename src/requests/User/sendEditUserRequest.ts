@@ -1,4 +1,4 @@
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

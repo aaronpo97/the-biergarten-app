@@ -1,7 +1,7 @@
 import { setLoginSession } from '@/config/auth/session';
 import { verifyResetPasswordToken } from '@/config/jwt';
 import ServerError from '@/config/util/ServerError';
-import findUserById from '@/services/User/findUserById';
+import findUserById from '@/services/users/User/findUserById';
 
 import { GetServerSideProps, NextApiResponse, NextPage } from 'next';
 

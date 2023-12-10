@@ -5,9 +5,9 @@ import DBClient from '@/prisma/DBClient';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
-import getBeerStyleById from '@/services/BeerStyles/getBeerStyleById';
-import getBeerPostsByBeerStyleId from '@/services/BeerPost/getBeerPostsByBeerStyleId';
-import getAllBeerStyles from '@/services/BeerStyles/getAllBeerStyles';
+import getBeerStyleById from '@/services/posts/BeerStyles/getBeerStyleById';
+import getBeerPostsByBeerStyleId from '@/services/posts/BeerPost/getBeerPostsByBeerStyleId';
+import getAllBeerStyles from '@/services/posts/BeerStyles/getAllBeerStyles';
 
 import ServerError from '@/config/util/ServerError';
 import { CreateBeerStyleRequest, GetBeerStyleByIdRequest } from './types';

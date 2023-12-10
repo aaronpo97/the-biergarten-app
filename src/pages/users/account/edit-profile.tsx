@@ -21,7 +21,7 @@ import UpdateProfileForm from '@/components/Account/UpdateProfileForm';
 import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
 import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 
-import UpdateProfileSchema from '@/services/User/schema/UpdateProfileSchema';
+import UpdateProfileSchema from '@/services/users/User/schema/UpdateProfileSchema';
 import sendUpdateUserAvatarRequest from '@/requests/Account/sendUpdateUserAvatarRequest';
 import sendUpdateUserProfileRequest from '@/requests/Account/sendUpdateUserProfileRequest';
 import Spinner from '@/components/ui/Spinner';

@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import { createRouter } from 'next-connect';
-import { CreateUserValidationSchema } from '@/services/User/schema/CreateUserValidationSchemas';
+import { CreateUserValidationSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';

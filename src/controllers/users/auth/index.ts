@@ -3,24 +3,24 @@ import localStrat from '@/config/auth/localStrat';
 import { getLoginSession, setLoginSession } from '@/config/auth/session';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
-import createNewUser from '@/services/User/createNewUser';
-import findUserByEmail from '@/services/User/findUserByEmail';
+import createNewUser from '@/services/users/User/createNewUser';
+import findUserByEmail from '@/services/users/User/findUserByEmail';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { expressWrapper } from 'next-connect';
 import passport from 'passport';
 import { z } from 'zod';
 
-import findUserByUsername from '@/services/User/findUserByUsername';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
-import sendConfirmationEmail from '@/services/User/sendConfirmationEmail';
+import findUserByUsername from '@/services/users/User/findUserByUsername';
+import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
+import sendConfirmationEmail from '@/services/users/User/sendConfirmationEmail';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import type { NextFunction } from 'express';
 import { verifyConfirmationToken } from '@/config/jwt';
-import updateUserToBeConfirmedById from '@/services/User/updateUserToBeConfirmedById';
+import updateUserToBeConfirmedById from '@/services/users/User/updateUserToBeConfirmedById';
 import DBClient from '@/prisma/DBClient';
-import sendResetPasswordEmail from '@/services/User/sendResetPasswordEmail';
+import sendResetPasswordEmail from '@/services/users/User/sendResetPasswordEmail';
 import { hashPassword } from '@/config/auth/passwordFns';
-import deleteUserById from '@/services/User/deleteUserById';
+import deleteUserById from '@/services/users/User/deleteUserById';
 import {
   CheckEmailRequest,
   CheckUsernameRequest,

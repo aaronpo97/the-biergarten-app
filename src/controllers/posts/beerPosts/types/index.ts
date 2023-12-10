@@ -1,6 +1,6 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
-import EditBeerPostValidationSchema from '@/services/BeerPost/schema/EditBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/posts/BeerPost/schema/CreateBeerPostValidationSchema';
+import EditBeerPostValidationSchema from '@/services/posts/BeerPost/schema/EditBeerPostValidationSchema';
 import { NextApiRequest } from 'next';
 import { z } from 'zod';
 

@@ -3,7 +3,7 @@ import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { updatePassword } from '@/controllers/users/auth';
 import { UpdatePasswordRequest } from '@/controllers/users/auth/types';
-import { UpdatePasswordSchema } from '@/services/User/schema/CreateUserValidationSchemas';
+import { UpdatePasswordSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';

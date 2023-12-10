@@ -1,7 +1,7 @@
 import UserContext from '@/contexts/UserContext';
 import useGetBreweryPostLikeCount from '@/hooks/data-fetching/brewery-likes/useGetBreweryPostLikeCount';
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
-import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
 import { format } from 'date-fns';
 import { FC, useContext } from 'react';
 

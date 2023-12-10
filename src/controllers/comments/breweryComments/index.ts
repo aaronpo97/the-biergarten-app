@@ -1,13 +1,13 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import getBreweryCommentById from '@/services/BreweryComment/getBreweryCommentById';
+import getBreweryCommentById from '@/services/comments/BreweryComment/getBreweryCommentById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
 import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
-import createNewBreweryComment from '@/services/BreweryComment/createNewBreweryComment';
-import getAllBreweryComments from '@/services/BreweryComment/getAllBreweryComments';
+import createNewBreweryComment from '@/services/comments/BreweryComment/createNewBreweryComment';
+import getAllBreweryComments from '@/services/comments/BreweryComment/getAllBreweryComments';
 import {
   CommentRequest,
   EditAndCreateCommentRequest,

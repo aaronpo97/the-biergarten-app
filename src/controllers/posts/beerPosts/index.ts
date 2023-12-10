@@ -1,16 +1,16 @@
 import ServerError from '@/config/util/ServerError';
-import deleteBeerPostById from '@/services/BeerPost/deleteBeerPostById';
-import editBeerPostById from '@/services/BeerPost/editBeerPostById';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
+import deleteBeerPostById from '@/services/posts/BeerPost/deleteBeerPostById';
+import editBeerPostById from '@/services/posts/BeerPost/editBeerPostById';
+import getBeerPostById from '@/services/posts/BeerPost/getBeerPostById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
-import getBeerRecommendations from '@/services/BeerPost/getBeerRecommendations';
-import getAllBeerPosts from '@/services/BeerPost/getAllBeerPosts';
+import getBeerRecommendations from '@/services/posts/BeerPost/getBeerRecommendations';
+import getAllBeerPosts from '@/services/posts/BeerPost/getAllBeerPosts';
 import DBClient from '@/prisma/DBClient';
-import createNewBeerPost from '@/services/BeerPost/createNewBeerPost';
-import getBeerPostsByPostedById from '@/services/BeerPost/getBeerPostsByPostedById';
+import createNewBeerPost from '@/services/posts/BeerPost/createNewBeerPost';
+import getBeerPostsByPostedById from '@/services/posts/BeerPost/getBeerPostsByPostedById';
 import {
   BeerPostRequest,
   CreateBeerPostRequest,

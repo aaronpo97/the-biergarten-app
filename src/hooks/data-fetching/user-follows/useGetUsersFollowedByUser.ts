@@ -17,7 +17,7 @@
  *   - `mutate` A function to mutate the data.
  *   - `error` The error object, if any.
  */
-import FollowInfoSchema from '@/services/UserFollows/schema/FollowInfoSchema';
+import FollowInfoSchema from '@/services/users/UserFollows/schema/FollowInfoSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';

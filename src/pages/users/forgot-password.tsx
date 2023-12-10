@@ -4,7 +4,7 @@ import FormInfo from '@/components/ui/forms/FormInfo';
 import FormLabel from '@/components/ui/forms/FormLabel';
 import FormSegment from '@/components/ui/forms/FormSegment';
 import FormTextInput from '@/components/ui/forms/FormTextInput';
-import { BaseCreateUserSchema } from '@/services/User/schema/CreateUserValidationSchemas';
+import { BaseCreateUserSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
 import createErrorToast from '@/util/createErrorToast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NextPage } from 'next';

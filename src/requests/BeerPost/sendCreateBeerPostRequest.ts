@@ -1,5 +1,5 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
-import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
+import CreateBeerPostValidationSchema from '@/services/posts/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

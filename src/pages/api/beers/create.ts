@@ -1,7 +1,7 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { createRouter } from 'next-connect';
 
-import CreateBeerPostValidationSchema from '@/services/BeerPost/schema/CreateBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/posts/BeerPost/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';

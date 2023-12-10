@@ -1,6 +1,6 @@
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
-import findUserById from '@/services/User/findUserById';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import findUserById from '@/services/users/User/findUserById';
+import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
 
 import Head from 'next/head';
 import { FC } from 'react';

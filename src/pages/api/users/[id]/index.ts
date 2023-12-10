@@ -4,7 +4,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { editUserInfo, deleteAccount } from '@/controllers/users/auth';
 import { checkIfUserCanEditUser } from '@/controllers/users/profile';
 import { EditUserRequest } from '@/controllers/users/profile/types';
-import EditUserSchema from '@/services/User/schema/EditUserSchema';
+import EditUserSchema from '@/services/users/User/schema/EditUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
 import { NextApiResponse } from 'next';

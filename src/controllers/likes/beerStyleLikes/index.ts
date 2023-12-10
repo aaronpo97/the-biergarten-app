@@ -1,9 +1,9 @@
 import ServerError from '@/config/util/ServerError';
-import createBeerStyleLike from '@/services/BeerStyleLike/createBeerStyleLike';
-import findBeerStyleLikeById from '@/services/BeerStyleLike/findBeerStyleLikeById';
-import getBeerStyleLikeCount from '@/services/BeerStyleLike/getBeerStyleLikeCount';
-import removeBeerStyleLikeById from '@/services/BeerStyleLike/removeBeerStyleLikeById';
-import getBeerStyleById from '@/services/BeerStyles/getBeerStyleById';
+import createBeerStyleLike from '@/services/likes/BeerStyleLike/createBeerStyleLike';
+import findBeerStyleLikeById from '@/services/likes/BeerStyleLike/findBeerStyleLikeById';
+import getBeerStyleLikeCount from '@/services/likes/BeerStyleLike/getBeerStyleLikeCount';
+import removeBeerStyleLikeById from '@/services/likes/BeerStyleLike/removeBeerStyleLikeById';
+import getBeerStyleById from '@/services/posts/BeerStyles/getBeerStyleById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';

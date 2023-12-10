@@ -1,6 +1,6 @@
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
-import findUserById from '@/services/User/findUserById';
+import findUserById from '@/services/users/User/findUserById';
 import ServerError from '@/config/util/ServerError';
 import { getLoginSession } from '../../auth/session';
 import { UserExtendedNextApiRequest } from '../../auth/types';

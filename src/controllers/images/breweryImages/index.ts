@@ -1,5 +1,5 @@
 import ServerError from '@/config/util/ServerError';
-import addBreweryImageToDB from '@/services/BreweryImage/addBreweryImageToDB';
+import addBreweryImageToDB from '@/services/images/BreweryImage/addBreweryImageToDB';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';

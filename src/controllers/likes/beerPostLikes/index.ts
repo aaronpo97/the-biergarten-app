@@ -1,10 +1,10 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import createBeerPostLike from '@/services/BeerPostLike/createBeerPostLike';
-import findBeerPostLikeById from '@/services/BeerPostLike/findBeerPostLikeById';
-import getBeerPostLikeCountByBeerPostId from '@/services/BeerPostLike/getBeerPostLikeCount';
-import removeBeerPostLikeById from '@/services/BeerPostLike/removeBeerPostLikeById';
+import getBeerPostById from '@/services/posts/BeerPost/getBeerPostById';
+import createBeerPostLike from '@/services/likes/BeerPostLike/createBeerPostLike';
+import findBeerPostLikeById from '@/services/likes/BeerPostLike/findBeerPostLikeById';
+import getBeerPostLikeCountByBeerPostId from '@/services/likes/BeerPostLike/getBeerPostLikeCount';
+import removeBeerPostLikeById from '@/services/likes/BeerPostLike/removeBeerPostLikeById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';

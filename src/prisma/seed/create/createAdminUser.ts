@@ -4,7 +4,7 @@ import { hashPassword } from '../../../config/auth/passwordFns';
 import { ADMIN_PASSWORD } from '../../../config/env';
 
 import DBClient from '../../DBClient';
-import GetUserSchema from '../../../services/User/schema/GetUserSchema';
+import GetUserSchema from '../../../services/users/User/schema/GetUserSchema';
 import imageUrls from '../util/imageUrls';
 
 const createAdminUser = async () => {

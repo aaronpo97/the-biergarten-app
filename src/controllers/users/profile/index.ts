@@ -1,17 +1,17 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import findUserById from '@/services/User/findUserById';
+import findUserById from '@/services/users/User/findUserById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
-import getUsersFollowingUser from '@/services/UserFollows/getUsersFollowingUser';
-import getUsersFollowedByUser from '@/services/UserFollows/getUsersFollowedByUser';
+import getUsersFollowingUser from '@/services/users/UserFollows/getUsersFollowingUser';
+import getUsersFollowedByUser from '@/services/users/UserFollows/getUsersFollowedByUser';
 import { NextHandler } from 'next-connect';
 import updateUserAvatarById, {
   UpdateUserAvatarByIdParams,
-} from '@/services/UserAccount/UpdateUserAvatarByIdParams';
+} from '@/services/users/UserAccount/UpdateUserAvatarByIdParams';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import updateUserProfileById from '@/services/User/updateUserProfileById';
+import updateUserProfileById from '@/services/users/User/updateUserProfileById';
 import {
   UserRouteRequest,
   GetUserFollowInfoRequest,

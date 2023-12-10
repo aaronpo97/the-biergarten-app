@@ -1,14 +1,14 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import updateBeerStyleCommentById from '@/services/BeerStyleComment/updateBeerStyleCommentById';
+import updateBeerStyleCommentById from '@/services/comments/BeerStyleComment/updateBeerStyleCommentById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
 
 import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
-import createNewBeerStyleComment from '@/services/BeerStyleComment/createNewBeerStyleComment';
-import getAllBeerStyleComments from '@/services/BeerStyleComment/getAllBeerStyleComments';
+import createNewBeerStyleComment from '@/services/comments/BeerStyleComment/createNewBeerStyleComment';
+import getAllBeerStyleComments from '@/services/comments/BeerStyleComment/getAllBeerStyleComments';
 
 import {
   CommentRequest,

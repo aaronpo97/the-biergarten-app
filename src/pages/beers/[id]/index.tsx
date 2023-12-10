@@ -1,8 +1,8 @@
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
+import getBeerPostById from '@/services/posts/BeerPost/getBeerPostById';
 
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
 
 import { z } from 'zod';
 

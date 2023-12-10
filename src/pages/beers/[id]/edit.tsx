@@ -3,8 +3,8 @@ import Head from 'next/head';
 import React from 'react';
 
 import withPageAuthRequired from '@/util/withPageAuthRequired';
-import getBeerPostById from '@/services/BeerPost/getBeerPostById';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import getBeerPostById from '@/services/posts/BeerPost/getBeerPostById';
+import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
 import EditBeerPostForm from '@/components/EditBeerPostForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import { BiBeer } from 'react-icons/bi';
