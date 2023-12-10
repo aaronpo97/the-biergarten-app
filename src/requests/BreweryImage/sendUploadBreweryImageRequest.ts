@@ -1,4 +1,4 @@
-import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { z } from 'zod';
 
 interface SendUploadBeerImagesRequestArgs {

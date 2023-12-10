@@ -3,7 +3,7 @@ import { FC, MutableRefObject, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import useBeerRecommendations from '@/hooks/data-fetching/beer-posts/useBeerRecommendations';
-import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import debounce from 'lodash/debounce';
 import BeerRecommendationLoadingComponent from './BeerRecommendationLoadingComponent';
 

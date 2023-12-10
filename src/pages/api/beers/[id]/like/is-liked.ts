@@ -7,7 +7,7 @@ import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 
-import { checkIfBeerPostIsLiked } from '@/controllers/likes/beerPostLikes';
+import { checkIfBeerPostIsLiked } from '@/controllers/likes/beer-posts-likes';
 
 const router = createRouter<
   UserExtendedNextApiRequest,

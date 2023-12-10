@@ -1,4 +1,4 @@
-import BeerStyleQueryResult from '@/services/posts/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import Link from 'next/link';
 import { FC } from 'react';
 

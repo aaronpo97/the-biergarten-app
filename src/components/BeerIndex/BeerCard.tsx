@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { FC, useContext } from 'react';
 
-import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';

@@ -1,6 +1,6 @@
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { getAllBeersByBeerStyle } from '@/controllers/posts/beerStyles';
+import { getAllBeersByBeerStyle } from '@/controllers/posts/beer-styles';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiRequest, NextApiResponse } from 'next';

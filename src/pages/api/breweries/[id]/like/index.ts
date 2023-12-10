@@ -5,7 +5,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import {
   sendBreweryPostLikeRequest,
   getBreweryPostLikeCount,
-} from '@/controllers/likes/breweryPostLikes';
+} from '@/controllers/likes/brewery-post-likes';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';

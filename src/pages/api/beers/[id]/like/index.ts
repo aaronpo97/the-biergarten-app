@@ -9,7 +9,7 @@ import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import {
   sendBeerPostLikeRequest,
   getBeerPostLikeCount,
-} from '@/controllers/likes/beerPostLikes';
+} from '@/controllers/likes/beer-posts-likes';
 import { LikeRequest } from '@/controllers/likes/types';
 
 const router = createRouter<

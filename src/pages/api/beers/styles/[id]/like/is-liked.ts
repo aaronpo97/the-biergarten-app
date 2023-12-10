@@ -6,7 +6,7 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import { checkIfBeerStyleIsLiked } from '@/controllers/likes/beerStyleLikes';
+import { checkIfBeerStyleIsLiked } from '@/controllers/likes/beer-style-likes';
 
 const router = createRouter<
   UserExtendedNextApiRequest,

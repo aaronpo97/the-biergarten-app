@@ -6,7 +6,7 @@ import {
   checkIfBreweryCommentOwner,
   deleteBreweryPostComment,
   editBreweryPostComment,
-} from '@/controllers/comments/breweryComments';
+} from '@/controllers/comments/brewery-comments';
 import { CommentRequest } from '@/controllers/comments/types';
 
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';

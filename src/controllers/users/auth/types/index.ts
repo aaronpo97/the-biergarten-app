@@ -2,8 +2,8 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import {
   CreateUserValidationSchema,
   UpdatePasswordSchema,
-} from '@/services/users/User/schema/CreateUserValidationSchemas';
-import TokenValidationSchema from '@/services/users/User/schema/TokenValidationSchema';
+} from '@/services/users/auth/schema/CreateUserValidationSchemas';
+import TokenValidationSchema from '@/services/users/auth/schema/TokenValidationSchema';
 import { NextApiRequest } from 'next';
 import { z } from 'zod';
 

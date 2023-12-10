@@ -1,6 +1,6 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import DBClient from '@/prisma/DBClient';
-import BreweryPostMapQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostMapQueryResult';
+import BreweryPostMapQueryResult from '@/services/posts/brewery-post/schema/BreweryPostMapQueryResult';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';

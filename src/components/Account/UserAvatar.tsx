@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { CldImage } from 'next-cloudinary';
 import { z } from 'zod';
-import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import { FaUser } from 'react-icons/fa';
 
 interface UserAvatarProps {

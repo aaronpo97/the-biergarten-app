@@ -1,4 +1,4 @@
-import { UpdatePasswordSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
+import { UpdatePasswordSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

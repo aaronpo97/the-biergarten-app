@@ -6,14 +6,14 @@ import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 
-import { EditBeerPostRequest } from '@/controllers/posts/beerPosts/types';
+import { EditBeerPostRequest } from '@/controllers/posts/beer-posts/types';
 import {
   checkIfBeerPostOwner,
   editBeerPost,
   deleteBeerPost,
-} from '@/controllers/posts/beerPosts';
+} from '@/controllers/posts/beer-posts';
 
-import EditBeerPostValidationSchema from '@/services/posts/BeerPost/schema/EditBeerPostValidationSchema';
+import EditBeerPostValidationSchema from '@/services/posts/beer-post/schema/EditBeerPostValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 

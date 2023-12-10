@@ -1,4 +1,4 @@
-import UpdateProfileSchema from '@/services/users/User/schema/UpdateProfileSchema';
+import UpdateProfileSchema from '@/services/users/auth/schema/UpdateProfileSchema';
 import { z } from 'zod';
 
 interface UpdateProfileRequestParams {

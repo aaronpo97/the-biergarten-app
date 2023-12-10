@@ -7,7 +7,7 @@ import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
-import { createComment, getAll } from '@/controllers/comments/beerStyleComments';
+import { createComment, getAll } from '@/controllers/comments/beer-style-comments';
 
 const router = createRouter<
   // I don't want to use any, but I can't figure out how to get the types to work

@@ -7,8 +7,8 @@ import { createRouter, NextHandler } from 'next-connect';
 import { z } from 'zod';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import getBreweryPostById from '@/services/posts/BreweryPost/getBreweryPostById';
-import EditBreweryPostValidationSchema from '@/services/posts/BreweryPost/schema/EditBreweryPostValidationSchema';
+import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
+import EditBreweryPostValidationSchema from '@/services/posts/brewery-post/schema/EditBreweryPostValidationSchema';
 
 interface BreweryPostRequest extends UserExtendedNextApiRequest {
   query: { id: string };

@@ -9,7 +9,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 
 import { TokenValidationRequest } from '@/controllers/users/auth/types';
 import { confirmUser } from '@/controllers/users/auth';
-import TokenValidationSchema from '@/services/users/User/schema/TokenValidationSchema';
+import TokenValidationSchema from '@/services/users/auth/schema/TokenValidationSchema';
 
 const router = createRouter<
   TokenValidationRequest,

@@ -1,5 +1,5 @@
-import getBreweryPostById from '@/services/posts/BreweryPost/getBreweryPostById';
-import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
+import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { GetServerSideProps, NextPage } from 'next';
 
 import { z } from 'zod';

@@ -7,7 +7,7 @@ import LocationMarker from '@/components/ui/LocationMarker';
 import Link from 'next/link';
 import Head from 'next/head';
 import useGeolocation from '@/hooks/utilities/useGeolocation';
-import BreweryPostMapQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostMapQueryResult';
+import BreweryPostMapQueryResult from '@/services/posts/brewery-post/schema/BreweryPostMapQueryResult';
 import { z } from 'zod';
 import useBreweryMapPagePosts from '@/hooks/data-fetching/brewery-posts/useBreweryMapPagePosts';
 import ControlPanel from '@/components/ui/maps/ControlPanel';

@@ -1,14 +1,14 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { createRouter } from 'next-connect';
 
-import CreateBeerPostValidationSchema from '@/services/posts/BeerPost/schema/CreateBeerPostValidationSchema';
+import CreateBeerPostValidationSchema from '@/services/posts/beer-post/schema/CreateBeerPostValidationSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
-import { createBeerPost } from '@/controllers/posts/beerPosts';
-import { CreateBeerPostRequest } from '@/controllers/posts/beerPosts/types';
+import { createBeerPost } from '@/controllers/posts/beer-posts';
+import { CreateBeerPostRequest } from '@/controllers/posts/beer-posts/types';
 
 const router = createRouter<
   CreateBeerPostRequest,

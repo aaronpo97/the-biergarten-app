@@ -1,17 +1,16 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import findUserById from '@/services/users/User/findUserById';
+import findUserById from '@/services/users/auth/findUserById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
-import getUsersFollowingUser from '@/services/users/UserFollows/getUsersFollowingUser';
-import getUsersFollowedByUser from '@/services/users/UserFollows/getUsersFollowedByUser';
 import { NextHandler } from 'next-connect';
 import updateUserAvatarById, {
   UpdateUserAvatarByIdParams,
-} from '@/services/users/UserAccount/UpdateUserAvatarByIdParams';
+} from '@/services/users/account/UpdateUserAvatarByIdParams';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import updateUserProfileById from '@/services/users/User/updateUserProfileById';
+import updateUserProfileById from '@/services/users/auth/updateUserProfileById';
+
 import {
   UserRouteRequest,
   GetUserFollowInfoRequest,
@@ -19,6 +18,8 @@ import {
   UpdateAvatarRequest,
   UpdateProfileRequest,
 } from './types';
+import getUsersFollowingUser from '@/services/users/follows/getUsersFollowingUser';
+import getUsersFollowedByUser from '@/services/users/follows/getUsersFollowedByUser';
 
 export const followUser = async (
   req: UserRouteRequest,

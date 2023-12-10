@@ -10,7 +10,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import ImageMetadataValidationSchema from '@/services/schema/ImageSchema/ImageMetadataValidationSchema';
 import { uploadMiddlewareMultiple } from '@/config/multer/uploadMiddleware';
 import { UploadImagesRequest } from '@/controllers/images/types';
-import { processBeerImageData } from '@/controllers/images/beerImages';
+import { processBeerImageData } from '@/controllers/images/beer-images';
 
 const router = createRouter<
   UploadImagesRequest,

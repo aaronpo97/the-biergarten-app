@@ -7,7 +7,7 @@ import { FaRegEdit } from 'react-icons/fa';
 
 import { z } from 'zod';
 import useTimeDistance from '@/hooks/utilities/useTimeDistance';
-import BeerStyleQueryResult from '@/services/posts/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleLikeCount from '@/hooks/data-fetching/beer-style-likes/useBeerStyleLikeCount';
 import BeerStyleLikeButton from './BeerStyleLikeButton';
 

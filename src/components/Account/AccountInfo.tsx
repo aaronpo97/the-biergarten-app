@@ -1,6 +1,6 @@
 import validateEmailRequest from '@/requests/User/validateEmailRequest';
 import validateUsernameRequest from '@/requests/validateUsernameRequest';
-import { BaseCreateUserSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
+import { BaseCreateUserSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import { Switch } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, FC, useContext } from 'react';

@@ -1,5 +1,5 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import EditUserSchema from '@/services/users/User/schema/EditUserSchema';
+import EditUserSchema from '@/services/users/auth/schema/EditUserSchema';
 import { z } from 'zod';
 
 export interface UserRouteRequest extends UserExtendedNextApiRequest {

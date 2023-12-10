@@ -10,7 +10,7 @@ import CreateCommentValidationSchema from '@/services/schema/CommentSchema/Creat
 import {
   createBeerPostComment,
   getAllBeerPostComments,
-} from '@/controllers/comments/beerComments';
+} from '@/controllers/comments/beer-comments';
 
 const router = createRouter<
   // @TODO: Fix this any type

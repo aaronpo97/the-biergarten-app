@@ -1,5 +1,5 @@
-import { CreateUserValidationSchema } from '@/services/users/User/schema/CreateUserValidationSchemas';
-import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
+import { CreateUserValidationSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

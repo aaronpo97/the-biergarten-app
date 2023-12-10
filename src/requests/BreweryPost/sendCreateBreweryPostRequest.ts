@@ -1,5 +1,5 @@
-import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
-import CreateBreweryPostSchema from '@/services/posts/BreweryPost/schema/CreateBreweryPostSchema';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
+import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { z } from 'zod';
 

@@ -1,5 +1,5 @@
 import UseBeerPostsByBrewery from '@/hooks/data-fetching/beer-posts/useBeerPostsByBrewery';
-import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import Link from 'next/link';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';

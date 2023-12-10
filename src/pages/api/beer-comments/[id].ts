@@ -13,7 +13,7 @@ import {
   checkIfBeerCommentOwner,
   deleteBeerPostComment,
   editBeerPostComment,
-} from '@/controllers/comments/beerComments';
+} from '@/controllers/comments/beer-comments';
 
 const router = createRouter<
   CommentRequest,

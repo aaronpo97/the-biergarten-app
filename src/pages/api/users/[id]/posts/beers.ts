@@ -6,7 +6,7 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { GetAllPostsByConnectedPostId } from '@/controllers/posts/types';
-import { getBeerPostsByUserId } from '@/controllers/posts/beerPosts';
+import { getBeerPostsByUserId } from '@/controllers/posts/beer-posts';
 
 const router = createRouter<
   GetAllPostsByConnectedPostId,

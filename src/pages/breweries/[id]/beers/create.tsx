@@ -3,12 +3,12 @@ import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import DBClient from '@/prisma/DBClient';
-import BreweryPostQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { BeerStyle } from '@prisma/client';
 import { NextPage } from 'next';
 import { BiBeer } from 'react-icons/bi';
 import { z } from 'zod';
-import getBreweryPostById from '@/services/posts/BreweryPost/getBreweryPostById';
+import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
 
 interface CreateBeerPageProps {
   brewery: z.infer<typeof BreweryPostQueryResult>;

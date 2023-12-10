@@ -5,7 +5,7 @@ import FormSegment from '@/components/ui/forms/FormSegment';
 import Link from 'next/link';
 import FormTextArea from '@/components/ui/forms/FormTextArea';
 import { FC } from 'react';
-import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import type {
   UseFormHandleSubmit,
   SubmitHandler,
@@ -13,7 +13,7 @@ import type {
   UseFormRegister,
 } from 'react-hook-form';
 import { z } from 'zod';
-import UpdateProfileSchema from '../../services/users/User/schema/UpdateProfileSchema';
+import UpdateProfileSchema from '@/services/users/auth/schema/UpdateProfileSchema';
 
 type UpdateProfileSchemaT = z.infer<typeof UpdateProfileSchema>;
 

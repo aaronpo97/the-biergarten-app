@@ -1,14 +1,14 @@
 import DBClient from '@/prisma/DBClient';
-import getAllBreweryPostsByPostedById from '@/services/posts/BreweryPost/getAllBreweryPostsByPostedById';
+import getAllBreweryPostsByPostedById from '@/services/posts/brewery-post/getAllBreweryPostsByPostedById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
-import getAllBreweryPosts from '@/services/posts/BreweryPost/getAllBreweryPosts';
-import createNewBreweryPost from '@/services/posts/BreweryPost/createNewBreweryPost';
+import getAllBreweryPosts from '@/services/posts/brewery-post/getAllBreweryPosts';
+import createNewBreweryPost from '@/services/posts/brewery-post/createNewBreweryPost';
 import geocode from '@/config/mapbox/geocoder';
 import ServerError from '@/config/util/ServerError';
-import BreweryPostMapQueryResult from '@/services/posts/BreweryPost/schema/BreweryPostMapQueryResult';
-import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
+import BreweryPostMapQueryResult from '@/services/posts/brewery-post/schema/BreweryPostMapQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import { CreateBreweryPostRequest, GetBreweryPostsRequest } from './types';
 import { GetAllPostsByConnectedPostId } from '../types';
 

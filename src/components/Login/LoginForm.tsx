@@ -1,5 +1,5 @@
 import sendLoginUserRequest from '@/requests/User/sendLoginUserRequest';
-import LoginValidationSchema from '@/services/users/User/schema/LoginValidationSchema';
+import LoginValidationSchema from '@/services/users/auth/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';

@@ -1,6 +1,6 @@
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { getBeerPosts } from '@/controllers/posts/beerPosts';
-import { GetAllBeerPostsRequest } from '@/controllers/posts/beerPosts/types';
+import { getBeerPosts } from '@/controllers/posts/beer-posts';
+import { GetAllBeerPostsRequest } from '@/controllers/posts/beer-posts/types';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';

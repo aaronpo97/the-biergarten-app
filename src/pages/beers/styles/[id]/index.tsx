@@ -5,9 +5,9 @@ import { z } from 'zod';
 
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
-import getBeerStyleById from '@/services/posts/BeerStyles/getBeerStyleById';
+import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
 import BeerStyleHeader from '@/components/BeerStyleById/BeerStyleHeader';
-import BeerStyleQueryResult from '@/services/posts/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import BeerStyleCommentSection from '@/components/BeerStyleById/BeerStyleCommentSection';
 import BeerStyleBeerSection from '@/components/BeerStyleById/BeerStyleBeerSection';
 

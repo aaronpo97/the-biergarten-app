@@ -1,6 +1,6 @@
 import UserContext from '@/contexts/UserContext';
 
-import BeerPostQueryResult from '@/services/posts/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';

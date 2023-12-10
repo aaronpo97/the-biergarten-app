@@ -2,7 +2,7 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
-import { getBreweryPostLikeStatus } from '@/controllers/likes/breweryPostLikes';
+import { getBreweryPostLikeStatus } from '@/controllers/likes/brewery-post-likes';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';

@@ -2,7 +2,7 @@ import useFollowStatus from '@/hooks/data-fetching/user-follows/useFollowStatus'
 import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
 import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 import sendUserFollowRequest from '@/requests/UserFollow/sendUserFollowRequest';
-import GetUserSchema from '@/services/users/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import { FC, useState } from 'react';
 import { FaUserCheck, FaUserPlus } from 'react-icons/fa';
 import { z } from 'zod';

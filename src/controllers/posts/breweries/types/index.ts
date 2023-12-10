@@ -1,5 +1,5 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
-import CreateBreweryPostSchema from '@/services/posts/BreweryPost/schema/CreateBreweryPostSchema';
+import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import { NextApiRequest } from 'next';
 import { z } from 'zod';
