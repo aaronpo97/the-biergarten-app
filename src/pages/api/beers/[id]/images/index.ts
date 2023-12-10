@@ -9,11 +9,11 @@ import { z } from 'zod';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import ImageMetadataValidationSchema from '@/services/schema/ImageSchema/ImageMetadataValidationSchema';
 import { uploadMiddlewareMultiple } from '@/config/multer/uploadMiddleware';
-import { UploadBeerPostImagesRequest } from '@/controllers/images/beerImages/types';
+import { UploadImagesRequest } from '@/controllers/images/types';
 import { processBeerImageData } from '@/controllers/images/beerImages';
 
 const router = createRouter<
-  UploadBeerPostImagesRequest,
+  UploadImagesRequest,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 

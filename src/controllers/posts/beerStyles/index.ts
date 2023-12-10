@@ -10,13 +10,8 @@ import getBeerPostsByBeerStyleId from '@/services/BeerPost/getBeerPostsByBeerSty
 import getAllBeerStyles from '@/services/BeerStyles/getAllBeerStyles';
 
 import ServerError from '@/config/util/ServerError';
-import {
-  CreateBeerStyleRequest,
-  GetAllBeersByBeerStyleRequest,
-  GetBeerStyleByIdRequest,
-} from './types';
-
-import { GetAllPostsRequest } from '../types';
+import { CreateBeerStyleRequest, GetBeerStyleByIdRequest } from './types';
+import { GetAllPostsByConnectedPostId, GetAllPostsRequest } from '../types';
 
 export const getBeerStyle = async (
   req: GetBeerStyleByIdRequest,
@@ -35,7 +30,7 @@ export const getBeerStyle = async (
 };
 
 export const getAllBeersByBeerStyle = async (
-  req: GetAllBeersByBeerStyleRequest,
+  req: GetAllPostsByConnectedPostId,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention

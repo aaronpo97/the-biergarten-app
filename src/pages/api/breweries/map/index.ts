@@ -12,7 +12,7 @@ interface GetBreweryPostsRequest extends NextApiRequest {
   query: z.infer<typeof PaginatedQueryResponseSchema>;
 }
 
-const getBreweryPosts = async (
+const getMapBreweryPosts = async (
   req: GetBreweryPostsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
@@ -53,7 +53,7 @@ const router = createRouter<
 
 router.get(
   validateRequest({ querySchema: PaginatedQueryResponseSchema }),
-  getBreweryPosts,
+  getMapBreweryPosts,
 );
 
 const handler = router.handler();

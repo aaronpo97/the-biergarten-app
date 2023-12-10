@@ -5,11 +5,11 @@ import { z } from 'zod';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { GetPostsByUserIdRequest } from '@/controllers/posts/types';
+import { GetAllPostsByConnectedPostId } from '@/controllers/posts/types';
 import { getBeerPostsByUserId } from '@/controllers/posts/beerPosts';
 
 const router = createRouter<
-  GetPostsByUserIdRequest,
+  GetAllPostsByConnectedPostId,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 

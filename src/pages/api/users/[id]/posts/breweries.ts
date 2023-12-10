@@ -6,10 +6,10 @@ import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { getBreweryPostsByUserId } from '@/controllers/posts/breweries';
-import { GetPostsByUserIdRequest } from '@/controllers/posts/types';
+import { GetAllPostsByConnectedPostId } from '@/controllers/posts/types';
 
 const router = createRouter<
-  GetPostsByUserIdRequest,
+  GetAllPostsByConnectedPostId,
   NextApiResponse<z.infer<typeof APIResponseValidationSchema>>
 >();
 

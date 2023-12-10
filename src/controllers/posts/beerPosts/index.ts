@@ -18,7 +18,7 @@ import {
   GetAllBeerPostsRequest,
   GetBeerRecommendationsRequest,
 } from './types';
-import { GetPostsByUserIdRequest } from '../types';
+import { GetAllPostsByConnectedPostId } from '../types';
 
 export const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostRequest>(
   req: BeerPostRequestType,
@@ -145,7 +145,7 @@ export const createBeerPost = async (
 };
 
 export const getBeerPostsByUserId = async (
-  req: GetPostsByUserIdRequest,
+  req: GetAllPostsByConnectedPostId,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const pageNum = parseInt(req.query.page_num, 10);

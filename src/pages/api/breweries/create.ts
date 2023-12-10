@@ -1,4 +1,3 @@
-import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { createRouter } from 'next-connect';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
@@ -11,10 +10,7 @@ import createNewBreweryPost from '@/services/BreweryPost/createNewBreweryPost';
 import geocode from '@/config/mapbox/geocoder';
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-
-interface CreateBreweryPostRequest extends UserExtendedNextApiRequest {
-  body: z.infer<typeof CreateBreweryPostSchema>;
-}
+import { CreateBreweryPostRequest } from '@/controllers/posts/breweries/types';
 
 const createBreweryPost = async (
   req: CreateBreweryPostRequest,

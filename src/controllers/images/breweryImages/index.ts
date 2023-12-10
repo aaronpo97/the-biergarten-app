@@ -1,12 +1,12 @@
 import ServerError from '@/config/util/ServerError';
-import addBeerImageToDB from '@/services/BeerImage/addBeerImageToDB';
+import addBreweryImageToDB from '@/services/BreweryImage/addBreweryImageToDB';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import { UploadImagesRequest } from '../types';
 
 // eslint-disable-next-line import/prefer-default-export
-export const processBeerImageData = async (
+export const processBreweryImageData = async (
   req: UploadImagesRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
@@ -16,18 +16,18 @@ export const processBeerImageData = async (
     throw new ServerError('No images uploaded', 400);
   }
 
-  const beerImages = await addBeerImageToDB({
+  const breweryImages = await addBreweryImageToDB({
     alt: body.alt,
     caption: body.caption,
-    beerPostId: req.query.id,
+    breweryPostId: req.query.id,
     userId: user!.id,
     files,
   });
 
   res.status(200).json({
     success: true,
-    message: `Successfully uploaded ${beerImages.length} image${
-      beerImages.length > 1 ? 's' : ''
+    message: `Successfully uploaded ${breweryImages.length} image${
+      breweryImages.length > 1 ? 's' : ''
     }`,
     statusCode: 200,
   });
