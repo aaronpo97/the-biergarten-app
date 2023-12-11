@@ -10,7 +10,8 @@ import updateUserAvatarById, {
 } from '@/services/users/account/UpdateUserAvatarByIdParams';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import updateUserProfileById from '@/services/users/auth/updateUserProfileById';
-
+import getUsersFollowingUser from '@/services/users/follows/getUsersFollowingUser';
+import getUsersFollowedByUser from '@/services/users/follows/getUsersFollowedByUser';
 import {
   UserRouteRequest,
   GetUserFollowInfoRequest,
@@ -18,8 +19,6 @@ import {
   UpdateAvatarRequest,
   UpdateProfileRequest,
 } from './types';
-import getUsersFollowingUser from '@/services/users/follows/getUsersFollowingUser';
-import getUsersFollowedByUser from '@/services/users/follows/getUsersFollowedByUser';
 
 export const followUser = async (
   req: UserRouteRequest,

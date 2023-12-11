@@ -1,14 +1,18 @@
 import ServerError from '@/config/util/ServerError';
 import DBClient from '@/prisma/DBClient';
-import updateBeerStyleCommentById from '@/services/comments/beer-style-comment/updateBeerStyleCommentById';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
 
-import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
-import createNewBeerStyleComment from '@/services/comments/beer-style-comment/createNewBeerStyleComment';
-import getAllBeerStyleComments from '@/services/comments/beer-style-comment/getAllBeerStyleComments';
+import {
+  updateBeerStyleCommentById,
+  createNewBeerStyleComment,
+  getAllBeerStyleComments,
+  findBeerStyleCommentById,
+  deleteBeerStyleCommentById,
+} from '@/services/comments/beer-style-comment';
 
 import {
   CommentRequest,
@@ -25,15 +29,14 @@ export const checkIfBeerStyleCommentOwner = async <
 ) => {
   const { id } = req.query;
   const user = req.user!;
-  const beerStyleComment = await DBClient.instance.beerStyleComment.findFirst({
-    where: { id },
-  });
+
+  const beerStyleComment = await findBeerStyleCommentById({ beerStyleCommentId: id });
 
   if (!beerStyleComment) {
     throw new ServerError('Beer style comment not found.', 404);
   }
 
-  if (beerStyleComment.postedById !== user.id) {
+  if (beerStyleComment.postedBy.id !== user.id) {
     throw new ServerError(
       'You are not authorized to modify this beer style comment.',
       403,
@@ -47,8 +50,8 @@ export const editBeerStyleComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const updated = await updateBeerStyleCommentById({
-    id: req.query.id,
+  await updateBeerStyleCommentById({
+    beerStyleCommentId: req.query.id,
     body: req.body,
   });
 
@@ -56,7 +59,6 @@ export const editBeerStyleComment = async (
     success: true,
     message: 'Comment updated successfully',
     statusCode: 200,
-    payload: updated,
   });
 };
 
@@ -66,7 +68,7 @@ export const deleteBeerStyleComment = async (
 ) => {
   const { id } = req.query;
 
-  await DBClient.instance.beerStyleComment.delete({ where: { id } });
+  await deleteBeerStyleCommentById({ beerStyleCommentId: id });
 
   res.status(200).json({
     success: true,
@@ -79,15 +81,11 @@ export const createComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { content, rating } = req.body;
-
-  const newBeerStyleComment: z.infer<typeof CommentQueryResult> =
-    await createNewBeerStyleComment({
-      content,
-      rating,
-      beerStyleId: req.query.id,
-      userId: req.user!.id,
-    });
+  const newBeerStyleComment = await createNewBeerStyleComment({
+    body: req.body,
+    beerStyleId: req.query.id,
+    userId: req.user!.id,
+  });
 
   res.status(201).json({
     message: 'Beer comment created successfully',

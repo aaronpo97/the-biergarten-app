@@ -1,13 +1,19 @@
-import ServerError from '@/config/util/ServerError';
-import DBClient from '@/prisma/DBClient';
-import editBeerCommentById from '@/services/comments/beer-comment/editBeerCommentById';
-import findBeerCommentById from '@/services/comments/beer-comment/findBeerCommentById';
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
-import createNewBeerComment from '@/services/comments/beer-comment/createNewBeerComment';
-import getAllBeerComments from '@/services/comments/beer-comment/getAllBeerComments';
+
+import ServerError from '@/config/util/ServerError';
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
+
+import {
+  getBeerPostCommentByIdService,
+  editBeerPostCommentByIdService,
+  createBeerPostCommentService,
+  getAllBeerCommentsService,
+  deleteBeerCommentByIdService,
+  getBeerPostCommentCountService,
+} from '@/services/comments/beer-comment';
+
 import {
   CommentRequest,
   EditAndCreateCommentRequest,
@@ -21,7 +27,7 @@ export const checkIfBeerCommentOwner = async <T extends CommentRequest>(
 ) => {
   const { id } = req.query;
   const user = req.user!;
-  const comment = await findBeerCommentById({ beerCommentId: id });
+  const comment = await getBeerPostCommentByIdService({ beerPostCommentId: id });
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
@@ -40,17 +46,12 @@ export const editBeerPostComment = async (
 ) => {
   const { id } = req.query;
 
-  const updated = await editBeerCommentById({
-    content: req.body.content,
-    rating: req.body.rating,
-    id,
-  });
+  await editBeerPostCommentByIdService({ body: req.body, beerPostCommentId: id });
 
   res.status(200).json({
     success: true,
     message: 'Comment updated successfully',
     statusCode: 200,
-    payload: updated,
   });
 };
 
@@ -60,9 +61,7 @@ export const deleteBeerPostComment = async (
 ) => {
   const { id } = req.query;
 
-  await DBClient.instance.beerComment.delete({
-    where: { id },
-  });
+  await deleteBeerCommentByIdService({ beerPostCommentId: id });
 
   res.status(200).json({
     success: true,
@@ -75,15 +74,12 @@ export const createBeerPostComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { content, rating } = req.body;
-
   const beerPostId = req.query.id;
 
-  const newBeerComment = await createNewBeerComment({
-    content,
-    rating,
-    beerPostId,
+  const newBeerComment = await createBeerPostCommentService({
+    body: req.body,
     userId: req.user!.id,
+    beerPostId,
   });
 
   res.status(201).json({
@@ -102,13 +98,13 @@ export const getAllBeerPostComments = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
-  const comments = await getAllBeerComments({
+  const comments = await getAllBeerCommentsService({
     beerPostId,
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
   });
 
-  const count = await DBClient.instance.beerComment.count({ where: { beerPostId } });
+  const count = await getBeerPostCommentCountService({ beerPostId });
 
   res.setHeader('X-Total-Count', count);
 
