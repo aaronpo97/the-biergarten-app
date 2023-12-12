@@ -6,6 +6,14 @@ import {
   UpdateBreweryCommentById,
 } from './types';
 
+/**
+ * The select object for retrieving brewery comments.
+ *
+ * @example
+ *   const breweryComments = await DBClient.instance.breweryComment.findMany({
+ *     select: breweryCommentSelect,
+ *   });
+ */
 const breweryCommentSelect = {
   id: true,
   content: true,
@@ -17,6 +25,16 @@ const breweryCommentSelect = {
   },
 } as const;
 
+/**
+ * Updates a brewery comment by ID.
+ *
+ * @param params - The options for updating the brewery comment.
+ * @param params.breweryCommentId - The ID of the brewery comment.
+ * @param params.body - The body of the comment.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the brewery.
+ * @returns A promise that resolves to the updated brewery comment.
+ */
 export const updateBreweryCommentById: UpdateBreweryCommentById = ({
   breweryCommentId,
   body,
@@ -30,6 +48,17 @@ export const updateBreweryCommentById: UpdateBreweryCommentById = ({
   });
 };
 
+/**
+ * Creates a new comment for a brewery.
+ *
+ * @param params - The options for creating the comment.
+ * @param params.body - The body of the comment.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the brewery.
+ * @param params.breweryPostId - The ID of the brewery post.
+ * @param params.userId - The ID of the user creating the comment.
+ * @returns A promise that resolves to the created brewery comment.
+ */
 export const createNewBreweryComment: CreateNewBreweryComment = ({
   body,
   breweryPostId,
@@ -47,6 +76,15 @@ export const createNewBreweryComment: CreateNewBreweryComment = ({
   });
 };
 
+/**
+ * Gets all comments for a brewery.
+ *
+ * @param params - The options for getting the comments.
+ * @param params.breweryPostId - The ID of the brewery post.
+ * @param params.pageNum - The page number of the comments.
+ * @param params.pageSize - The number of comments per page.
+ * @returns A promise that resolves to the retrieved brewery comments.
+ */
 export const getAllBreweryComments: GetAllBreweryComments = async ({
   id,
   pageNum,
@@ -67,6 +105,13 @@ export const getAllBreweryComments: GetAllBreweryComments = async ({
   return { comments, count };
 };
 
+/**
+ * Finds a comment for a brewery post by ID.
+ *
+ * @param params - The options for finding the comment.
+ * @param params.breweryCommentId - The ID of the brewery post comment.
+ * @returns A promise that resolves to the found brewery comment.
+ */
 export const getBreweryCommentById: FindDeleteBreweryCommentById = ({
   breweryCommentId,
 }) => {
@@ -76,6 +121,13 @@ export const getBreweryCommentById: FindDeleteBreweryCommentById = ({
   });
 };
 
+/**
+ * Deletes a comment for a brewery post by ID.
+ *
+ * @param params - The options for deleting the comment.
+ * @param params.breweryCommentId - The ID of the brewery post comment.
+ * @returns A promise that resolves to the deleted brewery comment.
+ */
 export const deleteBreweryCommentByIdService: FindDeleteBreweryCommentById = ({
   breweryCommentId,
 }) => {

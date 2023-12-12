@@ -7,6 +7,14 @@ import {
   GetAllBeerPostComments,
 } from './types';
 
+/**
+ * The select object for retrieving beer post comments.
+ *
+ * @example
+ *   const beerPostComments = await DBClient.instance.beerComment.findMany({
+ *     select: beerPostCommentSelect,
+ *   });
+ */
 const beerPostCommentSelect = {
   id: true,
   content: true,
@@ -18,6 +26,17 @@ const beerPostCommentSelect = {
   },
 } as const;
 
+/**
+ * Creates a new comment for a beer post.
+ *
+ * @param params - The options for creating the comment.
+ * @param params.body - The body of the comment.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the beer.
+ * @param params.beerPostId - The ID of the beer post.
+ * @param params.userId - The ID of the user creating the comment.
+ * @returns A promise that resolves to the created beer comment.
+ */
 export const createBeerPostCommentService: CreateBeerPostComment = ({
   body,
   beerPostId,
@@ -35,6 +54,16 @@ export const createBeerPostCommentService: CreateBeerPostComment = ({
   });
 };
 
+/**
+ * Edits a comment for a beer post.
+ *
+ * @param params - The options for editing the comment.
+ * @param params.body - The body of the comment.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the beer.
+ * @param params.beerPostCommentId - The ID of the beer post comment.
+ * @returns A promise that resolves to the updated beer comment.
+ */
 export const editBeerPostCommentByIdService: EditBeerPostCommentById = ({
   beerPostCommentId,
   body,
@@ -47,6 +76,13 @@ export const editBeerPostCommentByIdService: EditBeerPostCommentById = ({
   });
 };
 
+/**
+ * Finds a comment for a beer post by ID.
+ *
+ * @param params - The options for finding the comment.
+ * @param params.beerPostCommentId - The ID of the beer post comment.
+ * @returns A promise that resolves to the found beer comment.
+ */
 export const getBeerPostCommentByIdService: FindOrDeleteBeerPostCommentById = ({
   beerPostCommentId,
 }) => {
@@ -56,6 +92,13 @@ export const getBeerPostCommentByIdService: FindOrDeleteBeerPostCommentById = ({
   });
 };
 
+/**
+ * Deletes a comment for a beer post by ID.
+ *
+ * @param params - The options for deleting the comment.
+ * @param params.beerPostCommentId - The ID of the beer post comment.
+ * @returns A promise that resolves to the deleted beer comment.
+ */
 export const deleteBeerCommentByIdService: FindOrDeleteBeerPostCommentById = ({
   beerPostCommentId,
 }) => {
@@ -65,6 +108,15 @@ export const deleteBeerCommentByIdService: FindOrDeleteBeerPostCommentById = ({
   });
 };
 
+/**
+ * Gets all comments for a beer post.
+ *
+ * @param params - The options for getting the comments.
+ * @param params.beerPostId - The ID of the beer post.
+ * @param params.pageNum - The page number of the comments.
+ * @param params.pageSize - The number of comments per page.
+ * @returns A promise that resolves to the found beer comments.
+ */
 export const getAllBeerCommentsService: GetAllBeerPostComments = async ({
   beerPostId,
   pageNum,
