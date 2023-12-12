@@ -1,16 +1,18 @@
 import ServerError from '@/config/util/ServerError';
-import deleteBeerPostById from '@/services/posts/beer-post/deleteBeerPostById';
-import editBeerPostById from '@/services/posts/beer-post/editBeerPostById';
-import getBeerPostById from '@/services/posts/beer-post/getBeerPostById';
+
+import {
+  getBeerPostById,
+  editBeerPostByIdService,
+  deleteBeerPostByIdService,
+  getBeerRecommendationsService,
+  getAllBeerPostsService,
+  createNewBeerPost,
+  getBeerPostsByPostedByIdService,
+} from '@/services/posts/beer-post';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import { z } from 'zod';
-import getBeerRecommendations from '@/services/posts/beer-post/getBeerRecommendations';
-import getAllBeerPosts from '@/services/posts/beer-post/getAllBeerPosts';
-import DBClient from '@/prisma/DBClient';
-import createNewBeerPost from '@/services/posts/beer-post/createNewBeerPost';
-import getBeerPostsByPostedById from '@/services/posts/beer-post/getBeerPostsByPostedById';
 import {
   BeerPostRequest,
   CreateBeerPostRequest,
@@ -28,7 +30,7 @@ export const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostR
   const { user, query } = req;
   const { id } = query;
 
-  const beerPost = await getBeerPostById(id);
+  const beerPost = await getBeerPostById({ beerPostId: id });
 
   if (!beerPost) {
     throw new ServerError('Beer post not found', 404);
@@ -45,7 +47,7 @@ export const editBeerPost = async (
   req: EditBeerPostRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  await editBeerPostById({ id: req.query.id, data: req.body });
+  await editBeerPostByIdService({ beerPostId: req.query.id, body: req.body });
 
   res.status(200).json({
     message: 'Beer post updated successfully',
@@ -57,7 +59,7 @@ export const editBeerPost = async (
 export const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const deleted = await deleteBeerPostById({ beerPostId: id });
+  const deleted = await deleteBeerPostByIdService({ beerPostId: id });
   if (!deleted) {
     throw new ServerError('Beer post not found', 404);
   }
@@ -75,7 +77,7 @@ export const getBeerPostRecommendations = async (
 ) => {
   const { id } = req.query;
 
-  const beerPost = await getBeerPostById(id);
+  const beerPost = await getBeerPostById({ beerPostId: id });
 
   if (!beerPost) {
     throw new ServerError('Beer post not found', 404);
@@ -84,7 +86,7 @@ export const getBeerPostRecommendations = async (
   const pageNum = parseInt(req.query.page_num as string, 10);
   const pageSize = parseInt(req.query.page_size as string, 10);
 
-  const { count, beerRecommendations } = await getBeerRecommendations({
+  const { beerRecommendations, count } = await getBeerRecommendationsService({
     beerPost,
     pageNum,
     pageSize,
@@ -106,11 +108,9 @@ export const getBeerPosts = async (
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const beerPosts = await getAllBeerPosts({ pageNum, pageSize });
+  const { beerPosts, count } = await getAllBeerPostsService({ pageNum, pageSize });
 
-  const beerPostCount = await DBClient.instance.beerPost.count();
-
-  res.setHeader('X-Total-Count', beerPostCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Beer posts retrieved successfully',
@@ -124,14 +124,14 @@ export const createBeerPost = async (
   req: CreateBeerPostRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { name, description, styleId: typeId, abv, ibu, breweryId } = req.body;
+  const { name, description, styleId, abv, ibu, breweryId } = req.body;
 
   const newBeerPost = await createNewBeerPost({
     name,
     description,
     abv,
     ibu,
-    styleId: typeId,
+    styleId,
     breweryId,
     userId: req.user!.id,
   });
@@ -153,17 +153,13 @@ export const getBeerPostsByUserId = async (
 
   const { id } = req.query;
 
-  const beerPosts = await getBeerPostsByPostedById({
+  const { beerPosts, count } = await getBeerPostsByPostedByIdService({
     pageNum,
     pageSize,
     postedById: id,
   });
 
-  const beerPostCount = await DBClient.instance.beerPost.count({
-    where: { postedBy: { id } },
-  });
-
-  res.setHeader('X-Total-Count', beerPostCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: `Beer posts by user ${id} fetched successfully`,

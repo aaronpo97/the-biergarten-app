@@ -3,12 +3,12 @@ import Head from 'next/head';
 import React from 'react';
 
 import withPageAuthRequired from '@/util/withPageAuthRequired';
-import getBeerPostById from '@/services/posts/beer-post/getBeerPostById';
 import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import EditBeerPostForm from '@/components/EditBeerPostForm';
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import { BiBeer } from 'react-icons/bi';
 import { z } from 'zod';
+import { getBeerPostById } from '@/services/posts/beer-post';
 
 interface EditPageProps {
   beerPost: z.infer<typeof BeerPostQueryResult>;
@@ -37,7 +37,6 @@ const EditBeerPostPage: NextPage<EditPageProps> = ({ beerPost }) => {
             ibu: beerPost.ibu,
             description: beerPost.description,
             id: beerPost.id,
-            styleId: beerPost.style.id,
           }}
         />
       </FormPageLayout>
@@ -50,7 +49,7 @@ export default EditBeerPostPage;
 export const getServerSideProps = withPageAuthRequired<EditPageProps>(
   async (context, session) => {
     const beerPostId = context.params?.id as string;
-    const beerPost = await getBeerPostById(beerPostId);
+    const beerPost = await getBeerPostById({ beerPostId });
     const { id: userId } = session;
 
     if (!beerPost) {

@@ -13,13 +13,14 @@ export type UpdateBeerStyleCommentById = (args: {
   beerStyleCommentId: string;
 }) => Promise<BeerStyleComment>;
 
-export type GetBeerStyleCommentCount = (args: { beerStyleId: string }) => Promise<number>;
-
 export type GetAllBeerStyleComments = (args: {
   beerStyleId: string;
   pageNum: number;
   pageSize: number;
-}) => Promise<BeerStyleComment[]>;
+}) => Promise<{
+  comments: BeerStyleComment[];
+  count: number;
+}>;
 
 export type CreateNewBeerStyleComment = (args: {
   body: z.infer<typeof CreateCommentValidationSchema>;

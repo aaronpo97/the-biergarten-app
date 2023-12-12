@@ -1,14 +1,15 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
-import getBeerPostById from '@/services/posts/beer-post/getBeerPostById';
-import createBeerPostLike from '@/services/likes/beer-post-like/createBeerPostLike';
-import findBeerPostLikeById from '@/services/likes/beer-post-like/findBeerPostLikeById';
-import getBeerPostLikeCountByBeerPostId from '@/services/likes/beer-post-like/getBeerPostLikeCount';
-import removeBeerPostLikeById from '@/services/likes/beer-post-like/removeBeerPostLikeById';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';
 import { LikeRequest } from '../types';
+import createBeerPostLike from '@/services/likes/beer-post-like/createBeerPostLike';
+import findBeerPostLikeById from '@/services/likes/beer-post-like/findBeerPostLikeById';
+import getBeerPostLikeCountByBeerPostId from '@/services/likes/beer-post-like/getBeerPostLikeCount';
+import removeBeerPostLikeById from '@/services/likes/beer-post-like/removeBeerPostLikeById';
+import { getBeerPostById } from '@/services/posts/beer-post';
 
 export const sendBeerPostLikeRequest = async (
   req: LikeRequest,
@@ -17,7 +18,7 @@ export const sendBeerPostLikeRequest = async (
   const user = req.user!;
   const id = req.query.id as string;
 
-  const beer = await getBeerPostById(id);
+  const beer = await getBeerPostById({ beerPostId: id });
   if (!beer) {
     throw new ServerError('Could not find a beer post with that id', 404);
   }

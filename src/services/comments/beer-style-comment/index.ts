@@ -2,7 +2,6 @@ import DBClient from '@/prisma/DBClient';
 import {
   CreateNewBeerStyleComment,
   GetAllBeerStyleComments,
-  GetBeerStyleCommentCount,
   UpdateBeerStyleCommentById,
   FindOrDeleteBeerStyleCommentById,
 } from './types';
@@ -35,22 +34,24 @@ export const createNewBeerStyleComment: CreateNewBeerStyleComment = ({
   });
 };
 
-export const getAllBeerStyleComments: GetAllBeerStyleComments = ({
+export const getAllBeerStyleComments: GetAllBeerStyleComments = async ({
   beerStyleId,
   pageNum,
   pageSize,
 }) => {
-  return DBClient.instance.beerStyleComment.findMany({
+  const comments = await DBClient.instance.beerStyleComment.findMany({
     skip: (pageNum - 1) * pageSize,
     take: pageSize,
     where: { beerStyleId },
     orderBy: { createdAt: 'desc' },
     select: beerStyleCommentSelect,
   });
-};
 
-export const getBeerStyleCommentCount: GetBeerStyleCommentCount = ({ beerStyleId }) => {
-  return DBClient.instance.beerStyleComment.count({ where: { beerStyleId } });
+  const count = await DBClient.instance.beerStyleComment.count({
+    where: { beerStyleId },
+  });
+
+  return { comments, count };
 };
 
 export const updateBeerStyleCommentById: UpdateBeerStyleCommentById = ({

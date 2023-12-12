@@ -6,12 +6,13 @@ import DBClient from '@/prisma/DBClient';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
 import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
-import getBeerPostsByBeerStyleId from '@/services/posts/beer-post/getBeerPostsByBeerStyleId';
 import getAllBeerStyles from '@/services/posts/beer-style-post/getAllBeerStyles';
 
 import ServerError from '@/config/util/ServerError';
+
 import { CreateBeerStyleRequest, GetBeerStyleByIdRequest } from './types';
 import { GetAllPostsByConnectedPostId, GetAllPostsRequest } from '../types';
+import { getBeerPostsByBeerStyleIdService } from '@/services/posts/beer-post';
 
 export const getBeerStyle = async (
   req: GetBeerStyleByIdRequest,
@@ -36,7 +37,7 @@ export const getAllBeersByBeerStyle = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
-  const beers = await getBeerPostsByBeerStyleId({
+  const beers = await getBeerPostsByBeerStyleIdService({
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
     styleId: id,

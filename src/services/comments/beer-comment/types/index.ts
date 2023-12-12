@@ -19,10 +19,11 @@ export type FindOrDeleteBeerPostCommentById = (args: {
   beerPostCommentId: string;
 }) => Promise<BeerPostComment | null>;
 
-export type GetBeerPostCommentCount = (args: { beerPostId: string }) => Promise<number>;
-
 export type GetAllBeerPostComments = (args: {
   beerPostId: string;
   pageNum: number;
   pageSize: number;
-}) => Promise<BeerPostComment[]>;
+}) => Promise<{
+  comments: BeerPostComment[];
+  count: number;
+}>;

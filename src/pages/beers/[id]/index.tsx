@@ -1,6 +1,5 @@
 import { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
-import getBeerPostById from '@/services/posts/beer-post/getBeerPostById';
 
 import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 
@@ -12,6 +11,7 @@ import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 import { CldImage } from 'next-cloudinary';
+import { getBeerPostById } from '@/services/posts/beer-post';
 
 const [BeerInfoHeader, BeerPostCommentsSection, BeerRecommendations] = [
   dynamic(() => import('@/components/BeerById/BeerInfoHeader')),
@@ -100,7 +100,9 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<BeerPageProps> = async (context) => {
-  const beerPost = await getBeerPostById(context.params!.id! as string);
+  const beerPost = await getBeerPostById({
+    beerPostId: context.params?.id as string,
+  });
 
   if (!beerPost) {
     return { notFound: true };

@@ -3,7 +3,6 @@ import {
   CreateNewBreweryComment,
   FindDeleteBreweryCommentById,
   GetAllBreweryComments,
-  GetBreweryCommentCount,
   UpdateBreweryCommentById,
 } from './types';
 
@@ -48,18 +47,24 @@ export const createNewBreweryComment: CreateNewBreweryComment = ({
   });
 };
 
-export const getAllBreweryComments: GetAllBreweryComments = ({
+export const getAllBreweryComments: GetAllBreweryComments = async ({
   id,
   pageNum,
   pageSize,
 }) => {
-  return DBClient.instance.breweryComment.findMany({
+  const comments = await DBClient.instance.breweryComment.findMany({
     skip: (pageNum - 1) * pageSize,
     take: pageSize,
     where: { breweryPostId: id },
     select: breweryCommentSelect,
     orderBy: { createdAt: 'desc' },
   });
+
+  const count = await DBClient.instance.breweryComment.count({
+    where: { breweryPostId: id },
+  });
+
+  return { comments, count };
 };
 
 export const getBreweryCommentById: FindDeleteBreweryCommentById = ({
@@ -78,8 +83,4 @@ export const deleteBreweryCommentByIdService: FindDeleteBreweryCommentById = ({
     where: { id: breweryCommentId },
     select: breweryCommentSelect,
   });
-};
-
-export const getBreweryCommentCount: GetBreweryCommentCount = ({ breweryPostId }) => {
-  return DBClient.instance.breweryComment.count({ where: { breweryPostId } });
 };

@@ -1,6 +1,4 @@
 import ServerError from '@/config/util/ServerError';
-import DBClient from '@/prisma/DBClient';
-
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
@@ -103,14 +101,10 @@ export const getAll = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
-  const comments = await getAllBeerStyleComments({
+  const { comments, count } = await getAllBeerStyleComments({
     beerStyleId,
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
-  });
-
-  const count = await DBClient.instance.beerStyleComment.count({
-    where: { beerStyleId },
   });
 
   res.setHeader('X-Total-Count', count);

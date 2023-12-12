@@ -20,12 +20,11 @@ const sendEditBeerPostRequest = async ({
   ibu,
   id,
   name,
-  styleId,
 }: z.infer<typeof EditBeerPostValidationSchema>) => {
   const response = await fetch(`/api/beers/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ abv, description, ibu, name, styleId, id }),
+    body: JSON.stringify({ abv, description, ibu, name, id }),
   });
 
   if (!response.ok) {

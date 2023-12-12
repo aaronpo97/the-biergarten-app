@@ -10,7 +10,6 @@ import {
   getAllBreweryComments,
   deleteBreweryCommentByIdService,
   updateBreweryCommentById,
-  getBreweryCommentCount,
 } from '@/services/comments/brewery-comment';
 
 import {
@@ -70,7 +69,7 @@ export const deleteBreweryPostComment = async (
 
   res.status(200).json({
     success: true,
-    message: 'Comment deleted successfully',
+    message: 'Brewery comment deleted successfully',
     statusCode: 200,
   });
 };
@@ -90,7 +89,7 @@ export const createComment = async (
   });
 
   res.status(201).json({
-    message: 'Beer comment created successfully',
+    message: 'Brewery comment created successfully',
     statusCode: 201,
     payload: newBreweryComment,
     success: true,
@@ -105,18 +104,16 @@ export const getAll = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
-  const comments = await getAllBreweryComments({
+  const { comments, count } = await getAllBreweryComments({
     id: breweryPostId,
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
   });
 
-  const count = await getBreweryCommentCount({ breweryPostId });
-
   res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
-    message: 'Beer comments fetched successfully',
+    message: 'Brewery comments fetched successfully',
     statusCode: 200,
     payload: comments,
     success: true,

@@ -11,7 +11,6 @@ import {
   createBeerPostCommentService,
   getAllBeerCommentsService,
   deleteBeerCommentByIdService,
-  getBeerPostCommentCountService,
 } from '@/services/comments/beer-comment';
 
 import {
@@ -98,13 +97,11 @@ export const getAllBeerPostComments = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
-  const comments = await getAllBeerCommentsService({
+  const { comments, count } = await getAllBeerCommentsService({
     beerPostId,
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
   });
-
-  const count = await getBeerPostCommentCountService({ beerPostId });
 
   res.setHeader('X-Total-Count', count);
 

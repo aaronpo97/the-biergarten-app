@@ -20,10 +20,8 @@ export type GetAllBreweryComments = (args: {
   id: string;
   pageNum: number;
   pageSize: number;
-}) => Promise<BreweryComment[]>;
+}) => Promise<{ comments: BreweryComment[]; count: number }>;
 
 export type FindDeleteBreweryCommentById = (args: {
   breweryCommentId: string;
 }) => Promise<BreweryComment | null>;
-
-export type GetBreweryCommentCount = (args: { breweryPostId: string }) => Promise<number>;

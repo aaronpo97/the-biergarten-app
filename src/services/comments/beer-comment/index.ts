@@ -5,7 +5,6 @@ import {
   EditBeerPostCommentById,
   FindOrDeleteBeerPostCommentById,
   GetAllBeerPostComments,
-  GetBeerPostCommentCount,
 } from './types';
 
 const beerPostCommentSelect = {
@@ -66,22 +65,20 @@ export const deleteBeerCommentByIdService: FindOrDeleteBeerPostCommentById = ({
   });
 };
 
-export const getAllBeerCommentsService: GetAllBeerPostComments = ({
+export const getAllBeerCommentsService: GetAllBeerPostComments = async ({
   beerPostId,
   pageNum,
   pageSize,
 }) => {
-  return DBClient.instance.beerComment.findMany({
+  const comments = await DBClient.instance.beerComment.findMany({
     skip: (pageNum - 1) * pageSize,
     take: pageSize,
     where: { beerPostId },
     orderBy: { createdAt: 'desc' },
     select: beerPostCommentSelect,
   });
-};
 
-export const getBeerPostCommentCountService: GetBeerPostCommentCount = ({
-  beerPostId,
-}) => {
-  return DBClient.instance.beerComment.count({ where: { beerPostId } });
+  const count = await DBClient.instance.beerComment.count({ where: { beerPostId } });
+
+  return { comments, count };
 };
