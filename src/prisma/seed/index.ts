@@ -20,6 +20,7 @@ import createNewBeerStyleComments from './create/createNewBeerStyleComments';
 import createNewBeerStyleLikes from './create/createNewBeerStyleLikes';
 import createNewUserAvatars from './create/createNewUserAvatars';
 import createNewUserFollows from './create/createNewUserFollows';
+import clearCloudinaryStorage from './clear/clearCloudinaryStorage';
 
 (async () => {
   try {
@@ -27,6 +28,7 @@ import createNewUserFollows from './create/createNewUserFollows';
 
     logger.info('Clearing database.');
     await clearDatabase();
+    await clearCloudinaryStorage();
     logger.info('Database cleared successfully, preparing to seed.');
 
     await createAdminUser();

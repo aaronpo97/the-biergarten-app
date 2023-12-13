@@ -10,9 +10,9 @@ import getAllBeerStyles from '@/services/posts/beer-style-post/getAllBeerStyles'
 
 import ServerError from '@/config/util/ServerError';
 
+import { getBeerPostsByBeerStyleIdService } from '@/services/posts/beer-post';
 import { CreateBeerStyleRequest, GetBeerStyleByIdRequest } from './types';
 import { GetAllPostsByConnectedPostId, GetAllPostsRequest } from '../types';
-import { getBeerPostsByBeerStyleIdService } from '@/services/posts/beer-post';
 
 export const getBeerStyle = async (
   req: GetBeerStyleByIdRequest,

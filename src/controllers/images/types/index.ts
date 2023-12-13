@@ -7,3 +7,7 @@ export interface UploadImagesRequest extends UserExtendedNextApiRequest {
   query: { id: string };
   body: z.infer<typeof ImageMetadataValidationSchema>;
 }
+
+export interface DeleteImageRequest extends UserExtendedNextApiRequest {
+  query: { id: string };
+}

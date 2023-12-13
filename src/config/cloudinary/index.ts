@@ -4,6 +4,7 @@ import {
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_KEY,
   CLOUDINARY_SECRET,
+  NODE_ENV,
 } from '../env';
 import CloudinaryStorage from './CloudinaryStorage';
 
@@ -14,6 +15,9 @@ cloudinary.config({
 });
 
 /** Cloudinary storage instance. */
-const storage = new CloudinaryStorage({ cloudinary, params: { folder: 'biergarten' } });
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: NODE_ENV === 'production' ? 'biergarten' : 'biergarten-dev' },
+});
 
 export { cloudinary, storage };

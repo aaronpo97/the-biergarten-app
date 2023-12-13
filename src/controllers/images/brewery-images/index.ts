@@ -1,8 +1,9 @@
 import ServerError from '@/config/util/ServerError';
-import addBreweryImageToDB from '@/services/images/brewery-image/addBreweryImageToDB';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
+import { addBreweryImagesToDB } from '@/services/images/brewery-image';
 import { UploadImagesRequest } from '../types';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -16,11 +17,10 @@ export const processBreweryImageData = async (
     throw new ServerError('No images uploaded', 400);
   }
 
-  const breweryImages = await addBreweryImageToDB({
-    alt: body.alt,
-    caption: body.caption,
+  const breweryImages = await addBreweryImagesToDB({
     breweryPostId: req.query.id,
     userId: user!.id,
+    body,
     files,
   });
 
