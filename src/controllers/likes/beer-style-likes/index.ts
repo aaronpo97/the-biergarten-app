@@ -1,13 +1,16 @@
 import ServerError from '@/config/util/ServerError';
-import createBeerStyleLike from '@/services/likes/beer-style-like/createBeerStyleLike';
-import findBeerStyleLikeById from '@/services/likes/beer-style-like/findBeerStyleLikeById';
-import getBeerStyleLikeCount from '@/services/likes/beer-style-like/getBeerStyleLikeCount';
-import removeBeerStyleLikeById from '@/services/likes/beer-style-like/removeBeerStyleLikeById';
+
 import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
+import {
+  createBeerStyleLikeService,
+  findBeerStyleLikeService,
+  getBeerStyleLikeCountService,
+  removeBeerStyleLikeService,
+} from '@/services/likes/beer-style-like';
 import { LikeRequest } from '../types';
 
 export const sendBeerStyleLikeRequest = async (
@@ -22,20 +25,20 @@ export const sendBeerStyleLikeRequest = async (
     throw new ServerError('Could not find a beer style with that id.', 404);
   }
 
-  const beerStyleLike = await findBeerStyleLikeById({
+  const beerStyleLike = await findBeerStyleLikeService({
     beerStyleId: beerStyle.id,
     likedById: user.id,
   });
 
   if (beerStyleLike) {
-    await removeBeerStyleLikeById({ beerStyleLikeId: beerStyleLike.id });
+    await removeBeerStyleLikeService({ beerStyleLikeId: beerStyleLike.id });
     res.status(200).json({
       message: 'Successfully unliked beer style.',
       success: true,
       statusCode: 200,
     });
   } else {
-    await createBeerStyleLike({ beerStyleId: beerStyle.id, user });
+    await createBeerStyleLikeService({ beerStyleId: beerStyle.id, likedById: user.id });
     res.status(200).json({
       message: 'Successfully liked beer style.',
       success: true,
@@ -49,7 +52,7 @@ export const getBeerStyleLikeCountRequest = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const id = req.query.id as string;
-  const likeCount = await getBeerStyleLikeCount({ beerStyleId: id });
+  const likeCount = await getBeerStyleLikeCountService({ beerStyleId: id });
 
   res.status(200).json({
     success: true,
@@ -66,7 +69,10 @@ export const checkIfBeerStyleIsLiked = async (
   const user = req.user!;
   const beerStyleId = req.query.id as string;
 
-  const alreadyLiked = await findBeerStyleLikeById({ beerStyleId, likedById: user.id });
+  const alreadyLiked = await findBeerStyleLikeService({
+    beerStyleId,
+    likedById: user.id,
+  });
   res.status(200).json({
     success: true,
     message: alreadyLiked ? 'Beer style is liked.' : 'Beer style is not liked.',

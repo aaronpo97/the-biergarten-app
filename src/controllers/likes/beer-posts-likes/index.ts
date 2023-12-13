@@ -4,11 +4,14 @@ import ServerError from '@/config/util/ServerError';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';
-import createBeerPostLike from '@/services/likes/beer-post-like/createBeerPostLike';
-import findBeerPostLikeById from '@/services/likes/beer-post-like/findBeerPostLikeById';
-import getBeerPostLikeCountByBeerPostId from '@/services/likes/beer-post-like/getBeerPostLikeCount';
-import removeBeerPostLikeById from '@/services/likes/beer-post-like/removeBeerPostLikeById';
+
 import { getBeerPostById } from '@/services/posts/beer-post';
+import {
+  findBeerPostLikeByIdService,
+  createBeerPostLikeService,
+  removeBeerPostLikeService,
+  getBeerPostLikeCountService,
+} from '@/services/likes/beer-post-like';
 import { LikeRequest } from '../types';
 
 export const sendBeerPostLikeRequest = async (
@@ -23,26 +26,30 @@ export const sendBeerPostLikeRequest = async (
     throw new ServerError('Could not find a beer post with that id.', 404);
   }
 
-  const alreadyLiked = await findBeerPostLikeById({
+  const liked = await findBeerPostLikeByIdService({
     beerPostId: beer.id,
     likedById: user.id,
   });
 
-  const jsonResponse = {
-    success: true as const,
-    message: '',
-    statusCode: 200 as const,
-  };
+  if (liked) {
+    await removeBeerPostLikeService({ beerPostLikeId: liked.id });
+    res.status(200).json({
+      success: true,
+      message: 'Successfully unliked beer post.',
+      statusCode: 200,
+      payload: { liked: false },
+    });
 
-  if (alreadyLiked) {
-    await removeBeerPostLikeById({ beerLikeId: alreadyLiked.id });
-    jsonResponse.message = 'Successfully unliked beer post';
-  } else {
-    await createBeerPostLike({ id, user });
-    jsonResponse.message = 'Successfully liked beer post';
+    return;
   }
 
-  res.status(200).json(jsonResponse);
+  await createBeerPostLikeService({ beerPostId: beer.id, likedById: user.id });
+  res.status(200).json({
+    success: true,
+    message: 'Successfully liked beer post.',
+    statusCode: 200,
+    payload: { liked: true },
+  });
 };
 
 export const getBeerPostLikeCount = async (
@@ -51,7 +58,7 @@ export const getBeerPostLikeCount = async (
 ) => {
   const id = req.query.id as string;
 
-  const likeCount = await getBeerPostLikeCountByBeerPostId({ beerPostId: id });
+  const likeCount = await getBeerPostLikeCountService({ beerPostId: id });
 
   res.status(200).json({
     success: true,
@@ -68,7 +75,10 @@ export const checkIfBeerPostIsLiked = async (
   const user = req.user!;
   const beerPostId = req.query.id as string;
 
-  const alreadyLiked = await findBeerPostLikeById({ beerPostId, likedById: user.id });
+  const alreadyLiked = await findBeerPostLikeByIdService({
+    beerPostId,
+    likedById: user.id,
+  });
 
   res.status(200).json({
     success: true,

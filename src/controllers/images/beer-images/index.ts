@@ -1,7 +1,7 @@
 import ServerError from '@/config/util/ServerError';
 import {
-  addBeerImagesToDB,
-  deleteBeerImageFromDBAndStorage,
+  addBeerImagesService,
+  deleteBeerImageService,
 } from '@/services/images/beer-image';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
@@ -19,7 +19,7 @@ export const processBeerImageData = async (
     throw new ServerError('No images uploaded', 400);
   }
 
-  const beerImages = await addBeerImagesToDB({
+  const beerImages = await addBeerImagesService({
     beerPostId: req.query.id,
     userId: user!.id,
     body,
@@ -41,7 +41,7 @@ export const deleteBeerImageData = async (
 ) => {
   const { id } = req.query;
 
-  await deleteBeerImageFromDBAndStorage({ beerImageId: id });
+  await deleteBeerImageService({ beerImageId: id });
 
   res.status(200).json({
     success: true,

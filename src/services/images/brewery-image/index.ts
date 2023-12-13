@@ -20,7 +20,7 @@ import {
  * @returns A promise that resolves to an array of created brewery images.
  */
 
-export const addBreweryImagesToDB: AddBreweryImagesToDB = ({
+export const addBreweryImagesService: AddBreweryImagesToDB = ({
   body,
   files,
   breweryPostId,
@@ -52,15 +52,16 @@ export const addBreweryImagesToDB: AddBreweryImagesToDB = ({
  * @param options - The options for deleting a brewery image.
  * @param options.breweryImageId - The ID of the brewery image.
  */
-export const deleteBreweryImageFromDBAndStorage: DeleteBreweryImageFromDBAndStorage =
-  async ({ breweryImageId }) => {
-    const deleted = await DBClient.instance.breweryImage.delete({
-      where: { id: breweryImageId },
-      select: { path: true, id: true },
-    });
-    const { path } = deleted;
-    await cloudinary.uploader.destroy(path);
-  };
+export const deleteBreweryImageService: DeleteBreweryImageFromDBAndStorage = async ({
+  breweryImageId,
+}) => {
+  const deleted = await DBClient.instance.breweryImage.delete({
+    where: { id: breweryImageId },
+    select: { path: true, id: true },
+  });
+  const { path } = deleted;
+  await cloudinary.uploader.destroy(path);
+};
 
 /**
  * Updates the brewery image metadata in the database.
@@ -72,7 +73,7 @@ export const deleteBreweryImageFromDBAndStorage: DeleteBreweryImageFromDBAndStor
  * @param options.body.caption - The caption for the brewery image.
  * @returns A promise that resolves to the updated brewery image.
  */
-export const updateBreweryImageMetadata: UpdateBreweryImageMetadata = async ({
+export const updateBreweryImageService: UpdateBreweryImageMetadata = async ({
   breweryImageId,
   body,
 }) => {

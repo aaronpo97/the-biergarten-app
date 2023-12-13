@@ -19,7 +19,7 @@ import {
  * @param options.userId - The ID of the user.
  * @returns A promise that resolves to an array of created beer images.
  */
-export const addBeerImagesToDB: AddBeerImagesToDB = ({
+export const addBeerImagesService: AddBeerImagesToDB = ({
   body,
   files,
   beerPostId,
@@ -51,7 +51,7 @@ export const addBeerImagesToDB: AddBeerImagesToDB = ({
  * @param options - The options for deleting a beer image.
  * @param options.beerImageId - The ID of the beer image.
  */
-export const deleteBeerImageFromDBAndStorage: DeleteBeerImageFromDBAndStorage = async ({
+export const deleteBeerImageService: DeleteBeerImageFromDBAndStorage = async ({
   beerImageId,
 }) => {
   const deleted = await DBClient.instance.beerImage.delete({
@@ -73,7 +73,7 @@ export const deleteBeerImageFromDBAndStorage: DeleteBeerImageFromDBAndStorage = 
  * @returns A promise that resolves to the updated beer image.
  */
 
-export const updateBeerImageMetadata: UpdateBeerImageMetadata = async ({
+export const updateBeerImageService: UpdateBeerImageMetadata = async ({
   beerImageId,
   body,
 }) => {
