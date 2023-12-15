@@ -8,7 +8,7 @@ import { BeerStyle } from '@prisma/client';
 import { NextPage } from 'next';
 import { BiBeer } from 'react-icons/bi';
 import { z } from 'zod';
-import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
+import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
 
 interface CreateBeerPageProps {
   brewery: z.infer<typeof BreweryPostQueryResult>;
@@ -32,7 +32,7 @@ export const getServerSideProps = withPageAuthRequired<CreateBeerPageProps>(
   async (context) => {
     const id = context.params?.id as string;
 
-    const breweryPost = await getBreweryPostById(id);
+    const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
     const beerStyles = await DBClient.instance.beerStyle.findMany();
 
     return {

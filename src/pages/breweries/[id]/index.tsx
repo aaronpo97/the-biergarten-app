@@ -1,4 +1,3 @@
-import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
 import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { GetServerSideProps, NextPage } from 'next';
 
@@ -13,6 +12,7 @@ import { Tab } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 import { CldImage } from 'next-cloudinary';
+import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
 
 const [BreweryInfoHeader, BreweryBeersSection, BreweryCommentsSection, BreweryPostMap] = [
   dynamic(() => import('@/components/BreweryById/BreweryInfoHeader')),
@@ -114,7 +114,9 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken 
 export const getServerSideProps: GetServerSideProps<BreweryPageProps> = async (
   context,
 ) => {
-  const breweryPost = await getBreweryPostById(context.params!.id! as string);
+  const breweryPost = await getBreweryPostByIdService({
+    breweryPostId: context.params?.id as string,
+  });
   const mapboxToken = MAPBOX_ACCESS_TOKEN;
 
   return !breweryPost

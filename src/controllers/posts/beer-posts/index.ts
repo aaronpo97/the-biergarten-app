@@ -1,5 +1,17 @@
 import ServerError from '@/config/util/ServerError';
 
+import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
+import { NextApiResponse } from 'next';
+import { NextHandler } from 'next-connect';
+import { z } from 'zod';
+import { GetAllPostsByConnectedPostId } from '@/controllers/posts/types';
+import {
+  BeerPostRequest,
+  CreateBeerPostRequest,
+  EditBeerPostRequest,
+  GetAllBeerPostsRequest,
+  GetBeerRecommendationsRequest,
+} from '@/controllers/posts/beer-posts/types';
 import {
   getBeerPostById,
   editBeerPostByIdService,
@@ -9,18 +21,6 @@ import {
   createNewBeerPost,
   getBeerPostsByPostedByIdService,
 } from '@/services/posts/beer-post';
-import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
-import { z } from 'zod';
-import {
-  BeerPostRequest,
-  CreateBeerPostRequest,
-  EditBeerPostRequest,
-  GetAllBeerPostsRequest,
-  GetBeerRecommendationsRequest,
-} from './types';
-import { GetAllPostsByConnectedPostId } from '../types';
 
 export const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostRequest>(
   req: BeerPostRequestType,

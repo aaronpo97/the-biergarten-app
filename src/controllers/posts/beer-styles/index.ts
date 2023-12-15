@@ -1,16 +1,16 @@
 import { NextApiResponse } from 'next';
 
 import { z } from 'zod';
-import DBClient from '@/prisma/DBClient';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
-import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
-import getAllBeerStyles from '@/services/posts/beer-style-post/getAllBeerStyles';
-
-import ServerError from '@/config/util/ServerError';
-
 import { getBeerPostsByBeerStyleIdService } from '@/services/posts/beer-post';
+import {
+  createBeerStyleService,
+  getAllBeerStylesService,
+  getBeerStyleByIdService,
+} from '@/services/posts/beer-style-post';
+
 import { CreateBeerStyleRequest, GetBeerStyleByIdRequest } from './types';
 import { GetAllPostsByConnectedPostId, GetAllPostsRequest } from '../types';
 
@@ -20,7 +20,9 @@ export const getBeerStyle = async (
 ) => {
   const { id } = req.query;
 
-  const beerStyle = await getBeerStyleById(id);
+  const beerStyle = await getBeerStyleByIdService({
+    beerStyleId: id,
+  });
 
   res.status(200).json({
     message: 'Beer style retrieved successfully.',
@@ -37,20 +39,18 @@ export const getAllBeersByBeerStyle = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num, id } = req.query;
 
-  const beers = await getBeerPostsByBeerStyleIdService({
+  const { beerPosts, count } = await getBeerPostsByBeerStyleIdService({
     pageNum: parseInt(page_num, 10),
     pageSize: parseInt(page_size, 10),
     styleId: id,
   });
-
-  const count = await DBClient.instance.beerPost.count({ where: { styleId: id } });
 
   res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: `Beers with style id ${id} retrieved successfully.`,
     statusCode: 200,
-    payload: beers,
+    payload: beerPosts,
     success: true,
   });
 };
@@ -62,8 +62,10 @@ export const getBeerStyles = async (
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const beerStyles = await getAllBeerStyles({ pageNum, pageSize });
-  const beerStyleCount = await DBClient.instance.beerStyle.count();
+  const { beerStyles, beerStyleCount } = await getAllBeerStylesService({
+    pageNum,
+    pageSize,
+  });
 
   res.setHeader('X-Total-Count', beerStyleCount);
 
@@ -83,23 +85,14 @@ export const createBeerStyle = async (
 
   const user = req.user!;
 
-  const glassware = await DBClient.instance.glassware.findUnique({
-    where: { id: glasswareId },
-    select: { id: true },
-  });
-
-  if (!glassware) {
-    throw new ServerError('Glassware not found.', 404);
-  }
-
-  const beerStyle = await DBClient.instance.beerStyle.create({
-    data: {
+  const beerStyle = await createBeerStyleService({
+    glasswareId,
+    postedById: user.id,
+    body: {
       abvRange,
       description,
-      glassware: { connect: { id: glasswareId } },
       ibuRange,
       name,
-      postedBy: { connect: { id: user.id } },
     },
   });
 

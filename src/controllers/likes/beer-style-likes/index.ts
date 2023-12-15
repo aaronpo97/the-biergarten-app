@@ -1,6 +1,5 @@
 import ServerError from '@/config/util/ServerError';
 
-import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';
@@ -11,6 +10,7 @@ import {
   getBeerStyleLikeCountService,
   removeBeerStyleLikeService,
 } from '@/services/likes/beer-style-like';
+import { getBeerStyleByIdService } from '@/services/posts/beer-style-post';
 import { LikeRequest } from '../types';
 
 export const sendBeerStyleLikeRequest = async (
@@ -20,7 +20,7 @@ export const sendBeerStyleLikeRequest = async (
   const user = req.user!;
   const { id } = req.query;
 
-  const beerStyle = await getBeerStyleById(id);
+  const beerStyle = await getBeerStyleByIdService({ beerStyleId: id });
   if (!beerStyle) {
     throw new ServerError('Could not find a beer style with that id.', 404);
   }

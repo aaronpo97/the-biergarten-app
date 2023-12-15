@@ -5,7 +5,8 @@ import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import FormSegment from '@/components/ui/forms/FormSegment';
 import FormTextArea from '@/components/ui/forms/FormTextArea';
 import FormTextInput from '@/components/ui/forms/FormTextInput';
-import getBreweryPostById from '@/services/posts/brewery-post/getBreweryPostById';
+import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
+
 import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import EditBreweryPostValidationSchema from '@/services/posts/brewery-post/schema/EditBreweryPostValidationSchema';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
@@ -143,7 +144,7 @@ export default EditBreweryPostPage;
 export const getServerSideProps = withPageAuthRequired<EditPageProps>(
   async (context, session) => {
     const breweryPostId = context.params?.id as string;
-    const breweryPost = await getBreweryPostById(breweryPostId);
+    const breweryPost = await getBreweryPostByIdService({ breweryPostId });
 
     const { id: userId } = session;
 

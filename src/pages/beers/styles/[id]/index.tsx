@@ -5,11 +5,12 @@ import { z } from 'zod';
 
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import { Tab } from '@headlessui/react';
-import getBeerStyleById from '@/services/posts/beer-style-post/getBeerStyleById';
+
 import BeerStyleHeader from '@/components/BeerStyleById/BeerStyleHeader';
 import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import BeerStyleCommentSection from '@/components/BeerStyleById/BeerStyleCommentSection';
 import BeerStyleBeerSection from '@/components/BeerStyleById/BeerStyleBeerSection';
+import { getBeerStyleByIdService } from '@/services/posts/beer-style-post';
 
 interface BeerStylePageProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -69,7 +70,7 @@ export default BeerStyleByIdPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const id = params!.id as string;
-  const beerStyle = await getBeerStyleById(id);
+  const beerStyle = await getBeerStyleByIdService({ beerStyleId: id });
   if (!beerStyle) {
     return { notFound: true };
   }

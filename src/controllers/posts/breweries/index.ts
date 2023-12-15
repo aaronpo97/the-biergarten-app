@@ -1,15 +1,27 @@
-import DBClient from '@/prisma/DBClient';
-import getAllBreweryPostsByPostedById from '@/services/posts/brewery-post/getAllBreweryPostsByPostedById';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';
-import getAllBreweryPosts from '@/services/posts/brewery-post/getAllBreweryPosts';
-import createNewBreweryPost from '@/services/posts/brewery-post/createNewBreweryPost';
+
 import geocode from '@/config/mapbox/geocoder';
 import ServerError from '@/config/util/ServerError';
-import BreweryPostMapQueryResult from '@/services/posts/brewery-post/schema/BreweryPostMapQueryResult';
-import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
-import { CreateBreweryPostRequest, GetBreweryPostsRequest } from './types';
+
+import {
+  getAllBreweryPostsByPostedByIdService,
+  getAllBreweryPostsService,
+  createNewBreweryPostService,
+  createBreweryPostLocationService,
+  getMapBreweryPostsService,
+  getBreweryPostByIdService,
+} from '@/services/posts/brewery-post';
+import { getBeerPostsByBreweryIdService } from '@/services/posts/beer-post';
+import { NextHandler } from 'next-connect';
+import DBClient from '@/prisma/DBClient';
+import {
+  BreweryPostRequest,
+  CreateBreweryPostRequest,
+  EditBreweryPostRequest,
+  GetBreweryPostsRequest,
+} from './types';
 import { GetAllPostsByConnectedPostId } from '../types';
 
 export const getBreweryPostsByUserId = async (
@@ -21,17 +33,13 @@ export const getBreweryPostsByUserId = async (
 
   const { id } = req.query;
 
-  const breweryPosts = await getAllBreweryPostsByPostedById({
+  const { breweryPosts, count } = await getAllBreweryPostsByPostedByIdService({
     pageNum,
     pageSize,
     postedById: id,
   });
 
-  const breweryPostCount = await DBClient.instance.breweryPost.count({
-    where: { postedBy: { id } },
-  });
-
-  res.setHeader('X-Total-Count', breweryPostCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: `Brewery posts by user ${id} fetched successfully`,
@@ -48,10 +56,9 @@ export const getBreweryPosts = async (
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const breweryPosts = await getAllBreweryPosts({ pageNum, pageSize });
-  const breweryPostCount = await DBClient.instance.breweryPost.count();
+  const { breweryPosts, count } = await getAllBreweryPostsService({ pageNum, pageSize });
 
-  res.setHeader('X-Total-Count', breweryPostCount);
+  res.setHeader('X-Total-Count', count);
   res.status(200).json({
     message: 'Brewery posts retrieved successfully',
     statusCode: 200,
@@ -77,19 +84,18 @@ export const createBreweryPost = async (
 
   const [latitude, longitude] = geocoded.center;
 
-  const location = await DBClient.instance.breweryLocation.create({
-    data: {
+  const location = await createBreweryPostLocationService({
+    body: {
       address,
       city,
       country,
       stateOrProvince: region,
       coordinates: [latitude, longitude],
-      postedBy: { connect: { id: userId } },
     },
-    select: { id: true },
+    postedById: userId,
   });
 
-  const newBreweryPost = await createNewBreweryPost({
+  const newBreweryPost = await createNewBreweryPostService({
     name,
     description,
     locationId: location.id,
@@ -112,24 +118,12 @@ export const getMapBreweryPosts = async (
   const pageNum = parseInt(req.query.page_num, 10);
   const pageSize = parseInt(req.query.page_size, 10);
 
-  const skip = (pageNum - 1) * pageSize;
-  const take = pageSize;
+  const { breweryPosts, count } = await getMapBreweryPostsService({
+    pageNum,
+    pageSize,
+  });
 
-  const breweryPosts: z.infer<typeof BreweryPostMapQueryResult>[] =
-    await DBClient.instance.breweryPost.findMany({
-      select: {
-        location: {
-          select: { coordinates: true, city: true, country: true, stateOrProvince: true },
-        },
-        id: true,
-        name: true,
-      },
-      skip,
-      take,
-    });
-  const breweryPostCount = await DBClient.instance.breweryPost.count();
-
-  res.setHeader('X-Total-Count', breweryPostCount);
+  res.setHeader('X-Total-Count', count);
 
   res.status(200).json({
     message: 'Brewery posts retrieved successfully',
@@ -149,37 +143,10 @@ export const getAllBeersByBrewery = async (
   const pageNum = parseInt(page_num, 10);
   const pageSize = parseInt(page_size, 10);
 
-  const beers: z.infer<typeof BeerPostQueryResult>[] =
-    await DBClient.instance.beerPost.findMany({
-      where: { breweryId: id },
-      skip: (pageNum - 1) * pageSize,
-      take: pageSize,
-      select: {
-        id: true,
-        name: true,
-        ibu: true,
-        abv: true,
-        createdAt: true,
-        updatedAt: true,
-        description: true,
-        postedBy: { select: { username: true, id: true } },
-        brewery: { select: { name: true, id: true } },
-        style: { select: { name: true, id: true, description: true } },
-        beerImages: {
-          select: {
-            alt: true,
-            path: true,
-            caption: true,
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        },
-      },
-    });
-
-  const count = await DBClient.instance.beerPost.count({
-    where: { breweryId: id },
+  const { beerPosts, count } = await getBeerPostsByBreweryIdService({
+    pageNum,
+    pageSize,
+    breweryId: id,
   });
 
   res.setHeader('X-Total-Count', count);
@@ -187,7 +154,69 @@ export const getAllBeersByBrewery = async (
   res.status(200).json({
     message: 'Beers fetched successfully',
     statusCode: 200,
-    payload: beers,
+    payload: beerPosts,
     success: true,
+  });
+};
+
+export const checkIfBreweryPostOwner = async (
+  req: BreweryPostRequest,
+  res: NextApiResponse,
+  next: NextHandler,
+) => {
+  const user = req.user!;
+  const { id } = req.query;
+
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
+  if (!breweryPost) {
+    throw new ServerError('Brewery post not found', 404);
+  }
+
+  if (breweryPost.postedBy.id !== user.id) {
+    throw new ServerError('You are not the owner of this brewery post', 403);
+  }
+
+  return next();
+};
+
+export const editBreweryPost = async (
+  req: EditBreweryPostRequest,
+  res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
+) => {
+  const {
+    body,
+    query: { id },
+  } = req;
+
+  await DBClient.instance.breweryPost.update({
+    where: { id },
+    data: body,
+  });
+
+  res.status(200).json({
+    message: 'Brewery post updated successfully',
+    success: true,
+    statusCode: 200,
+  });
+};
+
+export const deleteBreweryPost = async (
+  req: BreweryPostRequest,
+  res: NextApiResponse,
+) => {
+  const {
+    query: { id },
+  } = req;
+
+  const deleted = await DBClient.instance.breweryPost.delete({ where: { id } });
+
+  if (!deleted) {
+    throw new ServerError('Brewery post not found', 404);
+  }
+
+  res.status(200).json({
+    message: 'Brewery post deleted successfully',
+    success: true,
+    statusCode: 200,
   });
 };
