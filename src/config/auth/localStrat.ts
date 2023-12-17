@@ -1,11 +1,11 @@
-import findUserByUsername from '@/services/users/auth/findUserByUsername';
 import Local from 'passport-local';
+import { findUserByUsername } from '@/services/users/auth';
 import ServerError from '../util/ServerError';
 import { validatePassword } from './passwordFns';
 
 const localStrat = new Local.Strategy(async (username, password, done) => {
   try {
-    const user = await findUserByUsername(username);
+    const user = await findUserByUsername({ username });
     if (!user) {
       throw new ServerError('Username or password is incorrect.', 401);
     }

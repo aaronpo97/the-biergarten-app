@@ -3,24 +3,33 @@ import localStrat from '@/config/auth/localStrat';
 import { getLoginSession, setLoginSession } from '@/config/auth/session';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
-import createNewUser from '@/services/users/auth/createNewUser';
-import findUserByEmail from '@/services/users/auth/findUserByEmail';
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { expressWrapper } from 'next-connect';
 import passport from 'passport';
 import { z } from 'zod';
 
-import findUserByUsername from '@/services/users/auth/findUserByUsername';
 import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
-import sendConfirmationEmail from '@/services/users/auth/sendConfirmationEmail';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import type { NextFunction } from 'express';
 import { verifyConfirmationToken } from '@/config/jwt';
-import updateUserToBeConfirmedById from '@/services/users/auth/updateUserToBeConfirmedById';
-import DBClient from '@/prisma/DBClient';
-import sendResetPasswordEmail from '@/services/users/auth/sendResetPasswordEmail';
+
 import { hashPassword } from '@/config/auth/passwordFns';
-import deleteUserById from '@/services/users/auth/deleteUserById';
+
+import {
+  createNewUser,
+  deleteUserById,
+  findUserByEmail,
+  findUserByUsername,
+  sendConfirmationEmail,
+  sendResetPasswordEmail,
+  updateUserById,
+  updateUserPassword,
+  updateUserToBeConfirmedById,
+} from '@/services/users/auth';
+
+import { EditUserRequest, UserRouteRequest } from '@/controllers/users/profile/types';
 import {
   CheckEmailRequest,
   CheckUsernameRequest,
@@ -29,7 +38,6 @@ import {
   TokenValidationRequest,
   UpdatePasswordRequest,
 } from './types';
-import { EditUserRequest, UserRouteRequest } from '../profile/types';
 
 export const authenticateUser = expressWrapper(
   async (
@@ -88,10 +96,12 @@ export const registerUser = async (
   req: RegisterUserRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const [usernameTaken, emailTaken] = await Promise.all([
-    findUserByUsername(req.body.username),
-    findUserByEmail(req.body.email),
-  ]);
+  const [usernameTaken, emailTaken] = (
+    await Promise.all([
+      findUserByUsername({ username: req.body.username }),
+      findUserByEmail({ email: req.body.email }),
+    ])
+  ).map((user) => !!user);
 
   if (usernameTaken) {
     throw new ServerError(
@@ -114,7 +124,11 @@ export const registerUser = async (
     username: user.username,
   });
 
-  await sendConfirmationEmail(user);
+  await sendConfirmationEmail({
+    email: user.email,
+    username: user.username,
+    userId: user.id,
+  });
 
   res.status(201).json({
     success: true,
@@ -141,7 +155,7 @@ export const confirmUser = async (
     throw new ServerError('Could not confirm user.', 401);
   }
 
-  await updateUserToBeConfirmedById(id);
+  await updateUserToBeConfirmedById({ userId: id });
 
   res.status(200).json({
     message: 'User confirmed successfully.',
@@ -156,12 +170,14 @@ export const resetPassword = async (
 ) => {
   const { email } = req.body;
 
-  const user = await DBClient.instance.user.findUnique({
-    where: { email },
-  });
+  const user = await findUserByEmail({ email });
 
   if (user) {
-    await sendResetPasswordEmail(user);
+    await sendResetPasswordEmail({
+      email: user.email,
+      username: user.username,
+      userId: user.id,
+    });
   }
 
   res.status(200).json({
@@ -188,7 +204,7 @@ export const sendCurrentUser = async (
 export const checkEmail = async (req: CheckEmailRequest, res: NextApiResponse) => {
   const { email: emailToCheck } = req.query;
 
-  const email = await findUserByEmail(emailToCheck);
+  const email = await findUserByEmail({ email: emailToCheck });
 
   res.json({
     success: true,
@@ -201,7 +217,7 @@ export const checkEmail = async (req: CheckEmailRequest, res: NextApiResponse) =
 export const checkUsername = async (req: CheckUsernameRequest, res: NextApiResponse) => {
   const { username: usernameToCheck } = req.query;
 
-  const username = await findUserByUsername(usernameToCheck);
+  const username = await findUserByUsername({ username: usernameToCheck });
 
   res.json({
     success: true,
@@ -215,14 +231,10 @@ export const updatePassword = async (
   req: UpdatePasswordRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { password } = req.body;
-  const hash = await hashPassword(password);
-
   const user = req.user!;
-  await DBClient.instance.user.update({
-    data: { hash },
-    where: { id: user.id },
-  });
+  const { password } = req.body;
+
+  await updateUserPassword({ userId: user.id, password: await hashPassword(password) });
 
   res.json({
     message: 'Updated user password.',
@@ -237,7 +249,11 @@ export const resendConfirmation = async (
 ) => {
   const user = req.user!;
 
-  await sendConfirmationEmail(user);
+  await sendConfirmationEmail({
+    userId: user.id,
+    username: user.username,
+    email: user.email,
+  });
   res.status(200).json({
     message: `Resent the confirmation email for ${user.username}.`,
     statusCode: 200,
@@ -251,31 +267,9 @@ export const editUserInfo = async (
 ) => {
   const { email, firstName, lastName, username } = req.body;
 
-  const [usernameIsTaken, emailIsTaken] = await Promise.all([
-    findUserByUsername(username),
-    findUserByEmail(email),
-  ]);
-
-  const emailChanged = req.user!.email !== email;
-  const usernameChanged = req.user!.username !== username;
-
-  if (emailIsTaken && emailChanged) {
-    throw new ServerError('Email is already taken', 400);
-  }
-
-  if (usernameIsTaken && usernameChanged) {
-    throw new ServerError('Username is already taken', 400);
-  }
-
-  const updatedUser = await DBClient.instance.user.update({
-    where: { id: req.user!.id },
-    data: {
-      email,
-      firstName,
-      lastName,
-      username,
-      accountIsVerified: emailChanged ? false : undefined,
-    },
+  const updatedUser = await updateUserById({
+    userId: req.user!.id,
+    data: { email, firstName, lastName, username },
   });
 
   res.json({
@@ -291,7 +285,7 @@ export const deleteAccount = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const { id } = req.query;
-  const deletedUser = await deleteUserById(id);
+  const deletedUser = await deleteUserById({ userId: id });
 
   if (!deletedUser) {
     throw new ServerError('Could not find a user with that id.', 400);

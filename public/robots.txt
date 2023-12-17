@@ -3,4 +3,3 @@ Disallow: /api/
 Disallow: /login/
 Disallow: /register/
 Disallow: /users/
-Disallow: /account/

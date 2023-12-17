@@ -3,13 +3,13 @@ import { Tailwind } from '@react-email/tailwind';
 
 import { FC } from 'react';
 
-interface WelcomeEmail {
+interface WelcomeEmailProps {
   subject?: string;
   name?: string;
   url?: string;
 }
 
-const Welcome: FC<WelcomeEmail> = ({ name, url }) => (
+const WelcomeEmail: FC<WelcomeEmailProps> = ({ name, url }) => (
   <Tailwind>
     <Container className="flex h-full w-full flex-col items-center justify-center">
       <Section>
@@ -43,4 +43,4 @@ const Welcome: FC<WelcomeEmail> = ({ name, url }) => (
   </Tailwind>
 );
 
-export default Welcome;
+export default WelcomeEmail;

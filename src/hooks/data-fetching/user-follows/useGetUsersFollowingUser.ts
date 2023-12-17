@@ -1,4 +1,4 @@
-import FollowInfoSchema from '@/services/users/follows/schema/FollowInfoSchema';
+import FollowInfoSchema from '@/services/users/profile/schema/FollowInfoSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';

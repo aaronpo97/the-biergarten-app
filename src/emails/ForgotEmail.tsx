@@ -3,12 +3,12 @@ import { Tailwind } from '@react-email/tailwind';
 
 import { FC } from 'react';
 
-interface ForgotEmailProps {
+interface ResetPasswordEmailProps {
   name?: string;
   url?: string;
 }
 
-const ForgotEmail: FC<ForgotEmailProps> = ({ name, url }) => {
+const ResetPasswordEmail: FC<ResetPasswordEmailProps> = ({ name, url }) => {
   return (
     <Tailwind>
       <Container className="mx-auto">
@@ -36,4 +36,4 @@ const ForgotEmail: FC<ForgotEmailProps> = ({ name, url }) => {
   );
 };
 
-export default ForgotEmail;
+export default ResetPasswordEmail;

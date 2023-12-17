@@ -1,12 +1,13 @@
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
-import DBClient from '@/prisma/DBClient';
+
 import {
   createBreweryPostLikeService,
   findBreweryPostLikeService,
   getBreweryPostLikeCountService,
   removeBreweryPostLikeService,
 } from '@/services/likes/brewery-post-like';
+import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse, NextApiRequest } from 'next';
 import { z } from 'zod';
@@ -18,9 +19,7 @@ export const sendBreweryPostLikeRequest = async (
   const id = req.query.id! as string;
   const user = req.user!;
 
-  const breweryPost = await DBClient.instance.breweryPost.findUnique({
-    where: { id },
-  });
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
 
   if (!breweryPost) {
     throw new ServerError('Could not find a brewery post with that id', 404);
@@ -59,10 +58,7 @@ export const getBreweryPostLikeCount = async (
 ) => {
   const id = req.query.id! as string;
 
-  const breweryPost = await DBClient.instance.breweryPost.findUnique({
-    where: { id },
-  });
-
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
   if (!breweryPost) {
     throw new ServerError('Could not find a brewery post with that id', 404);
   }

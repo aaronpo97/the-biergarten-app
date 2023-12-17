@@ -1,9 +1,10 @@
 import { NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
-import findUserById from '@/services/users/auth/findUserById';
+
 import ServerError from '@/config/util/ServerError';
 import { getLoginSession } from '../../auth/session';
 import { UserExtendedNextApiRequest } from '../../auth/types';
+import { findUserById } from '@/services/users/auth';
 
 /** Get the current user from the session. Adds the user to the request object. */
 const getCurrentUser = async (
@@ -12,7 +13,7 @@ const getCurrentUser = async (
   next: NextHandler,
 ) => {
   const session = await getLoginSession(req);
-  const user = await findUserById(session?.id);
+  const user = await findUserById({ userId: session?.id });
 
   if (!user) {
     throw new ServerError('User is not logged in.', 401);
