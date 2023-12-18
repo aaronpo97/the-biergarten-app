@@ -1,7 +1,7 @@
 import { setLoginSession } from '@/config/auth/session';
 import { verifyResetPasswordToken } from '@/config/jwt';
 import ServerError from '@/config/util/ServerError';
-import { findUserById } from '@/services/users/auth';
+import { findUserByIdService } from '@/services/users/auth';
 
 import { GetServerSideProps, NextApiResponse, NextPage } from 'next';
 
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const { id } = await verifyResetPasswordToken(token as string);
 
-    const user = await findUserById({ userId: id as string });
+    const user = await findUserByIdService({ userId: id as string });
     if (!user) {
       throw new ServerError('User not found', 404);
     }

@@ -7,7 +7,7 @@ import { NextHandler } from 'next-connect';
 
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 
-import { findUserById } from '@/services/users/auth';
+import { findUserByIdService } from '@/services/users/auth';
 
 import {
   createUserFollow,
@@ -32,7 +32,7 @@ export const followUser = async (
 ) => {
   const { id } = req.query;
 
-  const user = await findUserById({ userId: id });
+  const user = await findUserByIdService({ userId: id });
   if (!user) {
     throw new ServerError('User not found', 404);
   }
@@ -70,7 +70,7 @@ export const getUserFollowers = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { id, page_num, page_size } = req.query;
 
-  const user = await findUserById({ userId: id });
+  const user = await findUserByIdService({ userId: id });
   if (!user) {
     throw new ServerError('User not found', 404);
   }
@@ -101,7 +101,7 @@ export const getUsersFollowed = async (
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { id, page_num, page_size } = req.query;
 
-  const user = await findUserById({ userId: id });
+  const user = await findUserByIdService({ userId: id });
   if (!user) {
     throw new ServerError('User not found', 404);
   }
@@ -131,7 +131,7 @@ export const checkIfUserIsFollowedBySessionUser = async (
 ) => {
   const { id } = req.query;
 
-  const user = await findUserById({ userId: id });
+  const user = await findUserByIdService({ userId: id });
   if (!user) {
     throw new ServerError('User not found', 404);
   }
@@ -162,7 +162,7 @@ export const checkIfUserCanEditUser = async (
 ) => {
   const authenticatedUser = req.user!;
 
-  const userToUpdate = await findUserById({ userId: req.query.id });
+  const userToUpdate = await findUserByIdService({ userId: req.query.id });
   if (!userToUpdate) {
     throw new ServerError('User not found', 404);
   }

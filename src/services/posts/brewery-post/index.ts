@@ -7,6 +7,7 @@ import {
   GetAllBreweryPostsByPostedById,
   GetBreweryPostById,
   GetMapBreweryPosts,
+  UpdateBreweryPost,
 } from './types';
 
 /**
@@ -204,4 +205,37 @@ export const getMapBreweryPostsService: GetMapBreweryPosts = async ({
 
   const count = await DBClient.instance.breweryPost.count();
   return { breweryPosts, count };
+};
+
+/**
+ * Updates a brewery post.
+ *
+ * @param args - The arguments to update a brewery post.
+ * @param args.breweryPostId - The ID of the brewery post to update.
+ * @param args.body - The body of the request.
+ * @param args.body.name - The name of the brewery.
+ * @param args.body.description - The description of the brewery.
+ * @param args.body.dateEstablished - The date the brewery was established.
+ * @returns The updated brewery post.
+ */
+export const updateBreweryPostService: UpdateBreweryPost = async ({
+  breweryPostId,
+  body,
+}) => {
+  const breweryPost = await DBClient.instance.breweryPost.update({
+    where: { id: breweryPostId },
+    data: body,
+    select: breweryPostSelect,
+  });
+
+  return breweryPost as Awaited<ReturnType<typeof updateBreweryPostService>>;
+};
+
+export const deleteBreweryPostService: GetBreweryPostById = async ({ breweryPostId }) => {
+  const breweryPost = await DBClient.instance.breweryPost.delete({
+    where: { id: breweryPostId },
+    select: breweryPostSelect,
+  });
+
+  return breweryPost as Awaited<ReturnType<typeof deleteBreweryPostService>>;
 };

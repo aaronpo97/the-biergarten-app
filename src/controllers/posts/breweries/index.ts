@@ -12,10 +12,12 @@ import {
   createBreweryPostLocationService,
   getMapBreweryPostsService,
   getBreweryPostByIdService,
+  updateBreweryPostService,
+  deleteBreweryPostService,
 } from '@/services/posts/brewery-post';
 import { getBeerPostsByBreweryIdService } from '@/services/posts/beer-post';
 import { NextHandler } from 'next-connect';
-import DBClient from '@/prisma/DBClient';
+
 import {
   BreweryPostRequest,
   CreateBreweryPostRequest,
@@ -188,10 +190,7 @@ export const editBreweryPost = async (
     query: { id },
   } = req;
 
-  await DBClient.instance.breweryPost.update({
-    where: { id },
-    data: body,
-  });
+  await updateBreweryPostService({ breweryPostId: id, body });
 
   res.status(200).json({
     message: 'Brewery post updated successfully',
@@ -204,11 +203,8 @@ export const deleteBreweryPost = async (
   req: BreweryPostRequest,
   res: NextApiResponse,
 ) => {
-  const {
-    query: { id },
-  } = req;
-
-  const deleted = await DBClient.instance.breweryPost.delete({ where: { id } });
+  const { id } = req.query;
+  const deleted = await deleteBreweryPostService({ breweryPostId: id });
 
   if (!deleted) {
     throw new ServerError('Brewery post not found', 404);

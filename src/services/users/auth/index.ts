@@ -76,7 +76,7 @@ const authUserSelect = {
  * @param args.username The username of the user to create.
  * @returns The user.
  */
-export const createNewUser: CreateNewUser = async ({
+export const createNewUserService: CreateNewUser = async ({
   email,
   password,
   firstName,
@@ -108,7 +108,7 @@ export const createNewUser: CreateNewUser = async ({
  * @param args.userId The id of the user to delete.
  * @returns The user that was deleted if found, otherwise null.
  */
-export const deleteUserById: DeleteUserById = ({ userId }) => {
+export const deleteUserService: DeleteUserById = ({ userId }) => {
   return DBClient.instance.user.delete({ where: { id: userId }, select: authUserSelect });
 };
 
@@ -120,7 +120,7 @@ export const deleteUserById: DeleteUserById = ({ userId }) => {
  * @returns The user if found, otherwise null.
  */
 
-export const findUserByUsername: FindUserByUsername = async ({ username }) => {
+export const findUserByUsernameService: FindUserByUsername = async ({ username }) => {
   return DBClient.instance.user.findUnique({
     where: { username },
     select: authUserSelect,
@@ -133,7 +133,7 @@ export const findUserByUsername: FindUserByUsername = async ({ username }) => {
  * @param args The arguments for service.
  * @param args.email The email of the user to find.
  */
-export const findUserByEmail: FindUserByEmail = async ({ email }) => {
+export const findUserByEmailService: FindUserByEmail = async ({ email }) => {
   return DBClient.instance.user.findUnique({ where: { email }, select: userSelect });
 };
 
@@ -144,7 +144,7 @@ export const findUserByEmail: FindUserByEmail = async ({ email }) => {
  * @param args.userId The id of the user to find.
  * @returns The user if found, otherwise null.
  */
-export const findUserById: FindUserById = ({ userId }) => {
+export const findUserByIdService: FindUserById = ({ userId }) => {
   return DBClient.instance.user.findUnique({ where: { id: userId }, select: userSelect });
 };
 
@@ -157,7 +157,7 @@ export const findUserById: FindUserById = ({ userId }) => {
  * @param args.email The email of the user to send the confirmation email to.
  * @returns The user if found, otherwise null.
  */
-export const sendConfirmationEmail: SendConfirmationEmail = async ({
+export const sendConfirmationEmailService: SendConfirmationEmail = async ({
   userId,
   username,
   email,
@@ -189,7 +189,7 @@ export const sendConfirmationEmail: SendConfirmationEmail = async ({
  * @param args.email The email of the user to send the reset password email to.
  * @returns A promise that resolves to void.
  */
-export const sendResetPasswordEmail: SendResetPasswordEmail = async ({
+export const sendResetPasswordEmailService: SendResetPasswordEmail = async ({
   userId,
   username,
   email,
@@ -221,9 +221,7 @@ export const sendResetPasswordEmail: SendResetPasswordEmail = async ({
  * @param args.userId The id of the user to update.
  * @returns The user.
  */
-export const updateUserToBeConfirmedById: UpdateUserToBeConfirmedById = async ({
-  userId,
-}) => {
+export const confirmUserService: UpdateUserToBeConfirmedById = async ({ userId }) => {
   return DBClient.instance.user.update({
     where: { id: userId },
     data: { accountIsVerified: true, updatedAt: new Date() },
@@ -231,7 +229,10 @@ export const updateUserToBeConfirmedById: UpdateUserToBeConfirmedById = async ({
   });
 };
 
-export const updateUserPassword: UpdateUserPassword = async ({ password, userId }) => {
+export const updateUserPasswordService: UpdateUserPassword = async ({
+  password,
+  userId,
+}) => {
   const hash = await hashPassword(password);
 
   const user = await DBClient.instance.user.update({
@@ -254,7 +255,7 @@ export const updateUserPassword: UpdateUserPassword = async ({ password, userId 
  * @param args.data.lastName The last name of the user to update.
  * @param args.data.username The username of the user to update.
  */
-export const updateUserById: UpdateUserById = async ({ userId, data }) => {
+export const updateUserService: UpdateUserById = async ({ userId, data }) => {
   const user = await DBClient.instance.user.findUnique({
     where: { id: userId },
     select: userSelect,
@@ -272,12 +273,12 @@ export const updateUserById: UpdateUserById = async ({ userId, data }) => {
   } as const;
 
   if (updatedFields.email) {
-    const emailIsTaken = await findUserByEmail({ email: data.email });
+    const emailIsTaken = await findUserByEmailService({ email: data.email });
     if (emailIsTaken) {
       throw new ServerError('Email is already taken', 400);
     }
 
-    await sendConfirmationEmail({
+    await sendConfirmationEmailService({
       userId,
       username: data.username,
       email: data.email,
@@ -285,7 +286,7 @@ export const updateUserById: UpdateUserById = async ({ userId, data }) => {
   }
 
   if (updatedFields.username) {
-    const usernameIsTaken = await findUserByUsername({ username: data.username });
+    const usernameIsTaken = await findUserByUsernameService({ username: data.username });
     if (usernameIsTaken) {
       throw new ServerError('Username is already taken', 400);
     }

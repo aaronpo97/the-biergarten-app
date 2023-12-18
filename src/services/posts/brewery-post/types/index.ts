@@ -46,3 +46,12 @@ export type GetMapBreweryPosts = (args: {
   breweryPosts: z.infer<typeof BreweryPostMapQueryResult>[];
   count: number;
 }>;
+
+export type UpdateBreweryPost = (args: {
+  breweryPostId: string;
+  body: {
+    name: string;
+    description: string;
+    dateEstablished: Date;
+  };
+}) => Promise<z.infer<typeof BreweryPostQueryResult>>;

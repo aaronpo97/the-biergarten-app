@@ -7,7 +7,7 @@ import { FC } from 'react';
 import { z } from 'zod';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import UserHeader from '@/components/UserPage/UserHeader';
-import { findUserById } from '@/services/users/auth';
+import { findUserByIdService } from '@/services/users/auth';
 
 interface UserInfoPageProps {
   user: z.infer<typeof GetUserSchema>;
@@ -40,7 +40,7 @@ export default UserInfoPage;
 export const getServerSideProps = withPageAuthRequired<UserInfoPageProps>(
   async (context) => {
     const { id } = context.params!;
-    const user = await findUserById({ userId: id as string });
+    const user = await findUserByIdService({ userId: id as string });
     return user
       ? { props: { user: JSON.parse(JSON.stringify(user)) } }
       : { notFound: true };

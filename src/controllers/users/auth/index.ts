@@ -18,15 +18,15 @@ import { verifyConfirmationToken } from '@/config/jwt';
 import { hashPassword } from '@/config/auth/passwordFns';
 
 import {
-  createNewUser,
-  deleteUserById,
-  findUserByEmail,
-  findUserByUsername,
-  sendConfirmationEmail,
-  sendResetPasswordEmail,
-  updateUserById,
-  updateUserPassword,
-  updateUserToBeConfirmedById,
+  createNewUserService,
+  deleteUserService,
+  findUserByEmailService,
+  findUserByUsernameService,
+  sendConfirmationEmailService,
+  sendResetPasswordEmailService,
+  updateUserService,
+  updateUserPasswordService,
+  confirmUserService,
 } from '@/services/users/auth';
 
 import { EditUserRequest, UserRouteRequest } from '@/controllers/users/profile/types';
@@ -98,8 +98,8 @@ export const registerUser = async (
 ) => {
   const [usernameTaken, emailTaken] = (
     await Promise.all([
-      findUserByUsername({ username: req.body.username }),
-      findUserByEmail({ email: req.body.email }),
+      findUserByUsernameService({ username: req.body.username }),
+      findUserByEmailService({ email: req.body.email }),
     ])
   ).map((user) => !!user);
 
@@ -117,14 +117,14 @@ export const registerUser = async (
     );
   }
 
-  const user = await createNewUser(req.body);
+  const user = await createNewUserService(req.body);
 
   await setLoginSession(res, {
     id: user.id,
     username: user.username,
   });
 
-  await sendConfirmationEmail({
+  await sendConfirmationEmailService({
     email: user.email,
     username: user.username,
     userId: user.id,
@@ -155,7 +155,7 @@ export const confirmUser = async (
     throw new ServerError('Could not confirm user.', 401);
   }
 
-  await updateUserToBeConfirmedById({ userId: id });
+  await confirmUserService({ userId: id });
 
   res.status(200).json({
     message: 'User confirmed successfully.',
@@ -170,10 +170,10 @@ export const resetPassword = async (
 ) => {
   const { email } = req.body;
 
-  const user = await findUserByEmail({ email });
+  const user = await findUserByEmailService({ email });
 
   if (user) {
-    await sendResetPasswordEmail({
+    await sendResetPasswordEmailService({
       email: user.email,
       username: user.username,
       userId: user.id,
@@ -204,7 +204,7 @@ export const sendCurrentUser = async (
 export const checkEmail = async (req: CheckEmailRequest, res: NextApiResponse) => {
   const { email: emailToCheck } = req.query;
 
-  const email = await findUserByEmail({ email: emailToCheck });
+  const email = await findUserByEmailService({ email: emailToCheck });
 
   res.json({
     success: true,
@@ -217,7 +217,7 @@ export const checkEmail = async (req: CheckEmailRequest, res: NextApiResponse) =
 export const checkUsername = async (req: CheckUsernameRequest, res: NextApiResponse) => {
   const { username: usernameToCheck } = req.query;
 
-  const username = await findUserByUsername({ username: usernameToCheck });
+  const username = await findUserByUsernameService({ username: usernameToCheck });
 
   res.json({
     success: true,
@@ -234,7 +234,10 @@ export const updatePassword = async (
   const user = req.user!;
   const { password } = req.body;
 
-  await updateUserPassword({ userId: user.id, password: await hashPassword(password) });
+  await updateUserPasswordService({
+    userId: user.id,
+    password: await hashPassword(password),
+  });
 
   res.json({
     message: 'Updated user password.',
@@ -249,7 +252,7 @@ export const resendConfirmation = async (
 ) => {
   const user = req.user!;
 
-  await sendConfirmationEmail({
+  await sendConfirmationEmailService({
     userId: user.id,
     username: user.username,
     email: user.email,
@@ -267,7 +270,7 @@ export const editUserInfo = async (
 ) => {
   const { email, firstName, lastName, username } = req.body;
 
-  const updatedUser = await updateUserById({
+  const updatedUser = await updateUserService({
     userId: req.user!.id,
     data: { email, firstName, lastName, username },
   });
@@ -285,7 +288,7 @@ export const deleteAccount = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const { id } = req.query;
-  const deletedUser = await deleteUserById({ userId: id });
+  const deletedUser = await deleteUserService({ userId: id });
 
   if (!deletedUser) {
     throw new ServerError('Could not find a user with that id.', 400);
