@@ -12,7 +12,7 @@ import { NextPage } from 'next';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import sendForgotPasswordRequest from '@/requests/User/sendForgotPasswordRequest';
+import sendForgotPasswordRequest from '@/requests/users/auth/sendForgotPasswordRequest';
 import { FaUserCircle } from 'react-icons/fa';
 
 interface ForgotPasswordPageProps {}

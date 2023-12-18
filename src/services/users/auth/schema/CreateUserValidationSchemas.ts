@@ -1,5 +1,5 @@
-import validateEmailRequest from '@/requests/User/validateEmailRequest';
-import validateUsernameRequest from '@/requests/validateUsernameRequest';
+import validateEmailRequest from '@/requests/users/auth/validateEmailRequest';
+import validateUsernameRequest from '@/requests/users/profile/validateUsernameRequest';
 import sub from 'date-fns/sub';
 import { z } from 'zod';
 

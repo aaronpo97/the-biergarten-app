@@ -6,9 +6,9 @@ import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
 import { z } from 'zod';
 import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import CreateBeerPostValidationSchema from '@/services/posts/beer-post/schema/CreateBeerPostValidationSchema';
-import sendCreateBeerPostRequest from '@/requests/BeerPost/sendCreateBeerPostRequest';
+import sendCreateBeerPostRequest from '@/requests/posts/beer-post/sendCreateBeerPostRequest';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
-import sendUploadBeerImagesRequest from '@/requests/BeerImage/sendUploadBeerImageRequest';
+import sendUploadBeerImagesRequest from '@/requests/images/beer-image/sendUploadBeerImageRequest';
 
 import toast from 'react-hot-toast';
 

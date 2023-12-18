@@ -1,4 +1,4 @@
-import sendCreateBeerCommentRequest from '@/requests/BeerComment/sendCreateBeerCommentRequest';
+import sendCreateBeerCommentRequest from '@/requests/comments/beer-comment/sendCreateBeerCommentRequest';
 
 import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';

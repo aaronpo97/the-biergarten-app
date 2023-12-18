@@ -1,4 +1,4 @@
-import sendLoginUserRequest from '@/requests/User/sendLoginUserRequest';
+import sendLoginUserRequest from '@/requests/users/auth/sendLoginUserRequest';
 import LoginValidationSchema from '@/services/users/auth/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';

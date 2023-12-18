@@ -1,5 +1,5 @@
-import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
-import sendCreateBreweryPostRequest from '@/requests/BreweryPost/sendCreateBreweryPostRequest';
+import sendUploadBreweryImagesRequest from '@/requests/images/brewery-image/sendUploadBreweryImageRequest';
+import sendCreateBreweryPostRequest from '@/requests/posts/brewery-post/sendCreateBreweryPostRequest';
 import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';

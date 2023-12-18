@@ -1,5 +1,5 @@
-import validateEmailRequest from '@/requests/User/validateEmailRequest';
-import validateUsernameRequest from '@/requests/validateUsernameRequest';
+import validateEmailRequest from '@/requests/users/auth/validateEmailRequest';
+import validateUsernameRequest from '@/requests/users/profile/validateUsernameRequest';
 import { BaseCreateUserSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import { Switch } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,7 +7,7 @@ import { Dispatch, FC, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
-import sendEditUserRequest from '@/requests/User/sendEditUserRequest';
+import sendEditUserRequest from '@/requests/users/auth/sendEditUserRequest';
 import createErrorToast from '@/util/createErrorToast';
 import { toast } from 'react-hot-toast';
 import { AccountPageAction, AccountPageState } from '@/reducers/accountPageReducer';

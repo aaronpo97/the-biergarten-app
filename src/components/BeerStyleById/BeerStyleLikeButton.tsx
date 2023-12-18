@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 
 import useGetBeerPostLikeCount from '@/hooks/data-fetching/beer-likes/useBeerPostLikeCount';
 import useCheckIfUserLikesBeerStyle from '@/hooks/data-fetching/beer-style-likes/useCheckIfUserLikesBeerPost';
-import sendBeerStyleLikeRequest from '@/requests/BeerStyleLike/sendBeerStyleLikeRequest';
+import sendBeerStyleLikeRequest from '@/requests/likes/beer-style-like/sendBeerStyleLikeRequest';
 import LikeButton from '../ui/LikeButton';
 
 const BeerStyleLikeButton: FC<{

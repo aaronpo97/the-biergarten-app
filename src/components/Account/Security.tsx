@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { UpdatePasswordSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
-import sendUpdatePasswordRequest from '@/requests/User/sendUpdatePasswordRequest';
+import sendUpdatePasswordRequest from '@/requests/users/auth/sendUpdatePasswordRequest';
 import { AccountPageState, AccountPageAction } from '@/reducers/accountPageReducer';
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';

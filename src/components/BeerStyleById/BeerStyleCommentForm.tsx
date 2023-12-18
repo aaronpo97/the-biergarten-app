@@ -10,7 +10,7 @@ import createErrorToast from '@/util/createErrorToast';
 
 import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
-import sendCreateBeerStyleCommentRequest from '@/requests/BeerStyleComment/sendCreateBeerStyleCommentRequest';
+import sendCreateBeerStyleCommentRequest from '@/requests/comments/beer-style-comment/sendCreateBeerStyleCommentRequest';
 import CommentForm from '../ui/CommentForm';
 
 interface BeerCommentFormProps {

@@ -6,9 +6,9 @@ import { z } from 'zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import deleteBeerPostRequest from '@/requests/BeerPost/deleteBeerPostRequest';
+import deleteBeerPostRequest from '@/requests/posts/beer-post/deleteBeerPostRequest';
 import EditBeerPostValidationSchema from '@/services/posts/beer-post/schema/EditBeerPostValidationSchema';
-import sendEditBeerPostRequest from '@/requests/BeerPost/sendEditBeerPostRequest';
+import sendEditBeerPostRequest from '@/requests/posts/beer-post/sendEditBeerPostRequest';
 import createErrorToast from '@/util/createErrorToast';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
