@@ -161,8 +161,8 @@ SPARKPOST_SENDER_ADDRESS=" > .env
   - Use the same command as above to generate a random string.
 - `SESSION_TOKEN_NAME` is the name of the session cookie.
   - You can set this to `biergarten`.
-- `SESSION_MAX_AGE` is the maximum age of the session cookie in milliseconds.
-  - You can set this to `604800000` (1 week).
+- `SESSION_MAX_AGE` is the maximum age of the session cookie in seconds.
+  - You can set this to `604800` (1 week).
 - `POSTGRES_PRISMA_URL`is a pooled connection string for your Neon Postgres database.
 - `POSTGRES_URL_NON_POOLING` is a non-pooled connection string for your Neon Postgres
   database used for migrations.

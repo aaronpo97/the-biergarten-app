@@ -121,7 +121,7 @@ export const SESSION_SECRET = parsed.data.SESSION_SECRET;
 export const SESSION_TOKEN_NAME = parsed.data.SESSION_TOKEN_NAME;
 
 /**
- * Maximum age of the session cookie in milliseconds.
+ * Maximum age of the session cookie in seconds.
  *
  * @example
  *   '86400000'; // 24 hours
