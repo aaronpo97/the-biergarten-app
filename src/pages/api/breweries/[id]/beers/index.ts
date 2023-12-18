@@ -2,6 +2,7 @@ import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { getAllBeersByBrewery } from '@/controllers/posts/breweries';
 import { GetAllPostsByConnectedPostId } from '@/controllers/posts/types';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
@@ -14,11 +15,7 @@ const router = createRouter<
 
 router.get(
   validateRequest({
-    querySchema: z.object({
-      page_size: z.string().nonempty(),
-      page_num: z.string().nonempty(),
-      id: z.string().nonempty(),
-    }),
+    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
   }),
   getAllBeersByBrewery,
 );

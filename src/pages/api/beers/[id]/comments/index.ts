@@ -11,6 +11,7 @@ import {
   createBeerPostComment,
   getAllBeerPostComments,
 } from '@/controllers/comments/beer-comments';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 const router = createRouter<
   // @TODO: Fix this any type
@@ -29,11 +30,7 @@ router.post(
 
 router.get(
   validateRequest({
-    querySchema: z.object({
-      id: z.string().cuid(),
-      page_size: z.coerce.number().int().positive(),
-      page_num: z.coerce.number().int().positive(),
-    }),
+    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
   }),
   getAllBeerPostComments,
 );

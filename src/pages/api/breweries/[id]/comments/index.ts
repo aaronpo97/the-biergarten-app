@@ -9,6 +9,7 @@ import { NextApiResponse } from 'next';
 
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import { createComment, getAll } from '@/controllers/comments/brewery-comments';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 const router = createRouter<
   // I don't want to use any, but I can't figure out how to get the types to work
@@ -27,11 +28,7 @@ router.post(
 
 router.get(
   validateRequest({
-    querySchema: z.object({
-      id: z.string().cuid(),
-      page_size: z.coerce.number().int().positive(),
-      page_num: z.coerce.number().int().positive(),
-    }),
+    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
   }),
   getAll,
 );
