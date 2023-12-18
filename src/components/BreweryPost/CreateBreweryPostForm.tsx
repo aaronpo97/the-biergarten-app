@@ -1,6 +1,6 @@
 import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
 import sendCreateBreweryPostRequest from '@/requests/BreweryPost/sendCreateBreweryPostRequest';
-import CreateBreweryPostSchema from '@/services/BreweryPost/schema/CreateBreweryPostSchema';
+import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';
 import { Tab } from '@headlessui/react';
@@ -29,7 +29,7 @@ import FormTextInput from '../ui/forms/FormTextInput';
 import Button from '../ui/forms/Button';
 
 const AddressAutofill = dynamic(
-  // @ts-ignore
+  // @ts-expect-error
   () => import('@mapbox/search-js-react').then((mod) => mod.AddressAutofill),
   { ssr: false },
 );
@@ -108,7 +108,8 @@ const LocationSection: FC<{
   errors: FieldErrors<z.infer<typeof CreateBreweryPostWithImagesSchema>>;
   isSubmitting: boolean;
   setValue: UseFormSetValue<z.infer<typeof CreateBreweryPostWithImagesSchema>>;
-}> = ({ register, errors, isSubmitting, setValue }) => {
+  mapboxAccessToken: string;
+}> = ({ register, errors, isSubmitting, setValue, mapboxAccessToken }) => {
   const onAutoCompleteChange = (address: string) => {
     setValue('address', address);
   };
@@ -133,7 +134,7 @@ const LocationSection: FC<{
       </FormInfo>
       <FormSegment>
         <AddressAutofill
-          accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
+          accessToken={mapboxAccessToken}
           onRetrieve={onAutoCompleteRetrieve}
           onChange={onAutoCompleteChange}
         >
@@ -201,7 +202,9 @@ const LocationSection: FC<{
   );
 };
 
-const CreateBreweryPostForm: FC = () => {
+const CreateBreweryPostForm: FC<{
+  mapboxAccessToken: string;
+}> = ({ mapboxAccessToken }) => {
   const {
     register,
     handleSubmit,
@@ -268,6 +271,7 @@ const CreateBreweryPostForm: FC = () => {
               register={register}
               errors={errors}
               isSubmitting={isSubmitting}
+              mapboxAccessToken={mapboxAccessToken}
             />
           </Tab.Panel>
         </Tab.Panels>

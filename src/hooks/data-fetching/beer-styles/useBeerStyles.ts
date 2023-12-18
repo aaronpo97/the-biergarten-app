@@ -1,10 +1,10 @@
-import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
 /**
- * A custom hook using SWR to fetch beer types from the API.
+ * A custom hook to fetch beer styles posts.
  *
  * @param options The options to use when fetching beer types.
  * @param options.pageSize The number of beer types to fetch per page.

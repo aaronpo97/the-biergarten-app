@@ -1,5 +1,5 @@
 /**
- * Custom hook using SWR for fetching users followed by a specific user.
+ * A custom hook to fetch the users followed by a given user.
  *
  * @param options - The options for fetching users.
  * @param [options.pageSize=5] - The number of users to fetch per page. Default is `5`
@@ -17,7 +17,7 @@
  *   - `mutate` A function to mutate the data.
  *   - `error` The error object, if any.
  */
-import FollowInfoSchema from '@/services/UserFollows/schema/FollowInfoSchema';
+import FollowInfoSchema from '@/services/users/profile/schema/FollowInfoSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';

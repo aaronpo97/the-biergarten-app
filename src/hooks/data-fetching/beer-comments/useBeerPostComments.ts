@@ -10,7 +10,7 @@ interface UseBeerPostCommentsProps {
 }
 
 /**
- * A custom React hook that fetches comments for a specific beer post.
+ * A custom hook to fetch comments for a specific beer post.
  *
  * @param props - The props object.
  * @param props.pageNum - The page number of the comments to fetch.

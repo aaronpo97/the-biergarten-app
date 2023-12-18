@@ -2,7 +2,9 @@
   "extends": ["next/core-web-vitals", "airbnb-base", "airbnb-typescript", "prettier"],
   "rules": {
     "arrow-body-style": "off",
-    "import/extensions": "off"
+    "import/extensions": "warn",
+    "import/order": "warn",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
   },
   "parserOptions": {
     "project": ["./tsconfig.json"]

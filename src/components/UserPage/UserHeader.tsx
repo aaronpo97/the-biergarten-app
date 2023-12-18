@@ -3,7 +3,7 @@ import useTimeDistance from '@/hooks/utilities/useTimeDistance';
 import { FC, useContext } from 'react';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import useGetUsersFollowedByUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowedByUser';
 import useGetUsersFollowingUser from '@/hooks/data-fetching/user-follows/useGetUsersFollowingUser';
 import UserContext from '@/contexts/UserContext';

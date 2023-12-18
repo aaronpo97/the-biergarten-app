@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useRouter } from 'next/router';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
-import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';

@@ -1,8 +1,9 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import useSWR from 'swr';
 import { z } from 'zod';
+
 /**
- * A custom React hook that searches for beer posts that match a given query string.
+ * A custom hook to search for beer posts that match a given query string.
  *
  * @param query The search query string to match beer posts against.
  * @returns An object with the following properties:

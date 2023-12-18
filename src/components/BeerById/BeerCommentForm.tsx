@@ -1,6 +1,6 @@
 import sendCreateBeerCommentRequest from '@/requests/BeerComment/sendCreateBeerCommentRequest';
 
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { FunctionComponent } from 'react';

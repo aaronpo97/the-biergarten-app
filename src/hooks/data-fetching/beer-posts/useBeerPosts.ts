@@ -1,10 +1,10 @@
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWRInfinite from 'swr/infinite';
 import { z } from 'zod';
 
 /**
- * A custom hook using SWR to fetch beer posts from the API.
+ * A custom hook to fetch beer posts from the API.
  *
  * @param options The options to use when fetching beer posts.
  * @param options.pageSize The number of beer posts to fetch per page.

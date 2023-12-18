@@ -3,13 +3,31 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import { z } from 'zod';
 import useSWRInfinite from 'swr/infinite';
 
-interface UseBeerStyleCommentsProps {
+interface UseBeerStyleCommentsOptions {
   id: string;
   pageSize: number;
   pageNum: number;
 }
-
-const useBeerStyleComments = ({ id, pageSize }: UseBeerStyleCommentsProps) => {
+/**
+ * A custom hook to fetch comments for a beer style post.
+ *
+ * @param options The options for fetching comments.
+ * @param options.id The ID of the beer style to fetch comments for.
+ * @param options.pageSize The number of comments to fetch per page.
+ * @param options.pageNum The page number to fetch.
+ * @returns An object with the following properties:
+ *
+ *   - `comments`: The comments fetched from the API.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `isLoadingMore`: A boolean indicating whether more data is being fetched.
+ *   - `isAtEnd`: A boolean indicating whether all data has been fetched.
+ *   - `mutate`: A function to mutate the data.
+ *   - `pageCount`: The total number of pages of data.
+ *   - `setSize`: A function to set the size of the data.
+ *   - `size`: The size of the data.
+ */
+const useBeerStyleComments = ({ id, pageSize }: UseBeerStyleCommentsOptions) => {
   const fetcher = async (url: string) => {
     const response = await fetch(url);
 

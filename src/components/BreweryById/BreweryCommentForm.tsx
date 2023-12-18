@@ -1,5 +1,5 @@
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
-import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FC } from 'react';

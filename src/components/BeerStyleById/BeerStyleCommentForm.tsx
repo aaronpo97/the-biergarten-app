@@ -8,7 +8,7 @@ import CreateCommentValidationSchema from '@/services/schema/CommentSchema/Creat
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';
 
-import BeerStyleQueryResult from '@/services/BeerStyles/schema/BeerStyleQueryResult';
+import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
 import sendCreateBeerStyleCommentRequest from '@/requests/BeerStyleComment/sendCreateBeerStyleCommentRequest';
 import CommentForm from '../ui/CommentForm';

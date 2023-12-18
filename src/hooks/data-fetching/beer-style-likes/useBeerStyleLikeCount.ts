@@ -3,7 +3,7 @@ import { z } from 'zod';
 import useSWR from 'swr';
 
 /**
- * Custom hook to fetch the like count for a beer style from the server.
+ * A custom hook to fetch the like count for a beer style post.
  *
  * @param beerStyleId - The ID of the beer style to fetch the like count for.
  * @returns An object with the following properties:

@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import DBClient from '@/prisma/DBClient';
-import BeerPostQueryResult from '@/services/BeerPost/schema/BeerPostQueryResult';
+import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 
 const SearchSchema = z.object({
   search: z.string().min(1),

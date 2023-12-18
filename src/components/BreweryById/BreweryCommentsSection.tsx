@@ -1,5 +1,5 @@
 import UserContext from '@/contexts/UserContext';
-import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';

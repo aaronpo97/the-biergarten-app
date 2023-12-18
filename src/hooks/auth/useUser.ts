@@ -1,9 +1,9 @@
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import useSWR from 'swr';
 
 /**
- * A custom React hook that fetches the current user's data from the server.
+ * A custom hook to fetch the current user's data.
  *
  * @returns An object with the following properties:
  *

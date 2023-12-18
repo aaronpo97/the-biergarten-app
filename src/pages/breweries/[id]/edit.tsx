@@ -5,9 +5,10 @@ import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import FormSegment from '@/components/ui/forms/FormSegment';
 import FormTextArea from '@/components/ui/forms/FormTextArea';
 import FormTextInput from '@/components/ui/forms/FormTextInput';
-import getBreweryPostById from '@/services/BreweryPost/getBreweryPostById';
-import BreweryPostQueryResult from '@/services/BreweryPost/schema/BreweryPostQueryResult';
-import EditBreweryPostValidationSchema from '@/services/BreweryPost/schema/EditBreweryPostValidationSchema';
+import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
+
+import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
+import EditBreweryPostValidationSchema from '@/services/posts/brewery-post/schema/EditBreweryPostValidationSchema';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NextPage } from 'next';
@@ -143,7 +144,7 @@ export default EditBreweryPostPage;
 export const getServerSideProps = withPageAuthRequired<EditPageProps>(
   async (context, session) => {
     const breweryPostId = context.params?.id as string;
-    const breweryPost = await getBreweryPostById(breweryPostId);
+    const breweryPost = await getBreweryPostByIdService({ breweryPostId });
 
     const { id: userId } = session;
 

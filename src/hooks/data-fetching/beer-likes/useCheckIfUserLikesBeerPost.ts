@@ -5,10 +5,9 @@ import useSWR from 'swr';
 import { z } from 'zod';
 
 /**
- * A custom React hook that checks if the current user has liked a beer post by fetching
- * data from the server.
+ * A custom hook to check if the current user has liked a beer post.
  *
- * @param beerPostId The ID of the beer post to check for likes.
+ * @param beerPostId The ID of the beer post.
  * @returns An object with the following properties:
  *
  *   - `error`: The error that occurred while fetching the data.

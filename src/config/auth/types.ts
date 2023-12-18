@@ -1,4 +1,4 @@
-import GetUserSchema from '@/services/User/schema/GetUserSchema';
+import GetUserSchema from '@/services/users/auth/schema/GetUserSchema';
 import { IncomingMessage } from 'http';
 import { NextApiRequest } from 'next';
 import { z } from 'zod';

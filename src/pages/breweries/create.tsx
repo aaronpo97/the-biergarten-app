@@ -1,12 +1,17 @@
 import FormPageLayout from '@/components/ui/forms/FormPageLayout';
 import withPageAuthRequired from '@/util/withPageAuthRequired';
-import { GetServerSideProps, NextPage } from 'next';
+import { NextPage } from 'next';
 import Head from 'next/head';
 
 import { FaBeer } from 'react-icons/fa';
 import CreateBreweryPostForm from '@/components/BreweryPost/CreateBreweryPostForm';
+import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 
-const CreateBreweryPage: NextPage = () => {
+interface CreateBreweryPageProps {
+  mapboxAccessToken: string;
+}
+
+const CreateBreweryPage: NextPage<CreateBreweryPageProps> = ({ mapboxAccessToken }) => {
   return (
     <>
       <Head>
@@ -20,7 +25,7 @@ const CreateBreweryPage: NextPage = () => {
             headingText="Create Brewery"
             headingIcon={FaBeer}
           >
-            <CreateBreweryPostForm />
+            <CreateBreweryPostForm mapboxAccessToken={mapboxAccessToken} />
           </FormPageLayout>
         </div>
       </div>
@@ -30,4 +35,6 @@ const CreateBreweryPage: NextPage = () => {
 
 export default CreateBreweryPage;
 
-export const getServerSideProps: GetServerSideProps = withPageAuthRequired();
+export const getServerSideProps = withPageAuthRequired<CreateBreweryPageProps>(
+  async () => ({ props: { mapboxAccessToken: MAPBOX_ACCESS_TOKEN } }),
+);

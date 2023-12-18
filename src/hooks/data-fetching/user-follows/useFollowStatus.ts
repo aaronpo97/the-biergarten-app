@@ -2,6 +2,17 @@ import APIResponseValidationSchema from '@/validation/APIResponseValidationSchem
 import useSWR from 'swr';
 import { z } from 'zod';
 
+/**
+ * A custom hook to check if the current user follows a given user.
+ *
+ * @param userFollowedId - The ID of the user to check.
+ * @returns An object with the following properties:
+ *
+ *   - `isFollowed`: A boolean indicating whether the current user follows the user.
+ *   - `error`: The error that occurred while fetching the data.
+ *   - `isLoading`: A boolean indicating whether the data is being fetched.
+ *   - `mutate`: A function to mutate the data.
+ */
 const useFollowStatus = (userFollowedId: string) => {
   const { data, error, isLoading, mutate } = useSWR(
     `/api/users/${userFollowedId}/is-followed`,

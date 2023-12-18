@@ -5,16 +5,7 @@ import { NextApiResponse } from 'next';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-
-const sendCurrentUser = async (req: UserExtendedNextApiRequest, res: NextApiResponse) => {
-  const { user } = req;
-  res.status(200).json({
-    message: `Currently logged in as ${user!.username}`,
-    statusCode: 200,
-    success: true,
-    payload: user,
-  });
-};
+import { sendCurrentUser } from '@/controllers/users/auth';
 
 const router = createRouter<
   UserExtendedNextApiRequest,
