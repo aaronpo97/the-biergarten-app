@@ -1,5 +1,3 @@
-import sendCreateBeerCommentRequest from '@/requests/comments/beer-comment/sendCreateBeerCommentRequest';
-
 import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -11,6 +9,7 @@ import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPost
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';
+import { sendCreateBeerCommentRequest } from '@/requests/comments/beer-comment';
 import CommentForm from '../ui/CommentForm';
 
 interface BeerCommentFormProps {
@@ -34,11 +33,7 @@ const BeerCommentForm: FunctionComponent<BeerCommentFormProps> = ({
   ) => {
     const loadingToast = toast.loading('Posting a new comment...');
     try {
-      await sendCreateBeerCommentRequest({
-        content: data.content,
-        rating: data.rating,
-        beerPostId: beerPost.id,
-      });
+      await sendCreateBeerCommentRequest({ body: data, beerPostId: beerPost.id });
       reset();
       toast.remove(loadingToast);
       toast.success('Comment posted successfully.');

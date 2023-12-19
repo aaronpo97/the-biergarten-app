@@ -7,6 +7,10 @@ import { z } from 'zod';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import { useRouter } from 'next/router';
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
+import {
+  deleteBeerPostCommentRequest,
+  editBeerPostCommentRequest,
+} from '@/requests/comments/beer-comment';
 import BeerCommentForm from './BeerCommentForm';
 
 import LoadingComponent from './LoadingComponent';
@@ -29,26 +33,14 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const handleDeleteRequest = async (id: string) => {
-    const response = await fetch(`/api/beer-comments/${id}`, { method: 'DELETE' });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete comment.');
-    }
+    deleteBeerPostCommentRequest({ commentId: id });
   };
 
   const handleEditRequest = async (
     id: string,
     data: z.infer<typeof CreateCommentValidationSchema>,
   ) => {
-    const response = await fetch(`/api/beer-comments/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: data.content, rating: data.rating }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update comment.');
-    }
+    editBeerPostCommentRequest({ body: data, commentId: id });
   };
 
   return (

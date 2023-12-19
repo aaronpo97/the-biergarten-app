@@ -6,47 +6,46 @@ import { useInView } from 'react-intersection-observer';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
+import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
 import NoCommentsCard from '../BeerById/NoCommentsCard';
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentCardBody from '../BeerBreweryComments/CommentCardBody';
 
+type HookReturnType = ReturnType<
+  typeof useBeerPostComments | typeof useBreweryPostComments | typeof useBeerStyleComments
+>;
+
+type HandleDeleteRequest = (id: string) => Promise<void>;
+
+type HandleEditRequest = (
+  id: string,
+  data: { content: string; rating: number },
+) => Promise<void>;
+
 interface CommentsComponentProps {
+  comments: HookReturnType['comments'];
   commentSectionRef: MutableRefObject<HTMLDivElement | null>;
+  handleDeleteRequest: HandleDeleteRequest;
+  handleEditRequest: HandleEditRequest;
+  isAtEnd: HookReturnType['isAtEnd'];
+  isLoadingMore: HookReturnType['isLoadingMore'];
+  mutate: HookReturnType['mutate'];
   pageSize: number;
-  size: ReturnType<typeof useBeerPostComments | typeof useBreweryPostComments>['size'];
-  setSize: ReturnType<
-    typeof useBeerPostComments | typeof useBreweryPostComments
-  >['setSize'];
-  comments: ReturnType<
-    typeof useBeerPostComments | typeof useBreweryPostComments
-  >['comments'];
-  isAtEnd: ReturnType<
-    typeof useBeerPostComments | typeof useBreweryPostComments
-  >['isAtEnd'];
-  isLoadingMore: ReturnType<
-    typeof useBeerPostComments | typeof useBreweryPostComments
-  >['isLoadingMore'];
-  mutate: ReturnType<
-    typeof useBeerPostComments | typeof useBreweryPostComments
-  >['mutate'];
-  handleDeleteRequest: (id: string) => Promise<void>;
-  handleEditRequest: (
-    id: string,
-    data: { content: string; rating: number },
-  ) => Promise<void>;
+  setSize: HookReturnType['setSize'];
+  size: HookReturnType['size'];
 }
 
 const CommentsComponent: FC<CommentsComponentProps> = ({
-  commentSectionRef,
   comments,
+  commentSectionRef,
+  handleDeleteRequest,
+  handleEditRequest,
   isAtEnd,
   isLoadingMore,
+  mutate,
   pageSize,
   setSize,
   size,
-  mutate,
-  handleDeleteRequest,
-  handleEditRequest,
 }) => {
   const { ref: penultimateCommentRef } = useInView({
     threshold: 0.1,
