@@ -24,9 +24,9 @@ export const checkIfBeerCommentOwner = async <T extends CommentRequest>(
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
   next: NextHandler,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
   const user = req.user!;
-  const comment = await getBeerPostCommentByIdService({ beerPostCommentId: id });
+  const comment = await getBeerPostCommentByIdService({ beerPostCommentId: commentId });
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
@@ -43,9 +43,9 @@ export const editBeerPostComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
 
-  await editBeerPostCommentByIdService({ body: req.body, beerPostCommentId: id });
+  await editBeerPostCommentByIdService({ body: req.body, beerPostCommentId: commentId });
 
   res.status(200).json({
     success: true,
@@ -58,9 +58,9 @@ export const deleteBeerPostComment = async (
   req: CommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
 
-  await deleteBeerCommentByIdService({ beerPostCommentId: id });
+  await deleteBeerCommentByIdService({ beerPostCommentId: commentId });
 
   res.status(200).json({
     success: true,
@@ -73,7 +73,7 @@ export const createBeerPostComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const beerPostId = req.query.id;
+  const beerPostId = req.query.postId;
 
   const newBeerComment = await createBeerPostCommentService({
     body: req.body,
@@ -93,7 +93,7 @@ export const getAllBeerPostComments = async (
   req: GetAllCommentsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const beerPostId = req.query.id;
+  const beerPostId = req.query.postId;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 

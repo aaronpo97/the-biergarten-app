@@ -1,12 +1,13 @@
-import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
+import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
+import { getBreweryPostLikeStatus } from '@/controllers/likes/brewery-post-likes';
+
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 import { NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { z } from 'zod';
-import { checkIfBeerStyleIsLiked } from '@/controllers/likes/beer-style-likes';
 
 const router = createRouter<
   UserExtendedNextApiRequest,
@@ -15,8 +16,8 @@ const router = createRouter<
 
 router.get(
   getCurrentUser,
-  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
-  checkIfBeerStyleIsLiked,
+  validateRequest({ querySchema: z.object({ postId: z.string().cuid() }) }),
+  getBreweryPostLikeStatus,
 );
 
 const handler = router.handler(NextConnectOptions);

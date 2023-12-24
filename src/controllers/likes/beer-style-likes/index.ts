@@ -1,7 +1,7 @@
 import ServerError from '@/config/util/ServerError';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiResponse, NextApiRequest } from 'next';
+import { NextApiResponse } from 'next';
 import { z } from 'zod';
 import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import {
@@ -18,9 +18,9 @@ export const sendBeerStyleLikeRequest = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
-  const { id } = req.query;
+  const { postId } = req.query;
 
-  const beerStyle = await getBeerStyleByIdService({ beerStyleId: id });
+  const beerStyle = await getBeerStyleByIdService({ beerStyleId: postId });
   if (!beerStyle) {
     throw new ServerError('Could not find a beer style with that id.', 404);
   }
@@ -48,11 +48,11 @@ export const sendBeerStyleLikeRequest = async (
 };
 
 export const getBeerStyleLikeCountRequest = async (
-  req: NextApiRequest,
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const id = req.query.id as string;
-  const likeCount = await getBeerStyleLikeCountService({ beerStyleId: id });
+  const { postId } = req.query;
+  const likeCount = await getBeerStyleLikeCountService({ beerStyleId: postId });
 
   res.status(200).json({
     success: true,

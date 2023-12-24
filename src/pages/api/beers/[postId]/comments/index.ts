@@ -22,7 +22,7 @@ const router = createRouter<
 router.post(
   validateRequest({
     bodySchema: CreateCommentValidationSchema,
-    querySchema: z.object({ id: z.string().cuid() }),
+    querySchema: z.object({ postId: z.string().cuid() }),
   }),
   getCurrentUser,
   createBeerPostComment,
@@ -30,7 +30,7 @@ router.post(
 
 router.get(
   validateRequest({
-    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
+    querySchema: PaginatedQueryResponseSchema.extend({ postId: z.string().cuid() }),
   }),
   getAllBeerPostComments,
 );

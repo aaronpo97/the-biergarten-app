@@ -33,14 +33,18 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const handleDeleteRequest = async (id: string) => {
-    deleteBeerPostCommentRequest({ commentId: id });
+    await deleteBeerPostCommentRequest({ commentId: id, beerPostId: beerPost.id });
   };
 
   const handleEditRequest = async (
     id: string,
     data: z.infer<typeof CreateCommentValidationSchema>,
   ) => {
-    editBeerPostCommentRequest({ body: data, commentId: id });
+    await editBeerPostCommentRequest({
+      body: data,
+      commentId: id,
+      beerPostId: beerPost.id,
+    });
   };
 
   return (

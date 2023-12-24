@@ -20,12 +20,12 @@ const router = createRouter<
 
 router.post(
   getCurrentUser,
-  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
+  validateRequest({ querySchema: z.object({ postId: z.string().cuid() }) }),
   sendBeerStyleLikeRequest,
 );
 
 router.get(
-  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
+  validateRequest({ querySchema: z.object({ postId: z.string().cuid() }) }),
   getBeerStyleLikeCountRequest,
 );
 

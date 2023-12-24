@@ -13,7 +13,7 @@ const router = createRouter<
 >();
 
 router.get(
-  validateRequest({ querySchema: z.object({ id: z.string().cuid() }) }),
+  validateRequest({ querySchema: z.object({ postId: z.string().cuid() }) }),
   getBeerStyle,
 );
 

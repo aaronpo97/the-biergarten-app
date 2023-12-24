@@ -41,7 +41,7 @@ const useGetBreweryPostLikeCount = (breweryPostId: string) => {
     error: error as unknown,
     isLoading,
     mutate,
-    likeCount: data as number | undefined,
+    likeCount: data,
   };
 };
 

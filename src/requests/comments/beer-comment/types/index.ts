@@ -5,10 +5,12 @@ import { z } from 'zod';
 export type SendEditBeerPostCommentRequest = (args: {
   body: { content: string; rating: number };
   commentId: string;
+  beerPostId: string;
 }) => Promise<z.infer<typeof APIResponseValidationSchema>>;
 
 export type SendDeleteBeerPostCommentRequest = (args: {
   commentId: string;
+  beerPostId: string;
 }) => Promise<z.infer<typeof APIResponseValidationSchema>>;
 
 export type SendCreateBeerCommentRequest = (args: {

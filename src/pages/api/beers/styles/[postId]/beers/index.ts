@@ -19,7 +19,7 @@ const router = createRouter<
 
 router.get(
   validateRequest({
-    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
+    querySchema: PaginatedQueryResponseSchema.extend({ postId: z.string().cuid() }),
   }),
   getAllBeersByBeerStyle,
 );

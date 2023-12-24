@@ -31,9 +31,10 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const handleDeleteRequest = async (commentId: string) => {
-    const response = await fetch(`/api/brewery-comments/${commentId}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(
+      `/api/breweries/${breweryPost.id}/comments/${commentId}`,
+      { method: 'DELETE' },
+    );
 
     if (!response.ok) {
       throw new Error(response.statusText);
@@ -44,15 +45,19 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
     commentId: string,
     data: z.infer<typeof CreateCommentValidationSchema>,
   ) => {
-    const response = await fetch(`/api/brewery-comments/${commentId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: data.content, rating: data.rating }),
-    });
+    const response = await fetch(
+      `/api/breweries/${breweryPost.id}/comments/${commentId}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: data.content, rating: data.rating }),
+      },
+    );
 
     if (!response.ok) {
       throw new Error(response.statusText);
     }
+    console.log(await response.json());
   };
 
   return (

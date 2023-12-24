@@ -3,7 +3,7 @@ import CreateCommentValidationSchema from '@/services/schema/CommentSchema/Creat
 import { z } from 'zod';
 
 export interface CommentRequest extends UserExtendedNextApiRequest {
-  query: { id: string };
+  query: { postId: string; commentId: string };
 }
 
 export interface EditAndCreateCommentRequest extends CommentRequest {
@@ -11,5 +11,5 @@ export interface EditAndCreateCommentRequest extends CommentRequest {
 }
 
 export interface GetAllCommentsRequest extends UserExtendedNextApiRequest {
-  query: { id: string; page_size: string; page_num: string };
+  query: { postId: string; page_size: string; page_num: string };
 }

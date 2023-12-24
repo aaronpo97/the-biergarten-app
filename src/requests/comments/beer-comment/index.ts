@@ -9,8 +9,9 @@ import {
 export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async ({
   body,
   commentId,
+  beerPostId,
 }) => {
-  const response = await fetch(`/api/beer-post-comments/${commentId}`, {
+  const response = await fetch(`/api/beers/${beerPostId}/comments/${commentId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -33,8 +34,9 @@ export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async 
 
 export const deleteBeerPostCommentRequest: SendDeleteBeerPostCommentRequest = async ({
   commentId,
+  beerPostId,
 }) => {
-  const response = await fetch(`/api/beer-post-comments/${commentId}`, {
+  const response = await fetch(`/api/beers/${beerPostId}/comments/${commentId}`, {
     method: 'DELETE',
   });
 

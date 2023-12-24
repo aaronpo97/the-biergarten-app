@@ -1,14 +1,12 @@
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
-
 import {
-  checkIfBreweryCommentOwner,
-  deleteBreweryPostComment,
-  editBreweryPostComment,
-} from '@/controllers/comments/brewery-comments';
+  checkIfBeerStyleCommentOwner,
+  deleteBeerStyleComment,
+  editBeerStyleComment,
+} from '@/controllers/comments/beer-style-comments';
 import { CommentRequest } from '@/controllers/comments/types';
-
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
@@ -24,20 +22,20 @@ const router = createRouter<
 router
   .delete(
     validateRequest({
-      querySchema: z.object({ id: z.string().cuid() }),
+      querySchema: z.object({ postId: z.string().cuid(), commentId: z.string().cuid() }),
     }),
     getCurrentUser,
-    checkIfBreweryCommentOwner,
-    deleteBreweryPostComment,
+    checkIfBeerStyleCommentOwner,
+    deleteBeerStyleComment,
   )
   .put(
     validateRequest({
-      querySchema: z.object({ id: z.string().cuid() }),
+      querySchema: z.object({ postId: z.string().cuid(), commentId: z.string().cuid() }),
       bodySchema: CreateCommentValidationSchema,
     }),
     getCurrentUser,
-    checkIfBreweryCommentOwner,
-    editBreweryPostComment,
+    checkIfBeerStyleCommentOwner,
+    editBeerStyleComment,
   );
 
 const handler = router.handler(NextConnectOptions);

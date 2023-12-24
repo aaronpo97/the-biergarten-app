@@ -28,7 +28,7 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const handleDeleteRequest = async (id: string) => {
-    const response = await fetch(`/api/beer-style-comments/${id}`, {
+    const response = await fetch(`/api/beers/styles/${beerStyle.id}/comments/${id}`, {
       method: 'DELETE',
     });
 
@@ -41,7 +41,7 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
     id: string,
     data: z.infer<typeof CreateCommentValidationSchema>,
   ) => {
-    const response = await fetch(`/api/beer-style-comments/${id}`, {
+    const response = await fetch(`/api/beers/styles/${beerStyle.id}/comments/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: data.content, rating: data.rating }),

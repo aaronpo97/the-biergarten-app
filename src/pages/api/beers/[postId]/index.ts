@@ -26,14 +26,14 @@ router
   .put(
     validateRequest({
       bodySchema: EditBeerPostValidationSchema,
-      querySchema: z.object({ id: z.string() }),
+      querySchema: z.object({ postId: z.string() }),
     }),
     getCurrentUser,
     checkIfBeerPostOwner,
     editBeerPost,
   )
   .delete(
-    validateRequest({ querySchema: z.object({ id: z.string() }) }),
+    validateRequest({ querySchema: z.object({ postId: z.string() }) }),
     getCurrentUser,
     checkIfBeerPostOwner,
     deleteBeerPost,

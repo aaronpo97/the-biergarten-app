@@ -6,9 +6,8 @@ import { createRouter } from 'next-connect';
 import { z } from 'zod';
 import getCurrentUser from '@/config/nextConnect/middleware/getCurrentUser';
 import { NextApiResponse } from 'next';
-
 import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
-import { createComment, getAll } from '@/controllers/comments/brewery-comments';
+import { createComment, getAll } from '@/controllers/comments/beer-style-comments';
 import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 
 const router = createRouter<
@@ -20,7 +19,7 @@ const router = createRouter<
 router.post(
   validateRequest({
     bodySchema: CreateCommentValidationSchema,
-    querySchema: z.object({ id: z.string().cuid() }),
+    querySchema: z.object({ postId: z.string().cuid() }),
   }),
   getCurrentUser,
   createComment,
@@ -28,7 +27,7 @@ router.post(
 
 router.get(
   validateRequest({
-    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
+    querySchema: PaginatedQueryResponseSchema.extend({ postId: z.string().cuid() }),
   }),
   getAll,
 );
