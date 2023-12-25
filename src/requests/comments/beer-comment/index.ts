@@ -6,6 +6,16 @@ import {
   SendEditBeerPostCommentRequest,
 } from './types';
 
+/**
+ * Sends an api request to edit a beer post comment.
+ *
+ * @param params - The parameters for the request.
+ * @param params.body - The body of the request.
+ * @param params.commentId - The id of the comment to edit.
+ * @param params.beerPostId - The id of the beer post the comment belongs to.
+ * @returns The edited comment.
+ * @throws An error if the request fails or the response is invalid.
+ */
 export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async ({
   body,
   commentId,
@@ -22,7 +32,6 @@ export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async 
   }
 
   const json = await response.json();
-
   const parsed = APIResponseValidationSchema.safeParse(json);
 
   if (!parsed.success) {
@@ -32,6 +41,15 @@ export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async 
   return parsed.data;
 };
 
+/**
+ * Sends an api request to delete a beer post comment.
+ *
+ * @param params - The parameters for the request.
+ * @param params.commentId - The id of the comment to delete.
+ * @param params.beerPostId - The id of the beer post the comment belongs to.
+ * @returns The deleted comment.
+ * @throws An error if the request fails or the response is invalid.
+ */
 export const deleteBeerPostCommentRequest: SendDeleteBeerPostCommentRequest = async ({
   commentId,
   beerPostId,
@@ -45,7 +63,6 @@ export const deleteBeerPostCommentRequest: SendDeleteBeerPostCommentRequest = as
   }
 
   const json = await response.json();
-
   const parsed = APIResponseValidationSchema.safeParse(json);
 
   if (!parsed.success) {
@@ -55,22 +72,32 @@ export const deleteBeerPostCommentRequest: SendDeleteBeerPostCommentRequest = as
   return parsed.data;
 };
 
+/**
+ * Send an api request to create a comment on a beer post.
+ *
+ * @param params - The parameters for the request.
+ * @param params.beerPostId - The id of the beer post to create the comment on.
+ * @param params.body - The body of the request.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the beer.
+ * @returns The created comment.
+ * @throws An error if the request fails or the response is invalid.
+ */
 export const sendCreateBeerCommentRequest: SendCreateBeerCommentRequest = async ({
   beerPostId,
-  body,
+  body: { content, rating },
 }) => {
-  const { content, rating } = body;
   const response = await fetch(`/api/beers/${beerPostId}/comments`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ beerPostId, content, rating }),
   });
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }
 
   const data = await response.json();
-
   const parsedResponse = APIResponseValidationSchema.safeParse(data);
 
   if (!parsedResponse.success) {

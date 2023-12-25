@@ -57,7 +57,6 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    console.log(await response.json());
   };
 
   return (

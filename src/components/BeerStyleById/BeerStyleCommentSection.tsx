@@ -10,6 +10,10 @@ import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useB
 import LoadingComponent from '../BeerById/LoadingComponent';
 import CommentsComponent from '../ui/CommentsComponent';
 import BeerStyleCommentForm from './BeerStyleCommentForm';
+import {
+  sendDeleteBeerStyleCommentRequest,
+  sendEditBeerStyleCommentRequest,
+} from '@/requests/comments/beer-style-comment';
 
 interface BeerStyleCommentsSectionProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -28,28 +32,18 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const handleDeleteRequest = async (id: string) => {
-    const response = await fetch(`/api/beers/styles/${beerStyle.id}/comments/${id}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete comment.');
-    }
+    await sendDeleteBeerStyleCommentRequest({ beerStyleId: beerStyle.id, commentId: id });
   };
 
   const handleEditRequest = async (
     id: string,
     data: z.infer<typeof CreateCommentValidationSchema>,
   ) => {
-    const response = await fetch(`/api/beers/styles/${beerStyle.id}/comments/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: data.content, rating: data.rating }),
+    await sendEditBeerStyleCommentRequest({
+      beerStyleId: beerStyle.id,
+      commentId: id,
+      body: data,
     });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
   };
 
   return (
