@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { z } from 'zod';
 import sendCreateBreweryCommentRequest from '@/requests/comments/brewery-comment/sendCreateBreweryCommentRequest';
 import createErrorToast from '@/util/createErrorToast';
-import CommentForm from '../ui/CommentForm';
+import CommentForm from '../Comments/CommentForm';
 
 interface BreweryCommentFormProps {
   breweryPost: z.infer<typeof BreweryPostQueryResult>;

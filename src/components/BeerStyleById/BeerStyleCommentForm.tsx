@@ -11,7 +11,7 @@ import createErrorToast from '@/util/createErrorToast';
 import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
 import { sendCreateBeerStyleCommentRequest } from '@/requests/comments/beer-style-comment';
-import CommentForm from '../ui/CommentForm';
+import CommentForm from '../Comments/CommentForm';
 
 interface BeerCommentFormProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;

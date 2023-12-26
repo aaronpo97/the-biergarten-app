@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import Spinner from '../ui/Spinner';
-import CommentLoadingCardBody from '../BeerBreweryComments/CommentLoadingCardBody';
+import CommentLoadingCardBody from './CommentLoadingCardBody';
 
-interface LoadingComponentProps {
+interface CommentLoadingComponentProps {
   length: number;
 }
 
-const LoadingComponent: FC<LoadingComponentProps> = ({ length }) => {
+const CommentLoadingComponent: FC<CommentLoadingComponentProps> = ({ length }) => {
   return (
     <>
       {Array.from({ length }).map((_, i) => (
@@ -19,4 +19,4 @@ const LoadingComponent: FC<LoadingComponentProps> = ({ length }) => {
   );
 };
 
-export default LoadingComponent;
+export default CommentLoadingComponent;

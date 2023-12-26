@@ -14,6 +14,7 @@ import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
+import { HandleDeleteCommentRequest, HandleEditCommentRequest } from './types';
 
 interface EditCommentBodyProps {
   comment: z.infer<typeof CommentQueryResult>;
@@ -22,19 +23,16 @@ interface EditCommentBodyProps {
   mutate: ReturnType<
     typeof useBeerPostComments | typeof useBreweryPostComments
   >['mutate'];
-  handleDeleteRequest: (id: string) => Promise<void>;
-  handleEditRequest: (
-    id: string,
-    data: z.infer<typeof CreateCommentValidationSchema>,
-  ) => Promise<void>;
+  handleDeleteCommentRequest: HandleDeleteCommentRequest;
+  handleEditCommentRequest: HandleEditCommentRequest;
 }
 
 const EditCommentBody: FC<EditCommentBodyProps> = ({
   comment,
   setInEditMode,
   mutate,
-  handleDeleteRequest,
-  handleEditRequest,
+  handleDeleteCommentRequest,
+  handleEditCommentRequest,
 }) => {
   const { register, handleSubmit, formState, setValue, watch } = useForm<
     z.infer<typeof CreateCommentValidationSchema>
@@ -51,7 +49,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
     const loadingToast = toast.loading('Deleting comment...');
     setIsDeleting(true);
     try {
-      await handleDeleteRequest(comment.id);
+      await handleDeleteCommentRequest(comment.id);
       await mutate();
       toast.remove(loadingToast);
       toast.success('Deleted comment.');
@@ -68,7 +66,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
 
     try {
       setInEditMode(true);
-      await handleEditRequest(comment.id, data);
+      await handleEditCommentRequest(comment.id, data);
       await mutate();
       toast.remove(loadingToast);
       toast.success('Comment edits submitted successfully.');
@@ -79,6 +77,8 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
       setInEditMode(false);
     }
   };
+
+  const disableForm = isSubmitting || isDeleting;
 
   return (
     <div className="py-4 pr-3 animate-in fade-in-10">
@@ -95,7 +95,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               placeholder="Comment"
               rows={2}
               error={!!errors.content?.message}
-              disabled={isSubmitting || isDeleting}
+              disabled={disableForm}
             />
           </FormSegment>
           <div className="flex flex-row items-center justify-between">
@@ -114,8 +114,8 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
                   <Rating.Item
                     name="rating-1"
                     className="mask mask-star cursor-default"
-                    disabled={isSubmitting || isDeleting}
-                    aria-disabled={isSubmitting || isDeleting}
+                    disabled={disableForm}
+                    aria-disabled={disableForm}
                     key={index}
                   />
                 ))}
@@ -125,7 +125,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               <button
                 type="button"
                 className="btn join-item btn-xs lg:btn-sm"
-                disabled={isSubmitting || isDeleting}
+                disabled={disableForm}
                 onClick={() => {
                   setInEditMode(false);
                 }}
@@ -134,7 +134,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || isDeleting}
+                disabled={disableForm}
                 className="btn join-item btn-xs lg:btn-sm"
               >
                 Save
@@ -143,7 +143,7 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
                 type="button"
                 className="btn join-item btn-xs lg:btn-sm"
                 onClick={onDelete}
-                disabled={isDeleting || formState.isSubmitting}
+                disabled={disableForm}
               >
                 Delete
               </button>

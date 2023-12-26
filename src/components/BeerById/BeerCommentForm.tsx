@@ -10,7 +10,7 @@ import CreateCommentValidationSchema from '@/services/schema/CommentSchema/Creat
 import toast from 'react-hot-toast';
 import createErrorToast from '@/util/createErrorToast';
 import { sendCreateBeerCommentRequest } from '@/requests/comments/beer-comment';
-import CommentForm from '../ui/CommentForm';
+import CommentForm from '../Comments/CommentForm';
 
 interface BeerCommentFormProps {
   beerPost: z.infer<typeof BeerPostQueryResult>;

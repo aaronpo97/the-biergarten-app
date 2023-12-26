@@ -11,9 +11,11 @@ import {
  *
  * @param params - The parameters for the request.
  * @param params.body - The body of the request.
+ * @param params.body.content - The content of the comment.
+ * @param params.body.rating - The rating of the beer.
  * @param params.commentId - The id of the comment to edit.
  * @param params.beerPostId - The id of the beer post the comment belongs to.
- * @returns The edited comment.
+ * @returns The JSON response from the server.
  * @throws An error if the request fails or the response is invalid.
  */
 export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async ({
@@ -47,7 +49,7 @@ export const editBeerPostCommentRequest: SendEditBeerPostCommentRequest = async 
  * @param params - The parameters for the request.
  * @param params.commentId - The id of the comment to delete.
  * @param params.beerPostId - The id of the beer post the comment belongs to.
- * @returns The deleted comment.
+ * @returns The JSON response from the server.
  * @throws An error if the request fails or the response is invalid.
  */
 export const deleteBeerPostCommentRequest: SendDeleteBeerPostCommentRequest = async ({

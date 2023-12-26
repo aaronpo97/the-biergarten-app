@@ -3,28 +3,26 @@ import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResu
 import { FC, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
-import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
+
 import CommentContentBody from './CommentContentBody';
 import EditCommentBody from './EditCommentBody';
 import UserAvatar from '../Account/UserAvatar';
+import { HandleDeleteCommentRequest, HandleEditCommentRequest } from './types';
 
 interface CommentCardProps {
   comment: z.infer<typeof CommentQueryResult>;
   mutate: ReturnType<typeof useBeerPostComments>['mutate'];
   ref?: ReturnType<typeof useInView>['ref'];
-  handleDeleteRequest: (id: string) => Promise<void>;
-  handleEditRequest: (
-    id: string,
-    data: z.infer<typeof CreateCommentValidationSchema>,
-  ) => Promise<void>;
+  handleDeleteCommentRequest: HandleDeleteCommentRequest;
+  handleEditCommentRequest: HandleEditCommentRequest;
 }
 
 const CommentCardBody: FC<CommentCardProps> = ({
   comment,
   mutate,
   ref,
-  handleDeleteRequest,
-  handleEditRequest,
+  handleDeleteCommentRequest,
+  handleEditCommentRequest,
 }) => {
   const [inEditMode, setInEditMode] = useState(false);
 
@@ -44,8 +42,8 @@ const CommentCardBody: FC<CommentCardProps> = ({
             comment={comment}
             mutate={mutate}
             setInEditMode={setInEditMode}
-            handleDeleteRequest={handleDeleteRequest}
-            handleEditRequest={handleEditRequest}
+            handleDeleteCommentRequest={handleDeleteCommentRequest}
+            handleEditCommentRequest={handleEditCommentRequest}
           />
         )}
       </div>

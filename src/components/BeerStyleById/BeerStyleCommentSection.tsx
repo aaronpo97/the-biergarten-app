@@ -3,17 +3,16 @@ import UserContext from '@/contexts/UserContext';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import { useRouter } from 'next/router';
-import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
-import LoadingComponent from '../BeerById/LoadingComponent';
-import CommentsComponent from '../ui/CommentsComponent';
-import BeerStyleCommentForm from './BeerStyleCommentForm';
 import {
   sendDeleteBeerStyleCommentRequest,
   sendEditBeerStyleCommentRequest,
 } from '@/requests/comments/beer-style-comment';
+import CommentLoadingComponent from '../Comments/CommentLoadingComponent';
+import CommentsComponent from '../Comments/CommentsComponent';
+import BeerStyleCommentForm from './BeerStyleCommentForm';
 
 interface BeerStyleCommentsSectionProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -30,21 +29,6 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
     useBeerStyleComments({ id: beerStyle.id, pageNum, pageSize: PAGE_SIZE });
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-
-  const handleDeleteRequest = async (id: string) => {
-    await sendDeleteBeerStyleCommentRequest({ beerStyleId: beerStyle.id, commentId: id });
-  };
-
-  const handleEditRequest = async (
-    id: string,
-    data: z.infer<typeof CreateCommentValidationSchema>,
-  ) => {
-    await sendEditBeerStyleCommentRequest({
-      beerStyleId: beerStyle.id,
-      commentId: id,
-      body: data,
-    });
-  };
 
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
@@ -67,7 +51,7 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
          */
         isLoading ? (
           <div className="card bg-base-300 pb-6">
-            <LoadingComponent length={PAGE_SIZE} />
+            <CommentLoadingComponent length={PAGE_SIZE} />
           </div>
         ) : (
           <CommentsComponent
@@ -79,8 +63,19 @@ const BeerStyleCommentsSection: FC<BeerStyleCommentsSectionProps> = ({ beerStyle
             setSize={setSize}
             size={size}
             mutate={mutate}
-            handleDeleteRequest={handleDeleteRequest}
-            handleEditRequest={handleEditRequest}
+            handleDeleteCommentRequest={(id) => {
+              return sendDeleteBeerStyleCommentRequest({
+                beerStyleId: beerStyle.id,
+                commentId: id,
+              });
+            }}
+            handleEditCommentRequest={(id, data) => {
+              return sendEditBeerStyleCommentRequest({
+                beerStyleId: beerStyle.id,
+                commentId: id,
+                body: data,
+              });
+            }}
           />
         )
       }

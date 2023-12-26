@@ -8,12 +8,12 @@ import type {
   UseFormSetValue,
   UseFormWatch,
 } from 'react-hook-form';
-import FormError from './forms/FormError';
-import FormInfo from './forms/FormInfo';
-import FormLabel from './forms/FormLabel';
-import FormSegment from './forms/FormSegment';
-import FormTextArea from './forms/FormTextArea';
-import Button from './forms/Button';
+import FormError from '../ui/forms/FormError';
+import FormInfo from '../ui/forms/FormInfo';
+import FormLabel from '../ui/forms/FormLabel';
+import FormSegment from '../ui/forms/FormSegment';
+import FormTextArea from '../ui/forms/FormTextArea';
+import Button from '../ui/forms/Button';
 
 interface Comment {
   content: string;
