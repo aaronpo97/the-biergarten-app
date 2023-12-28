@@ -1,18 +1,20 @@
+import { FunctionComponent } from 'react';
+import router from 'next/router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BeerStyle } from '@prisma/client';
-import router from 'next/router';
-import { FunctionComponent } from 'react';
+import toast from 'react-hot-toast';
 import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
 import { z } from 'zod';
+
 import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import CreateBeerPostValidationSchema from '@/services/posts/beer-post/schema/CreateBeerPostValidationSchema';
-import sendCreateBeerPostRequest from '@/requests/posts/beer-post/sendCreateBeerPostRequest';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
-import sendUploadBeerImagesRequest from '@/requests/images/beer-image/sendUploadBeerImageRequest';
-
-import toast from 'react-hot-toast';
 
 import createErrorToast from '@/util/createErrorToast';
+
+import { sendCreateBeerPostRequest } from '@/requests/posts/beer-post';
+import sendUploadBeerImagesRequest from '@/requests/images/beer-image/sendUploadBeerImageRequest';
+
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -53,7 +55,16 @@ const CreateBeerPostForm: FunctionComponent<BeerFormProps> = ({
 
     try {
       const loadingToast = toast.loading('Creating beer post...');
-      const beerPost = await sendCreateBeerPostRequest(data);
+      const beerPost = await sendCreateBeerPostRequest({
+        body: {
+          name: data.name,
+          description: data.description,
+          abv: data.abv,
+          ibu: data.ibu,
+        },
+        breweryId: data.breweryId,
+        styleId: data.styleId,
+      });
       await sendUploadBeerImagesRequest({ beerPost, images: data.images });
       await router.push(`/beers/${beerPost.id}`);
       toast.dismiss(loadingToast);

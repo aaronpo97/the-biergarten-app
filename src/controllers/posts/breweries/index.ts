@@ -167,9 +167,9 @@ export const checkIfBreweryPostOwner = async (
   next: NextHandler,
 ) => {
   const user = req.user!;
-  const { id } = req.query;
+  const { postId } = req.query;
 
-  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: postId });
   if (!breweryPost) {
     throw new ServerError('Brewery post not found', 404);
   }
@@ -187,10 +187,10 @@ export const editBreweryPost = async (
 ) => {
   const {
     body,
-    query: { id },
+    query: { postId },
   } = req;
 
-  await updateBreweryPostService({ breweryPostId: id, body });
+  await updateBreweryPostService({ breweryPostId: postId, body });
 
   res.status(200).json({
     message: 'Brewery post updated successfully',
@@ -203,8 +203,8 @@ export const deleteBreweryPost = async (
   req: BreweryPostRequest,
   res: NextApiResponse,
 ) => {
-  const { id } = req.query;
-  const deleted = await deleteBreweryPostService({ breweryPostId: id });
+  const { postId } = req.query;
+  const deleted = await deleteBreweryPostService({ breweryPostId: postId });
 
   if (!deleted) {
     throw new ServerError('Brewery post not found', 404);

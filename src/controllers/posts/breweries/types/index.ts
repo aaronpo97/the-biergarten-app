@@ -14,7 +14,7 @@ export interface CreateBreweryPostRequest extends UserExtendedNextApiRequest {
 }
 
 export interface BreweryPostRequest extends UserExtendedNextApiRequest {
-  query: { id: string };
+  query: { postId: string };
 }
 
 export interface EditBreweryPostRequest extends BreweryPostRequest {
