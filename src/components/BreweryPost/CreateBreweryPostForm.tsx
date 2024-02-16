@@ -1,5 +1,5 @@
 import sendUploadBreweryImagesRequest from '@/requests/images/brewery-image/sendUploadBreweryImageRequest';
-import sendCreateBreweryPostRequest from '@/requests/posts/brewery-post/sendCreateBreweryPostRequest';
+
 import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';
@@ -27,6 +27,7 @@ import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 import FormTextInput from '../ui/forms/FormTextInput';
 import Button from '../ui/forms/Button';
+import { sendCreateBreweryPostRequest } from '@/requests/posts/brewery-post';
 
 const AddressAutofill = dynamic(
   // @ts-expect-error
@@ -225,7 +226,7 @@ const CreateBreweryPostForm: FC<{
       if (!(data.images instanceof FileList)) {
         return;
       }
-      const breweryPost = await sendCreateBreweryPostRequest(data);
+      const breweryPost = await sendCreateBreweryPostRequest({ body: data });
       await sendUploadBreweryImagesRequest({ breweryPost, images: data.images });
       await router.push(`/breweries/${breweryPost.id}`);
       toast.remove(loadingToast);
