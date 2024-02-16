@@ -1,4 +1,3 @@
-import sendRegisterUserRequest from '@/requests/users/auth/sendRegisterUserRequest';
 import { CreateUserValidationSchemaWithUsernameAndEmailCheck } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
@@ -9,6 +8,7 @@ import { z } from 'zod';
 
 import createErrorToast from '@/util/createErrorToast';
 import toast from 'react-hot-toast';
+import { sendRegisterUserRequest } from '@/requests/users/auth';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';

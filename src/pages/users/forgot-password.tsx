@@ -12,8 +12,9 @@ import { NextPage } from 'next';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import sendForgotPasswordRequest from '@/requests/users/auth/sendForgotPasswordRequest';
+
 import { FaUserCircle } from 'react-icons/fa';
+import { sendForgotPasswordRequest } from '@/requests/users/auth';
 
 interface ForgotPasswordPageProps {}
 
@@ -29,7 +30,7 @@ const ForgotPasswordPage: NextPage<ForgotPasswordPageProps> = () => {
   const onSubmit: SubmitHandler<{ email: string }> = async (data) => {
     try {
       const loadingToast = toast.loading('Sending reset link...');
-      await sendForgotPasswordRequest(data.email);
+      await sendForgotPasswordRequest({ email: data.email });
       reset();
       toast.dismiss(loadingToast);
       toast.success('Password reset link sent!');
