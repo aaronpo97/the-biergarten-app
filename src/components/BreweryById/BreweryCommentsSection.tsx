@@ -2,11 +2,14 @@ import UserContext from '@/contexts/UserContext';
 import BreweryPostQueryResult from '@/services/posts/brewery-post/schema/BreweryPostQueryResult';
 import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
-import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
 
 import useBreweryPostComments from '@/hooks/data-fetching/brewery-comments/useBreweryPostComments';
-import LoadingComponent from '../BeerById/LoadingComponent';
-import CommentsComponent from '../ui/CommentsComponent';
+import {
+  sendDeleteBreweryPostCommentRequest,
+  sendEditBreweryPostCommentRequest,
+} from '@/requests/comments/brewery-comment';
+import CommentLoadingComponent from '../Comments/CommentLoadingComponent';
+import CommentsComponent from '../Comments/CommentsComponent';
 import BreweryCommentForm from './BreweryCommentForm';
 
 interface BreweryBeerSectionProps {
@@ -30,31 +33,6 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  const handleDeleteRequest = async (commentId: string) => {
-    const response = await fetch(`/api/brewery-comments/${commentId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-  };
-
-  const handleEditRequest = async (
-    commentId: string,
-    data: z.infer<typeof CreateCommentValidationSchema>,
-  ) => {
-    const response = await fetch(`/api/brewery-comments/${commentId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: data.content, rating: data.rating }),
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-  };
-
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
       <div className="card">
@@ -75,7 +53,7 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
          */
         isLoading ? (
           <div className="card pb-6">
-            <LoadingComponent length={PAGE_SIZE} />
+            <CommentLoadingComponent length={PAGE_SIZE} />
           </div>
         ) : (
           <CommentsComponent
@@ -87,8 +65,19 @@ const BreweryCommentsSection: FC<BreweryBeerSectionProps> = ({ breweryPost }) =>
             size={size}
             commentSectionRef={commentSectionRef}
             mutate={mutate}
-            handleDeleteRequest={handleDeleteRequest}
-            handleEditRequest={handleEditRequest}
+            handleDeleteCommentRequest={(id) => {
+              return sendDeleteBreweryPostCommentRequest({
+                breweryPostId: breweryPost.id,
+                commentId: id,
+              });
+            }}
+            handleEditCommentRequest={(commentId, data) => {
+              return sendEditBreweryPostCommentRequest({
+                breweryPostId: breweryPost.id,
+                commentId,
+                body: { content: data.content, rating: data.rating },
+              });
+            }}
           />
         )
       }

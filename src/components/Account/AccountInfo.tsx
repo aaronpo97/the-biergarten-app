@@ -1,5 +1,4 @@
-import validateEmailRequest from '@/requests/User/validateEmailRequest';
-import validateUsernameRequest from '@/requests/validateUsernameRequest';
+import validateUsernameRequest from '@/requests/users/profile/validateUsernameRequest';
 import { BaseCreateUserSchema } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import { Switch } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,7 +6,7 @@ import { Dispatch, FC, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UserContext from '@/contexts/UserContext';
-import sendEditUserRequest from '@/requests/User/sendEditUserRequest';
+
 import createErrorToast from '@/util/createErrorToast';
 import { toast } from 'react-hot-toast';
 import { AccountPageAction, AccountPageState } from '@/reducers/accountPageReducer';
@@ -15,6 +14,7 @@ import FormError from '../ui/forms/FormError';
 import FormInfo from '../ui/forms/FormInfo';
 import FormLabel from '../ui/forms/FormLabel';
 import FormTextInput from '../ui/forms/FormTextInput';
+import { sendEditUserRequest, validateEmailRequest } from '@/requests/users/auth';
 
 interface AccountInfoProps {
   pageState: AccountPageState;
@@ -36,7 +36,7 @@ const AccountInfo: FC<AccountInfoProps> = ({ pageState, dispatch }) => {
       .refine(
         async (email) => {
           if (user!.email === email) return true;
-          return validateEmailRequest(email);
+          return validateEmailRequest({ email });
         },
         { message: 'Email is already taken.' },
       ),

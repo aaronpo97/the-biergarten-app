@@ -6,10 +6,13 @@ import { z } from 'zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import deleteBeerPostRequest from '@/requests/BeerPost/deleteBeerPostRequest';
 import EditBeerPostValidationSchema from '@/services/posts/beer-post/schema/EditBeerPostValidationSchema';
-import sendEditBeerPostRequest from '@/requests/BeerPost/sendEditBeerPostRequest';
+
 import createErrorToast from '@/util/createErrorToast';
+import {
+  sendEditBeerPostRequest,
+  sendDeleteBeerPostRequest,
+} from '@/requests/posts/beer-post';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -35,7 +38,15 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
   const onSubmit: SubmitHandler<EditBeerPostSchema> = async (data) => {
     try {
       const loadingToast = toast.loading('Editing beer post...');
-      await sendEditBeerPostRequest(data);
+      await sendEditBeerPostRequest({
+        beerPostId: data.id,
+        body: {
+          name: data.name,
+          abv: data.abv,
+          ibu: data.ibu,
+          description: data.description,
+        },
+      });
       await router.push(`/beers/${data.id}`);
       toast.success('Edited beer post.');
       toast.dismiss(loadingToast);
@@ -48,7 +59,7 @@ const EditBeerPostForm: FC<EditBeerPostFormProps> = ({ previousValues }) => {
   const onDelete = async () => {
     try {
       const loadingToast = toast.loading('Deleting beer post...');
-      await deleteBeerPostRequest(previousValues.id);
+      await sendDeleteBeerPostRequest({ beerPostId: previousValues.id });
       toast.dismiss(loadingToast);
       await router.push('/beers');
       toast.success('Deleted beer post.');

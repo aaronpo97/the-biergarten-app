@@ -6,11 +6,15 @@ import { FC, MutableRefObject, useContext, useRef } from 'react';
 import { z } from 'zod';
 import useBeerPostComments from '@/hooks/data-fetching/beer-comments/useBeerPostComments';
 import { useRouter } from 'next/router';
-import CreateCommentValidationSchema from '@/services/schema/CommentSchema/CreateCommentValidationSchema';
+
+import {
+  deleteBeerPostCommentRequest,
+  editBeerPostCommentRequest,
+} from '@/requests/comments/beer-comment';
 import BeerCommentForm from './BeerCommentForm';
 
-import LoadingComponent from './LoadingComponent';
-import CommentsComponent from '../ui/CommentsComponent';
+import CommentLoadingComponent from '../Comments/CommentLoadingComponent';
+import CommentsComponent from '../Comments/CommentsComponent';
 
 interface BeerPostCommentsSectionProps {
   beerPost: z.infer<typeof BeerPostQueryResult>;
@@ -27,29 +31,6 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
     useBeerPostComments({ id: beerPost.id, pageNum, pageSize: PAGE_SIZE });
 
   const commentSectionRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-
-  const handleDeleteRequest = async (id: string) => {
-    const response = await fetch(`/api/beer-comments/${id}`, { method: 'DELETE' });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete comment.');
-    }
-  };
-
-  const handleEditRequest = async (
-    id: string,
-    data: z.infer<typeof CreateCommentValidationSchema>,
-  ) => {
-    const response = await fetch(`/api/beer-comments/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: data.content, rating: data.rating }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update comment.');
-    }
-  };
 
   return (
     <div className="w-full space-y-3" ref={commentSectionRef}>
@@ -72,7 +53,7 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
          */
         isLoading ? (
           <div className="card bg-base-300 pb-6">
-            <LoadingComponent length={PAGE_SIZE} />
+            <CommentLoadingComponent length={PAGE_SIZE} />
           </div>
         ) : (
           <CommentsComponent
@@ -84,8 +65,19 @@ const BeerPostCommentsSection: FC<BeerPostCommentsSectionProps> = ({ beerPost })
             setSize={setSize}
             size={size}
             mutate={mutate}
-            handleDeleteRequest={handleDeleteRequest}
-            handleEditRequest={handleEditRequest}
+            handleDeleteCommentRequest={(id) => {
+              return deleteBeerPostCommentRequest({
+                commentId: id,
+                beerPostId: beerPost.id,
+              });
+            }}
+            handleEditCommentRequest={(id, data) => {
+              return editBeerPostCommentRequest({
+                body: data,
+                commentId: id,
+                beerPostId: beerPost.id,
+              });
+            }}
           />
         )
       }

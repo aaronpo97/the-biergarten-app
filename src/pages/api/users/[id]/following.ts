@@ -2,6 +2,7 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import NextConnectOptions from '@/config/nextConnect/NextConnectOptions';
 import validateRequest from '@/config/nextConnect/middleware/validateRequest';
 import { getUsersFollowed } from '@/controllers/users/profile';
+import PaginatedQueryResponseSchema from '@/services/schema/PaginatedQueryResponseSchema';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
 
 import { NextApiResponse } from 'next';
@@ -19,11 +20,7 @@ const router = createRouter<
 
 router.get(
   validateRequest({
-    querySchema: z.object({
-      id: z.string().cuid(),
-      page_size: z.string().regex(/^\d+$/),
-      page_num: z.string().regex(/^\d+$/),
-    }),
+    querySchema: PaginatedQueryResponseSchema.extend({ id: z.string().cuid() }),
   }),
   getUsersFollowed,
 );

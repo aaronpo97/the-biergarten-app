@@ -18,7 +18,7 @@ export const processBreweryImageData = async (
   }
 
   const breweryImages = await addBreweryImagesService({
-    breweryPostId: req.query.id,
+    breweryPostId: req.query.postId,
     userId: user!.id,
     body,
     files,

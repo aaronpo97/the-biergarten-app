@@ -10,8 +10,8 @@ import createErrorToast from '@/util/createErrorToast';
 
 import BeerStyleQueryResult from '@/services/posts/beer-style-post/schema/BeerStyleQueryResult';
 import useBeerStyleComments from '@/hooks/data-fetching/beer-style-comments/useBeerStyleComments';
-import sendCreateBeerStyleCommentRequest from '@/requests/BeerStyleComment/sendCreateBeerStyleCommentRequest';
-import CommentForm from '../ui/CommentForm';
+import { sendCreateBeerStyleCommentRequest } from '@/requests/comments/beer-style-comment';
+import CommentForm from '../Comments/CommentForm';
 
 interface BeerCommentFormProps {
   beerStyle: z.infer<typeof BeerStyleQueryResult>;
@@ -35,8 +35,7 @@ const BeerStyleCommentForm: FunctionComponent<BeerCommentFormProps> = ({
     const loadingToast = toast.loading('Posting a new comment...');
     try {
       await sendCreateBeerStyleCommentRequest({
-        content: data.content,
-        rating: data.rating,
+        body: { content: data.content, rating: data.rating },
         beerStyleId: beerStyle.id,
       });
       reset();

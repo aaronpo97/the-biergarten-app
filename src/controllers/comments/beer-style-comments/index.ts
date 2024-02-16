@@ -25,10 +25,12 @@ export const checkIfBeerStyleCommentOwner = async <
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
   next: NextHandler,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
   const user = req.user!;
 
-  const beerStyleComment = await findBeerStyleCommentById({ beerStyleCommentId: id });
+  const beerStyleComment = await findBeerStyleCommentById({
+    beerStyleCommentId: commentId,
+  });
 
   if (!beerStyleComment) {
     throw new ServerError('Beer style comment not found.', 404);
@@ -49,7 +51,7 @@ export const editBeerStyleComment = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   await updateBeerStyleCommentById({
-    beerStyleCommentId: req.query.id,
+    beerStyleCommentId: req.query.commentId,
     body: req.body,
   });
 
@@ -64,9 +66,9 @@ export const deleteBeerStyleComment = async (
   req: CommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
 
-  await deleteBeerStyleCommentById({ beerStyleCommentId: id });
+  await deleteBeerStyleCommentById({ beerStyleCommentId: commentId });
 
   res.status(200).json({
     success: true,
@@ -81,7 +83,7 @@ export const createComment = async (
 ) => {
   const newBeerStyleComment = await createNewBeerStyleComment({
     body: req.body,
-    beerStyleId: req.query.id,
+    beerStyleId: req.query.postId,
     userId: req.user!.id,
   });
 
@@ -97,7 +99,7 @@ export const getAll = async (
   req: GetAllCommentsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const beerStyleId = req.query.id;
+  const beerStyleId = req.query.postId;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 

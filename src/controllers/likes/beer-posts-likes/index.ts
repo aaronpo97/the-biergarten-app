@@ -2,7 +2,7 @@ import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
 
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiResponse, NextApiRequest } from 'next';
+import { NextApiResponse } from 'next';
 import { z } from 'zod';
 
 import { getBeerPostById } from '@/services/posts/beer-post';
@@ -19,9 +19,9 @@ export const sendBeerPostLikeRequest = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
-  const id = req.query.id as string;
+  const { postId } = req.query;
 
-  const beer = await getBeerPostById({ beerPostId: id });
+  const beer = await getBeerPostById({ beerPostId: postId });
   if (!beer) {
     throw new ServerError('Could not find a beer post with that id.', 404);
   }
@@ -53,12 +53,12 @@ export const sendBeerPostLikeRequest = async (
 };
 
 export const getBeerPostLikeCount = async (
-  req: NextApiRequest,
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const id = req.query.id as string;
+  const { postId } = req.query;
 
-  const likeCount = await getBeerPostLikeCountService({ beerPostId: id });
+  const likeCount = await getBeerPostLikeCountService({ beerPostId: postId });
 
   res.status(200).json({
     success: true,

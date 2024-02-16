@@ -25,9 +25,9 @@ export const checkIfBreweryCommentOwner = async <
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
   next: NextHandler,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
   const user = req.user!;
-  const comment = await getBreweryCommentById({ breweryCommentId: id });
+  const comment = await getBreweryCommentById({ breweryCommentId: commentId });
 
   if (!comment) {
     throw new ServerError('Comment not found', 404);
@@ -44,10 +44,10 @@ export const editBreweryPostComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
 
-  const updated = updateBreweryCommentById({
-    breweryCommentId: id,
+  const updated = await updateBreweryCommentById({
+    breweryCommentId: commentId,
     body: req.body,
   });
 
@@ -63,9 +63,9 @@ export const deleteBreweryPostComment = async (
   req: CommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { commentId } = req.query;
 
-  await deleteBreweryCommentByIdService({ breweryCommentId: id });
+  await deleteBreweryCommentByIdService({ breweryCommentId: commentId });
 
   res.status(200).json({
     success: true,
@@ -78,7 +78,7 @@ export const createComment = async (
   req: EditAndCreateCommentRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const breweryPostId = req.query.id;
+  const breweryPostId = req.query.postId;
 
   const user = req.user!;
 
@@ -100,7 +100,7 @@ export const getAll = async (
   req: GetAllCommentsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const breweryPostId = req.query.id;
+  const breweryPostId = req.query.postId;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page_size, page_num } = req.query;
 
