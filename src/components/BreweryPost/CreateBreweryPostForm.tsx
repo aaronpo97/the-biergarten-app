@@ -250,13 +250,9 @@ const CreateBreweryPostForm: FC<{
       autoComplete="off"
     >
       <Tab.Group as={Fragment}>
-        <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
-          <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-            Information
-          </Tab>
-          <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-            Location
-          </Tab>
+        <Tab.List className="tabs-boxed tabs grid grid-cols-2">
+          <Tab className="tab uppercase ui-selected:tab-active">Information</Tab>
+          <Tab className="tab uppercase ui-selected:tab-active">Location</Tab>
         </Tab.List>
         <Tab.Panels className="mt-4">
           <Tab.Panel>

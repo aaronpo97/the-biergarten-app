@@ -74,13 +74,9 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
               </div>
             ) : (
               <Tab.Group>
-                <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
-                  <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-                    Comments
-                  </Tab>
-                  <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-                    Other Beers
-                  </Tab>
+                <Tab.List className="tabs-boxed tabs grid grid-cols-2">
+                  <Tab className="tab uppercase ui-selected:tab-active">Comments</Tab>
+                  <Tab className="tab uppercase ui-selected:tab-active">Other Beers</Tab>
                 </Tab.List>
                 <Tab.Panels className="mt-2">
                   <Tab.Panel>

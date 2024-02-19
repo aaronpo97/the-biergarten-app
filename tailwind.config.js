@@ -27,9 +27,9 @@ const myThemes = {
     warning: 'hsl(40, 76%, 73%)',
     'primary-content': 'hsl(0, 0%, 0%)',
     'error-content': 'hsl(0, 0%, 0%)',
-    'base-300': 'hsl(180, 10%, 88%)',
-    'base-200': 'hsl(180, 10%, 92%)',
-    'base-100': 'hsl(180, 10%, 95%)',
+    'base-300': 'hsl(180, 10%, 70%)',
+    'base-200': 'hsl(180, 10%, 75%)',
+    'base-100': 'hsl(180, 10%, 80%)',
   },
 };
 

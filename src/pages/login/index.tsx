@@ -18,8 +18,8 @@ const LoginPage: NextPage = () => {
         <meta name="description" content="Login to your account" />
       </Head>
 
-      <div className="flex h-full flex-row">
-        <div className="hidden h-full flex-col items-center justify-center bg-base-100 lg:flex lg:w-[55%]">
+      <div className="flex h-screen flex-row">
+        <div className="hidden h-dvh flex-col items-center justify-center bg-base-100 lg:flex lg:w-[55%]">
           <CldImage
             src="https://res.cloudinary.com/dxie9b7na/image/upload/v1701056793/cloudinary-images/pexels-elevate-1267700_jrno3s.jpg"
             alt="Login Image"
@@ -28,7 +28,7 @@ const LoginPage: NextPage = () => {
             className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex h-full w-full flex-col items-center justify-center bg-base-300 lg:w-[45%]">
+        <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-base-100 lg:w-[45%]">
           <div className="w-10/12 space-y-5 sm:w-9/12">
             <div className=" flex flex-col items-center space-y-2">
               <FaUserCircle className="text-3xl" />
