@@ -46,10 +46,9 @@ module.exports = {
   plugins: [
     require('@headlessui/tailwindcss'),
     require('daisyui'),
-    require('tailwindcss-animate'),
+    require('tailwindcss-animated'),
     require('autoprefixer'),
   ],
-
   daisyui: {
     logs: false,
     themes: [myThemes],
