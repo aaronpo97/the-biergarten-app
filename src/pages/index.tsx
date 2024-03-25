@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
+import { CldImage } from 'next-cloudinary';
 import Head from 'next/head';
-import Image from 'next/image';
 
 const keywords = [
   'beer',
@@ -40,12 +40,12 @@ const Home: NextPage = () => {
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords.join(', ')} />
       </Head>
-      <div className="relative flex h-dvh w-full flex-col items-center justify-center">
-        <Image
-          alt=""
-          src="/background.jpg"
-          height={4015}
-          width={6035}
+      <div className="relative flex h-dvh w-full flex-col items-center justify-center bg-base-300">
+        <CldImage
+          src="https://res.cloudinary.com/dxie9b7na/image/upload/v1701056793/cloudinary-images/pexels-elevate-1267700_jrno3s.jpg"
+          alt="Login Image"
+          width={5000}
+          height={5000}
           className="pointer-events-none absolute h-full w-full object-cover mix-blend-overlay"
         />
         <div className="relative flex w-9/12 flex-col space-y-3 text-base-content">

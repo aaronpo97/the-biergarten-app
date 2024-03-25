@@ -1,10 +1,10 @@
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import useNavbar from '@/hooks/utilities/useNavbar';
-import useTheme from '@/hooks/utilities/useTheme';
+// import useTheme from '@/hooks/utilities/useTheme';
 
 import Link from 'next/link';
 import { FC, useRef } from 'react';
-import { MdDarkMode, MdLightMode } from 'react-icons/md';
+// import { MdDarkMode, MdLightMode } from 'react-icons/md';
 
 import { FaBars } from 'react-icons/fa';
 import classNames from 'classnames';
@@ -83,25 +83,30 @@ const MobileLinks: FC = () => {
 const Navbar = () => {
   const isDesktopView = useMediaQuery('(min-width: 1024px)');
 
-  const { theme, setTheme } = useTheme();
   const { currentURL } = useNavbar();
 
+  const backgroundIsTransparent =
+    currentURL === '/' || currentURL === '/login' || currentURL === '/register';
+
+  const isOnHomePage = currentURL === '/';
+
+  // const { theme, setTheme } = useTheme();
   return (
     <div
       className={classNames('navbar fixed top-0 z-20 h-10 min-h-10 text-base-content', {
-        'bg-transparent': currentURL === '/',
-        'bg-base-100': currentURL !== '/',
+        'bg-transparent': backgroundIsTransparent,
+        'bg-base-100': !backgroundIsTransparent,
       })}
     >
       <div className="flex-1">
-        {currentURL === '/' ? null : (
+        {isOnHomePage ? null : (
           <Link className="btn btn-ghost btn-sm" href="/">
             <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
           </Link>
         )}
       </div>
 
-      <div
+      {/* <div
         className="tooltip tooltip-left"
         data-tip={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
       >
@@ -126,7 +131,7 @@ const Navbar = () => {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
       <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
     </div>
   );

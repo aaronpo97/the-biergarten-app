@@ -47,7 +47,7 @@ const LoginForm = () => {
   };
 
   return (
-    <form className="form-control w-full space-y-5" onSubmit={handleSubmit(onSubmit)}>
+    <form className="form-control space-y-5" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <FormInfo>
           <FormLabel htmlFor="username">username</FormLabel>
