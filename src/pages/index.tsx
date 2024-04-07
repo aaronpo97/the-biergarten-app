@@ -49,8 +49,8 @@ const Home: NextPage = () => {
           className="pointer-events-none absolute h-full w-full object-cover mix-blend-overlay"
         />
         <div className="relative flex w-9/12 flex-col space-y-3 text-base-content">
-          <h1 className="text-8xl font-extrabold">The Biergarten App</h1>
-          <p className="text-3xl font-bold">{description}</p>
+          <h1 className="text-5xl font-extrabold lg:text-8xl">The Biergarten App</h1>
+          <p className="font-bold lg:text-3xl">{description}</p>
         </div>
       </div>
     </>

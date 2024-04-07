@@ -28,7 +28,7 @@ const LoginPage: NextPage = () => {
         />
 
         <div className="relative flex w-9/12 flex-col items-center text-center text-base-content lg:w-6/12">
-          <div className="flex w-full flex-col items-center space-y-2 text-center">
+          <div className="mb-8 flex w-full flex-col items-center space-y-2 text-center">
             <FaUserCircle className="text-6xl text-primary-content" />
             <h1 className="text-6xl font-extrabold">Login</h1>
           </div>
