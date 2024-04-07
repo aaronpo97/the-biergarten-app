@@ -28,9 +28,9 @@ export const checkIfBeerPostOwner = async <BeerPostRequestType extends BeerPostR
   next: NextHandler,
 ) => {
   const { user, query } = req;
-  const { id } = query;
+  const { postId } = query;
 
-  const beerPost = await getBeerPostById({ beerPostId: id });
+  const beerPost = await getBeerPostById({ beerPostId: postId });
 
   if (!beerPost) {
     throw new ServerError('Beer post not found', 404);
@@ -47,7 +47,7 @@ export const editBeerPost = async (
   req: EditBeerPostRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  await editBeerPostByIdService({ beerPostId: req.query.id, body: req.body });
+  await editBeerPostByIdService({ beerPostId: req.query.postId, body: req.body });
 
   res.status(200).json({
     message: 'Beer post updated successfully',
@@ -57,9 +57,9 @@ export const editBeerPost = async (
 };
 
 export const deleteBeerPost = async (req: BeerPostRequest, res: NextApiResponse) => {
-  const { id } = req.query;
+  const { postId } = req.query;
 
-  const deleted = await deleteBeerPostByIdService({ beerPostId: id });
+  const deleted = await deleteBeerPostByIdService({ beerPostId: postId });
   if (!deleted) {
     throw new ServerError('Beer post not found', 404);
   }
@@ -75,9 +75,9 @@ export const getBeerPostRecommendations = async (
   req: GetBeerRecommendationsRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const { id } = req.query;
+  const { postId } = req.query;
 
-  const beerPost = await getBeerPostById({ beerPostId: id });
+  const beerPost = await getBeerPostById({ beerPostId: postId });
 
   if (!beerPost) {
     throw new ServerError('Beer post not found', 404);

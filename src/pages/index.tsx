@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import { CldImage } from 'next-cloudinary';
 import Head from 'next/head';
 
 const keywords = [
@@ -29,7 +30,7 @@ const keywords = [
   'beer recipes',
 ];
 
-const description = `The Biergarten App is an app for beer lovers to share their favourite brews and breweries with like-minded people online.`;
+const description = `An app for beer lovers to share their favourite brews and breweries with like-minded people online.`;
 
 const Home: NextPage = () => {
   return (
@@ -39,13 +40,17 @@ const Home: NextPage = () => {
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords.join(', ')} />
       </Head>
-
-      <div className="flex h-full w-full items-center justify-center bg-primary">
-        <div className="w-9/12 text-center lg:w-8/12">
-          <h1 className="text-3xl font-bold md:text-4xl lg:text-5xl xl:text-8xl">
-            The Biergarten App
-          </h1>
-          <p className="mt-4 text-lg lg:text-2xl">{description}</p>
+      <div className="relative flex h-dvh w-full flex-col items-center justify-center bg-base-300">
+        <CldImage
+          src="https://res.cloudinary.com/dxie9b7na/image/upload/v1701056793/cloudinary-images/pexels-elevate-1267700_jrno3s.jpg"
+          alt="Login Image"
+          width={5000}
+          height={5000}
+          className="pointer-events-none absolute h-full w-full object-cover mix-blend-overlay"
+        />
+        <div className="relative flex w-9/12 flex-col space-y-3 text-base-content">
+          <h1 className="text-5xl font-extrabold lg:text-8xl">The Biergarten App</h1>
+          <p className="font-bold lg:text-3xl">{description}</p>
         </div>
       </div>
     </>

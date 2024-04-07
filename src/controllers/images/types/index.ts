@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export interface UploadImagesRequest extends UserExtendedNextApiRequest {
   files?: Express.Multer.File[];
-  query: { id: string };
+  query: { postId: string };
   body: z.infer<typeof ImageMetadataValidationSchema>;
 }
 

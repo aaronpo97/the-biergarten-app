@@ -22,7 +22,7 @@ const ProtectedPage: NextPage = () => {
       <Head>
         <title>Hello! | The Biergarten App</title>
       </Head>
-      <div className="flex h-full flex-col items-center justify-center space-y-3 bg-primary text-center">
+      <div className="h-dvh flex flex-col items-center justify-center space-y-3 bg-base-100 text-center">
         {isLoading && <Spinner size={isDesktop ? 'xl' : 'md'} />}
         {user && !isLoading && (
           <>

@@ -5,7 +5,7 @@ import { NextApiRequest } from 'next';
 import { z } from 'zod';
 
 export interface BeerPostRequest extends UserExtendedNextApiRequest {
-  query: { id: string };
+  query: { postId: string };
 }
 
 export interface EditBeerPostRequest extends BeerPostRequest {
@@ -17,7 +17,7 @@ export interface GetAllBeerPostsRequest extends NextApiRequest {
 }
 
 export interface GetBeerRecommendationsRequest extends BeerPostRequest {
-  query: { id: string; page_num: string; page_size: string };
+  query: { postId: string; page_num: string; page_size: string };
 }
 
 export interface CreateBeerPostRequest extends UserExtendedNextApiRequest {

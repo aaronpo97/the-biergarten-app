@@ -1,5 +1,5 @@
-import sendUploadBreweryImagesRequest from '@/requests/BreweryImage/sendUploadBreweryImageRequest';
-import sendCreateBreweryPostRequest from '@/requests/BreweryPost/sendCreateBreweryPostRequest';
+import sendUploadBreweryImagesRequest from '@/requests/images/brewery-image/sendUploadBreweryImageRequest';
+
 import CreateBreweryPostSchema from '@/services/posts/brewery-post/schema/CreateBreweryPostSchema';
 import UploadImageValidationSchema from '@/services/schema/ImageSchema/UploadImageValidationSchema';
 import createErrorToast from '@/util/createErrorToast';
@@ -27,6 +27,7 @@ import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 import FormTextInput from '../ui/forms/FormTextInput';
 import Button from '../ui/forms/Button';
+import { sendCreateBreweryPostRequest } from '@/requests/posts/brewery-post';
 
 const AddressAutofill = dynamic(
   // @ts-expect-error
@@ -225,7 +226,7 @@ const CreateBreweryPostForm: FC<{
       if (!(data.images instanceof FileList)) {
         return;
       }
-      const breweryPost = await sendCreateBreweryPostRequest(data);
+      const breweryPost = await sendCreateBreweryPostRequest({ body: data });
       await sendUploadBreweryImagesRequest({ breweryPost, images: data.images });
       await router.push(`/breweries/${breweryPost.id}`);
       toast.remove(loadingToast);
@@ -249,13 +250,9 @@ const CreateBreweryPostForm: FC<{
       autoComplete="off"
     >
       <Tab.Group as={Fragment}>
-        <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
-          <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-            Information
-          </Tab>
-          <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
-            Location
-          </Tab>
+        <Tab.List className="tabs-boxed tabs grid grid-cols-2">
+          <Tab className="tab uppercase ui-selected:tab-active">Information</Tab>
+          <Tab className="tab uppercase ui-selected:tab-active">Location</Tab>
         </Tab.List>
         <Tab.Panels className="mt-4">
           <Tab.Panel>

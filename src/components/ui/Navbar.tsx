@@ -1,11 +1,13 @@
 import useMediaQuery from '@/hooks/utilities/useMediaQuery';
 import useNavbar from '@/hooks/utilities/useNavbar';
-import useTheme from '@/hooks/utilities/useTheme';
+// import useTheme from '@/hooks/utilities/useTheme';
 
 import Link from 'next/link';
-import { FC } from 'react';
-import { MdDarkMode, MdLightMode } from 'react-icons/md';
-import { GiHamburgerMenu } from 'react-icons/gi';
+import { FC, useRef } from 'react';
+// import { MdDarkMode, MdLightMode } from 'react-icons/md';
+
+import { FaBars } from 'react-icons/fa';
+import classNames from 'classnames';
 
 const DesktopLinks: FC = () => {
   const { pages, currentURL } = useNavbar();
@@ -19,8 +21,8 @@ const DesktopLinks: FC = () => {
               <Link tabIndex={0} href={page.slug} className="hover:bg-primary-focus">
                 <span
                   className={`text-lg uppercase ${
-                    currentURL === page.slug ? 'font-black' : 'font-medium'
-                  } text-primary-content`}
+                    currentURL === page.slug ? 'font-extrabold' : 'font-bold'
+                  } text-base-content`}
                 >
                   {page.name}
                 </span>
@@ -35,24 +37,44 @@ const DesktopLinks: FC = () => {
 
 const MobileLinks: FC = () => {
   const { pages } = useNavbar();
+
+  const drawerRef = useRef<HTMLInputElement>(null);
   return (
     <div className="flex-none lg:hidden">
-      <div className="dropdown-end dropdown">
-        <label tabIndex={0} className="btn btn-circle btn-ghost">
-          <GiHamburgerMenu />
-        </label>
-        <ul
-          tabIndex={0}
-          className="menu-compact menu dropdown-content rounded-box mt-3 w-48 bg-base-100 p-2 shadow"
-        >
-          {pages.map((page) => (
-            <li key={page.slug}>
-              <Link href={page.slug}>
-                <span className="select-none text-primary-content">{page.name}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <div className="drawer drawer-end">
+        <input id="my-drawer" type="checkbox" className="drawer-toggle" ref={drawerRef} />
+        <div className="drawer-content">
+          <label htmlFor="my-drawer" className="btn btn-ghost drawer-button">
+            <FaBars />
+          </label>
+        </div>
+        <div className="drawer-side">
+          <label
+            htmlFor="my-drawer"
+            aria-label="close sidebar"
+            className="drawer-overlay"
+          />
+          <ul className="menu min-h-full bg-primary pr-16 text-base-content">
+            {pages.map((page) => {
+              return (
+                <li key={page.slug}>
+                  <Link
+                    href={page.slug}
+                    tabIndex={0}
+                    rel={page.slug === '/resume/main.pdf' ? 'noopener noreferrer' : ''}
+                    target={page.slug === '/resume/main.pdf' ? '_blank' : ''}
+                    onClick={() => {
+                      if (!drawerRef.current) return;
+                      drawerRef.current.checked = false;
+                    }}
+                  >
+                    <span className="text-lg font-bold uppercase">{page.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -61,17 +83,30 @@ const MobileLinks: FC = () => {
 const Navbar = () => {
   const isDesktopView = useMediaQuery('(min-width: 1024px)');
 
-  const { theme, setTheme } = useTheme();
+  const { currentURL } = useNavbar();
 
+  const backgroundIsTransparent =
+    currentURL === '/' || currentURL === '/login' || currentURL === '/register';
+
+  const isOnHomePage = currentURL === '/';
+
+  // const { theme, setTheme } = useTheme();
   return (
-    <div className="navbar sticky top-0 z-50 bg-primary text-primary-content">
+    <div
+      className={classNames('navbar fixed top-0 z-20 h-10 min-h-10 text-base-content', {
+        'bg-transparent': backgroundIsTransparent,
+        'bg-base-100': !backgroundIsTransparent,
+      })}
+    >
       <div className="flex-1">
-        <Link className="btn btn-ghost normal-case" href="/">
-          <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
-        </Link>
+        {isOnHomePage ? null : (
+          <Link className="btn btn-ghost btn-sm" href="/">
+            <span className="cursor-pointer text-lg font-bold">The Biergarten App</span>
+          </Link>
+        )}
       </div>
 
-      <div
+      {/* <div
         className="tooltip tooltip-left"
         data-tip={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
       >
@@ -96,7 +131,7 @@ const Navbar = () => {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
       <div>{isDesktopView ? <DesktopLinks /> : <MobileLinks />}</div>
     </div>
   );

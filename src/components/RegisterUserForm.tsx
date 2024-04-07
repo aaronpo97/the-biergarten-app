@@ -1,4 +1,3 @@
-import sendRegisterUserRequest from '@/requests/User/sendRegisterUserRequest';
 import { CreateUserValidationSchemaWithUsernameAndEmailCheck } from '@/services/users/auth/schema/CreateUserValidationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
@@ -9,6 +8,7 @@ import { z } from 'zod';
 
 import createErrorToast from '@/util/createErrorToast';
 import toast from 'react-hot-toast';
+import { sendRegisterUserRequest } from '@/requests/users/auth';
 import Button from './ui/forms/Button';
 import FormError from './ui/forms/FormError';
 import FormInfo from './ui/forms/FormInfo';
@@ -44,13 +44,9 @@ const RegisterUserForm: FC = () => {
     }
   };
   return (
-    <form
-      className="form-control w-full space-y-5"
-      noValidate
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div>
-        <div className="flex flex-col lg:flex-row lg:space-x-3">
+    <form className="form-control w-full" noValidate onSubmit={handleSubmit(onSubmit)}>
+      <div className="space-y-5">
+        <div className="flex flex-col lg:flex-row lg:space-x-5">
           <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="firstName">First name</FormLabel>
@@ -63,7 +59,7 @@ const RegisterUserForm: FC = () => {
                 type="text"
                 formValidationSchema={register('firstName')}
                 error={!!errors.firstName}
-                placeholder="first name"
+                placeholder="John"
               />
             </FormSegment>
           </div>
@@ -80,13 +76,13 @@ const RegisterUserForm: FC = () => {
                 type="text"
                 formValidationSchema={register('lastName')}
                 error={!!errors.lastName}
-                placeholder="last name"
+                placeholder="Doe"
               />
             </FormSegment>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:space-x-3">
+        <div className="flex flex-col lg:flex-row lg:space-x-5">
           <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="email">email</FormLabel>
@@ -99,7 +95,7 @@ const RegisterUserForm: FC = () => {
                 type="email"
                 formValidationSchema={register('email')}
                 error={!!errors.email}
-                placeholder="email"
+                placeholder="john.doe@example.com"
               />
             </FormSegment>
           </div>
@@ -115,13 +111,13 @@ const RegisterUserForm: FC = () => {
                 type="text"
                 formValidationSchema={register('username')}
                 error={!!errors.username}
-                placeholder="username"
+                placeholder="johndoe"
               />
             </FormSegment>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:space-x-3">
+        <div className="flex flex-col lg:flex-row lg:space-x-5">
           <div className="lg:w-[50%]">
             <FormInfo>
               <FormLabel htmlFor="password">password</FormLabel>
@@ -155,25 +151,27 @@ const RegisterUserForm: FC = () => {
             </FormSegment>
           </div>
         </div>
-        <FormInfo>
-          <FormLabel htmlFor="dateOfBirth">Date of birth</FormLabel>
-          <FormError>{errors.dateOfBirth?.message}</FormError>
-        </FormInfo>
-        <FormSegment>
-          <FormTextInput
-            id="dateOfBirth"
-            disabled={formState.isSubmitting}
-            type="date"
-            formValidationSchema={register('dateOfBirth')}
-            error={!!errors.dateOfBirth}
-            placeholder="date of birth"
-          />
-        </FormSegment>
-        <div className="mt-6 w-full">
-          <Button type="submit" isSubmitting={formState.isSubmitting}>
-            Register User
-          </Button>
+        <div>
+          <FormInfo>
+            <FormLabel htmlFor="dateOfBirth">Date of birth</FormLabel>
+            <FormError>{errors.dateOfBirth?.message}</FormError>
+          </FormInfo>
+          <FormSegment>
+            <FormTextInput
+              id="dateOfBirth"
+              disabled={formState.isSubmitting}
+              type="date"
+              formValidationSchema={register('dateOfBirth')}
+              error={!!errors.dateOfBirth}
+              placeholder="date of birth"
+            />
+          </FormSegment>
         </div>
+      </div>
+      <div className="mt-10">
+        <Button type="submit" isSubmitting={formState.isSubmitting}>
+          Register User
+        </Button>
       </div>
     </form>
   );

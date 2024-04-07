@@ -20,7 +20,7 @@ export const processBeerImageData = async (
   }
 
   const beerImages = await addBeerImagesService({
-    beerPostId: req.query.id,
+    beerPostId: req.query.postId,
     userId: user!.id,
     body,
     files,

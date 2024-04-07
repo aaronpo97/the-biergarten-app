@@ -1,4 +1,3 @@
-import { UserExtendedNextApiRequest } from '@/config/auth/types';
 import ServerError from '@/config/util/ServerError';
 
 import {
@@ -9,17 +8,18 @@ import {
 } from '@/services/likes/brewery-post-like';
 import { getBreweryPostByIdService } from '@/services/posts/brewery-post';
 import APIResponseValidationSchema from '@/validation/APIResponseValidationSchema';
-import { NextApiResponse, NextApiRequest } from 'next';
+import { NextApiResponse } from 'next';
 import { z } from 'zod';
+import { LikeRequest } from '../types';
 
 export const sendBreweryPostLikeRequest = async (
-  req: UserExtendedNextApiRequest,
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const id = req.query.id! as string;
+  const { postId } = req.query;
   const user = req.user!;
 
-  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: postId });
 
   if (!breweryPost) {
     throw new ServerError('Could not find a brewery post with that id', 404);
@@ -53,12 +53,12 @@ export const sendBreweryPostLikeRequest = async (
 };
 
 export const getBreweryPostLikeCount = async (
-  req: NextApiRequest,
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
-  const id = req.query.id! as string;
+  const { postId } = req.query;
 
-  const breweryPost = await getBreweryPostByIdService({ breweryPostId: id });
+  const breweryPost = await getBreweryPostByIdService({ breweryPostId: postId });
   if (!breweryPost) {
     throw new ServerError('Could not find a brewery post with that id', 404);
   }
@@ -76,14 +76,14 @@ export const getBreweryPostLikeCount = async (
 };
 
 export const getBreweryPostLikeStatus = async (
-  req: UserExtendedNextApiRequest,
+  req: LikeRequest,
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
-  const id = req.query.id as string;
+  const { postId } = req.query;
 
   const liked = await findBreweryPostLikeService({
-    breweryPostId: id,
+    breweryPostId: postId,
     likedById: user.id,
   });
 

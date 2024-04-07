@@ -1,4 +1,3 @@
-import sendLoginUserRequest from '@/requests/User/sendLoginUserRequest';
 import LoginValidationSchema from '@/services/users/auth/schema/LoginValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
@@ -15,6 +14,7 @@ import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextInput from '../ui/forms/FormTextInput';
 import Button from '../ui/forms/Button';
+import { sendLoginUserRequest } from '@/requests/users/auth';
 
 type LoginT = z.infer<typeof LoginValidationSchema>;
 const LoginForm = () => {
@@ -47,7 +47,7 @@ const LoginForm = () => {
   };
 
   return (
-    <form className="form-control w-full space-y-5" onSubmit={handleSubmit(onSubmit)}>
+    <form className="form-control space-y-5" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <FormInfo>
           <FormLabel htmlFor="username">username</FormLabel>
