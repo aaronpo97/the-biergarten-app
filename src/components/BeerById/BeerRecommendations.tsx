@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { FC, MutableRefObject, useRef } from 'react';
+import { FC } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import useBeerRecommendations from '@/hooks/data-fetching/beer-posts/useBeerRecommendations';
 import BeerPostQueryResult from '@/services/posts/beer-post/schema/BeerPostQueryResult';
 import debounce from 'lodash/debounce';
+
 import BeerRecommendationLoadingComponent from './BeerRecommendationLoadingComponent';
 
 const BeerRecommendationsSection: FC<{
@@ -28,10 +29,8 @@ const BeerRecommendationsSection: FC<{
     },
   });
 
-  const beerRecommendationsRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-
   return (
-    <div className="card h-full" ref={beerRecommendationsRef}>
+    <div className="card h-full">
       <div className="card-body">
         <>
           <div className="my-2 flex flex-row items-center justify-between">
@@ -54,6 +53,7 @@ const BeerRecommendationsSection: FC<{
                   <div
                     ref={isPenultimateBeerPost ? penultimateBeerPostRef : undefined}
                     key={post.id}
+                    className="animate-fade"
                   >
                     <div className="flex flex-col">
                       <Link className="link-hover link" href={`/beers/${post.id}`}>

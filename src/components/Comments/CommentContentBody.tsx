@@ -7,6 +7,8 @@ import Link from 'next/link';
 import CommentQueryResult from '@/services/schema/CommentSchema/CommentQueryResult';
 
 import { z } from 'zod';
+import { useInView } from 'react-intersection-observer';
+import classNames from 'classnames';
 import CommentCardDropdown from './CommentCardDropdown';
 
 interface CommentContentBodyProps {
@@ -17,9 +19,16 @@ interface CommentContentBodyProps {
 const CommentContentBody: FC<CommentContentBodyProps> = ({ comment, setInEditMode }) => {
   const { user } = useContext(UserContext);
   const timeDistance = useTimeDistance(new Date(comment.createdAt));
+  const [ref, inView] = useInView({ triggerOnce: true });
 
   return (
-    <div className="space-y-1 py-4 pr-3 animate-in fade-in-10">
+    <div
+      className={classNames('space-y-1 py-4 pr-3 fade-in-10', {
+        'opacity-0': !inView,
+        'animate-fade': inView,
+      })}
+      ref={ref}
+    >
       <div className="space-y-2">
         <div className="flex flex-row justify-between">
           <div>

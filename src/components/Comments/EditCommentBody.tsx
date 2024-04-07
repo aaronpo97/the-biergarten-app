@@ -15,6 +15,8 @@ import FormLabel from '../ui/forms/FormLabel';
 import FormSegment from '../ui/forms/FormSegment';
 import FormTextArea from '../ui/forms/FormTextArea';
 import { HandleDeleteCommentRequest, HandleEditCommentRequest } from './types';
+import { useInView } from 'react-intersection-observer';
+import classNames from 'classnames';
 
 interface EditCommentBodyProps {
   comment: z.infer<typeof CommentQueryResult>;
@@ -80,8 +82,16 @@ const EditCommentBody: FC<EditCommentBodyProps> = ({
 
   const disableForm = isSubmitting || isDeleting;
 
+  const [ref, inView] = useInView({ triggerOnce: true });
+
   return (
-    <div className="py-4 pr-3 animate-in fade-in-10">
+    <div
+      className={classNames('py-4 pr-3 animate-in fade-in-10', {
+        'opacity-0': !inView,
+        'animate-fade': inView,
+      })}
+      ref={ref}
+    >
       <form onSubmit={handleSubmit(onEdit)} className="space-y-3">
         <div>
           <FormInfo>

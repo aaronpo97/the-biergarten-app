@@ -5,7 +5,7 @@ import { FaArrowRight } from 'react-icons/fa';
 
 const UpdateProfileLink: React.FC = () => {
   return (
-    <div className="card mt-8">
+    <div className="card">
       <div className="card-body flex flex-col space-y-3">
         <div className="flex w-full items-center justify-between space-x-5">
           <div className="">

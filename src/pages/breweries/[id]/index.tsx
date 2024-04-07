@@ -85,11 +85,11 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken 
                   token={mapboxToken}
                 />
                 <Tab.Group>
-                  <Tab.List className="tabs-boxed tabs items-center justify-center rounded-2xl">
-                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                  <Tab.List className="tabs-boxed tabs grid grid-cols-2">
+                    <Tab className="tab-md tab w-1/2 uppercase ui-selected:tab-active">
                       Comments
                     </Tab>
-                    <Tab className="tab tab-md w-1/2 uppercase ui-selected:tab-active">
+                    <Tab className="tab-md tab w-1/2 uppercase ui-selected:tab-active">
                       Beers
                     </Tab>
                   </Tab.List>
