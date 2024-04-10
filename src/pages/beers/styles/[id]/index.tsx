@@ -27,7 +27,7 @@ const BeerStyleByIdPage: NextPage<BeerStylePageProps> = ({ beerStyle }) => {
       </Head>
       <>
         <main className="mb-12 mt-10 flex w-full items-center justify-center">
-          <div className="w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
+          <div className="mt-10 w-11/12 space-y-3 xl:w-9/12 2xl:w-8/12">
             <BeerStyleHeader beerStyle={beerStyle} />
 
             {isDesktop ? (

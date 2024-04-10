@@ -36,7 +36,7 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken 
         <meta name="description" content={breweryPost.description} />
       </Head>
 
-      <>
+      <div className="mt-10">
         <Carousel
           className="w-full"
           useKeyboardArrows
@@ -106,7 +106,7 @@ const BreweryByIdPage: NextPage<BreweryPageProps> = ({ breweryPost, mapboxToken 
             )}
           </div>
         </div>
-      </>
+      </div>
     </>
   );
 };

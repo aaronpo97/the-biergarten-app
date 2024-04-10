@@ -85,8 +85,7 @@ const Navbar = () => {
 
   const { currentURL } = useNavbar();
 
-  const backgroundIsTransparent =
-    currentURL === '/' || currentURL === '/login' || currentURL === '/register';
+  const backgroundIsTransparent = currentURL === '/';
 
   const isOnHomePage = currentURL === '/';
 
@@ -95,7 +94,7 @@ const Navbar = () => {
     <div
       className={classNames('navbar fixed top-0 z-20 h-10 min-h-10 text-base-content', {
         'bg-transparent': backgroundIsTransparent,
-        'bg-base-100': !backgroundIsTransparent,
+        'bg-primary': !backgroundIsTransparent,
       })}
     >
       <div className="flex-1">

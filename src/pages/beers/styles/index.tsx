@@ -33,7 +33,7 @@ const BeerStylePage: NextPage = () => {
           content="Find beers made by breweries near you and around the world."
         />
       </Head>
-      <div className="flex items-center justify-center bg-base-100" ref={pageRef}>
+      <div className="mt-10 flex items-center justify-center  bg-base-100" ref={pageRef}>
         <div className="my-10 flex w-10/12 flex-col space-y-4 lg:w-8/12 2xl:w-7/12">
           <header className="my-10 flex justify-between lg:flex-row">
             <div>
