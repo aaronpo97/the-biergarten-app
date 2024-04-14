@@ -108,7 +108,7 @@ const ProfilePage: NextPage = () => {
         <title>The Biergarten App || Update Your Profile</title>
         <meta name="description" content="Update your user profile." />
       </Head>
-      <div className="my-10 flex flex-col items-center justify-center">
+      <div className="my-20 flex flex-col items-center justify-center">
         {user ? (
           <div className="w-10/12 lg:w-7/12">
             <div className="card">
