@@ -73,7 +73,8 @@ export const checkIfBeerPostIsLiked = async (
   res: NextApiResponse<z.infer<typeof APIResponseValidationSchema>>,
 ) => {
   const user = req.user!;
-  const beerPostId = req.query.id as string;
+
+  const beerPostId = req.query.postId as string;
 
   const alreadyLiked = await findBeerPostLikeByIdService({
     beerPostId,
