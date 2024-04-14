@@ -32,7 +32,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
         <title>{beerPost.name}</title>
         <meta name="description" content={beerPost.description} />
       </Head>
-      <>
+      <div className="mt-10">
         <Carousel
           className="w-full"
           useKeyboardArrows
@@ -90,7 +90,7 @@ const BeerByIdPage: NextPage<BeerPageProps> = ({ beerPost }) => {
             )}
           </div>
         </main>
-      </>
+      </div>
     </>
   );
 };

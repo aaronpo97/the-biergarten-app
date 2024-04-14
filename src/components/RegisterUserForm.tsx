@@ -45,7 +45,7 @@ const RegisterUserForm: FC = () => {
   };
   return (
     <form className="form-control w-full" noValidate onSubmit={handleSubmit(onSubmit)}>
-      <div className="space-y-5">
+      <div className="lg:space-y-5">
         <div className="flex flex-col lg:flex-row lg:space-x-5">
           <div className="lg:w-[50%]">
             <FormInfo>
