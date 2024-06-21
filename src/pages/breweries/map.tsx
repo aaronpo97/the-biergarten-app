@@ -83,7 +83,7 @@ const BreweryMapPage: NextPage<BreweryMapPageProps> = ({ token }) => {
           content="Find breweries near you and around the world."
         />
       </Head>
-      <div className="h-full">
+      <div className="h-dvh">
         <Map
           // center the map on North America
           initialViewState={{ zoom: 3, latitude: 48.3544, longitude: -99.9981 }}
