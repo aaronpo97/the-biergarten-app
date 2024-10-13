@@ -30,7 +30,7 @@
     "argon2": "^0.31.1",
     "classnames": "^2.5.1",
     "cloudinary": "^1.41.0",
-    "cookie": "^0.5.0",
+    "cookie": "^0.7.0",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "jsonwebtoken": "^9.0.1",
