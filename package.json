@@ -29,7 +29,7 @@
     "@vercel/analytics": "^1.1.0",
     "argon2": "^0.31.1",
     "classnames": "^2.5.1",
-    "cloudinary": "^1.41.0",
+    "cloudinary": "^2.7.0",
     "cookie": "^0.7.0",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
