@@ -27,7 +27,7 @@
     "@react-email/render": "^0.0.9",
     "@react-email/tailwind": "^0.0.12",
     "@vercel/analytics": "^1.1.0",
-    "argon2": "^0.31.1",
+    "argon2": "^0.44.0",
     "classnames": "^2.5.1",
     "cloudinary": "^1.41.0",
     "cookie": "^0.7.0",
