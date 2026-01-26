@@ -1,6 +1,4 @@
-
-CREATE OR ALTER PROCEDURE usp_GetUserAccountById
-(
+CREATE OR ALTER PROCEDURE USP_GetUserAccountById(
     @UserAccountId UNIQUEIDENTIFIER
 )
 AS
@@ -18,4 +16,4 @@ BEGIN
            Timer
     FROM dbo.UserAccount
     WHERE UserAccountID = @UserAccountId;
-END;
+END

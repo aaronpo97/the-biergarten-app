@@ -1,6 +1,4 @@
-
-CREATE OR ALTER PROCEDURE usp_GetUserAccountByUsername
-(
+CREATE OR ALTER PROCEDURE usp_GetUserAccountByUsername(
     @Username VARCHAR(64)
 )
 AS

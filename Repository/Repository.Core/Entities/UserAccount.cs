@@ -12,3 +12,5 @@ public class UserAccount
     public DateTime DateOfBirth { get; set; }
     public byte[]? Timer { get; set; }
 }
+
+

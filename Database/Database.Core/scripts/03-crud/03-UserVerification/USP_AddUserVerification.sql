@@ -1,6 +1,5 @@
-CREATE OR ALTER PROCEDURE dbo.USP_CreateUserVerification
-    @UserAccountID uniqueidentifier,
-    @VerificationDateTime datetime = NULL
+CREATE OR ALTER PROCEDURE dbo.USP_CreateUserVerification @UserAccountID_ UNIQUEIDENTIFIER,
+                                                         @VerificationDateTime DATETIME = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -11,10 +10,13 @@ BEGIN
 
     BEGIN TRANSACTION;
 
+    EXEC USP_GetUserAccountByID @UserAccountId = @UserAccountID_;
+    IF @@ROWCOUNT = 0
+        THROW 50001, 'Could not find a user with that id', 1;
+
     INSERT INTO dbo.UserVerification
-    (UserAccountId, VerificationDateTime)
-    VALUES
-        (@UserAccountID, @VerificationDateTime);
+        (UserAccountId, VerificationDateTime)
+    VALUES (@UserAccountID_, @VerificationDateTime);
 
     COMMIT TRANSACTION;
 END

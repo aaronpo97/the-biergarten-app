@@ -6,8 +6,6 @@ CREATE OR ALTER PROCEDURE usp_DeleteUserAccount
 AS
 BEGIN
     SET NOCOUNT ON
-    SET XACT_ABORT ON
-    BEGIN TRANSACTION
 
     IF NOT EXISTS (SELECT 1 FROM UserAccount WHERE UserAccountId = @UserAccountId)
     BEGIN
@@ -19,5 +17,4 @@ BEGIN
 
     DELETE FROM UserAccount 
     WHERE UserAccountId = @UserAccountId;
-    COMMIT TRANSACTION
 END;

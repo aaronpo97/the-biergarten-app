@@ -1,4 +1,3 @@
-
 CREATE OR ALTER PROCEDURE usp_GetAllUserAccounts
 AS
 BEGIN

@@ -1,6 +1,4 @@
-
-CREATE OR ALTER PROCEDURE usp_GetUserAccountByEmail
-(
+CREATE OR ALTER PROCEDURE usp_GetUserAccountByEmail(
     @Email VARCHAR(128)
 )
 AS

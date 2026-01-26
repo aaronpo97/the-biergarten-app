@@ -164,7 +164,12 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
     Hash NVARCHAR(MAX) NOT NULL,
     -- uses argon2
 
-    Timer ROWVERSION,
+    IsRevoked BIT NOT NULL
+        CONSTRAINT DF_UserCredential_IsRevoked DEFAULT 0,
+
+    RevokedAt DATETIME NULL,
+
+    Timer     ROWVERSION,
 
     CONSTRAINT PK_UserCredential
         PRIMARY KEY (UserCredentialID),
@@ -173,9 +178,6 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
         FOREIGN KEY (UserAccountID)
         REFERENCES UserAccount(UserAccountID)
         ON DELETE CASCADE,
-
-    CONSTRAINT AK_UserCredential_UserAccountID
-        UNIQUE (UserAccountID)
 );
 
 CREATE NONCLUSTERED INDEX IX_UserCredential_UserAccount

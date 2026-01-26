@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -12,7 +13,7 @@ namespace DataAccessLayer.Sql
                                                         "Database connection string not configured. Set DB_CONNECTION_STRING env var or ConnectionStrings:Default."
                                                     );
 
-        public SqlConnection CreateConnection()
+        public DbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
         }

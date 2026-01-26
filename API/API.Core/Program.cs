@@ -1,5 +1,6 @@
 using BusinessLayer.Services;
-using DataAccessLayer.Repositories;
+using DataAccessLayer.Repositories.UserAccount;
+using DataAccessLayer.Repositories.UserCredential;
 using DataAccessLayer.Sql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 var app = builder.Build();
 
 app.UseSwagger();

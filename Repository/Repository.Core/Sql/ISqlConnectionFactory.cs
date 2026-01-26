@@ -1,9 +1,9 @@
-using Microsoft.Data.SqlClient;
+using System.Data.Common;
 
 namespace DataAccessLayer.Sql
 {
     public interface ISqlConnectionFactory
     {
-        SqlConnection CreateConnection();
+        DbConnection CreateConnection();
     }
 }
