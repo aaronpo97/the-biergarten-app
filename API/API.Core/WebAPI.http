@@ -1,0 +1,64 @@
+@WebAPI_HostAddress = http://localhost:5069
+
+GET {{WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{WebAPI_HostAddress}}/api/users
+Accept: application/json
+
+###
+
+GET {{WebAPI_HostAddress}}/api/users/{{userId}}
+Accept: application/json
+
+###
+
+GET {{WebAPI_HostAddress}}/api/users/by-username/{{username}}
+Accept: application/json
+
+###
+
+GET {{WebAPI_HostAddress}}/api/users/by-email/{{email}}
+Accept: application/json
+
+###
+
+POST {{WebAPI_HostAddress}}/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userAccountID": "00000000-0000-0000-0000-000000000000",
+  "username": "testuser",
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "testuser@example.com",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": null,
+  "dateOfBirth": "1990-01-01T00:00:00Z",
+  "timer": null
+}
+
+###
+
+PUT {{WebAPI_HostAddress}}/api/users/{{userId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userAccountID": "{{userId}}",
+  "username": "testuser",
+  "firstName": "Updated",
+  "lastName": "User",
+  "email": "testuser@example.com",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-02-01T00:00:00Z",
+  "dateOfBirth": "1990-01-01T00:00:00Z",
+  "timer": null
+}
+
+###
+
+DELETE {{WebAPI_HostAddress}}/api/users/{{userId}}

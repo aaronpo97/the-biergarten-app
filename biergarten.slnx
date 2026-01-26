@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/API/" >
+    <Project Path="API/API.Core/API.Core.csproj"/>
+  </Folder>
+  <Folder Name="/Database/">
+    <Project Path="Database/Database.Core/Database.Core.csproj" />
+    <Project Path="Database/Database.Seed/Database.Seed.csproj" />
+  </Folder>
+  <Folder Name="/Repository/" >
+    <Project Path="Repository/Repository.Core/Repository.Core.csproj"/>
+    <Project Path="Repository/Repository.Tests/Repository.Tests.csproj"/>
+  </Folder>
+  <Folder Name="/Service/">
+    <Project Path="Service/Service.Core/Service.Core.csproj"/>
+  </Folder>
+</Solution>

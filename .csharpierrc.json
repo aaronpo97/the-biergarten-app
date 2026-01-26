@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/belav/csharpier/main/src/CSharpier.Cli/schema.json",
+  "printWidth": 80,
+  "useTabs": false,
+  "tabWidth": 4,
+  "endOfLine": "auto",
+  "indentStyle": "space",
+  "lineEndings": "auto",
+  "wrapLineLength": 80
+}
