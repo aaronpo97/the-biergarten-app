@@ -142,7 +142,7 @@ MAPBOX_ACCESS_TOKEN=
 
 SPARKPOST_API_KEY=
 SPARKPOST_SENDER_ADDRESS=" > .env
-```
+``` 
 
 ### Explanation of environment variables
 
