@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Biergarten App is evolving from a standalone full‑stack Next.js application into a multi‑project monorepo with a dedicated .NET backend and a SQL‑first approach. Backend data access is being refactored to use stored procedures, with future microservices planned for image upload, mapping, and possibly authentication. The Next.js site remains the frontend and will consume the .NET API.
+The Biergarten App is evolving from a standalone full‑stack Next.js application into a multi‑project monorepo with a dedicated .NET backend and a SQL‑first approach. Backend data access is being refactored to use stored procedures. The Next.js site remains the frontend and will consume the .NET API.
 
 Status note (Jan 26, 2026): Migration is in progress; some parts are still being moved from the website into the .NET layers.
 
