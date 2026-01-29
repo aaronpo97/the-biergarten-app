@@ -1,6 +1,8 @@
+
+
 using DataAccessLayer.Entities;
 
-namespace BusinessLayer.Services
+namespace ServiceCore.Services
 {
     public interface IUserService
     {

@@ -1,12 +1,12 @@
-using BusinessLayer.Services;
 using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
+using ServiceCore.Services;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthService auth) : ControllerBase
+    public class AuthController(IAuthService auth, IJwtService jwtService) : ControllerBase
     {
         public record RegisterRequest(
             string Username,
@@ -39,9 +39,15 @@ namespace WebAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
-            var ok = await auth.LoginAsync(req.UsernameOrEmail, req.Password);
-            if (!ok) return Unauthorized();
-            return Ok(new { success = true });
+            var userAccount = await auth.LoginAsync(req.UsernameOrEmail, req.Password);
+            if (userAccount is null)
+            {
+                return Unauthorized();
+            }
+
+            var jwt = jwtService.GenerateJwt(userAccount.UserAccountId, userAccount.Username, userAccount.DateOfBirth);
+
+            return Ok(new { AccessToken = jwt, Message = "Logged in successfully." });
         }
     }
 }

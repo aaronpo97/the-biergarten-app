@@ -1,8 +1,7 @@
 using DataAccessLayer.Entities;
-using DataAccessLayer.Repositories;
 using DataAccessLayer.Repositories.UserAccount;
 
-namespace BusinessLayer.Services
+namespace ServiceCore.Services
 {
     public class UserService(IUserAccountRepository repository) : IUserService
     {

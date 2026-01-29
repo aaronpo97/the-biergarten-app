@@ -14,7 +14,7 @@ namespace DataAccessLayer.Repositories.UserCredential
             command.CommandText = "USP_RotateUserCredential";
             command.CommandType = CommandType.StoredProcedure;
 
-            AddParameter(command, "@UserAccountId", userAccountId);
+            AddParameter(command, "@UserAccountId_", userAccountId);
             AddParameter(command, "@Hash", credential.Hash);
 
             await command.ExecuteNonQueryAsync();
@@ -27,7 +27,7 @@ namespace DataAccessLayer.Repositories.UserCredential
             command.CommandText = "USP_GetActiveUserCredentialByUserAccountId";
             command.CommandType = CommandType.StoredProcedure;
 
-            AddParameter(command, "@UserAccountId", userAccountId);
+            AddParameter(command, "@UserAccountId_", userAccountId);
 
             await using var reader = await command.ExecuteReaderAsync();
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
@@ -40,7 +40,7 @@ namespace DataAccessLayer.Repositories.UserCredential
             command.CommandText = "USP_InvalidateUserCredential";
             command.CommandType = CommandType.StoredProcedure;
 
-            AddParameter(command, "@UserAccountId", userAccountId);
+            AddParameter(command, "@UserAccountId_", userAccountId);
             await command.ExecuteNonQueryAsync();
         }
 

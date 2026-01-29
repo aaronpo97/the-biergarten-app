@@ -1,8 +1,7 @@
 using DataAccessLayer.Entities;
 using DataAccessLayer.Repositories.UserAccount;
-using DataAccessLayer.Repositories.UserCredential;
 
-namespace BusinessLayer.Services
+namespace ServiceCore.Services
 {
     public class AuthService(IUserAccountRepository userRepo, IUserCredentialRepository credRepo) : IAuthService
     {
@@ -26,18 +25,31 @@ namespace BusinessLayer.Services
             return userAccount;
         }
 
-        public async Task<bool> LoginAsync(string usernameOrEmail, string password)
+        public async Task<UserAccount?> LoginAsync(string usernameOrEmail, string password)
         {
             // Attempt lookup by username, then email
-            var user = await userRepo.GetByUsernameAsync(usernameOrEmail) 
+            var user = await userRepo.GetByUsernameAsync(usernameOrEmail)
                        ?? await userRepo.GetByEmailAsync(usernameOrEmail);
-
-            if (user is null) return false;
-
+            // the user was not found
+            if (user is null)
+            {
+                return null;
+            }
+            
+            // they don't have an active credential
+            // @todo handle expired passwords
             var activeCred = await credRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
-            if (activeCred is null) return false;
+            if (activeCred is null)
+            {
+                return null;
+            }
 
-            return PasswordHasher.Verify(password, activeCred.Hash);
+            if (!PasswordHasher.Verify(password, activeCred.Hash))
+            {
+                return null;
+            }
+
+            return user;
         }
 
         public async Task InvalidateAsync(Guid userAccountId)
