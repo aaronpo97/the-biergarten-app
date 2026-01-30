@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/API/" >
     <Project Path="API/API.Core/API.Core.csproj"/>
+    <Project Path="API/API.Specs/API.Specs.csproj"/>
   </Folder>
   <Folder Name="/Database/">
     <Project Path="Database/Database.Core/Database.Core.csproj" />
