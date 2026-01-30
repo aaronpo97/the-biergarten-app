@@ -12,6 +12,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    DECLARE @Inserted TABLE (UserAccountID UNIQUEIDENTIFIER);
+
     INSERT INTO UserAccount 
     (
         Username,
@@ -20,6 +22,7 @@ BEGIN
         DateOfBirth,
         Email
     )
+    OUTPUT INSERTED.UserAccountID INTO @Inserted
     VALUES
     (
         @Username,
@@ -29,5 +32,5 @@ BEGIN
         @Email
     );
 
-    SELECT @UserAccountId AS UserAccountId;
+    SELECT @UserAccountId = UserAccountID FROM @Inserted;
 END;

@@ -9,11 +9,8 @@ using Microsoft.Data.SqlClient;
 
 namespace DBSeed
 {
-
     internal class UserSeeder : ISeeder
     {
-        
-        
         private static readonly IReadOnlyList<(
             string FirstName,
             string LastName
@@ -129,36 +126,38 @@ namespace DBSeed
             int createdCredentials = 0;
             int createdVerifications = 0;
 
+
             foreach (var (firstName, lastName) in SeedNames)
             {
-               // create the user in the database
-               var userAccountId = Guid.NewGuid();
-               await AddUserAccountAsync(connection, new UserAccount
-               {
-                   UserAccountId = userAccountId,
-                   FirstName = firstName,
-                   LastName = lastName,
-                   Email = $"{firstName}.{lastName}@thebiergarten.app",
-                   Username = $"{firstName[0]}.{lastName}",
-                   DateOfBirth = GenerateDateOfBirth(rng)
-               });
-               createdUsers++;
+                // prepare user fields
+                var username = $"{firstName[0]}.{lastName}";
+                var email = $"{firstName}.{lastName}@thebiergarten.app";
+                var dob = GenerateDateOfBirth(rng);
 
-               // add user credentials
-                if (!await HasUserCredentialAsync(connection, userAccountId))
-                {
-                    string pwd = generator.Generate(
-                        length: 64,
-                        numberOfDigits: 10,
-                        numberOfSymbols: 10
-                    );
-                    string hash = GeneratePasswordHash(pwd);
-                    await AddUserCredentialAsync(connection, userAccountId, hash);
-                    createdCredentials++;
-                }
+                // generate a password and hash it
+                string pwd = generator.Generate(
+                    length: 64,
+                    numberOfDigits: 10,
+                    numberOfSymbols: 10
+                );
+                string hash = GeneratePasswordHash(pwd);
+
+                // register the user (creates account + credential)
+                var userAccountId = await RegisterUserAsync(
+                    connection,
+                    username,
+                    firstName,
+                    lastName,
+                    dob,
+                    email,
+                    hash
+                );
+                createdUsers++;
+                createdCredentials++;
 
                 // add user verification
                 if (await HasUserVerificationAsync(connection, userAccountId)) continue;
+
                 await AddUserVerificationAsync(connection, userAccountId);
                 createdVerifications++;
             }
@@ -168,19 +167,34 @@ namespace DBSeed
             Console.WriteLine($"Added {createdVerifications} user verifications.");
         }
 
-        private static async Task AddUserAccountAsync(SqlConnection connection, UserAccount ua)
+        private static async Task<Guid> RegisterUserAsync(
+            SqlConnection connection,
+            string username,
+            string firstName,
+            string lastName,
+            DateTime dateOfBirth,
+            string email,
+            string hash
+        )
         {
-            await using var command = new SqlCommand("usp_CreateUserAccount", connection);
+            await using var command = new SqlCommand("dbo.USP_RegisterUser", connection);
             command.CommandType = CommandType.StoredProcedure;
 
-            command.Parameters.Add("@UserAccountId", SqlDbType.UniqueIdentifier).Value = ua.UserAccountId;
-            command.Parameters.Add("@Username", SqlDbType.NVarChar, 100).Value = ua.Username;
-            command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100).Value = ua.FirstName;
-            command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100).Value = ua.LastName;
-            command.Parameters.Add("@Email", SqlDbType.NVarChar, 256).Value = ua.Email;
-            command.Parameters.Add("@DateOfBirth", SqlDbType.Date).Value = ua.DateOfBirth;
+            var idParam = new SqlParameter("@UserAccountId_", SqlDbType.UniqueIdentifier)
+            {
+                Direction = ParameterDirection.Output
+            };
+            command.Parameters.Add(idParam);
+
+            command.Parameters.Add("@Username", SqlDbType.VarChar, 64).Value = username;
+            command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 128).Value = firstName;
+            command.Parameters.Add("@LastName", SqlDbType.NVarChar, 128).Value = lastName;
+            command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = dateOfBirth;
+            command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = email;
+            command.Parameters.Add("@Hash", SqlDbType.NVarChar, -1).Value = hash;
 
             await command.ExecuteNonQueryAsync();
+            return (Guid)idParam.Value;
         }
 
         private static string GeneratePasswordHash(string pwd)
@@ -197,39 +211,6 @@ namespace DBSeed
 
             byte[] hash = argon2.GetBytes(32);
             return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
-        }
-
-        private static async Task<bool> HasUserCredentialAsync(
-            SqlConnection connection,
-            Guid userAccountId
-        )
-        {
-            const string sql = $"""
-                                SELECT 1
-                                FROM dbo.UserCredential
-                                WHERE UserAccountId = @UserAccountId;
-                                """;
-            await using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@UserAccountId", userAccountId);
-            object? result = await command.ExecuteScalarAsync();
-            return result is not null;
-        }
-
-        private static async Task AddUserCredentialAsync(
-            SqlConnection connection,
-            Guid userAccountId,
-            string hash
-        )
-        {
-            await using var command = new SqlCommand(
-                "dbo.USP_AddUserCredential",
-                connection
-            );
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@UserAccountId", userAccountId);
-            command.Parameters.AddWithValue("@Hash", hash);
-
-            await command.ExecuteNonQueryAsync();
         }
 
         private static async Task<bool> HasUserVerificationAsync(
@@ -258,11 +239,11 @@ namespace DBSeed
                 connection
             );
             command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@UserAccountID", userAccountId);
+            command.Parameters.AddWithValue("@UserAccountID_", userAccountId);
 
             await command.ExecuteNonQueryAsync();
         }
-        
+
         private static DateTime GenerateDateOfBirth(Random random)
         {
             int age = 19 + random.Next(0, 30);
