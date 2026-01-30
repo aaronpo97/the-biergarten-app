@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/reqnroll/Reqnroll/main/Reqnroll.Configuration/reqnroll.schema.json",
+  "language": {
+    "feature": "en-US"
+  },
+  "bindingCulture": {
+    "name": "en-US"
+  },
+  "trace": {
+    "level": "Verbose"
+  },
+  "runtime": {
+    "stopAtFirstError": false
+  }
+}
