@@ -27,10 +27,9 @@ BEGIN
             THROW 50000, 'Failed to create user account.', 1;
         END
 
-
-    EXEC dbo.usp_RotateUserCredential
-         @UserAccountId = @UserAccountId_,
-         @Hash = @Hash;
+    INSERT INTO dbo.UserCredential
+        (UserAccountId, Hash)
+    VALUES (@UserAccountId_, @Hash);
 
     IF @@ROWCOUNT = 0
         BEGIN
