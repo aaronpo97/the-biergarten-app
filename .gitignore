@@ -480,3 +480,5 @@ FodyWeavers.xsd
 */data_source/other
 .fake
 .idea
+
+*.feature.cs
