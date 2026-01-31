@@ -14,15 +14,13 @@ public class ApiSteps
 
     private (string username, string password) testUser;
 
-
-    private
-
     [Given("the API is running")]
     public void GivenTheApiIsRunning()
     {
         _client = _factory.CreateClient();
     }
 
+    
     [Then("the response status code should be {int}")]
     public void ThenStatusCodeShouldBe(int expected)
     {
@@ -62,7 +60,7 @@ public class ApiSteps
     }
 
     [Then("the response has HTTP status {int}")]
-    public void ThenTheResponseHasHttpStatus(int expectedCode)
+    public void ThenTheResponseHasHttpStatusInt(int expectedCode)
     {
         _response.Should().NotBeNull("No response was received from the API");
 
@@ -76,8 +74,26 @@ public class ApiSteps
     }
 
     [Given("I submit a login request with a valid username and password")]
-    public void GivenISubmitALoginRequestWithAValidUsernameAndPassword()
+    public async Task GivenISubmitALoginRequestWithAValidUsernameAndPassword()
     {
-        WhenISendAnHttpRequestToWithBody("POST", "/api/v1/account/login");
+        await WhenISendAnHttpRequestToWithBody("POST", "/api/v1/account/login", $@"
+        {{
+            ""username"": ""{testUser.username}"",
+            ""password"": ""{testUser.password}""
+        }}");
+    }
+
+    [Then("the response JSON should have a valid access token.")]
+    public async Task ThenTheResponseJsonShouldHaveAValidAccessToken()
+    {
+        var dict = await _response!.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        dict.Should().NotBeNull();
+        
+        dict!.TryGetValue("AccessToken", out var value).Should().BeTrue();
+
+        var messageStr = value!.ToString();
+        
+        Console.WriteLine(messageStr);
+
     }
 }
