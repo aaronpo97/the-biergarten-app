@@ -7,33 +7,23 @@ namespace ServiceCore.Services
     {
         public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
         {
-            throw  new NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public async Task<UserAccount?> LoginAsync(string usernameOrEmail, string password)
+        public async Task<UserAccount?> LoginAsync(string username, string password)
         {
-            // Attempt lookup by username, then email
-            var user = await userRepo.GetByUsernameAsync(usernameOrEmail)
-                       ?? await userRepo.GetByEmailAsync(usernameOrEmail);
+            // Attempt lookup by username
+            var user = await userRepo.GetByUsernameAsync(username);
+        
             // the user was not found
-            if (user is null)
-            {
-                return null;
-            }
-            
-            // they don't have an active credential
+            if (user is null) return null;
+
             // @todo handle expired passwords
             var activeCred = await credRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
-            if (activeCred is null)
-            {
-                return null;
-            }
-
-            if (!PasswordHasher.Verify(password, activeCred.Hash))
-            {
-                return null;
-            }
-
+            
+            if (activeCred is null) return null;    
+            if (!PasswordHasher.Verify(password, activeCred.Hash)) return null;
+            
             return user;
         }
 

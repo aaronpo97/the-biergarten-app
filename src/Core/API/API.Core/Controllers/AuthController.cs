@@ -1,3 +1,4 @@
+using System.Net;
 using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using ServiceCore.Services;
@@ -17,7 +18,13 @@ namespace WebAPI.Controllers
             string Password
         );
 
-        public record LoginRequest(string UsernameOrEmail, string Password);
+        public record LoginRequest
+        {
+            public string Username { get; init; } = default!;
+            public string Password { get; init; } = default!;
+        }
+
+        private record ResponseBody(string Message, object? Payload);
 
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register([FromBody] RegisterRequest req)
@@ -39,15 +46,15 @@ namespace WebAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
-            var userAccount = await auth.LoginAsync(req.UsernameOrEmail, req.Password);
+            var userAccount = await auth.LoginAsync(req.Username, req.Password);
             if (userAccount is null)
             {
-                return Unauthorized();
+                return Unauthorized(new ResponseBody("Invalid username or password.", null));
             }
 
             var jwt = jwtService.GenerateJwt(userAccount.UserAccountId, userAccount.Username, userAccount.DateOfBirth);
 
-            return Ok(new { AccessToken = jwt, Message = "Logged in successfully." });
+            return Ok(new ResponseBody("Logged in successfully.", new { AccessToken = jwt }));
         }
     }
 }
