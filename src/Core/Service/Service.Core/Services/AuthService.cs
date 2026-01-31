@@ -7,22 +7,7 @@ namespace ServiceCore.Services
     {
         public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
         {
-            if (userAccount.UserAccountId == Guid.Empty)
-            {
-                userAccount.UserAccountId = Guid.NewGuid();
-            }
-
-            await userRepo.AddAsync(userAccount);
-
-            var credential = new UserCredential
-            {
-                UserAccountId = userAccount.UserAccountId,
-                Hash = PasswordHasher.Hash(password)
-            };
-
-            await credRepo.RotateCredentialAsync(userAccount.UserAccountId, credential);
-
-            return userAccount;
+            throw  new NotImplementedException();
         }
 
         public async Task<UserAccount?> LoginAsync(string usernameOrEmail, string password)

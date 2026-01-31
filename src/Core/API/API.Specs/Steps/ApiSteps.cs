@@ -8,28 +8,19 @@ namespace API.Specs.Steps;
 [Binding]
 public class ApiSteps
 {
-    private readonly TestApiFactory _factory;
+    private readonly TestApiFactory _factory = new();
     private HttpClient? _client;
     private HttpResponseMessage? _response;
 
-    public ApiSteps()
-    {
-        _factory = new TestApiFactory();
-    }
+    private (string username, string password) testUser;
+
+
+    private
 
     [Given("the API is running")]
     public void GivenTheApiIsRunning()
     {
         _client = _factory.CreateClient();
-    }
-
-    // No user service assumptions needed for 404 tests
-
-    [When("I GET {string}")]
-    public async Task WhenIGet(string path)
-    {
-        _client.Should().NotBeNull("API client must be initialized");
-        _response = await _client!.GetAsync(path);
     }
 
     [Then("the response status code should be {int}")]
@@ -47,5 +38,46 @@ public class ApiSteps
         dict.Should().NotBeNull();
         dict!.TryGetValue(field, out var value).Should().BeTrue();
         (value?.ToString()).Should().Be(expected);
+    }
+
+    [When("I send an HTTP request {string} to {string} with body:")]
+    public async Task WhenISendAnHttpRequestToWithBody(string method, string url, string jsonBody)
+    {
+        _client.Should().NotBeNull();
+
+        var requestMessage = new HttpRequestMessage(new HttpMethod(method), url)
+        {
+            // Convert the string body into JSON content
+            Content = new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json")
+        };
+
+        _response = await _client!.SendAsync(requestMessage);
+    }
+
+    [When("I send an HTTP request {string} to {string}")]
+    public async Task WhenISendAnHttpRequestTo(string method, string url)
+    {
+        var requestMessage = new HttpRequestMessage(new HttpMethod(method), url);
+        _response = await _client!.SendAsync(requestMessage);
+    }
+
+    [Then("the response has HTTP status {int}")]
+    public void ThenTheResponseHasHttpStatus(int expectedCode)
+    {
+        _response.Should().NotBeNull("No response was received from the API");
+
+        ((int)_response!.StatusCode).Should().Be(expectedCode);
+    }
+
+    [Given("I have an existing account")]
+    public void GivenIHaveAnExistingAccount()
+    {
+        testUser = ("test.user", "password");
+    }
+
+    [Given("I submit a login request with a valid username and password")]
+    public void GivenISubmitALoginRequestWithAValidUsernameAndPassword()
+    {
+        WhenISendAnHttpRequestToWithBody("POST", "/api/v1/account/login");
     }
 }

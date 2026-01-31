@@ -7,27 +7,7 @@ namespace DataAccessLayer.Repositories.UserAccount
     public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
         : Repository<Entities.UserAccount>(connectionFactory), IUserAccountRepository
     {
-        /**
-         * @todo update the create user account stored proc to add user credential creation in
-         *       a single transaction, use that transaction instead.
-         */
-        public override async Task AddAsync(Entities.UserAccount userAccount)
-        {
-            await using var connection = await CreateConnection();
-            await using var command = connection.CreateCommand();
-            command.CommandText = "usp_CreateUserAccount";
-            command.CommandType = CommandType.StoredProcedure;
-            AddParameter(command, "@UserAccountId", userAccount.UserAccountId);
-            AddParameter(command, "@Username", userAccount.Username);
-            AddParameter(command, "@FirstName", userAccount.FirstName);
-            AddParameter(command, "@LastName", userAccount.LastName);
-            AddParameter(command, "@Email", userAccount.Email);
-            AddParameter(command, "@DateOfBirth", userAccount.DateOfBirth);
-
-            await command.ExecuteNonQueryAsync();
-        }
-
-        public override async Task<Entities.UserAccount?> GetByIdAsync(Guid id)
+        public async Task<Entities.UserAccount?> GetByIdAsync(Guid id)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -40,7 +20,7 @@ namespace DataAccessLayer.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public override async Task<IEnumerable<Entities.UserAccount>> GetAllAsync(int? limit, int? offset)
+        public async Task<IEnumerable<Entities.UserAccount>> GetAllAsync(int? limit, int? offset)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -64,7 +44,7 @@ namespace DataAccessLayer.Repositories.UserAccount
             return users;
         }
 
-        public override async Task UpdateAsync(Entities.UserAccount userAccount)
+        public async Task UpdateAsync(Entities.UserAccount userAccount)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -81,7 +61,7 @@ namespace DataAccessLayer.Repositories.UserAccount
             await command.ExecuteNonQueryAsync();
         }
 
-        public override async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();

@@ -1,5 +1,3 @@
-
-
 using DataAccessLayer.Entities;
 
 namespace ServiceCore.Services
@@ -8,8 +6,6 @@ namespace ServiceCore.Services
     {
         Task<IEnumerable<UserAccount>> GetAllAsync(int? limit = null, int? offset = null);
         Task<UserAccount?> GetByIdAsync(Guid id);
-
-        Task AddAsync(UserAccount userAccount);
 
         Task UpdateAsync(UserAccount userAccount);
     }

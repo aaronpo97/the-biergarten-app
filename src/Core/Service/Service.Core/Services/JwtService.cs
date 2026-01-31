@@ -8,8 +8,8 @@ using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredCla
 namespace ServiceCore.Services;
 public class JwtService(IConfiguration config) : IJwtService
 {
-    private readonly string? _secret = config["Jwt:Secret"];
-
+    // private readonly string? _secret = config["Jwt:Secret"];
+    private readonly string? _secret = "128490218jfklsdajfdsa90f8sd0fid0safasr31jl2k1j4AFSDR!@#$fdsafjdslajfl";
     public string GenerateJwt(Guid userId, string username, DateTime expiry)
     {
         var handler = new JsonWebTokenHandler();

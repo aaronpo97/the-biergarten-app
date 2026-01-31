@@ -126,7 +126,23 @@ namespace DBSeed
             int createdCredentials = 0;
             int createdVerifications = 0;
 
+            {
+                const string firstName = "Test";
+                const string lastName = "User";
+                const string email = "test.user@thebiergarten.app";
+                var dob = new DateTime(1985, 03, 01);
+                var hash = GeneratePasswordHash("password");
 
+                var userAccountId = await RegisterUserAsync(
+                    connection,
+                    $"{firstName}.{lastName}",
+                    firstName,
+                    lastName,
+                    dob,
+                    email,
+                    hash
+                );
+            }
             foreach (var (firstName, lastName) in SeedNames)
             {
                 // prepare user fields
@@ -141,6 +157,7 @@ namespace DBSeed
                     numberOfSymbols: 10
                 );
                 string hash = GeneratePasswordHash(pwd);
+
 
                 // register the user (creates account + credential)
                 var userAccountId = await RegisterUserAsync(

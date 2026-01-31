@@ -14,12 +14,7 @@ namespace ServiceCore.Services
         {
             return await repository.GetByIdAsync(id);
         }
-
-        public async Task AddAsync(UserAccount userAccount)
-        {
-            await repository.AddAsync(userAccount);
-        }
-
+        
         public async Task UpdateAsync(UserAccount userAccount)
         {
             await repository.UpdateAsync(userAccount);
