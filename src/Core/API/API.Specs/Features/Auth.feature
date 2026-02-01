@@ -1,7 +1,7 @@
 Feature: User Login
-    As a registered user
-    I want to log in to my account
-    So that I receive an authentication token to access authenticated routes
+As a registered user
+I want to log in to my account
+So that I receive an authentication token to access authenticated routes
 
     Scenario: Successful login with valid credentials
         Given the API is running
@@ -32,3 +32,8 @@ Feature: User Login
         Given the API is running
         When I submit a login request with both username and password missing
         Then the response has HTTP status 400
+
+    Scenario: Login endpoint only accepts POST requests
+        Given the API is running
+        When I submit a login request using a GET request
+        Then the response has HTTP status 404
