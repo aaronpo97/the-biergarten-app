@@ -27,9 +27,9 @@ public class UserAccountRepositoryTest
                 ("DateOfBirth", typeof(DateTime)),
                 ("Timer", typeof(byte[]))
             ).AddRow(Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                     "yerb","Aaron","Po","aaronpo@example.com",
-                     new DateTime(2020,1,1), null,
-                     new DateTime(1990,1,1), null));
+                "yerb", "Aaron", "Po", "aaronpo@example.com",
+                new DateTime(2020, 1, 1), null,
+                new DateTime(1990, 1, 1), null));
 
         var repo = CreateRepo(conn);
         var result = await repo.GetByIdAsync(Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
@@ -45,18 +45,20 @@ public class UserAccountRepositoryTest
         var conn = new MockDbConnection();
         conn.Mocks
             .When(cmd => cmd.CommandText == "usp_GetAllUserAccounts")
-            .ReturnsTable(MockTable.WithColumns(   
-                ("UserAccountId", typeof(Guid)),
-                ("Username", typeof(string)),
-                ("FirstName", typeof(string)),
-                ("LastName", typeof(string)),
-                ("Email", typeof(string)),
-                ("CreatedAt", typeof(DateTime)),
-                ("UpdatedAt", typeof(DateTime?)),
-                ("DateOfBirth", typeof(DateTime)),
-                ("Timer", typeof(byte[]))
-            ).AddRow(Guid.NewGuid(), "a","A","A","a@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date, null)
-             .AddRow(Guid.NewGuid(), "b","B","B","b@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date, null));
+            .ReturnsTable(MockTable.WithColumns(
+                    ("UserAccountId", typeof(Guid)),
+                    ("Username", typeof(string)),
+                    ("FirstName", typeof(string)),
+                    ("LastName", typeof(string)),
+                    ("Email", typeof(string)),
+                    ("CreatedAt", typeof(DateTime)),
+                    ("UpdatedAt", typeof(DateTime?)),
+                    ("DateOfBirth", typeof(DateTime)),
+                    ("Timer", typeof(byte[]))
+                ).AddRow(Guid.NewGuid(), "a", "A", "A", "a@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date,
+                    null)
+                .AddRow(Guid.NewGuid(), "b", "B", "B", "b@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date,
+                    null));
 
         var repo = CreateRepo(conn);
         var results = (await repo.GetAllAsync(null, null)).ToList();
@@ -64,27 +66,6 @@ public class UserAccountRepositoryTest
         results.Select(r => r.Username).Should().BeEquivalentTo(new[] { "a", "b" });
     }
 
-    [Fact]
-    public async Task AddAsync_ExecutesStoredProcedure()
-    {
-        var conn = new MockDbConnection();
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "usp_CreateUserAccount")
-            .ReturnsScalar(1);
-
-        var repo = CreateRepo(conn);
-        var user = new DataAccessLayer.Entities.UserAccount
-        {
-            UserAccountId = Guid.NewGuid(),
-            Username = "newuser",
-            FirstName = "New",
-            LastName = "User",
-            Email = "newuser@example.com",
-            DateOfBirth = new DateTime(1991,1,1)
-        };
-
-        await repo.AddAsync(user);
-    }
 
     [Fact]
     public async Task GetByUsername_ReturnsRow()
@@ -102,7 +83,8 @@ public class UserAccountRepositoryTest
                 ("UpdatedAt", typeof(DateTime?)),
                 ("DateOfBirth", typeof(DateTime)),
                 ("Timer", typeof(byte[]))
-            ).AddRow(Guid.NewGuid(), "lookupuser","L","U","lookup@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date, null));
+            ).AddRow(Guid.NewGuid(), "lookupuser", "L", "U", "lookup@example.com", DateTime.UtcNow, null,
+                DateTime.UtcNow.Date, null));
 
         var repo = CreateRepo(conn);
         var result = await repo.GetByUsernameAsync("lookupuser");
@@ -126,7 +108,8 @@ public class UserAccountRepositoryTest
                 ("UpdatedAt", typeof(DateTime?)),
                 ("DateOfBirth", typeof(DateTime)),
                 ("Timer", typeof(byte[]))
-            ).AddRow(Guid.NewGuid(), "byemail","B","E","byemail@example.com", DateTime.UtcNow, null, DateTime.UtcNow.Date, null));
+            ).AddRow(Guid.NewGuid(), "byemail", "B", "E", "byemail@example.com", DateTime.UtcNow, null,
+                DateTime.UtcNow.Date, null));
 
         var repo = CreateRepo(conn);
         var result = await repo.GetByEmailAsync("byemail@example.com");

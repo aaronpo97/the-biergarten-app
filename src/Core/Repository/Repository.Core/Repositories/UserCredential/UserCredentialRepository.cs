@@ -14,7 +14,7 @@ namespace DataAccessLayer.Repositories.UserCredential
             command.CommandText = "USP_RotateUserCredential";
             command.CommandType = CommandType.StoredProcedure;
 
-            AddParameter(command, "@UserAccountId", userAccountId);
+            AddParameter(command, "@UserAccountId_", userAccountId);
             AddParameter(command, "@Hash", credential.Hash);
 
             await command.ExecuteNonQueryAsync();
@@ -40,24 +40,9 @@ namespace DataAccessLayer.Repositories.UserCredential
             command.CommandText = "USP_InvalidateUserCredential";
             command.CommandType = CommandType.StoredProcedure;
 
-            AddParameter(command, "@UserAccountId", userAccountId);
+            AddParameter(command, "@UserAccountId_", userAccountId);
             await command.ExecuteNonQueryAsync();
         }
-
-        public override Task AddAsync(Entities.UserCredential entity)
-            => throw new NotSupportedException("Use RotateCredentialAsync for adding/rotating credentials.");
-
-        public override Task<IEnumerable<Entities.UserCredential>> GetAllAsync(int? limit, int? offset)
-            => throw new NotSupportedException("Listing credentials is not supported.");
-
-        public override Task<Entities.UserCredential?> GetByIdAsync(Guid id)
-            => throw new NotSupportedException("Fetching credential by ID is not supported.");
-
-        public override Task UpdateAsync(Entities.UserCredential entity)
-            => throw new NotSupportedException("Use RotateCredentialAsync to update credentials.");
-
-        public override Task DeleteAsync(Guid id)
-            => throw new NotSupportedException("Deleting a credential by ID is not supported.");
 
         protected override Entities.UserCredential MapToEntity(DbDataReader reader)
         {

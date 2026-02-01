@@ -1,7 +1,7 @@
-using BusinessLayer.Services;
 using DataAccessLayer.Repositories.UserAccount;
 using DataAccessLayer.Repositories.UserCredential;
 using DataAccessLayer.Sql;
+using ServiceCore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,7 @@ builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 var app = builder.Build();
 
 app.UseSwagger();

@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Konscious.Security.Cryptography;
 
-namespace BusinessLayer.Services
+namespace ServiceCore.Services
 {
     public static class PasswordHasher
     {

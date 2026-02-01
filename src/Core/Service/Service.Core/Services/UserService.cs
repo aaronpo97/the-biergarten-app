@@ -1,8 +1,7 @@
 using DataAccessLayer.Entities;
-using DataAccessLayer.Repositories;
 using DataAccessLayer.Repositories.UserAccount;
 
-namespace BusinessLayer.Services
+namespace ServiceCore.Services
 {
     public class UserService(IUserAccountRepository repository) : IUserService
     {
@@ -15,12 +14,7 @@ namespace BusinessLayer.Services
         {
             return await repository.GetByIdAsync(id);
         }
-
-        public async Task AddAsync(UserAccount userAccount)
-        {
-            await repository.AddAsync(userAccount);
-        }
-
+        
         public async Task UpdateAsync(UserAccount userAccount)
         {
             await repository.UpdateAsync(userAccount);
