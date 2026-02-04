@@ -482,3 +482,8 @@ FodyWeavers.xsd
 .idea
 
 *.feature.cs
+
+
+database
+
+.env.*

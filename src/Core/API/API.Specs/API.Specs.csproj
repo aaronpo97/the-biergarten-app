@@ -12,6 +12,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="FluentAssertions" Version="6.9.0" />
+    <PackageReference Include="dbup" Version="5.0.41" />
 
     <!-- Reqnroll core, xUnit adapter and code-behind generator -->
     <PackageReference Include="Reqnroll" Version="3.3.3" />
@@ -33,5 +34,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API.Core\API.Core.csproj" />
+    <ProjectReference Include="..\..\Database\Database.Core\Database.Core.csproj" />
   </ItemGroup>
 </Project>
