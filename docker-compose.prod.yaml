@@ -1,0 +1,76 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: prod-env-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "${SA_PASSWORD}"
+      MSSQL_PID: "Express"
+    volumes:
+      - sqlserverdata-prod:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - prodnet
+
+  database.migrations:
+    image: database.migrations
+    container_name: prod-env-database-migrations
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    build:
+      context: ./src/Core/Database
+      dockerfile: Database.Migrations/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
+    restart: "no"
+    networks:
+      - prodnet
+
+  api.core:
+    image: api.core
+    container_name: prod-env-api-core
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    build:
+      context: ./src/Core
+      dockerfile: API/API.Core/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://0.0.0.0:8080"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
+      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+    restart: unless-stopped
+    networks:
+      - prodnet
+    volumes:
+      - nuget-cache-prod:/root/.nuget/packages
+
+volumes:
+  sqlserverdata-prod:
+    driver: local
+  nuget-cache-prod:
+    driver: local
+
+networks:
+  prodnet:
+    driver: bridge
