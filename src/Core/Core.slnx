@@ -4,7 +4,7 @@
     <Project Path="API/API.Specs/API.Specs.csproj" />
   </Folder>
   <Folder Name="/Database/">
-    <Project Path="Database/Database.Core/Database.Core.csproj" />
+    <Project Path="Database/Database.Migrations/Database.Migrations.csproj" />
     <Project Path="Database/Database.Seed/Database.Seed.csproj" />
   </Folder>
   <Folder Name="/Repository/">

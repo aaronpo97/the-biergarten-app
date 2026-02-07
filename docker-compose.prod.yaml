@@ -6,15 +6,35 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "${SA_PASSWORD}"
-      MSSQL_PID: "Developer"
+      MSSQL_PID: "Express"
     volumes:
-      - sqlserverdata:/var/opt/mssql
+      - sqlserverdata-prod:/var/opt/mssql
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 30s
+    networks:
+      - prodnet
+
+  database.migrations:
+    image: database.migrations
+    container_name: prod-env-database-migrations
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    build:
+      context: ./src/Core/Database
+      dockerfile: Database.Migrations/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
+    restart: "no"
     networks:
       - prodnet
 
@@ -37,17 +57,18 @@ services:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       DOTNET_RUNNING_IN_CONTAINER: "true"
+      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
       DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
     restart: unless-stopped
     networks:
       - prodnet
     volumes:
-      - nuget-cache:/root/.nuget/packages
+      - nuget-cache-prod:/root/.nuget/packages
 
 volumes:
-  sqlserverdata:
+  sqlserverdata-prod:
     driver: local
-  nuget-cache:
+  nuget-cache-prod:
     driver: local
 
 networks:

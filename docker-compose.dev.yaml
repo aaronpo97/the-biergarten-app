@@ -6,11 +6,11 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "${SA_PASSWORD}"
-      MSSQL_PID: "Developer"
+      MSSQL_PID: "Express"
     ports:
       - "1433:1433"
     volumes:
-      - sqlserverdata:/var/opt/mssql
+      - sqlserverdata-dev:/var/opt/mssql
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
@@ -19,7 +19,25 @@ services:
       start_period: 30s
     networks:
       - devnet
-
+  database.migrations:
+    image: database.migrations
+    container_name: dev-env-database-migrations
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    build:
+      context: ./src/Core/Database
+      dockerfile: Database.Migrations/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
+    restart: "no"
+    networks:
+      - devnet
   api.core:
     image: api.core
     container_name: dev-env-api-core
@@ -44,12 +62,12 @@ services:
     networks:
       - devnet
     volumes:
-      - nuget-cache:/root/.nuget/packages
+      - nuget-cache-dev:/root/.nuget/packages
 
 volumes:
-  sqlserverdata:
+  sqlserverdata-dev:
     driver: local
-  nuget-cache:
+  nuget-cache-dev:
     driver: local
 
 networks:

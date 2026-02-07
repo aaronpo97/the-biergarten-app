@@ -22,14 +22,14 @@ try
     await useMaster.ExecuteNonQueryAsync();
 
     var dbName = "Biergarten";
-    var dropDb = connection.CreateCommand();
-    dropDb.CommandText = $@"
-        IF DB_ID(N'{dbName}') IS NOT NULL
-        BEGIN
-            ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-            DROP DATABASE [{dbName}];
-        END";
-    await dropDb.ExecuteNonQueryAsync();
+        var dropDb = connection.CreateCommand();
+        dropDb.CommandText = $@"
+            IF DB_ID(N'{dbName}') IS NOT NULL
+            BEGIN
+                ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                DROP DATABASE [{dbName}];
+            END";
+        await dropDb.ExecuteNonQueryAsync();
 
     var createDb = connection.CreateCommand();
     createDb.CommandText = $@"CREATE DATABASE [{dbName}];";
