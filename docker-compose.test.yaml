@@ -73,6 +73,7 @@ services:
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
       DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
+      JWT_SECRET: "${JWT_SECRET}"
     volumes:
       - ./test-results:/app/test-results
     restart: "no"
@@ -93,6 +94,7 @@ services:
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
       DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
+      JWT_SECRET: "${JWT_SECRET}"
     volumes:
       - ./test-results:/app/test-results
     restart: "no"
