@@ -7,12 +7,41 @@ try
 {
     var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-    Console.WriteLine("Connected to database.");
+    Console.WriteLine("Attempting to connect to database...");
+
+    // Retry logic for database connection
+    SqlConnection? connection = null;
+    int maxRetries = 10;
+    int retryDelayMs = 2000;
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++)
+    {
+        try
+        {
+            connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+            Console.WriteLine($"Connected to database successfully on attempt {attempt}.");
+            break;
+        }
+        catch (SqlException ex) when (attempt < maxRetries)
+        {
+            Console.WriteLine($"Connection attempt {attempt}/{maxRetries} failed: {ex.Message}");
+            Console.WriteLine($"Retrying in {retryDelayMs}ms...");
+            await Task.Delay(retryDelayMs);
+            connection?.Dispose();
+            connection = null;
+        }
+    }
+
+    if (connection == null)
+    {
+        throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
+    }
+
     Console.WriteLine("Starting seeding...");
 
-    using (var connection = new SqlConnection(connectionString))
+    using (connection)
     {
-        await connection.OpenAsync();
 
         ISeeder[] seeders =
         [
