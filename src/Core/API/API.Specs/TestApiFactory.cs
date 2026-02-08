@@ -10,11 +10,6 @@ namespace API.Specs
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Testing");
-
-            builder.ConfigureAppConfiguration((context, configBuilder) =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            });
         }
     }
 }

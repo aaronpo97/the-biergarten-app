@@ -1,17 +1,18 @@
 services:
   sqlserver:
+    env_file: ".env.test"
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
     container_name: test-env-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "${SA_PASSWORD}"
+      SA_PASSWORD: "${DB_PASSWORD}"
       MSSQL_PID: "Express"
       DOTNET_RUNNING_IN_CONTAINER: "true"
     volumes:
       - sqlserverdata-test:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -20,6 +21,7 @@ services:
       - testnet
 
   database.migrations:
+    env_file: ".env.test"
     image: database.migrations
     container_name: test-env-database-migrations
     depends_on:
@@ -33,14 +35,17 @@ services:
         APP_UID: 1000
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
-      MASTER_DB_CONNECTION_STRING: "${TEST_MASTER_DB_CONNECTION_STRING}"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
       CLEAR_DATABASE: "true"
     restart: "no"
     networks:
       - testnet
 
   database.seed:
+    env_file: ".env.test"
     image: database.seed
     container_name: test-env-database-seed
     depends_on:
@@ -54,12 +59,16 @@ services:
         APP_UID: 1000
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
     restart: "no"
     networks:
       - testnet
 
   api.specs:
+    env_file: ".env.test"
     image: api.specs
     container_name: test-env-api-specs
     depends_on:
@@ -72,7 +81,10 @@ services:
         BUILD_CONFIGURATION: Release
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
       JWT_SECRET: "${JWT_SECRET}"
     volumes:
       - ./test-results:/app/test-results
@@ -81,6 +93,7 @@ services:
       - testnet
 
   repository.tests:
+    env_file: ".env.test"
     image: repository.tests
     container_name: test-env-repository-tests
     depends_on:
@@ -93,8 +106,6 @@ services:
         BUILD_CONFIGURATION: Release
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
-      JWT_SECRET: "${JWT_SECRET}"
     volumes:
       - ./test-results:/app/test-results
     restart: "no"

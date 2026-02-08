@@ -7,8 +7,39 @@ namespace Database.Migrations;
 
 public static class Program
 {
-    private static readonly string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-    private static readonly string? masterConnectionString = Environment.GetEnvironmentVariable("MASTER_DB_CONNECTION_STRING");
+    private static string BuildConnectionString(string? databaseName = null)
+    {
+        var server = Environment.GetEnvironmentVariable("DB_SERVER")
+            ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+
+        var dbName = databaseName
+            ?? Environment.GetEnvironmentVariable("DB_NAME")
+            ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+
+        var user = Environment.GetEnvironmentVariable("DB_USER")
+            ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+
+        var password = Environment.GetEnvironmentVariable("DB_PASSWORD")
+            ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+
+        var trustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE")
+            ?? "True";
+
+        var builder = new SqlConnectionStringBuilder
+        {
+            DataSource = server,
+            InitialCatalog = dbName,
+            UserID = user,
+            Password = password,
+            TrustServerCertificate = bool.Parse(trustServerCertificate),
+            Encrypt = true
+        };
+
+        return builder.ConnectionString;
+    }
+
+    private static readonly string connectionString = BuildConnectionString();
+    private static readonly string masterConnectionString = BuildConnectionString("master");
 
     private static bool DeployMigrations()
     {
