@@ -34,6 +34,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API.Core\API.Core.csproj" />
-    <ProjectReference Include="..\..\Database\Database.Core\Database.Core.csproj" />
   </ItemGroup>
 </Project>

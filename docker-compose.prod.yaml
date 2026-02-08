@@ -59,6 +59,7 @@ services:
       DOTNET_RUNNING_IN_CONTAINER: "true"
       MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
       DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+      JWT_SECRET: "${JWT_SECRET}"
     restart: unless-stopped
     networks:
       - prodnet

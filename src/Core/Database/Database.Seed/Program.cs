@@ -5,73 +5,60 @@ using System.Reflection;
 
 try
 {
-    var connectionString = Environment.GetEnvironmentVariable(
-        "DB_CONNECTION_STRING"
-    );
-    if (string.IsNullOrWhiteSpace(connectionString))
-        throw new InvalidOperationException(
-            "Environment variable DB_CONNECTION_STRING is not set or is empty."
-        );
+    var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-    await using var connection = new SqlConnection(connectionString);
-    await connection.OpenAsync();
+    Console.WriteLine("Attempting to connect to database...");
 
-    // drop and recreate the database
-    var useMaster = connection.CreateCommand();
-    useMaster.CommandText = "USE master;";
-    await useMaster.ExecuteNonQueryAsync();
+    // Retry logic for database connection
+    SqlConnection? connection = null;
+    int maxRetries = 10;
+    int retryDelayMs = 2000;
 
-    var dbName = "Biergarten";
-        var dropDb = connection.CreateCommand();
-        dropDb.CommandText = $@"
-            IF DB_ID(N'{dbName}') IS NOT NULL
-            BEGIN
-                ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                DROP DATABASE [{dbName}];
-            END";
-        await dropDb.ExecuteNonQueryAsync();
-
-    var createDb = connection.CreateCommand();
-    createDb.CommandText = $@"CREATE DATABASE [{dbName}];";
-    await createDb.ExecuteNonQueryAsync();
-    await connection.CloseAsync();
-    await connection.OpenAsync();
-
-
-    Console.WriteLine("Connected to database.");
-
-    Console.WriteLine("Starting migrations...");
-
-    // Run Database.Core migrations (embedded resources) via DbUp
-    var migrationAssembly = Assembly.Load("Database.Core");
-    var upgrader = DeployChanges
-        .To.SqlDatabase(connectionString)
-        .WithScriptsEmbeddedInAssembly(migrationAssembly)
-        .LogToConsole()
-        .Build();
-
-    var upgradeResult = upgrader.PerformUpgrade();
-    if (!upgradeResult.Successful)
-        throw upgradeResult.Error;
-
-    Console.WriteLine("Migrations completed.");
-
-
-    ISeeder[] seeders =
-    [
-        new LocationSeeder(),
-        new UserSeeder(),
-    ];
-
-    foreach (var seeder in seeders)
+    for (int attempt = 1; attempt <= maxRetries; attempt++)
     {
-        Console.WriteLine($"Seeding {seeder.GetType().Name}...");
-        await seeder.SeedAsync(connection);
-        Console.WriteLine($"{seeder.GetType().Name} seeded.");
+        try
+        {
+            connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+            Console.WriteLine($"Connected to database successfully on attempt {attempt}.");
+            break;
+        }
+        catch (SqlException ex) when (attempt < maxRetries)
+        {
+            Console.WriteLine($"Connection attempt {attempt}/{maxRetries} failed: {ex.Message}");
+            Console.WriteLine($"Retrying in {retryDelayMs}ms...");
+            await Task.Delay(retryDelayMs);
+            connection?.Dispose();
+            connection = null;
+        }
     }
 
-    Console.WriteLine("Seed completed successfully.");
-    await connection.CloseAsync();
+    if (connection == null)
+    {
+        throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
+    }
+
+    Console.WriteLine("Starting seeding...");
+
+    using (connection)
+    {
+
+        ISeeder[] seeders =
+        [
+            new LocationSeeder(),
+            new UserSeeder(),
+        ];
+
+        foreach (var seeder in seeders)
+        {
+            Console.WriteLine($"Seeding {seeder.GetType().Name}...");
+            await seeder.SeedAsync(connection);
+            Console.WriteLine($"{seeder.GetType().Name} seeded.");
+        }
+
+        Console.WriteLine("Seed completed successfully.");
+    }
+
     return 0;
 }
 catch (Exception ex)
