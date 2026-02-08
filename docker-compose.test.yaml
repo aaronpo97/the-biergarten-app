@@ -63,21 +63,35 @@ services:
     image: api.specs
     container_name: test-env-api-specs
     depends_on:
-        sqlserver:
-          condition: service_healthy
-        database.migrations:
-          condition: service_completed_successfully
-        database.seed:
-          condition: service_completed_successfully
+      database.seed:
+        condition: service_completed_successfully
     build:
       context: ./src/Core
       dockerfile: API/API.Specs/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
     environment:
-      ASPNETCORE_ENVIRONMENT: "Test"
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      API_BASE_URL: "http://api.core:8080"
+      DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
+    volumes:
+      - ./test-results:/app/test-results
+    restart: "no"
+    networks:
+      - testnet
+
+  repository.tests:
+    image: repository.tests
+    container_name: test-env-repository-tests
+    depends_on:
+      database.seed:
+        condition: service_completed_successfully
+    build:
+      context: ./src/Core
+      dockerfile: Repository/Repository.Tests/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
       DB_CONNECTION_STRING: "${TEST_DB_CONNECTION_STRING}"
     volumes:
       - ./test-results:/app/test-results
