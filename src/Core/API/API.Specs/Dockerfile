@@ -10,15 +10,10 @@ COPY . .
 WORKDIR "/src/API/API.Specs"
 RUN dotnet build "./API.Specs.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
+FROM build AS final
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./API.Specs.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS final
 WORKDIR /src
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-# Copy the entire source tree for testing
-COPY . .
 RUN mkdir -p /app/test-results
 WORKDIR /src/API/API.Specs
-ENTRYPOINT ["dotnet", "test", "API.Specs.csproj", "-c", "Release", "--logger", "trx;LogFileName=/app/test-results/test-results.trx"]
+ENTRYPOINT ["dotnet", "test", "API.Specs.csproj", "-c", "Release", "--no-build", "--no-restore", "--logger", "trx;LogFileName=/app/test-results/test-results.trx"]

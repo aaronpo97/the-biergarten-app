@@ -8,14 +8,7 @@ COPY . .
 WORKDIR "/src/Repository/Repository.Tests"
 RUN dotnet build "./Repository.Tests.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Repository.Tests.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS final
-WORKDIR /src
-# Copy the entire source tree for testing
-COPY . .
+FROM build AS final
 RUN mkdir -p /app/test-results
 WORKDIR /src/Repository/Repository.Tests
-ENTRYPOINT ["dotnet", "test", "Repository.Tests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/app/test-results/repository-tests.trx"]
+ENTRYPOINT ["dotnet", "test", "./Repository.Tests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=/app/test-results/repository-tests.trx"]
