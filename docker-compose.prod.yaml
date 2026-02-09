@@ -1,16 +1,17 @@
 services:
   sqlserver:
+    env_file: ".env.prod"
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
     container_name: prod-env-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "${SA_PASSWORD}"
+      SA_PASSWORD: "${DB_PASSWORD}"
       MSSQL_PID: "Express"
     volumes:
       - sqlserverdata-prod:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -19,6 +20,7 @@ services:
       - prodnet
 
   database.migrations:
+    env_file: ".env.prod"
     image: database.migrations
     container_name: prod-env-database-migrations
     depends_on:
@@ -32,13 +34,16 @@ services:
         APP_UID: 1000
     environment:
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
-      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
     restart: "no"
     networks:
       - prodnet
 
   api.core:
+    env_file: ".env.prod"
     image: api.core
     container_name: prod-env-api-core
     depends_on:
@@ -57,8 +62,10 @@ services:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       DOTNET_RUNNING_IN_CONTAINER: "true"
-      MASTER_DB_CONNECTION_STRING: "${MASTER_DB_CONNECTION_STRING}"
-      DB_CONNECTION_STRING: "${DB_CONNECTION_STRING}"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
       JWT_SECRET: "${JWT_SECRET}"
     restart: unless-stopped
     networks:

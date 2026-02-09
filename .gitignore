@@ -486,4 +486,7 @@ FodyWeavers.xsd
 
 database
 
-.env.*
+.env
+.env.dev
+.env.test
+.env.prod

@@ -16,4 +16,4 @@ WORKDIR /src
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /app/test-results
 WORKDIR /src/API/API.Specs
-ENTRYPOINT ["dotnet", "test", "API.Specs.csproj", "-c", "Release", "--no-build", "--no-restore", "--logger", "trx;LogFileName=/app/test-results/test-results.trx"]
+ENTRYPOINT ["dotnet", "test", "API.Specs.csproj", "-c", "Release", "--logger", "trx;LogFileName=/app/test-results/test-results.trx"]
