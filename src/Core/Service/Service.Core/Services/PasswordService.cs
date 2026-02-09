@@ -4,14 +4,14 @@ using Konscious.Security.Cryptography;
 
 namespace ServiceCore.Services
 {
-    public static class PasswordHasher
+    public class PasswordService : IPasswordService
     {
         private const int SaltSize = 16; // 128-bit
         private const int HashSize = 32; // 256-bit
         private const int ArgonIterations = 4;
         private const int ArgonMemoryKb = 65536; // 64MB
 
-        public static string Hash(string password)
+        public string Hash(string password)
         {
             var salt = RandomNumberGenerator.GetBytes(SaltSize);
             var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
@@ -26,7 +26,7 @@ namespace ServiceCore.Services
             return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
 
-        public static bool Verify(string password, string stored)
+        public bool Verify(string password, string stored)
         {
             try
             {

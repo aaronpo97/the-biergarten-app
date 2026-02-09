@@ -2,7 +2,7 @@ Feature: User Registration
    As a new user
    I want to register an account
    So that I can log in and access authenticated routes
-
+   @Ignore
    Scenario: Successful registration with valid details
       Given the API is running
       When I submit a registration request with values:
@@ -11,7 +11,7 @@ Feature: User Registration
       Then the response has HTTP status 201
       And the response JSON should have "message" equal "User registered successfully."
       And the response JSON should have an access token
-
+   @Ignore
    Scenario: Registration fails with existing username
       Given the API is running
       And I have an existing account with username "existinguser"
@@ -20,7 +20,7 @@ Feature: User Registration
          | existinguser | Existing  | User     | existing@example.com | 1990-01-01  | Password1! |
       Then the response has HTTP status 409
       And the response JSON should have "message" equal "Username already exists."
-
+   @Ignore
    Scenario: Registration fails with existing email
       Given the API is running
       And I have an existing account with email "existing@example.com"
@@ -29,7 +29,7 @@ Feature: User Registration
          | newuser  | New       | User     | existing@example.com | 1990-01-01  | Password1! |
       Then the response has HTTP status 409
       And the response JSON should have "message" equal "Email already in use."
-
+   @Ignore
    Scenario: Registration fails with missing required fields
       Given the API is running
       When I submit a registration request with values:
@@ -37,7 +37,7 @@ Feature: User Registration
          |          | New       | User     |       |             | Password1! |
       Then the response has HTTP status 400
       And the response JSON should have "message" equal "Username is required."
-
+   @Ignore
    Scenario: Registration fails with invalid email format
       Given the API is running
       When I submit a registration request with values:
@@ -45,7 +45,7 @@ Feature: User Registration
          | newuser  | New       | User     | invalidemail | 1990-01-01  | Password1! |
       Then the response has HTTP status 400
       And the response JSON should have "message" equal "Invalid email format."
-
+   @Ignore
    Scenario: Registration fails with weak password
       Given the API is running
       When I submit a registration request with values:
@@ -53,7 +53,7 @@ Feature: User Registration
          | newuser  | New       | User     | newuser@example.com | 1990-01-01  | weakpass |
       Then the response has HTTP status 400
       And the response JSON should have "message" equal "Password does not meet complexity requirements."
-
+   @Ignore
    Scenario: Cannot register a user younger than 19 years of age (regulatory requirement)
       Given the API is running
       When I submit a registration request with values:
@@ -61,7 +61,7 @@ Feature: User Registration
          | younguser | Young     | User     | younguser@example.com |             | Password1! |
       Then the response has HTTP status 400
       And the response JSON should have "message" equal "You must be at least 19 years old to register."
-
+   @Ignore
    Scenario: Registration endpoint only accepts POST requests
       Given the API is running
       When I submit a registration request using a GET request

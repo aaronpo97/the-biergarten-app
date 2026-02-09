@@ -1,4 +1,4 @@
-namespace DataAccessLayer.Entities;
+namespace Repository.Core.Entities;
 
 public class UserVerification
 {

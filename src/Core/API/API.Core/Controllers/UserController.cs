@@ -1,4 +1,4 @@
-using DataAccessLayer.Entities;
+using Repository.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using ServiceCore.Services;
 

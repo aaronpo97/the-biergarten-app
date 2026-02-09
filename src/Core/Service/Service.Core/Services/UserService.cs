@@ -1,5 +1,5 @@
-using DataAccessLayer.Entities;
-using DataAccessLayer.Repositories.UserAccount;
+using Repository.Core.Entities;
+using Repository.Core.Repositories.UserAccount;
 
 namespace ServiceCore.Services
 {
@@ -14,7 +14,7 @@ namespace ServiceCore.Services
         {
             return await repository.GetByIdAsync(id);
         }
-        
+
         public async Task UpdateAsync(UserAccount userAccount)
         {
             await repository.UpdateAsync(userAccount);

@@ -1,6 +1,6 @@
 using System.Data.Common;
 
-namespace DataAccessLayer.Sql
+namespace Repository.Core.Sql
 {
     public interface ISqlConnectionFactory
     {

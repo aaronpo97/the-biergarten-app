@@ -1,35 +1,53 @@
-using DataAccessLayer.Entities;
-using DataAccessLayer.Repositories.UserAccount;
+using Repository.Core.Entities;
+using Repository.Core.Repositories.Auth;
 
 namespace ServiceCore.Services
 {
-    public class AuthService(IUserAccountRepository userRepo, IUserCredentialRepository credRepo) : IAuthService
+    public class AuthService(
+        IAuthRepository authRepo,
+        IPasswordService passwordService
+    ) : IAuthService
     {
-        public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
+        public async Task<UserAccount?> RegisterAsync(UserAccount userAccount, string password)
         {
-            throw new NotImplementedException();
+            // Check if user already exists
+            var user = await authRepo.GetUserByUsernameAsync(userAccount.Username);
+            if (user is not null)
+            {
+                return null;
+            }
+
+            // password hashing
+            var hashed = passwordService.Hash(password);
+
+            // Register user with hashed password
+            return await authRepo.RegisterUserAsync(
+                userAccount.Username,
+                userAccount.FirstName,
+                userAccount.LastName,
+                userAccount.Email,
+                userAccount.DateOfBirth,
+                hashed);
         }
 
         public async Task<UserAccount?> LoginAsync(string username, string password)
         {
             // Attempt lookup by username
-            var user = await userRepo.GetByUsernameAsync(username);
-        
+            var user = await authRepo.GetUserByUsernameAsync(username);
+
             // the user was not found
             if (user is null) return null;
 
             // @todo handle expired passwords
-            var activeCred = await credRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
-            
-            if (activeCred is null) return null;    
-            if (!PasswordHasher.Verify(password, activeCred.Hash)) return null;
-            
-            return user;
+            var activeCred = await authRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
+
+            if (activeCred is null) return null;
+            return !passwordService.Verify(password, activeCred.Hash) ? null : user;
         }
 
         public async Task InvalidateAsync(Guid userAccountId)
         {
-            await credRepo.InvalidateCredentialsByUserAccountIdAsync(userAccountId);
+            await authRepo.InvalidateCredentialsByUserAccountIdAsync(userAccountId);
         }
     }
 }

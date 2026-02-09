@@ -1,6 +1,6 @@
 using Microsoft.Data.SqlClient;
 
-namespace DataAccessLayer.Sql
+namespace Repository.Core.Sql
 {
     public static class SqlConnectionStringHelper
     {

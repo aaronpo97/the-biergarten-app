@@ -1,4 +1,4 @@
-using DataAccessLayer.Entities;
+using Repository.Core.Entities;
 
 namespace ServiceCore.Services
 {
