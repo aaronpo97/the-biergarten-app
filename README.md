@@ -12,6 +12,15 @@ A social platform for craft beer enthusiasts to discover breweries, share review
   - [Prerequisites](#prerequisites)
   - [Quick Start (Development Environment)](#quick-start-development-environment)
   - [Manual Setup (Without Docker)](#manual-setup-without-docker)
+- [Environment Variables](#environment-variables)
+  - [Overview](#overview)
+  - [Backend Variables (.NET API)](#backend-variables-net-api)
+  - [Frontend Variables (Next.js)](#frontend-variables-nextjs)
+  - [Docker Variables](#docker-variables)
+  - [External Services](#external-services)
+  - [Generating Secrets](#generating-secrets)
+  - [Environment File Structure](#environment-file-structure)
+  - [Variable Reference Table](#variable-reference-table)
 - [Testing](#testing)
 - [Database Schema](#database-schema)
 - [Authentication & Security](#authentication--security)
@@ -154,16 +163,24 @@ Website/                   # Next.js frontend application
 
 2. **Configure environment variables**
 
-   Create a `.env` file in the project root:
+   Copy the example file and customize:
    ```bash
-   # Database
-   SA_PASSWORD=YourStrong!Passw0rd
-   DB_CONNECTION_STRING=Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;
-   MASTER_DB_CONNECTION_STRING=Server=localhost,1433;Database=master;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;
+   cp .env.example .env.dev
+   ```
+
+   Required variables in `.env.dev`:
+   ```bash
+   # Database (component-based for Docker)
+   DB_SERVER=sqlserver,1433
+   DB_NAME=Biergarten
+   DB_USER=sa
+   DB_PASSWORD=YourStrong!Passw0rd
 
    # JWT Authentication
-   JWT_SECRET=your-secret-key-here-min-32-chars
+   JWT_SECRET=your-secret-key-minimum-32-characters-required
    ```
+
+   For a complete list of all backend and frontend environment variables, see the [Environment Variables](#environment-variables) section.
 
 3. **Start the development environment**
    ```bash
@@ -181,27 +198,39 @@ Website/                   # Next.js frontend application
    Navigate to http://localhost:8080/swagger to explore and test API endpoints.
 
 5. **Run the frontend** (optional)
+
+   The frontend requires additional environment variables. See [Frontend Variables](#frontend-variables-nextjs) section.
+
    ```bash
    cd Website
+
+   # Create .env.local with frontend variables
+   # (see Environment Variables section)
+
    npm install
    npm run dev
    ```
 
-   For Website environment variables, see `Website/README.old.md`.
+   For complete environment variable documentation, see the [Environment Variables](#environment-variables) section below.
 
 ### Manual Setup (Without Docker)
 
+#### Backend Setup
+
 1. **Start SQL Server locally** or use a hosted instance
 
-2. **Set environment variable**
+2. **Set environment variables**
+
+   See [Backend Variables](#backend-variables-net-api) for details.
+
    ```bash
    # macOS/Linux
    export DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
-   export JWT_SECRET="your-secret-key-here-min-32-chars"
+   export JWT_SECRET="your-secret-key-minimum-32-characters-required"
 
    # Windows PowerShell
    $env:DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
-   $env:JWT_SECRET="your-secret-key-here-min-32-chars"
+   $env:JWT_SECRET="your-secret-key-minimum-32-characters-required"
    ```
 
 3. **Run migrations**
@@ -219,6 +248,324 @@ Website/                   # Next.js frontend application
    ```bash
    dotnet run --project API/API.Core/API.Core.csproj
    ```
+
+#### Frontend Setup
+
+1. **Navigate to Website directory**
+   ```bash
+   cd Website
+   ```
+
+2. **Create environment file**
+
+   Create `.env.local` with required frontend variables. See [Frontend Variables](#frontend-variables-nextjs) for the complete list.
+
+   ```bash
+   # Example minimal setup
+   BASE_URL=http://localhost:3000
+   NODE_ENV=development
+
+   # Generate secrets
+   CONFIRMATION_TOKEN_SECRET=$(openssl rand -base64 127)
+   RESET_PASSWORD_TOKEN_SECRET=$(openssl rand -base64 127)
+   SESSION_SECRET=$(openssl rand -base64 127)
+
+   # Add external service credentials
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+   CLOUDINARY_KEY=your-api-key
+   CLOUDINARY_SECRET=your-api-secret
+   # ... (see Environment Variables section for complete list)
+   ```
+
+3. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+4. **Run Prisma migrations** (current frontend database)
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+   The frontend will be available at http://localhost:3000
+
+---
+
+##  Environment Variables
+
+### Overview
+
+The Biergarten App uses environment variables for configuration across both backend (.NET API) and frontend (Next.js) services. This section provides complete documentation for all required and optional variables.
+
+**Configuration Patterns:**
+- **Backend**: Direct environment variable access via `Environment.GetEnvironmentVariable()`
+- **Frontend**: Centralized configuration module at [src/Website/src/config/env/index.ts](src/Website/src/config/env/index.ts) with Zod validation
+- **Docker**: Environment-specific `.env` files (`.env.dev`, `.env.test`, `.env.prod`)
+
+### Backend Variables (.NET API)
+
+The .NET API requires environment variables for database connectivity and JWT authentication. These can be set directly in your shell or via `.env` files when using Docker.
+
+#### Database Connection
+
+**Option 1: Component-Based (Recommended for Docker)**
+
+Use individual components to build the connection string:
+
+```bash
+DB_SERVER=sqlserver,1433          # SQL Server address and port
+DB_NAME=Biergarten                # Database name
+DB_USER=sa                        # SQL Server username
+DB_PASSWORD=YourStrong!Passw0rd   # SQL Server password
+DB_TRUST_SERVER_CERTIFICATE=True  # Optional, defaults to True
+```
+
+**Option 2: Full Connection String (Local Development)**
+
+Provide a complete SQL Server connection string:
+
+```bash
+DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
+```
+
+The connection factory checks for `DB_CONNECTION_STRING` first, then falls back to building from components. See [DefaultSqlConnectionFactory.cs](src/Core/Repository/Repository.Core/Sql/DefaultSqlConnectionFactory.cs).
+
+#### JWT Authentication
+
+```bash
+JWT_SECRET=your-secret-key-minimum-32-characters-required
+```
+
+- **Required**: Yes
+- **Minimum Length**: 32 characters
+- **Used For**: Signing JWT tokens for user authentication
+- **Location**: [JwtService.cs](src/Core/Service/Service.Core/Services/JwtService.cs)
+
+**Additional JWT Configuration** (in `appsettings.json`):
+- `Jwt:ExpirationMinutes` - Token lifetime (default: 60)
+- `Jwt:Issuer` - Token issuer (default: "biergarten-api")
+- `Jwt:Audience` - Token audience (default: "biergarten-users")
+
+#### Migration Control
+
+```bash
+CLEAR_DATABASE=true  # Development/Testing only
+```
+
+- **Required**: No
+- **Effect**: If set to "true", drops and recreates the database during migrations
+- **Usage**: Development and testing environments only
+- **Warning**: Never use in production
+
+### Frontend Variables (Next.js)
+
+The Next.js frontend requires environment variables for external services, authentication, and database connectivity. Create a `.env` or `.env.local` file in the `Website/` directory.
+
+All variables are validated at runtime using Zod schemas. See [src/Website/src/config/env/index.ts](src/Website/src/config/env/index.ts).
+
+#### Base Configuration
+
+```bash
+BASE_URL=http://localhost:3000     # Application base URL
+NODE_ENV=development               # Environment: development, production, test
+```
+
+#### Authentication & Sessions
+
+```bash
+# Token signing secrets (generate with: openssl rand -base64 127)
+CONFIRMATION_TOKEN_SECRET=<generated-secret>     # Email confirmation tokens
+RESET_PASSWORD_TOKEN_SECRET=<generated-secret>   # Password reset tokens
+SESSION_SECRET=<generated-secret>                # Session cookie signing
+
+# Session configuration
+SESSION_TOKEN_NAME=biergarten      # Cookie name
+SESSION_MAX_AGE=604800             # Cookie max age in seconds (604800 = 1 week)
+```
+
+#### Database (Prisma/Postgres)
+
+**Current State**: The frontend currently uses Neon Postgres with Prisma. This will migrate to the SQL Server backend once feature parity is achieved.
+
+```bash
+POSTGRES_PRISMA_URL=postgresql://user:pass@host/db?pgbouncer=true   # Pooled connection
+POSTGRES_URL_NON_POOLING=postgresql://user:pass@host/db             # Direct connection (migrations)
+SHADOW_DATABASE_URL=postgresql://user:pass@host/shadow_db           # Prisma shadow DB
+```
+
+#### Admin Account
+
+```bash
+ADMIN_PASSWORD=SecureAdminPassword123!   # Initial admin account password for seeding
+```
+
+### Docker Variables
+
+When running services in Docker, additional environment variables control container behavior:
+
+#### ASP.NET Core
+
+```bash
+ASPNETCORE_ENVIRONMENT=Development              # Development, Production
+ASPNETCORE_URLS=http://0.0.0.0:8080           # Binding address
+DOTNET_RUNNING_IN_CONTAINER=true               # Container execution flag
+```
+
+#### SQL Server (Docker Container)
+
+```bash
+SA_PASSWORD=YourStrong!Passw0rd   # SQL Server SA password (maps to DB_PASSWORD)
+ACCEPT_EULA=Y                     # Accept SQL Server EULA
+MSSQL_PID=Express                 # SQL Server edition (Express, Developer, etc.)
+```
+
+**Note**: `SA_PASSWORD` in the SQL Server container maps to `DB_PASSWORD` for the API application.
+
+### External Services
+
+The frontend integrates with several third-party services. Sign up for accounts and retrieve API credentials:
+
+#### Cloudinary (Image Hosting)
+
+```bash
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name   # Public, client-accessible
+CLOUDINARY_KEY=your-api-key                          # Server-side API key
+CLOUDINARY_SECRET=your-api-secret                    # Server-side secret
+```
+
+**Setup**:
+1. Sign up at [cloudinary.com](https://cloudinary.com)
+2. Navigate to Dashboard
+3. Copy Cloud Name, API Key, and API Secret
+
+**Note**: The `NEXT_PUBLIC_` prefix makes the cloud name accessible in client-side code.
+
+#### Mapbox (Maps & Geocoding)
+
+```bash
+MAPBOX_ACCESS_TOKEN=pk.your-public-token
+```
+
+**Setup**:
+1. Create account at [mapbox.com](https://mapbox.com)
+2. Navigate to Account → Tokens
+3. Create a new token with public scopes
+4. Copy the access token
+
+#### SparkPost (Email Service)
+
+```bash
+SPARKPOST_API_KEY=your-api-key
+SPARKPOST_SENDER_ADDRESS=noreply@yourdomain.com
+```
+
+**Setup**:
+1. Sign up at [sparkpost.com](https://sparkpost.com)
+2. Verify your sending domain or use sandbox
+3. Create an API key with "Send via SMTP" permission
+4. Configure sender address (must match verified domain)
+
+### Generating Secrets
+
+For authentication secrets (`JWT_SECRET`, `CONFIRMATION_TOKEN_SECRET`, etc.), generate cryptographically secure random values:
+
+**macOS/Linux:**
+```bash
+openssl rand -base64 127
+```
+
+**Windows PowerShell:**
+```powershell
+[Convert]::ToBase64String((1..127 | ForEach-Object { Get-Random -Maximum 256 }))
+```
+
+**Requirements**:
+- `JWT_SECRET`: Minimum 32 characters
+- Session/token secrets: Recommend 127+ characters for maximum security
+
+### Environment File Structure
+
+The project uses multiple environment files depending on the context:
+
+#### Backend/Docker (Root Directory)
+
+- **`.env.example`** - Template file (tracked in Git)
+- **`.env.dev`** - Development environment (gitignored)
+- **`.env.test`** - Testing environment (gitignored)
+- **`.env.prod`** - Production environment (gitignored)
+
+**Setup**:
+```bash
+# Copy template and customize
+cp .env.example .env.dev
+# Edit .env.dev with your values
+```
+
+Docker Compose files reference these:
+- `docker-compose.dev.yaml` → `.env.dev`
+- `docker-compose.test.yaml` → `.env.test`
+- `docker-compose.prod.yaml` → `.env.prod`
+
+#### Frontend (Website Directory)
+
+- **`.env`** or **`.env.local`** - Local development (gitignored)
+
+**Setup**:
+```bash
+cd Website
+# Create .env file with frontend variables
+touch .env.local
+```
+
+### Variable Reference Table
+
+| Variable | Backend | Frontend | Docker | Required | Notes |
+|----------|---------|----------|--------|----------|-------|
+| **Database** |
+| `DB_SERVER` | ✓ | | ✓ | Yes* | SQL Server address |
+| `DB_NAME` | ✓ | | ✓ | Yes* | Database name |
+| `DB_USER` | ✓ | | ✓ | Yes* | SQL username |
+| `DB_PASSWORD` | ✓ | | ✓ | Yes* | SQL password |
+| `DB_CONNECTION_STRING` | ✓ | | | Yes* | Alternative to components |
+| `DB_TRUST_SERVER_CERTIFICATE` | ✓ | | ✓ | No | Defaults to True |
+| `SA_PASSWORD` | | | ✓ | Yes | SQL Server container only |
+| **Authentication (Backend)** |
+| `JWT_SECRET` | ✓ | | ✓ | Yes | Min 32 chars |
+| **Authentication (Frontend)** |
+| `CONFIRMATION_TOKEN_SECRET` | | ✓ | | Yes | Email confirmation |
+| `RESET_PASSWORD_TOKEN_SECRET` | | ✓ | | Yes | Password reset |
+| `SESSION_SECRET` | | ✓ | | Yes | Session signing |
+| `SESSION_TOKEN_NAME` | | ✓ | | No | Default: "biergarten" |
+| `SESSION_MAX_AGE` | | ✓ | | No | Default: 604800 |
+| **Base Configuration** |
+| `BASE_URL` | | ✓ | | Yes | App base URL |
+| `NODE_ENV` | | ✓ | | Yes | development/production |
+| `ASPNETCORE_ENVIRONMENT` | ✓ | | ✓ | Yes | Development/Production |
+| `ASPNETCORE_URLS` | ✓ | | ✓ | Yes | Binding address |
+| **Database (Frontend - Current)** |
+| `POSTGRES_PRISMA_URL` | | ✓ | | Yes | Pooled connection |
+| `POSTGRES_URL_NON_POOLING` | | ✓ | | Yes | Direct connection |
+| `SHADOW_DATABASE_URL` | | ✓ | | No | Prisma shadow DB |
+| **External Services** |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | | ✓ | | Yes | Public, client-side |
+| `CLOUDINARY_KEY` | | ✓ | | Yes | Server-side |
+| `CLOUDINARY_SECRET` | | ✓ | | Yes | Server-side |
+| `MAPBOX_ACCESS_TOKEN` | | ✓ | | Yes | Maps/geocoding |
+| `SPARKPOST_API_KEY` | | ✓ | | Yes | Email service |
+| `SPARKPOST_SENDER_ADDRESS` | | ✓ | | Yes | From address |
+| **Other** |
+| `ADMIN_PASSWORD` | | ✓ | | No | Seeding only |
+| `CLEAR_DATABASE` | ✓ | | ✓ | No | Dev/test only |
+| `ACCEPT_EULA` | | | ✓ | Yes | SQL Server EULA |
+| `MSSQL_PID` | | | ✓ | No | SQL Server edition |
+
+\* Either `DB_CONNECTION_STRING` OR the four component variables (`DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) are required.
 
 ---
 
