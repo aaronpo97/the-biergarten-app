@@ -1,6 +1,6 @@
 using Repository.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
-using ServiceCore.Services;
+using Service.Core.User;
 
 namespace WebAPI.Controllers
 {

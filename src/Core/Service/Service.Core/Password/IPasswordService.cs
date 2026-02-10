@@ -1,4 +1,4 @@
-namespace ServiceCore.Services;
+namespace Service.Core.Password;
 
 public interface IPasswordService
 {

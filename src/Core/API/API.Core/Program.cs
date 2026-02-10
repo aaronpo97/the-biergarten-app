@@ -1,7 +1,10 @@
 using Repository.Core.Repositories.Auth;
 using Repository.Core.Repositories.UserAccount;
 using Repository.Core.Sql;
-using ServiceCore.Services;
+using Service.Core.Auth;
+using Service.Core.Jwt;
+using Service.Core.Password;
+using Service.Core.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
