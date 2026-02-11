@@ -1,3 +1,5 @@
+using Domain.Core.Entities;
+
 namespace Repository.Core.Repositories.Auth
 {
     /// <summary>
@@ -16,7 +18,7 @@ namespace Repository.Core.Repositories.Auth
         /// <param name="dateOfBirth">User's date of birth</param>
         /// <param name="passwordHash">Hashed password</param>
         /// <returns>The newly created UserAccount with generated ID</returns>
-        Task<Entities.UserAccount> RegisterUserAsync(
+        Task<Domain.Core.Entities.UserAccount> RegisterUserAsync(
             string username,
             string firstName,
             string lastName,
@@ -30,7 +32,7 @@ namespace Repository.Core.Repositories.Auth
         /// </summary>
         /// <param name="email">Email address to search for</param>
         /// <returns>UserAccount if found, null otherwise</returns>
-        Task<Entities.UserAccount?> GetUserByEmailAsync(string email);
+        Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(string email);
 
         /// <summary>
         /// Retrieves a user account by username (typically used for login).
@@ -38,7 +40,7 @@ namespace Repository.Core.Repositories.Auth
         /// </summary>
         /// <param name="username">Username to search for</param>
         /// <returns>UserAccount if found, null otherwise</returns>
-        Task<Entities.UserAccount?> GetUserByUsernameAsync(string username);
+        Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(string username);
 
         /// <summary>
         /// Retrieves the active (non-revoked) credential for a user account.
@@ -46,7 +48,7 @@ namespace Repository.Core.Repositories.Auth
         /// </summary>
         /// <param name="userAccountId">ID of the user account</param>
         /// <returns>Active UserCredential if found, null otherwise</returns>
-        Task<Entities.UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId);
+        Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId);
 
         /// <summary>
         /// Rotates a user's credential by invalidating all existing credentials and creating a new one.

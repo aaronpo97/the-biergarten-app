@@ -1,10 +1,11 @@
 using System.Data;
 using System.Data.Common;
+using Domain.Core.Entities;
 using Repository.Core.Sql;
 
 namespace Repository.Core.Repositories.Auth
 {
-    public class AuthRepository : Repository<Entities.UserAccount>, IAuthRepository
+    public class AuthRepository : Repository<Domain.Core.Entities.UserAccount>, IAuthRepository
     {
         public AuthRepository(ISqlConnectionFactory connectionFactory)
             : base(connectionFactory)
@@ -12,7 +13,7 @@ namespace Repository.Core.Repositories.Auth
         }
 
 
-        public async Task<Entities.UserAccount> RegisterUserAsync(
+        public async Task<Domain.Core.Entities.UserAccount> RegisterUserAsync(
             string username,
             string firstName,
             string lastName,
@@ -36,7 +37,7 @@ namespace Repository.Core.Repositories.Auth
             var result = await command.ExecuteScalarAsync();
             var userAccountId = result != null ? (Guid)result : Guid.Empty;
 
-            return new Entities.UserAccount
+            return new Domain.Core.Entities.UserAccount
             {
                 UserAccountId = userAccountId,
                 Username = username,
@@ -49,7 +50,7 @@ namespace Repository.Core.Repositories.Auth
         }
 
 
-        public async Task<Entities.UserAccount?> GetUserByEmailAsync(string email)
+        public async Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(string email)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -63,7 +64,7 @@ namespace Repository.Core.Repositories.Auth
         }
 
 
-        public async Task<Entities.UserAccount?> GetUserByUsernameAsync(string username)
+        public async Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(string username)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -76,7 +77,7 @@ namespace Repository.Core.Repositories.Auth
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<Entities.UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
+        public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -105,9 +106,9 @@ namespace Repository.Core.Repositories.Auth
         /// <summary>
         /// Maps a data reader row to a UserAccount entity.
         /// </summary>
-        protected override Entities.UserAccount MapToEntity(DbDataReader reader)
+        protected override Domain.Core.Entities.UserAccount MapToEntity(DbDataReader reader)
         {
-            return new Entities.UserAccount
+            return new Domain.Core.Entities.UserAccount
             {
                 UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
                 Username = reader.GetString(reader.GetOrdinal("Username")),
@@ -128,9 +129,9 @@ namespace Repository.Core.Repositories.Auth
         /// <summary>
         /// Maps a data reader row to a UserCredential entity.
         /// </summary>
-        private static Entities.UserCredential MapToCredentialEntity(DbDataReader reader)
+        private static UserCredential MapToCredentialEntity(DbDataReader reader)
         {
-            var entity = new Entities.UserCredential
+            var entity = new UserCredential
             {
                 UserCredentialId = reader.GetGuid(reader.GetOrdinal("UserCredentialId")),
                 UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),

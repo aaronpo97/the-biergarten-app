@@ -1,14 +1,15 @@
+using Domain.Core.Entities;
 
 
 namespace Repository.Core.Repositories.UserAccount
 {
     public interface IUserAccountRepository
     {
-        Task<Entities.UserAccount?> GetByIdAsync(Guid id);
-        Task<IEnumerable<Entities.UserAccount>> GetAllAsync(int? limit, int? offset);
-        Task UpdateAsync(Entities.UserAccount userAccount);
+        Task<Domain.Core.Entities.UserAccount?> GetByIdAsync(Guid id);
+        Task<IEnumerable<Domain.Core.Entities.UserAccount>> GetAllAsync(int? limit, int? offset);
+        Task UpdateAsync(Domain.Core.Entities.UserAccount userAccount);
         Task DeleteAsync(Guid id);
-        Task<Entities.UserAccount?> GetByUsernameAsync(string username);
-        Task<Entities.UserAccount?> GetByEmailAsync(string email);
+        Task<Domain.Core.Entities.UserAccount?> GetByUsernameAsync(string username);
+        Task<Domain.Core.Entities.UserAccount?> GetByEmailAsync(string email);
     }
 }

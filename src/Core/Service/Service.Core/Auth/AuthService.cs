@@ -1,4 +1,4 @@
-using Repository.Core.Entities;
+using Domain.Core.Entities;
 using Repository.Core.Repositories.Auth;
 using Service.Core.Password;
 
