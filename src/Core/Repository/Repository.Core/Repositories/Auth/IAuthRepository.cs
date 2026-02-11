@@ -55,12 +55,5 @@ namespace Repository.Core.Repositories.Auth
         /// <param name="userAccountId">ID of the user account</param>
         /// <param name="newPasswordHash">New hashed password</param>
         Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash);
-
-        /// <summary>
-        /// Invalidates all credentials for a user account (e.g., for logout or security purposes).
-        /// Uses stored procedure: USP_InvalidateUserCredential
-        /// </summary>
-        /// <param name="userAccountId">ID of the user account</param>
-        Task InvalidateCredentialsByUserAccountIdAsync(Guid userAccountId);
     }
 }

@@ -157,4 +157,64 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
+
+    [When("I submit a registration request with values:")]
+    public async Task WhenISubmitARegistrationRequestWithValues(Table table)
+    {
+        var client = GetClient();
+        var row = table.Rows[0];
+    
+        var registrationData = new
+        {
+            username = row.TryGetValue("Username", out var value) ? value : null,
+            firstName = row.TryGetValue("FirstName", out var value1) ? value1 : null,
+            lastName = row.TryGetValue("LastName", out var value2) ? value2 : null,
+            email = row.TryGetValue("Email", out var value3) ? value3 : null,
+            dateOfBirth = row.ContainsKey("DateOfBirth") && !string.IsNullOrEmpty(row["DateOfBirth"]) 
+                ? row["DateOfBirth"] 
+                : null,
+            password = row.ContainsKey("Password") ? row["Password"] : null
+        };
+
+        var body = JsonSerializer.Serialize(registrationData);
+
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/register")
+        {
+            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+        };
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
+    
+    [Given("I have an existing account with username {string}")]
+    public void GivenIHaveAnExistingAccountWithUsername(string username)
+    {
+     
+    }
+
+    [Given("I have an existing account with email {string}")]
+    public void GivenIHaveAnExistingAccountWithEmail(string email)
+    {
+       
+    }
+
+    [When("I submit a registration request using a GET request")]
+    public async Task WhenISubmitARegistrationRequestUsingAGetRequest()
+    {
+        var client = GetClient();
+        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/auth/register")
+        {
+            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json")
+        };
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
 }

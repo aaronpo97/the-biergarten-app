@@ -22,10 +22,10 @@ namespace Repository.Core.Repositories.Auth
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
+
             command.CommandText = "USP_RegisterUser";
             command.CommandType = CommandType.StoredProcedure;
 
-            // Input parameters
             AddParameter(command, "@Username", username);
             AddParameter(command, "@FirstName", firstName);
             AddParameter(command, "@LastName", lastName);
@@ -33,11 +33,9 @@ namespace Repository.Core.Repositories.Auth
             AddParameter(command, "@DateOfBirth", dateOfBirth);
             AddParameter(command, "@Hash", passwordHash);
 
-            // Execute and retrieve the generated UserAccountId from result set
             var result = await command.ExecuteScalarAsync();
             var userAccountId = result != null ? (Guid)result : Guid.Empty;
 
-            // Return the newly created user account
             return new Entities.UserAccount
             {
                 UserAccountId = userAccountId,
@@ -102,12 +100,6 @@ namespace Repository.Core.Repositories.Auth
             AddParameter(command, "@Hash", newPasswordHash);
 
             await command.ExecuteNonQueryAsync();
-        }
-
-
-        public async Task InvalidateCredentialsByUserAccountIdAsync(Guid userAccountId)
-        {
-            throw new NotImplementedException("InvalidateCredentialsByUserAccountIdAsync");
         }
 
         /// <summary>
