@@ -11,16 +11,17 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Folder Include="Infrastructure\" />
   </ItemGroup>
-  
+
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\Domain.Core\Domain.Core.csproj" />
     <ProjectReference Include="..\..\Repository\Repository.Core\Repository.Core.csproj" />
     <ProjectReference Include="..\..\Service\Service.Core\Service.Core.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="..\..\.dockerignore">
       <Link>.dockerignore</Link>

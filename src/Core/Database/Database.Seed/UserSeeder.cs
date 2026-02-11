@@ -1,7 +1,7 @@
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
-using Repository.Core.Entities;
+using Domain.Core.Entities;
 using Repository.Core.Repositories;
 using idunno.Password;
 using Konscious.Security.Cryptography;

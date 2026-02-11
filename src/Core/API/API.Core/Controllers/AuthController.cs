@@ -1,5 +1,5 @@
 using System.Net;
-using Repository.Core.Entities;
+using Domain.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Auth;
 using Service.Core.Jwt;

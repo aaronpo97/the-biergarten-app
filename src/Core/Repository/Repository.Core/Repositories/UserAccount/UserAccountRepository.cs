@@ -1,13 +1,14 @@
 using System.Data;
 using System.Data.Common;
+using Domain.Core.Entities;
 using Repository.Core.Sql;
 
 namespace Repository.Core.Repositories.UserAccount
 {
     public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
-        : Repository<Entities.UserAccount>(connectionFactory), IUserAccountRepository
+        : Repository<Domain.Core.Entities.UserAccount>(connectionFactory), IUserAccountRepository
     {
-        public async Task<Entities.UserAccount?> GetByIdAsync(Guid id)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByIdAsync(Guid id)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -20,7 +21,7 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<IEnumerable<Entities.UserAccount>> GetAllAsync(int? limit, int? offset)
+        public async Task<IEnumerable<Domain.Core.Entities.UserAccount>> GetAllAsync(int? limit, int? offset)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -34,7 +35,7 @@ namespace Repository.Core.Repositories.UserAccount
                 AddParameter(command, "@Offset", offset.Value);
 
             await using var reader = await command.ExecuteReaderAsync();
-            var users = new List<Entities.UserAccount>();
+            var users = new List<Domain.Core.Entities.UserAccount>();
 
             while (await reader.ReadAsync())
             {
@@ -44,7 +45,7 @@ namespace Repository.Core.Repositories.UserAccount
             return users;
         }
 
-        public async Task UpdateAsync(Entities.UserAccount userAccount)
+        public async Task UpdateAsync(Domain.Core.Entities.UserAccount userAccount)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -72,7 +73,7 @@ namespace Repository.Core.Repositories.UserAccount
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task<Entities.UserAccount?> GetByUsernameAsync(string username)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByUsernameAsync(string username)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -85,7 +86,7 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<Entities.UserAccount?> GetByEmailAsync(string email)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByEmailAsync(string email)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -98,9 +99,9 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        protected override Entities.UserAccount MapToEntity(DbDataReader reader)
+        protected override Domain.Core.Entities.UserAccount MapToEntity(DbDataReader reader)
         {
-            return new Entities.UserAccount
+            return new Domain.Core.Entities.UserAccount
             {
                 UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
                 Username = reader.GetString(reader.GetOrdinal("Username")),

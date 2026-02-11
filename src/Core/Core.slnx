@@ -7,6 +7,10 @@
     <Project Path="Database/Database.Migrations/Database.Migrations.csproj" />
     <Project Path="Database/Database.Seed/Database.Seed.csproj" />
   </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Domain/Domain.Core/Domain.Core.csproj" />
+    <Project Path="Domain/Domain.Validation/Domain.Validation.csproj" />
+  </Folder>
   <Folder Name="/Repository/">
     <Project Path="Repository/Repository.Core/Repository.Core.csproj" />
     <Project Path="Repository/Repository.Tests/Repository.Tests.csproj" />
