@@ -1,5 +1,4 @@
 CREATE OR ALTER PROCEDURE dbo.USP_RegisterUser(
-    @UserAccountId_ UNIQUEIDENTIFIER OUTPUT,
     @Username VARCHAR(64),
     @FirstName NVARCHAR(128),
     @LastName NVARCHAR(128),
@@ -11,6 +10,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
+
+    DECLARE @UserAccountId_ UNIQUEIDENTIFIER;
 
     BEGIN TRANSACTION;
 
@@ -37,5 +38,5 @@ BEGIN
         END
     COMMIT TRANSACTION;
 
-
+    SELECT @UserAccountId_ AS UserAccountId;
 END

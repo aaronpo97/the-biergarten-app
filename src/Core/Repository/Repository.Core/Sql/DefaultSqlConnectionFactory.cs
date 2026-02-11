@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 
-namespace DataAccessLayer.Sql
+namespace Repository.Core.Sql
 {
     public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlConnectionFactory
     {

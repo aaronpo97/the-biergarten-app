@@ -1,6 +1,6 @@
 
 
-namespace DataAccessLayer.Repositories.UserAccount
+namespace Repository.Core.Repositories.UserAccount
 {
     public interface IUserAccountRepository
     {

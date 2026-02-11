@@ -1,5 +1,5 @@
 using Apps72.Dev.Data.DbMocker;
-using DataAccessLayer.Repositories.UserAccount;
+using Repository.Core.Repositories.UserAccount;
 using FluentAssertions;
 using Repository.Tests.Database;
 

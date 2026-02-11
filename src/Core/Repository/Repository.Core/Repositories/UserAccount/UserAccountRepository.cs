@@ -1,8 +1,8 @@
 using System.Data;
 using System.Data.Common;
-using DataAccessLayer.Sql;
+using Repository.Core.Sql;
 
-namespace DataAccessLayer.Repositories.UserAccount
+namespace Repository.Core.Repositories.UserAccount
 {
     public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
         : Repository<Entities.UserAccount>(connectionFactory), IUserAccountRepository

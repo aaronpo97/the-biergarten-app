@@ -1,7 +1,7 @@
 using System.Data.Common;
-using DataAccessLayer.Sql;
+using Repository.Core.Sql;
 
-namespace DataAccessLayer.Repositories
+namespace Repository.Core.Repositories
 {
     public abstract class Repository<T>(ISqlConnectionFactory connectionFactory)
         where T : class

@@ -44,7 +44,7 @@ services:
     networks:
       - devnet
 
-database.seed:
+ database.seed:
     env_file: ".env.dev"
     image: database.seed
     container_name: dev-env-database-seed

@@ -1,12 +1,10 @@
-using System;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
-namespace ServiceCore.Services;
+namespace Service.Core.Jwt;
 public class JwtService : IJwtService
 {
     private readonly string? _secret = Environment.GetEnvironmentVariable("JWT_SECRET");

@@ -1,8 +1,8 @@
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
-using DataAccessLayer.Entities;
-using DataAccessLayer.Repositories;
+using Repository.Core.Entities;
+using Repository.Core.Repositories;
 using idunno.Password;
 using Konscious.Security.Cryptography;
 using Microsoft.Data.SqlClient;
@@ -133,15 +133,15 @@ namespace DBSeed
                 var dob = new DateTime(1985, 03, 01);
                 var hash = GeneratePasswordHash("password");
 
-                var userAccountId = await RegisterUserAsync(
-                    connection,
-                    $"{firstName}.{lastName}",
-                    firstName,
-                    lastName,
-                    dob,
-                    email,
-                    hash
-                );
+                await RegisterUserAsync(
+                               connection,
+                               $"{firstName}.{lastName}",
+                               firstName,
+                               lastName,
+                               dob,
+                               email,
+                               hash
+                           );
             }
             foreach (var (firstName, lastName) in SeedNames)
             {
@@ -160,7 +160,7 @@ namespace DBSeed
 
 
                 // register the user (creates account + credential)
-                var userAccountId = await RegisterUserAsync(
+                var id = await RegisterUserAsync(
                     connection,
                     username,
                     firstName,
@@ -172,10 +172,13 @@ namespace DBSeed
                 createdUsers++;
                 createdCredentials++;
 
-                // add user verification
-                if (await HasUserVerificationAsync(connection, userAccountId)) continue;
 
-                await AddUserVerificationAsync(connection, userAccountId);
+
+
+                // add user verification
+                if (await HasUserVerificationAsync(connection, id)) continue;
+
+                await AddUserVerificationAsync(connection, id);
                 createdVerifications++;
             }
 
@@ -197,11 +200,6 @@ namespace DBSeed
             await using var command = new SqlCommand("dbo.USP_RegisterUser", connection);
             command.CommandType = CommandType.StoredProcedure;
 
-            var idParam = new SqlParameter("@UserAccountId_", SqlDbType.UniqueIdentifier)
-            {
-                Direction = ParameterDirection.Output
-            };
-            command.Parameters.Add(idParam);
 
             command.Parameters.Add("@Username", SqlDbType.VarChar, 64).Value = username;
             command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 128).Value = firstName;
@@ -210,8 +208,11 @@ namespace DBSeed
             command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = email;
             command.Parameters.Add("@Hash", SqlDbType.NVarChar, -1).Value = hash;
 
-            await command.ExecuteNonQueryAsync();
-            return (Guid)idParam.Value;
+            var result = await command.ExecuteScalarAsync();
+
+
+            return (Guid)result!;
+
         }
 
         private static string GeneratePasswordHash(string pwd)

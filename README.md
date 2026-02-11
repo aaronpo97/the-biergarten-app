@@ -96,7 +96,7 @@ Website/                   # Next.js frontend application
 **Repository Layer** (`Repository.Core`)
 - Abstraction over SQL Server using ADO.NET
 - `ISqlConnectionFactory` for connection management
-- Repositories: `UserAccountRepository`, `UserCredentialRepository`
+- Repositories: `AuthRepository`, `UserAccountRepository`
 - All data access via stored procedures (no inline SQL)
 
 **Service Layer** (`Service.Core`)

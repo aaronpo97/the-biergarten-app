@@ -1,4 +1,4 @@
-namespace ServiceCore.Services;
+namespace Service.Core.Jwt;
 
 public interface IJwtService
 {

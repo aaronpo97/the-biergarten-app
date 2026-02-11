@@ -1,7 +1,8 @@
 using System.Net;
-using DataAccessLayer.Entities;
+using Repository.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
-using ServiceCore.Services;
+using Service.Core.Auth;
+using Service.Core.Jwt;
 
 namespace WebAPI.Controllers
 {

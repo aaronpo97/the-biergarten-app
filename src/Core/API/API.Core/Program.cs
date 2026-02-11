@@ -1,7 +1,10 @@
-using DataAccessLayer.Repositories.UserAccount;
-using DataAccessLayer.Repositories.UserCredential;
-using DataAccessLayer.Sql;
-using ServiceCore.Services;
+using Repository.Core.Repositories.Auth;
+using Repository.Core.Repositories.UserAccount;
+using Repository.Core.Sql;
+using Service.Core.Auth;
+using Service.Core.Jwt;
+using Service.Core.Password;
+using Service.Core.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +28,10 @@ if (!builder.Environment.IsProduction())
 builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 var app = builder.Build();
 

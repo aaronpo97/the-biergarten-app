@@ -1,5 +1,5 @@
 using System.Data.Common;
-using DataAccessLayer.Sql;
+using Repository.Core.Sql;
 
 namespace Repository.Tests.Database;
 
