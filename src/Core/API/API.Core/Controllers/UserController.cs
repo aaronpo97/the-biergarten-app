@@ -2,7 +2,7 @@ using Domain.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.User;
 
-namespace WebAPI.Controllers
+namespace API.Core.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

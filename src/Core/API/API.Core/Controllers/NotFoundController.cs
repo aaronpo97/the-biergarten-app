@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebAPI.Controllers
+namespace API.Core.Controllers
 {
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]

@@ -1,10 +1,9 @@
-using System.Net;
 using Domain.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Auth;
 using Service.Core.Jwt;
 
-namespace WebAPI.Controllers
+namespace API.Core.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
