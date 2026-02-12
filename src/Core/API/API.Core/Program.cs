@@ -1,4 +1,6 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Core.Repositories.Auth;
 using Repository.Core.Repositories.UserAccount;
 using Repository.Core.Sql;
@@ -9,13 +11,35 @@ using Service.Core.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            var message = errors.Count == 1
+                ? errors[0]
+                : string.Join(" ", errors);
+
+            var response = new
+            {
+                message
+            };
+
+            return new BadRequestObjectResult(response);
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddFluentValidationAutoValidation();
 
 // Add health checks
 builder.Services.AddHealthChecks();
@@ -59,3 +83,6 @@ lifetime.ApplicationStopping.Register(() =>
 });
 
 app.Run();
+
+// Make Program class accessible to test projects
+public partial class Program { }

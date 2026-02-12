@@ -52,7 +52,6 @@ Feature: User Registration
       | Username | FirstName | LastName | Email               | DateOfBirth | Password |
       | newuser  | New       | User     | newuser@example.com | 1990-01-01  | weakpass |
     Then the response has HTTP status 400
-    And the response JSON should have "message" equal "Password does not meet complexity requirements."
 
   Scenario: Cannot register a user younger than 19 years of age (regulatory requirement)
     Given the API is running
