@@ -1,3 +1,4 @@
+using FluentValidation;
 using Repository.Core.Repositories.Auth;
 using Repository.Core.Repositories.UserAccount;
 using Repository.Core.Sql;
@@ -12,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
+
+// Add FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Add health checks
 builder.Services.AddHealthChecks();

@@ -1,3 +1,5 @@
+using API.Core.Contracts.Auth;
+using API.Core.Contracts.Common;
 using Domain.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Auth;
@@ -9,27 +11,12 @@ namespace API.Core.Controllers
     [Route("api/[controller]")]
     public class AuthController(IAuthService auth, IJwtService jwtService) : ControllerBase
     {
-        public record RegisterRequest(
-            string Username,
-            string FirstName,
-            string LastName,
-            string Email,
-            DateTime DateOfBirth,
-            string Password
-        );
-
-        public record LoginRequest
-        {
-            public string Username { get; init; } = default!;
-            public string Password { get; init; } = default!;
-        }
-
-        private record ResponseBody(string Message, object? Payload);
 
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register([FromBody] RegisterRequest req)
         {
-            var user = new UserAccount
+
+            var created = await auth.RegisterAsync(new UserAccount
             {
                 UserAccountId = Guid.Empty,
                 Username = req.Username,
@@ -37,10 +24,23 @@ namespace API.Core.Controllers
                 LastName = req.LastName,
                 Email = req.Email,
                 DateOfBirth = req.DateOfBirth
-            };
+            }, req.Password);
 
-            var created = await auth.RegisterAsync(user, req.Password);
-            return CreatedAtAction(nameof(Register), new { id = created.UserAccountId }, created);
+            var jwtExpiresAt = DateTime.UtcNow.AddHours(1);
+            var jwt = jwtService.GenerateJwt(created.UserAccountId, created.Username, jwtExpiresAt
+
+            );
+
+            var response = new ResponseBody<AuthPayload>
+            {
+                Message = "User registered successfully.",
+                Payload = new AuthPayload(
+                    new UserDTO(created.UserAccountId, created.Username),
+                    jwt,
+                    DateTime.UtcNow,
+                    jwtExpiresAt)
+            };
+            return Created("/", response);
         }
 
         [HttpPost("login")]
@@ -49,12 +49,22 @@ namespace API.Core.Controllers
             var userAccount = await auth.LoginAsync(req.Username, req.Password);
             if (userAccount is null)
             {
-                return Unauthorized(new ResponseBody("Invalid username or password.", null));
+                return Unauthorized(new ResponseBody
+                {
+                    Message = "Invalid username or password."
+                });
             }
 
-            var jwt = jwtService.GenerateJwt(userAccount.UserAccountId, userAccount.Username, userAccount.DateOfBirth);
+            UserDTO dto = new(userAccount.UserAccountId, userAccount.Username);
 
-            return Ok(new ResponseBody("Logged in successfully.", new { AccessToken = jwt }));
+            var jwtExpiresAt = DateTime.UtcNow.AddHours(1);
+            var jwt = jwtService.GenerateJwt(userAccount.UserAccountId, userAccount.Username, jwtExpiresAt);
+
+            return Ok(new ResponseBody<AuthPayload>
+            {
+                Message = "Logged in successfully.",
+                Payload = new AuthPayload(dto, jwt, DateTime.UtcNow, jwtExpiresAt)
+            });
         }
     }
 }
