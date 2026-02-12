@@ -10,9 +10,13 @@
   <Folder Name="/Domain/">
     <Project Path="Domain/Domain.csproj" />
   </Folder>
-  <Folder Name="/Repository/">
-    <Project Path="Repository/Repository.Core/Repository.Core.csproj" />
-    <Project Path="Repository/Repository.Tests/Repository.Tests.csproj" />
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
+    <Project
+      Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
+    <Project Path="Infrastructure/Infrastructure.Repository/Repository.Core/Repository.Core.csproj" />
+    <Project
+      Path="Infrastructure/Infrastructure.Repository/Repository.Tests/Repository.Tests.csproj" />
   </Folder>
   <Folder Name="/Service/">
     <Project Path="Service/Service.Core/Service.Core.csproj" />

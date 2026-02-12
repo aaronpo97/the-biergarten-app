@@ -19,7 +19,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\Repository\Repository.Core\Repository.Core.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.Repository\Repository.Core\Repository.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
     <ProjectReference Include="..\..\Service\Service.Core\Service.Core.csproj" />
   </ItemGroup>
 
