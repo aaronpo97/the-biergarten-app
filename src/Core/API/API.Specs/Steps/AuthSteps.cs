@@ -163,17 +163,28 @@ public class AuthSteps(ScenarioContext scenario)
     {
         var client = GetClient();
         var row = table.Rows[0];
-    
+
+        var username = row["Username"] ?? "";
+        var firstName = row["FirstName"] ?? "";
+        var lastName = row["LastName"] ?? "";
+        var email = row["Email"] ?? "";
+        var dateOfBirth = row["DateOfBirth"] ?? "";
+
+        if (dateOfBirth == "{underage_date}")
+        {
+            dateOfBirth = DateTime.UtcNow.AddYears(-18).ToString("yyyy-MM-dd");
+        }
+
+        var password = row["Password"];
+
         var registrationData = new
         {
-            username = row.TryGetValue("Username", out var value) ? value : null,
-            firstName = row.TryGetValue("FirstName", out var value1) ? value1 : null,
-            lastName = row.TryGetValue("LastName", out var value2) ? value2 : null,
-            email = row.TryGetValue("Email", out var value3) ? value3 : null,
-            dateOfBirth = row.ContainsKey("DateOfBirth") && !string.IsNullOrEmpty(row["DateOfBirth"]) 
-                ? row["DateOfBirth"] 
-                : null,
-            password = row.ContainsKey("Password") ? row["Password"] : null
+            username,
+            firstName,
+            lastName,
+            email,
+            dateOfBirth,
+            password
         };
 
         var body = JsonSerializer.Serialize(registrationData);
@@ -189,17 +200,17 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
-    
+
     [Given("I have an existing account with username {string}")]
     public void GivenIHaveAnExistingAccountWithUsername(string username)
     {
-     
+
     }
 
     [Given("I have an existing account with email {string}")]
     public void GivenIHaveAnExistingAccountWithEmail(string email)
     {
-       
+
     }
 
     [When("I submit a registration request using a GET request")]

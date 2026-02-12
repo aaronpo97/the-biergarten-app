@@ -33,7 +33,7 @@ namespace API.Core.Controllers
 
             var response = new ResponseBody<AuthPayload>
             {
-                Message = "Registration successful.",
+                Message = "User registered successfully.",
                 Payload = new AuthPayload(
                     new UserDTO(created.UserAccountId, created.Username),
                     jwt,
@@ -49,7 +49,10 @@ namespace API.Core.Controllers
             var userAccount = await auth.LoginAsync(req.Username, req.Password);
             if (userAccount is null)
             {
-                return Unauthorized();
+                return Unauthorized(new ResponseBody
+                {
+                    Message = "Invalid username or password."
+                });
             }
 
             UserDTO dto = new(userAccount.UserAccountId, userAccount.Username);
@@ -59,7 +62,7 @@ namespace API.Core.Controllers
 
             return Ok(new ResponseBody<AuthPayload>
             {
-                Message = "Login successful.",
+                Message = "Logged in successfully.",
                 Payload = new AuthPayload(dto, jwt, DateTime.UtcNow, jwtExpiresAt)
             });
         }
