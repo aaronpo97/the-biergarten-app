@@ -1,7 +1,7 @@
 using System.Data.Common;
 using Infrastructure.Repository.Sql;
 
-namespace Repository.Tests.Database;
+namespace Infrastructure.Repository.Tests.Database;
 
 internal class TestConnectionFactory(DbConnection conn) : ISqlConnectionFactory
 {
