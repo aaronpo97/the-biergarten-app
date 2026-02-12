@@ -15,6 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.Core\Domain.Core.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.csproj" />
   </ItemGroup>
 </Project>
