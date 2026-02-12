@@ -1,6 +1,6 @@
 using Domain.Core.Entities;
 using Infrastructure.PasswordHashing;
-using Repository.Core.Repositories.Auth;
+using Infrastructure.Repository.Auth;
 
 namespace Service.Core.Auth;
 

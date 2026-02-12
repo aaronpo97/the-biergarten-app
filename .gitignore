@@ -483,9 +483,6 @@ FodyWeavers.xsd
 
 *.feature.cs
 
-
-database
-
 .env
 .env.dev
 .env.test

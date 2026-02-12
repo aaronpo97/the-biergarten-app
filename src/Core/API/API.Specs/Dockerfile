@@ -4,7 +4,7 @@ WORKDIR /src
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
 COPY ["API/API.Specs/API.Specs.csproj", "API/API.Specs/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
-COPY ["Infrastructure/Infrastructure.Repository/Repository.Core/Repository.Core.csproj", "Infrastructure/Infrastructure.Repository/Repository.Core/"]
+COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
 COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
 COPY ["Service/Service.Core/Service.Core.csproj", "Service/Service.Core/"]

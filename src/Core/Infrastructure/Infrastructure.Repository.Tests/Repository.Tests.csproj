@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>Repository.Tests</RootNamespace>
+    <RootNamespace>Infrastructure.Repository.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Repository.Core\Repository.Core.csproj" />
+    <ProjectReference Include="..\Infrastructure.Repository\Infrastructure.Repository.csproj" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 using Domain.Core.Entities;
-using Repository.Core.Repositories.UserAccount;
+using Infrastructure.Repository.UserAccount;
 
 namespace Service.Core.User;
 

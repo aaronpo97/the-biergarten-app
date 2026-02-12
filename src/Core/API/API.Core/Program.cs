@@ -2,10 +2,10 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Jwt;
 using Infrastructure.PasswordHashing;
+using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Sql;
+using Infrastructure.Repository.UserAccount;
 using Microsoft.AspNetCore.Mvc;
-using Repository.Core.Repositories.Auth;
-using Repository.Core.Repositories.UserAccount;
-using Repository.Core.Sql;
 using Service.Core.Auth;
 using Service.Core.User;
 

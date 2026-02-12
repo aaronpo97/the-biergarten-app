@@ -1,7 +1,7 @@
 using System.Data;
 using Apps72.Dev.Data.DbMocker;
 using FluentAssertions;
-using Repository.Core.Repositories.Auth;
+using Infrastructure.Repository.Auth;
 using Repository.Tests.Database;
 
 namespace Repository.Tests.Auth;
