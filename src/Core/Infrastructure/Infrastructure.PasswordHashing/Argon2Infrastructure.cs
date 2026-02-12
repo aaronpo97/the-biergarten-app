@@ -2,9 +2,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Konscious.Security.Cryptography;
 
-namespace Service.Core.Password;
+namespace Infrastructure.PasswordHashing;
 
-public class PasswordService : IPasswordService
+public class Argon2Infrastructure : IPasswordInfra
 {
     private const int SaltSize = 16; // 128-bit
     private const int HashSize = 32; // 256-bit
@@ -19,7 +19,7 @@ public class PasswordService : IPasswordService
             Salt = salt,
             DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
             MemorySize = ArgonMemoryKb,
-            Iterations = ArgonIterations
+            Iterations = ArgonIterations,
         };
 
         var hash = argon2.GetBytes(HashSize);
@@ -30,8 +30,12 @@ public class PasswordService : IPasswordService
     {
         try
         {
-            var parts = stored.Split(':', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2) return false;
+            var parts = stored.Split(
+                ':',
+                StringSplitOptions.RemoveEmptyEntries
+            );
+            if (parts.Length != 2)
+                return false;
 
             var salt = Convert.FromBase64String(parts[0]);
             var expected = Convert.FromBase64String(parts[1]);
@@ -41,7 +45,7 @@ public class PasswordService : IPasswordService
                 Salt = salt,
                 DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
                 MemorySize = ArgonMemoryKb,
-                Iterations = ArgonIterations
+                Iterations = ArgonIterations,
             };
 
             var actual = argon2.GetBytes(expected.Length);

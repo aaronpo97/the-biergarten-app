@@ -1,12 +1,12 @@
-using Domain.Core.Entities;
-using Repository.Core.Repositories.Auth;
-using Service.Core.Password;
+using Domain.Entities;
+using Infrastructure.PasswordHashing;
+using Infrastructure.Repository.Auth;
 
 namespace Service.Core.Auth;
 
 public class AuthService(
     IAuthRepository authRepo,
-    IPasswordService passwordService
+    IPasswordInfra passwordInfra
 ) : IAuthService
 {
     public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
@@ -19,7 +19,7 @@ public class AuthService(
         }
 
         // password hashing
-        var hashed = passwordService.Hash(password);
+        var hashed = passwordInfra.Hash(password);
 
         // Register user with hashed password
         return await authRepo.RegisterUserAsync(
@@ -43,6 +43,6 @@ public class AuthService(
         var activeCred = await authRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
 
         if (activeCred is null) return null;
-        return !passwordService.Verify(password, activeCred.Hash) ? null : user;
+        return !passwordInfra.Verify(password, activeCred.Hash) ? null : user;
     }
 }

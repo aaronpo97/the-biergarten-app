@@ -1,4 +1,4 @@
-namespace Service.Core.Jwt;
+namespace Infrastructure.Jwt;
 
 public interface IJwtService
 {

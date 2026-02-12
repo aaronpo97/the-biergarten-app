@@ -2,46 +2,6 @@
 
 A social platform for craft beer enthusiasts to discover breweries, share reviews, and connect with fellow beer lovers.
 
-
-## Table of Contents
-
-- [Project Status](#project-status)
-- [Repository Structure](#repository-structure)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start (Development Environment)](#quick-start-development-environment)
-  - [Manual Setup (Without Docker)](#manual-setup-without-docker)
-- [Environment Variables](#environment-variables)
-  - [Overview](#overview)
-  - [Backend Variables (.NET API)](#backend-variables-net-api)
-  - [Frontend Variables (Next.js)](#frontend-variables-nextjs)
-  - [Docker Variables](#docker-variables)
-  - [External Services](#external-services)
-  - [Generating Secrets](#generating-secrets)
-  - [Environment File Structure](#environment-file-structure)
-  - [Variable Reference Table](#variable-reference-table)
-- [Testing](#testing)
-- [Database Schema](#database-schema)
-- [Authentication & Security](#authentication--security)
-- [Architecture Patterns](#architecture-patterns)
-- [Docker & Containerization](#docker--containerization)
-  - [Container Architecture](#container-architecture)
-  - [Docker Compose Environments](#docker-compose-environments)
-  - [Service Dependencies](#service-dependencies)
-  - [Health Checks](#health-checks)
-  - [Volumes](#volumes)
-  - [Networks](#networks)
-  - [Environment Variables](#environment-variables)
-  - [Container Lifecycle](#container-lifecycle)
-- [Docker Tips & Troubleshooting](#docker-tips--troubleshooting)
-- [Roadmap](#roadmap)
-- [License](#license)
-- [Contact & Support](#contact--support)
-
----
-
-
 ##  Project Status
 
 This project is in active development, transitioning from a full-stack Next.js application to a **multi-project monorepo** with:
@@ -49,10 +9,10 @@ This project is in active development, transitioning from a full-stack Next.js a
 - **Frontend**: Next.js with TypeScript
 - **Architecture**: SQL-first approach using stored procedures
 
-**Current State** (February 2025):
+**Current State** (February 2026):
 -  Core authentication and user management APIs functional
 -  Database schema and migrations established
--  Repository and service layers implemented
+-  Domain, Infrastructure, Repository, and Service layers implemented
 -  Frontend integration with .NET API in progress
 -  Migrating remaining features from Next.js serverless functions
 
@@ -65,18 +25,26 @@ This project is in active development, transitioning from a full-stack Next.js a
 ```
 src/Core/
 ├── API/
-│   ├── API.Core/          # ASP.NET Core Web API with Swagger/OpenAPI
-│   └── API.Specs/         # Integration tests using Reqnroll (BDD)
+│   ├── API.Core/              # ASP.NET Core Web API with Swagger/OpenAPI
+│   └── API.Specs/             # Integration tests using Reqnroll (BDD)
 ├── Database/
-│   ├── Database.Migrations/  # DbUp migrations (embedded SQL scripts)
-│   └── Database.Seed/        # Database seeding for development/testing
-├── Repository/
-│   ├── Repository.Core/   # Data access layer (stored procedure-based)
-│   └── Repository.Tests/  # Unit tests for repositories
+│   ├── Database.Migrations/   # DbUp migrations (embedded SQL scripts)
+│   └── Database.Seed/         # Database seeding for development/testing
+├── Domain/
+│   └── Domain.csproj          # Domain entities and models
+│       └── Entities/          # Core domain entities (UserAccount, UserCredential, etc.)
+├── Infrastructure/
+│   ├── Infrastructure.Jwt/             # JWT token generation and validation
+│   ├── Infrastructure.PasswordHashing/ # Argon2id password hashing
+│   └── Infrastructure.Repository/
+│       ├── Infrastructure.Repository/       # Data access layer (stored procedure-based)
+│       └── Infrastructure.Repository.Tests/ # Unit tests for repositories
 └── Service/
-    └── Service.Core/      # Business logic layer
+    └── Service.Core/          # Business logic layer
 
-Website/                   # Next.js frontend application
+Website/                       # Next.js frontend application
+misc/
+└── raw-data/                  # Sample data files (breweries, beers)
 ```
 
 ### Key Components
@@ -86,6 +54,7 @@ Website/                   # Next.js frontend application
 - Controllers: `AuthController`, `UserController`
 - Configured with Swagger UI for API exploration
 - Health checks and structured logging
+- Middleware for error handling and request processing
 
 **Database Layer**
 - SQL Server with stored procedures for all data operations
@@ -93,7 +62,19 @@ Website/                   # Next.js frontend application
 - Comprehensive schema including users, breweries, beers, locations, and social features
 - Seeders for development data (users, locations across US/Canada/Mexico)
 
-**Repository Layer** (`Repository.Core`)
+**Domain Layer** (`Domain`)
+- Core business entities and models
+- Entities: `UserAccount`, `UserCredential`, `UserVerification`
+- Shared domain logic and value objects
+- No external dependencies - pure domain model
+
+**Infrastructure Layer**
+- **Infrastructure.Jwt**: JWT token generation, validation, and configuration
+- **Infrastructure.PasswordHashing**: Argon2id password hashing with configurable parameters
+- **Infrastructure.Password**: Password utilities and validation
+- **Infrastructure.Repository**: Repository pattern infrastructure and base classes
+
+**Repository Layer** (`Infrastructure.Repository`)
 - Abstraction over SQL Server using ADO.NET
 - `ISqlConnectionFactory` for connection management
 - Repositories: `AuthRepository`, `UserAccountRepository`
@@ -101,9 +82,9 @@ Website/                   # Next.js frontend application
 
 **Service Layer** (`Service.Core`)
 - Business logic and orchestration
-- Services: `AuthService`, `UserService`, `JwtService`
-- Password hashing with Argon2id
-- JWT token generation
+- Services: `AuthService`, `UserService`
+- Integration with infrastructure components
+- Transaction management and business rule enforcement
 
 **Frontend** (`Website`)
 - Next.js 14+ with TypeScript
@@ -334,7 +315,7 @@ Provide a complete SQL Server connection string:
 DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
 ```
 
-The connection factory checks for `DB_CONNECTION_STRING` first, then falls back to building from components. See [DefaultSqlConnectionFactory.cs](src/Core/Repository/Repository.Core/Sql/DefaultSqlConnectionFactory.cs).
+The connection factory checks for `DB_CONNECTION_STRING` first, then falls back to building from components. See [DefaultSqlConnectionFactory.cs](src/Core/Infrastructure/Infrastructure.Repository/Infrastructure.Repository/Sql/DefaultSqlConnectionFactory.cs).
 
 #### JWT Authentication
 
@@ -578,7 +559,7 @@ docker compose -f docker-compose.test.yaml up --abort-on-container-exit
 
 This runs:
 - **API.Specs** - BDD integration tests
-- **Repository.Tests** - Unit tests for data access
+- **Infrastructure.Repository.Tests** - Unit tests for data access
 
 Test results are output to `./test-results/`.
 
@@ -590,10 +571,10 @@ cd src/Core
 dotnet test API/API.Specs/API.Specs.csproj
 ```
 
-**Unit Tests (Repository.Tests)**
+**Unit Tests (Infrastructure.Repository.Tests)**
 ```bash
 cd src/Core
-dotnet test Repository/Repository.Tests/Repository.Tests.csproj
+dotnet test Infrastructure/Infrastructure.Repository/Infrastructure.Repository.Tests/Repository.Tests.csproj
 ```
 
 ### Test Features

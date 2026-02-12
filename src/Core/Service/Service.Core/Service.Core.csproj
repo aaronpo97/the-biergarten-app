@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\Repository\Repository.Core\Repository.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
-COPY ["Repository/Repository.Core/Repository.Core.csproj", "Repository/Repository.Core/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
+COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
+COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
 COPY ["Service/Service.Core/Service.Core.csproj", "Service/Service.Core/"]
 RUN dotnet restore "API/API.Core/API.Core.csproj"
 COPY . .
