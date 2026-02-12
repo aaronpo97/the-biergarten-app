@@ -1,12 +1,12 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Jwt;
+using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Mvc;
 using Repository.Core.Repositories.Auth;
 using Repository.Core.Repositories.UserAccount;
 using Repository.Core.Sql;
 using Service.Core.Auth;
-using Service.Core.Jwt;
-using Service.Core.Password;
 using Service.Core.User;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,7 +59,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IPasswordInfra, Argon2Infrastructure>();
 
 var app = builder.Build();
 

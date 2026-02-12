@@ -1,6 +1,6 @@
-namespace Service.Core.Password;
+namespace Infrastructure.PasswordHashing;
 
-public interface IPasswordService
+public interface IPasswordInfra
 {
     public string Hash(string password);
     public bool Verify(string password, string stored);

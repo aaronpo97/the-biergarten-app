@@ -2,9 +2,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Konscious.Security.Cryptography;
 
-namespace Service.Core.Password;
+namespace Infrastructure.PasswordHashing;
 
-public class PasswordService : IPasswordService
+public class Argon2Infrastructure : IPasswordInfra
 {
     private const int SaltSize = 16; // 128-bit
     private const int HashSize = 32; // 256-bit
