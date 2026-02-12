@@ -1,4 +1,4 @@
-using Domain.Core.Entities;
+using Domain.Entities;
 
 namespace Service.Core.Auth;
 

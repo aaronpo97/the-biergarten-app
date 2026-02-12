@@ -1,4 +1,4 @@
-using Domain.Core.Entities;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.User;
 

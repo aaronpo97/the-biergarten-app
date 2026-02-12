@@ -1,4 +1,4 @@
-using Domain.Core.Entities;
+using Domain.Entities;
 
 namespace Infrastructure.Repository.Auth;
 
@@ -18,7 +18,7 @@ public interface IAuthRepository
     /// <param name="dateOfBirth">User's date of birth</param>
     /// <param name="passwordHash">Hashed password</param>
     /// <returns>The newly created UserAccount with generated ID</returns>
-    Task<Domain.Core.Entities.UserAccount> RegisterUserAsync(
+    Task<Domain.Entities.UserAccount> RegisterUserAsync(
         string username,
         string firstName,
         string lastName,
@@ -33,7 +33,7 @@ public interface IAuthRepository
     /// </summary>
     /// <param name="email">Email address to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
-    Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(
+    Task<Domain.Entities.UserAccount?> GetUserByEmailAsync(
         string email
     );
 
@@ -43,7 +43,7 @@ public interface IAuthRepository
     /// </summary>
     /// <param name="username">Username to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
-    Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(
+    Task<Domain.Entities.UserAccount?> GetUserByUsernameAsync(
         string username
     );
 

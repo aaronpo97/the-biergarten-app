@@ -2,15 +2,15 @@ namespace Infrastructure.Repository.UserAccount;
 
 public interface IUserAccountRepository
 {
-    Task<Domain.Core.Entities.UserAccount?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Domain.Core.Entities.UserAccount>> GetAllAsync(
+    Task<Domain.Entities.UserAccount?> GetByIdAsync(Guid id);
+    Task<IEnumerable<Domain.Entities.UserAccount>> GetAllAsync(
         int? limit,
         int? offset
     );
-    Task UpdateAsync(Domain.Core.Entities.UserAccount userAccount);
+    Task UpdateAsync(Domain.Entities.UserAccount userAccount);
     Task DeleteAsync(Guid id);
-    Task<Domain.Core.Entities.UserAccount?> GetByUsernameAsync(
+    Task<Domain.Entities.UserAccount?> GetByUsernameAsync(
         string username
     );
-    Task<Domain.Core.Entities.UserAccount?> GetByEmailAsync(string email);
+    Task<Domain.Entities.UserAccount?> GetByEmailAsync(string email);
 }

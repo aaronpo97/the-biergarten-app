@@ -1,4 +1,4 @@
-using Domain.Core.Entities;
+using Domain.Entities;
 using Infrastructure.Repository.UserAccount;
 
 namespace Service.Core.User;

@@ -1,4 +1,4 @@
-namespace Domain.Core.Entities;
+namespace Domain.Entities;
 
 public class UserVerification
 {

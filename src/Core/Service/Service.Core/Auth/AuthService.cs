@@ -1,4 +1,4 @@
-using Domain.Core.Entities;
+using Domain.Entities;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 

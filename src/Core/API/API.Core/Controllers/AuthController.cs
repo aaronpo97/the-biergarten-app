@@ -1,6 +1,6 @@
 using API.Core.Contracts.Auth;
 using API.Core.Contracts.Common;
-using Domain.Core.Entities;
+using Domain.Entities;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Auth;

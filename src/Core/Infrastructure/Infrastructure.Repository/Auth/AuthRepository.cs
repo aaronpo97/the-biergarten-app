@@ -1,18 +1,15 @@
 using System.Data;
 using System.Data.Common;
-using Domain.Core.Entities;
+using Domain.Entities;
 using Infrastructure.Repository.Sql;
 
 namespace Infrastructure.Repository.Auth;
 
-public class AuthRepository
-    : Repository<Domain.Core.Entities.UserAccount>,
+public class AuthRepository(ISqlConnectionFactory connectionFactory)
+    : Repository<Domain.Entities.UserAccount>(connectionFactory),
         IAuthRepository
 {
-    public AuthRepository(ISqlConnectionFactory connectionFactory)
-        : base(connectionFactory) { }
-
-    public async Task<Domain.Core.Entities.UserAccount> RegisterUserAsync(
+    public async Task<Domain.Entities.UserAccount> RegisterUserAsync(
         string username,
         string firstName,
         string lastName,
@@ -37,7 +34,7 @@ public class AuthRepository
         var result = await command.ExecuteScalarAsync();
         var userAccountId = result != null ? (Guid)result : Guid.Empty;
 
-        return new Domain.Core.Entities.UserAccount
+        return new Domain.Entities.UserAccount
         {
             UserAccountId = userAccountId,
             Username = username,
@@ -49,7 +46,7 @@ public class AuthRepository
         };
     }
 
-    public async Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(
+    public async Task<Domain.Entities.UserAccount?> GetUserByEmailAsync(
         string email
     )
     {
@@ -64,7 +61,7 @@ public class AuthRepository
         return await reader.ReadAsync() ? MapToEntity(reader) : null;
     }
 
-    public async Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(
+    public async Task<Domain.Entities.UserAccount?> GetUserByUsernameAsync(
         string username
     )
     {
@@ -115,11 +112,11 @@ public class AuthRepository
     /// <summary>
     /// Maps a data reader row to a UserAccount entity.
     /// </summary>
-    protected override Domain.Core.Entities.UserAccount MapToEntity(
+    protected override Domain.Entities.UserAccount MapToEntity(
         DbDataReader reader
     )
     {
-        return new Domain.Core.Entities.UserAccount
+        return new Domain.Entities.UserAccount
         {
             UserAccountId = reader.GetGuid(
                 reader.GetOrdinal("UserAccountId")
