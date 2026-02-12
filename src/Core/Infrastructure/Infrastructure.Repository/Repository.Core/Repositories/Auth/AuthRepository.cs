@@ -5,13 +5,12 @@ using Repository.Core.Sql;
 
 namespace Repository.Core.Repositories.Auth
 {
-    public class AuthRepository : Repository<Domain.Core.Entities.UserAccount>, IAuthRepository
+    public class AuthRepository
+        : Repository<Domain.Core.Entities.UserAccount>,
+            IAuthRepository
     {
         public AuthRepository(ISqlConnectionFactory connectionFactory)
-            : base(connectionFactory)
-        {
-        }
-
+            : base(connectionFactory) { }
 
         public async Task<Domain.Core.Entities.UserAccount> RegisterUserAsync(
             string username,
@@ -19,7 +18,8 @@ namespace Repository.Core.Repositories.Auth
             string lastName,
             string email,
             DateTime dateOfBirth,
-            string passwordHash)
+            string passwordHash
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -45,12 +45,13 @@ namespace Repository.Core.Repositories.Auth
                 LastName = lastName,
                 Email = email,
                 DateOfBirth = dateOfBirth,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
         }
 
-
-        public async Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(string email)
+        public async Task<Domain.Core.Entities.UserAccount?> GetUserByEmailAsync(
+            string email
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -63,8 +64,9 @@ namespace Repository.Core.Repositories.Auth
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-
-        public async Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(string username)
+        public async Task<Domain.Core.Entities.UserAccount?> GetUserByUsernameAsync(
+            string username
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -77,7 +79,9 @@ namespace Repository.Core.Repositories.Auth
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
+        public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(
+            Guid userAccountId
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -87,10 +91,15 @@ namespace Repository.Core.Repositories.Auth
             AddParameter(command, "@UserAccountId", userAccountId);
 
             await using var reader = await command.ExecuteReaderAsync();
-            return await reader.ReadAsync() ? MapToCredentialEntity(reader) : null;
+            return await reader.ReadAsync()
+                ? MapToCredentialEntity(reader)
+                : null;
         }
 
-        public async Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash)
+        public async Task RotateCredentialAsync(
+            Guid userAccountId,
+            string newPasswordHash
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -106,11 +115,15 @@ namespace Repository.Core.Repositories.Auth
         /// <summary>
         /// Maps a data reader row to a UserAccount entity.
         /// </summary>
-        protected override Domain.Core.Entities.UserAccount MapToEntity(DbDataReader reader)
+        protected override Domain.Core.Entities.UserAccount MapToEntity(
+            DbDataReader reader
+        )
         {
             return new Domain.Core.Entities.UserAccount
             {
-                UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
+                UserAccountId = reader.GetGuid(
+                    reader.GetOrdinal("UserAccountId")
+                ),
                 Username = reader.GetString(reader.GetOrdinal("Username")),
                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
@@ -119,10 +132,12 @@ namespace Repository.Core.Repositories.Auth
                 UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt"))
                     ? null
                     : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
+                DateOfBirth = reader.GetDateTime(
+                    reader.GetOrdinal("DateOfBirth")
+                ),
                 Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
                     ? null
-                    : (byte[])reader["Timer"]
+                    : (byte[])reader["Timer"],
             };
         }
 
@@ -133,22 +148,34 @@ namespace Repository.Core.Repositories.Auth
         {
             var entity = new UserCredential
             {
-                UserCredentialId = reader.GetGuid(reader.GetOrdinal("UserCredentialId")),
-                UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
+                UserCredentialId = reader.GetGuid(
+                    reader.GetOrdinal("UserCredentialId")
+                ),
+                UserAccountId = reader.GetGuid(
+                    reader.GetOrdinal("UserAccountId")
+                ),
                 Hash = reader.GetString(reader.GetOrdinal("Hash")),
-                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
             };
 
             // Optional columns
-            var hasTimer = reader.GetSchemaTable()?.Rows
-                               .Cast<System.Data.DataRow>()
-                               .Any(r => string.Equals(r["ColumnName"]?.ToString(), "Timer",
-                                   StringComparison.OrdinalIgnoreCase)) ??
-                           false;
+            var hasTimer =
+                reader
+                    .GetSchemaTable()
+                    ?.Rows.Cast<System.Data.DataRow>()
+                    .Any(r =>
+                        string.Equals(
+                            r["ColumnName"]?.ToString(),
+                            "Timer",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    ) ?? false;
 
             if (hasTimer)
             {
-                entity.Timer = reader.IsDBNull(reader.GetOrdinal("Timer")) ? null : (byte[])reader["Timer"];
+                entity.Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
+                    ? null
+                    : (byte[])reader["Timer"];
             }
 
             return entity;
@@ -157,7 +184,11 @@ namespace Repository.Core.Repositories.Auth
         /// <summary>
         /// Helper method to add a parameter to a database command.
         /// </summary>
-        private static void AddParameter(DbCommand command, string name, object? value)
+        private static void AddParameter(
+            DbCommand command,
+            string name,
+            object? value
+        )
         {
             var p = command.CreateParameter();
             p.ParameterName = name;

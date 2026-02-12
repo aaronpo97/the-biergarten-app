@@ -1,15 +1,15 @@
-using Apps72.Dev.Data.DbMocker;
-using Repository.Core.Repositories.Auth;
-using FluentAssertions;
-using Repository.Tests.Database;
 using System.Data;
+using Apps72.Dev.Data.DbMocker;
+using FluentAssertions;
+using Repository.Core.Repositories.Auth;
+using Repository.Tests.Database;
 
 namespace Repository.Tests.Auth;
 
 public class AuthRepositoryTest
 {
-    private static AuthRepository CreateRepo(MockDbConnection conn)
-        => new(new TestConnectionFactory(conn));
+    private static AuthRepository CreateRepo(MockDbConnection conn) =>
+        new(new TestConnectionFactory(conn));
 
     [Fact]
     public async Task RegisterUserAsync_CreatesUserWithCredential_ReturnsUserAccount()
@@ -17,10 +17,12 @@ public class AuthRepositoryTest
         var expectedUserId = Guid.NewGuid();
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "USP_RegisterUser")
-            .ReturnsTable(MockTable.WithColumns(("UserAccountId", typeof(Guid)))
-                .AddRow(expectedUserId));
+        conn.Mocks.When(cmd => cmd.CommandText == "USP_RegisterUser")
+            .ReturnsTable(
+                MockTable
+                    .WithColumns(("UserAccountId", typeof(Guid)))
+                    .AddRow(expectedUserId)
+            );
 
         var repo = CreateRepo(conn);
         var result = await repo.RegisterUserAsync(
@@ -47,29 +49,32 @@ public class AuthRepositoryTest
         var userId = Guid.NewGuid();
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
-            .ReturnsTable(MockTable.WithColumns(
-                ("UserAccountId", typeof(Guid)),
-                ("Username", typeof(string)),
-                ("FirstName", typeof(string)),
-                ("LastName", typeof(string)),
-                ("Email", typeof(string)),
-                ("CreatedAt", typeof(DateTime)),
-                ("UpdatedAt", typeof(DateTime?)),
-                ("DateOfBirth", typeof(DateTime)),
-                ("Timer", typeof(byte[]))
-            ).AddRow(
-                userId,
-                "emailuser",
-                "Email",
-                "User",
-                "emailuser@example.com",
-                DateTime.UtcNow,
-                null,
-                new DateTime(1990, 5, 15),
-                null
-            ));
+        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
+            .ReturnsTable(
+                MockTable
+                    .WithColumns(
+                        ("UserAccountId", typeof(Guid)),
+                        ("Username", typeof(string)),
+                        ("FirstName", typeof(string)),
+                        ("LastName", typeof(string)),
+                        ("Email", typeof(string)),
+                        ("CreatedAt", typeof(DateTime)),
+                        ("UpdatedAt", typeof(DateTime?)),
+                        ("DateOfBirth", typeof(DateTime)),
+                        ("Timer", typeof(byte[]))
+                    )
+                    .AddRow(
+                        userId,
+                        "emailuser",
+                        "Email",
+                        "User",
+                        "emailuser@example.com",
+                        DateTime.UtcNow,
+                        null,
+                        new DateTime(1990, 5, 15),
+                        null
+                    )
+            );
 
         var repo = CreateRepo(conn);
         var result = await repo.GetUserByEmailAsync("emailuser@example.com");
@@ -87,8 +92,7 @@ public class AuthRepositoryTest
     {
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
+        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
             .ReturnsTable(MockTable.Empty());
 
         var repo = CreateRepo(conn);
@@ -103,29 +107,34 @@ public class AuthRepositoryTest
         var userId = Guid.NewGuid();
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
-            .ReturnsTable(MockTable.WithColumns(
-                ("UserAccountId", typeof(Guid)),
-                ("Username", typeof(string)),
-                ("FirstName", typeof(string)),
-                ("LastName", typeof(string)),
-                ("Email", typeof(string)),
-                ("CreatedAt", typeof(DateTime)),
-                ("UpdatedAt", typeof(DateTime?)),
-                ("DateOfBirth", typeof(DateTime)),
-                ("Timer", typeof(byte[]))
-            ).AddRow(
-                userId,
-                "usernameuser",
-                "Username",
-                "User",
-                "username@example.com",
-                DateTime.UtcNow,
-                null,
-                new DateTime(1985, 8, 20),
-                null
-            ));
+        conn.Mocks.When(cmd =>
+                cmd.CommandText == "usp_GetUserAccountByUsername"
+            )
+            .ReturnsTable(
+                MockTable
+                    .WithColumns(
+                        ("UserAccountId", typeof(Guid)),
+                        ("Username", typeof(string)),
+                        ("FirstName", typeof(string)),
+                        ("LastName", typeof(string)),
+                        ("Email", typeof(string)),
+                        ("CreatedAt", typeof(DateTime)),
+                        ("UpdatedAt", typeof(DateTime?)),
+                        ("DateOfBirth", typeof(DateTime)),
+                        ("Timer", typeof(byte[]))
+                    )
+                    .AddRow(
+                        userId,
+                        "usernameuser",
+                        "Username",
+                        "User",
+                        "username@example.com",
+                        DateTime.UtcNow,
+                        null,
+                        new DateTime(1985, 8, 20),
+                        null
+                    )
+            );
 
         var repo = CreateRepo(conn);
         var result = await repo.GetUserByUsernameAsync("usernameuser");
@@ -141,8 +150,9 @@ public class AuthRepositoryTest
     {
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
+        conn.Mocks.When(cmd =>
+                cmd.CommandText == "usp_GetUserAccountByUsername"
+            )
             .ReturnsTable(MockTable.Empty());
 
         var repo = CreateRepo(conn);
@@ -158,21 +168,26 @@ public class AuthRepositoryTest
         var credentialId = Guid.NewGuid();
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId")
-            .ReturnsTable(MockTable.WithColumns(
-                ("UserCredentialId", typeof(Guid)),
-                ("UserAccountId", typeof(Guid)),
-                ("Hash", typeof(string)),
-                ("CreatedAt", typeof(DateTime)),
-                ("Timer", typeof(byte[]))
-            ).AddRow(
-                credentialId,
-                userId,
-                "hashed_password_value",
-                DateTime.UtcNow,
-                null
-            ));
+        conn.Mocks.When(cmd =>
+                cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId"
+            )
+            .ReturnsTable(
+                MockTable
+                    .WithColumns(
+                        ("UserCredentialId", typeof(Guid)),
+                        ("UserAccountId", typeof(Guid)),
+                        ("Hash", typeof(string)),
+                        ("CreatedAt", typeof(DateTime)),
+                        ("Timer", typeof(byte[]))
+                    )
+                    .AddRow(
+                        credentialId,
+                        userId,
+                        "hashed_password_value",
+                        DateTime.UtcNow,
+                        null
+                    )
+            );
 
         var repo = CreateRepo(conn);
         var result = await repo.GetActiveCredentialByUserAccountIdAsync(userId);
@@ -189,8 +204,9 @@ public class AuthRepositoryTest
         var userId = Guid.NewGuid();
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId")
+        conn.Mocks.When(cmd =>
+                cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId"
+            )
             .ReturnsTable(MockTable.Empty());
 
         var repo = CreateRepo(conn);
@@ -206,14 +222,14 @@ public class AuthRepositoryTest
         var newPasswordHash = "new_hashed_password";
         var conn = new MockDbConnection();
 
-        conn.Mocks
-            .When(cmd => cmd.CommandText == "USP_RotateUserCredential")
+        conn.Mocks.When(cmd => cmd.CommandText == "USP_RotateUserCredential")
             .ReturnsScalar(1);
 
         var repo = CreateRepo(conn);
 
         // Should not throw
-        var act = async () => await repo.RotateCredentialAsync(userId, newPasswordHash);
+        var act = async () =>
+            await repo.RotateCredentialAsync(userId, newPasswordHash);
         await act.Should().NotThrowAsync();
     }
 }

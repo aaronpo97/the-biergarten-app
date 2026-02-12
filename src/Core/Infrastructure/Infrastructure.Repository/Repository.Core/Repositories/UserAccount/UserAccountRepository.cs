@@ -6,9 +6,12 @@ using Repository.Core.Sql;
 namespace Repository.Core.Repositories.UserAccount
 {
     public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
-        : Repository<Domain.Core.Entities.UserAccount>(connectionFactory), IUserAccountRepository
+        : Repository<Domain.Core.Entities.UserAccount>(connectionFactory),
+            IUserAccountRepository
     {
-        public async Task<Domain.Core.Entities.UserAccount?> GetByIdAsync(Guid id)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByIdAsync(
+            Guid id
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -21,7 +24,9 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<IEnumerable<Domain.Core.Entities.UserAccount>> GetAllAsync(int? limit, int? offset)
+        public async Task<
+            IEnumerable<Domain.Core.Entities.UserAccount>
+        > GetAllAsync(int? limit, int? offset)
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -45,7 +50,9 @@ namespace Repository.Core.Repositories.UserAccount
             return users;
         }
 
-        public async Task UpdateAsync(Domain.Core.Entities.UserAccount userAccount)
+        public async Task UpdateAsync(
+            Domain.Core.Entities.UserAccount userAccount
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -73,7 +80,9 @@ namespace Repository.Core.Repositories.UserAccount
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task<Domain.Core.Entities.UserAccount?> GetByUsernameAsync(string username)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByUsernameAsync(
+            string username
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -86,7 +95,9 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        public async Task<Domain.Core.Entities.UserAccount?> GetByEmailAsync(string email)
+        public async Task<Domain.Core.Entities.UserAccount?> GetByEmailAsync(
+            string email
+        )
         {
             await using var connection = await CreateConnection();
             await using var command = connection.CreateCommand();
@@ -99,11 +110,15 @@ namespace Repository.Core.Repositories.UserAccount
             return await reader.ReadAsync() ? MapToEntity(reader) : null;
         }
 
-        protected override Domain.Core.Entities.UserAccount MapToEntity(DbDataReader reader)
+        protected override Domain.Core.Entities.UserAccount MapToEntity(
+            DbDataReader reader
+        )
         {
             return new Domain.Core.Entities.UserAccount
             {
-                UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
+                UserAccountId = reader.GetGuid(
+                    reader.GetOrdinal("UserAccountId")
+                ),
                 Username = reader.GetString(reader.GetOrdinal("Username")),
                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
@@ -112,14 +127,20 @@ namespace Repository.Core.Repositories.UserAccount
                 UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt"))
                     ? null
                     : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
+                DateOfBirth = reader.GetDateTime(
+                    reader.GetOrdinal("DateOfBirth")
+                ),
                 Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
                     ? null
-                    : (byte[])reader["Timer"]
+                    : (byte[])reader["Timer"],
             };
         }
 
-        private static void AddParameter(DbCommand command, string name, object? value)
+        private static void AddParameter(
+            DbCommand command,
+            string name,
+            object? value
+        )
         {
             var p = command.CreateParameter();
             p.ParameterName = name;

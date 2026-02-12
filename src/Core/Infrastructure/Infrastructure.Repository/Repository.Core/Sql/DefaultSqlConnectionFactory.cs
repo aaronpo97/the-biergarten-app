@@ -2,17 +2,21 @@ using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-
 namespace Repository.Core.Sql
 {
-    public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlConnectionFactory
+    public class DefaultSqlConnectionFactory(IConfiguration configuration)
+        : ISqlConnectionFactory
     {
-        private readonly string _connectionString = GetConnectionString(configuration);
+        private readonly string _connectionString = GetConnectionString(
+            configuration
+        );
 
         private static string GetConnectionString(IConfiguration configuration)
         {
             // Check for full connection string first
-            var fullConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            var fullConnectionString = Environment.GetEnvironmentVariable(
+                "DB_CONNECTION_STRING"
+            );
             if (!string.IsNullOrEmpty(fullConnectionString))
             {
                 return fullConnectionString;

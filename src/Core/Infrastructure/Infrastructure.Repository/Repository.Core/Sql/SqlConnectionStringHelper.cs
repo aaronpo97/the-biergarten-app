@@ -12,18 +12,30 @@ namespace Repository.Core.Sql
         /// <returns>A properly formatted SQL Server connection string.</returns>
         public static string BuildConnectionString(string? databaseName = null)
         {
-            var server = Environment.GetEnvironmentVariable("DB_SERVER")
-                ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+            var server =
+                Environment.GetEnvironmentVariable("DB_SERVER")
+                ?? throw new InvalidOperationException(
+                    "DB_SERVER environment variable is not set"
+                );
 
-            var dbName = databaseName
+            var dbName =
+                databaseName
                 ?? Environment.GetEnvironmentVariable("DB_NAME")
-                ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+                ?? throw new InvalidOperationException(
+                    "DB_NAME environment variable is not set"
+                );
 
-            var user = Environment.GetEnvironmentVariable("DB_USER")
-                ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+            var user =
+                Environment.GetEnvironmentVariable("DB_USER")
+                ?? throw new InvalidOperationException(
+                    "DB_USER environment variable is not set"
+                );
 
-            var password = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+            var password =
+                Environment.GetEnvironmentVariable("DB_PASSWORD")
+                ?? throw new InvalidOperationException(
+                    "DB_PASSWORD environment variable is not set"
+                );
 
             var builder = new SqlConnectionStringBuilder
             {
@@ -32,7 +44,7 @@ namespace Repository.Core.Sql
                 UserID = user,
                 Password = password,
                 TrustServerCertificate = true,
-                Encrypt = true
+                Encrypt = true,
             };
 
             return builder.ConnectionString;

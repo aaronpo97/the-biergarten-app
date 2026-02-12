@@ -12,7 +12,10 @@
       Version="160.1000.6"
     />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference
+      Include="Microsoft.Extensions.Configuration.Abstractions"
+      Version="8.0.0"
+    />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Domain\Domain.csproj" />
