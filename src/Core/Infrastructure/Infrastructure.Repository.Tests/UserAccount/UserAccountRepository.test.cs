@@ -1,9 +1,9 @@
 using Apps72.Dev.Data.DbMocker;
 using FluentAssertions;
+using Infrastructure.Repository.Tests.Database;
 using Infrastructure.Repository.UserAccount;
-using Repository.Tests.Database;
 
-namespace Repository.Tests.UserAccount;
+namespace Infrastructure.Repository.Tests.UserAccount;
 
 public class UserAccountRepositoryTest
 {

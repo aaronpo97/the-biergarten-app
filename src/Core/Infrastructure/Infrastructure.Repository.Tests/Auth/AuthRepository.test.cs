@@ -1,10 +1,9 @@
-using System.Data;
 using Apps72.Dev.Data.DbMocker;
 using FluentAssertions;
 using Infrastructure.Repository.Auth;
-using Repository.Tests.Database;
+using Infrastructure.Repository.Tests.Database;
 
-namespace Repository.Tests.Auth;
+namespace Infrastructure.Repository.Tests.Auth;
 
 public class AuthRepositoryTest
 {
