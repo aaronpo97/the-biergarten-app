@@ -3,6 +3,6 @@
       <TargetFramework>net10.0</TargetFramework>
       <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
-      <RootNamespace>Domain.Core</RootNamespace>
+      <RootNamespace>Domain</RootNamespace>
    </PropertyGroup>
 </Project>
