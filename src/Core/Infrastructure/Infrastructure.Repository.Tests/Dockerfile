@@ -1,7 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Domain.Entities/Domain.Entities.csproj", "Domain.Entities/"]
+COPY ["Domain.Exceptions/Domain.Exceptions.csproj", "Domain.Exceptions/"]
 COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
 COPY ["Infrastructure/Infrastructure.Repository.Tests/Infrastructure.Repository.Tests.csproj", "Infrastructure/Infrastructure.Repository.Tests/"]
 RUN dotnet restore "Infrastructure/Infrastructure.Repository.Tests/Infrastructure.Repository.Tests.csproj"

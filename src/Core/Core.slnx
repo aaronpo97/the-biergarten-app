@@ -8,7 +8,8 @@
     <Project Path="Database/Database.Seed/Database.Seed.csproj" />
   </Folder>
   <Folder Name="/Domain/">
-    <Project Path="Domain/Domain.csproj" />
+    <Project Path="Domain.Entities\Domain.Entities.csproj" />
+    <Project Path="Domain.Exceptions/Domain.Exceptions.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />

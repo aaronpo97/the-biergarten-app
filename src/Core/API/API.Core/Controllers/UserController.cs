@@ -19,7 +19,6 @@ namespace API.Core.Controllers
         public async Task<ActionResult<UserAccount>> GetById(Guid id)
         {
             var user = await userService.GetByIdAsync(id);
-            if (user is null) return NotFound();
             return Ok(user);
         }
     }

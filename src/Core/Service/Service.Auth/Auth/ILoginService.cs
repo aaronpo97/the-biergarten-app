@@ -5,5 +5,5 @@ namespace Service.Auth.Auth;
 
 public interface ILoginService
 {
-    Task<UserAccount?> LoginAsync(string username, string password);
+    Task<UserAccount> LoginAsync(string username, string password);
 }

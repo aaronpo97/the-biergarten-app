@@ -201,18 +201,6 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseBodyKey] = responseBody;
     }
 
-    [Given("I have an existing account with username {string}")]
-    public void GivenIHaveAnExistingAccountWithUsername(string username)
-    {
-
-    }
-
-    [Given("I have an existing account with email {string}")]
-    public void GivenIHaveAnExistingAccountWithEmail(string email)
-    {
-
-    }
-
     [When("I submit a registration request using a GET request")]
     public async Task WhenISubmitARegistrationRequestUsingAGetRequest()
     {
