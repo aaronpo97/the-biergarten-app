@@ -17,7 +17,8 @@
     <!-- Reqnroll core, xUnit adapter and code-behind generator -->
     <PackageReference Include="Reqnroll" Version="3.3.3" />
     <PackageReference Include="Reqnroll.xUnit" Version="3.3.3" />
-    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="3.3.3" PrivateAssets="all" />
+    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="3.3.3"
+      PrivateAssets="all" />
 
     <!-- ASP.NET Core integration testing -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.1" />
@@ -34,5 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API.Core\API.Core.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
   </ItemGroup>
 </Project>

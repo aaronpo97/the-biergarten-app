@@ -98,6 +98,19 @@ services:
     volumes:
       - nuget-cache-dev:/root/.nuget/packages
 
+  mailpit:
+      image: axllent/mailpit:latest
+      container_name: dev-env-mailpit
+      ports:
+        - "8025:8025"  # Web UI
+        - "1025:1025"  # SMTP server
+
+      restart: unless-stopped
+      environment:
+        MP_SMTP_AUTH_ACCEPT_ANY: 1
+        MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      networks:
+        - devnet
 volumes:
   sqlserverdata-dev:
     driver: local
