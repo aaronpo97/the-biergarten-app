@@ -6,7 +6,7 @@ namespace API.Specs.Mocks;
 /// Mock email service for testing that doesn't actually send emails.
 /// Tracks sent emails for verification in tests if needed.
 /// </summary>
-public class MockEmailService : IEmailService
+public class MockEmailProvider : IEmailProvider
 {
    public List<SentEmail> SentEmails { get; } = new();
 

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Exceptions;
 using Infrastructure.Email;
+using Infrastructure.Email.Templates;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 
@@ -10,7 +11,8 @@ namespace Service.Auth.Auth;
 public class RegisterService(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,
-    IEmailService emailService
+    IEmailProvider emailProvider,
+    IEmailTemplateProvider emailTemplateProvider
 ) : IRegisterService
 {
     public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
@@ -28,8 +30,8 @@ public class RegisterService(
         // password hashing
         var hashed = passwordInfrastructure.Hash(password);
 
-        // Register user with hashed password
-        await authRepo.RegisterUserAsync(
+        // Register user with hashed password and get the created user with generated ID
+        var createdUser = await authRepo.RegisterUserAsync(
             userAccount.Username,
             userAccount.FirstName,
             userAccount.LastName,
@@ -37,13 +39,24 @@ public class RegisterService(
             userAccount.DateOfBirth,
             hashed);
 
-        // Send welcome email
-        await emailService.SendAsync(
-            userAccount.Email,
-            "Welcome to The Biergarten App!",
-            $"Hi {userAccount.FirstName},\n\nThank you for registering with The Biergarten App! We're excited to have you on board.\n\nBest regards,\nThe Biergarten Team"
+
+        // Generate confirmation link (TODO: implement proper token-based confirmation)
+        var confirmationLink = $"https://thebiergarten.app/confirm?email={Uri.EscapeDataString(createdUser.Email)}";
+
+        // Render email template
+        var emailHtml = await emailTemplateProvider.RenderUserRegisteredEmailAsync(
+            createdUser.FirstName,
+            confirmationLink
         );
-        
-        return userAccount;
+
+        // Send welcome email with rendered template
+        await emailProvider.SendAsync(
+            createdUser.Email,
+            "Welcome to The Biergarten App!",
+            emailHtml,
+            isHtml: true
+        );
+
+        return createdUser;
     }
 }

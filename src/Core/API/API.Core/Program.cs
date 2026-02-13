@@ -13,6 +13,7 @@ using Service.Auth.Auth;
 using Service.UserManagement.User;
 using API.Core.Contracts.Common;
 using Infrastructure.Email;
+using Infrastructure.Email.Templates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,8 @@ builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
 builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
-builder.Services.AddScoped<IEmailService, SmtpEmailService>(); 
+builder.Services.AddScoped<IEmailProvider, SmtpEmailProvider>();
+builder.Services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
 
 // Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();

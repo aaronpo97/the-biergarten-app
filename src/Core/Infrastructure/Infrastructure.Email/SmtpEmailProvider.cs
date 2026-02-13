@@ -5,34 +5,10 @@ using MimeKit;
 namespace Infrastructure.Email;
 
 /// <summary>
-/// Service for sending emails via SMTP.
-/// </summary>
-public interface IEmailService
-{
-    /// <summary>
-    /// Sends an email to a single recipient.
-    /// </summary>
-    /// <param name="to">Recipient email address</param>
-    /// <param name="subject">Email subject line</param>
-    /// <param name="body">Email body (HTML or plain text)</param>
-    /// <param name="isHtml">Whether the body is HTML (default: true)</param>
-    Task SendAsync(string to, string subject, string body, bool isHtml = true);
-
-    /// <summary>
-    /// Sends an email to multiple recipients.
-    /// </summary>
-    /// <param name="to">List of recipient email addresses</param>
-    /// <param name="subject">Email subject line</param>
-    /// <param name="body">Email body (HTML or plain text)</param>
-    /// <param name="isHtml">Whether the body is HTML (default: true)</param>
-    Task SendAsync(IEnumerable<string> to, string subject, string body, bool isHtml = true);
-}
-
-/// <summary>
 /// SMTP email service implementation using MailKit.
 /// Configured via environment variables.
 /// </summary>
-public class SmtpEmailService : IEmailService
+public class SmtpEmailProvider : IEmailProvider
 {
     private readonly string _host;
     private readonly int _port;
@@ -42,7 +18,7 @@ public class SmtpEmailService : IEmailService
     private readonly string _fromEmail;
     private readonly string _fromName;
 
-    public SmtpEmailService()
+    public SmtpEmailProvider()
     {
         _host = Environment.GetEnvironmentVariable("SMTP_HOST")
                 ?? throw new InvalidOperationException("SMTP_HOST environment variable is not set");

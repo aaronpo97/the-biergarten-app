@@ -18,14 +18,14 @@ namespace API.Specs
             {
                 // Replace the real email service with mock for testing
                 var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(IEmailService));
+                    d => d.ServiceType == typeof(IEmailProvider));
 
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
                 }
 
-                services.AddScoped<IEmailService, MockEmailService>();
+                services.AddScoped<IEmailProvider, MockEmailProvider>();
             });
         }
     }

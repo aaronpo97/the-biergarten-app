@@ -1,25 +1,26 @@
 <Solution>
-  <Folder Name="/API/">
-    <Project Path="API/API.Core/API.Core.csproj" />
-    <Project Path="API/API.Specs/API.Specs.csproj" />
-  </Folder>
-  <Folder Name="/Database/">
-    <Project Path="Database/Database.Migrations/Database.Migrations.csproj" />
-    <Project Path="Database/Database.Seed/Database.Seed.csproj" />
-  </Folder>
-  <Folder Name="/Domain/">
-    <Project Path="Domain.Entities\Domain.Entities.csproj" />
-    <Project Path="Domain.Exceptions/Domain.Exceptions.csproj" />
-  </Folder>
-  <Folder Name="/Infrastructure/">
-    <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
-    <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
-    <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
-    <Project Path="Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj" />
-    <Project Path="Infrastructure\Infrastructure.Repository.Tests\Infrastructure.Repository.Tests.csproj" />
-  </Folder>
-  <Folder Name="/Service/">
-    <Project Path="Service/Service.UserManagement/Service.UserManagement.csproj" />
-    <Project Path="Service\Service.Auth\Service.Auth.csproj" />
-  </Folder>
+    <Folder Name="/API/">
+        <Project Path="API/API.Core/API.Core.csproj"/>
+        <Project Path="API/API.Specs/API.Specs.csproj"/>
+    </Folder>
+    <Folder Name="/Database/">
+        <Project Path="Database/Database.Migrations/Database.Migrations.csproj"/>
+        <Project Path="Database/Database.Seed/Database.Seed.csproj"/>
+    </Folder>
+    <Folder Name="/Domain/">
+        <Project Path="Domain.Entities\Domain.Entities.csproj"/>
+        <Project Path="Domain.Exceptions/Domain.Exceptions.csproj"/>
+    </Folder>
+    <Folder Name="/Infrastructure/">
+        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj"/>
+        <Project Path="Infrastructure\Infrastructure.Repository.Tests\Infrastructure.Repository.Tests.csproj"/>
+    </Folder>
+    <Folder Name="/Service/">
+        <Project Path="Service/Service.UserManagement/Service.UserManagement.csproj"/>
+        <Project Path="Service\Service.Auth\Service.Auth.csproj"/>
+    </Folder>
 </Solution>
