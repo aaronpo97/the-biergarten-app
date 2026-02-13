@@ -3,20 +3,18 @@ using API.Core.Contracts.Common;
 using Domain.Entities;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Mvc;
-using Service.Core.Auth;
+using Service.Auth.Auth;
 
 namespace API.Core.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthService auth, IJwtService jwtService) : ControllerBase
+    public class AuthController(IRegisterService register, ILoginService login, ITokenInfrastructure tokenInfrastructure) : ControllerBase
     {
-
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register([FromBody] RegisterRequest req)
         {
-
-            var created = await auth.RegisterAsync(new UserAccount
+            var created = await register.RegisterAsync(new UserAccount
             {
                 UserAccountId = Guid.Empty,
                 Username = req.Username,
@@ -27,8 +25,7 @@ namespace API.Core.Controllers
             }, req.Password);
 
             var jwtExpiresAt = DateTime.UtcNow.AddHours(1);
-            var jwt = jwtService.GenerateJwt(created.UserAccountId, created.Username, jwtExpiresAt
-
+            var jwt = tokenInfrastructure.GenerateJwt(created.UserAccountId, created.Username, jwtExpiresAt
             );
 
             var response = new ResponseBody<AuthPayload>
@@ -46,7 +43,7 @@ namespace API.Core.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
-            var userAccount = await auth.LoginAsync(req.Username, req.Password);
+            var userAccount = await login.LoginAsync(req.Username, req.Password);
             if (userAccount is null)
             {
                 return Unauthorized(new ResponseBody
@@ -58,7 +55,7 @@ namespace API.Core.Controllers
             UserDTO dto = new(userAccount.UserAccountId, userAccount.Username);
 
             var jwtExpiresAt = DateTime.UtcNow.AddHours(1);
-            var jwt = jwtService.GenerateJwt(userAccount.UserAccountId, userAccount.Username, jwtExpiresAt);
+            var jwt = tokenInfrastructure.GenerateJwt(userAccount.UserAccountId, userAccount.Username, jwtExpiresAt);
 
             return Ok(new ResponseBody<AuthPayload>
             {
