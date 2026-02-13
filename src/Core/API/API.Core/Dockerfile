@@ -13,7 +13,8 @@ COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
 COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
-COPY ["Service/Service.Core/Service.Core.csproj", "Service/Service.Core/"]
+COPY ["Service/Service.Auth/Service.Auth.csproj", "Service/Service.Auth/"]
+COPY ["Service/Service.UserManagement/Service.UserManagement.csproj", "Service/Service.UserManagement/"]
 RUN dotnet restore "API/API.Core/API.Core.csproj"
 COPY . .
 WORKDIR "/src/API/API.Core"
