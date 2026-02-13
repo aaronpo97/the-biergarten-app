@@ -4,7 +4,7 @@ using Konscious.Security.Cryptography;
 
 namespace Infrastructure.PasswordHashing;
 
-public class Argon2Infrastructure : IPasswordInfra
+public class Argon2Infrastructure : IPasswordInfrastructure
 {
     private const int SaltSize = 16; // 128-bit
     private const int HashSize = 32; // 256-bit

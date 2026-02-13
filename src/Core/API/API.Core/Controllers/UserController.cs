@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Service.Core.User;
+using Service.UserManagement.User;
 
 namespace API.Core.Controllers
 {

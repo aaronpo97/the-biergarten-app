@@ -17,6 +17,7 @@
     <Project Path="Infrastructure\Infrastructure.Repository.Tests\Infrastructure.Repository.Tests.csproj" />
   </Folder>
   <Folder Name="/Service/">
-    <Project Path="Service/Service.Core/Service.Core.csproj" />
+    <Project Path="Service/Service.UserManagement/Service.UserManagement.csproj" />
+    <Project Path="Service\Service.Auth\Service.Auth.csproj" />
   </Folder>
 </Solution>
