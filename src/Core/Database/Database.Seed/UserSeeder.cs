@@ -124,6 +124,7 @@ internal class UserSeeder : ISeeder
         int createdCredentials = 0;
         int createdVerifications = 0;
 
+        // create a known user for testing purposes
         {
             const string firstName = "Test";
             const string lastName = "User";

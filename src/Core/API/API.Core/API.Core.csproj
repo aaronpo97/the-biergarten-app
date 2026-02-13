@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\Domain.Entities\Domain.Entities.csproj" />
+    <ProjectReference Include="..\..\Domain.Exceptions\Domain.Exceptions.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
     <ProjectReference Include="..\..\Service\Service.Auth\Service.Auth.csproj" />

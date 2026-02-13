@@ -44,13 +44,6 @@ namespace API.Core.Controllers
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
             var userAccount = await login.LoginAsync(req.Username, req.Password);
-            if (userAccount is null)
-            {
-                return Unauthorized(new ResponseBody
-                {
-                    Message = "Invalid username or password."
-                });
-            }
 
             UserDTO dto = new(userAccount.UserAccountId, userAccount.Username);
 

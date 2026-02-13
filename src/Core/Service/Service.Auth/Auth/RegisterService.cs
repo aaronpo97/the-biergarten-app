@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.Exceptions;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 
@@ -13,11 +14,15 @@ public class RegisterService(
     public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
     {
         // Check if user already exists
-        var user = await authRepo.GetUserByUsernameAsync(userAccount.Username);
-        if (user is not null)
+        var existingUsername = await authRepo.GetUserByUsernameAsync(userAccount.Username);
+        var existingEmail = await authRepo.GetUserByEmailAsync(userAccount.Email);
+
+        if (existingUsername != null || existingEmail != null)
         {
-            return null!;
+            throw new ConflictException("Username or email already exists");
         }
+
+
 
         // password hashing
         var hashed = passwordInfrastructure.Hash(password);
@@ -32,5 +37,5 @@ public class RegisterService(
             hashed);
     }
 
- 
+
 }
