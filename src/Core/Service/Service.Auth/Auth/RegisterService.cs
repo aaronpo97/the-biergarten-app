@@ -1,13 +1,14 @@
+using System.Threading.Tasks;
 using Domain.Entities;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 
-namespace Service.Core.Auth;
+namespace Service.Auth.Auth;
 
-public class AuthService(
+public class RegisterService(
     IAuthRepository authRepo,
-    IPasswordInfra passwordInfra
-) : IAuthService
+    IPasswordInfrastructure passwordInfrastructure
+) : IRegisterService
 {
     public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
     {
@@ -19,7 +20,7 @@ public class AuthService(
         }
 
         // password hashing
-        var hashed = passwordInfra.Hash(password);
+        var hashed = passwordInfrastructure.Hash(password);
 
         // Register user with hashed password
         return await authRepo.RegisterUserAsync(
@@ -31,18 +32,5 @@ public class AuthService(
             hashed);
     }
 
-    public async Task<UserAccount?> LoginAsync(string username, string password)
-    {
-        // Attempt lookup by username
-        var user = await authRepo.GetUserByUsernameAsync(username);
-
-        // the user was not found
-        if (user is null) return null;
-
-        // @todo handle expired passwords
-        var activeCred = await authRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
-
-        if (activeCred is null) return null;
-        return !passwordInfra.Verify(password, activeCred.Hash) ? null : user;
-    }
+ 
 }

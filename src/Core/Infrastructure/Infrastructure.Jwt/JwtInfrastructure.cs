@@ -6,7 +6,7 @@ using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredCla
 
 namespace Infrastructure.Jwt;
 
-public class JwtService : IJwtService
+public class JwtInfrastructure : ITokenInfrastructure
 {
     private readonly string? _secret = Environment.GetEnvironmentVariable(
         "JWT_SECRET"

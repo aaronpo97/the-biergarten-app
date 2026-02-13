@@ -6,8 +6,9 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
 using Microsoft.AspNetCore.Mvc;
-using Service.Core.Auth;
-using Service.Core.User;
+using Service.Auth.Auth;
+using Service.UserManagement.User;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,14 +53,20 @@ if (!builder.Environment.IsProduction())
     builder.Logging.AddDebug();
 }
 
-// Dependency Injection
+// Configure Dependency Injection -------------------------------------------------------------------------------------
+
 builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IPasswordInfra, Argon2Infrastructure>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IRegisterService, RegisterService>();
+
+builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
+builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
+
 
 var app = builder.Build();
 

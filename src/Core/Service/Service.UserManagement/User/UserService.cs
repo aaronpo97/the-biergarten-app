@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Infrastructure.Repository.UserAccount;
 
-namespace Service.Core.User;
+namespace Service.UserManagement.User;
 
 public class UserService(IUserAccountRepository repository) : IUserService
 {
