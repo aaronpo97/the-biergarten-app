@@ -8,6 +8,6 @@ BEGIN
     DECLARE @StateProvinceId UNIQUEIDENTIFIER;
     SELECT @StateProvinceId = StateProvinceID
     FROM dbo.StateProvince
-    WHERE ISO3616_2 = @StateProvinceCode;
+    WHERE ISO3166_2 = @StateProvinceCode;
     RETURN @StateProvinceId;
 END;
