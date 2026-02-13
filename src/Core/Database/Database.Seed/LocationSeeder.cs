@@ -277,7 +277,7 @@ internal class LocationSeeder : ISeeder
         );
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@CountryName", countryName);
-        command.Parameters.AddWithValue("@ISO3616_1", countryCode);
+        command.Parameters.AddWithValue("@ISO3166_1", countryCode);
 
         await command.ExecuteNonQueryAsync();
     }
@@ -298,7 +298,7 @@ internal class LocationSeeder : ISeeder
             "@StateProvinceName",
             stateProvinceName
         );
-        command.Parameters.AddWithValue("@ISO3616_2", stateProvinceCode);
+        command.Parameters.AddWithValue("@ISO3166_2", stateProvinceCode);
         command.Parameters.AddWithValue("@CountryCode", countryCode);
 
         await command.ExecuteNonQueryAsync();

@@ -41,7 +41,7 @@ CREATE TABLE dbo.UserAccount
 
     Timer ROWVERSION,
 
-    CONSTRAINT PK_UserAccount 
+    CONSTRAINT PK_UserAccount
         PRIMARY KEY (UserAccountID),
 
     CONSTRAINT AK_Username
@@ -125,16 +125,16 @@ CREATE TABLE UserVerification -- delete verification data when user account is d
     UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
     VerificationDateTime DATETIME NOT NULL
-        CONSTRAINT DF_VerificationDateTime 
+        CONSTRAINT DF_VerificationDateTime
         DEFAULT GETDATE(),
 
     Timer ROWVERSION,
 
-    CONSTRAINT PK_UserVerification 
+    CONSTRAINT PK_UserVerification
         PRIMARY KEY (UserVerificationID),
 
-    CONSTRAINT FK_UserVerification_UserAccount 
-        FOREIGN KEY (UserAccountID) 
+    CONSTRAINT FK_UserVerification_UserAccount
+        FOREIGN KEY (UserAccountID)
         REFERENCES UserAccount(UserAccountID)
         ON DELETE CASCADE,
 
@@ -169,7 +169,7 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
 
     RevokedAt DATETIME NULL,
 
-    Timer     ROWVERSION,
+    Timer ROWVERSION,
 
     CONSTRAINT PK_UserCredential
         PRIMARY KEY (UserCredentialID),
@@ -204,7 +204,7 @@ CREATE TABLE UserFollow
         PRIMARY KEY (UserFollowID),
 
     CONSTRAINT FK_UserFollow_UserAccount
-        FOREIGN KEY (UserAccountID) 
+        FOREIGN KEY (UserAccountID)
         REFERENCES UserAccount(UserAccountID),
 
     CONSTRAINT FK_UserFollow_UserAccountFollowing
@@ -215,7 +215,7 @@ CREATE TABLE UserFollow
         CHECK (UserAccountID != FollowingID)
 );
 
-CREATE NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID 
+CREATE NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
     ON UserFollow(UserAccountID, FollowingID);
 
 CREATE NONCLUSTERED INDEX IX_UserFollow_FollowingID_UserAccount
@@ -232,15 +232,15 @@ CREATE TABLE Country
 
     CountryName NVARCHAR(100) NOT NULL,
 
-    ISO3616_1 CHAR(2) NOT NULL,
+    ISO3166_1 CHAR(2) NOT NULL,
 
     Timer ROWVERSION,
 
     CONSTRAINT PK_Country
         PRIMARY KEY (CountryID),
 
-    CONSTRAINT AK_Country_ISO3616_1
-       UNIQUE (ISO3616_1)
+    CONSTRAINT AK_Country_ISO3166_1
+       UNIQUE (ISO3166_1)
 );
 
 ----------------------------------------------------------------------------
@@ -253,7 +253,7 @@ CREATE TABLE StateProvince
 
     StateProvinceName NVARCHAR(100) NOT NULL,
 
-    ISO3616_2 CHAR(6) NOT NULL,
+    ISO3166_2 CHAR(6) NOT NULL,
     -- eg 'US-CA' for California, 'CA-ON' for Ontario
 
     CountryID UNIQUEIDENTIFIER NOT NULL,
@@ -263,8 +263,8 @@ CREATE TABLE StateProvince
     CONSTRAINT PK_StateProvince
         PRIMARY KEY (StateProvinceID),
 
-    CONSTRAINT AK_StateProvince_ISO3616_2
-        UNIQUE (ISO3616_2),
+    CONSTRAINT AK_StateProvince_ISO3166_2
+        UNIQUE (ISO3166_2),
 
     CONSTRAINT FK_StateProvince_Country
         FOREIGN KEY (CountryID)
@@ -319,7 +319,7 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
 
     Timer ROWVERSION,
 
-    CONSTRAINT PK_BreweryPost 
+    CONSTRAINT PK_BreweryPost
         PRIMARY KEY (BreweryPostID),
 
     CONSTRAINT FK_BreweryPost_UserAccount
@@ -334,7 +334,8 @@ CREATE NONCLUSTERED INDEX IX_BreweryPost_PostedByID
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
-CREATE TABLE BreweryPostLocation (
+CREATE TABLE BreweryPostLocation
+(
     BreweryPostLocationID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostLocationID DEFAULT NEWID(),
 
@@ -458,7 +459,7 @@ CREATE TABLE BeerPost
 
     Timer ROWVERSION,
 
-    CONSTRAINT PK_BeerPost 
+    CONSTRAINT PK_BeerPost
         PRIMARY KEY (BeerPostID),
 
     CONSTRAINT FK_BeerPost_PostedBy
@@ -473,10 +474,10 @@ CREATE TABLE BeerPost
         FOREIGN KEY (BrewedByID)
         REFERENCES BreweryPost(BreweryPostID),
 
-    CONSTRAINT CHK_BeerPost_ABV 
+    CONSTRAINT CHK_BeerPost_ABV
         CHECK (ABV >= 0 AND ABV <= 67),
 
-    CONSTRAINT CHK_BeerPost_IBU 
+    CONSTRAINT CHK_BeerPost_IBU
         CHECK (IBU >= 0 AND IBU <= 120)
 );
 

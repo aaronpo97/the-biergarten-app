@@ -9,7 +9,7 @@ BEGIN
 
     SELECT @CountryId = CountryID
     FROM dbo.Country
-    WHERE ISO3616_1 = @CountryCode;
+    WHERE ISO3166_1 = @CountryCode;
 
     RETURN @CountryId;
 END;
