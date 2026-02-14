@@ -6,7 +6,6 @@ using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 using Moq;
-using Service.Auth.Auth;
 
 namespace Service.Auth.Tests;
 

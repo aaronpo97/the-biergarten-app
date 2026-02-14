@@ -33,9 +33,7 @@ public interface IAuthRepository
     /// </summary>
     /// <param name="email">Email address to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
-    Task<Domain.Entities.UserAccount?> GetUserByEmailAsync(
-        string email
-    );
+    Task<Domain.Entities.UserAccount?> GetUserByEmailAsync(string email);
 
     /// <summary>
     /// Retrieves a user account by username (typically used for login).
@@ -43,9 +41,7 @@ public interface IAuthRepository
     /// </summary>
     /// <param name="username">Username to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
-    Task<Domain.Entities.UserAccount?> GetUserByUsernameAsync(
-        string username
-    );
+    Task<Domain.Entities.UserAccount?> GetUserByUsernameAsync(string username);
 
     /// <summary>
     /// Retrieves the active (non-revoked) credential for a user account.
