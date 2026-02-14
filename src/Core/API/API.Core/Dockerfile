@@ -14,6 +14,7 @@ COPY ["Domain.Exceptions/Domain.Exceptions.csproj", "Domain.Exceptions/"]
 COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
 COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
+COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
 COPY ["Service/Service.Auth/Service.Auth.csproj", "Service/Service.Auth/"]
 COPY ["Service/Service.UserManagement/Service.UserManagement.csproj", "Service/Service.UserManagement/"]
 RUN dotnet restore "API/API.Core/API.Core.csproj"
