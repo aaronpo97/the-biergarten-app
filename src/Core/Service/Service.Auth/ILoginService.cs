@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
 using Domain.Entities;
 
-namespace Service.Auth.Auth;
+namespace Service.Auth;
 
 public interface ILoginService
 {

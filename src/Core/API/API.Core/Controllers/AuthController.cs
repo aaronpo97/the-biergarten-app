@@ -3,7 +3,7 @@ using API.Core.Contracts.Common;
 using Domain.Entities;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Mvc;
-using Service.Auth.Auth;
+using Service.Auth;
 
 namespace API.Core.Controllers
 {

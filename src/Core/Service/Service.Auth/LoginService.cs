@@ -1,10 +1,9 @@
-using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Exceptions;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 
-namespace Service.Auth.Auth;
+namespace Service.Auth;
 
 public class LoginService(
     IAuthRepository authRepo,
