@@ -1,5 +1,6 @@
 @* User Registration Email Template for A Sample App *@
 @using Infrastructure.Email.Templates
+@using Infrastructure.Email.Templates.Components
 
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
@@ -76,7 +77,7 @@
                                         </v:roundrect>
                                         <![endif]-->
                               <!--[if !mso]><!-->
-                              <a href="@ConfirmationLink"       target="_blank"               rel="noopener noreferrer"
+                              <a href="@ConfirmationLink" target="_blank" rel="noopener noreferrer"
                                  style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600; min-width: 170px; text-align: center; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
                                  Confirm Your Email
                               </a>
@@ -97,16 +98,7 @@
                </tr>
 
                <!-- Footer info -->
-               <tr>
-                  <td style="padding: 30px 40px 40px 40px; text-align: center; border-top: 1px solid #eeeeee;">
-                     <p style="margin: 0 0 10px 0; font-size: 13px; line-height: 20px; color: #999999;">
-                        If you didn't create this account, you can safely ignore this email.
-                     </p>
-                     <p style="margin: 0; font-size: 13px; line-height: 20px; color: #999999;">
-                        This is an automated message. Please do not reply as this inbox is unmonitored.
-                     </p>
-                  </td>
-               </tr>
+               <EmailFooter FooterText="Cheers, The Biergarten App Team" />
             </table>
             <!--[if mso]>
                 </td>
