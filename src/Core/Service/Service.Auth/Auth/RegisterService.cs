@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Infrastructure.Email;
 using Infrastructure.Email.Templates;
+using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 

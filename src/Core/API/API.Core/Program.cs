@@ -14,6 +14,7 @@ using Service.UserManagement.User;
 using API.Core.Contracts.Common;
 using Infrastructure.Email;
 using Infrastructure.Email.Templates;
+using Infrastructure.Email.Templates.Rendering;
 
 var builder = WebApplication.CreateBuilder(args);
 

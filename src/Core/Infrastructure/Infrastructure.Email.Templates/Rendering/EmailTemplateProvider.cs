@@ -1,8 +1,9 @@
+using Infrastructure.Email.Templates.Mail;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Email.Templates;
+namespace Infrastructure.Email.Templates.Rendering;
 
 /// <summary>
 /// Service for rendering Razor email templates to HTML using HtmlRenderer.
@@ -17,11 +18,11 @@ public class EmailTemplateProvider(IServiceProvider serviceProvider, ILoggerFact
    {
       var parameters = new Dictionary<string, object?>
         {
-            { nameof(UserRegisteredEmail.Username), username },
-            { nameof(UserRegisteredEmail.ConfirmationLink), confirmationLink }
+            { nameof(UserRegistration.Username), username },
+            { nameof(UserRegistration.ConfirmationLink), confirmationLink }
         };
 
-      return await RenderComponentAsync<UserRegisteredEmail>(parameters);
+      return await RenderComponentAsync<UserRegistration>(parameters);
    }
 
    /// <summary>
