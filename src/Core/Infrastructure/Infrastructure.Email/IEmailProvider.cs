@@ -21,5 +21,10 @@ public interface IEmailProvider
     /// <param name="subject">Email subject line</param>
     /// <param name="body">Email body (HTML or plain text)</param>
     /// <param name="isHtml">Whether the body is HTML (default: true)</param>
-    Task SendAsync(IEnumerable<string> to, string subject, string body, bool isHtml = true);
+    Task SendAsync(
+        IEnumerable<string> to,
+        string subject,
+        string body,
+        bool isHtml = true
+    );
 }
