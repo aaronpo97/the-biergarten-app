@@ -11,15 +11,18 @@ public class LoginServiceTest
 {
     private readonly Mock<IAuthRepository> _authRepoMock;
     private readonly Mock<IPasswordInfrastructure> _passwordInfraMock;
+    private readonly Mock<ITokenService> _tokenServiceMock;
     private readonly LoginService _loginService;
 
     public LoginServiceTest()
     {
         _authRepoMock = new Mock<IAuthRepository>();
         _passwordInfraMock = new Mock<IPasswordInfrastructure>();
+        _tokenServiceMock = new Mock<ITokenService>();
         _loginService = new LoginService(
             _authRepoMock.Object,
-            _passwordInfraMock.Object
+            _passwordInfraMock.Object,
+            _tokenServiceMock.Object
         );
     }
 
@@ -63,13 +66,26 @@ public class LoginServiceTest
             .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
 
+        _tokenServiceMock
+            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Returns("access-token");
+
+        _tokenServiceMock
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Returns("refresh-token");
+
         // Act
-        var result = await _loginService.LoginAsync(username, It.IsAny<string>());
+        var result = await _loginService.LoginAsync(
+            username,
+            It.IsAny<string>()
+        );
 
         // Assert
         result.Should().NotBeNull();
-        result.UserAccountId.Should().Be(userAccountId);
-        result.Username.Should().Be(username);
+        result.UserAccount.UserAccountId.Should().Be(userAccountId);
+        result.UserAccount.Username.Should().Be(username);
+        result.AccessToken.Should().Be("access-token");
+        result.RefreshToken.Should().Be("refresh-token");
 
         _authRepoMock.Verify(
             x => x.GetActiveCredentialByUserAccountIdAsync(userAccountId),

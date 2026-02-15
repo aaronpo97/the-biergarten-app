@@ -9,14 +9,19 @@ namespace Service.Auth;
 
 public class RegisterService(
     IAuthRepository authRepo,
-    IPasswordInfrastructure passwordInfrastructure
+    IPasswordInfrastructure passwordInfrastructure,
+    ITokenService tokenService
 ) : IRegisterService
 {
     private async Task ValidateUserDoesNotExist(UserAccount userAccount)
     {
         // Check if user already exists
-        var existingUsername = await authRepo.GetUserByUsernameAsync(userAccount.Username);
-        var existingEmail = await authRepo.GetUserByEmailAsync(userAccount.Email);
+        var existingUsername = await authRepo.GetUserByUsernameAsync(
+            userAccount.Username
+        );
+        var existingEmail = await authRepo.GetUserByEmailAsync(
+            userAccount.Email
+        );
 
         if (existingUsername != null || existingEmail != null)
         {
@@ -24,7 +29,10 @@ public class RegisterService(
         }
     }
 
-    public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
+    public async Task<AuthServiceReturn> RegisterAsync(
+        UserAccount userAccount,
+        string password
+    )
     {
         await ValidateUserDoesNotExist(userAccount);
         // password hashing
@@ -37,8 +45,12 @@ public class RegisterService(
             userAccount.LastName,
             userAccount.Email,
             userAccount.DateOfBirth,
-            hashed);
+            hashed
+        );
 
-        return createdUser;
+        var accessToken = tokenService.GenerateAccessToken(createdUser);
+        var refreshToken = tokenService.GenerateRefreshToken(createdUser);
+
+        return new AuthServiceReturn(createdUser, refreshToken, accessToken);
     }
 }
