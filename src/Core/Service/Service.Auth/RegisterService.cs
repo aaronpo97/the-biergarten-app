@@ -9,12 +9,10 @@ namespace Service.Auth;
 
 public class RegisterService(
     IAuthRepository authRepo,
-    IPasswordInfrastructure passwordInfrastructure,
-    IEmailProvider emailProvider,
-    IEmailTemplateProvider emailTemplateProvider
+    IPasswordInfrastructure passwordInfrastructure
 ) : IRegisterService
 {
-    public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
+    private async Task ValidateUserDoesNotExist(UserAccount userAccount)
     {
         // Check if user already exists
         var existingUsername = await authRepo.GetUserByUsernameAsync(userAccount.Username);
@@ -24,8 +22,11 @@ public class RegisterService(
         {
             throw new ConflictException("Username or email already exists");
         }
+    }
 
-
+    public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
+    {
+        await ValidateUserDoesNotExist(userAccount);
         // password hashing
         var hashed = passwordInfrastructure.Hash(password);
 
@@ -37,24 +38,6 @@ public class RegisterService(
             userAccount.Email,
             userAccount.DateOfBirth,
             hashed);
-
-
-        // Generate confirmation link (TODO: implement proper token-based confirmation)
-        var confirmationLink = $"https://thebiergarten.app/confirm?email={Uri.EscapeDataString(createdUser.Email)}";
-
-        // Render email template
-        var emailHtml = await emailTemplateProvider.RenderUserRegisteredEmailAsync(
-            createdUser.FirstName,
-            confirmationLink
-        );
-
-        // Send welcome email with rendered template
-        await emailProvider.SendAsync(
-            createdUser.Email,
-            "Welcome to The Biergarten App!",
-            emailHtml,
-            isHtml: true
-        );
 
         return createdUser;
     }
