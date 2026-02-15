@@ -9,12 +9,12 @@ using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Service.Auth.Auth;
 using Service.UserManagement.User;
 using API.Core.Contracts.Common;
 using Infrastructure.Email;
 using Infrastructure.Email.Templates;
 using Infrastructure.Email.Templates.Rendering;
+using Service.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

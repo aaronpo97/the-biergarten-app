@@ -88,9 +88,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         AddParameter(command, "@UserAccountId", userAccountId);
 
         await using var reader = await command.ExecuteReaderAsync();
-        return await reader.ReadAsync()
-            ? MapToCredentialEntity(reader)
-            : null;
+        return await reader.ReadAsync() ? MapToCredentialEntity(reader) : null;
     }
 
     public async Task RotateCredentialAsync(
@@ -118,9 +116,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         return new Domain.Entities.UserAccount
         {
-            UserAccountId = reader.GetGuid(
-                reader.GetOrdinal("UserAccountId")
-            ),
+            UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
             Username = reader.GetString(reader.GetOrdinal("Username")),
             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
             LastName = reader.GetString(reader.GetOrdinal("LastName")),
@@ -129,9 +125,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt"))
                 ? null
                 : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-            DateOfBirth = reader.GetDateTime(
-                reader.GetOrdinal("DateOfBirth")
-            ),
+            DateOfBirth = reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
             Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
                 ? null
                 : (byte[])reader["Timer"],
@@ -148,9 +142,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             UserCredentialId = reader.GetGuid(
                 reader.GetOrdinal("UserCredentialId")
             ),
-            UserAccountId = reader.GetGuid(
-                reader.GetOrdinal("UserAccountId")
-            ),
+            UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
             Hash = reader.GetString(reader.GetOrdinal("Hash")),
             CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
         };

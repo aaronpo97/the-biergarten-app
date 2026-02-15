@@ -8,9 +8,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     : Repository<Domain.Entities.UserAccount>(connectionFactory),
         IUserAccountRepository
 {
-    public async Task<Domain.Entities.UserAccount?> GetByIdAsync(
-        Guid id
-    )
+    public async Task<Domain.Entities.UserAccount?> GetByIdAsync(Guid id)
     {
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();
@@ -23,9 +21,10 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
         return await reader.ReadAsync() ? MapToEntity(reader) : null;
     }
 
-    public async Task<
-        IEnumerable<Domain.Entities.UserAccount>
-    > GetAllAsync(int? limit, int? offset)
+    public async Task<IEnumerable<Domain.Entities.UserAccount>> GetAllAsync(
+        int? limit,
+        int? offset
+    )
     {
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();
@@ -49,9 +48,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
         return users;
     }
 
-    public async Task UpdateAsync(
-        Domain.Entities.UserAccount userAccount
-    )
+    public async Task UpdateAsync(Domain.Entities.UserAccount userAccount)
     {
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();
@@ -115,9 +112,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     {
         return new Domain.Entities.UserAccount
         {
-            UserAccountId = reader.GetGuid(
-                reader.GetOrdinal("UserAccountId")
-            ),
+            UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
             Username = reader.GetString(reader.GetOrdinal("Username")),
             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
             LastName = reader.GetString(reader.GetOrdinal("LastName")),
@@ -126,9 +121,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
             UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt"))
                 ? null
                 : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-            DateOfBirth = reader.GetDateTime(
-                reader.GetOrdinal("DateOfBirth")
-            ),
+            DateOfBirth = reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
             Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
                 ? null
                 : (byte[])reader["Timer"],

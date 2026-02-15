@@ -11,6 +11,6 @@ WORKDIR "/src/Infrastructure/Infrastructure.Repository.Tests"
 RUN dotnet build "./Infrastructure.Repository.Tests.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS final
-RUN mkdir -p /app/test-results
+RUN mkdir -p /app/test-results/repository-tests
 WORKDIR /src/Infrastructure/Infrastructure.Repository.Tests
-ENTRYPOINT ["dotnet", "test", "./Infrastructure.Repository.Tests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/app/test-results/repository-tests.trx"]
+ENTRYPOINT ["dotnet", "test", "./Infrastructure.Repository.Tests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/app/test-results/repository-tests/results.trx"]

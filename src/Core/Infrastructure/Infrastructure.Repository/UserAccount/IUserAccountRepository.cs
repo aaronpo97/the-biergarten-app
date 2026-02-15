@@ -9,8 +9,6 @@ public interface IUserAccountRepository
     );
     Task UpdateAsync(Domain.Entities.UserAccount userAccount);
     Task DeleteAsync(Guid id);
-    Task<Domain.Entities.UserAccount?> GetByUsernameAsync(
-        string username
-    );
+    Task<Domain.Entities.UserAccount?> GetByUsernameAsync(string username);
     Task<Domain.Entities.UserAccount?> GetByEmailAsync(string email);
 }
