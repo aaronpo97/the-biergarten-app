@@ -32,9 +32,13 @@ namespace API.Core.Controllers
             var response = new ResponseBody<RegistrationPayload>
             {
                 Message = "User registered successfully.",
-                Payload = new RegistrationPayload(rtn.UserAccount.UserAccountId, rtn.UserAccount.Username,
+                Payload = new RegistrationPayload(
+                    rtn.UserAccount.UserAccountId,
+                    rtn.UserAccount.Username,
                     rtn.RefreshToken,
-                    rtn.AccessToken, rtn.EmailSent),
+                    rtn.AccessToken,
+                    rtn.EmailSent
+                ),
             };
             return Created("/", response);
         }

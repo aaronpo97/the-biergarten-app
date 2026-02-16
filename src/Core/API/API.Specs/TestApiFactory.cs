@@ -18,8 +18,9 @@ namespace API.Specs
             builder.ConfigureServices(services =>
             {
                 // Replace the real email provider with mock for testing
-                var emailProviderDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(IEmailProvider));
+                var emailProviderDescriptor = services.SingleOrDefault(d =>
+                    d.ServiceType == typeof(IEmailProvider)
+                );
 
                 if (emailProviderDescriptor != null)
                 {
@@ -29,8 +30,9 @@ namespace API.Specs
                 services.AddScoped<IEmailProvider, MockEmailProvider>();
 
                 // Replace the real email service with mock for testing
-                var emailServiceDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(IEmailService));
+                var emailServiceDescriptor = services.SingleOrDefault(d =>
+                    d.ServiceType == typeof(IEmailService)
+                );
 
                 if (emailServiceDescriptor != null)
                 {

@@ -54,11 +54,13 @@ public class RegisterService(
         var accessToken = tokenService.GenerateAccessToken(createdUser);
         var refreshToken = tokenService.GenerateRefreshToken(createdUser);
 
-        if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+        if (
+            string.IsNullOrEmpty(accessToken)
+            || string.IsNullOrEmpty(refreshToken)
+        )
         {
             return new RegisterServiceReturn(createdUser);
         }
-
 
         bool emailSent = false;
         try
@@ -76,7 +78,11 @@ public class RegisterService(
             // ignored
         }
 
-
-        return new RegisterServiceReturn(createdUser, accessToken, refreshToken, emailSent);
+        return new RegisterServiceReturn(
+            createdUser,
+            accessToken,
+            refreshToken,
+            emailSent
+        );
     }
 }

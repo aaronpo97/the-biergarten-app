@@ -4,24 +4,28 @@ namespace Service.Auth;
 
 public record RegisterServiceReturn
 {
-    public bool IsAuthenticated { get; init; }
-    public bool EmailSent { get; init; }
+    public bool IsAuthenticated { get; init; } = false;
+    public bool EmailSent { get; init; } = false;
     public UserAccount UserAccount { get; init; }
     public string AccessToken { get; init; } = string.Empty;
     public string RefreshToken { get; init; } = string.Empty;
 
-    public RegisterServiceReturn(UserAccount userAccount, string accessToken, string refreshToken, bool emailSent)
+    public RegisterServiceReturn(
+        UserAccount userAccount,
+        string accessToken,
+        string refreshToken,
+        bool emailSent
+    )
     {
         IsAuthenticated = true;
+        EmailSent = emailSent;
         UserAccount = userAccount;
         AccessToken = accessToken;
         RefreshToken = refreshToken;
-        EmailSent = true;
     }
 
     public RegisterServiceReturn(UserAccount userAccount)
     {
-        IsAuthenticated = false;
         UserAccount = userAccount;
     }
 }

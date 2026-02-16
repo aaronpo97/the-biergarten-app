@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Reqnroll;
-using FluentAssertions;
 using API.Specs;
+using FluentAssertions;
+using Reqnroll;
 
 namespace API.Specs.Steps;
 
@@ -21,7 +21,12 @@ public class AuthSteps(ScenarioContext scenario)
             return client;
         }
 
-        var factory = scenario.TryGetValue<TestApiFactory>(FactoryKey, out var f) ? f : new TestApiFactory();
+        var factory = scenario.TryGetValue<TestApiFactory>(
+            FactoryKey,
+            out var f
+        )
+            ? f
+            : new TestApiFactory();
         scenario[FactoryKey] = factory;
 
         client = factory.CreateClient();
@@ -45,15 +50,25 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitALoginRequestWithAUsernameAndPassword()
     {
         var client = GetClient();
-        var (username, password) = scenario.TryGetValue<(string username, string password)>(TestUserKey, out var user)
+        var (username, password) = scenario.TryGetValue<(
+            string username,
+            string password
+        )>(TestUserKey, out var user)
             ? user
             : ("test.user", "password");
 
         var body = JsonSerializer.Serialize(new { username, password });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -69,9 +84,16 @@ public class AuthSteps(ScenarioContext scenario)
         var client = GetClient();
         var body = JsonSerializer.Serialize(new { password = "test" });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -87,9 +109,16 @@ public class AuthSteps(ScenarioContext scenario)
         var client = GetClient();
         var body = JsonSerializer.Serialize(new { username = "test" });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -103,9 +132,16 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitALoginRequestWithBothUsernameAndPasswordMissing()
     {
         var client = GetClient();
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                "{}",
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -118,37 +154,55 @@ public class AuthSteps(ScenarioContext scenario)
     [Then("the response JSON should have an access token")]
     public void ThenTheResponseJsonShouldHaveAnAccessToken()
     {
-        scenario.TryGetValue<HttpResponseMessage>(ResponseKey, out var response).Should().BeTrue();
-        scenario.TryGetValue<string>(ResponseBodyKey, out var responseBody).Should().BeTrue();
+        scenario
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .Should()
+            .BeTrue();
+        scenario
+            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .Should()
+            .BeTrue();
 
         var doc = JsonDocument.Parse(responseBody!);
         var root = doc.RootElement;
         JsonElement tokenElem = default;
         var hasToken = false;
 
-
-        if (root.TryGetProperty("payload", out var payloadElem) && payloadElem.ValueKind == JsonValueKind.Object)
+        if (
+            root.TryGetProperty("payload", out var payloadElem)
+            && payloadElem.ValueKind == JsonValueKind.Object
+        )
         {
-            hasToken = payloadElem.TryGetProperty("accessToken", out tokenElem)
-                       || payloadElem.TryGetProperty("AccessToken", out tokenElem);
+            hasToken =
+                payloadElem.TryGetProperty("accessToken", out tokenElem)
+                || payloadElem.TryGetProperty("AccessToken", out tokenElem);
         }
 
-
-        hasToken.Should().BeTrue("Expected an access token either at the root or inside 'payload'");
+        hasToken
+            .Should()
+            .BeTrue(
+                "Expected an access token either at the root or inside 'payload'"
+            );
 
         var token = tokenElem.GetString();
         token.Should().NotBeNullOrEmpty();
     }
-
 
     [When("I submit a login request using a GET request")]
     public async Task WhenISubmitALoginRequestUsingAgetRequest()
     {
         var client = GetClient();
         // testing GET
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                "{}",
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -184,14 +238,21 @@ public class AuthSteps(ScenarioContext scenario)
             lastName,
             email,
             dateOfBirth,
-            password
+            password,
         };
 
         var body = JsonSerializer.Serialize(registrationData);
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/register")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/register"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -205,9 +266,16 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARegistrationRequestUsingAGetRequest()
     {
         var client = GetClient();
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/auth/register")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/auth/register"
+        )
         {
-            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                "{}",
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
