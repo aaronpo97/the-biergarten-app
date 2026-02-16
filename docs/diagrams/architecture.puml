@@ -1,0 +1,75 @@
+@startuml architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title The Biergarten App - Layered Architecture
+
+package "API Layer" #E3F2FD {
+  [API.Core\nASP.NET Core Web API] as API
+  note right of API
+    - Controllers (Auth, User)
+    - Swagger/OpenAPI
+    - Middleware
+    - Health Checks
+  end note
+}
+
+package "Service Layer" #F3E5F5 {
+  [Service.Auth] as AuthSvc
+  [Service.UserManagement] as UserSvc
+  note right of AuthSvc
+    - Business Logic
+    - Validation
+    - Orchestration
+  end note
+}
+
+package "Infrastructure Layer" #FFF3E0 {
+  [Infrastructure.Repository] as Repo
+  [Infrastructure.Jwt] as JWT
+  [Infrastructure.PasswordHashing] as PwdHash
+  [Infrastructure.Email] as Email
+}
+
+package "Domain Layer" #E8F5E9 {
+  [Domain.Entities] as Domain
+  note right of Domain
+    - UserAccount
+    - UserCredential
+    - UserVerification
+  end note
+}
+
+database "SQL Server" {
+  [Stored Procedures] as SP
+  [Tables] as Tables
+}
+
+' Relationships
+API --> AuthSvc
+API --> UserSvc
+
+AuthSvc --> Repo
+AuthSvc --> JWT
+AuthSvc --> PwdHash
+AuthSvc --> Email
+
+UserSvc --> Repo
+
+Repo --> SP
+Repo --> Domain
+SP --> Tables
+
+AuthSvc --> Domain
+UserSvc --> Domain
+
+' Notes
+note left of Repo
+  SQL-first approach
+  All queries via
+  stored procedures
+end note
+
+@enduml

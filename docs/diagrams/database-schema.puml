@@ -1,0 +1,104 @@
+@startuml database-schema
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam linetype ortho
+
+title Key Database Schema - User & Authentication
+
+entity "UserAccount" as User {
+  * UserAccountId: INT <<PK>>
+  --
+  * Username: NVARCHAR(30) <<UNIQUE>>
+  * Email: NVARCHAR(255) <<UNIQUE>>
+  * FirstName: NVARCHAR(50)
+  * LastName: NVARCHAR(50)
+  Bio: NVARCHAR(500)
+  CreatedAt: DATETIME2
+  UpdatedAt: DATETIME2
+  LastLoginAt: DATETIME2
+}
+
+entity "UserCredential" as Cred {
+  * UserCredentialId: INT <<PK>>
+  --
+  * UserAccountId: INT <<FK>>
+  * PasswordHash: VARBINARY(32)
+  * PasswordSalt: VARBINARY(16)
+  CredentialRotatedAt: DATETIME2
+  CredentialExpiresAt: DATETIME2
+  CredentialRevokedAt: DATETIME2
+  * IsActive: BIT
+  CreatedAt: DATETIME2
+}
+
+entity "UserVerification" as Verify {
+  * UserVerificationId: INT <<PK>>
+  --
+  * UserAccountId: INT <<FK>>
+  * IsVerified: BIT
+  VerifiedAt: DATETIME2
+  VerificationToken: NVARCHAR(255)
+  TokenExpiresAt: DATETIME2
+}
+
+entity "UserAvatar" as Avatar {
+  * UserAvatarId: INT <<PK>>
+  --
+  * UserAccountId: INT <<FK>>
+  PhotoId: INT <<FK>>
+  * IsActive: BIT
+  CreatedAt: DATETIME2
+}
+
+entity "UserFollow" as Follow {
+  * UserFollowId: INT <<PK>>
+  --
+  * FollowerUserId: INT <<FK>>
+  * FollowedUserId: INT <<FK>>
+  CreatedAt: DATETIME2
+}
+
+entity "Photo" as Photo {
+  * PhotoId: INT <<PK>>
+  --
+  * Url: NVARCHAR(500)
+  * CloudinaryPublicId: NVARCHAR(255)
+  Width: INT
+  Height: INT
+  Format: NVARCHAR(10)
+  CreatedAt: DATETIME2
+}
+
+' Relationships
+User ||--o{ Cred : "has"
+User ||--o| Verify : "has"
+User ||--o{ Avatar : "has"
+User ||--o{ Follow : "follows"
+User ||--o{ Follow : "followed by"
+Avatar }o--|| Photo : "refers to"
+
+note right of Cred
+  Password hashing:
+  - Algorithm: Argon2id
+  - Memory: 64MB
+  - Iterations: 4
+  - Salt: 128-bit
+  - Hash: 256-bit
+end note
+
+note right of Verify
+  Account verification
+  via email token
+  with expiry
+end note
+
+note bottom of User
+  Core stored procedures:
+  - USP_RegisterUser
+  - USP_GetUserAccountByUsername
+  - USP_RotateUserCredential
+  - USP_UpdateUserAccount
+end note
+
+@enduml

@@ -1,0 +1,298 @@
+@startuml authentication-flow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 200
+
+title User Authentication Flow - Expanded
+
+actor User
+participant "API\nController" as API
+box "Service Layer" #LightBlue
+participant "RegisterService" as RegSvc
+participant "LoginService" as LoginSvc
+participant "TokenService" as TokenSvc
+participant "EmailService" as EmailSvc
+end box
+box "Infrastructure Layer" #LightGreen
+participant "Argon2\nInfrastructure" as Argon2
+participant "JWT\nInfrastructure" as JWT
+participant "Email\nProvider" as SMTP
+participant "Template\nProvider" as Template
+end box
+box "Repository Layer" #LightYellow
+participant "AuthRepository" as AuthRepo
+participant "UserAccount\nRepository" as UserRepo
+end box
+database "SQL Server\nStored Procedures" as DB
+
+== Registration Flow ==
+
+User -> API: POST /api/auth/register\n{username, firstName, lastName,\nemail, dateOfBirth, password}
+activate API
+
+note right of API
+  FluentValidation runs:
+  - Username: 3-64 chars, alphanumeric + [._-]
+  - Email: valid format, max 128 chars
+  - Password: min 8 chars, uppercase,\n    lowercase, number, special char
+  - DateOfBirth: must be 19+ years old
+end note
+
+API -> API: Validate request\n(FluentValidation)
+
+alt Validation fails
+  API -> User: 400 Bad Request\n{errors: {...}}
+else Validation succeeds
+  API -> RegSvc: RegisterAsync(userAccount, password)
+  activate RegSvc
+
+  RegSvc -> AuthRepo: GetUserByUsernameAsync(username)
+  activate AuthRepo
+  AuthRepo -> DB: EXEC usp_GetUserAccountByUsername
+  activate DB
+  DB --> AuthRepo: null (user doesn't exist)
+  deactivate DB
+  deactivate AuthRepo
+
+  RegSvc -> AuthRepo: GetUserByEmailAsync(email)
+  activate AuthRepo
+  AuthRepo -> DB: EXEC usp_GetUserAccountByEmail
+  activate DB
+  DB --> AuthRepo: null (email doesn't exist)
+  deactivate DB
+  deactivate AuthRepo
+
+  alt User/Email already exists
+    RegSvc -> API: throw ConflictException
+    API -> User: 409 Conflict\n"Username or email already exists"
+  else User doesn't exist
+
+    RegSvc -> Argon2: Hash(password)
+    activate Argon2
+    note right of Argon2
+      Argon2id parameters:
+      - Salt: 16 bytes (128-bit)
+      - Memory: 64MB
+      - Iterations: 4
+      - Parallelism: CPU count
+      - Hash output: 32 bytes
+    end note
+    Argon2 -> Argon2: Generate random salt\n(16 bytes)
+    Argon2 -> Argon2: Hash password with\nArgon2id algorithm
+    Argon2 --> RegSvc: "base64(salt):base64(hash)"
+    deactivate Argon2
+
+    RegSvc -> AuthRepo: RegisterUserAsync(\n  username, firstName, lastName,\n  email, dateOfBirth, hash)
+    activate AuthRepo
+
+    AuthRepo -> DB: EXEC USP_RegisterUser
+    activate DB
+    note right of DB
+      Transaction begins:
+      1. INSERT UserAccount
+      2. INSERT UserCredential
+         (with hashed password)
+      Transaction commits
+    end note
+    DB -> DB: BEGIN TRANSACTION
+    DB -> DB: INSERT INTO UserAccount\n(Username, FirstName, LastName,\nEmail, DateOfBirth)
+    DB -> DB: OUTPUT INSERTED.UserAccountID
+    DB -> DB: INSERT INTO UserCredential\n(UserAccountId, Hash)
+    DB -> DB: COMMIT TRANSACTION
+    DB --> AuthRepo: UserAccountId (GUID)
+    deactivate DB
+
+    AuthRepo --> RegSvc: UserAccount entity
+    deactivate AuthRepo
+
+    RegSvc -> TokenSvc: GenerateAccessToken(userAccount)
+    activate TokenSvc
+    TokenSvc -> JWT: GenerateJwt(userId, username, expiry)
+    activate JWT
+    note right of JWT
+      JWT Configuration:
+      - Algorithm: HS256
+      - Expires: 1 hour
+      - Claims:
+        * sub: userId
+        * unique_name: username
+        * jti: unique token ID
+    end note
+    JWT -> JWT: Create JWT with claims
+    JWT -> JWT: Sign with secret key
+    JWT --> TokenSvc: Access Token
+    deactivate JWT
+    TokenSvc --> RegSvc: Access Token
+    deactivate TokenSvc
+
+    RegSvc -> TokenSvc: GenerateRefreshToken(userAccount)
+    activate TokenSvc
+    TokenSvc -> JWT: GenerateJwt(userId, username, expiry)
+    activate JWT
+    note right of JWT
+      Refresh Token:
+      - Expires: 21 days
+      - Same structure as access token
+    end note
+    JWT --> TokenSvc: Refresh Token
+    deactivate JWT
+    TokenSvc --> RegSvc: Refresh Token
+    deactivate TokenSvc
+
+    RegSvc -> EmailSvc: SendRegistrationEmailAsync(\n  createdUser, confirmationToken)
+    activate EmailSvc
+
+    EmailSvc -> Template: RenderUserRegisteredEmailAsync(\n  firstName, confirmationLink)
+    activate Template
+    note right of Template
+      Razor Component:
+      - Header with branding
+      - Welcome message
+      - Confirmation button
+      - Footer
+    end note
+    Template -> Template: Render Razor component\nto HTML
+    Template --> EmailSvc: HTML email content
+    deactivate Template
+
+    EmailSvc -> SMTP: SendAsync(email, subject, body)
+    activate SMTP
+    note right of SMTP
+      SMTP Configuration:
+      - Host: from env (SMTP_HOST)
+      - Port: from env (SMTP_PORT)
+      - TLS: StartTLS
+      - Auth: username/password
+    end note
+    SMTP -> SMTP: Create MIME message
+    SMTP -> SMTP: Connect to SMTP server
+    SMTP -> SMTP: Authenticate
+    SMTP -> SMTP: Send email
+    SMTP -> SMTP: Disconnect
+    SMTP --> EmailSvc: Success / Failure
+    deactivate SMTP
+
+    alt Email sent successfully
+      EmailSvc --> RegSvc: emailSent = true
+    else Email failed
+      EmailSvc --> RegSvc: emailSent = false\n(error suppressed)
+    end
+    deactivate EmailSvc
+
+    RegSvc --> API: RegisterServiceReturn(\n  userAccount, accessToken,\n  refreshToken, emailSent)
+    deactivate RegSvc
+
+    API -> API: Create response body
+    API -> User: 201 Created\n{\n  message: "User registered successfully",\n  payload: {\n    userAccountId, username,\n    accessToken, refreshToken,\n    confirmationEmailSent\n  }\n}
+  end
+end
+deactivate API
+
+== Login Flow ==
+
+User -> API: POST /api/auth/login\n{username, password}
+activate API
+
+API -> API: Validate request\n(FluentValidation)
+
+alt Validation fails
+  API -> User: 400 Bad Request\n{errors: {...}}
+else Validation succeeds
+
+  API -> LoginSvc: LoginAsync(username, password)
+  activate LoginSvc
+
+  LoginSvc -> AuthRepo: GetUserByUsernameAsync(username)
+  activate AuthRepo
+  AuthRepo -> DB: EXEC usp_GetUserAccountByUsername
+  activate DB
+  DB -> DB: SELECT FROM UserAccount\nWHERE Username = @Username
+  DB --> AuthRepo: UserAccount entity
+  deactivate DB
+  deactivate AuthRepo
+
+  alt User not found
+    LoginSvc -> API: throw UnauthorizedException\n"Invalid username or password"
+    API -> User: 401 Unauthorized
+  else User found
+
+    LoginSvc -> AuthRepo: GetActiveCredentialByUserAccountIdAsync(userId)
+    activate AuthRepo
+    AuthRepo -> DB: EXEC USP_GetActiveUserCredentialByUserAccountId
+    activate DB
+    note right of DB
+      SELECT FROM UserCredential
+      WHERE UserAccountId = @UserAccountId
+        AND IsRevoked = 0
+    end note
+    DB --> AuthRepo: UserCredential entity
+    deactivate DB
+    deactivate AuthRepo
+
+    alt No active credential
+      LoginSvc -> API: throw UnauthorizedException
+      API -> User: 401 Unauthorized
+    else Active credential found
+
+      LoginSvc -> Argon2: Verify(password, storedHash)
+      activate Argon2
+      note right of Argon2
+        1. Split stored hash: "salt:hash"
+        2. Extract salt
+        3. Hash provided password\n   with same salt
+        4. Constant-time comparison
+      end note
+      Argon2 -> Argon2: Parse salt from stored hash
+      Argon2 -> Argon2: Hash provided password\nwith extracted salt
+      Argon2 -> Argon2: FixedTimeEquals(\n  computed, stored)
+      Argon2 --> LoginSvc: true/false
+      deactivate Argon2
+
+      alt Password invalid
+        LoginSvc -> API: throw UnauthorizedException
+        API -> User: 401 Unauthorized
+      else Password valid
+
+        LoginSvc -> TokenSvc: GenerateAccessToken(user)
+        activate TokenSvc
+        TokenSvc -> JWT: GenerateJwt(...)
+        activate JWT
+        JWT --> TokenSvc: Access Token
+        deactivate JWT
+        TokenSvc --> LoginSvc: Access Token
+        deactivate TokenSvc
+
+        LoginSvc -> TokenSvc: GenerateRefreshToken(user)
+        activate TokenSvc
+        TokenSvc -> JWT: GenerateJwt(...)
+        activate JWT
+        JWT --> TokenSvc: Refresh Token
+        deactivate JWT
+        TokenSvc --> LoginSvc: Refresh Token
+        deactivate TokenSvc
+
+        LoginSvc --> API: LoginServiceReturn(\n  userAccount, accessToken,\n  refreshToken)
+        deactivate LoginSvc
+
+        API -> User: 200 OK\n{\n  message: "Logged in successfully",\n  payload: {\n    userAccountId, username,\n    accessToken, refreshToken\n  }\n}
+      end
+    end
+  end
+end
+deactivate API
+
+== Error Handling (Global Exception Filter) ==
+
+note over API
+  GlobalExceptionFilter catches:
+  - ValidationException → 400 Bad Request
+  - ConflictException → 409 Conflict
+  - NotFoundException → 404 Not Found
+  - UnauthorizedException → 401 Unauthorized
+  - ForbiddenException → 403 Forbidden
+  - All others → 500 Internal Server Error
+end note
+
+@enduml
