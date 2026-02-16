@@ -4,6 +4,7 @@ using FluentAssertions;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 using Moq;
+using Service.Emails;
 
 namespace Service.Auth.Tests;
 
@@ -12,6 +13,7 @@ public class RegisterServiceTest
     private readonly Mock<IAuthRepository> _authRepoMock;
     private readonly Mock<IPasswordInfrastructure> _passwordInfraMock;
     private readonly Mock<ITokenService> _tokenServiceMock;
+    private readonly Mock<IEmailService> _emailServiceMock; // todo handle email related test cases here
     private readonly RegisterService _registerService;
 
     public RegisterServiceTest()
@@ -19,11 +21,14 @@ public class RegisterServiceTest
         _authRepoMock = new Mock<IAuthRepository>();
         _passwordInfraMock = new Mock<IPasswordInfrastructure>();
         _tokenServiceMock = new Mock<ITokenService>();
+        _emailServiceMock = new Mock<IEmailService>();
+
 
         _registerService = new RegisterService(
             _authRepoMock.Object,
             _passwordInfraMock.Object,
-            _tokenServiceMock.Object
+            _tokenServiceMock.Object,
+            _emailServiceMock.Object
         );
     }
 
@@ -92,6 +97,7 @@ public class RegisterServiceTest
             .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
             .Returns("refresh-token");
 
+
         // Act
         var result = await _registerService.RegisterAsync(
             userAccount,
@@ -128,6 +134,8 @@ public class RegisterServiceTest
                 ),
             Times.Once
         );
+        _emailServiceMock.Verify(x => x.SendRegistrationEmailAsync(It.IsAny<UserAccount>(), It.IsAny<string>()),
+            Times.Once);
     }
 
     [Fact]

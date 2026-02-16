@@ -4,13 +4,15 @@ using Infrastructure.Email;
 using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
+using Service.Emails;
 
 namespace Service.Auth;
 
 public class RegisterService(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,
-    ITokenService tokenService
+    ITokenService tokenService,
+    IEmailService emailService
 ) : IRegisterService
 {
     private async Task ValidateUserDoesNotExist(UserAccount userAccount)
@@ -50,6 +52,9 @@ public class RegisterService(
 
         var accessToken = tokenService.GenerateAccessToken(createdUser);
         var refreshToken = tokenService.GenerateRefreshToken(createdUser);
+
+        // send confirmation email
+        await emailService.SendRegistrationEmailAsync(createdUser, "some-confirmation-token");
 
         return new AuthServiceReturn(createdUser, refreshToken, accessToken);
     }

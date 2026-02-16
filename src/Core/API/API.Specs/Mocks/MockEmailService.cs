@@ -1,37 +1,18 @@
-using Infrastructure.Email;
+using Domain.Entities;
+using Service.Emails;
 
 namespace API.Specs.Mocks;
 
-/// <summary>
-/// Mock email service for testing that doesn't actually send emails.
-/// Tracks sent emails for verification in tests if needed.
-/// </summary>
-public class MockEmailProvider : IEmailProvider
+public class MockEmailService : IEmailService
 {
-   public List<SentEmail> SentEmails { get; } = new();
+   public List<RegistrationEmail> SentRegistrationEmails { get; } = new();
 
-   public Task SendAsync(string to, string subject, string body, bool isHtml = true)
+   public Task SendRegistrationEmailAsync(UserAccount createdUser, string confirmationToken)
    {
-      SentEmails.Add(new SentEmail
+      SentRegistrationEmails.Add(new RegistrationEmail
       {
-         To = [to],
-         Subject = subject,
-         Body = body,
-         IsHtml = isHtml,
-         SentAt = DateTime.UtcNow
-      });
-
-      return Task.CompletedTask;
-   }
-
-   public Task SendAsync(IEnumerable<string> to, string subject, string body, bool isHtml = true)
-   {
-      SentEmails.Add(new SentEmail
-      {
-         To = to.ToList(),
-         Subject = subject,
-         Body = body,
-         IsHtml = isHtml,
+         UserAccount = createdUser,
+         ConfirmationToken = confirmationToken,
          SentAt = DateTime.UtcNow
       });
 
@@ -40,15 +21,13 @@ public class MockEmailProvider : IEmailProvider
 
    public void Clear()
    {
-      SentEmails.Clear();
+      SentRegistrationEmails.Clear();
    }
 
-   public class SentEmail
+   public class RegistrationEmail
    {
-      public List<string> To { get; init; } = new();
-      public string Subject { get; init; } = string.Empty;
-      public string Body { get; init; } = string.Empty;
-      public bool IsHtml { get; init; }
+      public UserAccount UserAccount { get; init; } = null!;
+      public string ConfirmationToken { get; init; } = string.Empty;
       public DateTime SentAt { get; init; }
    }
 }
