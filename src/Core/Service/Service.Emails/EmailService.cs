@@ -6,21 +6,30 @@ namespace Service.Emails;
 
 public interface IEmailService
 {
-    public Task SendRegistrationEmailAsync(UserAccount createdUser, string confirmationToken);
+    public Task SendRegistrationEmailAsync(
+        UserAccount createdUser,
+        string confirmationToken
+    );
 }
 
 public class EmailService(
     IEmailProvider emailProvider,
-    IEmailTemplateProvider emailTemplateProvider) : IEmailService
+    IEmailTemplateProvider emailTemplateProvider
+) : IEmailService
 {
-    public async Task SendRegistrationEmailAsync(UserAccount createdUser, string confirmationToken)
+    public async Task SendRegistrationEmailAsync(
+        UserAccount createdUser,
+        string confirmationToken
+    )
     {
-        var confirmationLink = $"https://thebiergarten.app/confirm?token={confirmationToken}";
+        var confirmationLink =
+            $"https://thebiergarten.app/confirm?token={confirmationToken}";
 
-        var emailHtml = await emailTemplateProvider.RenderUserRegisteredEmailAsync(
-            createdUser.FirstName,
-            confirmationLink
-        );
+        var emailHtml =
+            await emailTemplateProvider.RenderUserRegisteredEmailAsync(
+                createdUser.FirstName,
+                confirmationLink
+            );
 
         await emailProvider.SendAsync(
             createdUser.Email,

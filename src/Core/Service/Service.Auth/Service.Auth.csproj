@@ -8,15 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Domain.Entities\Domain.Entities.csproj" />
     <ProjectReference Include="..\..\Domain.Exceptions\Domain.Exceptions.csproj" />
-    <ProjectReference
-      Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
-    <ProjectReference
-      Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
-    <ProjectReference
-      Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
-    <ProjectReference
-      Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj" />
     <ProjectReference Include="..\Service.Emails\Service.Emails.csproj" />
   </ItemGroup>
 </Project>

@@ -54,7 +54,10 @@ public class RegisterService(
         var refreshToken = tokenService.GenerateRefreshToken(createdUser);
 
         // send confirmation email
-        await emailService.SendRegistrationEmailAsync(createdUser, "some-confirmation-token");
+        await emailService.SendRegistrationEmailAsync(
+            createdUser,
+            "some-confirmation-token"
+        );
 
         return new AuthServiceReturn(createdUser, refreshToken, accessToken);
     }

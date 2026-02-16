@@ -1,15 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Domain.Entities\Domain.Entities.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain.Entities\Domain.Entities.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+  </ItemGroup>
 </Project>

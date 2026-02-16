@@ -23,7 +23,6 @@ public class RegisterServiceTest
         _tokenServiceMock = new Mock<ITokenService>();
         _emailServiceMock = new Mock<IEmailService>();
 
-
         _registerService = new RegisterService(
             _authRepoMock.Object,
             _passwordInfraMock.Object,
@@ -97,7 +96,6 @@ public class RegisterServiceTest
             .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
             .Returns("refresh-token");
 
-
         // Act
         var result = await _registerService.RegisterAsync(
             userAccount,
@@ -134,8 +132,14 @@ public class RegisterServiceTest
                 ),
             Times.Once
         );
-        _emailServiceMock.Verify(x => x.SendRegistrationEmailAsync(It.IsAny<UserAccount>(), It.IsAny<string>()),
-            Times.Once);
+        _emailServiceMock.Verify(
+            x =>
+                x.SendRegistrationEmailAsync(
+                    It.IsAny<UserAccount>(),
+                    It.IsAny<string>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
