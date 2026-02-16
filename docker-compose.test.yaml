@@ -112,6 +112,26 @@ services:
     networks:
       - testnet
 
+  service.auth.tests:
+    env_file: ".env.test"
+    image: service.auth.tests
+    container_name: test-env-service-auth-tests
+    depends_on:
+      database.seed:
+        condition: service_completed_successfully
+    build:
+      context: ./src/Core
+      dockerfile: Service/Service.Auth.Tests/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+    volumes:
+      - ./test-results:/app/test-results
+    restart: "no"
+    networks:
+      - testnet
+
 volumes:
   sqlserverdata-test:
     driver: local

@@ -5,30 +5,42 @@ using Infrastructure.Repository.Auth;
 
 namespace Service.Auth;
 
+public record LoginServiceReturn(
+    UserAccount UserAccount,
+    string RefreshToken,
+    string AccessToken
+);
+
 public class LoginService(
     IAuthRepository authRepo,
-    IPasswordInfrastructure passwordInfrastructure
+    IPasswordInfrastructure passwordInfrastructure,
+    ITokenService tokenService
 ) : ILoginService
 {
-
-    public async Task<UserAccount> LoginAsync(string username, string password)
+    public async Task<LoginServiceReturn> LoginAsync(
+        string username,
+        string password
+    )
     {
         // Attempt lookup by username
-        var user = await authRepo.GetUserByUsernameAsync(username);
-
         // the user was not found
-        if (user is null)
-            throw new UnauthorizedException("Invalid username or password.");
+        var user =
+            await authRepo.GetUserByUsernameAsync(username)
+            ?? throw new UnauthorizedException("Invalid username or password.");
 
         // @todo handle expired passwords
-        var activeCred = await authRepo.GetActiveCredentialByUserAccountIdAsync(user.UserAccountId);
-
-        if (activeCred is null)
-            throw new UnauthorizedException("Invalid username or password.");
+        var activeCred =
+            await authRepo.GetActiveCredentialByUserAccountIdAsync(
+                user.UserAccountId
+            )
+            ?? throw new UnauthorizedException("Invalid username or password.");
 
         if (!passwordInfrastructure.Verify(password, activeCred.Hash))
             throw new UnauthorizedException("Invalid username or password.");
 
-        return user;
+        string accessToken = tokenService.GenerateAccessToken(user);
+        string refreshToken = tokenService.GenerateRefreshToken(user);
+
+        return new LoginServiceReturn(user, refreshToken, accessToken);
     }
 }

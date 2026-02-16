@@ -4,28 +4,40 @@ using Infrastructure.Email;
 using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
+using Microsoft.Extensions.Logging;
+using Service.Emails;
 
 namespace Service.Auth;
 
 public class RegisterService(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,
-    IEmailProvider emailProvider,
-    IEmailTemplateProvider emailTemplateProvider
+    ITokenService tokenService,
+    IEmailService emailService
 ) : IRegisterService
 {
-    public async Task<UserAccount> RegisterAsync(UserAccount userAccount, string password)
+    private async Task ValidateUserDoesNotExist(UserAccount userAccount)
     {
         // Check if user already exists
-        var existingUsername = await authRepo.GetUserByUsernameAsync(userAccount.Username);
-        var existingEmail = await authRepo.GetUserByEmailAsync(userAccount.Email);
+        var existingUsername = await authRepo.GetUserByUsernameAsync(
+            userAccount.Username
+        );
+        var existingEmail = await authRepo.GetUserByEmailAsync(
+            userAccount.Email
+        );
 
         if (existingUsername != null || existingEmail != null)
         {
             throw new ConflictException("Username or email already exists");
         }
+    }
 
-
+    public async Task<RegisterServiceReturn> RegisterAsync(
+        UserAccount userAccount,
+        string password
+    )
+    {
+        await ValidateUserDoesNotExist(userAccount);
         // password hashing
         var hashed = passwordInfrastructure.Hash(password);
 
@@ -36,26 +48,41 @@ public class RegisterService(
             userAccount.LastName,
             userAccount.Email,
             userAccount.DateOfBirth,
-            hashed);
-
-
-        // Generate confirmation link (TODO: implement proper token-based confirmation)
-        var confirmationLink = $"https://thebiergarten.app/confirm?email={Uri.EscapeDataString(createdUser.Email)}";
-
-        // Render email template
-        var emailHtml = await emailTemplateProvider.RenderUserRegisteredEmailAsync(
-            createdUser.FirstName,
-            confirmationLink
+            hashed
         );
 
-        // Send welcome email with rendered template
-        await emailProvider.SendAsync(
-            createdUser.Email,
-            "Welcome to The Biergarten App!",
-            emailHtml,
-            isHtml: true
-        );
+        var accessToken = tokenService.GenerateAccessToken(createdUser);
+        var refreshToken = tokenService.GenerateRefreshToken(createdUser);
 
-        return createdUser;
+        if (
+            string.IsNullOrEmpty(accessToken)
+            || string.IsNullOrEmpty(refreshToken)
+        )
+        {
+            return new RegisterServiceReturn(createdUser);
+        }
+
+        bool emailSent = false;
+        try
+        {
+            // send confirmation email
+            await emailService.SendRegistrationEmailAsync(
+                createdUser,
+                "some-confirmation-token"
+            );
+
+            emailSent = true;
+        }
+        catch
+        {
+            // ignored
+        }
+
+        return new RegisterServiceReturn(
+            createdUser,
+            accessToken,
+            refreshToken,
+            emailSent
+        );
     }
 }

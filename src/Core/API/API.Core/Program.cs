@@ -1,7 +1,11 @@
 using API.Core;
+using API.Core.Contracts.Common;
 using Domain.Exceptions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Email;
+using Infrastructure.Email.Templates;
+using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.Jwt;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
@@ -9,12 +13,8 @@ using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Service.UserManagement.User;
-using API.Core.Contracts.Common;
-using Infrastructure.Email;
-using Infrastructure.Email.Templates;
-using Infrastructure.Email.Templates.Rendering;
 using Service.Auth;
+using Service.UserManagement.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +45,10 @@ if (!builder.Environment.IsProduction())
 
 // Configure Dependency Injection -------------------------------------------------------------------------------------
 
-builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+builder.Services.AddSingleton<
+    ISqlConnectionFactory,
+    DefaultSqlConnectionFactory
+>();
 
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -53,6 +56,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
 builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();

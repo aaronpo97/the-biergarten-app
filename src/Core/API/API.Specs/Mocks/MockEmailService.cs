@@ -1,54 +1,38 @@
-using Infrastructure.Email;
+using Domain.Entities;
+using Service.Emails;
 
 namespace API.Specs.Mocks;
 
-/// <summary>
-/// Mock email service for testing that doesn't actually send emails.
-/// Tracks sent emails for verification in tests if needed.
-/// </summary>
-public class MockEmailProvider : IEmailProvider
+public class MockEmailService : IEmailService
 {
-   public List<SentEmail> SentEmails { get; } = new();
+    public List<RegistrationEmail> SentRegistrationEmails { get; } = new();
 
-   public Task SendAsync(string to, string subject, string body, bool isHtml = true)
-   {
-      SentEmails.Add(new SentEmail
-      {
-         To = [to],
-         Subject = subject,
-         Body = body,
-         IsHtml = isHtml,
-         SentAt = DateTime.UtcNow
-      });
+    public Task SendRegistrationEmailAsync(
+        UserAccount createdUser,
+        string confirmationToken
+    )
+    {
+        SentRegistrationEmails.Add(
+            new RegistrationEmail
+            {
+                UserAccount = createdUser,
+                ConfirmationToken = confirmationToken,
+                SentAt = DateTime.UtcNow,
+            }
+        );
 
-      return Task.CompletedTask;
-   }
+        return Task.CompletedTask;
+    }
 
-   public Task SendAsync(IEnumerable<string> to, string subject, string body, bool isHtml = true)
-   {
-      SentEmails.Add(new SentEmail
-      {
-         To = to.ToList(),
-         Subject = subject,
-         Body = body,
-         IsHtml = isHtml,
-         SentAt = DateTime.UtcNow
-      });
+    public void Clear()
+    {
+        SentRegistrationEmails.Clear();
+    }
 
-      return Task.CompletedTask;
-   }
-
-   public void Clear()
-   {
-      SentEmails.Clear();
-   }
-
-   public class SentEmail
-   {
-      public List<string> To { get; init; } = new();
-      public string Subject { get; init; } = string.Empty;
-      public string Body { get; init; } = string.Empty;
-      public bool IsHtml { get; init; }
-      public DateTime SentAt { get; init; }
-   }
+    public class RegistrationEmail
+    {
+        public UserAccount UserAccount { get; init; } = null!;
+        public string ConfirmationToken { get; init; } = string.Empty;
+        public DateTime SentAt { get; init; }
+    }
 }

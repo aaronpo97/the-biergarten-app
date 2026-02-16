@@ -9,7 +9,10 @@ namespace API.Core.Controllers
     public class UserController(IUserService userService) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserAccount>>> GetAll([FromQuery] int? limit, [FromQuery] int? offset)
+        public async Task<ActionResult<IEnumerable<UserAccount>>> GetAll(
+            [FromQuery] int? limit,
+            [FromQuery] int? offset
+        )
         {
             var users = await userService.GetAllAsync(limit, offset);
             return Ok(users);

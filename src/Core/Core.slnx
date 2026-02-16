@@ -21,6 +21,7 @@
     </Folder>
     <Folder Name="/Service/">
         <Project Path="Service/Service.Auth.Tests/Service.Auth.Tests.csproj" />
+        <Project Path="Service/Service.Emails/Service.Emails.csproj" />
         <Project Path="Service/Service.UserManagement/Service.UserManagement.csproj" />
         <Project Path="Service\Service.Auth\Service.Auth.csproj" />
     </Folder>
