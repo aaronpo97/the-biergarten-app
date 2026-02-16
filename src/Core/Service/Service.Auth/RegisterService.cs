@@ -4,6 +4,7 @@ using Infrastructure.Email;
 using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
+using Microsoft.Extensions.Logging;
 using Service.Emails;
 
 namespace Service.Auth;
@@ -31,7 +32,7 @@ public class RegisterService(
         }
     }
 
-    public async Task<AuthServiceReturn> RegisterAsync(
+    public async Task<RegisterServiceReturn> RegisterAsync(
         UserAccount userAccount,
         string password
     )
@@ -53,12 +54,29 @@ public class RegisterService(
         var accessToken = tokenService.GenerateAccessToken(createdUser);
         var refreshToken = tokenService.GenerateRefreshToken(createdUser);
 
-        // send confirmation email
-        await emailService.SendRegistrationEmailAsync(
-            createdUser,
-            "some-confirmation-token"
-        );
+        if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+        {
+            return new RegisterServiceReturn(createdUser);
+        }
 
-        return new AuthServiceReturn(createdUser, refreshToken, accessToken);
+
+        bool emailSent = false;
+        try
+        {
+            // send confirmation email
+            await emailService.SendRegistrationEmailAsync(
+                createdUser,
+                "some-confirmation-token"
+            );
+
+            emailSent = true;
+        }
+        catch
+        {
+            // ignored
+        }
+
+
+        return new RegisterServiceReturn(createdUser, accessToken, refreshToken, emailSent);
     }
 }

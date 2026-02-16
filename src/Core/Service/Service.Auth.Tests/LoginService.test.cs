@@ -7,6 +7,7 @@ using Moq;
 
 namespace Service.Auth.Tests;
 
+
 public class LoginServiceTest
 {
     private readonly Mock<IAuthRepository> _authRepoMock;

@@ -5,13 +5,19 @@ using Infrastructure.Repository.Auth;
 
 namespace Service.Auth;
 
+public record LoginServiceReturn(
+    UserAccount UserAccount,
+    string RefreshToken,
+    string AccessToken
+);
+
 public class LoginService(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,
     ITokenService tokenService
 ) : ILoginService
 {
-    public async Task<AuthServiceReturn> LoginAsync(
+    public async Task<LoginServiceReturn> LoginAsync(
         string username,
         string password
     )
@@ -35,6 +41,6 @@ public class LoginService(
         string accessToken = tokenService.GenerateAccessToken(user);
         string refreshToken = tokenService.GenerateRefreshToken(user);
 
-        return new AuthServiceReturn(user, refreshToken, accessToken);
+        return new LoginServiceReturn(user, refreshToken, accessToken);
     }
 }

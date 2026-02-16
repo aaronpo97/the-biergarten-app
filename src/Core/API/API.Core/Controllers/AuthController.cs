@@ -16,7 +16,7 @@ namespace API.Core.Controllers
             [FromBody] RegisterRequest req
         )
         {
-            AuthServiceReturn rtn = await register.RegisterAsync(
+            var rtn = await register.RegisterAsync(
                 new UserAccount
                 {
                     UserAccountId = Guid.Empty,
@@ -29,15 +29,12 @@ namespace API.Core.Controllers
                 req.Password
             );
 
-            var response = new ResponseBody<AuthPayload>
+            var response = new ResponseBody<RegistrationPayload>
             {
                 Message = "User registered successfully.",
-                Payload = new AuthPayload(
-                    rtn.UserAccount.UserAccountId,
-                    rtn.UserAccount.Username,
+                Payload = new RegistrationPayload(rtn.UserAccount.UserAccountId, rtn.UserAccount.Username,
                     rtn.RefreshToken,
-                    rtn.AccessToken
-                ),
+                    rtn.AccessToken, rtn.EmailSent),
             };
             return Created("/", response);
         }
@@ -48,10 +45,10 @@ namespace API.Core.Controllers
             var rtn = await login.LoginAsync(req.Username, req.Password);
 
             return Ok(
-                new ResponseBody<AuthPayload>
+                new ResponseBody<LoginPayload>
                 {
                     Message = "Logged in successfully.",
-                    Payload = new AuthPayload(
+                    Payload = new LoginPayload(
                         rtn.UserAccount.UserAccountId,
                         rtn.UserAccount.Username,
                         rtn.RefreshToken,
