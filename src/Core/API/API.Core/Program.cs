@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Service.Auth;
 using Service.UserManagement.User;
+using Service.Emails;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
 builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
 builder.Services.AddScoped<IEmailProvider, SmtpEmailProvider>();
 builder.Services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();
