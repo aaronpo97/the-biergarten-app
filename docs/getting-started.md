@@ -185,36 +185,6 @@ npm run dev
 
 The frontend will be available at http://localhost:3000.
 
-## Generate Diagrams (Optional)
-
-The project includes PlantUML diagrams that can be converted to PDF or PNG:
-
-### Install Java
-
-Make sure Java 8+ is installed:
-
-```bash
-# Check Java version
-java -version
-```
-
-### Generate Diagrams
-
-```bash
-# Generate all PDFs
-make
-
-# Generate PNGs
-make pngs
-
-# Generate both
-make diagrams
-
-# View help
-make help
-```
-
-Generated diagrams will be in `docs/diagrams/pdf/`.
 
 ## Next Steps
 
@@ -223,39 +193,3 @@ Generated diagrams will be in `docs/diagrams/pdf/`.
 - **Learn the Architecture**: Read [Architecture Overview](architecture.md)
 - **Understand Docker Setup**: See [Docker Guide](docker.md)
 - **Database Details**: Check [Database Schema](database.md)
-
-## Troubleshooting
-
-### Port Already in Use
-
-If port 8080 or 1433 is already in use, you can either:
-
-- Stop the service using that port
-- Change the port mapping in `docker-compose.dev.yaml`
-
-### Database Connection Issues
-
-Check that:
-
-- SQL Server container is running: `docker ps`
-- Connection string is correct in `.env.dev`
-- Health check is passing: `docker compose -f docker-compose.dev.yaml ps`
-
-### Container Won't Start
-
-View container logs:
-
-```bash
-docker compose -f docker-compose.dev.yaml logs <service-name>
-```
-
-### Fresh Start
-
-Remove all containers and volumes:
-
-```bash
-docker compose -f docker-compose.dev.yaml down -v
-docker system prune -f
-```
-
-For more troubleshooting, see the [Docker Guide](docker.md#troubleshooting).
