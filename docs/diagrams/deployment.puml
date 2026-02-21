@@ -1,0 +1,227 @@
+@startuml deployment
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam linetype ortho
+
+title Docker Deployment Architecture
+
+' External systems
+actor Developer
+cloud "Docker Host" as Host
+
+package "Development Environment\n(docker-compose.dev.yaml)" #E3F2FD {
+
+  node "SQL Server\n(mcr.microsoft.com/mssql/server:2022-latest)" as DevDB {
+    database "Biergarten\nDatabase" as DevDBInner {
+      portin "1433"
+    }
+    note right
+      Environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=***
+      - MSSQL_PID=Developer
+
+      Volumes:
+      - biergarten-dev-data
+    end note
+  }
+
+  node "API Container\n(API.Core)" as DevAPI {
+    component "ASP.NET Core 10" as API1
+    portin "8080:8080 (HTTP)" as DevPort1
+    portin "8081:8081 (HTTPS)" as DevPort2
+
+    note right
+      Environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DB_SERVER=sql-server
+      - DB_NAME=Biergarten
+      - DB_USER/PASSWORD
+      - JWT_SECRET
+      - SMTP_* (10+ variables)
+
+      Health Check:
+      /health endpoint
+    end note
+  }
+
+  node "Migrations\n(run-once)" as DevMig {
+    component "Database.Migrations" as Mig1
+    note bottom
+      Runs: DbUp migrations
+      Environment:
+      - CLEAR_DATABASE=false
+      Depends on: sql-server
+    end note
+  }
+
+  node "Seed\n(run-once)" as DevSeed {
+    component "Database.Seed" as Seed1
+    note bottom
+      Creates:
+      - 100 test users
+      - Location data (US/CA/MX)
+      - test.user account
+      Depends on: migrations
+    end note
+  }
+
+}
+
+package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
+
+  node "SQL Server\n(isolated instance)" as TestDB {
+    database "Biergarten\nTest Database" as TestDBInner {
+      portin "1434"
+    }
+    note right
+      Fresh instance each run
+      CLEAR_DATABASE=true
+
+      Volumes:
+      - biergarten-test-data
+      (ephemeral)
+    end note
+  }
+
+  node "Migrations\n(test)" as TestMig {
+    component "Database.Migrations"
+  }
+
+  node "Seed\n(test)" as TestSeed {
+    component "Database.Seed"
+    note bottom
+      Minimal seed:
+      - test.user only
+      - Essential data
+    end note
+  }
+
+  node "API.Specs\n(Integration Tests)" as Specs {
+    component "Reqnroll + xUnit" as SpecsComp
+    note right
+      Tests:
+      - Registration flow
+      - Login flow
+      - Validation rules
+      - 404 handling
+
+      Uses: TestApiFactory
+      Mocks: Email services
+    end note
+  }
+
+  node "Infrastructure.Repository.Tests\n(Unit Tests)" as RepoTests {
+    component "xUnit + DbMocker" as RepoComp
+    note right
+      Tests:
+      - AuthRepository
+      - UserAccountRepository
+      - SQL command building
+
+      Uses: Mock connections
+      No real database needed
+    end note
+  }
+
+  node "Service.Auth.Tests\n(Unit Tests)" as SvcTests {
+    component "xUnit + Moq" as SvcComp
+    note right
+      Tests:
+      - RegisterService
+      - LoginService
+      - Token generation
+
+      Uses: Mocked dependencies
+      No database or infrastructure
+    end note
+  }
+
+}
+
+folder "test-results/\n(mounted volume)" as Results {
+  file "api-specs/\n  results.trx" as Result1
+  file "repository-tests/\n  results.trx" as Result2
+  file "service-auth-tests/\n  results.trx" as Result3
+
+  note bottom
+    TRX format
+    Readable by:
+    - Visual Studio
+    - Azure DevOps
+    - GitHub Actions
+  end note
+}
+
+' External access
+Developer --> Host : docker compose up
+Host --> DevAPI : http://localhost:8080
+
+' Development dependencies
+DevMig --> DevDB : 1. Run migrations
+DevSeed --> DevDB : 2. Seed data
+DevAPI --> DevDB : 3. Connect & serve
+DevMig .up.> DevDB : depends_on
+DevSeed .up.> DevMig : depends_on
+DevAPI .up.> DevSeed : depends_on
+
+' Test dependencies
+TestMig --> TestDB : 1. Migrate
+TestSeed --> TestDB : 2. Seed
+Specs --> TestDB : 3. Integration test
+RepoTests ..> TestDB : Mock (no connection)
+SvcTests ..> TestDB : Mock (no connection)
+
+TestMig .up.> TestDB : depends_on
+TestSeed .up.> TestMig : depends_on
+Specs .up.> TestSeed : depends_on
+
+' Test results export
+Specs --> Results : Export TRX
+RepoTests --> Results : Export TRX
+SvcTests --> Results : Export TRX
+
+' Network notes
+note bottom of DevDB
+  <b>Dev Network (bridge: biergarten-dev)</b>
+  Internal DNS:
+  - sql-server (resolves to SQL container)
+  - api (resolves to API container)
+end note
+
+note bottom of TestDB
+  <b>Test Network (bridge: biergarten-test)</b>
+  All test components isolated
+end note
+
+' Startup sequence notes
+note top of DevMig
+  Startup Order:
+  1. SQL Server (health check)
+  2. Migrations (run-once)
+  3. Seed (run-once)
+  4. API (long-running)
+end note
+
+note top of Specs
+  Test Execution:
+  All tests run in parallel
+  Results aggregated
+end note
+
+' Production note
+note as ProductionNote
+  <b>Production Deployment (not shown):</b>
+
+  Would include:
+  • Azure SQL Database / AWS RDS
+  • Azure Container Apps / ECS
+  • Azure Key Vault for secrets
+  • Application Insights / CloudWatch
+  • Load balancer
+  • HTTPS termination
+  • CDN for static assets
+end note
+
+@enduml

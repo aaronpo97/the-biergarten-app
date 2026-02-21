@@ -1,0 +1,523 @@
+@startuml class-diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Biergarten Application - Class Diagram
+
+' API Layer
+package "API.Core" <<Rectangle>> #E3F2FD {
+
+  class AuthController {
+    - IRegisterService _registerService
+    - ILoginService _loginService
+    + <<async>> Task<ActionResult> Register(RegisterRequest)
+    + <<async>> Task<ActionResult> Login(LoginRequest)
+  }
+
+  class UserController {
+    - IUserService _userService
+    + <<async>> Task<ActionResult<IEnumerable<UserAccount>>> GetAll(int?, int?)
+    + <<async>> Task<ActionResult<UserAccount>> GetById(Guid)
+  }
+
+  class GlobalExceptionFilter {
+    - ILogger<GlobalExceptionFilter> _logger
+    + void OnException(ExceptionContext)
+  }
+
+  package "Contracts" {
+    class RegisterRequest <<record>> {
+      + string Username
+      + string FirstName
+      + string LastName
+      + string Email
+      + DateTime DateOfBirth
+      + string Password
+    }
+
+    class LoginRequest <<record>> {
+      + string Username
+      + string Password
+    }
+
+    class RegisterRequestValidator {
+      + RegisterRequestValidator()
+    }
+
+    class LoginRequestValidator {
+      + LoginRequestValidator()
+    }
+
+    class "ResponseBody<T>" <<record>> {
+      + string Message
+      + T Payload
+    }
+
+    class LoginPayload <<record>> {
+      + Guid UserAccountId
+      + string Username
+      + string RefreshToken
+      + string AccessToken
+    }
+
+    class RegistrationPayload <<record>> {
+      + Guid UserAccountId
+      + string Username
+      + string RefreshToken
+      + string AccessToken
+      + bool ConfirmationEmailSent
+    }
+  }
+}
+
+' Service Layer
+package "Service Layer" <<Rectangle>> #C8E6C9 {
+
+  package "Service.Auth" {
+    interface IRegisterService {
+      + <<async>> Task<RegisterServiceReturn> RegisterAsync(UserAccount, string)
+    }
+
+    class RegisterService {
+      - IAuthRepository _authRepo
+      - IPasswordInfrastructure _passwordInfra
+      - ITokenService _tokenService
+      - IEmailService _emailService
+      + <<async>> Task<RegisterServiceReturn> RegisterAsync(UserAccount, string)
+      - <<async>> Task ValidateUserDoesNotExist(UserAccount)
+    }
+
+    interface ILoginService {
+      + <<async>> Task<LoginServiceReturn> LoginAsync(string, string)
+    }
+
+    class LoginService {
+      - IAuthRepository _authRepo
+      - IPasswordInfrastructure _passwordInfra
+      - ITokenService _tokenService
+      + <<async>> Task<LoginServiceReturn> LoginAsync(string, string)
+    }
+
+    interface ITokenService {
+      + string GenerateAccessToken(UserAccount)
+      + string GenerateRefreshToken(UserAccount)
+    }
+
+    class TokenService {
+      - ITokenInfrastructure _tokenInfrastructure
+      + string GenerateAccessToken(UserAccount)
+      + string GenerateRefreshToken(UserAccount)
+    }
+
+    class RegisterServiceReturn <<record>> {
+      + bool IsAuthenticated
+      + bool EmailSent
+      + UserAccount UserAccount
+      + string AccessToken
+      + string RefreshToken
+    }
+
+    class LoginServiceReturn <<record>> {
+      + UserAccount UserAccount
+      + string RefreshToken
+      + string AccessToken
+    }
+  }
+
+  package "Service.UserManagement" {
+    interface IUserService {
+      + <<async>> Task<IEnumerable<UserAccount>> GetAllAsync(int?, int?)
+      + <<async>> Task<UserAccount> GetByIdAsync(Guid)
+      + <<async>> Task UpdateAsync(UserAccount)
+    }
+
+    class UserService {
+      - IUserAccountRepository _repository
+      + <<async>> Task<IEnumerable<UserAccount>> GetAllAsync(int?, int?)
+      + <<async>> Task<UserAccount> GetByIdAsync(Guid)
+      + <<async>> Task UpdateAsync(UserAccount)
+    }
+  }
+
+  package "Service.Emails" {
+    interface IEmailService {
+      + <<async>> Task SendRegistrationEmailAsync(UserAccount, string)
+    }
+
+    class EmailService {
+      - IEmailProvider _emailProvider
+      - IEmailTemplateProvider _templateProvider
+      + <<async>> Task SendRegistrationEmailAsync(UserAccount, string)
+    }
+  }
+}
+
+' Domain Layer
+package "Domain" <<Rectangle>> #FFF9C4 {
+
+  package "Domain.Entities" {
+    class UserAccount {
+      + Guid UserAccountId
+      + string Username
+      + string FirstName
+      + string LastName
+      + string Email
+      + DateTime CreatedAt
+      + DateTime? UpdatedAt
+      + DateTime DateOfBirth
+      + byte[]? Timer
+    }
+
+    class UserCredential {
+      + Guid UserCredentialId
+      + Guid UserAccountId
+      + DateTime CreatedAt
+      + DateTime Expiry
+      + string Hash
+      + byte[]? Timer
+    }
+
+    class UserVerification {
+      + Guid UserVerificationId
+      + Guid UserAccountId
+      + DateTime VerificationDateTime
+      + byte[]? Timer
+    }
+  }
+
+  package "Domain.Exceptions" {
+    class ConflictException {
+      + ConflictException(string)
+    }
+
+    class NotFoundException {
+      + NotFoundException(string)
+    }
+
+    class UnauthorizedException {
+      + UnauthorizedException(string)
+    }
+
+    class ForbiddenException {
+      + ForbiddenException(string)
+    }
+
+    class ValidationException {
+      + ValidationException(string)
+    }
+  }
+}
+
+' Infrastructure Layer
+package "Infrastructure" <<Rectangle>> #E1BEE7 {
+
+  package "Infrastructure.Repository" {
+    interface IAuthRepository {
+      + <<async>> Task<UserAccount> RegisterUserAsync(string, string, string, string, DateTime, string)
+      + <<async>> Task<UserAccount?> GetUserByEmailAsync(string)
+      + <<async>> Task<UserAccount?> GetUserByUsernameAsync(string)
+      + <<async>> Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid)
+      + <<async>> Task RotateCredentialAsync(Guid, string)
+    }
+
+    class AuthRepository {
+      - ISqlConnectionFactory _connectionFactory
+      + <<async>> Task<UserAccount> RegisterUserAsync(...)
+      + <<async>> Task<UserAccount?> GetUserByEmailAsync(string)
+      + <<async>> Task<UserAccount?> GetUserByUsernameAsync(string)
+      + <<async>> Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid)
+      + <<async>> Task RotateCredentialAsync(Guid, string)
+      # UserAccount MapToEntity(DbDataReader)
+      - UserCredential MapToCredentialEntity(DbDataReader)
+    }
+
+    interface IUserAccountRepository {
+      + <<async>> Task<UserAccount?> GetByIdAsync(Guid)
+      + <<async>> Task<IEnumerable<UserAccount>> GetAllAsync(int?, int?)
+      + <<async>> Task UpdateAsync(UserAccount)
+      + <<async>> Task DeleteAsync(Guid)
+      + <<async>> Task<UserAccount?> GetByUsernameAsync(string)
+      + <<async>> Task<UserAccount?> GetByEmailAsync(string)
+    }
+
+    class UserAccountRepository {
+      - ISqlConnectionFactory _connectionFactory
+      + <<async>> Task<UserAccount?> GetByIdAsync(Guid)
+      + <<async>> Task<IEnumerable<UserAccount>> GetAllAsync(int?, int?)
+      + <<async>> Task UpdateAsync(UserAccount)
+      + <<async>> Task DeleteAsync(Guid)
+      + <<async>> Task<UserAccount?> GetByUsernameAsync(string)
+      + <<async>> Task<UserAccount?> GetByEmailAsync(string)
+      # UserAccount MapToEntity(DbDataReader)
+    }
+
+    abstract class "Repository<T>" {
+      # ISqlConnectionFactory _connectionFactory
+      # <<async>> Task<DbConnection> CreateConnection()
+      # {abstract} T MapToEntity(DbDataReader)
+    }
+
+    package "Sql" {
+      interface ISqlConnectionFactory {
+        + DbConnection CreateConnection()
+      }
+
+      class DefaultSqlConnectionFactory {
+        - string _connectionString
+        + DbConnection CreateConnection()
+      }
+
+      class SqlConnectionStringHelper <<static>> {
+        + {static} string BuildConnectionString(string?)
+        + {static} string BuildMasterConnectionString()
+      }
+    }
+  }
+
+  package "Infrastructure.PasswordHashing" {
+    interface IPasswordInfrastructure {
+      + string Hash(string)
+      + bool Verify(string, string)
+    }
+
+    class Argon2Infrastructure {
+      - {static} int SaltSize = 16
+      - {static} int HashSize = 32
+      - {static} int ArgonIterations = 4
+      - {static} int ArgonMemoryKb = 65536
+      + string Hash(string)
+      + bool Verify(string, string)
+    }
+  }
+
+  package "Infrastructure.Jwt" {
+    interface ITokenInfrastructure {
+      + string GenerateJwt(Guid, string, DateTime)
+    }
+
+    class JwtInfrastructure {
+      - string? _secret
+      + string GenerateJwt(Guid, string, DateTime)
+    }
+  }
+
+  package "Infrastructure.Email" {
+    interface IEmailProvider {
+      + <<async>> Task SendAsync(string, string, string, bool)
+      + <<async>> Task SendAsync(IEnumerable<string>, string, string, bool)
+    }
+
+    class SmtpEmailProvider {
+      - string _host
+      - int _port
+      - string? _username
+      - string? _password
+      - bool _useSsl
+      - string _fromEmail
+      - string _fromName
+      + <<async>> Task SendAsync(string, string, string, bool)
+      + <<async>> Task SendAsync(IEnumerable<string>, string, string, bool)
+    }
+  }
+
+  package "Infrastructure.Email.Templates" {
+    interface IEmailTemplateProvider {
+      + <<async>> Task<string> RenderUserRegisteredEmailAsync(string, string)
+    }
+
+    class EmailTemplateProvider {
+      - IServiceProvider _serviceProvider
+      - ILoggerFactory _loggerFactory
+      + <<async>> Task<string> RenderUserRegisteredEmailAsync(string, string)
+      - <<async>> Task<string> RenderComponentAsync<TComponent>(Dictionary<string, object?>)
+    }
+
+    class "UserRegistration <<Razor>>" {
+      + string Username
+      + string ConfirmationLink
+    }
+
+    class "Header <<Razor>>" {
+    }
+
+    class "Footer <<Razor>>" {
+      + string? FooterText
+    }
+  }
+}
+
+' Database Layer
+package "Database" <<Rectangle>> #FFCCBC {
+
+  class "SQL Server" <<Database>> {
+    .. Tables ..
+    UserAccount
+    UserCredential
+    UserVerification
+    UserAvatar
+    Photo
+    UserFollow
+    Country
+    StateProvince
+    City
+    BreweryPost
+    BreweryPostLocation
+    BreweryPostPhoto
+    BeerStyle
+    BeerPost
+    BeerPostPhoto
+    BeerPostComment
+    .. Stored Procedures ..
+    USP_RegisterUser
+    usp_GetUserAccountByUsername
+    usp_GetUserAccountByEmail
+    usp_GetUserAccountById
+    USP_GetActiveUserCredentialByUserAccountId
+    USP_RotateUserCredential
+    USP_CreateUserVerification
+  }
+}
+
+' Relationships - API to Service
+AuthController ..> IRegisterService : uses
+AuthController ..> ILoginService : uses
+UserController ..> IUserService : uses
+
+AuthController ..> RegisterRequest : receives
+AuthController ..> LoginRequest : receives
+AuthController ..> "ResponseBody<T>" : returns
+AuthController ..> RegistrationPayload : returns
+AuthController ..> LoginPayload : returns
+
+RegisterRequest ..> RegisterRequestValidator : validated by
+LoginRequest ..> LoginRequestValidator : validated by
+
+' Relationships - Service Layer
+IRegisterService <|.. RegisterService : implements
+ILoginService <|.. LoginService : implements
+ITokenService <|.. TokenService : implements
+IUserService <|.. UserService : implements
+IEmailService <|.. EmailService : implements
+
+RegisterService ..> IAuthRepository : uses
+RegisterService ..> IPasswordInfrastructure : uses
+RegisterService ..> ITokenService : uses
+RegisterService ..> IEmailService : uses
+RegisterService ..> RegisterServiceReturn : returns
+RegisterService ..> UserAccount : uses
+
+LoginService ..> IAuthRepository : uses
+LoginService ..> IPasswordInfrastructure : uses
+LoginService ..> ITokenService : uses
+LoginService ..> LoginServiceReturn : returns
+LoginService ..> UserAccount : uses
+LoginService ..> UserCredential : uses
+
+TokenService ..> ITokenInfrastructure : uses
+TokenService ..> UserAccount : uses
+
+UserService ..> IUserAccountRepository : uses
+UserService ..> UserAccount : uses
+
+EmailService ..> IEmailProvider : uses
+EmailService ..> IEmailTemplateProvider : uses
+EmailService ..> UserAccount : uses
+
+' Relationships - Repository Layer
+IAuthRepository <|.. AuthRepository : implements
+IUserAccountRepository <|.. UserAccountRepository : implements
+"Repository<T>" <|-- AuthRepository : extends
+"Repository<T>" <|-- UserAccountRepository : extends
+
+AuthRepository ..> ISqlConnectionFactory : uses
+AuthRepository ..> UserAccount : returns
+AuthRepository ..> UserCredential : returns
+AuthRepository ..> "SQL Server" : queries
+
+UserAccountRepository ..> ISqlConnectionFactory : uses
+UserAccountRepository ..> UserAccount : returns
+UserAccountRepository ..> "SQL Server" : queries
+
+"Repository<T>" ..> ISqlConnectionFactory : uses
+
+ISqlConnectionFactory <|.. DefaultSqlConnectionFactory : implements
+DefaultSqlConnectionFactory ..> SqlConnectionStringHelper : uses
+
+' Relationships - Infrastructure
+IPasswordInfrastructure <|.. Argon2Infrastructure : implements
+ITokenInfrastructure <|.. JwtInfrastructure : implements
+IEmailProvider <|.. SmtpEmailProvider : implements
+IEmailTemplateProvider <|.. EmailTemplateProvider : implements
+
+EmailTemplateProvider ..> "UserRegistration <<Razor>>" : renders
+"UserRegistration <<Razor>>" ..> "Header <<Razor>>" : includes
+"UserRegistration <<Razor>>" ..> "Footer <<Razor>>" : includes
+
+' Relationships - Domain
+UserAccount -- UserCredential : "1" -- "*"
+UserAccount -- UserVerification : "1" -- "0..1"
+
+' Exception handling
+GlobalExceptionFilter ..> ConflictException : catches
+GlobalExceptionFilter ..> NotFoundException : catches
+GlobalExceptionFilter ..> UnauthorizedException : catches
+GlobalExceptionFilter ..> ForbiddenException : catches
+GlobalExceptionFilter ..> ValidationException : catches
+
+RegisterService ..> ConflictException : throws
+LoginService ..> UnauthorizedException : throws
+UserService ..> NotFoundException : throws
+
+' Notes
+note right of Argon2Infrastructure
+  Security Parameters:
+  - Memory: 64MB
+  - Iterations: 4
+  - Salt: 16 bytes
+  - Output: 32 bytes
+end note
+
+note right of JwtInfrastructure
+  JWT Configuration:
+  - Algorithm: HS256
+  - Access: 1 hour
+  - Refresh: 21 days
+end note
+
+note right of "SQL Server"
+  Stored Procedures:
+  - USP_RegisterUser: Transaction
+    creates UserAccount +
+    UserCredential
+  - Credentials tracked with
+    IsRevoked flag
+end note
+
+note right of AuthRepository
+  Uses ADO.NET with
+  parameterized queries
+  to prevent SQL injection
+end note
+
+note bottom of RegisterService
+  Registration Flow:
+  1. Validate user doesn't exist
+  2. Hash password (Argon2)
+  3. Create account + credential
+  4. Generate tokens
+  5. Send confirmation email
+end note
+
+note bottom of LoginService
+  Login Flow:
+  1. Find user by username
+  2. Get active credential
+  3. Verify password
+  4. Generate tokens
+  5. Return authenticated user
+end note
+
+@enduml
