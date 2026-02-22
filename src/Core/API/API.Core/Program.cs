@@ -64,6 +64,7 @@ builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
 builder.Services.AddScoped<IEmailProvider, SmtpEmailProvider>();
 builder.Services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IConfirmationService, ConfirmationService>();
 
 // Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();

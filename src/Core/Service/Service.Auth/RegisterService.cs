@@ -53,6 +53,7 @@ public class RegisterService(
 
         var accessToken = tokenService.GenerateAccessToken(createdUser);
         var refreshToken = tokenService.GenerateRefreshToken(createdUser);
+        var confirmationToken = tokenService.GenerateConfirmationToken(createdUser);
 
         if (
             string.IsNullOrEmpty(accessToken)
@@ -67,14 +68,15 @@ public class RegisterService(
         {
             // send confirmation email
             await emailService.SendRegistrationEmailAsync(
-                createdUser,
-                "some-confirmation-token"
+                createdUser, confirmationToken
             );
 
             emailSent = true;
         }
-        catch
+        catch (Exception ex)
         {
+            await Console.Error.WriteLineAsync(ex.Message);
+            Console.WriteLine("Could not send email.");
             // ignored
         }
 

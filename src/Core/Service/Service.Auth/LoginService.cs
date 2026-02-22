@@ -5,11 +5,6 @@ using Infrastructure.Repository.Auth;
 
 namespace Service.Auth;
 
-public record LoginServiceReturn(
-    UserAccount UserAccount,
-    string RefreshToken,
-    string AccessToken
-);
 
 public class LoginService(
     IAuthRepository authRepo,

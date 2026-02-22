@@ -8,16 +8,17 @@ namespace Infrastructure.Jwt;
 
 public class JwtInfrastructure : ITokenInfrastructure
 {
-    private readonly string? _secret = Environment.GetEnvironmentVariable(
-        "JWT_SECRET"
-    );
-
-    public string GenerateJwt(Guid userId, string username, DateTime expiry)
+    public string GenerateJwt(
+        Guid userId,
+        string username,
+        DateTime expiry,
+        string secret
+    )
     {
         var handler = new JsonWebTokenHandler();
 
         var key = Encoding.UTF8.GetBytes(
-            _secret ?? throw new InvalidOperationException("secret not set")
+            secret ?? throw new InvalidOperationException("secret not set")
         );
 
         // Base claims (always present)

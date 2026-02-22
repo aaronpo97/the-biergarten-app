@@ -17,3 +17,7 @@ public record RegistrationPayload(
     string AccessToken,
     bool ConfirmationEmailSent
 );
+
+public record ConfirmationPayload(
+    Guid UserAccountId,
+    DateTime ConfirmedDate);
