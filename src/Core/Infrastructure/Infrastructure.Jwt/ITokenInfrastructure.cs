@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 namespace Infrastructure.Jwt;
 
 public interface ITokenInfrastructure
@@ -8,4 +10,6 @@ public interface ITokenInfrastructure
         DateTime expiry,
         string secret
     );
+
+    Task<ClaimsPrincipal> ValidateJwtAsync(string token, string secret);
 }

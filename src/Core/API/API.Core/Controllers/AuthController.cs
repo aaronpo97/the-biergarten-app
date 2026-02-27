@@ -11,8 +11,8 @@ namespace API.Core.Controllers
     public class AuthController(
         IRegisterService registerService,
         ILoginService loginService,
-        IConfirmationService confirmationService)
-        : ControllerBase
+        IConfirmationService confirmationService
+    ) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register(
@@ -69,13 +69,16 @@ namespace API.Core.Controllers
         public async Task<ActionResult> Confirm([FromQuery] string token)
         {
             var rtn = await confirmationService.ConfirmUserAsync(token);
-            return Ok(new ResponseBody<ConfirmationPayload>
-            {
-                Message = "User with ID " + rtn.userId + " is confirmed.",
-                Payload = new ConfirmationPayload(
-                    rtn.userId, rtn.confirmedAt
-                )
-            });
+            return Ok(
+                new ResponseBody<ConfirmationPayload>
+                {
+                    Message = "User with ID " + rtn.userId + " is confirmed.",
+                    Payload = new ConfirmationPayload(
+                        rtn.userId,
+                        rtn.confirmedAt
+                    ),
+                }
+            );
         }
     }
 }

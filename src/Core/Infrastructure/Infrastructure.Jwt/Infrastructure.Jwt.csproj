@@ -16,4 +16,8 @@
       Version="8.2.1"
     />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain.Exceptions\Domain.Exceptions.csproj" />
+  </ItemGroup>
 </Project>

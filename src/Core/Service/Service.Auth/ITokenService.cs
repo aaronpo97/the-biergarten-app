@@ -3,11 +3,21 @@ using Infrastructure.Jwt;
 
 namespace Service.Auth;
 
+public enum TokenType
+{
+    AccessToken,
+    RefreshToken,
+    ConfirmationToken,
+}
+
 public interface ITokenService
 {
     public string GenerateAccessToken(UserAccount user);
     public string GenerateRefreshToken(UserAccount user);
     public string GenerateConfirmationToken(UserAccount user);
+
+    public string GenerateToken<T>(UserAccount user)
+        where T : struct, Enum;
 }
 
 public static class TokenServiceExpirationHours
@@ -75,5 +85,29 @@ public class TokenService(ITokenInfrastructure tokenInfrastructure)
             jwtExpiresAt,
             _confirmationTokenSecret
         );
+    }
+
+    public string GenerateToken<T>(UserAccount userAccount)
+        where T : struct, Enum
+    {
+        var tokenType = typeof(T);
+        if (tokenType == typeof(TokenType))
+        {
+            var tokenTypeValue = (TokenType)
+                Enum.Parse(tokenType, typeof(T).Name);
+            return tokenTypeValue switch
+            {
+                TokenType.AccessToken => GenerateAccessToken(userAccount),
+                TokenType.RefreshToken => GenerateRefreshToken(userAccount),
+                TokenType.ConfirmationToken => GenerateConfirmationToken(
+                    userAccount
+                ),
+                _ => throw new InvalidOperationException("Invalid token type"),
+            };
+        }
+        else
+        {
+            throw new InvalidOperationException("Invalid token type");
+        }
     }
 }

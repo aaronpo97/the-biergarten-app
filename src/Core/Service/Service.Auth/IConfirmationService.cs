@@ -10,11 +10,12 @@ public interface IConfirmationService
     Task<ConfirmationServiceReturn> ConfirmUserAsync(string confirmationToken);
 }
 
-
-public class ConfirmationService(IAuthRepository authRepository) : IConfirmationService
+public class ConfirmationService(IAuthRepository authRepository)
+    : IConfirmationService
 {
-
-    public async Task<ConfirmationServiceReturn> ConfirmUserAsync(string confirmationToken)
+    public async Task<ConfirmationServiceReturn> ConfirmUserAsync(
+        string confirmationToken
+    )
     {
         return new ConfirmationServiceReturn(DateTime.Now, Guid.NewGuid());
     }

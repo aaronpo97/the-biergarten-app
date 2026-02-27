@@ -14,8 +14,8 @@ using Infrastructure.Repository.UserAccount;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Service.Auth;
-using Service.UserManagement.User;
 using Service.Emails;
+using Service.UserManagement.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
