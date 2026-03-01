@@ -58,38 +58,52 @@ built from components.
 
 **Implementation**: See `DefaultSqlConnectionFactory.cs`
 
-### JWT Authentication
+### JWT Authentication Secrets (Backend)
+
+The backend uses separate secrets for different token types to enable independent key rotation and validation isolation.
 
 ```bash
-JWT_SECRET=your-secret-key-minimum-32-characters-required
+# Access token secret (1-hour tokens)
+ACCESS_TOKEN_SECRET=<generated-secret>              # Signs short-lived access tokens
+
+# Refresh token secret (21-day tokens)
+REFRESH_TOKEN_SECRET=<generated-secret>             # Signs long-lived refresh tokens
+
+# Confirmation token secret (30-minute tokens)
+CONFIRMATION_TOKEN_SECRET=<generated-secret>        # Signs email confirmation tokens
 ```
 
-- **Required**: Yes
-- **Minimum Length**: 32 characters (enforced)
-- **Purpose**: Signs JWT tokens for user authentication
-- **Algorithm**: HS256 (HMAC-SHA256)
+**Security Requirements**:
 
-**Generate Secret**:
+- Each secret should be minimum 32 characters
+- Recommend 127+ characters for production
+- Generate using cryptographically secure random functions
+- Never reuse secrets across token types or environments
+- Rotate secrets periodically in production
+
+**Generate Secrets**:
 
 ```bash
-# macOS/Linux
+# macOS/Linux - Generate 127-character base64 secret
 openssl rand -base64 127
 
 # Windows PowerShell
 [Convert]::ToBase64String((1..127 | %{Get-Random -Max 256}))
 ```
 
-**Additional JWT Settings** (appsettings.json):
+**Token Expiration**:
 
-```json
-{
-  "Jwt": {
-    "ExpirationMinutes": 60,
-    "Issuer": "biergarten-api",
-    "Audience": "biergarten-users"
-  }
-}
-```
+- **Access tokens**: 1 hour
+- **Refresh tokens**: 21 days
+- **Confirmation tokens**: 30 minutes
+
+(Defined in `TokenServiceExpirationHours` class)
+
+**JWT Implementation**:
+
+- **Algorithm**: HS256 (HMAC-SHA256)
+- **Handler**: Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler
+- **Validation**: Token signature, expiration, and malformed token checks
 
 ### Migration Control
 
@@ -274,8 +288,10 @@ touch .env.local
 | `DB_CONNECTION_STRING`              |    ✓    |          |        |  Yes\*   | Alternative to components |
 | `DB_TRUST_SERVER_CERTIFICATE`       |    ✓    |          |   ✓    |    No    | Defaults to True          |
 | `SA_PASSWORD`                       |         |          |   ✓    |   Yes    | SQL Server container      |
-| **Authentication (Backend)**        |
-| `JWT_SECRET`                        |    ✓    |          |   ✓    |   Yes    | Min 32 chars              |
+| **Authentication (Backend - JWT)**  |
+| `ACCESS_TOKEN_SECRET`               |    ✓    |          |   ✓    |   Yes    | Access token secret       |
+| `REFRESH_TOKEN_SECRET`              |    ✓    |          |   ✓    |   Yes    | Refresh token secret      |
+| `CONFIRMATION_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Confirmation token secret |
 | **Authentication (Frontend)**       |
 | `CONFIRMATION_TOKEN_SECRET`         |         |    ✓     |        |   Yes    | Email confirmation        |
 | `RESET_PASSWORD_TOKEN_SECRET`       |         |    ✓     |        |   Yes    | Password reset            |
@@ -339,8 +355,10 @@ DB_NAME=Biergarten
 DB_USER=sa
 DB_PASSWORD=Dev_Password_123!
 
-# JWT
-JWT_SECRET=development-secret-key-at-least-32-characters-long-recommended-longer
+# JWT Authentication Secrets
+ACCESS_TOKEN_SECRET=<generated-with-openssl>
+REFRESH_TOKEN_SECRET=<generated-with-openssl>
+CONFIRMATION_TOKEN_SECRET=<generated-with-openssl>
 
 # Migration
 CLEAR_DATABASE=true
@@ -363,8 +381,6 @@ BASE_URL=http://localhost:3000
 NODE_ENV=development
 
 # Authentication
-CONFIRMATION_TOKEN_SECRET=<generated-with-openssl>
-RESET_PASSWORD_TOKEN_SECRET=<generated-with-openssl>
 SESSION_SECRET=<generated-with-openssl>
 
 # Database (current Prisma setup)

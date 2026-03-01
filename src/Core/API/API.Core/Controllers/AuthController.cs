@@ -11,7 +11,8 @@ namespace API.Core.Controllers
     public class AuthController(
         IRegisterService registerService,
         ILoginService loginService,
-        IConfirmationService confirmationService
+        IConfirmationService confirmationService,
+        ITokenService tokenService
     ) : ControllerBase
     {
         [HttpPost("register")]
@@ -76,6 +77,29 @@ namespace API.Core.Controllers
                     Payload = new ConfirmationPayload(
                         rtn.userId,
                         rtn.confirmedAt
+                    ),
+                }
+            );
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult> Refresh(
+            [FromBody] RefreshTokenRequest req
+        )
+        {
+            var rtn = await tokenService.RefreshTokenAsync(
+                req.RefreshToken
+            );
+
+            return Ok(
+                new ResponseBody<LoginPayload>
+                {
+                    Message = "Token refreshed successfully.",
+                    Payload = new LoginPayload(
+                        rtn.UserAccount.UserAccountId,
+                        rtn.UserAccount.Username,
+                        rtn.RefreshToken,
+                        rtn.AccessToken
                     ),
                 }
             );
