@@ -107,6 +107,45 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task<Domain.Entities.UserAccount?> GetUserByIdAsync(
+        Guid userAccountId
+    )
+    {
+        await using var connection = await CreateConnection();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "usp_GetUserAccountById";
+        command.CommandType = CommandType.StoredProcedure;
+
+        AddParameter(command, "@UserAccountId", userAccountId);
+
+        await using var reader = await command.ExecuteReaderAsync();
+        return await reader.ReadAsync() ? MapToEntity(reader) : null;
+    }
+
+    public async Task<Domain.Entities.UserAccount?> ConfirmUserAccountAsync(
+        Guid userAccountId
+    )
+    {
+        var user = await GetUserByIdAsync(userAccountId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        await using var connection = await CreateConnection();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "USP_ConfirmUserAccount";
+        command.CommandType = CommandType.StoredProcedure;
+
+        AddParameter(command, "@UserAccountId", userAccountId);
+
+        await command.ExecuteNonQueryAsync();
+
+        // Fetch and return the updated user
+        return await GetUserByIdAsync(userAccountId);
+    }
+
+
     /// <summary>
     /// Maps a data reader row to a UserAccount entity.
     /// </summary>
