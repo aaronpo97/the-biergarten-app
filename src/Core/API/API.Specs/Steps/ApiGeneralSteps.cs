@@ -149,4 +149,55 @@ public class ApiGeneralSteps(ScenarioContext scenario)
             );
         value.GetString().Should().Be(expected);
     }
+
+    [Then("the response JSON should have {string} containing {string}")]
+    public void ThenTheResponseJsonShouldHaveStringContainingString(
+        string field,
+        string expectedSubstring
+    )
+    {
+        scenario
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .Should()
+            .BeTrue();
+        scenario
+            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .Should()
+            .BeTrue();
+
+        using var doc = JsonDocument.Parse(responseBody!);
+        var root = doc.RootElement;
+
+        if (!root.TryGetProperty(field, out var value))
+        {
+            root.TryGetProperty("payload", out var payloadElem)
+                .Should()
+                .BeTrue(
+                    "Expected field '{0}' to be present either at the root or inside 'payload'",
+                    field
+                );
+            payloadElem
+                .ValueKind.Should()
+                .Be(JsonValueKind.Object, "payload must be an object");
+            payloadElem
+                .TryGetProperty(field, out value)
+                .Should()
+                .BeTrue(
+                    "Expected field '{0}' to be present inside 'payload'",
+                    field
+                );
+        }
+
+        value
+            .ValueKind.Should()
+            .Be(
+                JsonValueKind.String,
+                "Expected field '{0}' to be a string",
+                field
+            );
+        var actualValue = value.GetString();
+        actualValue.Should().Contain(expectedSubstring,
+            "Expected field '{0}' to contain '{1}' but was '{2}'",
+            field, expectedSubstring, actualValue);
+    }
 }

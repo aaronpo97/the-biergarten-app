@@ -1,4 +1,5 @@
 using API.Core;
+using API.Core.Authentication;
 using API.Core.Contracts.Common;
 using Domain.Exceptions;
 using FluentValidation;
@@ -11,6 +12,7 @@ using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Service.Auth;
@@ -69,6 +71,12 @@ builder.Services.AddScoped<IConfirmationService, ConfirmationService>();
 // Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();
 
+// Configure JWT Authentication
+builder.Services.AddAuthentication("JWT")
+    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>("JWT", options => { });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -76,6 +84,9 @@ app.UseSwaggerUI();
 app.MapOpenApi();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Health check endpoint (used by Docker health checks and orchestrators)
 app.MapHealthChecks("/health");

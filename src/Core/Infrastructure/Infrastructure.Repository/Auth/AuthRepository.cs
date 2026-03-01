@@ -134,10 +134,10 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
 
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();
-        command.CommandText = "USP_ConfirmUserAccount";
+        command.CommandText = "USP_CreateUserVerification";
         command.CommandType = CommandType.StoredProcedure;
 
-        AddParameter(command, "@UserAccountId", userAccountId);
+        AddParameter(command, "@UserAccountID_", userAccountId);
 
         await command.ExecuteNonQueryAsync();
 

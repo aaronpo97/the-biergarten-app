@@ -73,10 +73,10 @@ namespace API.Core.Controllers
             return Ok(
                 new ResponseBody<ConfirmationPayload>
                 {
-                    Message = "User with ID " + rtn.userId + " is confirmed.",
+                    Message = "User with ID " + rtn.UserId + " is confirmed.",
                     Payload = new ConfirmationPayload(
-                        rtn.userId,
-                        rtn.confirmedAt
+                        rtn.UserId,
+                        rtn.ConfirmedAt
                     ),
                 }
             );

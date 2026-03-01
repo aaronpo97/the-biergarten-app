@@ -68,8 +68,8 @@ public class ConfirmationServiceTest
 
       // Assert
       result.Should().NotBeNull();
-      result.userId.Should().Be(userId);
-      result.confirmedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+      result.UserId.Should().Be(userId);
+      result.ConfirmedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
 
       _tokenServiceMock.Verify(
           x => x.ValidateConfirmationTokenAsync(confirmationToken),

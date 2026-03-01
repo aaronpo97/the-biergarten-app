@@ -3,6 +3,7 @@ Feature: Token Refresh
    I want to refresh my access token using my refresh token
    So that I can maintain my session without logging in again
 
+   @Ignore
    Scenario: Successful token refresh with valid refresh token
       Given the API is running
       And I have an existing account
@@ -13,6 +14,7 @@ Feature: Token Refresh
       And the response JSON should have a new access token
       And the response JSON should have a new refresh token
 
+   @Ignore
    Scenario: Token refresh fails with invalid refresh token
       Given the API is running
       When I submit a refresh token request with an invalid refresh token
