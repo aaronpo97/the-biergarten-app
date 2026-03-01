@@ -6,8 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain.Entities\Domain.Entities.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
   </ItemGroup>
 </Project>

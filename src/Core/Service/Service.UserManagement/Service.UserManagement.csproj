@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain.Exceptions\Domain.Exceptions.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
+    <ProjectReference
+      Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@ public interface IConfirmationService
 public class ConfirmationService(IAuthRepository authRepository)
     : IConfirmationService
 {
+    private readonly IAuthRepository _authRepository = authRepository;
+
     public async Task<ConfirmationServiceReturn> ConfirmUserAsync(
         string confirmationToken
     )
