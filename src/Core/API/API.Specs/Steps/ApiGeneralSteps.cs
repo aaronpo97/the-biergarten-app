@@ -196,8 +196,14 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                 field
             );
         var actualValue = value.GetString();
-        actualValue.Should().Contain(expectedSubstring,
-            "Expected field '{0}' to contain '{1}' but was '{2}'",
-            field, expectedSubstring, actualValue);
+        actualValue
+            .Should()
+            .Contain(
+                expectedSubstring,
+                "Expected field '{0}' to contain '{1}' but was '{2}'",
+                field,
+                expectedSubstring,
+                actualValue
+            );
     }
 }

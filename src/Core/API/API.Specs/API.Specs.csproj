@@ -1,46 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-    <RootNamespace>API.Specs</RootNamespace>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>API.Specs</RootNamespace>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
-    <PackageReference Include="FluentAssertions" Version="6.9.0" />
-    <PackageReference Include="dbup" Version="5.0.41" />
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+        <PackageReference Include="FluentAssertions" Version="6.9.0" />
+        <PackageReference Include="dbup" Version="5.0.41" />
 
-    <!-- Reqnroll core, xUnit adapter and code-behind generator -->
-    <PackageReference Include="Reqnroll" Version="3.3.3" />
-    <PackageReference Include="Reqnroll.xUnit" Version="3.3.3" />
-    <PackageReference
-      Include="Reqnroll.Tools.MsBuild.Generation"
-      Version="3.3.3"
-      PrivateAssets="all"
-    />
+        <!-- Reqnroll core, xUnit adapter and code-behind generator -->
+        <PackageReference Include="Reqnroll" Version="3.3.3" />
+        <PackageReference Include="Reqnroll.xUnit" Version="3.3.3" />
+        <PackageReference
+            Include="Reqnroll.Tools.MsBuild.Generation"
+            Version="3.3.3"
+            PrivateAssets="all"
+        />
 
-    <!-- ASP.NET Core integration testing -->
-    <PackageReference
-      Include="Microsoft.AspNetCore.Mvc.Testing"
-      Version="9.0.1"
-    />
-  </ItemGroup>
+        <!-- ASP.NET Core integration testing -->
+        <PackageReference
+            Include="Microsoft.AspNetCore.Mvc.Testing"
+            Version="9.0.1"
+        />
+    </ItemGroup>
 
-  <ItemGroup>
-    <!-- Ensure feature files are included in the project -->
-    <None Include="Features\**\*.feature" />
-  </ItemGroup>
+    <ItemGroup>
+        <!-- Ensure feature files are included in the project -->
+        <None Include="Features\**\*.feature" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\API.Core\API.Core.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\API.Core\API.Core.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+    </ItemGroup>
 </Project>

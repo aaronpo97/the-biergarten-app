@@ -300,9 +300,16 @@ public class AuthSteps(ScenarioContext scenario)
         };
 
         var body = JsonSerializer.Serialize(registrationData);
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/register")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/register"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -318,9 +325,16 @@ public class AuthSteps(ScenarioContext scenario)
         var loginData = new { username = "test.user", password = "password" };
         var body = JsonSerializer.Serialize(loginData);
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/login"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -330,13 +344,17 @@ public class AuthSteps(ScenarioContext scenario)
         var root = doc.RootElement;
         if (root.TryGetProperty("payload", out var payloadElem))
         {
-            if (payloadElem.TryGetProperty("accessToken", out var tokenElem) ||
-                payloadElem.TryGetProperty("AccessToken", out tokenElem))
+            if (
+                payloadElem.TryGetProperty("accessToken", out var tokenElem)
+                || payloadElem.TryGetProperty("AccessToken", out tokenElem)
+            )
             {
                 scenario["accessToken"] = tokenElem.GetString();
             }
-            if (payloadElem.TryGetProperty("refreshToken", out var refreshElem) ||
-                payloadElem.TryGetProperty("RefreshToken", out refreshElem))
+            if (
+                payloadElem.TryGetProperty("refreshToken", out var refreshElem)
+                || payloadElem.TryGetProperty("RefreshToken", out refreshElem)
+            )
             {
                 scenario["refreshToken"] = refreshElem.GetString();
             }
@@ -363,13 +381,20 @@ public class AuthSteps(ScenarioContext scenario)
         scenario["confirmationToken"] = "valid-confirmation-token";
     }
 
-    [When("I submit a request to a protected endpoint with a valid access token")]
+    [When(
+        "I submit a request to a protected endpoint with a valid access token"
+    )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithAValidAccessToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t) ? t : "invalid-token";
+        var token = scenario.TryGetValue<string>("accessToken", out var t)
+            ? t
+            : "invalid-token";
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", $"Bearer {token}" } },
         };
@@ -378,11 +403,16 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseKey] = response;
     }
 
-    [When("I submit a request to a protected endpoint with an invalid access token")]
+    [When(
+        "I submit a request to a protected endpoint with an invalid access token"
+    )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithAnInvalidAccessToken()
     {
         var client = GetClient();
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", "Bearer invalid-token-format" } },
         };
@@ -395,12 +425,21 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAConfirmationRequestWithTheValidToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t) ? t : "valid-token";
+        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+            ? t
+            : "valid-token";
         var body = JsonSerializer.Serialize(new { token });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/confirm")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/confirm"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -413,11 +452,20 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAConfirmationRequestWithAMalformedToken()
     {
         var client = GetClient();
-        var body = JsonSerializer.Serialize(new { token = "malformed-token-not-jwt" });
+        var body = JsonSerializer.Serialize(
+            new { token = "malformed-token-not-jwt" }
+        );
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/confirm")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/confirm"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -430,12 +478,21 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARefreshTokenRequestWithTheValidRefreshToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("refreshToken", out var t) ? t : "valid-refresh-token";
+        var token = scenario.TryGetValue<string>("refreshToken", out var t)
+            ? t
+            : "valid-refresh-token";
         var body = JsonSerializer.Serialize(new { refreshToken = token });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/refresh"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -449,11 +506,20 @@ public class AuthSteps(ScenarioContext scenario)
     {
         var client = GetClient();
         // Use an expired token
-        var body = JsonSerializer.Serialize(new { refreshToken = "expired-refresh-token" });
+        var body = JsonSerializer.Serialize(
+            new { refreshToken = "expired-refresh-token" }
+        );
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/refresh"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -468,9 +534,16 @@ public class AuthSteps(ScenarioContext scenario)
         var client = GetClient();
         var body = JsonSerializer.Serialize(new { });
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            "/api/auth/refresh"
+        )
         {
-            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -483,9 +556,16 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARefreshTokenRequestUsingAGETRequest()
     {
         var client = GetClient();
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/auth/refresh")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/auth/refresh"
+        )
         {
-            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                "{}",
+                System.Text.Encoding.UTF8,
+                "application/json"
+            ),
         };
 
         var response = await client.SendAsync(requestMessage);
@@ -497,7 +577,10 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARequestToAProtectedEndpointWithoutAnAccessToken()
     {
         var client = GetClient();
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected");
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        );
 
         var response = await client.SendAsync(requestMessage);
         scenario[ResponseKey] = response;
@@ -514,16 +597,22 @@ public class AuthSteps(ScenarioContext scenario)
     public void GivenIHaveAnAccessTokenSignedWithTheWrongSecret()
     {
         // Create a token with a different secret
-        scenario["accessToken"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        scenario["accessToken"] =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     }
 
     [When("I submit a request to a protected endpoint with the expired token")]
     public async Task WhenISubmitARequestToAProtectedEndpointWithTheExpiredToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t) ? t : "expired-token";
+        var token = scenario.TryGetValue<string>("accessToken", out var t)
+            ? t
+            : "expired-token";
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", $"Bearer {token}" } },
         };
@@ -536,9 +625,14 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARequestToAProtectedEndpointWithTheTamperedToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t) ? t : "tampered-token";
+        var token = scenario.TryGetValue<string>("accessToken", out var t)
+            ? t
+            : "tampered-token";
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", $"Bearer {token}" } },
         };
@@ -547,13 +641,20 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseKey] = response;
     }
 
-    [When("I submit a request to a protected endpoint with my refresh token instead of access token")]
+    [When(
+        "I submit a request to a protected endpoint with my refresh token instead of access token"
+    )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithMyRefreshTokenInsteadOfAccessToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("refreshToken", out var t) ? t : "refresh-token";
+        var token = scenario.TryGetValue<string>("refreshToken", out var t)
+            ? t
+            : "refresh-token";
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", $"Bearer {token}" } },
         };
@@ -568,13 +669,20 @@ public class AuthSteps(ScenarioContext scenario)
         scenario["confirmationToken"] = "valid-confirmation-token";
     }
 
-    [When("I submit a request to a protected endpoint with my confirmation token instead of access token")]
+    [When(
+        "I submit a request to a protected endpoint with my confirmation token instead of access token"
+    )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithMyConfirmationTokenInsteadOfAccessToken()
     {
         var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t) ? t : "confirmation-token";
+        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+            ? t
+            : "confirmation-token";
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "/api/protected")
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/protected"
+        )
         {
             Headers = { { "Authorization", $"Bearer {token}" } },
         };

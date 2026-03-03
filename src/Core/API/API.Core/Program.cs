@@ -72,8 +72,12 @@ builder.Services.AddScoped<IConfirmationService, ConfirmationService>();
 builder.Services.AddScoped<GlobalExceptionFilter>();
 
 // Configure JWT Authentication
-builder.Services.AddAuthentication("JWT")
-    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>("JWT", options => { });
+builder
+    .Services.AddAuthentication("JWT")
+    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>(
+        "JWT",
+        options => { }
+    );
 
 builder.Services.AddAuthorization();
 

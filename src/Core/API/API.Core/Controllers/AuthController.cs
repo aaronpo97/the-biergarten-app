@@ -87,9 +87,7 @@ namespace API.Core.Controllers
             [FromBody] RefreshTokenRequest req
         )
         {
-            var rtn = await tokenService.RefreshTokenAsync(
-                req.RefreshToken
-            );
+            var rtn = await tokenService.RefreshTokenAsync(req.RefreshToken);
 
             return Ok(
                 new ResponseBody<LoginPayload>

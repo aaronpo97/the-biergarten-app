@@ -18,6 +18,4 @@ public record RegistrationPayload(
     bool ConfirmationEmailSent
 );
 
-public record ConfirmationPayload(
-    Guid UserAccountId,
-    DateTime ConfirmedDate);
+public record ConfirmationPayload(Guid UserAccountId, DateTime ConfirmedDate);
