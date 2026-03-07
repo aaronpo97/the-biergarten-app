@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.Json;
+using API.Core.Contracts.Common;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -16,12 +18,17 @@ public class JwtAuthenticationHandler(
 {
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // Get the JWT secret from configuration
-        var secret =
-            configuration["Jwt:SecretKey"]
-            ?? throw new InvalidOperationException(
-                "JWT SecretKey is not configured"
-            );
+        // Use the same access-token secret source as TokenService to avoid mismatched validation.
+        var secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET");
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            secret = configuration["Jwt:SecretKey"];
+        }
+
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            return AuthenticateResult.Fail("JWT secret is not configured");
+        }
 
         // Check if Authorization header exists
         if (
@@ -64,6 +71,15 @@ public class JwtAuthenticationHandler(
                 $"Token validation failed: {ex.Message}"
             );
         }
+    }
+
+    protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+    {
+        Response.ContentType = "application/json";
+        Response.StatusCode = 401;
+
+        var response = new ResponseBody { Message = "Unauthorized: Invalid or missing authentication token" };
+        await Response.WriteAsJsonAsync(response);
     }
 }
 

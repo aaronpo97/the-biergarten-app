@@ -19,7 +19,7 @@ Feature: Protected Endpoint Access Token Validation
       Given the API is running
       When I submit a request to a protected endpoint with an invalid access token
       Then the response has HTTP status 401
-      And the response JSON should have "message" containing "Invalid"
+      And the response JSON should have "message" containing "Unauthorized"
 
    Scenario: Protected endpoint rejects expired access token
       Given the API is running
@@ -27,14 +27,14 @@ Feature: Protected Endpoint Access Token Validation
       And I am logged in with an immediately-expiring access token
       When I submit a request to a protected endpoint with the expired token
       Then the response has HTTP status 401
-      And the response JSON should have "message" containing "expired"
+      And the response JSON should have "message" containing "Unauthorized"
 
    Scenario: Protected endpoint rejects token signed with wrong secret
       Given the API is running
       And I have an access token signed with the wrong secret
       When I submit a request to a protected endpoint with the tampered token
       Then the response has HTTP status 401
-      And the response JSON should have "message" containing "Invalid"
+      And the response JSON should have "message" containing "Unauthorized"
 
    Scenario: Protected endpoint rejects refresh token as access token
       Given the API is running

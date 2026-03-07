@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices.JavaScript;
+using Domain.Exceptions;
 using Infrastructure.Repository.Auth;
 
 namespace Service.Auth;
@@ -13,11 +13,23 @@ public interface IConfirmationService
 public class ConfirmationService(IAuthRepository authRepository, ITokenService tokenService)
     : IConfirmationService
 {
-
     public async Task<ConfirmationServiceReturn> ConfirmUserAsync(
         string confirmationToken
     )
     {
-        return new ConfirmationServiceReturn(DateTime.Now, Guid.NewGuid());
+        var validatedToken = await tokenService.ValidateConfirmationTokenAsync(
+            confirmationToken
+        );
+
+        var user = await authRepository.ConfirmUserAccountAsync(
+            validatedToken.UserId
+        );
+
+        if (user == null)
+        {
+            throw new UnauthorizedException("User account not found");
+        }
+
+        return new ConfirmationServiceReturn(DateTime.UtcNow, user.UserAccountId);
     }
 }
