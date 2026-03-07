@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using Domain.Entities;
 using Infrastructure.Repository.Sql;
+using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Repository.Auth;
 
@@ -132,6 +133,12 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             return null;
         }
 
+        // Idempotency: if already verified, treat as successful confirmation.
+        if (await IsUserVerifiedAsync(userAccountId))
+        {
+            return user;
+        }
+
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();
         command.CommandText = "USP_CreateUserVerification";
@@ -139,10 +146,37 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
 
         AddParameter(command, "@UserAccountID_", userAccountId);
 
-        await command.ExecuteNonQueryAsync();
+        try
+        {
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (SqlException ex) when (IsDuplicateVerificationViolation(ex))
+        {
+            // A concurrent request verified this user first. Keep behavior idempotent.
+        }
 
         // Fetch and return the updated user
         return await GetUserByIdAsync(userAccountId);
+    }
+
+    private async Task<bool> IsUserVerifiedAsync(Guid userAccountId)
+    {
+        await using var connection = await CreateConnection();
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            "SELECT TOP 1 1 FROM dbo.UserVerification WHERE UserAccountID = @UserAccountID";
+        command.CommandType = CommandType.Text;
+
+        AddParameter(command, "@UserAccountID", userAccountId);
+
+        var result = await command.ExecuteScalarAsync();
+        return result != null && result != DBNull.Value;
+    }
+
+    private static bool IsDuplicateVerificationViolation(SqlException ex)
+    {
+        // 2601/2627 are duplicate key violations in SQL Server.
+        return ex.Number == 2601 || ex.Number == 2627;
     }
 
 

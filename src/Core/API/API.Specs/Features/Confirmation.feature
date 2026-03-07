@@ -10,6 +10,15 @@ Feature: User Account Confirmation
       Then the response has HTTP status 200
       And the response JSON should have "message" containing "is confirmed"
 
+   Scenario: Re-confirming an already verified account remains successful
+      Given the API is running
+      And I have registered a new account
+      And I have a valid confirmation token for my account
+      When I submit a confirmation request with the valid token
+      And I submit the same confirmation request again
+      Then the response has HTTP status 200
+      And the response JSON should have "message" containing "is confirmed"
+
    Scenario: Confirmation fails with invalid token
       Given the API is running
       When I submit a confirmation request with an invalid token

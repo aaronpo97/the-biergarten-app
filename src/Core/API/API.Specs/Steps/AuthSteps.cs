@@ -599,6 +599,25 @@ public class AuthSteps(ScenarioContext scenario)
         scenario[ResponseBodyKey] = responseBody;
     }
 
+    [When("I submit the same confirmation request again")]
+    public async Task WhenISubmitTheSameConfirmationRequestAgain()
+    {
+        var client = GetClient();
+        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+            ? t
+            : "valid-token";
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
+        );
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
+
     [When("I submit a confirmation request with a malformed token")]
     public async Task WhenISubmitAConfirmationRequestWithAMalformedToken()
     {
