@@ -8,15 +8,19 @@ namespace API.Core.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IRegisterService register, ILoginService login)
-        : ControllerBase
+    public class AuthController(
+        IRegisterService registerService,
+        ILoginService loginService,
+        IConfirmationService confirmationService,
+        ITokenService tokenService
+    ) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register(
             [FromBody] RegisterRequest req
         )
         {
-            var rtn = await register.RegisterAsync(
+            var rtn = await registerService.RegisterAsync(
                 new UserAccount
                 {
                     UserAccountId = Guid.Empty,
@@ -46,12 +50,49 @@ namespace API.Core.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
-            var rtn = await login.LoginAsync(req.Username, req.Password);
+            var rtn = await loginService.LoginAsync(req.Username, req.Password);
 
             return Ok(
                 new ResponseBody<LoginPayload>
                 {
                     Message = "Logged in successfully.",
+                    Payload = new LoginPayload(
+                        rtn.UserAccount.UserAccountId,
+                        rtn.UserAccount.Username,
+                        rtn.RefreshToken,
+                        rtn.AccessToken
+                    ),
+                }
+            );
+        }
+
+        [HttpPost("confirm")]
+        public async Task<ActionResult> Confirm([FromQuery] string token)
+        {
+            var rtn = await confirmationService.ConfirmUserAsync(token);
+            return Ok(
+                new ResponseBody<ConfirmationPayload>
+                {
+                    Message = "User with ID " + rtn.UserId + " is confirmed.",
+                    Payload = new ConfirmationPayload(
+                        rtn.UserId,
+                        rtn.ConfirmedAt
+                    ),
+                }
+            );
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult> Refresh(
+            [FromBody] RefreshTokenRequest req
+        )
+        {
+            var rtn = await tokenService.RefreshTokenAsync(req.RefreshToken);
+
+            return Ok(
+                new ResponseBody<LoginPayload>
+                {
+                    Message = "Token refreshed successfully.",
                     Payload = new LoginPayload(
                         rtn.UserAccount.UserAccountId,
                         rtn.UserAccount.Username,

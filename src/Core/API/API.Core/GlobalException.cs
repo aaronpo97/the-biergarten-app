@@ -3,6 +3,7 @@
 using API.Core.Contracts.Common;
 using Domain.Exceptions;
 using FluentValidation;
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -67,6 +68,16 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
                 )
                 {
                     StatusCode = 403,
+                };
+                context.ExceptionHandled = true;
+                break;
+
+            case SqlException ex:
+                context.Result = new ObjectResult(
+                    new ResponseBody { Message = "A database error occurred." }
+                )
+                {
+                    StatusCode = 503,
                 };
                 context.ExceptionHandled = true;
                 break;

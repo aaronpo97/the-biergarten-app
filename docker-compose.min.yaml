@@ -1,6 +1,6 @@
 services:
   sqlserver:
-    env_file: ".env.dev"
+    env_file: ".env.local"
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
     container_name: dev-env-sqlserver
@@ -21,7 +21,7 @@ services:
     networks:
       - devnet
   database.migrations:
-    env_file: ".env.dev"
+    env_file: ".env.local"
     image: database.migrations
     container_name: dev-env-database-migrations
     depends_on:
@@ -44,8 +44,22 @@ services:
     networks:
       - devnet
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: dev-env-mailpit
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP server
+
+    restart: unless-stopped
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - devnet
+
   database.seed:
-    env_file: ".env.dev"
+    env_file: ".env.local"
     image: database.seed
     container_name: dev-env-database-seed
     depends_on:
@@ -64,53 +78,6 @@ services:
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
     restart: "no"
-    networks:
-      - devnet
-
-  api.core:
-    env_file: ".env.dev"
-    image: api.core
-    container_name: dev-env-api-core
-    depends_on:
-      database.seed:
-        condition: service_completed_successfully
-    build:
-      context: ./src/Core
-      dockerfile: API/API.Core/Dockerfile
-      args:
-        BUILD_CONFIGURATION: Release
-        APP_UID: 1000
-    ports:
-      - "8080:8080"
-      - "8081:8081"
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Development"
-      ASPNETCORE_URLS: "http://0.0.0.0:8080"
-      DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_SERVER: "${DB_SERVER}"
-      DB_NAME: "${DB_NAME}"
-      DB_USER: "${DB_USER}"
-      DB_PASSWORD: "${DB_PASSWORD}"
-      ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
-      REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
-      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
-    restart: unless-stopped
-    networks:
-      - devnet
-    volumes:
-      - nuget-cache-dev:/root/.nuget/packages
-
-  mailpit:
-    image: axllent/mailpit:latest
-    container_name: dev-env-mailpit
-    ports:
-      - "8025:8025" # Web UI
-      - "1025:1025" # SMTP server
-
-    restart: unless-stopped
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - devnet
 volumes:

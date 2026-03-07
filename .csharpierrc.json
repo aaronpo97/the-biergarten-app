@@ -1,9 +1,19 @@
 {
+  "$schema": "https://json.schemastore.org/csharpier.json",
+
   "printWidth": 80,
   "useTabs": false,
-  "tabWidth": 4,
-  "endOfLine": "auto",
-  "indentStyle": "space",
-  "lineEndings": "auto",
-  "wrapLineLength": 80
+  "indentSize": 4,
+  "endOfLine": "lf",
+
+  "overrides": [
+    {
+      "files": "*.xml",
+      "indentSize": 2
+    },
+    {
+      "files": "*.csx",
+      "printWidth": 80
+    }
+  ]
 }

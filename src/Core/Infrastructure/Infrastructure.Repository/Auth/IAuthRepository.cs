@@ -60,4 +60,19 @@ public interface IAuthRepository
     /// <param name="userAccountId">ID of the user account</param>
     /// <param name="newPasswordHash">New hashed password</param>
     Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash);
+
+    /// <summary>
+    /// Marks a user account as confirmed.
+    /// </summary>
+    /// <param name="userAccountId">ID of the user account to confirm</param>
+    /// <returns>The confirmed UserAccount entity</returns>
+    /// <exception cref="UnauthorizedException">If user account not found</exception>
+    Task<Domain.Entities.UserAccount?> ConfirmUserAccountAsync(Guid userAccountId);
+
+    /// <summary>
+    /// Retrieves a user account by ID.
+    /// </summary>
+    /// <param name="userAccountId">ID of the user account</param>
+    /// <returns>UserAccount if found, null otherwise</returns>
+    Task<Domain.Entities.UserAccount?> GetUserByIdAsync(Guid userAccountId);
 }
