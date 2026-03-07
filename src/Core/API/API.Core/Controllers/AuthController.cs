@@ -1,6 +1,7 @@
 using API.Core.Contracts.Auth;
 using API.Core.Contracts.Common;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Auth;
 
@@ -8,6 +9,7 @@ namespace API.Core.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "JWT")]
     public class AuthController(
         IRegisterService registerService,
         ILoginService loginService,
@@ -15,6 +17,7 @@ namespace API.Core.Controllers
         ITokenService tokenService
     ) : ControllerBase
     {
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<UserAccount>> Register(
             [FromBody] RegisterRequest req
@@ -47,6 +50,7 @@ namespace API.Core.Controllers
             return Created("/", response);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest req)
         {
@@ -82,6 +86,7 @@ namespace API.Core.Controllers
             );
         }
 
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<ActionResult> Refresh(
             [FromBody] RefreshTokenRequest req
