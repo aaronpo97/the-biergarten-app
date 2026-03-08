@@ -8,4 +8,6 @@ public record ConfirmationServiceReturn(DateTime ConfirmedAt, Guid UserId);
 public interface IConfirmationService
 {
     Task<ConfirmationServiceReturn> ConfirmUserAsync(string confirmationToken);
+    Task ResendConfirmationEmailAsync(Guid userId);
+
 }

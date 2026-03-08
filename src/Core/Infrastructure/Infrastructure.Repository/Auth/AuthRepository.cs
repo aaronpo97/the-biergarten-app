@@ -159,7 +159,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return await GetUserByIdAsync(userAccountId);
     }
 
-    private async Task<bool> IsUserVerifiedAsync(Guid userAccountId)
+    public async Task<bool> IsUserVerifiedAsync(Guid userAccountId)
     {
         await using var connection = await CreateConnection();
         await using var command = connection.CreateCommand();

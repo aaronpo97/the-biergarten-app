@@ -75,4 +75,11 @@ public interface IAuthRepository
     /// <param name="userAccountId">ID of the user account</param>
     /// <returns>UserAccount if found, null otherwise</returns>
     Task<Domain.Entities.UserAccount?> GetUserByIdAsync(Guid userAccountId);
+
+    /// <summary>
+    /// Checks whether a user account has been verified.
+    /// </summary>
+    /// <param name="userAccountId">ID of the user account</param>
+    /// <returns>True if the user has a verification record, false otherwise</returns>
+    Task<bool> IsUserVerifiedAsync(Guid userAccountId);
 }
