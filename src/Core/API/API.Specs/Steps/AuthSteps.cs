@@ -457,6 +457,32 @@ public class AuthSteps(ScenarioContext scenario)
         await GivenIAmLoggedIn();
     }
 
+    [Given("I have a valid access token for my account")]
+    public void GivenIHaveAValidAccessTokenForMyAccount()
+    {
+        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+            ? id
+            : throw new InvalidOperationException(
+                "registered user ID not found in scenario"
+            );
+        var username = scenario.TryGetValue<string>(
+            RegisteredUsernameKey,
+            out var user
+        )
+            ? user
+            : throw new InvalidOperationException(
+                "registered username not found in scenario"
+            );
+
+        var secret = GetRequiredEnvVar("ACCESS_TOKEN_SECRET");
+        scenario["accessToken"] = GenerateJwtToken(
+            userId,
+            username,
+            secret,
+            DateTime.UtcNow.AddMinutes(60)
+        );
+    }
+
     [Given("I have a valid confirmation token for my account")]
     public void GivenIHaveAValidConfirmationTokenForMyAccount()
     {
@@ -587,11 +613,16 @@ public class AuthSteps(ScenarioContext scenario)
         var token = scenario.TryGetValue<string>("confirmationToken", out var t)
             ? t
             : "valid-token";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -606,11 +637,16 @@ public class AuthSteps(ScenarioContext scenario)
         var token = scenario.TryGetValue<string>("confirmationToken", out var t)
             ? t
             : "valid-token";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -623,11 +659,16 @@ public class AuthSteps(ScenarioContext scenario)
     {
         var client = GetClient();
         const string token = "malformed-token-not-jwt";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -883,11 +924,16 @@ public class AuthSteps(ScenarioContext scenario)
         var token = scenario.TryGetValue<string>("confirmationToken", out var t)
             ? t
             : "expired-confirmation-token";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -902,11 +948,16 @@ public class AuthSteps(ScenarioContext scenario)
         var token = scenario.TryGetValue<string>("confirmationToken", out var t)
             ? t
             : "tampered-confirmation-token";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -918,7 +969,13 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAConfirmationRequestWithAMissingToken()
     {
         var client = GetClient();
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
+
         var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/confirm");
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
         var response = await client.SendAsync(requestMessage);
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -974,6 +1031,30 @@ public class AuthSteps(ScenarioContext scenario)
     {
         var client = GetClient();
         const string token = "invalid-confirmation-token";
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
+        );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
+
+    [When("I submit a confirmation request with the valid token without an access token")]
+    public async Task WhenISubmitAConfirmationRequestWithTheValidTokenWithoutAnAccessToken()
+    {
+        var client = GetClient();
+        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+            ? t
+            : "valid-token";
 
         var requestMessage = new HttpRequestMessage(
             HttpMethod.Post,

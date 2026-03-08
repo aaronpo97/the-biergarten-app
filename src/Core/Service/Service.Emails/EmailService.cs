@@ -17,13 +17,17 @@ public class EmailService(
     IEmailTemplateProvider emailTemplateProvider
 ) : IEmailService
 {
+    private static readonly string WebsiteBaseUrl =
+        Environment.GetEnvironmentVariable("WEBSITE_BASE_URL")
+        ?? throw new InvalidOperationException("WEBSITE_BASE_URL environment variable is not set");
+
     public async Task SendRegistrationEmailAsync(
         UserAccount createdUser,
         string confirmationToken
     )
     {
         var confirmationLink =
-            $"https://thebiergarten.app/confirm?token={confirmationToken}";
+            $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
 
         var emailHtml =
             await emailTemplateProvider.RenderUserRegisteredEmailAsync(

@@ -71,6 +71,9 @@ REFRESH_TOKEN_SECRET=<generated-secret>             # Signs long-lived refresh t
 
 # Confirmation token secret (30-minute tokens)
 CONFIRMATION_TOKEN_SECRET=<generated-secret>        # Signs email confirmation tokens
+
+# Website base URL (used in confirmation emails)
+WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 ```
 
 **Security Requirements**:
@@ -292,6 +295,7 @@ touch .env.local
 | `ACCESS_TOKEN_SECRET`               |    ✓    |          |   ✓    |   Yes    | Access token secret       |
 | `REFRESH_TOKEN_SECRET`              |    ✓    |          |   ✓    |   Yes    | Refresh token secret      |
 | `CONFIRMATION_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Confirmation token secret |
+| `WEBSITE_BASE_URL`                  |    ✓    |          |        |   Yes    | Website URL for emails    |
 | **Authentication (Frontend)**       |
 | `CONFIRMATION_TOKEN_SECRET`         |         |    ✓     |        |   Yes    | Email confirmation        |
 | `RESET_PASSWORD_TOKEN_SECRET`       |         |    ✓     |        |   Yes    | Password reset            |
@@ -359,6 +363,7 @@ DB_PASSWORD=Dev_Password_123!
 ACCESS_TOKEN_SECRET=<generated-with-openssl>
 REFRESH_TOKEN_SECRET=<generated-with-openssl>
 CONFIRMATION_TOKEN_SECRET=<generated-with-openssl>
+WEBSITE_BASE_URL=http://localhost:3000
 
 # Migration
 CLEAR_DATABASE=true

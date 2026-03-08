@@ -94,6 +94,7 @@ services:
       ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
+      WEBSITE_BASE_URL: "${WEBSITE_BASE_URL}"
     restart: unless-stopped
     networks:
       - devnet

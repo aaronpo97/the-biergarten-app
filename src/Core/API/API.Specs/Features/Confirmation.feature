@@ -6,6 +6,7 @@ Feature: User Account Confirmation
       Given the API is running
       And I have registered a new account
       And I have a valid confirmation token for my account
+      And I have a valid access token for my account
       When I submit a confirmation request with the valid token
       Then the response has HTTP status 200
       And the response JSON should have "message" containing "is confirmed"
@@ -14,6 +15,7 @@ Feature: User Account Confirmation
       Given the API is running
       And I have registered a new account
       And I have a valid confirmation token for my account
+      And I have a valid access token for my account
       When I submit a confirmation request with the valid token
       And I submit the same confirmation request again
       Then the response has HTTP status 200
@@ -21,6 +23,8 @@ Feature: User Account Confirmation
 
    Scenario: Confirmation fails with invalid token
       Given the API is running
+      And I have registered a new account
+      And I have a valid access token for my account
       When I submit a confirmation request with an invalid token
       Then the response has HTTP status 401
       And the response JSON should have "message" containing "Invalid token"
@@ -29,6 +33,7 @@ Feature: User Account Confirmation
       Given the API is running
       And I have registered a new account
       And I have an expired confirmation token for my account
+      And I have a valid access token for my account
       When I submit a confirmation request with the expired token
       Then the response has HTTP status 401
       And the response JSON should have "message" containing "Invalid token"
@@ -37,12 +42,15 @@ Feature: User Account Confirmation
       Given the API is running
       And I have registered a new account
       And I have a confirmation token signed with the wrong secret
+      And I have a valid access token for my account
       When I submit a confirmation request with the tampered token
       Then the response has HTTP status 401
       And the response JSON should have "message" containing "Invalid token"
 
    Scenario: Confirmation fails when token is missing
       Given the API is running
+      And I have registered a new account
+      And I have a valid access token for my account
       When I submit a confirmation request with a missing token
       Then the response has HTTP status 400
 
@@ -54,6 +62,15 @@ Feature: User Account Confirmation
 
    Scenario: Confirmation fails with malformed token
       Given the API is running
+      And I have registered a new account
+      And I have a valid access token for my account
       When I submit a confirmation request with a malformed token
       Then the response has HTTP status 401
       And the response JSON should have "message" containing "Invalid token"
+
+   Scenario: Confirmation fails without an access token
+      Given the API is running
+      And I have registered a new account
+      And I have a valid confirmation token for my account
+      When I submit a confirmation request with the valid token without an access token
+      Then the response has HTTP status 401
