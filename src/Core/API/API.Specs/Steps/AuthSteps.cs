@@ -1124,4 +1124,91 @@ public class AuthSteps(ScenarioContext scenario)
             refreshToken.Should().NotBe(previousRefreshToken);
         }
     }
+
+    [Given("I have confirmed my account")]
+    public async Task GivenIHaveConfirmedMyAccount()
+    {
+        var client = GetClient();
+        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+            ? t
+            : throw new InvalidOperationException("confirmation token not found");
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
+        );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+        var response = await client.SendAsync(requestMessage);
+        response.EnsureSuccessStatusCode();
+    }
+
+    [When("I submit a resend confirmation request for my account")]
+    public async Task WhenISubmitAResendConfirmationRequestForMyAccount()
+    {
+        var client = GetClient();
+        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+            ? id
+            : throw new InvalidOperationException("registered user ID not found");
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm/resend?userId={userId}"
+        );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
+
+    [When("I submit a resend confirmation request for a non-existent user")]
+    public async Task WhenISubmitAResendConfirmationRequestForANonExistentUser()
+    {
+        var client = GetClient();
+        var fakeUserId = Guid.NewGuid();
+        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+            ? at
+            : string.Empty;
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm/resend?userId={fakeUserId}"
+        );
+        if (!string.IsNullOrEmpty(accessToken))
+            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
+
+    [When("I submit a resend confirmation request without an access token")]
+    public async Task WhenISubmitAResendConfirmationRequestWithoutAnAccessToken()
+    {
+        var client = GetClient();
+        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+            ? id
+            : Guid.NewGuid();
+
+        var requestMessage = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/api/auth/confirm/resend?userId={userId}"
+        );
+
+        var response = await client.SendAsync(requestMessage);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        scenario[ResponseKey] = response;
+        scenario[ResponseBodyKey] = responseBody;
+    }
 }

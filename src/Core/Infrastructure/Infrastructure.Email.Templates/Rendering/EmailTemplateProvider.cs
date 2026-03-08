@@ -31,6 +31,23 @@ public class EmailTemplateProvider(
     }
 
     /// <summary>
+    /// Renders the ResendConfirmation template with the specified parameters.
+    /// </summary>
+    public async Task<string> RenderResendConfirmationEmailAsync(
+        string username,
+        string confirmationLink
+    )
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            { nameof(ResendConfirmation.Username), username },
+            { nameof(ResendConfirmation.ConfirmationLink), confirmationLink },
+        };
+
+        return await RenderComponentAsync<ResendConfirmation>(parameters);
+    }
+
+    /// <summary>
     /// Generic method to render any Razor component to HTML.
     /// </summary>
     private async Task<string> RenderComponentAsync<TComponent>(

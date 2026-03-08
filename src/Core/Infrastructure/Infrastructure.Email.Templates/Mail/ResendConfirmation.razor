@@ -1,0 +1,117 @@
+@using Infrastructure.Email.Templates.Components
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+      xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="x-apple-disable-message-reformatting">
+   <title>Resend Confirmation - The Biergarten App</title>
+   <!--[if mso]>
+    <style>
+     * { font-family: Arial, sans-serif !important; }
+     table { border-collapse: collapse; }
+    </style>
+    <![endif]-->
+   <!--[if !mso]><!-->
+   <style>
+         * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         }
+   </style>
+   <!--<![endif]-->
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f4f4; width:100%;">
+   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f4f4;">
+      <tr>
+         <td align="center" style="padding:40px 10px;">
+            <!--[if mso]>
+          <table border="0" cellpadding="0" cellspacing="0" width="600" style="width:600px;">
+          <tr><td>
+          <![endif]-->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+                   style="max-width:600px; background:#ffffff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+               <Header />
+
+               <tr>
+                  <td style="padding:40px 40px 16px 40px; text-align:center;">
+                     <h1 style="margin:0; color:#333333; font-size:26px; font-weight:700;">
+                        New Confirmation Link
+                     </h1>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td style="padding:0 40px 20px 40px; text-align:center;">
+                     <p style="margin:0; color:#666666; font-size:16px; line-height:24px;">
+                        Hi <strong style="color:#333333;">@Username</strong>, you requested another email confirmation
+                        link.
+                        Use the button below to verify your account.
+                     </p>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td style="padding:8px 40px;">
+                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                           <td align="center">
+                              <!--[if mso]>
+                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                             href="@ConfirmationLink" style="height:50px;v-text-anchor:middle;width:260px;"
+                             arcsize="10%" stroke="f" fillcolor="#f59e0b">
+                       <w:anchorlock/>
+                       <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:700;">
+                        Confirm Email Again
+                       </center>
+                      </v:roundrect>
+                      <![endif]-->
+                              <!--[if !mso]><!-->
+                              <a href="@ConfirmationLink" target="_blank" rel="noopener noreferrer"
+                                 style="display:inline-block; padding:16px 40px; background:#d97706; color:#ffffff; text-decoration:none; border-radius:6px; font-size:16px; font-weight:700;">
+                                 Confirm Email Again
+                              </a>
+                              <!--<![endif]-->
+                           </td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td style="padding:20px 40px 8px 40px; text-align:center;">
+                     <p style="margin:0; color:#999999; font-size:13px; line-height:20px;">
+                        This replacement link expires in 24 hours.
+                     </p>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td style="padding:0 40px 28px 40px; text-align:center;">
+                     <p style="margin:0; color:#999999; font-size:13px; line-height:20px;">
+                        If you did not request this, you can safely ignore this email.
+                     </p>
+                  </td>
+               </tr>
+
+               <EmailFooter FooterText="Cheers, The Biergarten App Team" />
+            </table>
+            <!--[if mso]></td></tr></table><![endif]-->
+         </td>
+      </tr>
+   </table>
+</body>
+</html>
+
+@code {
+   [Parameter]
+   public string Username { get; set; } = string.Empty;
+
+   [Parameter]
+   public string ConfirmationLink { get; set; } = string.Empty;
+}

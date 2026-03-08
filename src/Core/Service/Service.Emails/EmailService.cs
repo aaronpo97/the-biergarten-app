@@ -10,6 +10,11 @@ public interface IEmailService
         UserAccount createdUser,
         string confirmationToken
     );
+
+    public Task SendResendConfirmationEmailAsync(
+        UserAccount user,
+        string confirmationToken
+    );
 }
 
 public class EmailService(
@@ -38,6 +43,28 @@ public class EmailService(
         await emailProvider.SendAsync(
             createdUser.Email,
             "Welcome to The Biergarten App!",
+            emailHtml,
+            isHtml: true
+        );
+    }
+
+    public async Task SendResendConfirmationEmailAsync(
+        UserAccount user,
+        string confirmationToken
+    )
+    {
+        var confirmationLink =
+            $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
+
+        var emailHtml =
+            await emailTemplateProvider.RenderResendConfirmationEmailAsync(
+                user.FirstName,
+                confirmationLink
+            );
+
+        await emailProvider.SendAsync(
+            user.Email,
+            "Confirm Your Email - The Biergarten App",
             emailHtml,
             isHtml: true
         );
