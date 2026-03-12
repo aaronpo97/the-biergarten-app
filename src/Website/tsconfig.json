@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "charset": "utf8",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "target": "ES2022",
+    "skipLibCheck": true
+  },
+  "include": ["app"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: biergarten-lager, biergarten-stout;
+}
+
+@theme {
+  --font-sans:
+    "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Volkhov", ui-serif, Georgia, serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title {
+  font-family: var(--font-serif);
+}
+
+@plugin "daisyui/theme" {
+  name: "biergarten-lager";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  /* Base — warm parchment / aged paper */
+  --color-base-100: oklch(97% 0.025 80);
+  --color-base-200: oklch(92% 0.04 78);
+  --color-base-300: oklch(86% 0.06 75);
+  --color-base-content: oklch(28% 0.05 55);
+  /* Primary — golden amber lager */
+  --color-primary: oklch(68% 0.165 60);
+  --color-primary-content: oklch(18% 0.04 55);
+  /* Secondary — deep mahogany ale */
+  --color-secondary: oklch(38% 0.09 40);
+  --color-secondary-content: oklch(95% 0.02 75);
+  /* Accent — frothy cream head */
+  --color-accent: oklch(94% 0.03 90);
+  --color-accent-content: oklch(30% 0.05 55);
+  /* Neutral — roasted stout */
+  --color-neutral: oklch(24% 0.04 45);
+  --color-neutral-content: oklch(92% 0.025 80);
+  /* Info — cool hop green */
+  --color-info: oklch(58% 0.14 145);
+  --color-info-content: oklch(97% 0.015 145);
+  /* Success — fresh barley */
+  --color-success: oklch(72% 0.13 120);
+  --color-success-content: oklch(20% 0.04 120);
+  /* Warning — amber harvest */
+  --color-warning: oklch(74% 0.19 55);
+  --color-warning-content: oklch(18% 0.04 55);
+  /* Error — deep cherry kriek */
+  --color-error: oklch(52% 0.2 20);
+  --color-error-content: oklch(97% 0.012 15);
+  --radius-selector: 0.375rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.875rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
+@plugin "daisyui/theme" {
+  name: "biergarten-stout";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+
+  /* Base — charred barrel / roasted malt darkness */
+  --color-base-100: oklch(14% 0.006 45);
+  --color-base-200: oklch(18% 0.008 43);
+  --color-base-300: oklch(23% 0.01 42);
+  --color-base-content: oklch(88% 0.008 75);
+
+  /* Primary — golden amber lager */
+  --color-primary: oklch(68% 0.055 60);
+  --color-primary-content: oklch(14% 0.012 50);
+
+  /* Secondary — deep mahogany ale */
+  --color-secondary: oklch(55% 0.025 40);
+  --color-secondary-content: oklch(97% 0.005 75);
+
+  /* Accent — frothy cream head */
+  --color-accent: oklch(82% 0.01 88);
+  --color-accent-content: oklch(20% 0.01 55);
+
+  /* Neutral — near-black with warmth */
+  --color-neutral: oklch(20% 0.008 45);
+  --color-neutral-content: oklch(88% 0.007 78);
+
+  /* Info — cool hop green */
+  --color-info: oklch(54% 0.04 145);
+  --color-info-content: oklch(97% 0.005 145);
+
+  /* Success — fresh barley */
+  --color-success: oklch(66% 0.038 120);
+  --color-success-content: oklch(14% 0.012 120);
+
+  /* Warning — amber harvest */
+  --color-warning: oklch(70% 0.055 55);
+  --color-warning-content: oklch(14% 0.012 55);
+
+  /* Error — deep cherry kriek */
+  --color-error: oklch(50% 0.06 20);
+  --color-error-content: oklch(97% 0.004 15);
+
+  --radius-selector: 0.375rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.875rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
