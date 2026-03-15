@@ -1,12 +1,12 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: biergarten-lager, biergarten-stout;
+  themes: biergarten-lager, biergarten-stout, biergarten-cassis, biergarten-weizen;
 }
 
 @theme {
   --font-sans:
-    "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: "Volkhov", ui-serif, Georgia, serif;
 }
 
@@ -25,35 +25,35 @@ h6,
   default: true;
   prefersdark: false;
   color-scheme: "light";
-  /* Base — warm parchment / aged paper */
-  --color-base-100: oklch(97% 0.025 80);
-  --color-base-200: oklch(92% 0.04 78);
-  --color-base-300: oklch(86% 0.06 75);
-  --color-base-content: oklch(28% 0.05 55);
-  /* Primary — golden amber lager */
-  --color-primary: oklch(68% 0.165 60);
-  --color-primary-content: oklch(18% 0.04 55);
-  /* Secondary — deep mahogany ale */
-  --color-secondary: oklch(38% 0.09 40);
-  --color-secondary-content: oklch(95% 0.02 75);
-  /* Accent — frothy cream head */
-  --color-accent: oklch(94% 0.03 90);
-  --color-accent-content: oklch(30% 0.05 55);
-  /* Neutral — roasted stout */
-  --color-neutral: oklch(24% 0.04 45);
-  --color-neutral-content: oklch(92% 0.025 80);
-  /* Info — cool hop green */
-  --color-info: oklch(58% 0.14 145);
-  --color-info-content: oklch(97% 0.015 145);
-  /* Success — fresh barley */
-  --color-success: oklch(72% 0.13 120);
-  --color-success-content: oklch(20% 0.04 120);
-  /* Warning — amber harvest */
-  --color-warning: oklch(74% 0.19 55);
-  --color-warning-content: oklch(18% 0.04 55);
-  /* Error — deep cherry kriek */
-  --color-error: oklch(52% 0.2 20);
-  --color-error-content: oklch(97% 0.012 15);
+  /* Base — muted parchment / brushed paper */
+  --color-base-100: oklch(96% 0.012 82);
+  --color-base-200: oklch(92% 0.018 80);
+  --color-base-300: oklch(87% 0.025 78);
+  --color-base-content: oklch(30% 0.025 58);
+  /* Primary — mellow amber */
+  --color-primary: oklch(65% 0.085 62);
+  --color-primary-content: oklch(20% 0.02 58);
+  /* Secondary — softened mahogany */
+  --color-secondary: oklch(42% 0.05 42);
+  --color-secondary-content: oklch(96% 0.01 76);
+  /* Accent — frothy cream */
+  --color-accent: oklch(93% 0.015 90);
+  --color-accent-content: oklch(32% 0.02 58);
+  /* Neutral — warm roast */
+  --color-neutral: oklch(28% 0.02 46);
+  --color-neutral-content: oklch(92% 0.012 80);
+  /* Info — muted hop green */
+  --color-info: oklch(46% 0.065 145);
+  --color-info-content: oklch(97% 0.008 145);
+  /* Success — soft barley */
+  --color-success: oklch(70% 0.06 122);
+  --color-success-content: oklch(22% 0.02 122);
+  /* Warning — toned amber */
+  --color-warning: oklch(72% 0.09 56);
+  --color-warning-content: oklch(20% 0.02 56);
+  /* Error — restrained cherry */
+  --color-error: oklch(54% 0.09 22);
+  --color-error-content: oklch(97% 0.006 15);
   --radius-selector: 0.375rem;
   --radius-field: 0.5rem;
   --radius-box: 0.875rem;
@@ -80,7 +80,7 @@ h6,
   --color-primary-content: oklch(14% 0.012 50);
 
   /* Secondary — deep mahogany ale */
-  --color-secondary: oklch(55% 0.025 40);
+  --color-secondary: oklch(51% 0.025 40);
   --color-secondary-content: oklch(97% 0.005 75);
 
   /* Accent — frothy cream head */
@@ -115,4 +115,112 @@ h6,
   --border: 1px;
   --depth: 1;
   --noise: 1;
+}
+
+@plugin "daisyui/theme" {
+  name: "biergarten-cassis";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+
+  /* Base — blackberry-stained barrel, dark purple-black */
+  --color-base-100: oklch(13% 0.022 295);
+  --color-base-200: oklch(17% 0.028 292);
+  --color-base-300: oklch(22% 0.032 290);
+  --color-base-content: oklch(90% 0.014 300);
+
+  /* Primary — cassis berry purple */
+  --color-primary: oklch(52% 0.15 295);
+  --color-primary-content: oklch(97% 0.008 295);
+
+  /* Secondary — sour cherry */
+  --color-secondary: oklch(46% 0.11 10);
+  --color-secondary-content: oklch(97% 0.006 10);
+
+  /* Accent — tart lime zest */
+  --color-accent: oklch(75% 0.1 130);
+  --color-accent-content: oklch(18% 0.04 130);
+
+  /* Neutral — deep blackened grape */
+  --color-neutral: oklch(18% 0.016 290);
+  --color-neutral-content: oklch(88% 0.01 295);
+
+  /* Info — muted indigo */
+  --color-info: oklch(46% 0.065 250);
+  --color-info-content: oklch(97% 0.006 250);
+
+  /* Success — dark elderberry green */
+  --color-success: oklch(50% 0.065 145);
+  --color-success-content: oklch(97% 0.006 145);
+
+  /* Warning — sour apricot */
+  --color-warning: oklch(70% 0.1 65);
+  --color-warning-content: oklch(18% 0.03 65);
+
+  /* Error — kriek red */
+  --color-error: oklch(50% 0.13 22);
+  --color-error-content: oklch(97% 0.006 22);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
+
+@plugin "daisyui/theme" {
+  name: "biergarten-weizen";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+
+  /* Base — near-white with the faintest young-barley green breath */
+  --color-base-100: oklch(99% 0.007 112);
+  --color-base-200: oklch(96% 0.012 114);
+  --color-base-300: oklch(92% 0.019 116);
+  --color-base-content: oklch(20% 0.022 122);
+
+  /* Primary — fresh-cut barley, green-gold */
+  --color-primary: oklch(70% 0.09 118);
+  --color-primary-content: oklch(16% 0.022 118);
+
+  /* Secondary — muted sage stem */
+  --color-secondary: oklch(44% 0.055 128);
+  --color-secondary-content: oklch(97% 0.005 128);
+
+  /* Accent — pale morning dew */
+  --color-accent: oklch(93% 0.03 148);
+  --color-accent-content: oklch(22% 0.022 148);
+
+  /* Neutral — dried straw with green memory */
+  --color-neutral: oklch(88% 0.014 116);
+  --color-neutral-content: oklch(20% 0.02 118);
+
+  /* Info — clear summer sky */
+  --color-info: oklch(46% 0.07 232);
+  --color-info-content: oklch(98% 0.005 232);
+
+  /* Success — vivid young shoot */
+  --color-success: oklch(48% 0.09 145);
+  --color-success-content: oklch(98% 0.005 145);
+
+  /* Warning — ripening grain amber */
+  --color-warning: oklch(68% 0.1 76);
+  --color-warning-content: oklch(18% 0.02 72);
+
+  /* Error — washed dusty rose */
+  --color-error: oklch(52% 0.1 18);
+  --color-error-content: oklch(98% 0.005 15);
+
+  --radius-selector: 2rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
 }

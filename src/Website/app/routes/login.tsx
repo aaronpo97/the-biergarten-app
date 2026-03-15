@@ -1,6 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { HomeSimpleDoor, LogIn, UserPlus } from "iconoir-react";
 import { useForm } from "react-hook-form";
 import { Link, redirect, useNavigation, useSubmit } from "react-router";
+import FormField from "../components/forms/FormField";
+import SubmitButton from "../components/forms/SubmitButton";
 import { createAuthSession, getOptionalAuth, login } from "../lib/auth.server";
 import { loginSchema, type LoginSchema } from "../lib/schemas";
 import type { Route } from "./+types/login";
@@ -54,10 +57,11 @@ export default function Login({ actionData }: Route.ComponentProps) {
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body gap-4">
           <div className="text-center">
-            <h1 className="card-title text-3xl justify-center">Login</h1>
-            <p className="text-base-content/70">
-              Sign in to your Biergarten account
-            </p>
+            <h1 className="card-title text-3xl justify-center gap-2">
+              <LogIn className="size-7" aria-hidden="true" />
+              Login
+            </h1>
+            <p className="text-base-content/70">Sign in to your Biergarten account</p>
           </div>
 
           {actionData?.error && (
@@ -67,63 +71,46 @@ export default function Login({ actionData }: Route.ComponentProps) {
           )}
 
           <form onSubmit={onSubmit} className="space-y-3">
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend">Username</legend>
-              <input
-                id="username"
-                type="text"
-                autoComplete="username"
-                placeholder="your_username"
-                className={`input w-full ${errors.username ? "input-error" : ""}`}
-                {...register("username")}
-              />
-              {errors.username && (
-                <p className="label text-error">{errors.username.message}</p>
-              )}
-            </fieldset>
+            <FormField
+              id="username"
+              type="text"
+              autoComplete="username"
+              placeholder="your_username"
+              label="Username"
+              error={errors.username?.message}
+              {...register("username")}
+            />
 
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend">Password</legend>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                className={`input w-full ${errors.password ? "input-error" : ""}`}
-                {...register("password")}
-              />
-              {errors.password && (
-                <p className="label text-error">{errors.password.message}</p>
-              )}
-            </fieldset>
+            <FormField
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              label="Password"
+              error={errors.password?.message}
+              {...register("password")}
+            />
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn btn-primary w-full mt-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="loading loading-spinner loading-sm" />{" "}
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+            <SubmitButton
+              isSubmitting={isSubmitting}
+              idleText="Sign In"
+              submittingText="Signing in..."
+            />
           </form>
 
           <div className="divider text-xs">New here?</div>
 
           <div className="text-center space-y-2">
-            <Link to="/register" className="btn btn-outline btn-sm w-full">
+            <Link to="/register" className="btn btn-outline btn-sm w-full gap-2">
+              <UserPlus className="size-4" aria-hidden="true" />
               Create an account
             </Link>
             <Link
               to="/"
-              className="link link-hover text-sm text-base-content/60"
+              className="link link-hover text-sm text-base-content/60 inline-flex items-center gap-1"
             >
-              ← Back to home
+              <HomeSimpleDoor className="size-4" aria-hidden="true" />
+              Back to home
             </Link>
           </div>
         </div>

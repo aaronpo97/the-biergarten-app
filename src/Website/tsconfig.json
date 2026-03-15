@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "charset": "utf8",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
@@ -9,10 +8,12 @@
     "moduleResolution": "bundler",
     "module": "ESNext",
     "noEmit": true,
+    "rootDirs": [".", "./.react-router/types"],
     "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
     "target": "ES2022",
     "skipLibCheck": true
   },
-  "include": ["app"],
+  "include": ["app", ".react-router/types/**/*", "react-router.config.ts"],
   "exclude": ["node_modules"]
 }
