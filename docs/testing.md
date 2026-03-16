@@ -4,11 +4,13 @@ This document describes the testing strategy and how to run tests for The Bierga
 
 ## Overview
 
-The project uses a multi-layered testing approach:
+The project uses a multi-layered testing approach across backend and frontend:
 
 - **API.Specs** - BDD integration tests using Reqnroll (Gherkin)
 - **Infrastructure.Repository.Tests** - Unit tests for data access layer
 - **Service.Auth.Tests** - Unit tests for authentication business logic
+- **Storybook Vitest project** - Browser-based interaction tests for shared website stories
+- **Storybook Playwright suite** - Browser checks against Storybook-rendered components
 
 ## Running Tests with Docker (Recommended)
 
@@ -86,6 +88,33 @@ dotnet test Service/Service.Auth.Tests/Service.Auth.Tests.csproj
 
 - No database required (uses Moq for mocking)
 
+### Frontend Storybook Tests
+
+```bash
+cd src/Website
+npm install
+npm run test:storybook
+```
+
+**Purpose**:
+
+- Verifies shared stories such as form fields, submit buttons, navbar states, toasts, and the theme gallery
+- Runs in browser mode via Vitest and Storybook integration
+
+### Frontend Playwright Storybook Tests
+
+```bash
+cd src/Website
+npm install
+npm run test:storybook:playwright
+```
+
+**Requirements**:
+
+- Storybook dependencies installed
+- Playwright browser dependencies installed
+- The command will start or reuse the Storybook server defined in `playwright.storybook.config.ts`
+
 ## Test Coverage
 
 ### Current Coverage
@@ -112,6 +141,14 @@ dotnet test Service/Service.Auth.Tests/Service.Auth.Tests.csproj
 - Register service with validation
 - Business logic for authentication flow
 
+**Frontend UI Coverage**:
+
+- Shared submit button states
+- Form field happy path and error presentation
+- Navbar guest, authenticated, and mobile behavior
+- Theme gallery rendering across Biergarten themes
+- Toast interactions and themed notification display
+
 ### Planned Coverage
 
 - [ ] Email verification workflow
@@ -121,6 +158,7 @@ dotnet test Service/Service.Auth.Tests/Service.Auth.Tests.csproj
 - [ ] Beer post operations
 - [ ] User follow/unfollow
 - [ ] Image upload service
+- [ ] Frontend route integration coverage beyond Storybook stories
 
 ## Testing Frameworks & Tools
 
@@ -253,6 +291,15 @@ Exit codes:
 
 - `0` - All tests passed
 - Non-zero - Test failures occurred
+
+Frontend UI checks should also be included in CI for the active website workspace:
+
+```bash
+cd src/Website
+npm ci
+npm run test:storybook
+npm run test:storybook:playwright
+```
 
 ## Troubleshooting
 

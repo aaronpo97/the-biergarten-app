@@ -1,28 +1,27 @@
 # Architecture
 
-This document describes the architecture patterns and design decisions for The Biergarten
-App.
+This document describes the active architecture of The Biergarten App.
 
 ## High-Level Overview
 
-The Biergarten App follows a **multi-project monorepo** architecture with clear separation
-between backend and frontend:
+The Biergarten App is a monorepo with a clear split between the backend and the active
+website:
 
-- **Backend**: .NET 10 Web API with SQL Server
-- **Frontend**: Next.js with TypeScript
-- **Architecture Style**: Layered architecture with SQL-first approach
+- **Backend**: .NET 10 Web API with SQL Server and a layered architecture
+- **Frontend**: React 19 + React Router 7 website in `src/Website`
+- **Architecture Style**: Layered backend plus server-rendered React frontend
+
+The legacy Next.js frontend has been retained in `src/Website-v1` for reference only and is
+documented in [archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Diagrams
 
 For visual representations, see:
 
-- [architecture.pdf](diagrams/pdf/architecture.pdf) - Layered architecture diagram
-- [deployment.pdf](diagrams/pdf/deployment.pdf) - Docker deployment diagram
-- [authentication-flow.pdf](diagrams/pdf/authentication-flow.pdf) - Authentication
-  workflow
-- [database-schema.pdf](diagrams/pdf/database-schema.pdf) - Database relationships
-
-Generate diagrams with: `make diagrams`
+- [architecture.svg](diagrams-out/architecture.svg) - Layered architecture diagram
+- [deployment.svg](diagrams-out/deployment.svg) - Docker deployment diagram
+- [authentication-flow.svg](diagrams-out/authentication-flow.svg) - Authentication workflow
+- [database-schema.svg](diagrams-out/database-schema.svg) - Database relationships
 
 ## Backend Architecture
 
@@ -217,39 +216,49 @@ public interface IAuthRepository
 
 ## Frontend Architecture
 
-### Next.js Application Structure
+### Active Website (`src/Website`)
 
+The current website is a React Router 7 application with server-side rendering enabled.
+
+```text
+src/Website/
+├── app/
+│   ├── components/      Shared UI such as Navbar, FormField, SubmitButton, ToastProvider
+│   ├── lib/             Auth helpers, schemas, and theme metadata
+│   ├── routes/          Route modules for home, login, register, dashboard, confirm, theme
+│   ├── root.tsx         App shell and global providers
+│   └── app.css          Theme tokens and global styling
+├── .storybook/          Storybook config and preview setup
+├── stories/             Storybook stories for shared UI and themes
+├── tests/playwright/    Storybook Playwright coverage
+└── package.json         Frontend scripts and dependencies
 ```
-Website/src/
-├── components/        # React components
-├── pages/            # Next.js routes
-├── contexts/         # React context providers
-├── hooks/            # Custom React hooks
-├── controllers/      # Business logic layer
-├── services/         # API communication
-├── requests/         # API request builders
-├── validation/       # Form validation schemas
-├── config/           # Configuration & env vars
-└── prisma/           # Database schema (current)
-```
 
-### Migration Strategy
+### Frontend Responsibilities
 
-The frontend is **transitioning** from a standalone architecture to integrate with the
-.NET API:
+- Render the auth demo and theme guide routes
+- Manage cookie-backed website session state
+- Call the .NET API for login, registration, token refresh, and confirmation
+- Provide shared UI building blocks for forms, navigation, themes, and toasts
+- Supply Storybook documentation and browser-based component verification
 
-**Current State**:
+### Theme System
 
-- Uses Prisma ORM with Postgres (Neon)
-- Has its own server-side API routes
-- Direct database access from Next.js
+The active website uses semantic DaisyUI theme tokens backed by four Biergarten themes:
 
-**Target State**:
+- Biergarten Lager
+- Biergarten Stout
+- Biergarten Cassis
+- Biergarten Weizen
 
-- Pure client-side Next.js app
-- All data via .NET API
-- No server-side database access
-- JWT-based authentication
+All component styling should prefer semantic tokens such as `primary`, `success`,
+`surface`, and `highlight` instead of hard-coded color values.
+
+### Legacy Frontend
+
+The previous Next.js frontend has been archived at `src/Website-v1`. Active product and
+engineering documentation should point to `src/Website`, while legacy notes live in
+[archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Security Architecture
 
@@ -385,7 +394,7 @@ dependencies
 
 ```yaml
 healthcheck:
-  test: ['CMD-SHELL', 'sqlcmd health check']
+  test: ["CMD-SHELL", "sqlcmd health check"]
   interval: 10s
   retries: 12
   start_period: 30s

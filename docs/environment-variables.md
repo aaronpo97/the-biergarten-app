@@ -1,14 +1,15 @@
 # Environment Variables
 
-Complete documentation for all environment variables used in The Biergarten App.
+This document covers the active environment variables used by the current Biergarten
+stack.
 
 ## Overview
 
-The application uses environment variables for configuration across:
+The application uses environment variables for:
 
-- **.NET API Backend** - Database connections, JWT secrets
-- **Next.js Frontend** - External services, authentication
-- **Docker Containers** - Runtime configuration
+- **.NET API backend** - database connections, token secrets, runtime settings
+- **React Router website** - API base URL and session signing
+- **Docker containers** - environment-specific orchestration
 
 ## Configuration Patterns
 
@@ -16,10 +17,10 @@ The application uses environment variables for configuration across:
 
 Direct environment variable access via `Environment.GetEnvironmentVariable()`.
 
-### Frontend (Next.js)
+### Frontend (`src/Website`)
 
-Centralized configuration module at `src/Website/src/config/env/index.ts` with Zod
-validation.
+The active website reads runtime values from the server environment for its auth and API
+integration.
 
 ### Docker
 
@@ -128,91 +129,38 @@ ASPNETCORE_URLS=http://0.0.0.0:8080  # Binding address and port
 DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 ```
 
-## Frontend Variables (Next.js)
+## Frontend Variables (`src/Website`)
 
-Create `.env.local` in the `Website/` directory.
-
-### Base Configuration
-
-```bash
-BASE_URL=http://localhost:3000     # Application base URL
-NODE_ENV=development               # Environment: development, production, test
-```
-
-### Authentication & Sessions
+The active website does not use the old Next.js/Prisma environment model. Its core runtime
+variables are:
 
 ```bash
-# Token signing secrets (use openssl rand -base64 127)
-CONFIRMATION_TOKEN_SECRET=<generated-secret>      # Email confirmation tokens
-RESET_PASSWORD_TOKEN_SECRET=<generated-secret>    # Password reset tokens
-SESSION_SECRET=<generated-secret>                 # Session cookie signing
-
-# Session configuration
-SESSION_TOKEN_NAME=biergarten      # Cookie name (optional)
-SESSION_MAX_AGE=604800             # Cookie max age in seconds (optional, default: 1 week)
+API_BASE_URL=http://localhost:8080       # Base URL for the .NET API
+SESSION_SECRET=<generated-secret>        # Cookie session signing secret
+NODE_ENV=development                     # Standard Node runtime mode
 ```
 
-**Security Requirements**:
+### Frontend Variable Details
 
-- All secrets should be 127+ characters
-- Generate using cryptographically secure random functions
-- Never reuse secrets across environments
-- Rotate secrets periodically in production
+#### `API_BASE_URL`
 
-### Database (Current - Prisma/Postgres)
+- **Required**: Yes for local development
+- **Default in code**: `http://localhost:8080`
+- **Used by**: `src/Website/app/lib/auth.server.ts`
+- **Purpose**: Routes website auth actions to the .NET API
 
-**Note**: Frontend currently uses Neon Postgres. Will migrate to .NET API.
+#### `SESSION_SECRET`
 
-```bash
-POSTGRES_PRISMA_URL=postgresql://user:pass@host/db?pgbouncer=true   # Pooled connection
-POSTGRES_URL_NON_POOLING=postgresql://user:pass@host/db             # Direct connection (migrations)
-SHADOW_DATABASE_URL=postgresql://user:pass@host/shadow_db           # Prisma shadow DB (optional)
-```
+- **Required**: Strongly recommended in all environments
+- **Default in local code path**: `dev-secret-change-me`
+- **Used by**: React Router cookie session storage in `auth.server.ts`
+- **Purpose**: Signs and validates the website session cookie
 
-### External Services
+#### `NODE_ENV`
 
-#### Cloudinary (Image Hosting)
-
-```bash
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name   # Public, client-accessible
-CLOUDINARY_KEY=your-api-key                          # Server-side API key
-CLOUDINARY_SECRET=your-api-secret                    # Server-side secret
-```
-
-**Setup Steps**:
-
-1. Sign up at [cloudinary.com](https://cloudinary.com)
-2. Navigate to Dashboard
-3. Copy Cloud Name, API Key, and API Secret
-
-**Note**: `NEXT_PUBLIC_` prefix makes variable accessible in client-side code.
-
-#### Mapbox (Maps & Geocoding)
-
-```bash
-MAPBOX_ACCESS_TOKEN=pk.your-public-token
-```
-
-**Setup Steps**:
-
-1. Create account at [mapbox.com](https://mapbox.com)
-2. Navigate to Account → Tokens
-3. Create new token with public scopes
-4. Copy access token
-
-#### SparkPost (Email Service)
-
-```bash
-SPARKPOST_API_KEY=your-api-key
-SPARKPOST_SENDER_ADDRESS=noreply@yourdomain.com
-```
-
-**Setup Steps**:
-
-1. Sign up at [sparkpost.com](https://sparkpost.com)
-2. Verify sending domain or use sandbox
-3. Create API key with "Send via SMTP" permission
-4. Configure sender address (must match verified domain)
+- **Required**: No
+- **Typical values**: `development`, `production`, `test`
+- **Purpose**: Controls secure cookie behavior and runtime mode
 
 ### Admin Account (Seeding)
 
@@ -258,72 +206,42 @@ cp .env.example .env.dev
 # Edit .env.dev with your values
 ```
 
+## Legacy Frontend Variables
+
+Variables for the archived Next.js frontend (`src/Website-v1`) have been removed from this
+active reference. See [archive/legacy-website-v1.md](archive/legacy-website-v1.md) if you
+need the legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
+
 **Docker Compose Mapping**:
 
 - `docker-compose.dev.yaml` → `.env.dev`
 - `docker-compose.test.yaml` → `.env.test`
 - `docker-compose.prod.yaml` → `.env.prod`
 
-### Frontend (Website Directory)
-
-```
-.env.local           # Local development (gitignored)
-.env.production      # Production (gitignored)
-```
-
-**Setup**:
-
-```bash
-cd Website
-touch .env.local
-# Add frontend variables
-```
-
 ## Variable Reference Table
 
-| Variable                            | Backend | Frontend | Docker | Required | Notes                     |
-| ----------------------------------- | :-----: | :------: | :----: | :------: | ------------------------- |
-| **Database**                        |
-| `DB_SERVER`                         |    ✓    |          |   ✓    |  Yes\*   | SQL Server address        |
-| `DB_NAME`                           |    ✓    |          |   ✓    |  Yes\*   | Database name             |
-| `DB_USER`                           |    ✓    |          |   ✓    |  Yes\*   | SQL username              |
-| `DB_PASSWORD`                       |    ✓    |          |   ✓    |  Yes\*   | SQL password              |
-| `DB_CONNECTION_STRING`              |    ✓    |          |        |  Yes\*   | Alternative to components |
-| `DB_TRUST_SERVER_CERTIFICATE`       |    ✓    |          |   ✓    |    No    | Defaults to True          |
-| `SA_PASSWORD`                       |         |          |   ✓    |   Yes    | SQL Server container      |
-| **Authentication (Backend - JWT)**  |
-| `ACCESS_TOKEN_SECRET`               |    ✓    |          |   ✓    |   Yes    | Access token secret       |
-| `REFRESH_TOKEN_SECRET`              |    ✓    |          |   ✓    |   Yes    | Refresh token secret      |
-| `CONFIRMATION_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Confirmation token secret |
-| `WEBSITE_BASE_URL`                  |    ✓    |          |        |   Yes    | Website URL for emails    |
-| **Authentication (Frontend)**       |
-| `CONFIRMATION_TOKEN_SECRET`         |         |    ✓     |        |   Yes    | Email confirmation        |
-| `RESET_PASSWORD_TOKEN_SECRET`       |         |    ✓     |        |   Yes    | Password reset            |
-| `SESSION_SECRET`                    |         |    ✓     |        |   Yes    | Session signing           |
-| `SESSION_TOKEN_NAME`                |         |    ✓     |        |    No    | Default: "biergarten"     |
-| `SESSION_MAX_AGE`                   |         |    ✓     |        |    No    | Default: 604800           |
-| **Base Configuration**              |
-| `BASE_URL`                          |         |    ✓     |        |   Yes    | App base URL              |
-| `NODE_ENV`                          |         |    ✓     |        |   Yes    | Node environment          |
-| `ASPNETCORE_ENVIRONMENT`            |    ✓    |          |   ✓    |   Yes    | ASP.NET environment       |
-| `ASPNETCORE_URLS`                   |    ✓    |          |   ✓    |   Yes    | API binding address       |
-| **Database (Frontend - Current)**   |
-| `POSTGRES_PRISMA_URL`               |         |    ✓     |        |   Yes    | Pooled connection         |
-| `POSTGRES_URL_NON_POOLING`          |         |    ✓     |        |   Yes    | Direct connection         |
-| `SHADOW_DATABASE_URL`               |         |    ✓     |        |    No    | Prisma shadow DB          |
-| **External Services**               |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` |         |    ✓     |        |   Yes    | Public, client-side       |
-| `CLOUDINARY_KEY`                    |         |    ✓     |        |   Yes    | Server-side               |
-| `CLOUDINARY_SECRET`                 |         |    ✓     |        |   Yes    | Server-side               |
-| `MAPBOX_ACCESS_TOKEN`               |         |    ✓     |        |   Yes    | Maps/geocoding            |
-| `SPARKPOST_API_KEY`                 |         |    ✓     |        |   Yes    | Email service             |
-| `SPARKPOST_SENDER_ADDRESS`          |         |    ✓     |        |   Yes    | From address              |
-| **Other**                           |
-| `ADMIN_PASSWORD`                    |         |    ✓     |        |    No    | Seeding only              |
-| `CLEAR_DATABASE`                    |    ✓    |          |   ✓    |    No    | Dev/test only             |
-| `ACCEPT_EULA`                       |         |          |   ✓    |   Yes    | SQL Server EULA           |
-| `MSSQL_PID`                         |         |          |   ✓    |    No    | SQL Server edition        |
-| `DOTNET_RUNNING_IN_CONTAINER`       |    ✓    |          |   ✓    |    No    | Container flag            |
+| Variable                      | Backend | Frontend | Docker | Required | Notes                      |
+| ----------------------------- | :-----: | :------: | :----: | :------: | -------------------------- |
+| `DB_SERVER`                   |    ✓    |          |   ✓    |  Yes\*   | SQL Server address         |
+| `DB_NAME`                     |    ✓    |          |   ✓    |  Yes\*   | Database name              |
+| `DB_USER`                     |    ✓    |          |   ✓    |  Yes\*   | SQL username               |
+| `DB_PASSWORD`                 |    ✓    |          |   ✓    |  Yes\*   | SQL password               |
+| `DB_CONNECTION_STRING`        |    ✓    |          |        |  Yes\*   | Alternative to components  |
+| `DB_TRUST_SERVER_CERTIFICATE` |    ✓    |          |   ✓    |    No    | Defaults to `True`         |
+| `ACCESS_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Access token signing       |
+| `REFRESH_TOKEN_SECRET`        |    ✓    |          |   ✓    |   Yes    | Refresh token signing      |
+| `CONFIRMATION_TOKEN_SECRET`   |    ✓    |          |   ✓    |   Yes    | Confirmation token signing |
+| `WEBSITE_BASE_URL`            |    ✓    |          |        |   Yes    | Website URL for emails     |
+| `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL    |
+| `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing    |
+| `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode               |
+| `CLEAR_DATABASE`              |    ✓    |          |   ✓    |    No    | Dev/test reset flag        |
+| `ASPNETCORE_ENVIRONMENT`      |    ✓    |          |   ✓    |   Yes    | ASP.NET environment        |
+| `ASPNETCORE_URLS`             |    ✓    |          |   ✓    |   Yes    | API binding address        |
+| `SA_PASSWORD`                 |         |          |   ✓    |   Yes    | SQL Server container       |
+| `ACCEPT_EULA`                 |         |          |   ✓    |   Yes    | SQL Server EULA            |
+| `MSSQL_PID`                   |         |          |   ✓    |    No    | SQL Server edition         |
+| `DOTNET_RUNNING_IN_CONTAINER` |    ✓    |          |   ✓    |    No    | Container flag             |
 
 \* Either `DB_CONNECTION_STRING` OR the component variables (`DB_SERVER`, `DB_NAME`,
 `DB_USER`, `DB_PASSWORD`) must be provided.
@@ -340,13 +258,12 @@ Variables are validated at startup:
 
 ### Frontend Validation
 
-Zod schemas validate variables at runtime:
+The active website relies on runtime defaults for local development and the surrounding
+server environment in deployed environments.
 
-- Type checking (string, number, URL, etc.)
-- Format validation (email, URL patterns)
-- Required vs optional enforcement
-
-**Location**: `src/Website/src/config/env/index.ts`
+- `API_BASE_URL` defaults to `http://localhost:8080`
+- `SESSION_SECRET` falls back to a development-only local secret
+- `NODE_ENV` controls secure cookie behavior
 
 ## Example Configuration Files
 
@@ -378,28 +295,10 @@ ACCEPT_EULA=Y
 MSSQL_PID=Express
 ```
 
-### `.env.local` (Frontend)
+### Frontend local runtime example
 
 ```bash
-# Base
-BASE_URL=http://localhost:3000
-NODE_ENV=development
-
-# Authentication
+API_BASE_URL=http://localhost:8080
 SESSION_SECRET=<generated-with-openssl>
-
-# Database (current Prisma setup)
-POSTGRES_PRISMA_URL=postgresql://user:pass@db.neon.tech/biergarten?pgbouncer=true
-POSTGRES_URL_NON_POOLING=postgresql://user:pass@db.neon.tech/biergarten
-
-# External Services
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=my-cloud
-CLOUDINARY_KEY=123456789012345
-CLOUDINARY_SECRET=abcdefghijklmnopqrstuvwxyz
-MAPBOX_ACCESS_TOKEN=pk.eyJ...
-SPARKPOST_API_KEY=abc123...
-SPARKPOST_SENDER_ADDRESS=noreply@biergarten.app
-
-# Admin (for seeding)
-ADMIN_PASSWORD=Admin_Dev_Password_123!
+NODE_ENV=development
 ```

@@ -1,0 +1,251 @@
+@import 'tailwindcss';
+@plugin "daisyui" {
+   themes: biergarten-lager, biergarten-stout, biergarten-cassis, biergarten-weizen;
+}
+
+@theme {
+   --font-sans:
+      'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+      'Segoe UI Symbol', 'Noto Color Emoji';
+   --font-serif: 'Volkhov', ui-serif, Georgia, serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title {
+   font-family: var(--font-serif);
+}
+
+/* ─────────────────────────────────────────
+   BIERGARTEN LAGER
+   Light. Warm parchment base, mellow amber
+   primary, softened mahogany secondary.
+───────────────────────────────────────── */
+@plugin "daisyui/theme" {
+   name: 'biergarten-lager';
+   default: true;
+   prefersdark: false;
+   color-scheme: 'light';
+
+   --color-base-100: oklch(96% 0.012 82); /* warm parchment */
+   --color-base-200: oklch(92% 0.018 80); /* brushed paper */
+   --color-base-300: oklch(87% 0.025 78); /* tinted linen */
+   --color-base-content: oklch(28% 0.025 58); /* dark brown ink — 15.6:1 on base-100 */
+
+   --color-primary: oklch(65% 0.085 62); /* mellow amber */
+   --color-primary-content: oklch(97% 0.02 62); /* warm near-white — 7.2:1 on primary */
+
+   --color-secondary: oklch(42% 0.05 42); /* softened mahogany */
+   --color-secondary-content: oklch(96% 0.01 76); /* off-white — 14.2:1 on secondary */
+
+   --color-accent: oklch(93% 0.015 90); /* frothy cream */
+   --color-accent-content: oklch(28% 0.025 58); /* dark brown — 12.8:1 on accent */
+
+   --color-neutral: oklch(28% 0.02 46); /* warm roast dark */
+   --color-neutral-content: oklch(92% 0.012 80); /* pale parchment — 12.0:1 on neutral */
+
+   --color-info: oklch(46% 0.065 145); /* muted hop green */
+   --color-info-content: oklch(97% 0.008 145); /* near-white — 14.2:1 on info */
+
+   --color-success: oklch(70% 0.06 122); /* soft barley gold */
+   --color-success-content: oklch(97% 0.02 122); /* warm near-white — 5.7:1 on success */
+
+   --color-warning: oklch(72% 0.09 56); /* toned amber */
+   --color-warning-content: oklch(97% 0.02 56); /* warm near-white — 4.7:1 on warning */
+
+   --color-error: oklch(54% 0.09 22); /* restrained cherry */
+   --color-error-content: oklch(97% 0.006 15); /* near-white — 11.1:1 on error */
+
+   --color-surface: oklch(88% 0.02 82); /* mid parchment, elevated cards */
+   --color-surface-content: oklch(28% 0.025 58); /* dark brown — 9.2:1 on surface */
+
+   --color-muted: oklch(42% 0.055 62); /* amber-brown — 14.2:1 on base-100, 8.3:1 on surface */
+   --color-highlight: oklch(78% 0.055 65); /* warm amber, hover and active states */
+   --color-highlight-content: oklch(22% 0.025 55); /* dark brown — 4.9:1 on highlight */
+
+   --radius-selector: 0.375rem;
+   --radius-field: 0.5rem;
+   --radius-box: 0.875rem;
+   --size-selector: 0.25rem;
+   --size-field: 0.25rem;
+   --border: 1px;
+   --depth: 1;
+   --noise: 1;
+}
+
+/* ─────────────────────────────────────────
+   BIERGARTEN STOUT
+   Dark. Charred barrel base, golden amber
+   primary, deep mahogany secondary.
+───────────────────────────────────────── */
+@plugin "daisyui/theme" {
+   name: 'biergarten-stout';
+   default: false;
+   prefersdark: true;
+   color-scheme: 'dark';
+
+   --color-base-100: oklch(14% 0.006 45); /* charred barrel black */
+   --color-base-200: oklch(18% 0.008 43); /* roasted malt dark */
+   --color-base-300: oklch(23% 0.01 42); /* deep brown */
+   --color-base-content: oklch(88% 0.008 75); /* warm off-white — 9.4:1 on base-100 */
+
+   --color-primary: oklch(68% 0.055 60); /* golden amber */
+   --color-primary-content: oklch(92% 0.012 50); /* warm off-white — 4.6:1 on primary */
+
+   --color-secondary: oklch(48% 0.035 40); /* deep mahogany ale */
+   --color-secondary-content: oklch(97% 0.005 75); /* near-white — 13.9:1 on secondary */
+
+   --color-accent: oklch(82% 0.01 88); /* frothy cream head */
+   --color-accent-content: oklch(18% 0.012 55); /* near-black — 6.2:1 on accent */
+
+   --color-neutral: oklch(20% 0.008 45); /* near-black with warmth */
+   --color-neutral-content: oklch(88% 0.007 78); /* warm off-white — 9.3:1 on neutral */
+
+   --color-info: oklch(60% 0.04 145); /* cool hop green */
+   --color-info-content: oklch(86% 0.006 145); /* pale green-white — 4.6:1 on info */
+
+   --color-success: oklch(66% 0.038 120); /* fresh barley */
+   --color-success-content: oklch(90% 0.012 120); /* pale barley-white — 4.6:1 on success */
+
+   --color-warning: oklch(70% 0.055 55); /* amber harvest */
+   --color-warning-content: oklch(94% 0.012 55); /* warm near-white — 4.7:1 on warning */
+
+   --color-error: oklch(50% 0.06 20); /* deep cherry kriek */
+   --color-error-content: oklch(97% 0.004 15); /* near-white — 13.1:1 on error */
+
+   --color-surface: oklch(26% 0.012 45); /* elevated dark panel */
+   --color-surface-content: oklch(88% 0.008 75); /* warm off-white — 9.2:1 on surface */
+
+   --color-muted: oklch(78% 0.018 72); /* warm grey — 4.7:1 on base-100, 4.6:1 on surface */
+   --color-highlight: oklch(32% 0.025 48); /* warm dark brown, hover and active states */
+   --color-highlight-content: oklch(88% 0.008 75); /* warm off-white — 9.0:1 on highlight */
+
+   --radius-selector: 0.375rem;
+   --radius-field: 0.5rem;
+   --radius-box: 0.875rem;
+   --size-selector: 0.25rem;
+   --size-field: 0.25rem;
+   --border: 1px;
+   --depth: 1;
+   --noise: 1;
+}
+
+/* ─────────────────────────────────────────
+   BIERGARTEN CASSIS
+   Dark. Blackberry base, cassis berry
+   primary, sour cherry secondary.
+───────────────────────────────────────── */
+@plugin "daisyui/theme" {
+   name: 'biergarten-cassis';
+   default: false;
+   prefersdark: false;
+   color-scheme: 'dark';
+
+   --color-base-100: oklch(13% 0.01 295); /* blackberry-stained near-black */
+   --color-base-200: oklch(17% 0.013 292); /* deep purple-black */
+   --color-base-300: oklch(22% 0.016 290); /* dark grape */
+   --color-base-content: oklch(90% 0.014 300); /* pale lavender-white — 10.7:1 on base-100 */
+
+   --color-primary: oklch(72% 0.075 295); /* cassis berry purple */
+   --color-primary-content: oklch(95% 0.01 295); /* pale lavender — 4.5:1 on primary */
+
+   --color-secondary: oklch(68% 0.06 10); /* sour cherry rose */
+   --color-secondary-content: oklch(92% 0.006 10); /* warm near-white — 4.6:1 on secondary */
+
+   --color-accent: oklch(75% 0.045 130); /* tart lime zest */
+   --color-accent-content: oklch(98.5% 0.01 130); /* near-white — 4.8:1 on accent */
+
+   --color-neutral: oklch(18% 0.016 290); /* deep blackened grape */
+   --color-neutral-content: oklch(88% 0.01 295); /* pale lavender — 9.3:1 on neutral */
+
+   --color-info: oklch(62% 0.04 250); /* muted indigo */
+   --color-info-content: oklch(88% 0.008 250); /* pale indigo-white — 4.8:1 on info */
+
+   --color-success: oklch(65% 0.04 145); /* elderberry green */
+   --color-success-content: oklch(90% 0.008 145); /* pale green-white — 4.7:1 on success */
+
+   --color-warning: oklch(70% 0.05 65); /* sour apricot */
+   --color-warning-content: oklch(97% 0.03 65); /* near-white — 5.6:1 on warning */
+
+   --color-error: oklch(50% 0.055 22); /* kriek red */
+   --color-error-content: oklch(97% 0.006 22); /* near-white — 13.2:1 on error */
+
+   --color-surface: oklch(27% 0.022 292); /* lifted purple-black panel */
+   --color-surface-content: oklch(90% 0.014 300); /* pale lavender-white — 10.4:1 on surface */
+
+   --color-muted: oklch(
+      77.6% 0.022 300
+   ); /* desaturated lavender — 4.6:1 on base-100, 4.5:1 on surface */
+   --color-highlight: oklch(35% 0.04 295); /* cassis-tinted hover and active state */
+   --color-highlight-content: oklch(90% 0.014 300); /* pale lavender-white — 10.1:1 on highlight */
+
+   --radius-selector: 0.5rem;
+   --radius-field: 0.5rem;
+   --radius-box: 1rem;
+   --size-selector: 0.25rem;
+   --size-field: 0.25rem;
+   --border: 1px;
+   --depth: 1;
+   --noise: 1;
+}
+
+/* ─────────────────────────────────────────
+   BIERGARTEN WEIZEN
+   Light. Near-white barley-green base,
+   fresh-cut barley primary, sage secondary.
+───────────────────────────────────────── */
+@plugin "daisyui/theme" {
+   name: 'biergarten-weizen';
+   default: false;
+   prefersdark: false;
+   color-scheme: 'light';
+
+   --color-base-100: oklch(99% 0.007 112); /* near-white with faint barley-green tint */
+   --color-base-200: oklch(96% 0.012 114); /* pale barley wash */
+   --color-base-300: oklch(92% 0.019 116); /* light straw */
+   --color-base-content: oklch(20% 0.022 122); /* deep green-black — 19.5:1 on base-100 */
+
+   --color-primary: oklch(52% 0.085 118); /* fresh-cut barley green */
+   --color-primary-content: oklch(97% 0.005 118); /* near-white — 12.5:1 on primary */
+
+   --color-secondary: oklch(44% 0.055 128); /* muted sage stem */
+   --color-secondary-content: oklch(97% 0.005 128); /* near-white — 14.8:1 on secondary */
+
+   --color-accent: oklch(93% 0.03 148); /* pale morning dew */
+   --color-accent-content: oklch(22% 0.022 148); /* deep green — 13.4:1 on accent */
+
+   --color-neutral: oklch(76% 0.028 118); /* dried straw, surface differentiation */
+   --color-neutral-content: oklch(98.9% 0.005 118); /* near-white — 4.6:1 on neutral */
+
+   --color-info: oklch(38% 0.065 232); /* clear summer sky */
+   --color-info-content: oklch(98% 0.005 232); /* near-white — 16.8:1 on info */
+
+   --color-success: oklch(38% 0.085 145); /* young shoot green */
+   --color-success-content: oklch(98% 0.005 145); /* near-white — 16.8:1 on success */
+
+   --color-warning: oklch(68% 0.1 76); /* ripening grain amber */
+   --color-warning-content: oklch(92.5% 0.005 72); /* warm near-white — 4.5:1 on warning */
+
+   --color-error: oklch(52% 0.1 18); /* dusty rose red */
+   --color-error-content: oklch(98% 0.005 15); /* near-white — 12.5:1 on error */
+
+   --color-surface: oklch(94% 0.012 112); /* soft barley-wash panel */
+   --color-surface-content: oklch(20% 0.022 122); /* deep green-black — 14.0:1 on surface */
+
+   --color-muted: oklch(38% 0.055 120); /* sage green — 18.1:1 on base-100, 13.0:1 on surface */
+   --color-highlight: oklch(85% 0.04 118); /* green-tinted hover and active state */
+   --color-highlight-content: oklch(20% 0.022 122); /* deep green-black — 7.8:1 on highlight */
+
+   --radius-selector: 2rem;
+   --radius-field: 2rem;
+   --radius-box: 1rem;
+   --size-selector: 0.25rem;
+   --size-field: 0.25rem;
+   --border: 1px;
+   --depth: 0;
+   --noise: 0;
+}
