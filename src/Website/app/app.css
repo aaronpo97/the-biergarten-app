@@ -124,21 +124,21 @@ h6,
   color-scheme: "dark";
 
   /* Base — blackberry-stained barrel, dark purple-black */
-  --color-base-100: oklch(13% 0.022 295);
-  --color-base-200: oklch(17% 0.028 292);
-  --color-base-300: oklch(22% 0.032 290);
+  --color-base-100: oklch(13% 0.01 295);
+  --color-base-200: oklch(17% 0.013 292);
+  --color-base-300: oklch(22% 0.016 290);
   --color-base-content: oklch(90% 0.014 300);
 
   /* Primary — cassis berry purple */
-  --color-primary: oklch(52% 0.15 295);
+  --color-primary: oklch(52% 0.07 295);
   --color-primary-content: oklch(97% 0.008 295);
 
   /* Secondary — sour cherry */
-  --color-secondary: oklch(46% 0.11 10);
+  --color-secondary: oklch(46% 0.05 10);
   --color-secondary-content: oklch(97% 0.006 10);
 
   /* Accent — tart lime zest */
-  --color-accent: oklch(75% 0.1 130);
+  --color-accent: oklch(75% 0.045 130);
   --color-accent-content: oklch(18% 0.04 130);
 
   /* Neutral — deep blackened grape */
@@ -146,19 +146,19 @@ h6,
   --color-neutral-content: oklch(88% 0.01 295);
 
   /* Info — muted indigo */
-  --color-info: oklch(46% 0.065 250);
+  --color-info: oklch(46% 0.035 250);
   --color-info-content: oklch(97% 0.006 250);
 
   /* Success — dark elderberry green */
-  --color-success: oklch(50% 0.065 145);
+  --color-success: oklch(50% 0.035 145);
   --color-success-content: oklch(97% 0.006 145);
 
   /* Warning — sour apricot */
-  --color-warning: oklch(70% 0.1 65);
+  --color-warning: oklch(70% 0.05 65);
   --color-warning-content: oklch(18% 0.03 65);
 
   /* Error — kriek red */
-  --color-error: oklch(50% 0.13 22);
+  --color-error: oklch(50% 0.055 22);
   --color-error-content: oklch(97% 0.006 22);
 
   --radius-selector: 0.5rem;

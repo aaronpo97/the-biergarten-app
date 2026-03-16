@@ -1,36 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  biergartenThemes,
+  defaultThemeName,
+  isBiergartenTheme,
+  themeStorageKey,
+  type ThemeName,
+} from "../lib/themes";
 import type { Route } from "./+types/theme";
-
-interface ThemeOption {
-  value: "biergarten-lager" | "biergarten-stout" | "biergarten-cassis" | "biergarten-weizen";
-  label: string;
-  vibe: string;
-}
-
-const themeOptions: ThemeOption[] = [
-  {
-    value: "biergarten-lager",
-    label: "Biergarten Lager",
-    vibe: "Warm parchment, golden amber, daytime beer garden",
-  },
-  {
-    value: "biergarten-stout",
-    label: "Biergarten Stout",
-    vibe: "Charred barrel, deep roast, cozy evening cellar",
-  },
-  {
-    value: "biergarten-cassis",
-    label: "Biergarten Cassis",
-    vibe: "Blackberry barrel, sour kriek, dark berry night",
-  },
-  {
-    value: "biergarten-weizen",
-    label: "Biergarten Weizen",
-    vibe: "Hazy straw wheat, banana-clove, sunny afternoon",
-  },
-];
-
-const storageKey = "biergarten-theme";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -42,23 +18,19 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-function isValidTheme(value: string | null): value is ThemeOption["value"] {
-  return themeOptions.some((theme) => theme.value === value);
-}
-
-function applyTheme(theme: ThemeOption["value"]) {
+function applyTheme(theme: ThemeName) {
   document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem(storageKey, theme);
+  localStorage.setItem(themeStorageKey, theme);
 }
 
 export default function ThemePage() {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeOption["value"]>(() => {
+  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(() => {
     if (typeof window === "undefined") {
-      return "biergarten-lager";
+      return defaultThemeName;
     }
 
-    const savedTheme = localStorage.getItem(storageKey);
-    return isValidTheme(savedTheme) ? savedTheme : "biergarten-lager";
+    const savedTheme = localStorage.getItem(themeStorageKey);
+    return isBiergartenTheme(savedTheme) ? savedTheme : defaultThemeName;
   });
 
   useEffect(() => {
@@ -66,7 +38,7 @@ export default function ThemePage() {
   }, [selectedTheme]);
 
   const activeTheme =
-    themeOptions.find((theme) => theme.value === selectedTheme) ?? themeOptions[0];
+    biergartenThemes.find((theme) => theme.value === selectedTheme) ?? biergartenThemes[0];
 
   return (
     <main className="min-h-screen bg-base-200 px-4 py-8 sm:px-6 lg:px-8">
@@ -97,7 +69,7 @@ export default function ThemePage() {
               role="radiogroup"
               aria-label="Theme selector"
             >
-              {themeOptions.map((theme) => {
+              {biergartenThemes.map((theme) => {
                 const checked = selectedTheme === theme.value;
 
                 return (

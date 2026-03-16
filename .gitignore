@@ -17,7 +17,10 @@
 
 # project-specific build artifacts
 /src/Website/build/
+/src/Website/storybook-static/
 /src/Website/.react-router/
+/src/Website/playwright-report/
+/src/Website/test-results/
 /test-results/
 
 # misc
@@ -495,3 +498,6 @@ FodyWeavers.xsd
 .env.dev
 .env.test
 .env.prod
+
+*storybook.log
+storybook-static

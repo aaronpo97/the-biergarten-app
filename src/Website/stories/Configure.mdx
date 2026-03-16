@@ -1,0 +1,41 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Storybook" />
+
+# Biergarten Storybook
+
+This Storybook is scoped to real app UI only:
+
+- `SubmitButton`
+- `FormField`
+- `Navbar`
+- `Themes` gallery
+
+## Theme workflow
+
+Use the toolbar theme switcher to preview all Biergarten themes:
+
+- `biergarten-lager`
+- `biergarten-stout`
+- `biergarten-cassis`
+- `biergarten-weizen`
+
+Stories are rendered inside a decorator that sets `data-theme`, so tokens and components reflect production styling.
+
+## Tests
+
+Two layers are enabled:
+
+1. Story `play` tests (Storybook test runner / Vitest addon)
+2. Browser checks with Playwright against Storybook iframe routes
+
+Run:
+
+- `npm run build-storybook -- --test`
+- `npm run test:storybook:playwright`
+
+## Rules
+
+- Add stories only for reusable app components.
+- Prefer semantic classes (`bg-primary`, `text-base-content`, etc.).
+- Keep stories state-focused and minimal.
