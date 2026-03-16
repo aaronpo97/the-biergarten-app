@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HomeSimpleDoor, LogIn, UserPlus } from "iconoir-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, redirect, useNavigation, useSubmit } from "react-router";
 import FormField from "../components/forms/FormField";
 import SubmitButton from "../components/forms/SubmitButton";
+import { showErrorToast } from "../components/toast/toast";
 import { createAuthSession, getOptionalAuth, login } from "../lib/auth.server";
 import { loginSchema, type LoginSchema } from "../lib/schemas";
 import type { Route } from "./+types/login";
@@ -51,6 +53,12 @@ export default function Login({ actionData }: Route.ComponentProps) {
   const onSubmit = handleSubmit((data) => {
     submit(data, { method: "post" });
   });
+
+  useEffect(() => {
+    if (actionData?.error) {
+      showErrorToast(actionData.error);
+    }
+  }, [actionData?.error]);
 
   return (
     <div className="hero min-h-screen bg-base-200">

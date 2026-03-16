@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Link } from "react-router";
+import { showErrorToast, showSuccessToast } from "../components/toast/toast";
 import { confirmEmail, requireAuth } from "../lib/auth.server";
 import type { Route } from "./+types/confirm";
 
@@ -30,6 +32,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Confirm({ loaderData }: Route.ComponentProps) {
+  useEffect(() => {
+    if (loaderData.success) {
+      showSuccessToast("Email confirmed successfully.");
+      return;
+    }
+
+    showErrorToast(loaderData.error);
+  }, [loaderData]);
+
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
@@ -63,8 +74,7 @@ export default function Confirm({ loaderData }: Route.ComponentProps) {
                 <span>{loaderData.error}</span>
               </div>
               <p className="text-base-content/70 text-sm">
-                The confirmation link may have expired (valid for 30 minutes) or
-                already been used.
+                The confirmation link may have expired (valid for 30 minutes) or already been used.
               </p>
               <div className="card-actions w-full pt-2 flex-col gap-2">
                 <Link to="/dashboard" className="btn btn-primary w-full">

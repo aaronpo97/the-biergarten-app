@@ -6,6 +6,7 @@ const config: StorybookConfig = {
     "../stories/SubmitButton.stories.tsx",
     "../stories/FormField.stories.tsx",
     "../stories/Navbar.stories.tsx",
+    "../stories/Toast.stories.tsx",
     "../stories/Themes.stories.tsx",
   ],
   addons: [

@@ -10,6 +10,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import Navbar from "./components/Navbar";
+import ToastProvider from "./components/toast/ToastProvider";
 import { getOptionalAuth } from "./lib/auth.server";
 
 export const links: Route.LinksFunction = () => [
@@ -53,6 +54,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <Navbar auth={auth} />
+      <ToastProvider />
       <Outlet />
     </>
   );
@@ -66,9 +68,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";
     details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
+      error.status === 404 ? "The requested page could not be found." : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
