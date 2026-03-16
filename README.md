@@ -1,261 +1,142 @@
 # The Biergarten App
 
-A social platform for craft beer enthusiasts to discover breweries, share reviews, and
-connect with fellow beer lovers.
+The Biergarten App is a multi-project monorepo with a .NET backend and an active React
+Router frontend in `src/Website`. The current website focuses on account flows, theme
+switching, shared UI components, Storybook coverage, and integration with the API.
 
-**Documentation**
+## Documentation
 
-- [Getting Started](docs/getting-started.md) - Setup and installation
-- [Architecture](docs/architecture.md) - System design and patterns
-- [Database](docs/database.md) - Schema and stored procedures
-- [Docker Guide](docs/docker.md) - Container deployment
-- [Testing](docs/testing.md) - Test strategy and commands
-- [Environment Variables](docs/environment-variables.md) - Configuration reference
+- [Getting Started](docs/getting-started.md) - Local setup for backend and active website
+- [Architecture](docs/architecture.md) - Current backend and frontend architecture
+- [Docker Guide](docs/docker.md) - Container-based backend development and testing
+- [Testing](docs/testing.md) - Backend and frontend test commands
+- [Environment Variables](docs/environment-variables.md) - Active configuration reference
+- [Token Validation](docs/token-validation.md) - JWT validation architecture
+- [Legacy Website Archive](docs/archive/legacy-website-v1.md) - Archived notes for the old Next.js frontend
 
-**Diagrams**
+## Diagrams
 
-- [Architecture](docs/diagrams/pdf/architecture.pdf) - Layered architecture
-- [Deployment](docs/diagrams/pdf/deployment.pdf) - Docker topology
-- [Authentication Flow](docs/diagrams/pdf/authentication-flow.pdf) - Auth sequence
-- [Database Schema](docs/diagrams/pdf/database-schema.pdf) - Entity relationships
+- [Architecture](docs/diagrams-out/architecture.svg) - Layered architecture
+- [Deployment](docs/diagrams-out/deployment.svg) - Docker topology
+- [Authentication Flow](docs/diagrams-out/authentication-flow.svg) - Auth sequence
+- [Database Schema](docs/diagrams-out/database-schema.svg) - Entity relationships
 
-## Project Status
+## Current Status
 
-**Active Development** - Transitioning from full-stack Next.js to multi-project monorepo
+Active areas in the repository:
 
-- Core authentication and user management APIs
-- Database schema with migrations and seeding
-- Layered architecture (Domain, Service, Infrastructure, Repository, API)
-- Comprehensive test suite (unit + integration)
-- Frontend integration with .NET API (in progress)
-- Migration from Next.js serverless functions
+- .NET 10 backend with layered architecture and SQL Server
+- React Router 7 website in `src/Website`
+- Shared Biergarten theme system with a theme guide route
+- Storybook stories and browser-based checks for shared UI
+- Auth demo flows for home, login, register, dashboard, logout, and confirmation
+- Toast-based feedback for auth outcomes
 
----
+Legacy area retained for reference:
+
+- `src/Website-v1` contains the archived Next.js frontend and is no longer the active website
 
 ## Tech Stack
 
-**Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp **Frontend**: Next.js 14+,
-TypeScript, TailwindCSS **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
-**Infrastructure**: Docker, Docker Compose **Security**: Argon2id password hashing, JWT
-(HS256)
-
----
+- **Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp
+- **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5
+- **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
+- **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
+- **Infrastructure**: Docker, Docker Compose
+- **Security**: Argon2id password hashing, JWT access/refresh/confirmation tokens
 
 ## Quick Start
 
-### Prerequisites
-
-- [.NET SDK 10+](https://dotnet.microsoft.com/download)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- [Node.js 18+](https://nodejs.org/) (for frontend)
-
-### Start Development Environment
+### Backend
 
 ```bash
-# Clone repository
 git clone https://github.com/aaronpo97/the-biergarten-app
 cd the-biergarten-app
-
-# Configure environment
 cp .env.example .env.dev
-
-# Start all services
 docker compose -f docker-compose.dev.yaml up -d
-
-# View logs
-docker compose -f docker-compose.dev.yaml logs -f
 ```
 
-**Access**:
+Backend access:
 
-- API: http://localhost:8080/swagger
-- Health: http://localhost:8080/health
+- API Swagger: http://localhost:8080/swagger
+- Health Check: http://localhost:8080/health
 
-### Run Tests
+### Frontend
 
 ```bash
-docker compose -f docker-compose.test.yaml up --abort-on-container-exit
+cd src/Website
+npm install
+API_BASE_URL=http://localhost:8080 SESSION_SECRET=dev-secret npm run dev
 ```
 
-Results are in `./test-results/`
+Optional frontend tools:
 
----
+```bash
+cd src/Website
+npm run storybook
+npm run test:storybook
+npm run test:storybook:playwright
+```
 
 ## Repository Structure
 
+```text
+src/Core/          Backend projects (.NET)
+src/Website/       Active React Router frontend
+src/Website-v1/    Archived legacy Next.js frontend
+docs/              Active project documentation
+docs/archive/      Archived legacy documentation
 ```
-src/Core/                          # Backend (.NET)
-├── API/
-│   ├── API.Core/                 # ASP.NET Core Web API
-│   └── API.Specs/                # Integration tests (Reqnroll)
-├── Database/
-│   ├── Database.Migrations/      # DbUp migrations
-│   └── Database.Seed/            # Data seeding
-├── Domain.Entities/              # Domain models
-├── Infrastructure/               # Cross-cutting concerns
-│   ├── Infrastructure.Jwt/
-│   ├── Infrastructure.PasswordHashing/
-│   ├── Infrastructure.Email/
-│   ├── Infrastructure.Repository/
-│   └── Infrastructure.Repository.Tests/
-└── Service/                      # Business logic
-    ├── Service.Auth/
-    ├── Service.Auth.Tests/
-    └── Service.UserManagement/
-
-Website/                          # Frontend (Next.js)
-docs/                             # Documentation
-docs/diagrams/                    # PlantUML diagrams
-```
-
----
 
 ## Key Features
 
-### Implemented
+Implemented today:
 
-- User registration and authentication
-- JWT token-based auth
-- Argon2id password hashing
-- SQL Server with stored procedures
-- Database migrations (DbUp)
-- Docker containerization
-- Comprehensive test suite
-- Swagger/OpenAPI documentation
-- Health checks
+- User registration and login against the API
+- JWT-based auth with access, refresh, and confirmation flows
+- SQL Server migrations and seed projects
+- Shared form components and auth screens
+- Theme switching with Lager, Stout, Cassis, and Weizen variants
+- Storybook documentation and automated story interaction tests
+- Toast feedback for auth-related outcomes
 
-### Planned
+Planned next:
 
-- [ ] Brewery discovery and management
-- [ ] Beer reviews and ratings
-- [ ] Social following/followers
-- [ ] Geospatial brewery search
-- [ ] Image upload (Cloudinary)
-- [ ] Email notifications
-- [ ] OAuth integration
-
----
-
-## Architecture Highlights
-
-### Layered Architecture
-
-```
-API Layer (Controllers)
-    │
-Service Layer (Business Logic)
-    │
-Infrastructure Layer (Repositories, JWT, Email)
-    │
-Domain Layer (Entities)
-    │
-Database (SQL Server + Stored Procedures)
-```
-
-### SQL-First Approach
-
-- All queries via stored procedures
-- No ORM (no Entity Framework)
-- Version-controlled schema
-
-### Security
-
-- **Password Hashing**: Argon2id (64MB memory, 4 iterations)
-- **JWT Tokens**: HS256 with configurable expiration
-- **Credential Rotation**: Built-in password change support
-
-See [Architecture Guide](docs/architecture.md) for details.
-
----
+- Brewery discovery and management
+- Beer reviews and ratings
+- Social follow relationships
+- Geospatial brewery experiences
+- Additional frontend routes beyond the auth demo
 
 ## Testing
 
-The project includes three test suites:
+Backend suites:
 
-| Suite                  | Type        | Framework      | Purpose                |
-| ---------------------- | ----------- | -------------- | ---------------------- |
-| **API.Specs**          | Integration | Reqnroll (BDD) | End-to-end API testing |
-| **Repository.Tests**   | Unit        | xUnit          | Data access layer      |
-| **Service.Auth.Tests** | Unit        | xUnit + Moq    | Business logic         |
+- `API.Specs` - integration tests
+- `Infrastructure.Repository.Tests` - repository unit tests
+- `Service.Auth.Tests` - service unit tests
 
-**Run All Tests**:
+Frontend suites:
+
+- Storybook interaction tests via Vitest
+- Storybook browser regression checks via Playwright
+
+Run all backend tests with Docker:
 
 ```bash
 docker compose -f docker-compose.test.yaml up --abort-on-container-exit
 ```
 
-**Run Individual Test Suite**:
-
-```bash
-cd src/Core
-dotnet test API/API.Specs/API.Specs.csproj
-dotnet test Infrastructure/Infrastructure.Repository.Tests/Infrastructure.Repository.Tests.csproj
-dotnet test Service/Service.Auth.Tests/Service.Auth.Tests.csproj
-```
-
-See [Testing Guide](docs/testing.md) for more information.
-
----
-
-## Docker Environments
-
-The project uses three Docker Compose configurations:
-
-| File                         | Purpose       | Features                                          |
-| ---------------------------- | ------------- | ------------------------------------------------- |
-| **docker-compose.dev.yaml**  | Development   | Persistent data, hot reload, Swagger UI           |
-| **docker-compose.test.yaml** | CI/CD Testing | Isolated DB, auto-exit, test results export       |
-| **docker-compose.prod.yaml** | Production    | Optimized builds, health checks, restart policies |
-
-**Common Commands**:
-
-```bash
-# Development
-docker compose -f docker-compose.dev.yaml up -d
-docker compose -f docker-compose.dev.yaml logs -f api.core
-docker compose -f docker-compose.dev.yaml down -v
-
-# Testing
-docker compose -f docker-compose.test.yaml up --abort-on-container-exit
-docker compose -f docker-compose.test.yaml down -v
-
-# Build
-docker compose -f docker-compose.dev.yaml build
-docker compose -f docker-compose.dev.yaml build --no-cache
-```
-
-See [Docker Guide](docs/docker.md) for troubleshooting and advanced usage.
-
----
+See [Testing](docs/testing.md) for the full command list.
 
 ## Configuration
 
-### Required Environment Variables
+Common active variables:
 
-**Backend** (`.env.dev`):
+- Backend: `DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`
+- Frontend: `API_BASE_URL`, `SESSION_SECRET`, `NODE_ENV`
 
-```bash
-DB_SERVER=sqlserver,1433
-DB_NAME=Biergarten
-DB_USER=sa
-DB_PASSWORD=YourStrong!Passw0rd
-JWT_SECRET=<min-32-chars>
-```
-
-**Frontend** (`.env.local`):
-
-```bash
-BASE_URL=http://localhost:3000
-NODE_ENV=development
-CONFIRMATION_TOKEN_SECRET=<generated>
-RESET_PASSWORD_TOKEN_SECRET=<generated>
-SESSION_SECRET=<generated>
-# + External services (Cloudinary, Mapbox, SparkPost)
-```
-
-See [Environment Variables Guide](docs/environment-variables.md) for complete reference.
-
----
+See [Environment Variables](docs/environment-variables.md) for details.
 
 ## Contributing
 

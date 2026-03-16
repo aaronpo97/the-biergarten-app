@@ -1,19 +1,16 @@
 # Getting Started
 
-This guide will help you set up and run The Biergarten App in your development
-environment.
+This guide covers local setup for the current Biergarten stack: the .NET backend in
+`src/Core` and the active React Router frontend in `src/Website`.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+- **.NET SDK 10+**
+- **Node.js 18+**
+- **Docker Desktop** or equivalent Docker Engine setup
+- **Java 8+** if you want to regenerate PlantUML diagrams
 
-- **.NET SDK 10+** - [Download](https://dotnet.microsoft.com/download)
-- **Node.js 18+** - [Download](https://nodejs.org/)
-- **Docker Desktop** - [Download](https://www.docker.com/products/docker-desktop)
-  (recommended)
-- **Java 8+** - Required for generating diagrams from PlantUML (optional)
-
-## Quick Start with Docker (Recommended)
+## Recommended Path: Docker for Backend, Node for Frontend
 
 ### 1. Clone the Repository
 
@@ -22,174 +19,120 @@ git clone <repository-url>
 cd the-biergarten-app
 ```
 
-### 2. Configure Environment Variables
-
-Copy the example environment file:
+### 2. Configure Backend Environment Variables
 
 ```bash
 cp .env.example .env.dev
 ```
 
-Edit `.env.dev` with your configuration:
+At minimum, ensure `.env.dev` includes valid database and token values:
 
 ```bash
-# Database (component-based for Docker)
 DB_SERVER=sqlserver,1433
 DB_NAME=Biergarten
 DB_USER=sa
 DB_PASSWORD=YourStrong!Passw0rd
-
-# JWT Authentication
-JWT_SECRET=your-secret-key-minimum-32-characters-required
+ACCESS_TOKEN_SECRET=<generated>
+REFRESH_TOKEN_SECRET=<generated>
+CONFIRMATION_TOKEN_SECRET=<generated>
+WEBSITE_BASE_URL=http://localhost:3000
 ```
 
-> For a complete list of environment variables, see
-> [Environment Variables](environment-variables.md).
+See [Environment Variables](environment-variables.md) for the full list.
 
-### 3. Start the Development Environment
+### 3. Start the Backend Stack
 
 ```bash
 docker compose -f docker-compose.dev.yaml up -d
 ```
 
-This command will:
+This starts SQL Server, migrations, seeding, and the API.
 
-- Start SQL Server container
-- Run database migrations
-- Seed initial data
-- Start the API on http://localhost:8080
+Available endpoints:
 
-### 4. Access the API
+- API Swagger: http://localhost:8080/swagger
+- Health Check: http://localhost:8080/health
 
-- **Swagger UI**: http://localhost:8080/swagger
-- **Health Check**: http://localhost:8080/health
-
-### 5. View Logs
+### 4. Start the Active Frontend
 
 ```bash
-# All services
-docker compose -f docker-compose.dev.yaml logs -f
-
-# Specific service
-docker compose -f docker-compose.dev.yaml logs -f api.core
+cd src/Website
+npm install
+API_BASE_URL=http://localhost:8080 SESSION_SECRET=dev-secret-change-me npm run dev
 ```
 
-### 6. Stop the Environment
+The website will be available at the local address printed by React Router dev.
+
+Required frontend runtime variables for local work:
+
+- `API_BASE_URL` - Base URL for the .NET API
+- `SESSION_SECRET` - Cookie session signing secret for the website server
+
+### 5. Optional: Run Storybook
 
 ```bash
-docker compose -f docker-compose.dev.yaml down
+cd src/Website
+npm run storybook
+```
 
-# Remove volumes (fresh start)
+Storybook runs at http://localhost:6006 by default.
+
+## Useful Commands
+
+### Backend
+
+```bash
+docker compose -f docker-compose.dev.yaml logs -f
+docker compose -f docker-compose.dev.yaml down
 docker compose -f docker-compose.dev.yaml down -v
 ```
 
-## Manual Setup (Without Docker)
-
-If you prefer to run services locally without Docker:
-
-### Backend Setup
-
-#### 1. Start SQL Server
-
-You can use a local SQL Server instance or a cloud-hosted one. Ensure it's accessible and
-you have the connection details.
-
-#### 2. Set Environment Variables
+### Frontend
 
 ```bash
-# macOS/Linux
-export DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
-export JWT_SECRET="your-secret-key-minimum-32-characters-required"
-
-# Windows PowerShell
-$env:DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
-$env:JWT_SECRET="your-secret-key-minimum-32-characters-required"
+cd src/Website
+npm run lint
+npm run typecheck
+npm run format:check
+npm run test:storybook
+npm run test:storybook:playwright
 ```
 
-#### 3. Run Database Migrations
+## Manual Backend Setup
+
+If you do not want to use Docker, you can run the backend locally.
+
+### 1. Set Environment Variables
+
+```bash
+export DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
+export ACCESS_TOKEN_SECRET="<generated>"
+export REFRESH_TOKEN_SECRET="<generated>"
+export CONFIRMATION_TOKEN_SECRET="<generated>"
+export WEBSITE_BASE_URL="http://localhost:3000"
+```
+
+### 2. Run Migrations and Seed
 
 ```bash
 cd src/Core
 dotnet run --project Database/Database.Migrations/Database.Migrations.csproj
-```
-
-#### 4. Seed the Database
-
-```bash
 dotnet run --project Database/Database.Seed/Database.Seed.csproj
 ```
 
-#### 5. Start the API
+### 3. Start the API
 
 ```bash
 dotnet run --project API/API.Core/API.Core.csproj
 ```
 
-The API will be available at http://localhost:5000 (or the port specified in
-launchSettings.json).
+## Legacy Frontend Note
 
-### Frontend Setup
-
-> **Note**: The frontend is currently transitioning from its standalone Prisma/Postgres
-> backend to the .NET API. Some features may still use the old backend.
-
-#### 1. Navigate to Website Directory
-
-```bash
-cd Website
-```
-
-#### 2. Create Environment File
-
-Create `.env.local` with frontend variables. See
-[Environment Variables - Frontend](environment-variables.md#frontend-variables) for the
-complete list.
-
-```bash
-BASE_URL=http://localhost:3000
-NODE_ENV=development
-
-# Generate secrets
-CONFIRMATION_TOKEN_SECRET=$(openssl rand -base64 127)
-RESET_PASSWORD_TOKEN_SECRET=$(openssl rand -base64 127)
-SESSION_SECRET=$(openssl rand -base64 127)
-
-# External services (you'll need to register for these)
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_KEY=your-api-key
-CLOUDINARY_SECRET=your-api-secret
-NEXT_PUBLIC_MAPBOX_KEY=your-mapbox-token
-
-# Database URL (current Prisma setup)
-DATABASE_URL=your-postgres-connection-string
-```
-
-#### 3. Install Dependencies
-
-```bash
-npm install
-```
-
-#### 4. Run Prisma Migrations
-
-```bash
-npx prisma generate
-npx prisma migrate dev
-```
-
-#### 5. Start Development Server
-
-```bash
-npm run dev
-```
-
-The frontend will be available at http://localhost:3000.
-
+The previous Next.js frontend now lives in `src/Website-v1` and is not the active website.
+Legacy setup details have been moved to [docs/archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Next Steps
 
-- **Test the API**: Visit http://localhost:8080/swagger and try the endpoints
-- **Run Tests**: See [Testing Guide](testing.md)
-- **Learn the Architecture**: Read [Architecture Overview](architecture.md)
-- **Understand Docker Setup**: See [Docker Guide](docker.md)
-- **Database Details**: Check [Database Schema](database.md)
+- Review [Architecture](architecture.md)
+- Run backend and frontend checks from [Testing](testing.md)
+- Use [Docker Guide](docker.md) for container troubleshooting
