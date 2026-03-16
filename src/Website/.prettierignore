@@ -2,3 +2,6 @@ build
 node_modules
 .react-router
 package-lock.json
+storybook-static
+test-results
+debug-storybook.log
