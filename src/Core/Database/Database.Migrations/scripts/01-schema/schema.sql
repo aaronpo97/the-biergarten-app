@@ -22,7 +22,7 @@ USE Biergarten;
 CREATE TABLE dbo.UserAccount
 (
     UserAccountID UNIQUEIDENTIFIER
-        CONSTRAINT DF_UserAccountID	DEFAULT NEWID(),
+        CONSTRAINT DF_UserAccountID DEFAULT NEWID(),
 
     Username VARCHAR(64) NOT NULL,
 
@@ -37,7 +37,7 @@ CREATE TABLE dbo.UserAccount
 
     UpdatedAt DATETIME,
 
-    DateOfBirth DATETIME NOT NULL,
+    DateOfBirth DATE NOT NULL,
 
     Timer ROWVERSION,
 
@@ -49,7 +49,6 @@ CREATE TABLE dbo.UserAccount
 
     CONSTRAINT AK_Email
         UNIQUE (Email)
-
 );
 
 ----------------------------------------------------------------------------
@@ -109,7 +108,7 @@ CREATE TABLE UserAvatar -- delete avatar photo when user account is deleted
 
     CONSTRAINT AK_UserAvatar_UserAccountID
         UNIQUE (UserAccountID)
-)
+);
 
 CREATE NONCLUSTERED INDEX IX_UserAvatar_UserAccount
     ON UserAvatar(UserAccountID);
@@ -125,8 +124,7 @@ CREATE TABLE UserVerification -- delete verification data when user account is d
     UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
     VerificationDateTime DATETIME NOT NULL
-        CONSTRAINT DF_VerificationDateTime
-        DEFAULT GETDATE(),
+        CONSTRAINT DF_VerificationDateTime DEFAULT GETDATE(),
 
     Timer ROWVERSION,
 
@@ -155,13 +153,13 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
 
     UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
-    CreatedAt DATETIME
-        CONSTRAINT DF_UserCredential_CreatedAt DEFAULT GETDATE() NOT NULL,
+    CreatedAt DATETIME NOT NULL
+        CONSTRAINT DF_UserCredential_CreatedAt DEFAULT GETDATE(),
 
-    Expiry DATETIME
-        CONSTRAINT DF_UserCredential_Expiry DEFAULT DATEADD(DAY, 90, GETDATE()) NOT NULL,
+    Expiry DATETIME NOT NULL
+        CONSTRAINT DF_UserCredential_Expiry DEFAULT DATEADD(DAY, 90, GETDATE()),
 
-    Hash NVARCHAR(MAX) NOT NULL,
+    Hash NVARCHAR(256) NOT NULL,
     -- uses argon2
 
     IsRevoked BIT NOT NULL
@@ -177,11 +175,15 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
     CONSTRAINT FK_UserCredential_UserAccount
         FOREIGN KEY (UserAccountID)
         REFERENCES UserAccount(UserAccountID)
-        ON DELETE CASCADE,
+        ON DELETE CASCADE
 );
 
 CREATE NONCLUSTERED INDEX IX_UserCredential_UserAccount
     ON UserCredential(UserAccountID);
+
+CREATE NONCLUSTERED INDEX IX_UserCredential_Account_Active
+    ON UserCredential(UserAccountID, IsRevoked, Expiry)
+    INCLUDE (Hash);
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -195,8 +197,8 @@ CREATE TABLE UserFollow
 
     FollowingID UNIQUEIDENTIFIER NOT NULL,
 
-    CreatedAt DATETIME
-        CONSTRAINT DF_UserFollow_CreatedAt DEFAULT GETDATE() NOT NULL,
+    CreatedAt DATETIME NOT NULL
+        CONSTRAINT DF_UserFollow_CreatedAt DEFAULT GETDATE(),
 
     Timer ROWVERSION,
 
@@ -205,11 +207,13 @@ CREATE TABLE UserFollow
 
     CONSTRAINT FK_UserFollow_UserAccount
         FOREIGN KEY (UserAccountID)
-        REFERENCES UserAccount(UserAccountID),
+        REFERENCES UserAccount(UserAccountID)
+        ON DELETE NO ACTION,
 
     CONSTRAINT FK_UserFollow_UserAccountFollowing
         FOREIGN KEY (FollowingID)
-        REFERENCES UserAccount(UserAccountID),
+        REFERENCES UserAccount(UserAccountID)
+        ON DELETE NO ACTION,
 
     CONSTRAINT CK_CannotFollowOwnAccount
         CHECK (UserAccountID != FollowingID)
@@ -220,7 +224,6 @@ CREATE NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
 
 CREATE NONCLUSTERED INDEX IX_UserFollow_FollowingID_UserAccount
     ON UserFollow(FollowingID, UserAccountID);
-
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -240,7 +243,7 @@ CREATE TABLE Country
         PRIMARY KEY (CountryID),
 
     CONSTRAINT AK_Country_ISO3166_1
-       UNIQUE (ISO3166_1)
+        UNIQUE (ISO3166_1)
 );
 
 ----------------------------------------------------------------------------
@@ -299,7 +302,6 @@ CREATE TABLE City
 CREATE NONCLUSTERED INDEX IX_City_StateProvince
     ON City(StateProvinceID);
 
-
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 
@@ -307,6 +309,8 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
 (
     BreweryPostID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostID DEFAULT NEWID(),
+
+    BreweryName NVARCHAR(256) NOT NULL,
 
     PostedByID UNIQUEIDENTIFIER NOT NULL,
 
@@ -325,15 +329,15 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
     CONSTRAINT FK_BreweryPost_UserAccount
         FOREIGN KEY (PostedByID)
         REFERENCES UserAccount(UserAccountID)
-        ON DELETE NO ACTION,
-
-)
+        ON DELETE NO ACTION
+);
 
 CREATE NONCLUSTERED INDEX IX_BreweryPost_PostedByID
     ON BreweryPost(PostedByID);
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
+
 CREATE TABLE BreweryPostLocation
 (
     BreweryPostLocationID UNIQUEIDENTIFIER
@@ -349,7 +353,7 @@ CREATE TABLE BreweryPostLocation
 
     CityID UNIQUEIDENTIFIER NOT NULL,
 
-    Coordinates GEOGRAPHY NOT NULL,
+    Coordinates GEOGRAPHY NULL,
 
     Timer ROWVERSION,
 
@@ -362,7 +366,11 @@ CREATE TABLE BreweryPostLocation
     CONSTRAINT FK_BreweryPostLocation_BreweryPost
         FOREIGN KEY (BreweryPostID)
         REFERENCES BreweryPost(BreweryPostID)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT FK_BreweryPostLocation_City
+        FOREIGN KEY (CityID)
+        REFERENCES City(CityID)
 );
 
 CREATE NONCLUSTERED INDEX IX_BreweryPostLocation_BreweryPost
@@ -370,6 +378,18 @@ CREATE NONCLUSTERED INDEX IX_BreweryPostLocation_BreweryPost
 
 CREATE NONCLUSTERED INDEX IX_BreweryPostLocation_City
     ON BreweryPostLocation(CityID);
+
+-- To assess when the time comes:
+
+-- This would allow for efficient spatial queries to find breweries within a certain distance of a location, but it adds overhead to insert/update operations.
+
+-- CREATE SPATIAL INDEX SIDX_BreweryPostLocation_Coordinates
+--     ON BreweryPostLocation(Coordinates)
+--     USING GEOGRAPHY_GRID
+--     WITH (
+--         GRIDS = (LEVEL_1 = MEDIUM, LEVEL_2 = MEDIUM, LEVEL_3 = MEDIUM, LEVEL_4 = MEDIUM),
+--         CELLS_PER_OBJECT = 16
+--     );
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -403,13 +423,14 @@ CREATE TABLE BreweryPostPhoto -- All photos linked to a post are deleted if the 
 );
 
 CREATE NONCLUSTERED INDEX IX_BreweryPostPhoto_Photo_BreweryPost
-ON BreweryPostPhoto(PhotoID, BreweryPostID);
+    ON BreweryPostPhoto(PhotoID, BreweryPostID);
 
 CREATE NONCLUSTERED INDEX IX_BreweryPostPhoto_BreweryPost_Photo
-ON BreweryPostPhoto(BreweryPostID, PhotoID);
+    ON BreweryPostPhoto(BreweryPostID, PhotoID);
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
+
 CREATE TABLE BeerStyle
 (
     BeerStyleID UNIQUEIDENTIFIER
@@ -444,7 +465,7 @@ CREATE TABLE BeerPost
     -- Alcohol By Volume (typically 0-67%)
 
     IBU INT NOT NULL,
-    -- International Bitterness Units (typically 0-100)
+    -- International Bitterness Units (typically 0-120)
 
     PostedByID UNIQUEIDENTIFIER NOT NULL,
 
@@ -464,7 +485,8 @@ CREATE TABLE BeerPost
 
     CONSTRAINT FK_BeerPost_PostedBy
         FOREIGN KEY (PostedByID)
-        REFERENCES UserAccount(UserAccountID),
+        REFERENCES UserAccount(UserAccountID)
+        ON DELETE NO ACTION,
 
     CONSTRAINT FK_BeerPost_BeerStyle
         FOREIGN KEY (BeerStyleID)
@@ -522,10 +544,10 @@ CREATE TABLE BeerPostPhoto -- All photos linked to a beer post are deleted if th
 );
 
 CREATE NONCLUSTERED INDEX IX_BeerPostPhoto_Photo_BeerPost
-ON BeerPostPhoto(PhotoID, BeerPostID);
+    ON BeerPostPhoto(PhotoID, BeerPostID);
 
 CREATE NONCLUSTERED INDEX IX_BeerPostPhoto_BeerPost_Photo
-ON BeerPostPhoto(BeerPostID, PhotoID);
+    ON BeerPostPhoto(BeerPostID, PhotoID);
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -539,17 +561,35 @@ CREATE TABLE BeerPostComment
 
     BeerPostID UNIQUEIDENTIFIER NOT NULL,
 
+    CommentedByID UNIQUEIDENTIFIER NOT NULL,
+
     Rating INT NOT NULL,
+
+    CreatedAt DATETIME NOT NULL
+        CONSTRAINT DF_BeerPostComment_CreatedAt DEFAULT GETDATE(),
+
+    UpdatedAt DATETIME NULL,
 
     Timer ROWVERSION,
 
     CONSTRAINT PK_BeerPostComment
-       PRIMARY KEY (BeerPostCommentID),
+        PRIMARY KEY (BeerPostCommentID),
 
     CONSTRAINT FK_BeerPostComment_BeerPost
-       FOREIGN KEY (BeerPostID) REFERENCES BeerPost(BeerPostID)
-)
+        FOREIGN KEY (BeerPostID)
+        REFERENCES BeerPost(BeerPostID),
+
+    CONSTRAINT FK_BeerPostComment_UserAccount
+        FOREIGN KEY (CommentedByID)
+        REFERENCES UserAccount(UserAccountID)
+        ON DELETE NO ACTION,
+
+    CONSTRAINT CHK_BeerPostComment_Rating
+        CHECK (Rating BETWEEN 1 AND 5)
+);
 
 CREATE NONCLUSTERED INDEX IX_BeerPostComment_BeerPost
-    ON BeerPostComment(BeerPostID)
+    ON BeerPostComment(BeerPostID);
 
+CREATE NONCLUSTERED INDEX IX_BeerPostComment_CommentedBy
+    ON BeerPostComment(CommentedByID);
