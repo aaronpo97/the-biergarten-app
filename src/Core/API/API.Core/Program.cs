@@ -1,20 +1,15 @@
 using API.Core;
 using API.Core.Authentication;
-using API.Core.Contracts.Common;
-using Domain.Exceptions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Email;
-using Infrastructure.Email.Templates;
 using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.Jwt;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+using Infrastructure.Repository.Breweries;
 using Service.Auth;
 using Service.Emails;
 using Service.UserManagement.User;
@@ -55,6 +50,7 @@ builder.Services.AddSingleton<
 
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IBreweryRepository, BreweryRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
