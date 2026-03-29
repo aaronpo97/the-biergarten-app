@@ -20,28 +20,31 @@ BEGIN
         THROW 50002, 'Brewery description cannot be null.', 1;
 
     IF NOT EXISTS (SELECT 1
-    FROM dbo.UserAccount
-    WHERE UserAccountID = @PostedByID)
+                   FROM dbo.UserAccount
+                   WHERE UserAccountID = @PostedByID)
         THROW 50404, 'User not found.', 1;
 
     IF NOT EXISTS (SELECT 1
-    FROM dbo.City
-    WHERE CityID = @CityID)
+                   FROM dbo.City
+                   WHERE CityID = @CityID)
         THROW 50404, 'City not found.', 1;
 
     DECLARE @NewBreweryID UNIQUEIDENTIFIER = NEWID();
+    DECLARE @NewBrewerLocationID UNIQUEIDENTIFIER = NEWID();
 
     BEGIN TRANSACTION;
 
     INSERT INTO dbo.BreweryPost
         (BreweryPostID, BreweryName, Description, PostedByID)
-    VALUES
-        (@NewBreweryID, @BreweryName, @Description, @PostedByID);
+    VALUES (@NewBreweryID, @BreweryName, @Description, @PostedByID);
 
     INSERT INTO dbo.BreweryPostLocation
-        (BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
-    VALUES
-        (@NewBreweryID, @CityID, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates);
+    (BreweryPostLocationID, BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
+    VALUES (@NewBrewerLocationID, @NewBreweryID, @CityID, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates);
 
     COMMIT TRANSACTION;
+
+    SELECT @NewBreweryID        AS BreweryPostID,
+           @NewBrewerLocationID AS BreweryPostLocationID;
+
 END

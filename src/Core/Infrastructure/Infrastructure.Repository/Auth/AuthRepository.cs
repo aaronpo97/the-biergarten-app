@@ -35,16 +35,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         var result = await command.ExecuteScalarAsync();
         var userAccountId = result != null ? (Guid)result : Guid.Empty;
 
-        return new Domain.Entities.UserAccount
-        {
-            UserAccountId = userAccountId,
-            Username = username,
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            DateOfBirth = dateOfBirth,
-            CreatedAt = DateTime.UtcNow,
-        };
+        return await GetUserByIdAsync(userAccountId) ?? throw new Exception("Failed to retrieve newly registered user.");
     }
 
     public async Task<Domain.Entities.UserAccount?> GetUserByEmailAsync(
