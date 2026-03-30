@@ -33,7 +33,37 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         AddParameter(command, "@Hash", passwordHash);
 
         var result = await command.ExecuteScalarAsync();
-        var userAccountId = result != null ? (Guid)result : Guid.Empty;
+
+        Guid userAccountId = Guid.Empty;
+        if (result != null && result != DBNull.Value)
+        {
+            if (result is Guid g)
+            {
+                userAccountId = g;
+            }
+            else if (result is string s && Guid.TryParse(s, out var parsed))
+            {
+                userAccountId = parsed;
+            }
+            else if (result is byte[] bytes && bytes.Length == 16)
+            {
+                userAccountId = new Guid(bytes);
+            }
+            else
+            {
+                // Fallback: try to convert and parse string representation
+                try
+                {
+                    var str = result.ToString();
+                    if (!string.IsNullOrEmpty(str) && Guid.TryParse(str, out var p))
+                        userAccountId = p;
+                }
+                catch
+                {
+                    userAccountId = Guid.Empty;
+                }
+            }
+        }
 
         return await GetUserByIdAsync(userAccountId) ?? throw new Exception("Failed to retrieve newly registered user.");
     }

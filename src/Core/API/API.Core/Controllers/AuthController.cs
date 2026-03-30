@@ -86,6 +86,13 @@ namespace API.Core.Controllers
             );
         }
 
+        [HttpPost("confirm/resend")]
+        public async Task<ActionResult> ResendConfirmation([FromQuery] Guid userId)
+        {
+            await confirmationService.ResendConfirmationEmailAsync(userId);
+            return Ok(new ResponseBody { Message = "confirmation email has been resent" });
+        }
+
         [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<ActionResult> Refresh(
