@@ -1,72 +1,65 @@
 using Domain.Entities;
 using Infrastructure.Repository.Breweries;
-using API.Core.Contracts.Breweries;
 
 namespace Service.Breweries;
 
 public class BreweryService(IBreweryRepository repository) : IBreweryService
 {
-   private readonly IBreweryRepository _repository = repository;
+    public Task<BreweryPost?> GetByIdAsync(Guid id) =>
+        repository.GetByIdAsync(id);
 
-   public Task<BreweryPost?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
+    public Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit = null, int? offset = null) =>
+        repository.GetAllAsync(limit, offset);
 
-   public Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit = null, int? offset = null) => _repository.GetAllAsync(limit, offset);
+    public async Task<BreweryServiceReturn> CreateAsync(BreweryCreateRequest request)
+    {
+        var entity = new BreweryPost
+        {
+            BreweryPostId = Guid.NewGuid(),
+            PostedById = request.PostedById,
+            BreweryName = request.BreweryName,
+            Description = request.Description,
+            CreatedAt = DateTime.UtcNow,
+            Location = new BreweryPostLocation
+            {
+                BreweryPostLocationId = Guid.NewGuid(),
+                CityId = request.Location.CityId,
+                AddressLine1 = request.Location.AddressLine1,
+                AddressLine2 = request.Location.AddressLine2,
+                PostalCode = request.Location.PostalCode,
+                Coordinates = request.Location.Coordinates,
+            },
+        };
 
-   public async Task<BreweryServiceReturn> CreateAsync(BreweryCreateDto brewery)
-   {
-      if (brewery.Location is null)
-         return new BreweryServiceReturn("Location must be provided");
+        await repository.CreateAsync(entity);
+        return new BreweryServiceReturn(entity);
+    }
 
-      var entity = new BreweryPost
-      {
-         BreweryPostId = Guid.NewGuid(),
-         PostedById = brewery.PostedById,
-         BreweryName = brewery.BreweryName,
-         Description = brewery.Description,
-         CreatedAt = DateTime.UtcNow,
-         Location = new BreweryPostLocation
-         {
-            BreweryPostLocationId = Guid.NewGuid(),
-            CityId = brewery.Location.CityId,
-            AddressLine1 = brewery.Location.AddressLine1,
-            AddressLine2 = brewery.Location.AddressLine2,
-            PostalCode = brewery.Location.PostalCode,
-            Coordinates = brewery.Location.Coordinates
-         }
-      };
+    public async Task<BreweryServiceReturn> UpdateAsync(BreweryUpdateRequest request)
+    {
+        var entity = new BreweryPost
+        {
+            BreweryPostId = request.BreweryPostId,
+            PostedById = request.PostedById,
+            BreweryName = request.BreweryName,
+            Description = request.Description,
+            UpdatedAt = DateTime.UtcNow,
+            Location = request.Location is null ? null : new BreweryPostLocation
+            {
+                BreweryPostLocationId = request.Location.BreweryPostLocationId,
+                BreweryPostId = request.BreweryPostId,
+                CityId = request.Location.CityId,
+                AddressLine1 = request.Location.AddressLine1,
+                AddressLine2 = request.Location.AddressLine2,
+                PostalCode = request.Location.PostalCode,
+                Coordinates = request.Location.Coordinates,
+            },
+        };
 
-      await _repository.CreateAsync(entity);
-      return new BreweryServiceReturn(entity);
-   }
+        await repository.UpdateAsync(entity);
+        return new BreweryServiceReturn(entity);
+    }
 
-   public async Task<BreweryServiceReturn> UpdateAsync(BreweryDto brewery)
-   {
-      if (brewery is null) return new BreweryServiceReturn("Brewery payload is null");
-
-      var entity = new BreweryPost
-      {
-         BreweryPostId = brewery.BreweryPostId,
-         PostedById = brewery.PostedById,
-         BreweryName = brewery.BreweryName,
-         Description = brewery.Description,
-         CreatedAt = brewery.CreatedAt,
-         UpdatedAt = brewery.UpdatedAt,
-         Timer = brewery.Timer,
-         Location = brewery.Location is null ? null : new BreweryPostLocation
-         {
-            BreweryPostLocationId = brewery.Location.BreweryPostLocationId,
-            BreweryPostId = brewery.BreweryPostId,
-            CityId = brewery.Location.CityId,
-            AddressLine1 = brewery.Location.AddressLine1,
-            AddressLine2 = brewery.Location.AddressLine2,
-            PostalCode = brewery.Location.PostalCode,
-            Coordinates = brewery.Location.Coordinates
-         }
-      };
-
-      await _repository.UpdateAsync(entity);
-      return new BreweryServiceReturn(entity);
-   }
-
-   public Task DeleteAsync(Guid id) => _repository.DeleteAsync(id);
+    public Task DeleteAsync(Guid id) =>
+        repository.DeleteAsync(id);
 }
