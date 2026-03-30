@@ -4,24 +4,10 @@ using Infrastructure.Repository.Sql;
 
 namespace Infrastructure.Repository.Breweries;
 
-public interface IBreweryRepository
+public class BreweryRepository(ISqlConnectionFactory connectionFactory)
+    : Repository<BreweryPost>(connectionFactory), IBreweryRepository
 {
-    Task<BreweryPost?> GetByIdAsync(Guid id);
-    Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset);
-    Task UpdateAsync(BreweryPost brewery);
-    Task DeleteAsync(Guid id);
-    Task CreateAsync(BreweryPost brewery);
-}
-
-public class BreweryRepository : Repository<BreweryPost>, IBreweryRepository
-{
-    private readonly ISqlConnectionFactory _connectionFactory;
-
-    public BreweryRepository(ISqlConnectionFactory connectionFactory)
-        : base(connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    private readonly ISqlConnectionFactory _connectionFactory = connectionFactory;
 
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
