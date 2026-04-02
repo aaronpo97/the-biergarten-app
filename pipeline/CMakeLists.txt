@@ -39,6 +39,24 @@ if(NOT spdlog_POPULATED)
     add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
+# llama.cpp (on-device inference)
+set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    llama_cpp
+    GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
+    GIT_TAG        b8611
+)
+FetchContent_MakeAvailable(llama_cpp)
+
+if(TARGET llama)
+    target_compile_options(llama PRIVATE
+        $<$<CXX_COMPILER_ID:AppleClang>:-include algorithm>
+    )
+endif()
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
 )
@@ -49,6 +67,7 @@ target_include_directories(biergarten-pipeline
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/includes
         ${rapidjson_SOURCE_DIR}/include
+        ${llama_cpp_SOURCE_DIR}/include
 )
 
 target_link_libraries(biergarten-pipeline
@@ -56,7 +75,8 @@ target_link_libraries(biergarten-pipeline
         CURL::libcurl
         Boost::unit_test_framework
         SQLite::SQLite3
-    spdlog::spdlog
+        spdlog::spdlog
+        llama
 )
 
 target_compile_options(biergarten-pipeline PRIVATE
@@ -116,7 +136,6 @@ if(BUILD_TESTING)
             Boost::unit_test_framework
             CURL::libcurl
             nlohmann_json::nlohmann_json
-            llama
       )
 
       add_test(

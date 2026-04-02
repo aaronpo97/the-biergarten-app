@@ -1,9 +1,12 @@
 #include "data_downloader.h"
+#include "data_generator.h"
 #include "database.h"
-#include "generator.h"
 #include "json_loader.h"
+#include "llama_generator.h"
+#include "mock_generator.h"
 #include <curl/curl.h>
 #include <filesystem>
+#include <memory>
 #include <spdlog/spdlog.h>
 
 static bool FileExists(const std::string &filePath) {
@@ -14,7 +17,7 @@ int main(int argc, char *argv[]) {
   try {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    std::string modelPath = argc > 1 ? argv[1] : "./model.gguf";
+    std::string modelPath = argc > 1 ? argv[1] : "";
     std::string cacheDir = argc > 2 ? argv[2] : "/tmp";
     std::string commit =
         argc > 3 ? argv[3] : "c5eb7772"; // Default: stable 2026-03-28
@@ -41,8 +44,15 @@ int main(int argc, char *argv[]) {
     }
 
     spdlog::info("Initializing brewery generator...");
-    LlamaBreweryGenerator generator;
-    generator.LoadModel(modelPath);
+    std::unique_ptr<IDataGenerator> generator;
+    if (modelPath.empty()) {
+      generator = std::make_unique<MockGenerator>();
+      spdlog::info("[Generator] Using MockGenerator (no model path provided)");
+    } else {
+      generator = std::make_unique<LlamaGenerator>();
+      spdlog::info("[Generator] Using LlamaGenerator: {}", modelPath);
+    }
+    generator->load(modelPath);
 
     spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
@@ -74,7 +84,7 @@ int main(int argc, char *argv[]) {
     spdlog::info("\n=== SAMPLE BREWERY GENERATION ===\n");
     for (size_t i = 0; i < std::min(size_t(5), cities.size()); i++) {
       const auto &[cityId, cityName] = cities[i];
-      auto brewery = generator.GenerateBrewery(cityName, i);
+      auto brewery = generator->generateBrewery(cityName, "");
       spdlog::info("  {}: {}", cityName, brewery.name);
       spdlog::info("    -> {}", brewery.description);
     }

@@ -2,7 +2,6 @@
 
 #include "database.h"
 #include "stream_parser.h"
-#include "work_queue.h"
 #include <string>
 
 /// @brief Loads world-city JSON data into SQLite through streaming parsing.
