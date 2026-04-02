@@ -4,7 +4,6 @@
 #include <boost/program_options.hpp>
 #include <spdlog/spdlog.h>
 
-#include "application_options.h"
 #include "biergarten_data_generator.h"
 #include "web_client/curl_web_client.h"
 #include "database/database.h"
@@ -17,11 +16,30 @@ namespace po = boost::program_options;
  * @param argc Command-line argument count.
  * @param argv Command-line arguments.
  * @param options Output ApplicationOptions struct.
- * @return true if parsing succeeded and help was not requested, false otherwise.
+ * @return true if parsing succeeded and should proceed, false otherwise.
  */
 bool ParseArguments(int argc, char **argv, ApplicationOptions &options) {
+  // If no arguments provided, display usage and exit
+  if (argc == 1) {
+    std::cout << "Biergarten Pipeline - Geographic Data Pipeline with Brewery Generation\n\n";
+    std::cout << "Usage: biergarten-pipeline [options]\n\n";
+    std::cout << "Options:\n";
+    std::cout << "  --mocked             Use mocked generator for brewery/user data\n";
+    std::cout << "  --model, -m PATH     Path to LLM model file (gguf) for generation\n";
+    std::cout << "  --cache-dir, -c DIR  Directory for cached JSON (default: /tmp)\n";
+    std::cout << "  --temperature TEMP   LLM sampling temperature 0.0-1.0 (default: 0.8)\n";
+    std::cout << "  --top-p VALUE        Nucleus sampling parameter 0.0-1.0 (default: 0.92)\n";
+    std::cout << "  --seed SEED          Random seed: -1 for random (default: -1)\n";
+    std::cout << "  --help, -h           Show this help message\n\n";
+    std::cout << "Note: --mocked and --model are mutually exclusive. Exactly one must be provided.\n";
+    std::cout << "Data source is always pinned to commit c5eb7772 (stable 2026-03-28).\n";
+    return false;
+  }
+
   po::options_description desc("Pipeline Options");
   desc.add_options()("help,h", "Produce help message")(
+      "mocked", po::bool_switch(),
+      "Use mocked generator for brewery/user data")(
       "model,m", po::value<std::string>()->default_value(""),
       "Path to LLM model (gguf)")(
       "cache-dir,c", po::value<std::string>()->default_value("/tmp"),
@@ -31,9 +49,7 @@ bool ParseArguments(int argc, char **argv, ApplicationOptions &options) {
       "top-p", po::value<float>()->default_value(0.92f),
       "Nucleus sampling top-p in (0,1] (higher = more random)")(
       "seed", po::value<int>()->default_value(-1),
-      "Sampler seed: -1 for random, otherwise non-negative integer")(
-      "commit", po::value<std::string>()->default_value("c5eb7772"),
-      "Git commit hash for DB consistency");
+      "Sampler seed: -1 for random, otherwise non-negative integer");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -44,12 +60,38 @@ bool ParseArguments(int argc, char **argv, ApplicationOptions &options) {
     return false;
   }
 
-  options.modelPath = vm["model"].as<std::string>();
+  // Check for mutually exclusive --mocked and --model flags
+  bool useMocked = vm["mocked"].as<bool>();
+  std::string modelPath = vm["model"].as<std::string>();
+
+  if (useMocked && !modelPath.empty()) {
+    spdlog::error("ERROR: --mocked and --model are mutually exclusive");
+    return false;
+  }
+
+  if (!useMocked && modelPath.empty()) {
+    spdlog::error("ERROR: Either --mocked or --model must be specified");
+    return false;
+  }
+
+  // Warn if sampling parameters are provided with --mocked
+  if (useMocked) {
+    bool hasTemperature = vm["temperature"].defaulted() == false;
+    bool hasTopP = vm["top-p"].defaulted() == false;
+    bool hasSeed = vm["seed"].defaulted() == false;
+
+    if (hasTemperature || hasTopP || hasSeed) {
+      spdlog::warn("WARNING: Sampling parameters (--temperature, --top-p, --seed) are ignored when using --mocked");
+    }
+  }
+
+  options.useMocked = useMocked;
+  options.modelPath = modelPath;
   options.cacheDir = vm["cache-dir"].as<std::string>();
   options.temperature = vm["temperature"].as<float>();
   options.topP = vm["top-p"].as<float>();
   options.seed = vm["seed"].as<int>();
-  options.commit = vm["commit"].as<std::string>();
+  // commit is always pinned to c5eb7772
 
   return true;
 }

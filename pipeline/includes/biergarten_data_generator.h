@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include "application_options.h"
 #include "data_generation/data_generator.h"
 #include "database/database.h"
 #include "web_client/web_client.h"
@@ -16,8 +15,11 @@
  * @brief Program options for the Biergarten pipeline application.
  */
 struct ApplicationOptions {
-  /// @brief Path to the LLM model file (gguf format).
+  /// @brief Path to the LLM model file (gguf format); mutually exclusive with useMocked.
   std::string modelPath;
+
+  /// @brief Use mocked generator instead of LLM; mutually exclusive with modelPath.
+  bool useMocked = false;
 
   /// @brief Directory for cached JSON and database files.
   std::string cacheDir;
@@ -31,7 +33,7 @@ struct ApplicationOptions {
   /// @brief Random seed for sampling (-1 for random, otherwise non-negative).
   int seed = -1;
 
-  /// @brief Git commit hash for database consistency.
+  /// @brief Git commit hash for database consistency (always pinned to c5eb7772).
   std::string commit = "c5eb7772";
 };
 
