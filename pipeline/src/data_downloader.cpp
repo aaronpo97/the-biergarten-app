@@ -1,10 +1,10 @@
 #include "data_downloader.h"
 #include <cstdio>
 #include <curl/curl.h>
+#include <filesystem>
 #include <fstream>
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <sys/stat.h>
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb,
                             void *userp) {
@@ -19,8 +19,7 @@ DataDownloader::DataDownloader() {}
 DataDownloader::~DataDownloader() {}
 
 bool DataDownloader::FileExists(const std::string &filePath) const {
-  struct stat buffer;
-  return (stat(filePath.c_str(), &buffer) == 0);
+  return std::filesystem::exists(filePath);
 }
 
 std::string

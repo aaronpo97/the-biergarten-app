@@ -3,7 +3,12 @@
 #include "generator.h"
 #include "json_loader.h"
 #include <curl/curl.h>
+#include <filesystem>
 #include <spdlog/spdlog.h>
+
+static bool FileExists(const std::string &filePath) {
+  return std::filesystem::exists(filePath);
+}
 
 int main(int argc, char *argv[]) {
   try {
@@ -15,17 +20,25 @@ int main(int argc, char *argv[]) {
         argc > 3 ? argv[3] : "c5eb7772"; // Default: stable 2026-03-28
 
     std::string jsonPath = cacheDir + "/countries+states+cities.json";
+    std::string dbPath = cacheDir + "/biergarten-pipeline.db";
 
-    spdlog::info("\n[Pipeline] Downloading geographic data from GitHub...");
-    DataDownloader downloader;
-    downloader.DownloadCountriesDatabase(jsonPath, commit);
+    bool hasJsonCache = FileExists(jsonPath);
+    bool hasDbCache = FileExists(dbPath);
 
     SqliteDatabase db;
 
-    spdlog::info("Initializing in-memory SQLite database...");
-    db.Initialize();
+    spdlog::info("Initializing SQLite database at {}...", dbPath);
+    db.Initialize(dbPath);
 
-    JsonLoader::LoadWorldCities(jsonPath, db);
+    if (hasDbCache && hasJsonCache) {
+      spdlog::info("[Pipeline] Cache hit: skipping download and parse");
+    } else {
+      spdlog::info("\n[Pipeline] Downloading geographic data from GitHub...");
+      DataDownloader downloader;
+      downloader.DownloadCountriesDatabase(jsonPath, commit);
+
+      JsonLoader::LoadWorldCities(jsonPath, db);
+    }
 
     spdlog::info("Initializing brewery generator...");
     LlamaBreweryGenerator generator;

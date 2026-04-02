@@ -39,8 +39,14 @@ public:
   /// @brief Closes the SQLite connection if initialized.
   ~SqliteDatabase();
 
-  /// @brief Opens the in-memory database and creates schema objects.
-  void Initialize();
+  /// @brief Opens the SQLite database at dbPath and creates schema objects.
+  void Initialize(const std::string &dbPath = ":memory:");
+
+  /// @brief Starts a database transaction for batched writes.
+  void BeginTransaction();
+
+  /// @brief Commits the active database transaction.
+  void CommitTransaction();
 
   /// @brief Inserts a country row.
   void InsertCountry(int id, const std::string &name, const std::string &iso2,

@@ -1,10 +1,10 @@
 #include "stream_parser.h"
 #include "database.h"
-#include <fstream>
+#include <cstdio>
+#include <rapidjson/filereadstream.h>
 #include <rapidjson/reader.h>
 #include <rapidjson/stringbuffer.h>
 #include <spdlog/spdlog.h>
-#include <sstream>
 
 using namespace rapidjson;
 
@@ -196,31 +196,38 @@ void StreamingJsonParser::Parse(
 
   spdlog::info("  Streaming parse of {}...", filePath);
 
-  std::ifstream file(filePath, std::ios::binary);
-  if (!file.is_open()) {
+  FILE *file = std::fopen(filePath.c_str(), "rb");
+  if (!file) {
     throw std::runtime_error("Failed to open JSON file: " + filePath);
   }
 
-  std::stringstream buffer;
-  buffer << file.rdbuf();
-  file.close();
-  std::string json_str = buffer.str();
-  size_t total_size = json_str.length();
+  size_t total_size = 0;
+  if (std::fseek(file, 0, SEEK_END) == 0) {
+    long file_size = std::ftell(file);
+    if (file_size > 0) {
+      total_size = static_cast<size_t>(file_size);
+    }
+    std::rewind(file);
+  }
 
   CityRecordHandler::ParseContext ctx{&db,        onCity, onProgress, 0,
                                       total_size, 0,      0};
   CityRecordHandler handler(ctx);
 
   Reader reader;
-  StringStream ss(json_str.c_str());
+  char buf[65536];
+  FileReadStream frs(file, buf, sizeof(buf));
 
-  if (!reader.Parse(ss, handler)) {
+  if (!reader.Parse(frs, handler)) {
     ParseErrorCode errCode = reader.GetParseErrorCode();
     size_t errOffset = reader.GetErrorOffset();
+    std::fclose(file);
     throw std::runtime_error(std::string("JSON parse error at offset ") +
                              std::to_string(errOffset) +
                              " (code: " + std::to_string(errCode) + ")");
   }
+
+  std::fclose(file);
 
   spdlog::info("    OK: Parsed {} countries, {} states, {} cities",
                ctx.countries_inserted, ctx.states_inserted, ctx.cities_emitted);

@@ -48,13 +48,34 @@ SqliteDatabase::~SqliteDatabase() {
   }
 }
 
-void SqliteDatabase::Initialize() {
-  int rc = sqlite3_open(":memory:", &db);
+void SqliteDatabase::Initialize(const std::string &dbPath) {
+  int rc = sqlite3_open(dbPath.c_str(), &db);
   if (rc) {
-    throw std::runtime_error("Failed to create in-memory SQLite database");
+    throw std::runtime_error("Failed to open SQLite database: " + dbPath);
   }
-  spdlog::info("OK: In-memory SQLite database created");
+  spdlog::info("OK: SQLite database opened: {}", dbPath);
   InitializeSchema();
+}
+
+void SqliteDatabase::BeginTransaction() {
+  std::lock_guard<std::mutex> lock(dbMutex);
+  char *err = nullptr;
+  if (sqlite3_exec(db, "BEGIN TRANSACTION", nullptr, nullptr, &err) !=
+      SQLITE_OK) {
+    std::string msg = err ? err : "unknown";
+    sqlite3_free(err);
+    throw std::runtime_error("BeginTransaction failed: " + msg);
+  }
+}
+
+void SqliteDatabase::CommitTransaction() {
+  std::lock_guard<std::mutex> lock(dbMutex);
+  char *err = nullptr;
+  if (sqlite3_exec(db, "COMMIT", nullptr, nullptr, &err) != SQLITE_OK) {
+    std::string msg = err ? err : "unknown";
+    sqlite3_free(err);
+    throw std::runtime_error("CommitTransaction failed: " + msg);
+  }
 }
 
 void SqliteDatabase::InsertCountry(int id, const std::string &name,
