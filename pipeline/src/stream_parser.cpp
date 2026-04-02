@@ -1,15 +1,22 @@
-#include "stream_parser.h"
-#include "database.h"
 #include <cstdio>
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/reader.h>
-#include <rapidjson/stringbuffer.h>
+#include <stdexcept>
+
+#include <boost/json.hpp>
+#include <boost/json/basic_parser_impl.hpp>
 #include <spdlog/spdlog.h>
 
-using namespace rapidjson;
+#include "database.h"
+#include "stream_parser.h"
 
-class CityRecordHandler : public BaseReaderHandler<UTF8<>, CityRecordHandler> {
+class CityRecordHandler {
+  friend class boost::json::basic_parser<CityRecordHandler>;
+
 public:
+  static constexpr std::size_t max_array_size = static_cast<std::size_t>(-1);
+  static constexpr std::size_t max_object_size = static_cast<std::size_t>(-1);
+  static constexpr std::size_t max_string_size = static_cast<std::size_t>(-1);
+  static constexpr std::size_t max_key_size = static_cast<std::size_t>(-1);
+
   struct ParseContext {
     SqliteDatabase *db = nullptr;
     std::function<void(const CityRecord &)> on_city;
@@ -20,11 +27,35 @@ public:
     int states_inserted = 0;
   };
 
-  CityRecordHandler(ParseContext &ctx) : context(ctx) {}
+  explicit CityRecordHandler(ParseContext &ctx) : context(ctx) {}
 
-  bool StartArray() {
+private:
+  ParseContext &context;
+
+  int depth = 0;
+  bool in_countries_array = false;
+  bool in_country_object = false;
+  bool in_states_array = false;
+  bool in_state_object = false;
+  bool in_cities_array = false;
+  bool building_city = false;
+
+  int current_country_id = 0;
+  int current_state_id = 0;
+  CityRecord current_city = {};
+  std::string current_key;
+  std::string current_key_val;
+  std::string current_string_val;
+
+  std::string country_info[3];
+  std::string state_info[2];
+
+  // Boost.JSON SAX Hooks
+  bool on_document_begin(boost::system::error_code &) { return true; }
+  bool on_document_end(boost::system::error_code &) { return true; }
+
+  bool on_array_begin(boost::system::error_code &) {
     depth++;
-
     if (depth == 1) {
       in_countries_array = true;
     } else if (depth == 3 && current_key == "states") {
@@ -35,7 +66,7 @@ public:
     return true;
   }
 
-  bool EndArray(SizeType /*elementCount*/) {
+  bool on_array_end(std::size_t, boost::system::error_code &) {
     if (depth == 1) {
       in_countries_array = false;
     } else if (depth == 3) {
@@ -47,9 +78,8 @@ public:
     return true;
   }
 
-  bool StartObject() {
+  bool on_object_begin(boost::system::error_code &) {
     depth++;
-
     if (depth == 2 && in_countries_array) {
       in_country_object = true;
       current_country_id = 0;
@@ -68,7 +98,7 @@ public:
     return true;
   }
 
-  bool EndObject(SizeType /*memberCount*/) {
+  bool on_object_end(std::size_t, boost::system::error_code &) {
     if (depth == 6 && building_city) {
       if (current_city.id > 0 && current_state_id > 0 &&
           current_country_id > 0) {
@@ -84,7 +114,7 @@ public:
                                 context.total_file_size);
           }
         } catch (const std::exception &e) {
-          spdlog::warn("    WARN: Failed to emit city: {}", e.what());
+          spdlog::warn("Record parsing failed: {}", e.what());
         }
       }
       building_city = false;
@@ -95,7 +125,7 @@ public:
                                   state_info[0], state_info[1]);
           context.states_inserted++;
         } catch (const std::exception &e) {
-          spdlog::warn("    WARN: Failed to insert state: {}", e.what());
+          spdlog::warn("Record parsing failed: {}", e.what());
         }
       }
       in_state_object = false;
@@ -106,7 +136,7 @@ public:
                                     country_info[1], country_info[2]);
           context.countries_inserted++;
         } catch (const std::exception &e) {
-          spdlog::warn("    WARN: Failed to insert country: {}", e.what());
+          spdlog::warn("Record parsing failed: {}", e.what());
         }
       }
       in_country_object = false;
@@ -116,46 +146,71 @@ public:
     return true;
   }
 
-  bool Key(const char *str, SizeType len, bool /*copy*/) {
-    current_key.assign(str, len);
+  bool on_key_part(boost::json::string_view s, std::size_t,
+                   boost::system::error_code &) {
+    current_key_val.append(s.data(), s.size());
     return true;
   }
 
-  bool String(const char *str, SizeType len, bool /*copy*/) {
+  bool on_key(boost::json::string_view s, std::size_t,
+              boost::system::error_code &) {
+    current_key_val.append(s.data(), s.size());
+    current_key = current_key_val;
+    current_key_val.clear();
+    return true;
+  }
+
+  bool on_string_part(boost::json::string_view s, std::size_t,
+                      boost::system::error_code &) {
+    current_string_val.append(s.data(), s.size());
+    return true;
+  }
+
+  bool on_string(boost::json::string_view s, std::size_t,
+                 boost::system::error_code &) {
+    current_string_val.append(s.data(), s.size());
+
     if (building_city && current_key == "name") {
-      current_city.name.assign(str, len);
+      current_city.name = current_string_val;
     } else if (in_state_object && current_key == "name") {
-      state_info[0].assign(str, len);
+      state_info[0] = current_string_val;
     } else if (in_state_object && current_key == "iso2") {
-      state_info[1].assign(str, len);
+      state_info[1] = current_string_val;
     } else if (in_country_object && current_key == "name") {
-      country_info[0].assign(str, len);
+      country_info[0] = current_string_val;
     } else if (in_country_object && current_key == "iso2") {
-      country_info[1].assign(str, len);
+      country_info[1] = current_string_val;
     } else if (in_country_object && current_key == "iso3") {
-      country_info[2].assign(str, len);
+      country_info[2] = current_string_val;
     }
+
+    current_string_val.clear();
     return true;
   }
 
-  bool Int(int i) {
+  bool on_number_part(boost::json::string_view, boost::system::error_code &) {
+    return true;
+  }
+
+  bool on_int64(int64_t i, boost::json::string_view,
+                boost::system::error_code &) {
     if (building_city && current_key == "id") {
-      current_city.id = i;
+      current_city.id = static_cast<int>(i);
     } else if (in_state_object && current_key == "id") {
-      current_state_id = i;
+      current_state_id = static_cast<int>(i);
     } else if (in_country_object && current_key == "id") {
-      current_country_id = i;
+      current_country_id = static_cast<int>(i);
     }
     return true;
   }
 
-  bool Uint(unsigned i) { return Int(static_cast<int>(i)); }
+  bool on_uint64(uint64_t u, boost::json::string_view,
+                 boost::system::error_code &ec) {
+    return on_int64(static_cast<int64_t>(u), "", ec);
+  }
 
-  bool Int64(int64_t i) { return Int(static_cast<int>(i)); }
-
-  bool Uint64(uint64_t i) { return Int(static_cast<int>(i)); }
-
-  bool Double(double d) {
+  bool on_double(double d, boost::json::string_view,
+                 boost::system::error_code &) {
     if (building_city) {
       if (current_key == "latitude") {
         current_city.latitude = d;
@@ -166,27 +221,14 @@ public:
     return true;
   }
 
-  bool Bool(bool /*b*/) { return true; }
-  bool Null() { return true; }
-
-private:
-  ParseContext &context;
-
-  int depth = 0;
-  bool in_countries_array = false;
-  bool in_country_object = false;
-  bool in_states_array = false;
-  bool in_state_object = false;
-  bool in_cities_array = false;
-  bool building_city = false;
-
-  int current_country_id = 0;
-  int current_state_id = 0;
-  CityRecord current_city = {};
-  std::string current_key;
-
-  std::string country_info[3];
-  std::string state_info[2];
+  bool on_bool(bool, boost::system::error_code &) { return true; }
+  bool on_null(boost::system::error_code &) { return true; }
+  bool on_comment_part(boost::json::string_view, boost::system::error_code &) {
+    return true;
+  }
+  bool on_comment(boost::json::string_view, boost::system::error_code &) {
+    return true;
+  }
 };
 
 void StreamingJsonParser::Parse(
@@ -194,7 +236,7 @@ void StreamingJsonParser::Parse(
     std::function<void(const CityRecord &)> onCity,
     std::function<void(size_t, size_t)> onProgress) {
 
-  spdlog::info("  Streaming parse of {}...", filePath);
+  spdlog::info("  Streaming parse of {} (Boost.JSON)...", filePath);
 
   FILE *file = std::fopen(filePath.c_str(), "rb");
   if (!file) {
@@ -212,22 +254,34 @@ void StreamingJsonParser::Parse(
 
   CityRecordHandler::ParseContext ctx{&db,        onCity, onProgress, 0,
                                       total_size, 0,      0};
-  CityRecordHandler handler(ctx);
+  boost::json::basic_parser<CityRecordHandler> parser(
+      boost::json::parse_options{}, ctx);
 
-  Reader reader;
   char buf[65536];
-  FileReadStream frs(file, buf, sizeof(buf));
+  size_t bytes_read;
+  boost::system::error_code ec;
 
-  if (!reader.Parse(frs, handler)) {
-    ParseErrorCode errCode = reader.GetParseErrorCode();
-    size_t errOffset = reader.GetErrorOffset();
-    std::fclose(file);
-    throw std::runtime_error(std::string("JSON parse error at offset ") +
-                             std::to_string(errOffset) +
-                             " (code: " + std::to_string(errCode) + ")");
+  while ((bytes_read = std::fread(buf, 1, sizeof(buf), file)) > 0) {
+    char const *p = buf;
+    std::size_t remain = bytes_read;
+
+    while (remain > 0) {
+      std::size_t consumed = parser.write_some(true, p, remain, ec);
+      if (ec) {
+        std::fclose(file);
+        throw std::runtime_error("JSON parse error: " + ec.message());
+      }
+      p += consumed;
+      remain -= consumed;
+    }
   }
 
+  parser.write_some(false, nullptr, 0, ec); // Signal EOF
   std::fclose(file);
+
+  if (ec) {
+    throw std::runtime_error("JSON parse error at EOF: " + ec.message());
+  }
 
   spdlog::info("    OK: Parsed {} countries, {} states, {} cities",
                ctx.countries_inserted, ctx.states_inserted, ctx.cities_emitted);

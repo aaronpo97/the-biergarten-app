@@ -157,13 +157,12 @@ void SqliteDatabase::InsertCity(int id, int stateId, int countryId,
   sqlite3_finalize(stmt);
 }
 
-std::vector<std::pair<int, std::string>> SqliteDatabase::QueryCities() {
+std::vector<City> SqliteDatabase::QueryCities() {
   std::lock_guard<std::mutex> lock(dbMutex);
-
-  std::vector<std::pair<int, std::string>> cities;
+  std::vector<City> cities;
   sqlite3_stmt *stmt = nullptr;
 
-  const char *query = "SELECT id, name FROM cities ORDER BY name";
+  const char *query = "SELECT id, name, country_id FROM cities ORDER BY name";
   int rc = sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
 
   if (rc != SQLITE_OK) {
@@ -174,7 +173,8 @@ std::vector<std::pair<int, std::string>> SqliteDatabase::QueryCities() {
     int id = sqlite3_column_int(stmt, 0);
     const char *name =
         reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-    cities.push_back({id, name ? std::string(name) : ""});
+    int countryId = sqlite3_column_int(stmt, 2);
+    cities.push_back({id, name ? std::string(name) : "", countryId});
   }
 
   sqlite3_finalize(stmt);

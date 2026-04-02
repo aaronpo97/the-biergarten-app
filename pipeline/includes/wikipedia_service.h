@@ -1,0 +1,24 @@
+#pragma once
+
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
+#include "web_client.h"
+
+/// @brief Provides cached Wikipedia summary lookups for city and country pairs.
+class WikipediaService {
+public:
+  /// @brief Creates a new Wikipedia service with the provided web client.
+  explicit WikipediaService(std::shared_ptr<IWebClient> client);
+
+  /// @brief Returns the Wikipedia summary extract for city and country.
+  [[nodiscard]] std::string GetSummary(std::string_view city,
+                                       std::string_view country);
+
+private:
+  std::string FetchExtract(std::string_view query);
+  std::shared_ptr<IWebClient> client_;
+  std::unordered_map<std::string, std::string> cache_;
+};

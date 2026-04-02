@@ -1,14 +1,17 @@
 #ifndef DATA_DOWNLOADER_H
 #define DATA_DOWNLOADER_H
 
+#include <memory>
 #include <stdexcept>
 #include <string>
+
+#include "web_client.h"
 
 /// @brief Downloads and caches source geography JSON payloads.
 class DataDownloader {
 public:
   /// @brief Initializes global curl state used by this downloader.
-  DataDownloader();
+  DataDownloader(std::shared_ptr<IWebClient> webClient);
 
   /// @brief Cleans up global curl state.
   ~DataDownloader();
@@ -21,6 +24,7 @@ public:
 
 private:
   bool FileExists(const std::string &filePath) const;
+  std::shared_ptr<IWebClient> m_webClient;
 };
 
 #endif // DATA_DOWNLOADER_H

@@ -27,6 +27,15 @@ struct State {
   int countryId;
 };
 
+struct City {
+  /// @brief City identifier from the source dataset.
+  int id;
+  /// @brief City display name.
+  std::string name;
+  /// @brief Parent country identifier.
+  int countryId;
+};
+
 /// @brief Thread-safe SQLite wrapper for pipeline writes and readbacks.
 class SqliteDatabase {
 private:
@@ -60,8 +69,8 @@ public:
   void InsertCity(int id, int stateId, int countryId, const std::string &name,
                   double latitude, double longitude);
 
-  /// @brief Returns city id and city name pairs.
-  std::vector<std::pair<int, std::string>> QueryCities();
+  /// @brief Returns city records including parent country id.
+  std::vector<City> QueryCities();
 
   /// @brief Returns countries with optional row limit.
   std::vector<Country> QueryCountries(int limit = 0);
