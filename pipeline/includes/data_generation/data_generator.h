@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_GENERATOR_H_
+#define BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_GENERATOR_H_
 
 #include <string>
 
@@ -12,15 +13,17 @@ struct UserResult {
   std::string bio;
 };
 
-class IDataGenerator {
+class DataGenerator {
 public:
-  virtual ~IDataGenerator() = default;
+  virtual ~DataGenerator() = default;
 
-  virtual void load(const std::string &modelPath) = 0;
+  virtual void Load(const std::string &model_path) = 0;
 
-  virtual BreweryResult generateBrewery(const std::string &cityName,
-                                        const std::string &countryName,
-                                        const std::string &regionContext) = 0;
+  virtual BreweryResult GenerateBrewery(const std::string &city_name,
+                                        const std::string &country_name,
+                                        const std::string &region_context) = 0;
 
-  virtual UserResult generateUser(const std::string &locale) = 0;
+  virtual UserResult GenerateUser(const std::string &locale) = 0;
 };
+
+#endif  // BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_GENERATOR_H_

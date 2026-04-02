@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 void SqliteDatabase::InitializeSchema() {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   const char *schema = R"(
     CREATE TABLE IF NOT EXISTS countries (
@@ -34,7 +34,7 @@ void SqliteDatabase::InitializeSchema() {
   )";
 
   char *errMsg = nullptr;
-  int rc = sqlite3_exec(db, schema, nullptr, nullptr, &errMsg);
+  int rc = sqlite3_exec(db_, schema, nullptr, nullptr, &errMsg);
   if (rc != SQLITE_OK) {
     std::string error = errMsg ? std::string(errMsg) : "Unknown error";
     sqlite3_free(errMsg);
@@ -43,24 +43,24 @@ void SqliteDatabase::InitializeSchema() {
 }
 
 SqliteDatabase::~SqliteDatabase() {
-  if (db) {
-    sqlite3_close(db);
+  if (db_) {
+    sqlite3_close(db_);
   }
 }
 
-void SqliteDatabase::Initialize(const std::string &dbPath) {
-  int rc = sqlite3_open(dbPath.c_str(), &db);
+void SqliteDatabase::Initialize(const std::string &db_path) {
+  int rc = sqlite3_open(db_path.c_str(), &db_);
   if (rc) {
-    throw std::runtime_error("Failed to open SQLite database: " + dbPath);
+    throw std::runtime_error("Failed to open SQLite database: " + db_path);
   }
-  spdlog::info("OK: SQLite database opened: {}", dbPath);
+  spdlog::info("OK: SQLite database opened: {}", db_path);
   InitializeSchema();
 }
 
 void SqliteDatabase::BeginTransaction() {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
   char *err = nullptr;
-  if (sqlite3_exec(db, "BEGIN TRANSACTION", nullptr, nullptr, &err) !=
+  if (sqlite3_exec(db_, "BEGIN TRANSACTION", nullptr, nullptr, &err) !=
       SQLITE_OK) {
     std::string msg = err ? err : "unknown";
     sqlite3_free(err);
@@ -69,9 +69,9 @@ void SqliteDatabase::BeginTransaction() {
 }
 
 void SqliteDatabase::CommitTransaction() {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
   char *err = nullptr;
-  if (sqlite3_exec(db, "COMMIT", nullptr, nullptr, &err) != SQLITE_OK) {
+  if (sqlite3_exec(db_, "COMMIT", nullptr, nullptr, &err) != SQLITE_OK) {
     std::string msg = err ? err : "unknown";
     sqlite3_free(err);
     throw std::runtime_error("CommitTransaction failed: " + msg);
@@ -81,7 +81,7 @@ void SqliteDatabase::CommitTransaction() {
 void SqliteDatabase::InsertCountry(int id, const std::string &name,
                                    const std::string &iso2,
                                    const std::string &iso3) {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   const char *query = R"(
     INSERT OR IGNORE INTO countries (id, name, iso2, iso3)
@@ -89,7 +89,7 @@ void SqliteDatabase::InsertCountry(int id, const std::string &name,
   )";
 
   sqlite3_stmt *stmt;
-  int rc = sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query, -1, &stmt, nullptr);
   if (rc != SQLITE_OK)
     throw std::runtime_error("Failed to prepare country insert");
 
@@ -104,9 +104,9 @@ void SqliteDatabase::InsertCountry(int id, const std::string &name,
   sqlite3_finalize(stmt);
 }
 
-void SqliteDatabase::InsertState(int id, int countryId, const std::string &name,
+void SqliteDatabase::InsertState(int id, int country_id, const std::string &name,
                                  const std::string &iso2) {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   const char *query = R"(
     INSERT OR IGNORE INTO states (id, country_id, name, iso2)
@@ -114,12 +114,12 @@ void SqliteDatabase::InsertState(int id, int countryId, const std::string &name,
   )";
 
   sqlite3_stmt *stmt;
-  int rc = sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query, -1, &stmt, nullptr);
   if (rc != SQLITE_OK)
     throw std::runtime_error("Failed to prepare state insert");
 
   sqlite3_bind_int(stmt, 1, id);
-  sqlite3_bind_int(stmt, 2, countryId);
+  sqlite3_bind_int(stmt, 2, country_id);
   sqlite3_bind_text(stmt, 3, name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_text(stmt, 4, iso2.c_str(), -1, SQLITE_STATIC);
 
@@ -129,10 +129,10 @@ void SqliteDatabase::InsertState(int id, int countryId, const std::string &name,
   sqlite3_finalize(stmt);
 }
 
-void SqliteDatabase::InsertCity(int id, int stateId, int countryId,
+void SqliteDatabase::InsertCity(int id, int state_id, int country_id,
                                 const std::string &name, double latitude,
                                 double longitude) {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   const char *query = R"(
     INSERT OR IGNORE INTO cities (id, state_id, country_id, name, latitude, longitude)
@@ -140,13 +140,13 @@ void SqliteDatabase::InsertCity(int id, int stateId, int countryId,
   )";
 
   sqlite3_stmt *stmt;
-  int rc = sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query, -1, &stmt, nullptr);
   if (rc != SQLITE_OK)
     throw std::runtime_error("Failed to prepare city insert");
 
   sqlite3_bind_int(stmt, 1, id);
-  sqlite3_bind_int(stmt, 2, stateId);
-  sqlite3_bind_int(stmt, 3, countryId);
+  sqlite3_bind_int(stmt, 2, state_id);
+  sqlite3_bind_int(stmt, 3, country_id);
   sqlite3_bind_text(stmt, 4, name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_double(stmt, 5, latitude);
   sqlite3_bind_double(stmt, 6, longitude);
@@ -158,12 +158,12 @@ void SqliteDatabase::InsertCity(int id, int stateId, int countryId,
 }
 
 std::vector<City> SqliteDatabase::QueryCities() {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
   std::vector<City> cities;
   sqlite3_stmt *stmt = nullptr;
 
   const char *query = "SELECT id, name, country_id FROM cities ORDER BY name";
-  int rc = sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query, -1, &stmt, nullptr);
 
   if (rc != SQLITE_OK) {
     throw std::runtime_error("Failed to prepare query");
@@ -173,8 +173,8 @@ std::vector<City> SqliteDatabase::QueryCities() {
     int id = sqlite3_column_int(stmt, 0);
     const char *name =
         reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-    int countryId = sqlite3_column_int(stmt, 2);
-    cities.push_back({id, name ? std::string(name) : "", countryId});
+    int country_id = sqlite3_column_int(stmt, 2);
+    cities.push_back({id, name ? std::string(name) : "", country_id});
   }
 
   sqlite3_finalize(stmt);
@@ -182,7 +182,7 @@ std::vector<City> SqliteDatabase::QueryCities() {
 }
 
 std::vector<Country> SqliteDatabase::QueryCountries(int limit) {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   std::vector<Country> countries;
   sqlite3_stmt *stmt = nullptr;
@@ -193,7 +193,7 @@ std::vector<Country> SqliteDatabase::QueryCountries(int limit) {
     query += " LIMIT " + std::to_string(limit);
   }
 
-  int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query.c_str(), -1, &stmt, nullptr);
 
   if (rc != SQLITE_OK) {
     throw std::runtime_error("Failed to prepare countries query");
@@ -217,7 +217,7 @@ std::vector<Country> SqliteDatabase::QueryCountries(int limit) {
 }
 
 std::vector<State> SqliteDatabase::QueryStates(int limit) {
-  std::lock_guard<std::mutex> lock(dbMutex);
+  std::lock_guard<std::mutex> lock(db_mutex_);
 
   std::vector<State> states;
   sqlite3_stmt *stmt = nullptr;
@@ -228,7 +228,7 @@ std::vector<State> SqliteDatabase::QueryStates(int limit) {
     query += " LIMIT " + std::to_string(limit);
   }
 
-  int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+  int rc = sqlite3_prepare_v2(db_, query.c_str(), -1, &stmt, nullptr);
 
   if (rc != SQLITE_OK) {
     throw std::runtime_error("Failed to prepare states query");
@@ -240,9 +240,9 @@ std::vector<State> SqliteDatabase::QueryStates(int limit) {
         reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
     const char *iso2 =
         reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-    int countryId = sqlite3_column_int(stmt, 3);
+    int country_id = sqlite3_column_int(stmt, 3);
     states.push_back({id, name ? std::string(name) : "",
-                      iso2 ? std::string(iso2) : "", countryId});
+                      iso2 ? std::string(iso2) : "", country_id});
   }
 
   sqlite3_finalize(stmt);

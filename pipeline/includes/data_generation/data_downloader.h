@@ -1,5 +1,5 @@
-#ifndef DATA_DOWNLOADER_H
-#define DATA_DOWNLOADER_H
+#ifndef BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_DOWNLOADER_H_
+#define BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_DOWNLOADER_H_
 
 #include <memory>
 #include <stdexcept>
@@ -11,20 +11,20 @@
 class DataDownloader {
 public:
   /// @brief Initializes global curl state used by this downloader.
-  explicit DataDownloader(std::shared_ptr<IWebClient> webClient);
+  explicit DataDownloader(std::shared_ptr<WebClient> web_client);
 
   /// @brief Cleans up global curl state.
   ~DataDownloader();
 
   /// @brief Returns a local JSON path, downloading it when cache is missing.
   std::string DownloadCountriesDatabase(
-      const std::string &cachePath,
+      const std::string &cache_path,
       const std::string &commit = "c5eb7772" // Stable commit: 2026-03-28 export
   );
 
 private:
-  static bool FileExists(const std::string &filePath) ;
-  std::shared_ptr<IWebClient> m_webClient;
+  static bool FileExists(const std::string &file_path);
+  std::shared_ptr<WebClient> web_client_;
 };
 
-#endif // DATA_DOWNLOADER_H
+#endif  // BIERGARTEN_PIPELINE_DATA_GENERATION_DATA_DOWNLOADER_H_

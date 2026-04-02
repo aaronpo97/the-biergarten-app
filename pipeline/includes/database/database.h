@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_DATABASE_DATABASE_H_
+#define BIERGARTEN_PIPELINE_DATABASE_DATABASE_H_
 
 #include <mutex>
 #include <sqlite3.h>
@@ -24,7 +25,7 @@ struct State {
   /// @brief State or province short code.
   std::string iso2;
   /// @brief Parent country identifier.
-  int countryId;
+  int country_id;
 };
 
 struct City {
@@ -33,14 +34,14 @@ struct City {
   /// @brief City display name.
   std::string name;
   /// @brief Parent country identifier.
-  int countryId;
+  int country_id;
 };
 
 /// @brief Thread-safe SQLite wrapper for pipeline writes and readbacks.
 class SqliteDatabase {
 private:
-  sqlite3 *db = nullptr;
-  std::mutex dbMutex;
+  sqlite3 *db_ = nullptr;
+  std::mutex db_mutex_;
 
   void InitializeSchema();
 
@@ -48,8 +49,8 @@ public:
   /// @brief Closes the SQLite connection if initialized.
   ~SqliteDatabase();
 
-  /// @brief Opens the SQLite database at dbPath and creates schema objects.
-  void Initialize(const std::string &dbPath = ":memory:");
+  /// @brief Opens the SQLite database at db_path and creates schema objects.
+  void Initialize(const std::string &db_path = ":memory:");
 
   /// @brief Starts a database transaction for batched writes.
   void BeginTransaction();
@@ -62,11 +63,11 @@ public:
                      const std::string &iso3);
 
   /// @brief Inserts a state row linked to a country.
-  void InsertState(int id, int countryId, const std::string &name,
+  void InsertState(int id, int country_id, const std::string &name,
                    const std::string &iso2);
 
   /// @brief Inserts a city row linked to state and country.
-  void InsertCity(int id, int stateId, int countryId, const std::string &name,
+  void InsertCity(int id, int state_id, int country_id, const std::string &name,
                   double latitude, double longitude);
 
   /// @brief Returns city records including parent country id.
@@ -78,3 +79,5 @@ public:
   /// @brief Returns states with optional row limit.
   std::vector<State> QueryStates(int limit = 0);
 };
+
+#endif  // BIERGARTEN_PIPELINE_DATABASE_DATABASE_H_

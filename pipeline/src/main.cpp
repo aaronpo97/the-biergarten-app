@@ -61,21 +61,21 @@ bool ParseArguments(int argc, char **argv, ApplicationOptions &options) {
   }
 
   // Check for mutually exclusive --mocked and --model flags
-  bool useMocked = vm["mocked"].as<bool>();
-  std::string modelPath = vm["model"].as<std::string>();
+  bool use_mocked = vm["mocked"].as<bool>();
+  std::string model_path = vm["model"].as<std::string>();
 
-  if (useMocked && !modelPath.empty()) {
+  if (use_mocked && !model_path.empty()) {
     spdlog::error("ERROR: --mocked and --model are mutually exclusive");
     return false;
   }
 
-  if (!useMocked && modelPath.empty()) {
+  if (!use_mocked && model_path.empty()) {
     spdlog::error("ERROR: Either --mocked or --model must be specified");
     return false;
   }
 
   // Warn if sampling parameters are provided with --mocked
-  if (useMocked) {
+  if (use_mocked) {
     bool hasTemperature = vm["temperature"].defaulted() == false;
     bool hasTopP = vm["top-p"].defaulted() == false;
     bool hasSeed = vm["seed"].defaulted() == false;
@@ -85,11 +85,11 @@ bool ParseArguments(int argc, char **argv, ApplicationOptions &options) {
     }
   }
 
-  options.useMocked = useMocked;
-  options.modelPath = modelPath;
-  options.cacheDir = vm["cache-dir"].as<std::string>();
+  options.use_mocked = use_mocked;
+  options.model_path = model_path;
+  options.cache_dir = vm["cache-dir"].as<std::string>();
   options.temperature = vm["temperature"].as<float>();
-  options.topP = vm["top-p"].as<float>();
+  options.top_p = vm["top-p"].as<float>();
   options.seed = vm["seed"].as<int>();
   // commit is always pinned to c5eb7772
 

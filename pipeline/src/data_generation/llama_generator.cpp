@@ -180,14 +180,14 @@ std::string toChatPrompt(const llama_model *model,
 }
 
 std::string toChatPrompt(const llama_model *model,
-                         const std::string &systemPrompt,
+                         const std::string &system_prompt,
                          const std::string &userPrompt) {
   const char *tmpl = llama_model_chat_template(model, nullptr);
   if (tmpl == nullptr) {
-    return systemPrompt + "\n\n" + userPrompt;
+    return system_prompt + "\n\n" + userPrompt;
   }
 
-  const llama_chat_message messages[2] = {{"system", systemPrompt.c_str()},
+  const llama_chat_message messages[2] = {{"system", system_prompt.c_str()},
                                           {"user", userPrompt.c_str()}};
 
   std::vector<char> buffer(std::max<std::size_t>(
@@ -381,13 +381,13 @@ LlamaGenerator::~LlamaGenerator() {
   llama_backend_free();
 }
 
-void LlamaGenerator::setSamplingOptions(float temperature, float topP,
+void LlamaGenerator::SetSamplingOptions(float temperature, float top_p,
                                         int seed) {
   if (temperature < 0.0f) {
     throw std::runtime_error(
         "LlamaGenerator: sampling temperature must be >= 0");
   }
-  if (!(topP > 0.0f && topP <= 1.0f)) {
+  if (!(top_p > 0.0f && top_p <= 1.0f)) {
     throw std::runtime_error(
         "LlamaGenerator: sampling top-p must be in (0, 1]");
   }
@@ -397,13 +397,13 @@ void LlamaGenerator::setSamplingOptions(float temperature, float topP,
   }
 
   sampling_temperature_ = temperature;
-  sampling_top_p_ = topP;
+  sampling_top_p_ = top_p;
   sampling_seed_ = (seed < 0) ? static_cast<uint32_t>(LLAMA_DEFAULT_SEED)
                               : static_cast<uint32_t>(seed);
 }
 
-void LlamaGenerator::load(const std::string &modelPath) {
-  if (modelPath.empty())
+void LlamaGenerator::Load(const std::string &model_path) {
+  if (model_path.empty())
     throw std::runtime_error("LlamaGenerator: model path must not be empty");
 
   if (context_ != nullptr) {
@@ -417,27 +417,27 @@ void LlamaGenerator::load(const std::string &modelPath) {
 
   llama_backend_init();
 
-  llama_model_params modelParams = llama_model_default_params();
-  model_ = llama_model_load_from_file(modelPath.c_str(), modelParams);
+  llama_model_params model_params = llama_model_default_params();
+  model_ = llama_model_load_from_file(model_path.c_str(), model_params);
   if (model_ == nullptr) {
     throw std::runtime_error(
-        "LlamaGenerator: failed to load model from path: " + modelPath);
+        "LlamaGenerator: failed to load model from path: " + model_path);
   }
 
-  llama_context_params contextParams = llama_context_default_params();
-  contextParams.n_ctx = 2048;
+  llama_context_params context_params = llama_context_default_params();
+  context_params.n_ctx = 2048;
 
-  context_ = llama_init_from_model(model_, contextParams);
+  context_ = llama_init_from_model(model_, context_params);
   if (context_ == nullptr) {
     llama_model_free(model_);
     model_ = nullptr;
     throw std::runtime_error("LlamaGenerator: failed to create context");
   }
 
-  spdlog::info("[LlamaGenerator] Loaded model: {}", modelPath);
+  spdlog::info("[LlamaGenerator] Loaded model: {}", model_path);
 }
 
-std::string LlamaGenerator::infer(const std::string &prompt, int maxTokens) {
+std::string LlamaGenerator::Infer(const std::string &prompt, int max_tokens) {
   if (model_ == nullptr || context_ == nullptr)
     throw std::runtime_error("LlamaGenerator: model not loaded");
 
@@ -447,19 +447,19 @@ std::string LlamaGenerator::infer(const std::string &prompt, int maxTokens) {
 
   llama_memory_clear(llama_get_memory(context_), true);
 
-  const std::string formattedPrompt = toChatPrompt(model_, prompt);
+  const std::string formatted_prompt = toChatPrompt(model_, prompt);
 
-  std::vector<llama_token> promptTokens(formattedPrompt.size() + 8);
+  std::vector<llama_token> promptTokens(formatted_prompt.size() + 8);
   int32_t tokenCount = llama_tokenize(
-      vocab, formattedPrompt.c_str(),
-      static_cast<int32_t>(formattedPrompt.size()), promptTokens.data(),
+      vocab, formatted_prompt.c_str(),
+      static_cast<int32_t>(formatted_prompt.size()), promptTokens.data(),
       static_cast<int32_t>(promptTokens.size()), true, true);
 
   if (tokenCount < 0) {
     promptTokens.resize(static_cast<std::size_t>(-tokenCount));
     tokenCount = llama_tokenize(
-        vocab, formattedPrompt.c_str(),
-        static_cast<int32_t>(formattedPrompt.size()), promptTokens.data(),
+        vocab, formatted_prompt.c_str(),
+        static_cast<int32_t>(formatted_prompt.size()), promptTokens.data(),
         static_cast<int32_t>(promptTokens.size()), true, true);
   }
 
@@ -472,18 +472,18 @@ std::string LlamaGenerator::infer(const std::string &prompt, int maxTokens) {
     throw std::runtime_error("LlamaGenerator: invalid context or batch size");
   }
 
-  const int32_t effectiveMaxTokens = std::max(1, std::min(maxTokens, nCtx - 1));
-  int32_t promptBudget = std::min(nBatch, nCtx - effectiveMaxTokens);
-  promptBudget = std::max<int32_t>(1, promptBudget);
+  const int32_t effective_max_tokens = std::max(1, std::min(max_tokens, nCtx - 1));
+  const int32_t prompt_budget = std::min(nBatch, nCtx - effective_max_tokens);
+  prompt_budget = std::max<int32_t>(1, prompt_budget);
 
   promptTokens.resize(static_cast<std::size_t>(tokenCount));
-  if (tokenCount > promptBudget) {
+  if (tokenCount > prompt_budget) {
     spdlog::warn(
         "LlamaGenerator: prompt too long ({} tokens), truncating to {} tokens "
         "to fit n_batch/n_ctx limits",
-        tokenCount, promptBudget);
-    promptTokens.resize(static_cast<std::size_t>(promptBudget));
-    tokenCount = promptBudget;
+        tokenCount, prompt_budget);
+    promptTokens.resize(static_cast<std::size_t>(prompt_budget));
+    tokenCount = prompt_budget;
   }
 
   const llama_batch promptBatch = llama_batch_get_one(
@@ -491,11 +491,11 @@ std::string LlamaGenerator::infer(const std::string &prompt, int maxTokens) {
   if (llama_decode(context_, promptBatch) != 0)
     throw std::runtime_error("LlamaGenerator: prompt decode failed");
 
-  llama_sampler_chain_params samplerParams =
+  llama_sampler_chain_params sampler_params =
       llama_sampler_chain_default_params();
   using SamplerPtr =
       std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
-  SamplerPtr sampler(llama_sampler_chain_init(samplerParams),
+  SamplerPtr sampler(llama_sampler_chain_init(sampler_params),
                      &llama_sampler_free);
   if (!sampler)
     throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
@@ -507,29 +507,29 @@ std::string LlamaGenerator::infer(const std::string &prompt, int maxTokens) {
   llama_sampler_chain_add(sampler.get(),
                           llama_sampler_init_dist(sampling_seed_));
 
-  std::vector<llama_token> generatedTokens;
-  generatedTokens.reserve(static_cast<std::size_t>(maxTokens));
+  std::vector<llama_token> generated_tokens;
+  generated_tokens.reserve(static_cast<std::size_t>(max_tokens));
 
-  for (int i = 0; i < effectiveMaxTokens; ++i) {
+  for (int i = 0; i < effective_max_tokens; ++i) {
     const llama_token next = llama_sampler_sample(sampler.get(), context_, -1);
     if (llama_vocab_is_eog(vocab, next))
       break;
-    generatedTokens.push_back(next);
+    generated_tokens.push_back(next);
     llama_token token = next;
-    const llama_batch oneTokenBatch = llama_batch_get_one(&token, 1);
-    if (llama_decode(context_, oneTokenBatch) != 0)
+    const llama_batch one_token_batch = llama_batch_get_one(&token, 1);
+    if (llama_decode(context_, one_token_batch) != 0)
       throw std::runtime_error(
           "LlamaGenerator: decode failed during generation");
   }
 
   std::string output;
-  for (const llama_token token : generatedTokens)
+  for (const llama_token token : generated_tokens)
     appendTokenPiece(vocab, token, output);
   return output;
 }
 
-std::string LlamaGenerator::infer(const std::string &systemPrompt,
-                                  const std::string &prompt, int maxTokens) {
+std::string LlamaGenerator::Infer(const std::string &system_prompt,
+                                  const std::string &prompt, int max_tokens) {
   if (model_ == nullptr || context_ == nullptr)
     throw std::runtime_error("LlamaGenerator: model not loaded");
 
@@ -539,20 +539,20 @@ std::string LlamaGenerator::infer(const std::string &systemPrompt,
 
   llama_memory_clear(llama_get_memory(context_), true);
 
-  const std::string formattedPrompt =
-      toChatPrompt(model_, systemPrompt, prompt);
+  const std::string formatted_prompt =
+      toChatPrompt(model_, system_prompt, prompt);
 
-  std::vector<llama_token> promptTokens(formattedPrompt.size() + 8);
+  std::vector<llama_token> promptTokens(formatted_prompt.size() + 8);
   int32_t tokenCount = llama_tokenize(
-      vocab, formattedPrompt.c_str(),
-      static_cast<int32_t>(formattedPrompt.size()), promptTokens.data(),
+      vocab, formatted_prompt.c_str(),
+      static_cast<int32_t>(formatted_prompt.size()), promptTokens.data(),
       static_cast<int32_t>(promptTokens.size()), true, true);
 
   if (tokenCount < 0) {
     promptTokens.resize(static_cast<std::size_t>(-tokenCount));
     tokenCount = llama_tokenize(
-        vocab, formattedPrompt.c_str(),
-        static_cast<int32_t>(formattedPrompt.size()), promptTokens.data(),
+        vocab, formatted_prompt.c_str(),
+        static_cast<int32_t>(formatted_prompt.size()), promptTokens.data(),
         static_cast<int32_t>(promptTokens.size()), true, true);
   }
 
@@ -565,18 +565,18 @@ std::string LlamaGenerator::infer(const std::string &systemPrompt,
     throw std::runtime_error("LlamaGenerator: invalid context or batch size");
   }
 
-  const int32_t effectiveMaxTokens = std::max(1, std::min(maxTokens, nCtx - 1));
-  int32_t promptBudget = std::min(nBatch, nCtx - effectiveMaxTokens);
-  promptBudget = std::max<int32_t>(1, promptBudget);
+  const int32_t effective_max_tokens = std::max(1, std::min(max_tokens, nCtx - 1));
+  int32_t prompt_budget = std::min(nBatch, nCtx - effective_max_tokens);
+  prompt_budget = std::max<int32_t>(1, prompt_budget);
 
   promptTokens.resize(static_cast<std::size_t>(tokenCount));
-  if (tokenCount > promptBudget) {
+  if (tokenCount > prompt_budget) {
     spdlog::warn(
         "LlamaGenerator: prompt too long ({} tokens), truncating to {} tokens "
         "to fit n_batch/n_ctx limits",
-        tokenCount, promptBudget);
-    promptTokens.resize(static_cast<std::size_t>(promptBudget));
-    tokenCount = promptBudget;
+        tokenCount, prompt_budget);
+    promptTokens.resize(static_cast<std::size_t>(prompt_budget));
+    tokenCount = prompt_budget;
   }
 
   const llama_batch promptBatch = llama_batch_get_one(
@@ -584,11 +584,11 @@ std::string LlamaGenerator::infer(const std::string &systemPrompt,
   if (llama_decode(context_, promptBatch) != 0)
     throw std::runtime_error("LlamaGenerator: prompt decode failed");
 
-  llama_sampler_chain_params samplerParams =
+  llama_sampler_chain_params sampler_params =
       llama_sampler_chain_default_params();
   using SamplerPtr =
       std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
-  SamplerPtr sampler(llama_sampler_chain_init(samplerParams),
+  SamplerPtr sampler(llama_sampler_chain_init(sampler_params),
                      &llama_sampler_free);
   if (!sampler)
     throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
@@ -600,34 +600,34 @@ std::string LlamaGenerator::infer(const std::string &systemPrompt,
   llama_sampler_chain_add(sampler.get(),
                           llama_sampler_init_dist(sampling_seed_));
 
-  std::vector<llama_token> generatedTokens;
-  generatedTokens.reserve(static_cast<std::size_t>(maxTokens));
+  std::vector<llama_token> generated_tokens;
+  generated_tokens.reserve(static_cast<std::size_t>(max_tokens));
 
-  for (int i = 0; i < effectiveMaxTokens; ++i) {
+  for (int i = 0; i < effective_max_tokens; ++i) {
     const llama_token next = llama_sampler_sample(sampler.get(), context_, -1);
     if (llama_vocab_is_eog(vocab, next))
       break;
-    generatedTokens.push_back(next);
+    generated_tokens.push_back(next);
     llama_token token = next;
-    const llama_batch oneTokenBatch = llama_batch_get_one(&token, 1);
-    if (llama_decode(context_, oneTokenBatch) != 0)
+    const llama_batch one_token_batch = llama_batch_get_one(&token, 1);
+    if (llama_decode(context_, one_token_batch) != 0)
       throw std::runtime_error(
           "LlamaGenerator: decode failed during generation");
   }
 
   std::string output;
-  for (const llama_token token : generatedTokens)
+  for (const llama_token token : generated_tokens)
     appendTokenPiece(vocab, token, output);
   return output;
 }
 
 BreweryResult
-LlamaGenerator::generateBrewery(const std::string &cityName,
-                                const std::string &countryName,
-                                const std::string &regionContext) {
-  const std::string safeRegionContext = PrepareRegionContext(regionContext);
+LlamaGenerator::GenerateBrewery(const std::string &city_name,
+                                const std::string &country_name,
+                                const std::string &region_context) {
+  const std::string safe_region_context = PrepareRegionContext(region_context);
 
-  const std::string systemPrompt =
+  const std::string system_prompt =
       "You are a copywriter for a craft beer travel guide. "
       "Your writing is vivid, specific to place, and avoids generic beer "
       "cliches. "
@@ -639,18 +639,18 @@ LlamaGenerator::generateBrewery(const std::string &cityName,
   std::string prompt =
       "Write a brewery name and place-specific description for a craft "
       "brewery in " +
-      cityName +
-      (countryName.empty() ? std::string("")
-                           : std::string(", ") + countryName) +
-      (safeRegionContext.empty()
+      city_name +
+      (country_name.empty() ? std::string("")
+                           : std::string(", ") + country_name) +
+      (safe_region_context.empty()
            ? std::string(".")
-           : std::string(". Regional context: ") + safeRegionContext);
+           : std::string(". Regional context: ") + safe_region_context);
 
   const int maxAttempts = 3;
   std::string raw;
   std::string lastError;
   for (int attempt = 0; attempt < maxAttempts; ++attempt) {
-    raw = infer(systemPrompt, prompt, 384);
+    raw = Infer(system_prompt, prompt, 384);
     spdlog::debug("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
                   raw);
 
@@ -671,12 +671,12 @@ LlamaGenerator::generateBrewery(const std::string &cityName,
              "{\"name\": \"string\", \"description\": \"string\"}."
              "\nDo not include markdown, comments, or extra keys."
              "\n\nLocation: " +
-             cityName +
-             (countryName.empty() ? std::string("")
-                                  : std::string(", ") + countryName) +
-             (safeRegionContext.empty()
+             city_name +
+             (country_name.empty() ? std::string("")
+                                  : std::string(", ") + country_name) +
+             (safe_region_context.empty()
                   ? std::string("")
-                  : std::string("\nRegional context: ") + safeRegionContext);
+                  : std::string("\nRegional context: ") + safe_region_context);
   }
 
   spdlog::error("LlamaGenerator: malformed brewery response after {} attempts: "
@@ -685,8 +685,8 @@ LlamaGenerator::generateBrewery(const std::string &cityName,
   throw std::runtime_error("LlamaGenerator: malformed brewery response");
 }
 
-UserResult LlamaGenerator::generateUser(const std::string &locale) {
-  const std::string systemPrompt =
+UserResult LlamaGenerator::GenerateUser(const std::string &locale) {
+  const std::string system_prompt =
       "You generate plausible social media profiles for craft beer "
       "enthusiasts. "
       "Respond with exactly two lines: "
@@ -701,7 +701,7 @@ UserResult LlamaGenerator::generateUser(const std::string &locale) {
   const int maxAttempts = 3;
   std::string raw;
   for (int attempt = 0; attempt < maxAttempts; ++attempt) {
-    raw = infer(systemPrompt, prompt, 128);
+    raw = Infer(system_prompt, prompt, 128);
     spdlog::debug("LlamaGenerator (user): raw output (attempt {}): {}",
                   attempt + 1, raw);
 

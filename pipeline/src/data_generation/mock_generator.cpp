@@ -64,11 +64,11 @@ const std::vector<std::string> MockGenerator::kBios = {
     "Always ready to trade recommendations for underrated local breweries.",
     "Keeping a running list of must-try collab releases and tap takeovers."};
 
-void MockGenerator::load(const std::string & /*modelPath*/) {
+void MockGenerator::Load(const std::string & /*modelPath*/) {
   spdlog::info("[MockGenerator] No model needed");
 }
 
-std::size_t MockGenerator::deterministicHash(const std::string &a,
+std::size_t MockGenerator::DeterministicHash(const std::string &a,
                                              const std::string &b) {
   std::size_t seed = std::hash<std::string>{}(a);
   const std::size_t mixed = std::hash<std::string>{}(b);
@@ -77,14 +77,14 @@ std::size_t MockGenerator::deterministicHash(const std::string &a,
   return seed;
 }
 
-BreweryResult MockGenerator::generateBrewery(const std::string &cityName,
-                                             const std::string &countryName,
-                                             const std::string &regionContext) {
-  const std::string locationKey =
-      countryName.empty() ? cityName : cityName + "," + countryName;
-  const std::size_t hash = regionContext.empty()
-                               ? std::hash<std::string>{}(locationKey)
-                               : deterministicHash(locationKey, regionContext);
+BreweryResult MockGenerator::GenerateBrewery(const std::string &city_name,
+                                             const std::string &country_name,
+                                             const std::string &region_context) {
+  const std::string location_key =
+      country_name.empty() ? city_name : city_name + "," + country_name;
+  const std::size_t hash = region_context.empty()
+                               ? std::hash<std::string>{}(location_key)
+                               : DeterministicHash(location_key, region_context);
 
   BreweryResult result;
   result.name = kBreweryAdjectives[hash % kBreweryAdjectives.size()] + " " +
@@ -94,7 +94,7 @@ BreweryResult MockGenerator::generateBrewery(const std::string &cityName,
   return result;
 }
 
-UserResult MockGenerator::generateUser(const std::string &locale) {
+UserResult MockGenerator::GenerateUser(const std::string &locale) {
   const std::size_t hash = std::hash<std::string>{}(locale);
 
   UserResult result;

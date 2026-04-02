@@ -5,12 +5,12 @@
 #include "json_handling/json_loader.h"
 #include "json_handling/stream_parser.h"
 
-void JsonLoader::LoadWorldCities(const std::string &jsonPath,
+void JsonLoader::LoadWorldCities(const std::string &json_path,
                                  SqliteDatabase &db) {
   constexpr size_t kBatchSize = 10000;
 
   auto startTime = std::chrono::high_resolution_clock::now();
-  spdlog::info("\nLoading {} (streaming RapidJSON SAX)...", jsonPath);
+  spdlog::info("\nLoading {} (streaming RapidJSON SAX)...", json_path);
 
   db.BeginTransaction();
   bool transactionOpen = true;
@@ -18,7 +18,7 @@ void JsonLoader::LoadWorldCities(const std::string &jsonPath,
   size_t citiesProcessed = 0;
   try {
     StreamingJsonParser::Parse(
-        jsonPath, db,
+        json_path, db,
         [&](const CityRecord &record) {
           db.InsertCity(record.id, record.state_id, record.country_id,
                         record.name, record.latitude, record.longitude);

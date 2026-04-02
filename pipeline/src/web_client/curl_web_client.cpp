@@ -63,13 +63,13 @@ CURLWebClient::CURLWebClient() {}
 CURLWebClient::~CURLWebClient() {}
 
 void CURLWebClient::DownloadToFile(const std::string &url,
-                                   const std::string &filePath) {
+                                   const std::string &file_path) {
   auto curl = create_handle();
 
-  std::ofstream outFile(filePath, std::ios::binary);
+  std::ofstream outFile(file_path, std::ios::binary);
   if (!outFile.is_open()) {
     throw std::runtime_error("[CURLWebClient] Cannot open file for writing: " +
-                             filePath);
+                             file_path);
   }
 
   set_common_get_options(curl.get(), url, 30L, 300L);
@@ -81,7 +81,7 @@ void CURLWebClient::DownloadToFile(const std::string &url,
   outFile.close();
 
   if (res != CURLE_OK) {
-    std::remove(filePath.c_str());
+    std::remove(file_path.c_str());
     std::string error = std::string("[CURLWebClient] Download failed: ") +
                         curl_easy_strerror(res);
     throw std::runtime_error(error);
@@ -91,7 +91,7 @@ void CURLWebClient::DownloadToFile(const std::string &url,
   curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
 
   if (httpCode != 200) {
-    std::remove(filePath.c_str());
+    std::remove(file_path.c_str());
     std::stringstream ss;
     ss << "[CURLWebClient] HTTP error " << httpCode << " for URL " << url;
     throw std::runtime_error(ss.str());

@@ -1,14 +1,15 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_WEB_CLIENT_WEB_CLIENT_H_
+#define BIERGARTEN_PIPELINE_WEB_CLIENT_WEB_CLIENT_H_
 
 #include <string>
 
-class IWebClient {
+class WebClient {
 public:
-  virtual ~IWebClient() = default;
+  virtual ~WebClient() = default;
 
   // Downloads content from a URL to a file. Throws on error.
   virtual void DownloadToFile(const std::string &url,
-                              const std::string &filePath) = 0;
+                              const std::string &file_path) = 0;
 
   // Performs a GET request and returns the response body as a string. Throws on
   // error.
@@ -17,3 +18,5 @@ public:
   // URL-encodes a string.
   virtual std::string UrlEncode(const std::string &value) = 0;
 };
+
+#endif  // BIERGARTEN_PIPELINE_WEB_CLIENT_WEB_CLIENT_H_

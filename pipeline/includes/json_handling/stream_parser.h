@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_JSON_HANDLING_STREAM_PARSER_H_
+#define BIERGARTEN_PIPELINE_JSON_HANDLING_STREAM_PARSER_H_
 
 #include "database/database.h"
 #include <functional>
@@ -20,10 +21,10 @@ struct CityRecord {
 /// @brief Streaming SAX parser that emits city records during traversal.
 class StreamingJsonParser {
 public:
-  /// @brief Parses filePath and invokes callbacks for city rows and progress.
-  static void Parse(const std::string &filePath, SqliteDatabase &db,
-                    std::function<void(const CityRecord &)> onCity,
-                    std::function<void(size_t, size_t)> onProgress = nullptr);
+  /// @brief Parses file_path and invokes callbacks for city rows and progress.
+  static void Parse(const std::string &file_path, SqliteDatabase &db,
+                    std::function<void(const CityRecord &)> on_city,
+                    std::function<void(size_t, size_t)> on_progress = nullptr);
 
 private:
   /// @brief Mutable SAX handler state while traversing nested JSON arrays.
@@ -46,3 +47,5 @@ private:
     size_t bytes_processed = 0;
   };
 };
+
+#endif  // BIERGARTEN_PIPELINE_JSON_HANDLING_STREAM_PARSER_H_

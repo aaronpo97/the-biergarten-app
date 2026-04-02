@@ -232,15 +232,15 @@ private:
 };
 
 void StreamingJsonParser::Parse(
-    const std::string &filePath, SqliteDatabase &db,
-    std::function<void(const CityRecord &)> onCity,
-    std::function<void(size_t, size_t)> onProgress) {
+    const std::string &file_path, SqliteDatabase &db,
+    std::function<void(const CityRecord &)> on_city,
+    std::function<void(size_t, size_t)> on_progress) {
 
-  spdlog::info("  Streaming parse of {} (Boost.JSON)...", filePath);
+  spdlog::info("  Streaming parse of {} (Boost.JSON)...", file_path);
 
-  FILE *file = std::fopen(filePath.c_str(), "rb");
+  FILE *file = std::fopen(file_path.c_str(), "rb");
   if (!file) {
-    throw std::runtime_error("Failed to open JSON file: " + filePath);
+    throw std::runtime_error("Failed to open JSON file: " + file_path);
   }
 
   size_t total_size = 0;
@@ -252,7 +252,7 @@ void StreamingJsonParser::Parse(
     std::rewind(file);
   }
 
-  CityRecordHandler::ParseContext ctx{&db,        onCity, onProgress, 0,
+  CityRecordHandler::ParseContext ctx{&db,        on_city, on_progress, 0,
                                       total_size, 0,      0};
   boost::json::basic_parser<CityRecordHandler> parser(
       boost::json::parse_options{}, ctx);

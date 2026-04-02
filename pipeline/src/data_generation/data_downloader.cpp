@@ -6,41 +6,41 @@
 #include <sstream>
 #include <stdexcept>
 
-DataDownloader::DataDownloader(std::shared_ptr<IWebClient> webClient)
-    : m_webClient(std::move(webClient)) {}
+DataDownloader::DataDownloader(std::shared_ptr<WebClient> web_client)
+    : web_client_(std::move(web_client)) {}
 
 DataDownloader::~DataDownloader() {}
 
-bool DataDownloader::FileExists(const std::string &filePath)  {
-  return std::filesystem::exists(filePath);
+bool DataDownloader::FileExists(const std::string &file_path) {
+  return std::filesystem::exists(file_path);
 }
 
 std::string
-DataDownloader::DownloadCountriesDatabase(const std::string &cachePath,
+DataDownloader::DownloadCountriesDatabase(const std::string &cache_path,
                                           const std::string &commit) {
-  if (FileExists(cachePath)) {
-    spdlog::info("[DataDownloader] Cache hit: {}", cachePath);
-    return cachePath;
+  if (FileExists(cache_path)) {
+    spdlog::info("[DataDownloader] Cache hit: {}", cache_path);
+    return cache_path;
   }
 
-  std::string shortCommit = commit;
+  std::string short_commit = commit;
   if (commit.length() > 7) {
-    shortCommit = commit.substr(0, 7);
+    short_commit = commit.substr(0, 7);
   }
 
   std::string url = "https://raw.githubusercontent.com/dr5hn/"
                     "countries-states-cities-database/" +
-                    shortCommit + "/json/countries+states+cities.json";
+                    short_commit + "/json/countries+states+cities.json";
 
   spdlog::info("[DataDownloader] Downloading: {}", url);
 
-  m_webClient->DownloadToFile(url, cachePath);
+  web_client_->DownloadToFile(url, cache_path);
 
-  std::ifstream fileCheck(cachePath, std::ios::binary | std::ios::ate);
-  std::streamsize size = fileCheck.tellg();
-  fileCheck.close();
+  std::ifstream file_check(cache_path, std::ios::binary | std::ios::ate);
+  std::streamsize size = file_check.tellg();
+  file_check.close();
 
   spdlog::info("[DataDownloader] OK: Download complete: {} ({:.2f} MB)",
-               cachePath, (size / (1024.0 * 1024.0)));
-  return cachePath;
+               cache_path, (size / (1024.0 * 1024.0)));
+  return cache_path;
 }

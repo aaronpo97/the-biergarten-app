@@ -1,19 +1,20 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_DATA_GENERATION_MOCK_GENERATOR_H_
+#define BIERGARTEN_PIPELINE_DATA_GENERATION_MOCK_GENERATOR_H_
 
 #include "data_generation/data_generator.h"
 #include <string>
 #include <vector>
 
-class MockGenerator final : public IDataGenerator {
+class MockGenerator final : public DataGenerator {
 public:
-  void load(const std::string &modelPath) override;
-  BreweryResult generateBrewery(const std::string &cityName,
-                                const std::string &countryName,
-                                const std::string &regionContext) override;
-  UserResult generateUser(const std::string &locale) override;
+  void Load(const std::string &model_path) override;
+  BreweryResult GenerateBrewery(const std::string &city_name,
+                                const std::string &country_name,
+                                const std::string &region_context) override;
+  UserResult GenerateUser(const std::string &locale) override;
 
 private:
-  static std::size_t deterministicHash(const std::string &a,
+  static std::size_t DeterministicHash(const std::string &a,
                                        const std::string &b);
 
   static const std::vector<std::string> kBreweryAdjectives;
@@ -22,3 +23,5 @@ private:
   static const std::vector<std::string> kUsernames;
   static const std::vector<std::string> kBios;
 };
+
+#endif  // BIERGARTEN_PIPELINE_DATA_GENERATION_MOCK_GENERATOR_H_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_BIERGARTEN_DATA_GENERATOR_H_
+#define BIERGARTEN_PIPELINE_BIERGARTEN_DATA_GENERATOR_H_
 
 #include <memory>
 #include <string>
@@ -15,20 +16,20 @@
  * @brief Program options for the Biergarten pipeline application.
  */
 struct ApplicationOptions {
-  /// @brief Path to the LLM model file (gguf format); mutually exclusive with useMocked.
-  std::string modelPath;
+  /// @brief Path to the LLM model file (gguf format); mutually exclusive with use_mocked.
+  std::string model_path;
 
-  /// @brief Use mocked generator instead of LLM; mutually exclusive with modelPath.
-  bool useMocked = false;
+  /// @brief Use mocked generator instead of LLM; mutually exclusive with model_path.
+  bool use_mocked = false;
 
   /// @brief Directory for cached JSON and database files.
-  std::string cacheDir;
+  std::string cache_dir;
 
   /// @brief LLM sampling temperature (0.0 to 1.0, higher = more random).
   float temperature = 0.8f;
 
   /// @brief LLM nucleus sampling top-p parameter (0.0 to 1.0, higher = more random).
-  float topP = 0.92f;
+  float top_p = 0.92f;
 
   /// @brief Random seed for sampling (-1 for random, otherwise non-negative).
   int seed = -1;
@@ -36,6 +37,8 @@ struct ApplicationOptions {
   /// @brief Git commit hash for database consistency (always pinned to c5eb7772).
   std::string commit = "c5eb7772";
 };
+
+#endif  // BIERGARTEN_PIPELINE_BIERGARTEN_DATA_GENERATOR_H_
 
 
 /**
@@ -50,11 +53,11 @@ public:
    * @brief Construct a BiergartenDataGenerator with injected dependencies.
    *
    * @param options Application configuration options.
-   * @param webClient HTTP client for downloading data.
+   * @param web_client HTTP client for downloading data.
    * @param database SQLite database instance.
    */
   BiergartenDataGenerator(const ApplicationOptions &options,
-                          std::shared_ptr<IWebClient> webClient,
+                          std::shared_ptr<WebClient> web_client,
                           SqliteDatabase &database);
 
   /**
@@ -75,7 +78,7 @@ private:
   const ApplicationOptions options_;
 
   /// @brief Shared HTTP client dependency.
-  std::shared_ptr<IWebClient> webClient_;
+  std::shared_ptr<WebClient> webClient_;
 
   /// @brief Database dependency.
   SqliteDatabase &database_;
@@ -87,7 +90,7 @@ private:
    *
    * @return A unique_ptr to the initialized generator.
    */
-  std::unique_ptr<IDataGenerator> InitializeGenerator();
+  std::unique_ptr<DataGenerator> InitializeGenerator();
 
   /**
    * @brief Download and load geographic data if not cached.

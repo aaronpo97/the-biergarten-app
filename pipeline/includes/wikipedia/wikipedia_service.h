@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
+#define BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
 
 #include <memory>
 #include <string>
@@ -11,7 +12,7 @@
 class WikipediaService {
 public:
   /// @brief Creates a new Wikipedia service with the provided web client.
-  explicit WikipediaService(std::shared_ptr<IWebClient> client);
+  explicit WikipediaService(std::shared_ptr<WebClient> client);
 
   /// @brief Returns the Wikipedia summary extract for city and country.
   [[nodiscard]] std::string GetSummary(std::string_view city,
@@ -19,6 +20,8 @@ public:
 
 private:
   std::string FetchExtract(std::string_view query);
-  std::shared_ptr<IWebClient> client_;
+  std::shared_ptr<WebClient> client_;
   std::unordered_map<std::string, std::string> cache_;
 };
+
+#endif  // BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
