@@ -78,14 +78,15 @@ endif()
 # Main Executable
 # -----------------------------------------------------------------------------
 set(PIPELINE_SOURCES
-    src/curl_web_client.cpp
-    src/data_downloader.cpp
-    src/database.cpp
-    src/json_loader.cpp
-    src/llama_generator.cpp
-    src/mock_generator.cpp
-    src/stream_parser.cpp
-    src/wikipedia_service.cpp
+    src/biergarten_data_generator.cpp
+    src/web_client/curl_web_client.cpp
+    src/data_generation/data_downloader.cpp
+    src/database/database.cpp
+    src/json_handling/json_loader.cpp
+    src/data_generation/llama_generator.cpp
+    src/data_generation/mock_generator.cpp
+    src/json_handling/stream_parser.cpp
+    src/wikipedia/wikipedia_service.cpp
     src/main.cpp
 )
 
@@ -118,10 +119,10 @@ if(ENABLE_CLANG_FORMAT_TARGETS)
     find_program(CLANG_FORMAT_EXE NAMES clang-format)
     if(CLANG_FORMAT_EXE)
         file(GLOB_RECURSE FORMAT_SOURCES CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
-            ${CMAKE_CURRENT_SOURCE_DIR}/includes/*.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/includes/*.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/includes/**/*.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/includes/**/*.hpp
         )
 
         add_custom_target(format

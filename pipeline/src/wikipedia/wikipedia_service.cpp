@@ -1,4 +1,4 @@
-#include "wikipedia_service.h"
+#include "wikipedia/wikipedia_service.h"
 #include <boost/json.hpp>
 #include <spdlog/spdlog.h>
 

@@ -5,8 +5,8 @@
 #include <boost/json/basic_parser_impl.hpp>
 #include <spdlog/spdlog.h>
 
-#include "database.h"
-#include "stream_parser.h"
+#include "database/database.h"
+#include "json_handling/stream_parser.h"
 
 class CityRecordHandler {
   friend class boost::json::basic_parser<CityRecordHandler>;

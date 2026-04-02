@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data_generator.h"
+#include "data_generation/data_generator.h"
 #include <string>
 #include <vector>
 

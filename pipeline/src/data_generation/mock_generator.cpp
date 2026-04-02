@@ -1,4 +1,4 @@
-#include "mock_generator.h"
+#include "data_generation/mock_generator.h"
 
 #include <functional>
 #include <spdlog/spdlog.h>

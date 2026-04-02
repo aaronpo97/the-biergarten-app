@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#include "data_generator.h"
+#include "data_generation/data_generator.h"
 
 struct llama_model;
 struct llama_context;

@@ -1,5 +1,5 @@
-#include "data_downloader.h"
-#include "web_client.h"
+#include "data_generation/data_downloader.h"
+#include "web_client/web_client.h"
 #include <filesystem>
 #include <fstream>
 #include <spdlog/spdlog.h>

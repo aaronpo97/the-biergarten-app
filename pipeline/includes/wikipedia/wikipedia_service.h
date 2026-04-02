@@ -5,7 +5,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "web_client.h"
+#include "web_client/web_client.h"
 
 /// @brief Provides cached Wikipedia summary lookups for city and country pairs.
 class WikipediaService {

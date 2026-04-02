@@ -11,7 +11,7 @@
 #include <boost/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "llama_generator.h"
+#include "data_generation/llama_generator.h"
 
 namespace {
 

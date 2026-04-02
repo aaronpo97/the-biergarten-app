@@ -1,7 +1,7 @@
 #pragma once
 
-#include "database.h"
-#include "stream_parser.h"
+#include "database/database.h"
+#include "json_handling/stream_parser.h"
 #include <string>
 
 /// @brief Loads world-city JSON data into SQLite through streaming parsing.

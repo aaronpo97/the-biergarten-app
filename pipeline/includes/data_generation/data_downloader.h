@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "web_client.h"
+#include "web_client/web_client.h"
 
 /// @brief Downloads and caches source geography JSON payloads.
 class DataDownloader {

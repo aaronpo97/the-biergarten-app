@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "json_loader.h"
-#include "stream_parser.h"
+#include "json_handling/json_loader.h"
+#include "json_handling/stream_parser.h"
 
 void JsonLoader::LoadWorldCities(const std::string &jsonPath,
                                  SqliteDatabase &db) {
