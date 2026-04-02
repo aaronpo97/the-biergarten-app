@@ -8,6 +8,7 @@ class MockGenerator final : public IDataGenerator {
 public:
   void load(const std::string &modelPath) override;
   BreweryResult generateBrewery(const std::string &cityName,
+                                const std::string &countryName,
                                 const std::string &regionContext) override;
   UserResult generateUser(const std::string &locale) override;
 

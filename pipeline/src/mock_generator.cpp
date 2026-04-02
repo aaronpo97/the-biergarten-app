@@ -78,10 +78,13 @@ std::size_t MockGenerator::deterministicHash(const std::string &a,
 }
 
 BreweryResult MockGenerator::generateBrewery(const std::string &cityName,
+                                             const std::string &countryName,
                                              const std::string &regionContext) {
+  const std::string locationKey =
+      countryName.empty() ? cityName : cityName + "," + countryName;
   const std::size_t hash = regionContext.empty()
-                               ? std::hash<std::string>{}(cityName)
-                               : deterministicHash(cityName, regionContext);
+                               ? std::hash<std::string>{}(locationKey)
+                               : deterministicHash(locationKey, regionContext);
 
   BreweryResult result;
   result.name = kBreweryAdjectives[hash % kBreweryAdjectives.size()] + " " +

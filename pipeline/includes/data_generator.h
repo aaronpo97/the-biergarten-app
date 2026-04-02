@@ -19,6 +19,7 @@ public:
   virtual void load(const std::string &modelPath) = 0;
 
   virtual BreweryResult generateBrewery(const std::string &cityName,
+                                        const std::string &countryName,
                                         const std::string &regionContext) = 0;
 
   virtual UserResult generateUser(const std::string &locale) = 0;

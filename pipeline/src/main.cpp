@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <memory>
 #include <spdlog/spdlog.h>
+#include <vector>
 
 static bool FileExists(const std::string &filePath) {
   return std::filesystem::exists(filePath);
@@ -21,6 +22,8 @@ int main(int argc, char *argv[]) {
     std::string cacheDir = argc > 2 ? argv[2] : "/tmp";
     std::string commit =
         argc > 3 ? argv[3] : "c5eb7772"; // Default: stable 2026-03-28
+
+    std::string countryName = argc > 4 ? argv[4] : "";
 
     std::string jsonPath = cacheDir + "/countries+states+cities.json";
     std::string dbPath = cacheDir + "/biergarten-pipeline.db";
@@ -65,28 +68,29 @@ int main(int argc, char *argv[]) {
     spdlog::info("  States: {}", db.QueryStates(0).size());
     spdlog::info("  Cities: {}", cities.size());
 
-    spdlog::info("\n--- 50 COUNTRIES ---");
-    for (size_t i = 0; i < countries.size(); i++) {
-      spdlog::info("{}. {} ({}) {}", (i + 1), countries[i].iso2,
-                   countries[i].iso3, countries[i].name);
-    }
+    struct GeneratedBrewery {
+      int cityId;
+      std::string cityName;
+      BreweryResult brewery;
+    };
 
-    spdlog::info("\n--- 50 STATES ---");
-    for (size_t i = 0; i < states.size(); i++) {
-      spdlog::info("{}. {}: {}", (i + 1), states[i].iso2, states[i].name);
-    }
+    std::vector<GeneratedBrewery> generatedBreweries;
+    const size_t sampleCount = std::min(size_t(30), cities.size());
 
-    spdlog::info("\n--- 50 CITIES ---");
-    for (size_t i = 0; i < std::min(size_t(50), cities.size()); i++) {
-      spdlog::info("{}. {}", (i + 1), cities[i].second);
-    }
-
-    spdlog::info("\n=== SAMPLE BREWERY GENERATION ===\n");
-    for (size_t i = 0; i < std::min(size_t(5), cities.size()); i++) {
+    spdlog::info("\n=== SAMPLE BREWERY GENERATION ===");
+    for (size_t i = 0; i < sampleCount; i++) {
       const auto &[cityId, cityName] = cities[i];
-      auto brewery = generator->generateBrewery(cityName, "");
-      spdlog::info("  {}: {}", cityName, brewery.name);
-      spdlog::info("    -> {}", brewery.description);
+      auto brewery = generator->generateBrewery(cityName, countryName, "");
+      generatedBreweries.push_back({cityId, cityName, brewery});
+    }
+
+    spdlog::info("\n=== GENERATED DATA DUMP ===");
+    for (size_t i = 0; i < generatedBreweries.size(); i++) {
+      const auto &entry = generatedBreweries[i];
+      spdlog::info("{}. city_id={} city=\"{}\"", i + 1, entry.cityId,
+                   entry.cityName);
+      spdlog::info("   brewery_name=\"{}\"", entry.brewery.name);
+      spdlog::info("   brewery_description=\"{}\"", entry.brewery.description);
     }
 
     spdlog::info("\nOK: Pipeline completed successfully");
