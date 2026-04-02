@@ -17,7 +17,7 @@ CurlGlobalState::~CurlGlobalState() { curl_global_cleanup(); }
 
 namespace {
 // curl write callback that appends response data into a std::string
-static size_t WriteCallbackString(void *contents, size_t size, size_t nmemb,
+size_t WriteCallbackString(void *contents, size_t size, size_t nmemb,
                                   void *userp) {
   size_t realsize = size * nmemb;
   auto *s = static_cast<std::string *>(userp);
@@ -26,7 +26,7 @@ static size_t WriteCallbackString(void *contents, size_t size, size_t nmemb,
 }
 
 // curl write callback that writes to a file stream
-static size_t WriteCallbackFile(void *contents, size_t size, size_t nmemb,
+ size_t WriteCallbackFile(void *contents, size_t size, size_t nmemb,
                                 void *userp) {
   size_t realsize = size * nmemb;
   auto *outFile = static_cast<std::ofstream *>(userp);

@@ -11,7 +11,7 @@ DataDownloader::DataDownloader(std::shared_ptr<IWebClient> webClient)
 
 DataDownloader::~DataDownloader() {}
 
-bool DataDownloader::FileExists(const std::string &filePath) const {
+bool DataDownloader::FileExists(const std::string &filePath)  {
   return std::filesystem::exists(filePath);
 }
 

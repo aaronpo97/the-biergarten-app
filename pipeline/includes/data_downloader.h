@@ -11,7 +11,7 @@
 class DataDownloader {
 public:
   /// @brief Initializes global curl state used by this downloader.
-  DataDownloader(std::shared_ptr<IWebClient> webClient);
+  explicit DataDownloader(std::shared_ptr<IWebClient> webClient);
 
   /// @brief Cleans up global curl state.
   ~DataDownloader();
@@ -23,7 +23,7 @@ public:
   );
 
 private:
-  bool FileExists(const std::string &filePath) const;
+  static bool FileExists(const std::string &filePath) ;
   std::shared_ptr<IWebClient> m_webClient;
 };
 
