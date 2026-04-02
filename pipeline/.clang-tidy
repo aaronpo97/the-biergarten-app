@@ -1,0 +1,17 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  google-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-owning-memory,
+  -readability-magic-numbers,
+  -google-readability-todo
+HeaderFilterRegex: "^(src|includes)/.*"
+FormatStyle: file
+...

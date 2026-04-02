@@ -13,6 +13,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(ENABLE_CLANG_TIDY "Enable clang-tidy static analysis for project targets" ON)
+option(ENABLE_CLANG_FORMAT_TARGETS "Enable clang-format helper targets" ON)
+
+if(ENABLE_CLANG_TIDY)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+    if(CLANG_TIDY_EXE)
+        set(BIERGARTEN_CLANG_TIDY_COMMAND
+            "${CLANG_TIDY_EXE};--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy")
+        message(STATUS "clang-tidy enabled: ${CLANG_TIDY_EXE}")
+    else()
+        message(STATUS "clang-tidy not found; static analysis is disabled")
+    endif()
+endif()
+
 # -----------------------------------------------------------------------------
 # Compiler Options & Warnings (Interface Library)
 # -----------------------------------------------------------------------------
@@ -77,6 +91,12 @@ set(PIPELINE_SOURCES
 
 add_executable(biergarten-pipeline ${PIPELINE_SOURCES})
 
+if(BIERGARTEN_CLANG_TIDY_COMMAND)
+    set_target_properties(biergarten-pipeline PROPERTIES
+        CXX_CLANG_TIDY "${BIERGARTEN_CLANG_TIDY_COMMAND}"
+    )
+endif()
+
 target_include_directories(biergarten-pipeline
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/includes
@@ -93,6 +113,32 @@ target_link_libraries(biergarten-pipeline
         Boost::program_options
         Boost::json
 )
+
+if(ENABLE_CLANG_FORMAT_TARGETS)
+    find_program(CLANG_FORMAT_EXE NAMES clang-format)
+    if(CLANG_FORMAT_EXE)
+        file(GLOB_RECURSE FORMAT_SOURCES CONFIGURE_DEPENDS
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/includes/*.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/includes/*.hpp
+        )
+
+        add_custom_target(format
+            COMMAND ${CLANG_FORMAT_EXE} -style=file -i ${FORMAT_SOURCES}
+            COMMENT "Formatting source files with clang-format (Google style)"
+            VERBATIM
+        )
+
+        add_custom_target(format-check
+            COMMAND ${CLANG_FORMAT_EXE} -style=file --dry-run --Werror ${FORMAT_SOURCES}
+            COMMENT "Checking source formatting with clang-format (Google style)"
+            VERBATIM
+        )
+    else()
+        message(STATUS "clang-format not found; format targets are disabled")
+    endif()
+endif()
 
 # -----------------------------------------------------------------------------
 # Post-Build Steps & Utilities

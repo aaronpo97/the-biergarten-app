@@ -197,3 +197,28 @@ Run
 ./biergarten-pipeline
 
 Output: Logs to console; caches JSON in /tmp/countries+states+cities.json.
+
+Code Style and Static Analysis
+
+This project is configured to use:
+
+- clang-format with the Google C++ style guide (via .clang-format)
+- clang-tidy checks focused on Google, modernize, performance, and bug-prone rules (via .clang-tidy)
+
+After configuring CMake, use:
+
+cmake --build . --target format
+
+to apply formatting, and:
+
+cmake --build . --target format-check
+
+to validate formatting without modifying files.
+
+clang-tidy runs automatically on the biergarten-pipeline target when available. You can disable it at configure time:
+
+cmake -DENABLE_CLANG_TIDY=OFF ..
+
+You can also disable format helper targets:
+
+cmake -DENABLE_CLANG_FORMAT_TARGETS=OFF ..
