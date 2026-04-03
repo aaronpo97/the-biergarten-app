@@ -43,6 +43,7 @@ void LlamaGenerator::Load(const std::string& model_path) {
 
    llama_context_params context_params = llama_context_default_params();
    context_params.n_ctx = n_ctx_;
+   context_params.n_batch = n_ctx_;  // Set batch size equal to context window
 
    context_ = llama_init_from_model(model_, context_params);
    if (context_ == nullptr) {

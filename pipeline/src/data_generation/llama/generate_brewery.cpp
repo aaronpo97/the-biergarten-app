@@ -23,18 +23,12 @@ BreweryResult LlamaGenerator::GenerateBrewery(
        PrepareRegionContextPublic(region_context);
 
    /**
-    * System prompt: establishes role and output format constraints
-    * Instructs LLM to roleplay as brewery owner and output only JSON
+    * Load brewery system prompt from file
+    * Falls back to minimal inline prompt if file not found
+    * Default path: prompts/brewery_system_prompt_expanded.txt
     */
    const std::string system_prompt =
-       "You are the brewmaster and owner of a local craft brewery. "
-       "Write a name and a short, soulful description for your brewery that "
-       "reflects your pride in the local community and your craft. "
-       "The tone should be authentic and welcoming, like a note on a "
-       "chalkboard "
-       "menu. Output ONLY a single JSON object with keys \"name\" and "
-       "\"description\". "
-       "Do not include markdown formatting or backticks.";
+       LoadBrewerySystemPrompt("prompts/brewery_system_prompt_expanded.txt");
 
    /**
     * User prompt: provides geographic context to guide generation towards

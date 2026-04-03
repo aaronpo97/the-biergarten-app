@@ -36,12 +36,16 @@ class LlamaGenerator final : public DataGenerator {
    std::string InferFormatted(const std::string& formatted_prompt,
                               int max_tokens = 10000);
 
+   std::string LoadBrewerySystemPrompt(const std::string& prompt_file_path);
+   std::string GetFallbackBreweryPrompt();
+
    llama_model* model_ = nullptr;
    llama_context* context_ = nullptr;
    float sampling_temperature_ = 0.8f;
    float sampling_top_p_ = 0.92f;
    uint32_t sampling_seed_ = 0xFFFFFFFFu;
-   uint32_t n_ctx_ = 2048;
+   uint32_t n_ctx_ = 8192;
+   std::string brewery_system_prompt_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_DATA_GENERATION_LLAMA_GENERATOR_H_

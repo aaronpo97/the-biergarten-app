@@ -36,7 +36,7 @@ bool ParseArguments(int argc, char** argv, ApplicationOptions& options) {
       std::cout << "  --top-p VALUE        Nucleus sampling parameter 0.0-1.0 "
                    "(default: 0.92)\n";
       std::cout << "  --n-ctx SIZE         Context window size in tokens "
-                   "(default: 2048)\n";
+                   "(default: 4096)\n";
       std::cout << "  --seed SEED          Random seed: -1 for random "
                    "(default: -1)\n";
       std::cout << "  --help, -h           Show this help message\n\n";
@@ -59,7 +59,7 @@ bool ParseArguments(int argc, char** argv, ApplicationOptions& options) {
        "Sampling temperature (higher = more random)")(
        "top-p", po::value<float>()->default_value(0.92f),
        "Nucleus sampling top-p in (0,1] (higher = more random)")(
-       "n-ctx", po::value<uint32_t>()->default_value(2048),
+       "n-ctx", po::value<uint32_t>()->default_value(8192),
        "Context window size in tokens (1-32768)")(
        "seed", po::value<int>()->default_value(-1),
        "Sampler seed: -1 for random, otherwise non-negative integer");

@@ -66,7 +66,7 @@ std::string WikipediaService::GetSummary(std::string_view city,
       regionQuery += country;
    }
 
-   const std::string beerQuery = "beer in " + std::string(city);
+   const std::string beerQuery = "beer in " + std::string(country);
 
    try {
       const std::string regionExtract = FetchExtract(regionQuery);
