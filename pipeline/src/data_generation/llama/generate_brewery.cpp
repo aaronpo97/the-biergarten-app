@@ -23,7 +23,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
        "Do not include markdown formatting or backticks.";
 
    std::string prompt =
-       "Write a brewery name and place-specific description for a craft "
+       "Write a brewery name and place-specific long description for a craft "
        "brewery in " +
        city_name +
        (country_name.empty() ? std::string("")
