@@ -83,7 +83,13 @@ set(PIPELINE_SOURCES
     src/data_generation/data_downloader.cpp
     src/database/database.cpp
     src/json_handling/json_loader.cpp
-    src/data_generation/llama_generator.cpp
+    src/data_generation/llama/destructor.cpp
+    src/data_generation/llama/set_sampling_options.cpp
+    src/data_generation/llama/load.cpp
+    src/data_generation/llama/infer.cpp
+    src/data_generation/llama/generate_brewery.cpp
+    src/data_generation/llama/generate_user.cpp
+    src/data_generation/llama/helpers.cpp
     src/data_generation/mock_generator.cpp
     src/json_handling/stream_parser.cpp
     src/wikipedia/wikipedia_service.cpp

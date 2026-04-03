@@ -106,8 +106,8 @@ private:
    * @brief Helper struct to store generated brewery data.
    */
   struct GeneratedBrewery {
-    int cityId;
-    std::string cityName;
+    int city_id;
+    std::string city_name;
     BreweryResult brewery;
   };
 

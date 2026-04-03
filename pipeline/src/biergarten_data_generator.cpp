@@ -111,8 +111,8 @@ void BiergartenDataGenerator::GenerateSampleBreweries() {
   spdlog::info("\n=== GENERATED DATA DUMP ===");
   for (size_t i = 0; i < generatedBreweries_.size(); i++) {
     const auto &entry = generatedBreweries_[i];
-    spdlog::info("{}. city_id={} city=\"{}\"", i + 1, entry.cityId,
-                 entry.cityName);
+    spdlog::info("{}. city_id={} city=\"{}\"", i + 1, entry.city_id,
+                 entry.city_name);
     spdlog::info("   brewery_name=\"{}\"", entry.brewery.name);
     spdlog::info("   brewery_description=\"{}\"", entry.brewery.description);
   }

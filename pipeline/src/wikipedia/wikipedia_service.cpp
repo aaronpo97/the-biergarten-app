@@ -2,7 +2,7 @@
 #include <boost/json.hpp>
 #include <spdlog/spdlog.h>
 
-WikipediaService::WikipediaService(std::shared_ptr<IWebClient> client)
+WikipediaService::WikipediaService(std::shared_ptr<WebClient> client)
     : client_(std::move(client)) {}
 
 std::string WikipediaService::FetchExtract(std::string_view query) {
