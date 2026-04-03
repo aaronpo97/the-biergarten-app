@@ -11,7 +11,7 @@ void JsonLoader::LoadWorldCities(const std::string& json_path,
    constexpr size_t kBatchSize = 10000;
 
    auto startTime = std::chrono::high_resolution_clock::now();
-   spdlog::info("\nLoading {} (streaming RapidJSON SAX)...", json_path);
+   spdlog::info("\nLoading {} (streaming Boost.JSON SAX)...", json_path);
 
    db.BeginTransaction();
    bool transactionOpen = true;
@@ -44,7 +44,8 @@ void JsonLoader::LoadWorldCities(const std::string& json_path,
       }
    } catch (...) {
       if (transactionOpen) {
-         db.CommitTransaction();
+         db.RollbackTransaction();
+         transactionOpen = false;
       }
       throw;
    }

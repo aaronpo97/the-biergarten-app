@@ -51,6 +51,14 @@ BreweryResult LlamaGenerator::GenerateBrewery(
             : std::string(". Regional context: ") + safe_region_context);
 
    /**
+    * Store location context for retry prompts (without repeating full context)
+    */
+   const std::string retry_location =
+       "Location: " + city_name +
+       (country_name.empty() ? std::string("")
+                             : std::string(", ") + country_name);
+
+   /**
     * RETRY LOOP with validation and error correction
     * Attempts to generate valid brewery data up to 3 times, with feedback-based
     * refinement
@@ -84,19 +92,16 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       spdlog::warn("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
                    attempt + 1, validation_error);
 
-      // Update prompt with error details to guide LLM toward correct output
+      // Update prompt with error details to guide LLM toward correct output.
+      // For retries, use a compact prompt format to avoid exceeding token
+      // limits.
       prompt =
           "Your previous response was invalid. Error: " + validation_error +
           "\nReturn ONLY valid JSON with this exact schema: "
           "{\"name\": \"string\", \"description\": \"string\"}."
           "\nDo not include markdown, comments, or extra keys."
-          "\n\nLocation: " +
-          city_name +
-          (country_name.empty() ? std::string("")
-                                : std::string(", ") + country_name) +
-          (safe_region_context.empty()
-               ? std::string("")
-               : std::string("\nRegional context: ") + safe_region_context);
+          "\n\n" +
+          retry_location;
    }
 
    // All retry attempts exhausted: log failure and throw exception

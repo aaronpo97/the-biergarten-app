@@ -48,3 +48,18 @@ void LlamaGenerator::SetSamplingOptions(float temperature, float top_p,
    sampling_seed_ = (seed < 0) ? static_cast<uint32_t>(LLAMA_DEFAULT_SEED)
                                : static_cast<uint32_t>(seed);
 }
+
+void LlamaGenerator::SetContextSize(uint32_t n_ctx) {
+   /**
+    * Validate context size: must be positive and reasonable for the model
+    */
+   if (n_ctx == 0 || n_ctx > 32768) {
+      throw std::runtime_error(
+          "LlamaGenerator: context size must be in range [1, 32768]");
+   }
+
+   /**
+    * Store context size for use during model loading
+    */
+   n_ctx_ = n_ctx;
+}

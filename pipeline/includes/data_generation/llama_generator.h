@@ -16,6 +16,8 @@ class LlamaGenerator final : public DataGenerator {
 
    void SetSamplingOptions(float temperature, float top_p, int seed = -1);
 
+   void SetContextSize(uint32_t n_ctx);
+
    void Load(const std::string& model_path) override;
    BreweryResult GenerateBrewery(const std::string& city_name,
                                  const std::string& country_name,
@@ -39,6 +41,7 @@ class LlamaGenerator final : public DataGenerator {
    float sampling_temperature_ = 0.8f;
    float sampling_top_p_ = 0.92f;
    uint32_t sampling_seed_ = 0xFFFFFFFFu;
+   uint32_t n_ctx_ = 2048;
 };
 
 #endif  // BIERGARTEN_PIPELINE_DATA_GENERATION_LLAMA_GENERATOR_H_

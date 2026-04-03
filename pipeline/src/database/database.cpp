@@ -80,6 +80,16 @@ void SqliteDatabase::CommitTransaction() {
    }
 }
 
+void SqliteDatabase::RollbackTransaction() {
+   std::lock_guard<std::mutex> lock(db_mutex_);
+   char* err = nullptr;
+   if (sqlite3_exec(db_, "ROLLBACK", nullptr, nullptr, &err) != SQLITE_OK) {
+      std::string msg = err ? err : "unknown";
+      sqlite3_free(err);
+      throw std::runtime_error("RollbackTransaction failed: " + msg);
+   }
+}
+
 void SqliteDatabase::InsertCountry(int id, const std::string& name,
                                    const std::string& iso2,
                                    const std::string& iso3) {
@@ -96,9 +106,9 @@ void SqliteDatabase::InsertCountry(int id, const std::string& name,
       throw std::runtime_error("Failed to prepare country insert");
 
    sqlite3_bind_int(stmt, 1, id);
-   sqlite3_bind_text(stmt, 2, name.c_str(), -1, SQLITE_STATIC);
-   sqlite3_bind_text(stmt, 3, iso2.c_str(), -1, SQLITE_STATIC);
-   sqlite3_bind_text(stmt, 4, iso3.c_str(), -1, SQLITE_STATIC);
+   sqlite3_bind_text(stmt, 2, name.c_str(), -1, SQLITE_TRANSIENT);
+   sqlite3_bind_text(stmt, 3, iso2.c_str(), -1, SQLITE_TRANSIENT);
+   sqlite3_bind_text(stmt, 4, iso3.c_str(), -1, SQLITE_TRANSIENT);
 
    if (sqlite3_step(stmt) != SQLITE_DONE) {
       throw std::runtime_error("Failed to insert country");
@@ -123,8 +133,8 @@ void SqliteDatabase::InsertState(int id, int country_id,
 
    sqlite3_bind_int(stmt, 1, id);
    sqlite3_bind_int(stmt, 2, country_id);
-   sqlite3_bind_text(stmt, 3, name.c_str(), -1, SQLITE_STATIC);
-   sqlite3_bind_text(stmt, 4, iso2.c_str(), -1, SQLITE_STATIC);
+   sqlite3_bind_text(stmt, 3, name.c_str(), -1, SQLITE_TRANSIENT);
+   sqlite3_bind_text(stmt, 4, iso2.c_str(), -1, SQLITE_TRANSIENT);
 
    if (sqlite3_step(stmt) != SQLITE_DONE) {
       throw std::runtime_error("Failed to insert state");
@@ -150,7 +160,7 @@ void SqliteDatabase::InsertCity(int id, int state_id, int country_id,
    sqlite3_bind_int(stmt, 1, id);
    sqlite3_bind_int(stmt, 2, state_id);
    sqlite3_bind_int(stmt, 3, country_id);
-   sqlite3_bind_text(stmt, 4, name.c_str(), -1, SQLITE_STATIC);
+   sqlite3_bind_text(stmt, 4, name.c_str(), -1, SQLITE_TRANSIENT);
    sqlite3_bind_double(stmt, 5, latitude);
    sqlite3_bind_double(stmt, 6, longitude);
 
@@ -165,7 +175,8 @@ std::vector<City> SqliteDatabase::QueryCities() {
    std::vector<City> cities;
    sqlite3_stmt* stmt = nullptr;
 
-   const char* query = "SELECT id, name, country_id FROM cities ORDER BY name";
+   const char* query =
+       "SELECT id, name, country_id FROM cities ORDER BY RANDOM()";
    int rc = sqlite3_prepare_v2(db_, query, -1, &stmt, nullptr);
 
    if (rc != SQLITE_OK) {

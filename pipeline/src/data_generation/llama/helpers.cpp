@@ -147,7 +147,17 @@ std::pair<std::string, std::string> ParseTwoLineResponse(
       std::transform(low.begin(), low.end(), low.begin(), [](unsigned char c) {
          return static_cast<char>(std::tolower(c));
       });
-      if (!l.empty() && l.front() == '<' && low.back() == '>') continue;
+      // Filter known thinking tags like <think>...</think>, but be conservative
+      // to avoid removing legitimate output. Only filter specific known
+      // patterns.
+      if (!l.empty() && l.front() == '<' && low.back() == '>') {
+         // Only filter if it's a known thinking tag: <think>, <reasoning>, etc.
+         if (low.find("think") != std::string::npos ||
+             low.find("reasoning") != std::string::npos ||
+             low.find("reflect") != std::string::npos) {
+            continue;
+         }
+      }
       if (low.rfind("okay,", 0) == 0 || low.rfind("hmm", 0) == 0) continue;
       filtered.push_back(std::move(l));
    }

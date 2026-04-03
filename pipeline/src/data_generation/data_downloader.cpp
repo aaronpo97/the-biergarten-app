@@ -25,15 +25,10 @@ std::string DataDownloader::DownloadCountriesDatabase(
       return cache_path;
    }
 
-   std::string short_commit = commit;
-   if (commit.length() > 7) {
-      short_commit = commit.substr(0, 7);
-   }
-
    std::string url =
        "https://raw.githubusercontent.com/dr5hn/"
        "countries-states-cities-database/" +
-       short_commit + "/json/countries+states+cities.json";
+       commit + "/json/countries+states+cities.json";
 
    spdlog::info("[DataDownloader] Downloading: {}", url);
 

@@ -186,5 +186,11 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    std::string output;
    for (const llama_token token : generated_tokens)
       AppendTokenPiecePublic(vocab, token, output);
+
+   /**
+    * Advance seed for next generation to improve output diversity
+    */
+   sampling_seed_ = (sampling_seed_ == 0xFFFFFFFFu) ? 0 : sampling_seed_ + 1;
+
    return output;
 }

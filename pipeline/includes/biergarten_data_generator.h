@@ -33,6 +33,10 @@ struct ApplicationOptions {
    /// random).
    float top_p = 0.92f;
 
+   /// @brief Context window size (tokens) for LLM inference. Higher values
+   /// support longer prompts but use more memory.
+   uint32_t n_ctx = 2048;
+
    /// @brief Random seed for sampling (-1 for random, otherwise non-negative).
    int seed = -1;
 

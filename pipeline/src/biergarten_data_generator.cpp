@@ -28,11 +28,12 @@ std::unique_ptr<DataGenerator> BiergartenDataGenerator::InitializeGenerator() {
       auto llama_generator = std::make_unique<LlamaGenerator>();
       llama_generator->SetSamplingOptions(options_.temperature, options_.top_p,
                                           options_.seed);
+      llama_generator->SetContextSize(options_.n_ctx);
       spdlog::info(
           "[Generator] Using LlamaGenerator: {} (temperature={}, top-p={}, "
-          "seed={})",
+          "n_ctx={}, seed={})",
           options_.model_path, options_.temperature, options_.top_p,
-          options_.seed);
+          options_.n_ctx, options_.seed);
       generator = std::move(llama_generator);
    }
    generator->Load(options_.model_path);

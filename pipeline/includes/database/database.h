@@ -59,6 +59,9 @@ class SqliteDatabase {
    /// @brief Commits the active database transaction.
    void CommitTransaction();
 
+   /// @brief Rolls back the active database transaction.
+   void RollbackTransaction();
+
    /// @brief Inserts a country row.
    void InsertCountry(int id, const std::string& name, const std::string& iso2,
                       const std::string& iso3);
