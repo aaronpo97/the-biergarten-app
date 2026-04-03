@@ -1,3 +1,11 @@
+/**
+ * Helper Functions Module
+ * Provides utility functions for text processing, parsing, and chat template
+ * formatting. Functions handle whitespace normalization, response parsing, and
+ * conversion of prompts to proper chat format using the model's built-in
+ * template.
+ */
+
 #include <algorithm>
 #include <array>
 #include <boost/json.hpp>
@@ -12,6 +20,9 @@
 
 namespace {
 
+/**
+ * String trimming: removes leading and trailing whitespace
+ */
 std::string Trim(std::string value) {
    auto not_space = [](unsigned char ch) { return !std::isspace(ch); };
 
@@ -23,6 +34,10 @@ std::string Trim(std::string value) {
    return value;
 }
 
+/**
+ * Normalize whitespace: collapses multiple spaces/tabs/newlines into single
+ * spaces
+ */
 std::string CondenseWhitespace(std::string text) {
    std::string out;
    out.reserve(text.size());
@@ -44,6 +59,10 @@ std::string CondenseWhitespace(std::string text) {
    return Trim(std::move(out));
 }
 
+/**
+ * Truncate region context to fit within max length while preserving word
+ * boundaries
+ */
 std::string PrepareRegionContext(std::string_view region_context,
                                  std::size_t max_chars) {
    std::string normalized = CondenseWhitespace(std::string(region_context));
@@ -61,6 +80,9 @@ std::string PrepareRegionContext(std::string_view region_context,
    return normalized;
 }
 
+/**
+ * Remove common bullet points, numbers, and field labels added by LLM in output
+ */
 std::string StripCommonPrefix(std::string line) {
    line = Trim(std::move(line));
 
@@ -102,6 +124,10 @@ std::string StripCommonPrefix(std::string line) {
    return Trim(std::move(line));
 }
 
+/**
+ * Parse two-line response from LLM: normalize line endings, strip formatting,
+ * filter spurious output, and combine remaining lines if needed
+ */
 std::pair<std::string, std::string> ParseTwoLineResponse(
     const std::string& raw, const std::string& error_message) {
    std::string normalized = raw;
@@ -140,6 +166,9 @@ std::pair<std::string, std::string> ParseTwoLineResponse(
    return {first, second};
 }
 
+/**
+ * Apply model's chat template to user-only prompt, formatting it for the model
+ */
 std::string ToChatPrompt(const llama_model* model,
                          const std::string& user_prompt) {
    const char* tmpl = llama_model_chat_template(model, nullptr);
@@ -173,6 +202,10 @@ std::string ToChatPrompt(const llama_model* model,
    return std::string(buffer.data(), static_cast<std::size_t>(required));
 }
 
+/**
+ * Apply model's chat template to system+user prompt pair, formatting for the
+ * model
+ */
 std::string ToChatPrompt(const llama_model* model,
                          const std::string& system_prompt,
                          const std::string& user_prompt) {

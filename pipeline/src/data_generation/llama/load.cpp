@@ -1,3 +1,10 @@
+/**
+ * Model Loading Module
+ * This module handles loading a pre-trained LLM model from disk and
+ * initializing the llama.cpp context for inference. It performs one-time setup
+ * required before any inference operations can be performed.
+ */
+
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
@@ -7,6 +14,9 @@
 #include "llama.h"
 
 void LlamaGenerator::Load(const std::string& model_path) {
+   /**
+    * Validate input and clean up any previously loaded model/context
+    */
    if (model_path.empty())
       throw std::runtime_error("LlamaGenerator: model path must not be empty");
 
@@ -19,6 +29,9 @@ void LlamaGenerator::Load(const std::string& model_path) {
       model_ = nullptr;
    }
 
+   /**
+    * Initialize the llama backend (one-time setup for GPU/CPU acceleration)
+    */
    llama_backend_init();
 
    llama_model_params model_params = llama_model_default_params();

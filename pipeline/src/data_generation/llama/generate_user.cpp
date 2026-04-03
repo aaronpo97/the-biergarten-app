@@ -1,3 +1,11 @@
+/**
+ * User Profile Generation Module
+ * Uses the LLM to generate realistic user profiles (username and bio) for craft
+ * beer enthusiasts. Implements retry logic to handle parsing failures and
+ * ensures output adheres to strict format constraints (two lines, specific
+ * character limits).
+ */
+
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -8,6 +16,10 @@
 #include "data_generation/llama_generator_helpers.h"
 
 UserResult LlamaGenerator::GenerateUser(const std::string& locale) {
+   /**
+    * System prompt: specifies exact output format to minimize parsing errors
+    * Constraints: 2-line output, username format, bio length bounds
+    */
    const std::string system_prompt =
        "You generate plausible social media profiles for craft beer "
        "enthusiasts. "
@@ -17,39 +29,72 @@ UserResult LlamaGenerator::GenerateUser(const std::string& locale) {
        "The profile should feel consistent with the locale. "
        "No preamble, no labels.";
 
+   /**
+    * User prompt: locale parameter guides cultural appropriateness of generated
+    * profiles
+    */
    std::string prompt =
        "Generate a craft beer enthusiast profile. Locale: " + locale;
 
+   /**
+    * RETRY LOOP with format validation
+    * Attempts up to 3 times to generate valid user profile with correct format
+    */
    const int max_attempts = 3;
    std::string raw;
    for (int attempt = 0; attempt < max_attempts; ++attempt) {
+      /**
+       * Generate user profile (max 128 tokens - should fit 2 lines easily)
+       */
       raw = Infer(system_prompt, prompt, 128);
       spdlog::debug("LlamaGenerator (user): raw output (attempt {}): {}",
                     attempt + 1, raw);
 
       try {
+         /**
+          * Parse two-line response: first line = username, second line = bio
+          */
          auto [username, bio] = ParseTwoLineResponsePublic(
              raw, "LlamaGenerator: malformed user response");
 
+         /**
+          * Remove any whitespace from username (usernames shouldn't have
+          * spaces)
+          */
          username.erase(
              std::remove_if(username.begin(), username.end(),
                             [](unsigned char ch) { return std::isspace(ch); }),
              username.end());
 
+         /**
+          * Validate both fields are non-empty after processing
+          */
          if (username.empty() || bio.empty()) {
             throw std::runtime_error("LlamaGenerator: malformed user response");
          }
 
+         /**
+          * Truncate bio if exceeds reasonable length for bio field
+          */
          if (bio.size() > 200) bio = bio.substr(0, 200);
 
+         /**
+          * Success: return parsed user profile
+          */
          return {username, bio};
       } catch (const std::exception& e) {
+         /**
+          * Parsing failed: log and continue to next attempt
+          */
          spdlog::warn(
              "LlamaGenerator: malformed user response (attempt {}): {}",
              attempt + 1, e.what());
       }
    }
 
+   /**
+    * All retry attempts exhausted: log failure and throw exception
+    */
    spdlog::error(
        "LlamaGenerator: malformed user response after {} attempts: {}",
        max_attempts, raw);

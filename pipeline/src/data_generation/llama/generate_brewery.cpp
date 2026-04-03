@@ -1,3 +1,10 @@
+/**
+ * Brewery Data Generation Module
+ * Uses the LLM to generate realistic brewery names and descriptions for a given
+ * location. Implements retry logic with validation and error correction to
+ * ensure valid JSON output conforming to the expected schema.
+ */
+
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
@@ -9,9 +16,16 @@
 BreweryResult LlamaGenerator::GenerateBrewery(
     const std::string& city_name, const std::string& country_name,
     const std::string& region_context) {
+   /**
+    * Preprocess and truncate region context to manageable size
+    */
    const std::string safe_region_context =
        PrepareRegionContextPublic(region_context);
 
+   /**
+    * System prompt: establishes role and output format constraints
+    * Instructs LLM to roleplay as brewery owner and output only JSON
+    */
    const std::string system_prompt =
        "You are the brewmaster and owner of a local craft brewery. "
        "Write a name and a short, soulful description for your brewery that "
@@ -22,6 +36,10 @@ BreweryResult LlamaGenerator::GenerateBrewery(
        "\"description\". "
        "Do not include markdown formatting or backticks.";
 
+   /**
+    * User prompt: provides geographic context to guide generation towards
+    * culturally appropriate and locally-inspired brewery attributes
+    */
    std::string prompt =
        "Write a brewery name and place-specific long description for a craft "
        "brewery in " +
@@ -32,26 +50,41 @@ BreweryResult LlamaGenerator::GenerateBrewery(
             ? std::string(".")
             : std::string(". Regional context: ") + safe_region_context);
 
+   /**
+    * RETRY LOOP with validation and error correction
+    * Attempts to generate valid brewery data up to 3 times, with feedback-based
+    * refinement
+    */
    const int max_attempts = 3;
    std::string raw;
    std::string last_error;
+
+   // Limit output length to keep it concise and focused
+   constexpr int max_tokens = 1052;
    for (int attempt = 0; attempt < max_attempts; ++attempt) {
-      raw = Infer(system_prompt, prompt, 384);
+      // Generate brewery data from LLM
+      raw = Infer(system_prompt, prompt, max_tokens);
       spdlog::debug("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
                     raw);
+
+      // Validate output: parse JSON and check required fields
 
       std::string name;
       std::string description;
       const std::string validation_error =
           ValidateBreweryJsonPublic(raw, name, description);
       if (validation_error.empty()) {
+         // Success: return parsed brewery data
          return {std::move(name), std::move(description)};
       }
+
+      // Validation failed: log error and prepare corrective feedback
 
       last_error = validation_error;
       spdlog::warn("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
                    attempt + 1, validation_error);
 
+      // Update prompt with error details to guide LLM toward correct output
       prompt =
           "Your previous response was invalid. Error: " + validation_error +
           "\nReturn ONLY valid JSON with this exact schema: "
@@ -66,6 +99,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
                : std::string("\nRegional context: ") + safe_region_context);
    }
 
+   // All retry attempts exhausted: log failure and throw exception
    spdlog::error(
        "LlamaGenerator: malformed brewery response after {} attempts: "
        "{}",
