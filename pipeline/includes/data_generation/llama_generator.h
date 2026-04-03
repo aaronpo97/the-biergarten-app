@@ -31,6 +31,9 @@ class LlamaGenerator final : public DataGenerator {
    std::string Infer(const std::string& system_prompt,
                      const std::string& prompt, int max_tokens = 10000);
 
+   std::string InferFormatted(const std::string& formatted_prompt,
+                              int max_tokens = 10000);
+
    llama_model* model_ = nullptr;
    llama_context* context_ = nullptr;
    float sampling_temperature_ = 0.8f;
