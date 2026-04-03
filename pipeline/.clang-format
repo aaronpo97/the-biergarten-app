@@ -1,10 +1,5 @@
 ---
 BasedOnStyle: Google
-Standard: c++23
-ColumnLimit: 100
-IndentWidth: 2
-DerivePointerAlignment: false
-PointerAlignment: Left
-SortIncludes: true
-IncludeBlocks: Preserve
+ColumnLimit: 80
+IndentWidth: 3
 ...

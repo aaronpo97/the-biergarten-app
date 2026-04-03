@@ -12,18 +12,17 @@ typedef int llama_token;
 std::string PrepareRegionContextPublic(std::string_view region_context,
                                        std::size_t max_chars = 700);
 
-std::pair<std::string, std::string>
-ParseTwoLineResponsePublic(const std::string& raw,
-                           const std::string& error_message);
+std::pair<std::string, std::string> ParseTwoLineResponsePublic(
+    const std::string& raw, const std::string& error_message);
 
-std::string ToChatPromptPublic(const llama_model *model,
+std::string ToChatPromptPublic(const llama_model* model,
                                const std::string& user_prompt);
 
-std::string ToChatPromptPublic(const llama_model *model,
+std::string ToChatPromptPublic(const llama_model* model,
                                const std::string& system_prompt,
                                const std::string& user_prompt);
 
-void AppendTokenPiecePublic(const llama_vocab *vocab, llama_token token,
+void AppendTokenPiecePublic(const llama_vocab* vocab, llama_token token,
                             std::string& output);
 
 std::string ValidateBreweryJsonPublic(const std::string& raw,

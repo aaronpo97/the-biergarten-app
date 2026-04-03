@@ -1,7 +1,7 @@
-#include "data_generation/mock_generator.h"
+#include <string>
+#include <vector>
 
-#include <functional>
-#include <spdlog/spdlog.h>
+#include "data_generation/mock_generator.h"
 
 const std::vector<std::string> MockGenerator::kBreweryAdjectives = {
     "Craft",      "Heritage", "Local",  "Artisan",  "Pioneer",    "Golden",
@@ -63,42 +63,3 @@ const std::vector<std::string> MockGenerator::kBios = {
     "Craft beer fan mapping tasting notes and favorite brew routes.",
     "Always ready to trade recommendations for underrated local breweries.",
     "Keeping a running list of must-try collab releases and tap takeovers."};
-
-void MockGenerator::Load(const std::string & /*modelPath*/) {
-  spdlog::info("[MockGenerator] No model needed");
-}
-
-std::size_t MockGenerator::DeterministicHash(const std::string &a,
-                                             const std::string &b) {
-  std::size_t seed = std::hash<std::string>{}(a);
-  const std::size_t mixed = std::hash<std::string>{}(b);
-  seed ^= mixed + 0x9e3779b97f4a7c15ULL + (seed << 6) + (seed >> 2);
-  seed = (seed << 13) | (seed >> ((sizeof(std::size_t) * 8) - 13));
-  return seed;
-}
-
-BreweryResult MockGenerator::GenerateBrewery(const std::string &city_name,
-                                             const std::string &country_name,
-                                             const std::string &region_context) {
-  const std::string location_key =
-      country_name.empty() ? city_name : city_name + "," + country_name;
-  const std::size_t hash = region_context.empty()
-                               ? std::hash<std::string>{}(location_key)
-                               : DeterministicHash(location_key, region_context);
-
-  BreweryResult result;
-  result.name = kBreweryAdjectives[hash % kBreweryAdjectives.size()] + " " +
-                kBreweryNouns[(hash / 7) % kBreweryNouns.size()];
-  result.description =
-      kBreweryDescriptions[(hash / 13) % kBreweryDescriptions.size()];
-  return result;
-}
-
-UserResult MockGenerator::GenerateUser(const std::string &locale) {
-  const std::size_t hash = std::hash<std::string>{}(locale);
-
-  UserResult result;
-  result.username = kUsernames[hash % kUsernames.size()];
-  result.bio = kBios[(hash / 11) % kBios.size()];
-  return result;
-}

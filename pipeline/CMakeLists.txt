@@ -90,7 +90,11 @@ set(PIPELINE_SOURCES
     src/data_generation/llama/generate_brewery.cpp
     src/data_generation/llama/generate_user.cpp
     src/data_generation/llama/helpers.cpp
-    src/data_generation/mock_generator.cpp
+    src/data_generation/mock/data.cpp
+    src/data_generation/mock/deterministic_hash.cpp
+    src/data_generation/mock/load.cpp
+    src/data_generation/mock/generate_brewery.cpp
+    src/data_generation/mock/generate_user.cpp
     src/json_handling/stream_parser.cpp
     src/wikipedia/wikipedia_service.cpp
     src/main.cpp
