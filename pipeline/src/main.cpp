@@ -41,8 +41,6 @@ bool ParseArguments(int argc, char** argv, ApplicationOptions& options) {
       std::cout << "  --help, -h           Show this help message\n\n";
       std::cout << "Note: --mocked and --model are mutually exclusive. Exactly "
                    "one must be provided.\n";
-      std::cout << "Data source is always pinned to commit c5eb7772 (stable "
-                   "2026-03-28).\n";
       return false;
    }
 
