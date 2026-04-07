@@ -2,16 +2,15 @@
 #define BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
 
 #include <string>
+#include <vector>
 
-#include "database/database.h"
-#include "json_handling/stream_parser.h"
+#include "models/location.h"
 
-/// @brief Loads world-city JSON data into SQLite through streaming parsing.
+/// @brief Loads curated world locations from a JSON file into memory.
 class JsonLoader {
   public:
-   /// @brief Parses a JSON file and writes country/state/city rows into db.
-   static void LoadWorldCities(const std::string& json_path,
-                               SqliteDatabase& db);
+   /// @brief Parses a JSON array file and returns all location records.
+   static std::vector<Location> LoadLocations(const std::string& filepath);
 };
 
 #endif  // BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_

@@ -1,170 +1,104 @@
-cmake_minimum_required(VERSION 3.20)
-project(biergarten-pipeline VERSION 0.1.0 LANGUAGES CXX)
-
-# Allows older dependencies to configure on newer CMake.
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-
-# Policies
-cmake_policy(SET CMP0167 NEW) # FindBoost improvements
-
-# Global Settings
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-option(ENABLE_CLANG_TIDY "Enable clang-tidy static analysis for project targets" ON)
-option(ENABLE_CLANG_FORMAT_TARGETS "Enable clang-format helper targets" ON)
-
-if(ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-    if(CLANG_TIDY_EXE)
-        set(BIERGARTEN_CLANG_TIDY_COMMAND
-            "${CLANG_TIDY_EXE};--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy")
-        message(STATUS "clang-tidy enabled: ${CLANG_TIDY_EXE}")
+cmake_minimum_required(VERSION 3.24)
+project(biergarten-pipeline)
+# =============================================================================
+# 1. GPU Detection
+# =============================================================================
+# GGML_CUDA / GGML_METAL are set here so that the llama.cpp FetchContent below
+# inherits them as cache variables before its CMakeLists.txt is processed.
+if(APPLE)
+    message(STATUS "[biergarten] Apple Silicon detected — enabling Metal acceleration.")
+    set(GGML_METAL ON CACHE BOOL "Enable Metal for Apple Silicon" FORCE)
+elseif(UNIX AND NOT APPLE)
+    find_package(CUDAToolkit QUIET)
+    if(CUDAToolkit_FOUND)
+        message(STATUS "[biergarten] NVIDIA GPU detected — enabling CUDA acceleration.")
+        set(GGML_CUDA ON CACHE BOOL "Enable CUDA for NVIDIA GPUs" FORCE)
+        # 'native' resolves to the exact SM version of the present GPU at configure time
+        # (e.g. sm_89 for RTX 2000 Ada). Change to a concrete arch list for cross-compilation.
+        set(CMAKE_CUDA_ARCHITECTURES native)
     else()
-        message(STATUS "clang-tidy not found; static analysis is disabled")
+        message(STATUS "[biergarten] No NVIDIA GPU found — falling back to CPU.")
     endif()
 endif()
-
-# -----------------------------------------------------------------------------
-# Compiler Options & Warnings (Interface Library)
-# -----------------------------------------------------------------------------
-add_library(project_options INTERFACE)
-target_compile_options(project_options INTERFACE
-    $<$<CXX_COMPILER_ID:GNU,Clang>:
-        -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wunused
-    >
-    $<$<CXX_COMPILER_ID:MSVC>:
-        /W4 /WX /permissive-
-    >
-)
-
-# -----------------------------------------------------------------------------
-# Dependencies
-# -----------------------------------------------------------------------------
-find_package(CURL REQUIRED)
-find_package(SQLite3 REQUIRED)
-find_package(Boost 1.75 REQUIRED COMPONENTS program_options json)
-
+# =============================================================================
+# 2. Project-wide Settings
+# =============================================================================
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# =============================================================================
+# 3. Dependencies
+# =============================================================================
 include(FetchContent)
-
-# spdlog (Logging)
+# --- libcurl ------------------------------------------------------------------
+# Prefer the system package; the build will fail at link time if absent and
+# no system curl is found, so emit a fatal error early rather than a silent gap.
+find_package(CURL QUIET)
+if(NOT CURL_FOUND)
+    message(FATAL_ERROR
+        "[biergarten] libcurl not found. Install it via your package manager "
+        "(e.g. 'sudo dnf install libcurl-devel') or set CURL_ROOT.")
+endif()
+# --- llama.cpp ----------------------------------------------------------------
+# Pinned to a specific commit for reproducible builds.
+# To update: pick a new commit SHA from https://github.com/ggml-org/llama.cpp
+FetchContent_Declare(
+    llama-cpp
+    GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+    GIT_TAG        b8611
+)
+FetchContent_MakeAvailable(llama-cpp)
+# --- Boost (JSON + program_options) ------------------------------------------
+FetchContent_Declare(
+    boost
+    URL https://github.com/boostorg/boost/releases/download/boost-1.85.0/boost-1.85.0-cmake.tar.gz
+)
+FetchContent_MakeAvailable(boost)
+# --- spdlog -------------------------------------------------------------------
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG        v1.11.0
+    GIT_TAG        v1.15.3
 )
 FetchContent_MakeAvailable(spdlog)
-
-# llama.cpp (LLM Inference)
-set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(
-    llama_cpp
-    GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
-    GIT_TAG        b8611
-)
-FetchContent_MakeAvailable(llama_cpp)
-
-if(TARGET llama)
-    target_compile_options(llama PRIVATE
-        $<$<CXX_COMPILER_ID:AppleClang>:-include algorithm>
-    )
-endif()
-
-# -----------------------------------------------------------------------------
-# Main Executable
-# -----------------------------------------------------------------------------
-set(PIPELINE_SOURCES
+# =============================================================================
+# 4. Sources
+# =============================================================================
+set(SOURCES
+    src/main.cpp
     src/biergarten_data_generator.cpp
-    src/web_client/curl_web_client.cpp
-    src/data_generation/data_downloader.cpp
-    src/database/database.cpp
-    src/json_handling/json_loader.cpp
     src/data_generation/llama/destructor.cpp
-    src/data_generation/llama/set_sampling_options.cpp
-    src/data_generation/llama/load.cpp
-    src/data_generation/llama/infer.cpp
     src/data_generation/llama/generate_brewery.cpp
     src/data_generation/llama/generate_user.cpp
     src/data_generation/llama/helpers.cpp
+    src/data_generation/llama/infer.cpp
+    src/data_generation/llama/load.cpp
     src/data_generation/llama/load_brewery_prompt.cpp
+    src/data_generation/llama/set_sampling_options.cpp
     src/data_generation/mock/data.cpp
     src/data_generation/mock/deterministic_hash.cpp
-    src/data_generation/mock/load.cpp
     src/data_generation/mock/generate_brewery.cpp
     src/data_generation/mock/generate_user.cpp
-    src/json_handling/stream_parser.cpp
+    src/data_generation/mock/load.cpp
+    src/json_handling/json_loader.cpp
+    src/web_client/curl_web_client.cpp
     src/wikipedia/wikipedia_service.cpp
-    src/main.cpp
 )
-
-add_executable(biergarten-pipeline ${PIPELINE_SOURCES})
-
-if(BIERGARTEN_CLANG_TIDY_COMMAND)
-    set_target_properties(biergarten-pipeline PROPERTIES
-        CXX_CLANG_TIDY "${BIERGARTEN_CLANG_TIDY_COMMAND}"
-    )
-endif()
-
-target_include_directories(biergarten-pipeline
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes
-        ${llama_cpp_SOURCE_DIR}/include
+# =============================================================================
+# 5. Target
+# =============================================================================
+add_executable(${PROJECT_NAME}
+    ${SOURCES}
 )
-
-target_link_libraries(biergarten-pipeline
-    PRIVATE
-        project_options
-        CURL::libcurl
-        SQLite::SQLite3
-        spdlog::spdlog
-        llama
-        Boost::program_options
-        Boost::json
+target_include_directories(${PROJECT_NAME} PRIVATE
+    includes
+    ${llama-cpp_SOURCE_DIR}/include
+    ${llama-cpp_SOURCE_DIR}/common
 )
-
-if(ENABLE_CLANG_FORMAT_TARGETS)
-    find_program(CLANG_FORMAT_EXE NAMES clang-format)
-    if(CLANG_FORMAT_EXE)
-        file(GLOB_RECURSE FORMAT_SOURCES CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cc
-            ${CMAKE_CURRENT_SOURCE_DIR}/includes/**/*.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/includes/**/*.hpp
-        )
-
-        add_custom_target(format
-            COMMAND ${CLANG_FORMAT_EXE} -style=file -i ${FORMAT_SOURCES}
-            COMMENT "Formatting source files with clang-format (Google style)"
-            VERBATIM
-        )
-
-        add_custom_target(format-check
-            COMMAND ${CLANG_FORMAT_EXE} -style=file --dry-run --Werror ${FORMAT_SOURCES}
-            COMMENT "Checking source formatting with clang-format (Google style)"
-            VERBATIM
-        )
-    else()
-        message(STATUS "clang-format not found; format targets are disabled")
-    endif()
-endif()
-
-# -----------------------------------------------------------------------------
-# Post-Build Steps & Utilities
-# -----------------------------------------------------------------------------
-add_custom_command(TARGET biergarten-pipeline POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/output
-    COMMENT "Ensuring output directory exists"
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    llama
+    boost_json
+    boost_program_options
+    spdlog::spdlog
+    CURL::libcurl
 )
-
-find_program(VALGRIND valgrind)
-if(VALGRIND)
-    add_custom_target(memcheck
-        COMMAND ${VALGRIND} --leak-check=full --error-exitcode=1 $<TARGET_FILE:biergarten-pipeline> --help
-        DEPENDS biergarten-pipeline
-        COMMENT "Running Valgrind memory check"
-    )
-endif()

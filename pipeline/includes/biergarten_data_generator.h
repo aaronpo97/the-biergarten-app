@@ -3,11 +3,10 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "data_generation/data_generator.h"
-#include "database/database.h"
+#include "models/location.h"
 #include "web_client/web_client.h"
 #include "wikipedia/wikipedia_service.h"
 
@@ -49,8 +48,7 @@ struct ApplicationOptions {
  * @brief Main data generator class for the Biergarten pipeline.
  *
  * This class encapsulates the core logic for generating brewery data.
- * It handles database initialization, data loading/downloading, and brewery
- * generation.
+ * It handles location loading, city enrichment, and brewery generation.
  */
 class BiergartenDataGenerator {
   public:
@@ -59,20 +57,17 @@ class BiergartenDataGenerator {
     *
     * @param options Application configuration options.
     * @param web_client HTTP client for downloading data.
-    * @param database SQLite database instance.
     */
    BiergartenDataGenerator(const ApplicationOptions& options,
-                           std::shared_ptr<WebClient> web_client,
-                           SqliteDatabase& database);
+                           std::shared_ptr<WebClient> web_client);
 
    /**
     * @brief Run the data generation pipeline.
     *
     * Performs the following steps:
-    * 1. Initialize database
-    * 2. Download geographic data if needed
-    * 3. Initialize the generator (LLM or Mock)
-    * 4. Generate brewery data for sample cities
+    * 1. Load curated locations from JSON
+    * 2. Initialize the generator (LLM or Mock)
+    * 3. Generate brewery data for sampled cities
     *
     * @return 0 on success, 1 on failure.
     */
@@ -85,16 +80,11 @@ class BiergartenDataGenerator {
    /// @brief Shared HTTP client dependency.
    std::shared_ptr<WebClient> webClient_;
 
-   /// @brief Database dependency.
-   SqliteDatabase& database_;
-
    /**
     * @brief Enriched city data with Wikipedia context.
     */
    struct EnrichedCity {
-      int city_id;
-      std::string city_name;
-      std::string country_name;
+      Location location;
       std::string region_context;
    };
 
@@ -108,25 +98,20 @@ class BiergartenDataGenerator {
    std::unique_ptr<DataGenerator> InitializeGenerator();
 
    /**
-    * @brief Download and load geographic data if not cached.
-    */
-   void LoadGeographicData();
-
-   /**
-    * @brief Query cities from database and build country name map.
+    * @brief Load locations from JSON and sample cities.
     *
-    * @return Vector of (City, country_name) pairs capped at 30 entries.
+    * @return Vector of sampled locations capped at 30 entries.
     */
-   std::vector<std::pair<City, std::string>> QueryCitiesWithCountries();
+   std::vector<Location> QueryCitiesWithCountries();
 
    /**
     * @brief Enrich cities with Wikipedia summaries.
     *
-    * @param cities Vector of (City, country_name) pairs.
+    * @param cities Vector of sampled locations.
     * @return Vector of enriched city data with context.
     */
    std::vector<EnrichedCity> EnrichWithWikipedia(
-       const std::vector<std::pair<City, std::string>>& cities);
+       const std::vector<Location>& cities);
 
    /**
     * @brief Generate breweries for enriched cities.
@@ -146,8 +131,7 @@ class BiergartenDataGenerator {
     * @brief Helper struct to store generated brewery data.
     */
    struct GeneratedBrewery {
-      int city_id;
-      std::string city_name;
+      Location location;
       BreweryResult brewery;
    };
 

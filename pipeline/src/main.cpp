@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "biergarten_data_generator.h"
-#include "database/database.h"
 #include "web_client/curl_web_client.h"
 
 namespace po = boost::program_options;
@@ -122,9 +121,8 @@ int main(int argc, char* argv[]) {
       }
 
       auto webClient = std::make_shared<CURLWebClient>();
-      SqliteDatabase database;
 
-      BiergartenDataGenerator generator(options, webClient, database);
+      BiergartenDataGenerator generator(options, webClient);
       return generator.Run();
 
    } catch (const std::exception& e) {

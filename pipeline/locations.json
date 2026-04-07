@@ -1,0 +1,902 @@
+[
+  {
+    "city": "Cape Town",
+    "state_province": "Western Cape",
+    "iso3166_2": "ZA-WC",
+    "country": "South Africa",
+    "iso3166_1": "ZA",
+    "latitude": -33.9249,
+    "longitude": 18.4241
+  },
+  {
+    "city": "Johannesburg",
+    "state_province": "Gauteng",
+    "iso3166_2": "ZA-GT",
+    "country": "South Africa",
+    "iso3166_1": "ZA",
+    "latitude": -26.2041,
+    "longitude": 28.0473
+  },
+  {
+    "city": "Durban",
+    "state_province": "KwaZulu-Natal",
+    "iso3166_2": "ZA-NL",
+    "country": "South Africa",
+    "iso3166_1": "ZA",
+    "latitude": -29.8587,
+    "longitude": 31.0218
+  },
+  {
+    "city": "Franschhoek",
+    "state_province": "Western Cape",
+    "iso3166_2": "ZA-WC",
+    "country": "South Africa",
+    "iso3166_1": "ZA",
+    "latitude": -33.9146,
+    "longitude": 19.1198
+  },
+  {
+    "city": "Nairobi",
+    "state_province": "Nairobi",
+    "iso3166_2": "KE-30",
+    "country": "Kenya",
+    "iso3166_1": "KE",
+    "latitude": -1.2921,
+    "longitude": 36.8219
+  },
+  {
+    "city": "Buenos Aires",
+    "state_province": "Buenos Aires City",
+    "iso3166_2": "AR-C",
+    "country": "Argentina",
+    "iso3166_1": "AR",
+    "latitude": -34.6037,
+    "longitude": -58.3816
+  },
+  {
+    "city": "Bariloche",
+    "state_province": "Río Negro",
+    "iso3166_2": "AR-R",
+    "country": "Argentina",
+    "iso3166_1": "AR",
+    "latitude": -41.1335,
+    "longitude": -71.3103
+  },
+  {
+    "city": "Bogotá",
+    "state_province": "Bogotá D.C.",
+    "iso3166_2": "CO-DC",
+    "country": "Colombia",
+    "iso3166_1": "CO",
+    "latitude": 4.711,
+    "longitude": -74.0721
+  },
+  {
+    "city": "Medellín",
+    "state_province": "Antioquia",
+    "iso3166_2": "CO-ANT",
+    "country": "Colombia",
+    "iso3166_1": "CO",
+    "latitude": 6.2442,
+    "longitude": -75.5812
+  },
+  {
+    "city": "São Paulo",
+    "state_province": "São Paulo",
+    "iso3166_2": "BR-SP",
+    "country": "Brazil",
+    "iso3166_1": "BR",
+    "latitude": -23.5505,
+    "longitude": -46.6333
+  },
+  {
+    "city": "Curitiba",
+    "state_province": "Paraná",
+    "iso3166_2": "BR-PR",
+    "country": "Brazil",
+    "iso3166_1": "BR",
+    "latitude": -25.4284,
+    "longitude": -49.2733
+  },
+  {
+    "city": "Rio de Janeiro",
+    "state_province": "Rio de Janeiro",
+    "iso3166_2": "BR-RJ",
+    "country": "Brazil",
+    "iso3166_1": "BR",
+    "latitude": -22.9068,
+    "longitude": -43.1729
+  },
+  {
+    "city": "Santiago",
+    "state_province": "Santiago Metropolitan",
+    "iso3166_2": "CL-RM",
+    "country": "Chile",
+    "iso3166_1": "CL",
+    "latitude": -33.4489,
+    "longitude": -70.6693
+  },
+  {
+    "city": "Valdivia",
+    "state_province": "Los Ríos",
+    "iso3166_2": "CL-LR",
+    "country": "Chile",
+    "iso3166_1": "CL",
+    "latitude": -39.8142,
+    "longitude": -73.2459
+  },
+  {
+    "city": "Lima",
+    "state_province": "Lima",
+    "iso3166_2": "PE-LMA",
+    "country": "Peru",
+    "iso3166_1": "PE",
+    "latitude": -12.0464,
+    "longitude": -77.0428
+  },
+  {
+    "city": "Tokyo",
+    "state_province": "Tokyo",
+    "iso3166_2": "JP-13",
+    "country": "Japan",
+    "iso3166_1": "JP",
+    "latitude": 35.6762,
+    "longitude": 139.6503
+  },
+  {
+    "city": "Osaka",
+    "state_province": "Osaka",
+    "iso3166_2": "JP-27",
+    "country": "Japan",
+    "iso3166_1": "JP",
+    "latitude": 34.6937,
+    "longitude": 135.5023
+  },
+  {
+    "city": "Kyoto",
+    "state_province": "Kyoto",
+    "iso3166_2": "JP-26",
+    "country": "Japan",
+    "iso3166_1": "JP",
+    "latitude": 35.0116,
+    "longitude": 135.7681
+  },
+  {
+    "city": "Sapporo",
+    "state_province": "Hokkaido",
+    "iso3166_2": "JP-01",
+    "country": "Japan",
+    "iso3166_1": "JP",
+    "latitude": 43.0618,
+    "longitude": 141.3545
+  },
+  {
+    "city": "Seoul",
+    "state_province": "Seoul",
+    "iso3166_2": "KR-11",
+    "country": "South Korea",
+    "iso3166_1": "KR",
+    "latitude": 37.5665,
+    "longitude": 126.978
+  },
+  {
+    "city": "Busan",
+    "state_province": "Busan",
+    "iso3166_2": "KR-26",
+    "country": "South Korea",
+    "iso3166_1": "KR",
+    "latitude": 35.1796,
+    "longitude": 129.0756
+  },
+  {
+    "city": "Ho Chi Minh City",
+    "state_province": "Ho Chi Minh",
+    "iso3166_2": "VN-SG",
+    "country": "Vietnam",
+    "iso3166_1": "VN",
+    "latitude": 10.8231,
+    "longitude": 106.6297
+  },
+  {
+    "city": "Hanoi",
+    "state_province": "Hanoi",
+    "iso3166_2": "VN-HN",
+    "country": "Vietnam",
+    "iso3166_1": "VN",
+    "latitude": 21.0285,
+    "longitude": 105.8542
+  },
+  {
+    "city": "Da Nang",
+    "state_province": "Da Nang",
+    "iso3166_2": "VN-DN",
+    "country": "Vietnam",
+    "iso3166_1": "VN",
+    "latitude": 16.0544,
+    "longitude": 108.2022
+  },
+  {
+    "city": "Bangkok",
+    "state_province": "Bangkok",
+    "iso3166_2": "TH-10",
+    "country": "Thailand",
+    "iso3166_1": "TH",
+    "latitude": 13.7563,
+    "longitude": 100.5018
+  },
+  {
+    "city": "Taipei",
+    "state_province": "Taipei",
+    "iso3166_2": "TW-TPE",
+    "country": "Taiwan",
+    "iso3166_1": "TW",
+    "latitude": 25.033,
+    "longitude": 121.5654
+  },
+  {
+    "city": "Beijing",
+    "state_province": "Beijing",
+    "iso3166_2": "CN-BJ",
+    "country": "China",
+    "iso3166_1": "CN",
+    "latitude": 39.9042,
+    "longitude": 116.4074
+  },
+  {
+    "city": "Shanghai",
+    "state_province": "Shanghai",
+    "iso3166_2": "CN-SH",
+    "country": "China",
+    "iso3166_1": "CN",
+    "latitude": 31.2304,
+    "longitude": 121.4737
+  },
+  {
+    "city": "Bengaluru",
+    "state_province": "Karnataka",
+    "iso3166_2": "IN-KA",
+    "country": "India",
+    "iso3166_1": "IN",
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  {
+    "city": "Singapore",
+    "state_province": "Central Singapore",
+    "iso3166_2": "SG-01",
+    "country": "Singapore",
+    "iso3166_1": "SG",
+    "latitude": 1.3521,
+    "longitude": 103.8198
+  },
+  {
+    "city": "Melbourne",
+    "state_province": "Victoria",
+    "iso3166_2": "AU-VIC",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -37.8136,
+    "longitude": 144.9631
+  },
+  {
+    "city": "Sydney",
+    "state_province": "New South Wales",
+    "iso3166_2": "AU-NSW",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -33.8688,
+    "longitude": 151.2093
+  },
+  {
+    "city": "Brisbane",
+    "state_province": "Queensland",
+    "iso3166_2": "AU-QLD",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -27.4705,
+    "longitude": 153.026
+  },
+  {
+    "city": "Adelaide",
+    "state_province": "South Australia",
+    "iso3166_2": "AU-SA",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -34.9285,
+    "longitude": 138.6007
+  },
+  {
+    "city": "Perth",
+    "state_province": "Western Australia",
+    "iso3166_2": "AU-WA",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -31.9505,
+    "longitude": 115.8605
+  },
+  {
+    "city": "Hobart",
+    "state_province": "Tasmania",
+    "iso3166_2": "AU-TAS",
+    "country": "Australia",
+    "iso3166_1": "AU",
+    "latitude": -42.8821,
+    "longitude": 147.3272
+  },
+  {
+    "city": "Wellington",
+    "state_province": "Wellington",
+    "iso3166_2": "NZ-WGN",
+    "country": "New Zealand",
+    "iso3166_1": "NZ",
+    "latitude": -41.2865,
+    "longitude": 174.7762
+  },
+  {
+    "city": "Auckland",
+    "state_province": "Auckland",
+    "iso3166_2": "NZ-AUK",
+    "country": "New Zealand",
+    "iso3166_1": "NZ",
+    "latitude": -36.8485,
+    "longitude": 174.7633
+  },
+  {
+    "city": "Christchurch",
+    "state_province": "Canterbury",
+    "iso3166_2": "NZ-CAN",
+    "country": "New Zealand",
+    "iso3166_1": "NZ",
+    "latitude": -43.532,
+    "longitude": 172.6306
+  },
+  {
+    "city": "Nelson",
+    "state_province": "Nelson",
+    "iso3166_2": "NZ-NSN",
+    "country": "New Zealand",
+    "iso3166_1": "NZ",
+    "latitude": -41.2706,
+    "longitude": 173.284
+  },
+  {
+    "city": "Munich",
+    "state_province": "Bavaria",
+    "iso3166_2": "DE-BY",
+    "country": "Germany",
+    "iso3166_1": "DE",
+    "latitude": 48.1351,
+    "longitude": 11.582
+  },
+  {
+    "city": "Berlin",
+    "state_province": "Berlin",
+    "iso3166_2": "DE-BE",
+    "country": "Germany",
+    "iso3166_1": "DE",
+    "latitude": 52.52,
+    "longitude": 13.405
+  },
+  {
+    "city": "Cologne",
+    "state_province": "North Rhine-Westphalia",
+    "iso3166_2": "DE-NW",
+    "country": "Germany",
+    "iso3166_1": "DE",
+    "latitude": 50.9375,
+    "longitude": 6.9603
+  },
+  {
+    "city": "Bamberg",
+    "state_province": "Bavaria",
+    "iso3166_2": "DE-BY",
+    "country": "Germany",
+    "iso3166_1": "DE",
+    "latitude": 49.8916,
+    "longitude": 10.8916
+  },
+  {
+    "city": "Brussels",
+    "state_province": "Brussels-Capital",
+    "iso3166_2": "BE-BRU",
+    "country": "Belgium",
+    "iso3166_1": "BE",
+    "latitude": 50.8503,
+    "longitude": 4.3517
+  },
+  {
+    "city": "Antwerp",
+    "state_province": "Flanders",
+    "iso3166_2": "BE-VLG",
+    "country": "Belgium",
+    "iso3166_1": "BE",
+    "latitude": 51.2194,
+    "longitude": 4.4025
+  },
+  {
+    "city": "Bruges",
+    "state_province": "Flanders",
+    "iso3166_2": "BE-VLG",
+    "country": "Belgium",
+    "iso3166_1": "BE",
+    "latitude": 51.2093,
+    "longitude": 3.2247
+  },
+  {
+    "city": "London",
+    "state_province": "England",
+    "iso3166_2": "GB-ENG",
+    "country": "United Kingdom",
+    "iso3166_1": "GB",
+    "latitude": 51.5074,
+    "longitude": -0.1278
+  },
+  {
+    "city": "Bristol",
+    "state_province": "England",
+    "iso3166_2": "GB-ENG",
+    "country": "United Kingdom",
+    "iso3166_1": "GB",
+    "latitude": 51.4545,
+    "longitude": -2.5879
+  },
+  {
+    "city": "Edinburgh",
+    "state_province": "Scotland",
+    "iso3166_2": "GB-SCT",
+    "country": "United Kingdom",
+    "iso3166_1": "GB",
+    "latitude": 55.9533,
+    "longitude": -3.1883
+  },
+  {
+    "city": "Glasgow",
+    "state_province": "Scotland",
+    "iso3166_2": "GB-SCT",
+    "country": "United Kingdom",
+    "iso3166_1": "GB",
+    "latitude": 55.8642,
+    "longitude": -4.2518
+  },
+  {
+    "city": "Prague",
+    "state_province": "Prague",
+    "iso3166_2": "CZ-10",
+    "country": "Czechia",
+    "iso3166_1": "CZ",
+    "latitude": 50.0755,
+    "longitude": 14.4378
+  },
+  {
+    "city": "Pilsen",
+    "state_province": "Plzeň",
+    "iso3166_2": "CZ-32",
+    "country": "Czechia",
+    "iso3166_1": "CZ",
+    "latitude": 49.7384,
+    "longitude": 13.3736
+  },
+  {
+    "city": "Amsterdam",
+    "state_province": "North Holland",
+    "iso3166_2": "NL-NH",
+    "country": "Netherlands",
+    "iso3166_1": "NL",
+    "latitude": 52.3676,
+    "longitude": 4.9041
+  },
+  {
+    "city": "Copenhagen",
+    "state_province": "Capital Region",
+    "iso3166_2": "DK-84",
+    "country": "Denmark",
+    "iso3166_1": "DK",
+    "latitude": 55.6761,
+    "longitude": 12.5683
+  },
+  {
+    "city": "Warsaw",
+    "state_province": "Masovian",
+    "iso3166_2": "PL-MZ",
+    "country": "Poland",
+    "iso3166_1": "PL",
+    "latitude": 52.2297,
+    "longitude": 21.0122
+  },
+  {
+    "city": "Krakow",
+    "state_province": "Lesser Poland",
+    "iso3166_2": "PL-MA",
+    "country": "Poland",
+    "iso3166_1": "PL",
+    "latitude": 50.0647,
+    "longitude": 19.945
+  },
+  {
+    "city": "Rome",
+    "state_province": "Lazio",
+    "iso3166_2": "IT-62",
+    "country": "Italy",
+    "iso3166_1": "IT",
+    "latitude": 41.9028,
+    "longitude": 12.4964
+  },
+  {
+    "city": "Milan",
+    "state_province": "Lombardy",
+    "iso3166_2": "IT-25",
+    "country": "Italy",
+    "iso3166_1": "IT",
+    "latitude": 45.4642,
+    "longitude": 9.19
+  },
+  {
+    "city": "Barcelona",
+    "state_province": "Catalonia",
+    "iso3166_2": "ES-CT",
+    "country": "Spain",
+    "iso3166_1": "ES",
+    "latitude": 41.3851,
+    "longitude": 2.1734
+  },
+  {
+    "city": "Madrid",
+    "state_province": "Madrid",
+    "iso3166_2": "ES-MD",
+    "country": "Spain",
+    "iso3166_1": "ES",
+    "latitude": 40.4168,
+    "longitude": -3.7038
+  },
+  {
+    "city": "Paris",
+    "state_province": "Île-de-France",
+    "iso3166_2": "FR-IDF",
+    "country": "France",
+    "iso3166_1": "FR",
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  {
+    "city": "Lyon",
+    "state_province": "Auvergne-Rhône-Alpes",
+    "iso3166_2": "FR-ARA",
+    "country": "France",
+    "iso3166_1": "FR",
+    "latitude": 45.764,
+    "longitude": 4.8357
+  },
+  {
+    "city": "Stockholm",
+    "state_province": "Stockholm",
+    "iso3166_2": "SE-AB",
+    "country": "Sweden",
+    "iso3166_1": "SE",
+    "latitude": 59.3293,
+    "longitude": 18.0686
+  },
+  {
+    "city": "Gothenburg",
+    "state_province": "Västra Götaland",
+    "iso3166_2": "SE-O",
+    "country": "Sweden",
+    "iso3166_1": "SE",
+    "latitude": 57.7089,
+    "longitude": 11.9746
+  },
+  {
+    "city": "Oslo",
+    "state_province": "Oslo",
+    "iso3166_2": "NO-03",
+    "country": "Norway",
+    "iso3166_1": "NO",
+    "latitude": 59.9139,
+    "longitude": 10.7522
+  },
+  {
+    "city": "Dublin",
+    "state_province": "Leinster",
+    "iso3166_2": "IE-L",
+    "country": "Ireland",
+    "iso3166_1": "IE",
+    "latitude": 53.3498,
+    "longitude": -6.2603
+  },
+  {
+    "city": "Vienna",
+    "state_province": "Vienna",
+    "iso3166_2": "AT-9",
+    "country": "Austria",
+    "iso3166_1": "AT",
+    "latitude": 48.2082,
+    "longitude": 16.3738
+  },
+  {
+    "city": "Zurich",
+    "state_province": "Zurich",
+    "iso3166_2": "CH-ZH",
+    "country": "Switzerland",
+    "iso3166_1": "CH",
+    "latitude": 47.3769,
+    "longitude": 8.5417
+  },
+  {
+    "city": "Tallinn",
+    "state_province": "Harju",
+    "iso3166_2": "EE-37",
+    "country": "Estonia",
+    "iso3166_1": "EE",
+    "latitude": 59.437,
+    "longitude": 24.7536
+  },
+  {
+    "city": "Denver",
+    "state_province": "Colorado",
+    "iso3166_2": "US-CO",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 39.7392,
+    "longitude": -104.9903
+  },
+  {
+    "city": "Portland",
+    "state_province": "Oregon",
+    "iso3166_2": "US-OR",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 45.5152,
+    "longitude": -122.6784
+  },
+  {
+    "city": "San Diego",
+    "state_province": "California",
+    "iso3166_2": "US-CA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 32.7157,
+    "longitude": -117.1611
+  },
+  {
+    "city": "Asheville",
+    "state_province": "North Carolina",
+    "iso3166_2": "US-NC",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 35.5951,
+    "longitude": -82.5515
+  },
+  {
+    "city": "Grand Rapids",
+    "state_province": "Michigan",
+    "iso3166_2": "US-MI",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 42.9634,
+    "longitude": -85.6681
+  },
+  {
+    "city": "Chicago",
+    "state_province": "Illinois",
+    "iso3166_2": "US-IL",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 41.8781,
+    "longitude": -87.6298
+  },
+  {
+    "city": "Seattle",
+    "state_province": "Washington",
+    "iso3166_2": "US-WA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 47.6062,
+    "longitude": -122.3321
+  },
+  {
+    "city": "Austin",
+    "state_province": "Texas",
+    "iso3166_2": "US-TX",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 30.2672,
+    "longitude": -97.7431
+  },
+  {
+    "city": "Boston",
+    "state_province": "Massachusetts",
+    "iso3166_2": "US-MA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 42.3601,
+    "longitude": -71.0589
+  },
+  {
+    "city": "Philadelphia",
+    "state_province": "Pennsylvania",
+    "iso3166_2": "US-PA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 39.9526,
+    "longitude": -75.1652
+  },
+  {
+    "city": "Brooklyn",
+    "state_province": "New York",
+    "iso3166_2": "US-NY",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 40.6782,
+    "longitude": -73.9442
+  },
+  {
+    "city": "Milwaukee",
+    "state_province": "Wisconsin",
+    "iso3166_2": "US-WI",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 43.0389,
+    "longitude": -87.9065
+  },
+  {
+    "city": "Richmond",
+    "state_province": "Virginia",
+    "iso3166_2": "US-VA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 37.5407,
+    "longitude": -77.436
+  },
+  {
+    "city": "Cincinnati",
+    "state_province": "Ohio",
+    "iso3166_2": "US-OH",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 39.1031,
+    "longitude": -84.512
+  },
+  {
+    "city": "St. Louis",
+    "state_province": "Missouri",
+    "iso3166_2": "US-MO",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 38.627,
+    "longitude": -90.1994
+  },
+  {
+    "city": "Tampa",
+    "state_province": "Florida",
+    "iso3166_2": "US-FL",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 27.9506,
+    "longitude": -82.4572
+  },
+  {
+    "city": "Minneapolis",
+    "state_province": "Minnesota",
+    "iso3166_2": "US-MN",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 44.9778,
+    "longitude": -93.265
+  },
+  {
+    "city": "Burlington",
+    "state_province": "Vermont",
+    "iso3166_2": "US-VT",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 44.4759,
+    "longitude": -73.2121
+  },
+  {
+    "city": "Portland",
+    "state_province": "Maine",
+    "iso3166_2": "US-ME",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 43.6591,
+    "longitude": -70.2568
+  },
+  {
+    "city": "Atlanta",
+    "state_province": "Georgia",
+    "iso3166_2": "US-GA",
+    "country": "United States",
+    "iso3166_1": "US",
+    "latitude": 33.749,
+    "longitude": -84.388
+  },
+  {
+    "city": "Toronto",
+    "state_province": "Ontario",
+    "iso3166_2": "CA-ON",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 43.651,
+    "longitude": -79.347
+  },
+  {
+    "city": "Vancouver",
+    "state_province": "British Columbia",
+    "iso3166_2": "CA-BC",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 49.2827,
+    "longitude": -123.1207
+  },
+  {
+    "city": "Montreal",
+    "state_province": "Quebec",
+    "iso3166_2": "CA-QC",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 45.5017,
+    "longitude": -73.5673
+  },
+  {
+    "city": "Calgary",
+    "state_province": "Alberta",
+    "iso3166_2": "CA-AB",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 51.0447,
+    "longitude": -114.0719
+  },
+  {
+    "city": "Halifax",
+    "state_province": "Nova Scotia",
+    "iso3166_2": "CA-NS",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 44.6488,
+    "longitude": -63.5752
+  },
+  {
+    "city": "Mexico City",
+    "state_province": "Mexico City",
+    "iso3166_2": "MX-CMX",
+    "country": "Mexico",
+    "iso3166_1": "MX",
+    "latitude": 19.4326,
+    "longitude": -99.1332
+  },
+  {
+    "city": "Tijuana",
+    "state_province": "Baja California",
+    "iso3166_2": "MX-BCN",
+    "country": "Mexico",
+    "iso3166_1": "MX",
+    "latitude": 32.5149,
+    "longitude": -117.0382
+  },
+  {
+    "city": "Monterrey",
+    "state_province": "Nuevo León",
+    "iso3166_2": "MX-NLE",
+    "country": "Mexico",
+    "iso3166_1": "MX",
+    "latitude": 25.6866,
+    "longitude": -100.3161
+  },
+  {
+    "city": "Guadalajara",
+    "state_province": "Jalisco",
+    "iso3166_2": "MX-JAL",
+    "country": "Mexico",
+    "iso3166_1": "MX",
+    "latitude": 20.6597,
+    "longitude": -103.3496
+  },
+  {
+    "city": "Ensenada",
+    "state_province": "Baja California",
+    "iso3166_2": "MX-BCN",
+    "country": "Mexico",
+    "iso3166_1": "MX",
+    "latitude": 31.8667,
+    "longitude": -116.5964
+  }
+]
