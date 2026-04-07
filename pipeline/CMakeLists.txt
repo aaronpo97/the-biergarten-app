@@ -102,3 +102,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
     CURL::libcurl
 )
+
+# =============================================================================
+# 6. Runtime Assets
+# =============================================================================
+# Make locations.json available in the build directory for runtime relative path
+# lookups (e.g. when running from ./build).
+configure_file(
+    ${CMAKE_SOURCE_DIR}/locations.json
+    ${CMAKE_BINARY_DIR}/locations.json
+    COPYONLY
+)

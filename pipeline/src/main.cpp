@@ -126,6 +126,15 @@ int main(int argc, char* argv[]) {
       return generator.Run();
 
    } catch (const std::exception& e) {
+      const std::string message = e.what() ? e.what() : "";
+
+      if (message.find("LlamaGenerator: malformed brewery response") !=
+          std::string::npos) {
+         spdlog::warn("WARNING: Non-fatal LLM failure after retries: {}",
+                      message);
+         return 0;
+      }
+
       spdlog::error("ERROR: Application failed: {}", e.what());
       return 1;
    }

@@ -58,7 +58,7 @@ auto BiergartenDataGenerator::QueryCitiesWithCountries()
    auto all_locations = JsonLoader::LoadLocations(locations_path.string());
    spdlog::info("  Locations available: {}", all_locations.size());
 
-   const size_t sample_count = std::min<size_t>(30, all_locations.size());
+   const size_t sample_count = std::min<size_t>(4, all_locations.size());
    std::vector<Location> sampled_locations;
    sampled_locations.reserve(sample_count);
 
@@ -106,11 +106,27 @@ void BiergartenDataGenerator::GenerateBreweries(
    spdlog::info("\n=== SAMPLE BREWERY GENERATION ===");
    generatedBreweries_.clear();
 
+   size_t skipped_count = 0;
+
    for (const auto& enriched_city : cities) {
-      auto brewery = generator.GenerateBrewery(enriched_city.location.city,
-                                               enriched_city.location.country,
-                                               enriched_city.region_context);
-      generatedBreweries_.push_back({enriched_city.location, brewery});
+      try {
+         auto brewery = generator.GenerateBrewery(enriched_city.location.city,
+                                                  enriched_city.location.country,
+                                                  enriched_city.region_context);
+         generatedBreweries_.push_back({enriched_city.location, brewery});
+      } catch (const std::exception& e) {
+         ++skipped_count;
+         spdlog::warn(
+             "[Pipeline] Skipping city '{}' ({}): brewery generation failed: {}",
+             enriched_city.location.city, enriched_city.location.country,
+             e.what());
+      }
+   }
+
+   if (skipped_count > 0) {
+      spdlog::warn("[Pipeline] Skipped {} city/cities due to generation "
+                   "errors",
+                   skipped_count);
    }
 }
 
