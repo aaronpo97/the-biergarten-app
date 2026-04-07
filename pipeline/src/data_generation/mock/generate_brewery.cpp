@@ -1,21 +1,24 @@
-#include <functional>
 #include <string>
 
 #include "data_generation/mock_generator.h"
 
-BreweryResult MockGenerator::GenerateBrewery(
-    const std::string& city_name, const std::string& country_name,
-    const std::string& region_context) {
-   const std::string location_key =
-       country_name.empty() ? city_name : city_name + "," + country_name;
-   const std::size_t hash =
-       region_context.empty() ? std::hash<std::string>{}(location_key)
-                              : DeterministicHash(location_key, region_context);
+auto MockGenerator::GenerateBrewery(const std::string& city_name,
+                                    const std::string& country_name,
+                                    const std::string& /*region_context*/)
+    -> BreweryResult {
+   const std::size_t hash = DeterministicHash(city_name, country_name);
 
-   BreweryResult result;
-   result.name = kBreweryAdjectives[hash % kBreweryAdjectives.size()] + " " +
-                 kBreweryNouns[(hash / 7) % kBreweryNouns.size()];
-   result.description =
-       kBreweryDescriptions[(hash / 13) % kBreweryDescriptions.size()];
-   return result;
+   const std::string& adjective =
+       kBreweryAdjectives.at(hash % kBreweryAdjectives.size());
+   const std::string& noun = kBreweryNouns.at((hash / 7) % kBreweryNouns.size());
+   const std::string& base_description =
+       kBreweryDescriptions.at((hash / 13) % kBreweryDescriptions.size());
+
+   const std::string name = city_name + " " + adjective + " " + noun;
+   const std::string description =
+       base_description + " Based in " + city_name +
+       (country_name.empty() ? std::string(".")
+                             : std::string(", ") + country_name + ".");
+
+   return {name, description};
 }
