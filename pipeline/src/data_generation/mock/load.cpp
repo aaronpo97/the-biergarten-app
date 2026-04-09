@@ -1,3 +1,9 @@
+/**
+ * @file data_generation/mock/load.cpp
+ * @brief Provides MockGenerator initialization behavior, which is a no-op load
+ * path that logs readiness without model resources.
+ */
+
 #include <spdlog/spdlog.h>
 
 #include <string>

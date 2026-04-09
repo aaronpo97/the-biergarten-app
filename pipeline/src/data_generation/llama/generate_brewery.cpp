@@ -1,8 +1,7 @@
 /**
- * Brewery Data Generation Module
- * Uses the LLM to generate realistic brewery names and descriptions for a given
- * location. Implements retry logic with validation and error correction to
- * ensure valid JSON output conforming to the expected schema.
+ * @file data_generation/llama/generate_brewery.cpp
+ * @brief Builds brewery prompts with regional context, performs retry-based
+ * inference, and validates structured JSON output for brewery records.
  */
 
 #include <spdlog/spdlog.h>

@@ -1,3 +1,9 @@
+/**
+ * @file data_generation/mock/data.cpp
+ * @brief Defines static lookup tables used by MockGenerator for deterministic
+ * brewery names, descriptions, usernames, and bios.
+ */
+
 #include <string>
 #include <vector>
 

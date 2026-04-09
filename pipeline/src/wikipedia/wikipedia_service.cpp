@@ -1,3 +1,9 @@
+/**
+ * @file wikipedia/wikipedia_service.cpp
+ * @brief Implements Wikipedia extract retrieval and caching for city/country
+ * queries, including response parsing and resilient error handling.
+ */
+
 #include "wikipedia/wikipedia_service.h"
 
 #include <spdlog/spdlog.h>

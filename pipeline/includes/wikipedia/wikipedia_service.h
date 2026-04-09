@@ -1,6 +1,11 @@
 #ifndef BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
 #define BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
 
+/**
+ * @file wikipedia/wikipedia_service.h
+ * @brief Wikipedia summary retrieval service with in-memory caching.
+ */
+
 #include <memory>
 #include <string>
 #include <string_view>

@@ -1,8 +1,7 @@
 /**
- * Sampling Configuration Module
- * Configures the hyperparameters that control probabilistic token selection
- * during text generation. These settings affect the randomness, diversity, and
- * quality of generated output.
+ * @file data_generation/llama/set_sampling_options.cpp
+ * @brief Validates and stores sampling temperature, top-p, seed, and context
+ * size configuration used by subsequent LlamaGenerator inference calls.
  */
 
 #include <stdexcept>

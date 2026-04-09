@@ -1,3 +1,9 @@
+/**
+ * @file main.cpp
+ * @brief Parses command-line options, validates runtime mode selection,
+ * initializes shared infrastructure, and executes the pipeline entry flow.
+ */
+
 #include <spdlog/spdlog.h>
 
 #include <boost/program_options.hpp>

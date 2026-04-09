@@ -1,7 +1,7 @@
 /**
- * Destructor Module
- * Ensures proper cleanup of llama.cpp resources (context and model) when the
- * generator is destroyed, preventing memory leaks and resource exhaustion.
+ * @file data_generation/llama/destructor.cpp
+ * @brief Releases llama model/context resources and backend state during
+ * LlamaGenerator teardown to avoid leaks across runs.
  */
 
 #include "data_generation/llama_generator.h"

@@ -1,9 +1,7 @@
 /**
- * Helper Functions Module
- * Provides utility functions for text processing, parsing, and chat template
- * formatting. Functions handle whitespace normalization, response parsing, and
- * conversion of prompts to proper chat format using the model's built-in
- * template.
+ * @file data_generation/llama/helpers.cpp
+ * @brief Provides prompt formatting, whitespace normalization, response
+ * parsing, token decoding, and JSON validation helpers for Llama modules.
  */
 
 #include <algorithm>

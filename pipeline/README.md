@@ -6,7 +6,7 @@ A C++23 tool for processing geographic data and generating brewery metadata. It 
 
 The pipeline runs in four stages:
 
-- **Query**: Loads and samples from a local `locations.json` manifest.
+- **Query**: Loads and samples from a local `locations.json` file.
 - **Enrich**: Fetches regional and cultural context from Wikipedia in parallel using `std::async`.
 - **Generate**: Creates authentic brewery names and descriptions using a local GGUF model or a deterministic mock.
 - **Log**: Outputs results and metadata summaries via spdlog.
@@ -26,7 +26,9 @@ The pipeline runs in four stages:
 
 ## Hardware & GPU Config
 
-### Test Machine
+### Test Machines
+
+#### x86/64 Linux, NVIDIA RTX 2000
 
 - **Host**: ThinkPad P1 Gen 7 (Fedora 43)
 - **CPU**: Intel Core Ultra 7 155H
@@ -35,11 +37,25 @@ The pipeline runs in four stages:
 - **Model**: Qwen3-8B-Q6-K
 - **Inference**: llama.cpp with CUDA 12.x support
 
+#### ARM MacOS, M1 Pro
+
+- **Host**: MacBook Pro 14" (2021)
+- **CPU**: Apple M1 Pro (8-core)
+- **GPU**: Apple M1 Pro (14-core) [Integrated]
+- **Memory**: 16GB
+- **Model**: Qwen3-8B-Q6-K
+- **Inference**: llama.cpp with Metal (MPS) support
+
 ### GPU Build Flags
 
 ```bash
 cmake -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=89 ..
 cmake --build . --config Release
+```
+
+```zsh
+cmake ..
+cmake --build .
 ```
 
 ## Core Components

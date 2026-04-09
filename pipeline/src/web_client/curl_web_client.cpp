@@ -1,3 +1,9 @@
+/**
+ * @file web_client/curl_web_client.cpp
+ * @brief Implements libcurl-backed HTTP utilities, including GET requests,
+ * file downloads, URL encoding, and RAII global curl lifecycle handling.
+ */
+
 #include "web_client/curl_web_client.h"
 
 #include <curl/curl.h>

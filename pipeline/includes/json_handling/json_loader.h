@@ -1,6 +1,11 @@
 #ifndef BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
 #define BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
 
+/**
+ * @file json_handling/json_loader.h
+ * @brief Loader API for curated location data.
+ */
+
 #include <string>
 #include <vector>
 

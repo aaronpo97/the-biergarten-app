@@ -1,3 +1,9 @@
+/**
+ * @file biergarten_data_generator.cpp
+ * @brief Orchestrates end-to-end pipeline execution for city sampling,
+ * Wikipedia enrichment, generator initialization, and brewery result output.
+ */
+
 #include "biergarten_data_generator.h"
 
 #include <spdlog/spdlog.h>
@@ -14,11 +20,11 @@
 #include "wikipedia/wikipedia_service.h"
 
 BiergartenDataGenerator::BiergartenDataGenerator(
-   const ApplicationOptions& options, std::shared_ptr<WebClient> web_client)
-   : options_(options), webClient_(std::move(web_client)) {}
+    const ApplicationOptions& options, std::shared_ptr<WebClient> web_client)
+    : options_(options), webClient_(std::move(web_client)) {}
 
 auto BiergartenDataGenerator::InitializeGenerator()
-   -> std::unique_ptr<DataGenerator> {
+    -> std::unique_ptr<DataGenerator> {
    spdlog::info("Initializing brewery generator...");
 
    std::unique_ptr<DataGenerator> generator;
@@ -43,7 +49,7 @@ auto BiergartenDataGenerator::InitializeGenerator()
 }
 
 auto BiergartenDataGenerator::QueryCitiesWithCountries()
-   -> std::vector<Location> {
+    -> std::vector<Location> {
    spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
    std::filesystem::path locations_path = "locations.json";
@@ -72,7 +78,7 @@ auto BiergartenDataGenerator::QueryCitiesWithCountries()
 }
 
 auto BiergartenDataGenerator::EnrichWithWikipedia(
-   const std::vector<Location>& cities) -> std::vector<EnrichedCity> {
+    const std::vector<Location>& cities) -> std::vector<EnrichedCity> {
    std::vector<EnrichedCity> enriched;
    enriched.reserve(cities.size());
 
@@ -80,18 +86,15 @@ auto BiergartenDataGenerator::EnrichWithWikipedia(
    pending.reserve(cities.size());
 
    for (const auto& city : cities) {
-      pending.push_back(std::async(std::launch::async,
-                                   [web_client = webClient_, city]() {
-                                      WikipediaService wikipedia_service(
-                                          web_client);
-                                      const std::string region_context =
-                                          wikipedia_service.GetSummary(
-                                              city.city, city.country);
-                                      spdlog::debug(
-                                          "[Pipeline] Region context for {}: {}",
-                                          city.city, region_context);
-                                      return EnrichedCity{city, region_context};
-                                   }));
+      pending.push_back(
+          std::async(std::launch::async, [web_client = webClient_, city]() {
+             WikipediaService wikipedia_service(web_client);
+             const std::string region_context =
+                 wikipedia_service.GetSummary(city.city, city.country);
+             spdlog::debug("[Pipeline] Region context for {}: {}", city.city,
+                           region_context);
+             return EnrichedCity{city, region_context};
+          }));
    }
 
    for (auto& task : pending) {
@@ -110,23 +113,25 @@ void BiergartenDataGenerator::GenerateBreweries(
 
    for (const auto& enriched_city : cities) {
       try {
-         auto brewery = generator.GenerateBrewery(enriched_city.location.city,
-                                                  enriched_city.location.country,
-                                                  enriched_city.region_context);
+         auto brewery = generator.GenerateBrewery(
+             enriched_city.location.city, enriched_city.location.country,
+             enriched_city.region_context);
          generatedBreweries_.push_back({enriched_city.location, brewery});
       } catch (const std::exception& e) {
          ++skipped_count;
          spdlog::warn(
-             "[Pipeline] Skipping city '{}' ({}): brewery generation failed: {}",
+             "[Pipeline] Skipping city '{}' ({}): brewery generation failed: "
+             "{}",
              enriched_city.location.city, enriched_city.location.country,
              e.what());
       }
    }
 
    if (skipped_count > 0) {
-      spdlog::warn("[Pipeline] Skipped {} city/cities due to generation "
-                   "errors",
-                   skipped_count);
+      spdlog::warn(
+          "[Pipeline] Skipped {} city/cities due to generation "
+          "errors",
+          skipped_count);
    }
 }
 
@@ -134,11 +139,12 @@ void BiergartenDataGenerator::LogResults() const {
    spdlog::info("\n=== GENERATED DATA DUMP ===");
    size_t index = 1;
    for (const auto& entry : generatedBreweries_) {
-      spdlog::info("{}. city=\"{}\" country=\"{}\" state=\"{}\" "
-                   "iso3166_2={} lat={} lon={}",
-                   index, entry.location.city, entry.location.country,
-                   entry.location.state_province, entry.location.iso3166_2,
-                   entry.location.latitude, entry.location.longitude);
+      spdlog::info(
+          "{}. city=\"{}\" country=\"{}\" state=\"{}\" "
+          "iso3166_2={} lat={} lon={}",
+          index, entry.location.city, entry.location.country,
+          entry.location.state_province, entry.location.iso3166_2,
+          entry.location.latitude, entry.location.longitude);
       spdlog::info("   brewery_name=\"{}\"", entry.brewery.name);
       spdlog::info("   brewery_description=\"{}\"", entry.brewery.description);
       ++index;

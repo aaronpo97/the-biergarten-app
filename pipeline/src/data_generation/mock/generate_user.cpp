@@ -1,3 +1,9 @@
+/**
+ * @file data_generation/mock/generate_user.cpp
+ * @brief Generates deterministic mock user profiles by hashing locale values
+ * into predefined username and bio collections.
+ */
+
 #include <functional>
 #include <string>
 

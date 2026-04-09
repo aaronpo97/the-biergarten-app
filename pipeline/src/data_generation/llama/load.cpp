@@ -1,8 +1,7 @@
 /**
- * Model Loading Module
- * This module handles loading a pre-trained LLM model from disk and
- * initializing the llama.cpp context for inference. It performs one-time setup
- * required before any inference operations can be performed.
+ * @file data_generation/llama/load.cpp
+ * @brief Initializes llama backend, loads model weights, creates inference
+ * context, and resets prior resources during model reload.
  */
 
 #include <spdlog/spdlog.h>

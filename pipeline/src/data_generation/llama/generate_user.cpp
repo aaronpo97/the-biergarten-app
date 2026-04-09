@@ -1,9 +1,7 @@
 /**
- * User Profile Generation Module
- * Uses the LLM to generate realistic user profiles (username and bio) for craft
- * beer enthusiasts. Implements retry logic to handle parsing failures and
- * ensures output adheres to strict format constraints (two lines, specific
- * character limits).
+ * @file data_generation/llama/generate_user.cpp
+ * @brief Generates locale-aware user profiles with strict two-line formatting,
+ * retry handling, and output sanitization for downstream parsing.
  */
 
 #include <spdlog/spdlog.h>

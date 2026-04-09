@@ -1,11 +1,24 @@
-#include <fstream>
-#include <filesystem>
+/**
+ * @file data_generation/llama/load_brewery_prompt.cpp
+ * @brief Resolves brewery system prompt content from cache or filesystem
+ * search paths and provides a robust inline fallback prompt when absent.
+ */
+
 #include <spdlog/spdlog.h>
+
+#include <filesystem>
+#include <fstream>
 
 #include "data_generation/llama_generator.h"
 
 namespace fs = std::filesystem;
 
+/**
+ * @brief Loads brewery system prompt from disk or cache.
+ *
+ * @param prompt_file_path Preferred prompt file location.
+ * @return Prompt text loaded from disk or fallback content.
+ */
 std::string LlamaGenerator::LoadBrewerySystemPrompt(
     const std::string& prompt_file_path) {
    // Return cached version if already loaded
@@ -15,9 +28,9 @@ std::string LlamaGenerator::LoadBrewerySystemPrompt(
 
    // Try multiple path locations
    std::vector<std::string> paths_to_try = {
-       prompt_file_path,                          // As provided
-       "../" + prompt_file_path,                  // One level up
-       "../../" + prompt_file_path,               // Two levels up
+       prompt_file_path,             // As provided
+       "../" + prompt_file_path,     // One level up
+       "../../" + prompt_file_path,  // Two levels up
    };
 
    for (const auto& path : paths_to_try) {
@@ -29,7 +42,8 @@ std::string LlamaGenerator::LoadBrewerySystemPrompt(
 
          if (!prompt.empty()) {
             spdlog::info(
-                "LlamaGenerator: Loaded brewery system prompt from '{}' ({} chars)",
+                "LlamaGenerator: Loaded brewery system prompt from '{}' ({} "
+                "chars)",
                 path, prompt.length());
             brewery_system_prompt_ = prompt;
             return brewery_system_prompt_;
@@ -38,16 +52,23 @@ std::string LlamaGenerator::LoadBrewerySystemPrompt(
    }
 
    spdlog::warn(
-       "LlamaGenerator: Could not open brewery system prompt file at any of the "
+       "LlamaGenerator: Could not open brewery system prompt file at any of "
+       "the "
        "expected locations. Using fallback inline prompt.");
    return GetFallbackBreweryPrompt();
 }
 
-// Fallback: minimal inline prompt if file fails to load
+/**
+ * @brief Provides an inline fallback brewery system prompt.
+ *
+ * @return Default fallback prompt text.
+ */
 std::string LlamaGenerator::GetFallbackBreweryPrompt() {
-   return "You are an experienced brewmaster and owner of a local craft brewery. "
+   return "You are an experienced brewmaster and owner of a local craft "
+          "brewery. "
           "Create a distinctive, authentic name and detailed description that "
-          "genuinely reflects your specific location, brewing philosophy, local "
+          "genuinely reflects your specific location, brewing philosophy, "
+          "local "
           "culture, and community connection. The brewery must feel real and "
           "grounded—not generic or interchangeable.\n\n"
           "AVOID REPETITIVE PHRASES - Never use:\n"
@@ -56,14 +77,16 @@ std::string LlamaGenerator::GetFallbackBreweryPrompt() {
           "into, ancient roots, timeless, where tradition meets innovation\n\n"
           "OPENING APPROACHES - Choose ONE:\n"
           "1. Start with specific beer style and its regional origins\n"
-          "2. Begin with specific brewing challenge (water, altitude, climate)\n"
+          "2. Begin with specific brewing challenge (water, altitude, "
+          "climate)\n"
           "3. Open with founding story or personal motivation\n"
           "4. Lead with specific local ingredient or resource\n"
           "5. Start with unexpected angle or contradiction\n"
           "6. Open with local event, tradition, or cultural moment\n"
           "7. Begin with tangible architectural or geographic detail\n\n"
           "BE SPECIFIC - Include:\n"
-          "- At least ONE concrete proper noun (landmark, river, neighborhood)\n"
+          "- At least ONE concrete proper noun (landmark, river, "
+          "neighborhood)\n"
           "- Specific beer styles relevant to the REGION'S culture\n"
           "- Concrete brewing challenges or advantages\n"
           "- Sensory details SPECIFIC to place—not generic adjectives\n\n"

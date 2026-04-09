@@ -1,6 +1,11 @@
 #ifndef BIERGARTEN_PIPELINE_BIERGARTEN_DATA_GENERATOR_H_
 #define BIERGARTEN_PIPELINE_BIERGARTEN_DATA_GENERATOR_H_
 
+/**
+ * @file biergarten_data_generator.h
+ * @brief Core orchestration class for pipeline data generation.
+ */
+
 #include <memory>
 #include <string>
 #include <vector>

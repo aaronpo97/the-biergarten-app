@@ -1,21 +1,26 @@
+/**
+ * @file json_handling/json_loader.cpp
+ * @brief Parses curated location JSON input into strongly typed Location
+ * records with strict field validation and descriptive error reporting.
+ */
+
 #include "json_handling/json_loader.h"
 
 #include <spdlog/spdlog.h>
 
 #include <boost/json.hpp>
-
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 
 namespace {
 
-auto ReadRequiredString(const boost::json::object& object,
-                        const char* key) -> std::string {
+auto ReadRequiredString(const boost::json::object& object, const char* key)
+    -> std::string {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_string()) {
-      throw std::runtime_error(std::string("Missing or invalid string field: ") +
-                               key);
+      throw std::runtime_error(
+          std::string("Missing or invalid string field: ") + key);
    }
    return std::string(value->as_string().c_str());
 }
@@ -24,8 +29,8 @@ auto ReadRequiredNumber(const boost::json::object& object, const char* key)
     -> double {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_number()) {
-      throw std::runtime_error(std::string("Missing or invalid numeric field: ") +
-                               key);
+      throw std::runtime_error(
+          std::string("Missing or invalid numeric field: ") + key);
    }
    return value->to_number<double>();
 }
@@ -33,7 +38,7 @@ auto ReadRequiredNumber(const boost::json::object& object, const char* key)
 }  // namespace
 
 auto JsonLoader::LoadLocations(const std::string& filepath)
-   -> std::vector<Location> {
+    -> std::vector<Location> {
    std::ifstream input(filepath);
    if (!input.is_open()) {
       throw std::runtime_error("Failed to open locations file: " + filepath);
