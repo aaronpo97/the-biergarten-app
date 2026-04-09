@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "models/location.h"
+#include "data_model/location.h"
 
 /// @brief Loads curated world locations from a JSON file into memory.
 class JsonLoader {
