@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
-#define BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
+#define BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
 
 /**
  * @file wikipedia/wikipedia_service.h
@@ -29,4 +29,4 @@ class WikipediaService {
    std::unordered_map<std::string, std::string> cache_;
 };
 
-#endif  // BIERGARTEN_PIPELINE_WIKIPEDIA_WIKIPEDIA_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
