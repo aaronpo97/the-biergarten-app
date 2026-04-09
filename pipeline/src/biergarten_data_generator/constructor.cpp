@@ -8,5 +8,6 @@
 #include "biergarten_data_generator.h"
 
 BiergartenDataGenerator::BiergartenDataGenerator(
-    ApplicationOptions options, std::unique_ptr<WebClient> web_client)
-    : options_(std::move(options)), webClient_(std::move(web_client)) {}
+   ApplicationOptions const& options, std::shared_ptr<WebClient> web_client)
+   : options_(options), webClient_(std::move(web_client)) {
+}

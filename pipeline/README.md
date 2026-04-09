@@ -1,100 +1,73 @@
 # Biergarten Pipeline
 
-A C++23 tool for processing geographic data and generating brewery metadata. It utilizes a local city manifest, parallel Wikipedia enrichment via `std::async`, and local LLM inference via llama.cpp.
+Biergarten Pipeline is a C++23 command-line tool that reads a local city list, looks up a short Wikipedia summary for each sampled city, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either a local GGUF model or the mock generator to produce the output.
 
-## Overview
+## Pipeline
 
-The pipeline runs in four stages:
+| Stage    | What happens                                                                   |
+| -------- | ------------------------------------------------------------------------------ |
+| Load     | Reads `locations.json` and picks up to four city/country pairs.                |
+| Enrich   | Fetches a short Wikipedia summary for each city in parallel with `std::async`. |
+| Generate | Passes the city, country, and summary to the active generator.                 |
+| Log      | Writes the generated breweries and any warnings through `spdlog`.              |
 
-- **Query**: Loads and samples from a local `locations.json` file.
-- **Enrich**: Fetches regional and cultural context from Wikipedia in parallel using `std::async`.
-- **Generate**: Creates authentic brewery names and descriptions using a local GGUF model or a deterministic mock.
-- **Log**: Outputs results and metadata summaries via spdlog.
-
-## Implementation Details
-
-### Concurrency
-
-- **Async Enrichment**: Wikipedia API lookups are parallelized using `std::async`. Each city is processed in its own thread to hide network latency.
-- **RAII**: Resource management for libcurl handles and llama.cpp weights is handled via constructors/destructors to ensure clean teardown.
-
-### LLM Logic
-
-- **Retries**: Includes a 3-attempt loop with automated error correction. If the model returns invalid JSON, the specific error is fed back into the next prompt.
-- **Context Injection**: Wikipedia summaries are injected into the LLM system prompt to ensure descriptions are grounded in actual regional beer culture.
-- **Sampling**: Temperature, top-p, and seeds are configurable via the CLI.
-
-## Hardware & GPU Config
-
-### Test Machines
-
-#### x86/64 Linux, NVIDIA RTX 2000
-
-- **Host**: ThinkPad P1 Gen 7 (Fedora 43)
-- **CPU**: Intel Core Ultra 7 155H
-- **GPU**: NVIDIA RTX 2000 Ada Generation
-- **Memory**: 32GB
-- **Model**: Qwen3-8B-Q6-K
-- **Inference**: llama.cpp with CUDA 12.x support
-
-#### ARM MacOS, M1 Pro
-
-- **Host**: MacBook Pro 14" (2021)
-- **CPU**: Apple M1 Pro (8-core)
-- **GPU**: Apple M1 Pro (14-core) [Integrated]
-- **Memory**: 16GB
-- **Model**: Qwen3-8B-Q6-K
-- **Inference**: llama.cpp with Metal (MPS) support
-
-### GPU Build Flags
-
-```bash
-cmake -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=89 ..
-cmake --build . --config Release
-```
-
-```zsh
-cmake ..
-cmake --build .
-```
+If one Wikipedia lookup fails, the pipeline skips that city and keeps going.
 
 ## Core Components
 
-| Component               | Function                                                          |
-| ----------------------- | ----------------------------------------------------------------- |
-| BiergartenDataGenerator | Orchestrates the sampling, enrichment, and generation stages.     |
-| WikipediaService        | Fetches and caches summaries for cities and regional beer styles. |
-| LlamaGenerator          | Handles local GGUF inference and output validation.               |
-| JsonLoader              | Parses the local `locations.json` file into internal structures.  |
-| CURLWebClient           | libcurl wrapper for parallel Wikipedia API requests.              |
+| Component               | Role                                                       |
+| ----------------------- | ---------------------------------------------------------- |
+| BiergartenDataGenerator | Orchestrates loading, enrichment, generation, and logging. |
+| WikipediaService        | Fetches city summaries from Wikipedia.                     |
+| LlamaGenerator          | Runs local GGUF inference and validates output.            |
+| MockGenerator           | Produces deterministic fallback data without a model.      |
+| JsonLoader              | Parses the local `locations.json` file.                    |
+| CURLWebClient           | Handles HTTP requests to Wikipedia.                        |
 
-## CLI Options
+## Build
 
-```
-./biergarten-pipeline --model ./path/to/model.gguf [options]
-```
+| Requirement          | Notes                                                                      |
+| -------------------- | -------------------------------------------------------------------------- |
+| C++23 compiler       | GCC 13+ or Clang 16+ are good starting points.                             |
+| CMake                | Version 3.24 or newer.                                                     |
+| libcurl              | Required for Wikipedia requests.                                           |
+| Optional GPU tooling | CUDA on NVIDIA, HIP/ROCm on supported AMD systems, Metal on Apple Silicon. |
 
-| Flag            | Description                                     |
-| --------------- | ----------------------------------------------- |
-| `--mocked`      | Use deterministic mock data instead of an LLM.  |
-| `--model`, `-m` | Path to the GGUF file.                          |
-| `--temperature` | Model temperature (0.0 - 1.0).                  |
-| `--n-ctx`       | Context window size (default: 8192).            |
-| `--cache-dir`   | Directory containing the `locations.json` file. |
-
-## Building
-
-### Requirements
-
-- C++23 compiler (GCC 13+ / Clang 16+)
-- CMake 3.20+
-- Boost (JSON, Program_options), libcurl
-- CUDA Toolkit 12.x (optional for GPU)
-
-### Steps
+Boost, spdlog, and llama.cpp are fetched by CMake. On Apple Silicon, Metal is enabled automatically. On Linux, the build looks for CUDA or HIP/ROCm when the matching toolkit is present. Windows is not supported.
 
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build . -j$(nproc)
+cmake -S . -B build
+cmake --build build
 ```
+
+If the dependency build fails on macOS, check the repo build notes.
+
+## Run
+
+Run the executable from the build directory so the copied `locations.json` is available.
+
+```bash
+./biergarten-pipeline --mocked
+./biergarten-pipeline --model /path/to/model.gguf --temperature 0.8 --top-p 0.92 --n-ctx 8192 --seed -1
+```
+
+| Flag            | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `--mocked`      | Uses the mock generator instead of a model.  |
+| `--model, -m`   | Path to a GGUF model file.                   |
+| `--temperature` | Sampling temperature. Default: `0.8`.        |
+| `--top-p`       | Nucleus sampling parameter. Default: `0.92`. |
+| `--n-ctx`       | Context window size. Default: `8192`.        |
+| `--seed`        | Random seed. Default: `-1`.                  |
+| `--help, -h`    | Prints usage.                                |
+
+`--mocked` and `--model` are mutually exclusive. If neither is set, the program exits with an error. The sampling flags only matter when a model is loaded.
+
+## Layout
+
+| Path             | Use                                         |
+| ---------------- | ------------------------------------------- |
+| `includes/`      | Public headers.                             |
+| `src/`           | Implementation files.                       |
+| `locations.json` | Input city list copied into the build tree. |
+| `prompts/`       | Prompt text used by the model path.         |

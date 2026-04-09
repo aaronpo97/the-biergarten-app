@@ -13,11 +13,10 @@
 
 #include "web_client/curl_web_client.h"
 
-namespace {
 // RAII wrapper for CURL handle using unique_ptr
 using CurlHandle = std::unique_ptr<CURL, decltype(&curl_easy_cleanup)>;
 
-CurlHandle create_handle() {
+static CurlHandle create_handle() {
    CURL* handle = curl_easy_init();
    if (!handle) {
       throw std::runtime_error(
@@ -26,8 +25,8 @@ CurlHandle create_handle() {
    return CurlHandle(handle, &curl_easy_cleanup);
 }
 
-void set_common_get_options(CURL* curl, const std::string& url,
-                            long connect_timeout, long total_timeout) {
+static void set_common_get_options(CURL* curl, const std::string& url,
+                                   long connect_timeout, long total_timeout) {
    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
    curl_easy_setopt(curl, CURLOPT_USERAGENT, "biergarten-pipeline/0.1.0");
    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -38,14 +37,13 @@ void set_common_get_options(CURL* curl, const std::string& url,
 }
 
 // curl write callback that writes to a file stream
-size_t WriteCallbackFile(void* contents, size_t size, size_t nmemb,
-                         void* userp) {
+static size_t WriteCallbackFile(void* contents, size_t size, size_t nmemb,
+                                void* userp) {
    size_t realsize = size * nmemb;
    auto* outFile = static_cast<std::ofstream*>(userp);
    outFile->write(static_cast<char*>(contents), realsize);
    return realsize;
 }
-}  // namespace
 
 void CURLWebClient::DownloadToFile(const std::string& url,
                                    const std::string& file_path) {

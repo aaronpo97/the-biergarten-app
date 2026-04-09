@@ -56,8 +56,8 @@ class BiergartenDataGenerator {
     * @param options Application configuration options.
     * @param web_client HTTP client for downloading data.
     */
-   BiergartenDataGenerator(ApplicationOptions options,
-                           std::unique_ptr<WebClient> web_client);
+   BiergartenDataGenerator(const ApplicationOptions& options,
+                           std::shared_ptr<WebClient> web_client);
 
    /**
     * @brief Run the data generation pipeline.

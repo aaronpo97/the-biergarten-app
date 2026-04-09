@@ -1,0 +1,132 @@
+@startuml
+title Biergarten Pipeline - Class Diagram
+
+left to right direction
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Entry point" {
+  class Main <<entrypoint>> {
+    +main(argc: int, argv: char**): int
+  }
+
+  class CurlGlobalState {
+    +CurlGlobalState()
+    +~CurlGlobalState()
+  }
+}
+
+package "Core orchestration" {
+  class ApplicationOptions <<struct>> {
+    +model_path: std::string
+    +use_mocked: bool
+    +temperature: float
+    +top_p: float
+    +n_ctx: uint32_t
+    +seed: int
+  }
+
+  class BiergartenDataGenerator {
+    -options_: ApplicationOptions
+    -webClient_: std::shared_ptr<WebClient>
+    +BiergartenDataGenerator(options: ApplicationOptions, web_client: std::unique_ptr<WebClient>)
+    +Run(): bool
+    -InitializeGenerator(): std::unique_ptr<DataGenerator>
+    -QueryCitiesWithCountries(): std::vector<Location>
+    -EnrichWithWikipedia(cities: std::vector<Location>): std::vector<EnrichedCity>
+    -GenerateBreweries(generator: DataGenerator&, cities: std::vector<EnrichedCity>): void
+    -LogResults(): void
+  }
+}
+
+package "Shared models" {
+  class Location
+
+  class BreweryResult <<struct>> {
+    +name: std::string
+    +description: std::string
+  }
+
+  class UserResult <<struct>> {
+    +username: std::string
+    +bio: std::string
+  }
+}
+
+package "Generation" {
+  interface DataGenerator {
+    +Load(model_path: std::string): void
+    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
+    +GenerateUser(locale: std::string): UserResult
+  }
+
+  class MockGenerator {
+    +Load(model_path: std::string): void
+    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
+    +GenerateUser(locale: std::string): UserResult
+  }
+
+  class LlamaGenerator {
+    +SetSamplingOptions(temperature: float, top_p: float, seed: int = -1): void
+    +SetContextSize(n_ctx: uint32_t): void
+    +Load(model_path: std::string): void
+    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
+    +GenerateUser(locale: std::string): UserResult
+  }
+}
+
+package "HTTP" {
+  interface WebClient {
+    +DownloadToFile(url: std::string, file_path: std::string): void
+    +Get(url: std::string): std::string
+    +UrlEncode(value: std::string): std::string
+  }
+
+  class CURLWebClient {
+    +CURLWebClient()
+    +~CURLWebClient()
+    +DownloadToFile(url: std::string, file_path: std::string): void
+    +Get(url: std::string): std::string
+    +UrlEncode(value: std::string): std::string
+  }
+}
+
+package "Wikipedia" {
+  class WikipediaService {
+    +WikipediaService(client: std::shared_ptr<WebClient>)
+    +GetSummary(city: std::string_view, country: std::string_view): std::string
+  }
+
+  class JsonLoader {
+    {static} +LoadLocations(filepath: std::string): std::vector<Location>
+  }
+}
+
+Main --> CurlGlobalState
+Main --> ApplicationOptions
+Main --> BiergartenDataGenerator
+Main --> CURLWebClient
+
+BiergartenDataGenerator *-- ApplicationOptions : options_
+BiergartenDataGenerator --> WebClient : shared_ptr
+BiergartenDataGenerator ..> JsonLoader : LoadLocations()
+BiergartenDataGenerator ..> WikipediaService : enrich cities
+BiergartenDataGenerator ..> DataGenerator : initialize generator
+BiergartenDataGenerator ..> Location
+BiergartenDataGenerator ..> BreweryResult
+
+DataGenerator <|.. MockGenerator
+DataGenerator <|.. LlamaGenerator
+WebClient <|.. CURLWebClient
+
+WikipediaService --> WebClient : shared_ptr
+
+note right of BiergartenDataGenerator
+Current behavior:
+samples up to four locations per run.
+Wikipedia enrichment runs asynchronously per sampled city.
+If a lookup fails, that city is skipped.
+end note
+
+@enduml

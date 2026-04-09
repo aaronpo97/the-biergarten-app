@@ -16,12 +16,10 @@
 #include "data_generation/llama_generator.h"
 #include "llama.h"
 
-namespace {
-
 /**
  * String trimming: removes leading and trailing whitespace
  */
-std::string Trim(std::string value) {
+static std::string Trim(std::string value) {
    auto not_space = [](unsigned char ch) { return !std::isspace(ch); };
 
    value.erase(value.begin(),
@@ -36,7 +34,7 @@ std::string Trim(std::string value) {
  * Normalize whitespace: collapses multiple spaces/tabs/newlines into single
  * spaces
  */
-std::string CondenseWhitespace(std::string text) {
+static std::string CondenseWhitespace(std::string text) {
    std::string out;
    out.reserve(text.size());
 
@@ -61,8 +59,8 @@ std::string CondenseWhitespace(std::string text) {
  * Truncate region context to fit within max length while preserving word
  * boundaries
  */
-std::string PrepareRegionContext(std::string_view region_context,
-                                 std::size_t max_chars) {
+static std::string PrepareRegionContext(std::string_view region_context,
+                                        std::size_t max_chars) {
    std::string normalized = CondenseWhitespace(std::string(region_context));
    if (normalized.size() <= max_chars) {
       return normalized;
@@ -81,7 +79,7 @@ std::string PrepareRegionContext(std::string_view region_context,
 /**
  * Remove common bullet points, numbers, and field labels added by LLM in output
  */
-std::string StripCommonPrefix(std::string line) {
+static std::string StripCommonPrefix(std::string line) {
    line = Trim(std::move(line));
 
    if (!line.empty() && (line[0] == '-' || line[0] == '*')) {
@@ -126,7 +124,7 @@ std::string StripCommonPrefix(std::string line) {
  * Parse two-line response from LLM: normalize line endings, strip formatting,
  * filter spurious output, and combine remaining lines if needed
  */
-std::pair<std::string, std::string> ParseTwoLineResponse(
+static std::pair<std::string, std::string> ParseTwoLineResponse(
     const std::string& raw, const std::string& error_message) {
    std::string normalized = raw;
    std::replace(normalized.begin(), normalized.end(), '\r', '\n');
@@ -177,8 +175,8 @@ std::pair<std::string, std::string> ParseTwoLineResponse(
 /**
  * Apply model's chat template to user-only prompt, formatting it for the model
  */
-std::string ToChatPrompt(const llama_model* model,
-                         const std::string& user_prompt) {
+static std::string ToChatPrompt(const llama_model* model,
+                                const std::string& user_prompt) {
    const char* tmpl = llama_model_chat_template(model, nullptr);
    if (tmpl == nullptr) {
       return user_prompt;
@@ -214,9 +212,9 @@ std::string ToChatPrompt(const llama_model* model,
  * Apply model's chat template to system+user prompt pair, formatting for the
  * model
  */
-std::string ToChatPrompt(const llama_model* model,
-                         const std::string& system_prompt,
-                         const std::string& user_prompt) {
+static std::string ToChatPrompt(const llama_model* model,
+                                const std::string& system_prompt,
+                                const std::string& user_prompt) {
    const char* tmpl = llama_model_chat_template(model, nullptr);
    if (tmpl == nullptr) {
       return system_prompt + "\n\n" + user_prompt;
@@ -249,8 +247,8 @@ std::string ToChatPrompt(const llama_model* model,
    return std::string(buffer.data(), static_cast<std::size_t>(required));
 }
 
-void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
-                      std::string& output) {
+static void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
+                             std::string& output) {
    std::array<char, 256> buffer{};
    int32_t bytes =
        llama_token_to_piece(vocab, token, buffer.data(),
@@ -273,7 +271,8 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
    output.append(buffer.data(), static_cast<std::size_t>(bytes));
 }
 
-bool ExtractFirstJsonObject(const std::string& text, std::string& json_out) {
+static bool ExtractFirstJsonObject(const std::string& text,
+                                   std::string& json_out) {
    std::size_t start = std::string::npos;
    int depth = 0;
    bool in_string = false;
@@ -321,8 +320,9 @@ bool ExtractFirstJsonObject(const std::string& text, std::string& json_out) {
    return false;
 }
 
-std::string ValidateBreweryJson(const std::string& raw, std::string& name_out,
-                                std::string& description_out) {
+static std::string ValidateBreweryJson(const std::string& raw,
+                                       std::string& name_out,
+                                       std::string& description_out) {
    auto validate_object = [&](const boost::json::value& jv,
                               std::string& error_out) -> bool {
       if (!jv.is_object()) {
@@ -402,8 +402,6 @@ std::string ValidateBreweryJson(const std::string& raw, std::string& name_out,
 
    return {};
 }
-
-}  // namespace
 
 // Forward declarations for helper functions exposed to other translation units
 std::string PrepareRegionContextPublic(std::string_view region_context,

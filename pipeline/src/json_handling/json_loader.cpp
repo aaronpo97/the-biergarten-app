@@ -13,10 +13,8 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace {
-
-auto ReadRequiredString(const boost::json::object& object, const char* key)
-    -> std::string {
+static auto ReadRequiredString(const boost::json::object& object,
+                               const char* key) -> std::string {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_string()) {
       throw std::runtime_error(
@@ -25,8 +23,8 @@ auto ReadRequiredString(const boost::json::object& object, const char* key)
    return std::string(value->as_string().c_str());
 }
 
-auto ReadRequiredNumber(const boost::json::object& object, const char* key)
-    -> double {
+static auto ReadRequiredNumber(const boost::json::object& object,
+                               const char* key) -> double {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_number()) {
       throw std::runtime_error(
@@ -34,8 +32,6 @@ auto ReadRequiredNumber(const boost::json::object& object, const char* key)
    }
    return value->to_number<double>();
 }
-
-}  // namespace
 
 auto JsonLoader::LoadLocations(const std::string& filepath)
     -> std::vector<Location> {

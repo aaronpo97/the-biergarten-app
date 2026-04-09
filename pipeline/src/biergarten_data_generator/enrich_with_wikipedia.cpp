@@ -12,11 +12,9 @@
 #include "biergarten_data_generator.h"
 #include "wikipedia/wikipedia_service.h"
 
-namespace {
-
-auto TryGetRegionContext(const std::shared_ptr<WebClient>& web_client,
-                         const Location* city_ptr,
-                         std::atomic<size_t>* skipped_enrichment_count) noexcept
+static auto TryGetRegionContext(
+    const std::shared_ptr<WebClient>& web_client, const Location* city_ptr,
+    std::atomic<size_t>* skipped_enrichment_count) noexcept
     -> std::optional<std::string> {
    try {
       WikipediaService wikipedia_service(web_client);
@@ -26,8 +24,6 @@ auto TryGetRegionContext(const std::shared_ptr<WebClient>& web_client,
       return std::nullopt;
    }
 }
-
-}  // namespace
 
 auto BiergartenDataGenerator::EnrichWithWikipedia(
     const std::vector<Location>& cities) -> std::vector<EnrichedCity> {
