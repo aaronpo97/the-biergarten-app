@@ -7,13 +7,14 @@
 #include <spdlog/spdlog.h>
 
 #include <boost/program_options.hpp>
-#include <iostream>
+#include <exception>
 #include <memory>
+#include <string>
 
 #include "biergarten_data_generator.h"
 #include "web_client/curl_web_client.h"
 
-namespace po = boost::program_options;
+namespace prog_opts = boost::program_options;
 
 /**
  * @brief Parse command-line arguments into ApplicationOptions.
@@ -23,123 +24,119 @@ namespace po = boost::program_options;
  * @param options Output ApplicationOptions struct.
  * @return true if parsing succeeded and should proceed, false otherwise.
  */
-bool ParseArguments(int argc, char** argv, ApplicationOptions& options) {
-   // If no arguments provided, display usage and exit
-   if (argc == 1) {
-      std::cout << "Biergarten Pipeline - Geographic Data Pipeline with "
-                   "Brewery Generation\n\n";
-      std::cout << "Usage: biergarten-pipeline [options]\n\n";
-      std::cout << "Options:\n";
-      std::cout << "  --mocked             Use mocked generator for "
-                   "brewery/user data\n";
-      std::cout << "  --model, -m PATH     Path to LLM model file (gguf) for "
-                   "generation\n";
-      std::cout << "  --cache-dir, -c DIR  Directory for cached JSON (default: "
-                   "/tmp)\n";
-      std::cout << "  --temperature TEMP   LLM sampling temperature 0.0-1.0 "
-                   "(default: 0.8)\n";
-      std::cout << "  --top-p VALUE        Nucleus sampling parameter 0.0-1.0 "
-                   "(default: 0.92)\n";
-      std::cout << "  --n-ctx SIZE         Context window size in tokens "
-                   "(default: 4096)\n";
-      std::cout << "  --seed SEED          Random seed: -1 for random "
-                   "(default: -1)\n";
-      std::cout << "  --help, -h           Show this help message\n\n";
-      std::cout << "Note: --mocked and --model are mutually exclusive. Exactly "
-                   "one must be provided.\n";
-      return false;
-   }
-
-   po::options_description desc("Pipeline Options");
-   desc.add_options()("help,h", "Produce help message")(
-       "mocked", po::bool_switch(),
-       "Use mocked generator for brewery/user data")(
-       "model,m", po::value<std::string>()->default_value(""),
-       "Path to LLM model (gguf)")(
-       "cache-dir,c", po::value<std::string>()->default_value("/tmp"),
-       "Directory for cached JSON")(
-       "temperature", po::value<float>()->default_value(0.8f),
-       "Sampling temperature (higher = more random)")(
-       "top-p", po::value<float>()->default_value(0.92f),
-       "Nucleus sampling top-p in (0,1] (higher = more random)")(
-       "n-ctx", po::value<uint32_t>()->default_value(8192),
-       "Context window size in tokens (1-32768)")(
-       "seed", po::value<int>()->default_value(-1),
+auto ParseArguments(const int argc, char** argv,
+                    ApplicationOptions& options) noexcept -> bool {
+   prog_opts::options_description desc("Pipeline Options");
+   desc.add_options()
+      ("help,h", "Produce help message")
+      ("mocked",
+       prog_opts::bool_switch(),
+       "Use mocked generator for brewery/user data")
+      ("model,m",
+       prog_opts::value<std::string>()->default_value(""),
+       "Path to LLM model (gguf)")
+      ("temperature",
+       prog_opts::value<float>()->default_value(0.8f),
+       "Sampling temperature (higher = more random)")
+      ("top-p",
+       prog_opts::value<float>()->default_value(0.92f),
+       "Nucleus sampling top-p in (0,1] (higher = more random)")
+      ("n-ctx",
+       prog_opts::value<uint32_t>()->default_value(8192),
+       "Context window size in tokens (1-32768)")
+      ("seed",
+       prog_opts::value<int>()->default_value(-1),
        "Sampler seed: -1 for random, otherwise non-negative integer");
 
-   po::variables_map vm;
-   po::store(po::parse_command_line(argc, argv, desc), vm);
-   po::notify(vm);
-
-   if (vm.count("help")) {
-      std::cout << desc << "\n";
+   // Handle the "no arguments" or "help" case
+   if (argc == 1) {
+      spdlog::info("Biergarten Pipeline");
+      std::stringstream ss;
+      ss << "\nUsage: biergarten-pipeline [options]\n\n" << desc;
+      spdlog::info(ss.str());
       return false;
    }
 
-   // Check for mutually exclusive --mocked and --model flags
-   bool use_mocked = vm["mocked"].as<bool>();
-   std::string model_path = vm["model"].as<std::string>();
+   try {
+      prog_opts::variables_map vm;
+      prog_opts::store(prog_opts::parse_command_line(argc, argv, desc), vm);
+      prog_opts::notify(vm);
 
-   if (use_mocked && !model_path.empty()) {
-      spdlog::error("ERROR: --mocked and --model are mutually exclusive");
-      return false;
-   }
-
-   if (!use_mocked && model_path.empty()) {
-      spdlog::error("ERROR: Either --mocked or --model must be specified");
-      return false;
-   }
-
-   // Warn if sampling parameters are provided with --mocked
-   if (use_mocked) {
-      bool hasTemperature = vm["temperature"].defaulted() == false;
-      bool hasTopP = vm["top-p"].defaulted() == false;
-      bool hasSeed = vm["seed"].defaulted() == false;
-
-      if (hasTemperature || hasTopP || hasSeed) {
-         spdlog::warn(
-             "WARNING: Sampling parameters (--temperature, --top-p, --seed) "
-             "are ignored when using --mocked");
+      if (vm.contains("help")) {
+         std::stringstream ss;
+         ss << "\n" << desc;
+         spdlog::info(ss.str());
+         return false;
       }
+
+      const auto use_mocked = vm["mocked"].as<bool>();
+      const auto model_path = vm["model"].as<std::string>();
+
+      if (use_mocked && !model_path.empty()) {
+         spdlog::error(
+            "Invalid arguments: --mocked and --model are mutually exclusive");
+         return false;
+      }
+
+      if (!use_mocked && model_path.empty()) {
+         spdlog::error(
+            "Invalid arguments: Either --mocked or --model must be specified");
+         return false;
+      }
+
+      const bool has_llm_params = !vm["temperature"].defaulted() ||
+                                  !vm["top-p"].defaulted() ||
+                                  !vm["seed"].defaulted();
+
+      if (use_mocked && has_llm_params) {
+         spdlog::warn(
+            "Sampling parameters (--temperature, --top-p, --seed) are"
+            " ignored when using --mocked");
+      }
+
+      options.use_mocked = use_mocked;
+      options.model_path = model_path;
+      options.temperature = vm["temperature"].as<float>();
+      options.top_p = vm["top-p"].as<float>();
+      options.n_ctx = vm["n-ctx"].as<uint32_t>();
+      options.seed = vm["seed"].as<int>();
+
+      return true;
+   } catch (const std::exception& exception) {
+      spdlog::error("Failed to parse command-line arguments: {}",
+                    exception.what());
+      return false;
+   } catch (...) {
+      spdlog::error("Failed to parse command-line arguments: unknown error");
+      return false;
    }
-
-   options.use_mocked = use_mocked;
-   options.model_path = model_path;
-   options.cache_dir = vm["cache-dir"].as<std::string>();
-   options.temperature = vm["temperature"].as<float>();
-   options.top_p = vm["top-p"].as<float>();
-   options.n_ctx = vm["n-ctx"].as<uint32_t>();
-   options.seed = vm["seed"].as<int>();
-   // commit is always pinned to c5eb7772
-
-   return true;
 }
 
-int main(int argc, char* argv[]) {
+auto main(const int argc, char** argv) noexcept -> int {
    try {
       const CurlGlobalState curl_state;
+      spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
       ApplicationOptions options;
       if (!ParseArguments(argc, argv, options)) {
          return 0;
       }
 
-      auto webClient = std::make_shared<CURLWebClient>();
+      auto webClient = std::make_unique<CURLWebClient>();
+      BiergartenDataGenerator generator(options, std::move(webClient));
 
-      BiergartenDataGenerator generator(options, webClient);
-      return generator.Run();
-
-   } catch (const std::exception& e) {
-      const std::string message = e.what() ? e.what() : "";
-
-      if (message.find("LlamaGenerator: malformed brewery response") !=
-          std::string::npos) {
-         spdlog::warn("WARNING: Non-fatal LLM failure after retries: {}",
-                      message);
-         return 0;
+      if (!generator.Run()) {
+         spdlog::error("Pipeline execution failed");
+         return 1;
       }
 
-      spdlog::error("ERROR: Application failed: {}", e.what());
+      spdlog::info("Pipeline executed successfully");
+      return 0;
+   } catch (const std::exception& exception) {
+      spdlog::critical("Unhandled fatal error in main: {}", exception.what());
+      return 1;
+   } catch (...) {
+      spdlog::critical("Unhandled fatal non-standard exception in main");
       return 1;
    }
 }

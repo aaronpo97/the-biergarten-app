@@ -89,7 +89,27 @@ FetchContent_MakeAvailable(spdlog)
 # =============================================================================
 set(SOURCES
     src/main.cpp
-    src/biergarten_data_generator.cpp
+    # BiergartenDataGenerator methods
+    src/biergarten_data_generator/constructor.cpp
+    src/biergarten_data_generator/run.cpp
+    src/biergarten_data_generator/initialize_generator.cpp
+    src/biergarten_data_generator/query_cities_with_countries.cpp
+    src/biergarten_data_generator/enrich_with_wikipedia.cpp
+    src/biergarten_data_generator/generate_breweries.cpp
+    src/biergarten_data_generator/log_results.cpp
+    # WikipediaService methods
+    src/wikipedia/constructor.cpp
+    src/wikipedia/get_summary.cpp
+    src/wikipedia/fetch_extract.cpp
+    # CURLWebClient and CurlGlobalState methods
+    src/web_client/curl_global_state_constructor.cpp
+    src/web_client/curl_global_state_destructor.cpp
+    src/web_client/curl_web_client_constructor.cpp
+    src/web_client/curl_web_client_destructor.cpp
+    src/web_client/curl_web_client_download_to_file.cpp
+    src/web_client/curl_web_client_get.cpp
+    src/web_client/curl_web_client_url_encode.cpp
+    # Data generation modules
     src/data_generation/llama/destructor.cpp
     src/data_generation/llama/generate_brewery.cpp
     src/data_generation/llama/generate_user.cpp
@@ -104,8 +124,6 @@ set(SOURCES
     src/data_generation/mock/generate_user.cpp
     src/data_generation/mock/load.cpp
     src/json_handling/json_loader.cpp
-    src/web_client/curl_web_client.cpp
-    src/wikipedia/wikipedia_service.cpp
 )
 # =============================================================================
 # 5. Target

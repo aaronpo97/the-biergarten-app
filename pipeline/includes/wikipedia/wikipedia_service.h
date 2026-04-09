@@ -24,7 +24,7 @@ class WikipediaService {
                                         std::string_view country);
 
   private:
-   std::string FetchExtract(std::string_view query);
+   std::string FetchExtract(std::string_view query) const;
    std::shared_ptr<WebClient> client_;
    std::unordered_map<std::string, std::string> cache_;
 };

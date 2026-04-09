@@ -27,9 +27,6 @@ struct ApplicationOptions {
    /// model_path.
    bool use_mocked = false;
 
-   /// @brief Directory for cached JSON and database files.
-   std::string cache_dir;
-
    /// @brief LLM sampling temperature (0.0 to 1.0, higher = more random).
    float temperature = 0.8f;
 
@@ -43,10 +40,6 @@ struct ApplicationOptions {
 
    /// @brief Random seed for sampling (-1 for random, otherwise non-negative).
    int seed = -1;
-
-   /// @brief Git commit hash for database consistency (always pinned to
-   /// c5eb7772).
-   std::string commit = "c5eb7772";
 };
 
 /**
@@ -63,8 +56,8 @@ class BiergartenDataGenerator {
     * @param options Application configuration options.
     * @param web_client HTTP client for downloading data.
     */
-   BiergartenDataGenerator(const ApplicationOptions& options,
-                           std::shared_ptr<WebClient> web_client);
+   BiergartenDataGenerator(ApplicationOptions options,
+                           std::unique_ptr<WebClient> web_client);
 
    /**
     * @brief Run the data generation pipeline.
@@ -74,9 +67,9 @@ class BiergartenDataGenerator {
     * 2. Initialize the generator (LLM or Mock)
     * 3. Generate brewery data for sampled cities
     *
-    * @return 0 on success, 1 on failure.
+    * @return true if successful, false if not
     */
-   int Run();
+   bool Run();
 
   private:
    /// @brief Immutable application options.
@@ -100,14 +93,14 @@ class BiergartenDataGenerator {
     *
     * @return A unique_ptr to the initialized generator.
     */
-   std::unique_ptr<DataGenerator> InitializeGenerator();
+   std::unique_ptr<DataGenerator> InitializeGenerator() const;
 
    /**
     * @brief Load locations from JSON and sample cities.
     *
     * @return Vector of sampled locations capped at 30 entries.
     */
-   std::vector<Location> QueryCitiesWithCountries();
+   static std::vector<Location> QueryCitiesWithCountries();
 
    /**
     * @brief Enrich cities with Wikipedia summaries.
