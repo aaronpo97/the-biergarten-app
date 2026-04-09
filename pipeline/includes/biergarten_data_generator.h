@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "data_generation/data_generator.h"
-#include "models/location.h"
+#include "data_model/location.h"
 #include "web_client/web_client.h"
 #include "wikipedia/wikipedia_service.h"
 
