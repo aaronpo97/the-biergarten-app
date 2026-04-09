@@ -1,0 +1,902 @@
+[
+  {
+    "name": "Gose",
+    "description": "A historic warm-fermented beer originating from Goslar, Germany. It is brewed with at least 50% malted wheat and characterized by the addition of coriander and salt, resulting in a crisp, sour, salty, and herbal flavor profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Gose",
+    "min_abv": 4.2,
+    "max_abv": 4.8,
+    "min_ibu": 5,
+    "max_ibu": 15
+  },
+  {
+    "name": "Rauchbier",
+    "description": "A traditional German style originating in Bamberg, Franconia. The malt is dried over an open beechwood fire, imparting a distinctive, intense smoky flavor that balances with a rich, malty lager base.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Smoked_beer",
+    "min_abv": 4.8,
+    "max_abv": 6.0,
+    "min_ibu": 20,
+    "max_ibu": 30
+  },
+  {
+    "name": "Lambic",
+    "description": "A uniquely Belgian beer originating in the Senne river valley near Brussels. Instead of carefully cultivated brewer's yeast, it is fermented spontaneously by wild yeasts and bacteria native to the region, creating a dry, cidery, and profoundly sour profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Lambic",
+    "min_abv": 5.0,
+    "max_abv": 6.5,
+    "min_ibu": 0,
+    "max_ibu": 10
+  },
+  {
+    "name": "Sahti",
+    "description": "An ancient Finnish farmhouse ale brewed with a variety of grains (often including rye) and filtered through juniper twigs instead of relying heavily on hops for bittering. It is historically fermented with baker's yeast, yielding strong banana and clove esters.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Sahti",
+    "min_abv": 7.0,
+    "max_abv": 8.5,
+    "min_ibu": 0,
+    "max_ibu": 15
+  },
+  {
+    "name": "Kvass",
+    "description": "A traditional Slavic and Baltic fermented beverage commonly made from rye bread. It is typically extremely low in alcohol and features a sweet, bready, slightly tart flavor, often flavored with fruits or herbs like mint.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Kvass",
+    "min_abv": 0.5,
+    "max_abv": 2.0,
+    "min_ibu": 0,
+    "max_ibu": 5
+  },
+  {
+    "name": "Berliner Weisse",
+    "description": "A cloudy, sour, white beer originating in Berlin. Fermented with a mixture of yeast and lactic acid bacteria, it is sharply tart and highly carbonated. Historically, it is often served with a dash of raspberry or woodruff syrup to cut the acidity.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Berliner_Weisse",
+    "min_abv": 2.8,
+    "max_abv": 3.8,
+    "min_ibu": 3,
+    "max_ibu": 8
+  },
+  {
+    "name": "Eisbock",
+    "description": "A specialty German beer created by partially freezing a doppelbock and removing the water ice. This freeze-distillation process concentrates the flavor, malt richness, and alcohol content, creating a heavy, syrupy, and warming brew.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bock#Eisbock",
+    "min_abv": 9.0,
+    "max_abv": 14.0,
+    "min_ibu": 25,
+    "max_ibu": 35
+  },
+  {
+    "name": "Altbier",
+    "description": "A German style originating in Düsseldorf that straddles the line between ale and lager. It is top-fermented at moderate temperatures but then cold-conditioned (lagered), resulting in a clean, crisp beer with a firm, balanced maltiness and notable hop bitterness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Altbier",
+    "min_abv": 4.3,
+    "max_abv": 5.5,
+    "min_ibu": 25,
+    "max_ibu": 50
+  },
+  {
+    "name": "Kölsch",
+    "description": "A light, brilliantly clear, top-fermented beer strictly associated with Cologne, Germany. Like Altbier, it is warm-fermented and cold-conditioned, yielding a delicate, soft, and slightly fruity pale beer with a dry, crisp finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/K%C3%B6lsch_(beer)",
+    "min_abv": 4.4,
+    "max_abv": 5.2,
+    "min_ibu": 20,
+    "max_ibu": 30
+  },
+  {
+    "name": "Oud Bruin",
+    "description": "A Flanders Brown Ale characterized by a long aging process—often up to a year—in stainless steel rather than oak. It undergoes a secondary fermentation with lactic acid bacteria, resulting in a dark, malty, dark-fruit-forward profile with a mild to moderate sourness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Oud_bruin",
+    "min_abv": 4.0,
+    "max_abv": 8.0,
+    "min_ibu": 20,
+    "max_ibu": 25
+  },
+  {
+    "name": "Saison",
+    "description": "A pale ale originally brewed in the Wallonia region of Belgium for farm workers during the harvest season. Highly carbonated, fruity, spicy, and often dry, it frequently employs distinctive yeast strains and sometimes wild bacteria or spices.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Saison",
+    "min_abv": 5.0,
+    "max_abv": 7.0,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Roggenbier",
+    "description": "A historical German beer brewed with up to 50% rye malt. It shares the yeast strains used in Bavarian Hefeweizen, offering banana and clove notes, but the rye provides a distinctly earthy, spicy character and a dense, viscous mouthfeel.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Roggenbier",
+    "min_abv": 4.5,
+    "max_abv": 6.0,
+    "min_ibu": 10,
+    "max_ibu": 20
+  },
+  {
+    "name": "Schwarzbier",
+    "description": "Germany's 'black beer' is a dark lager that balances roasted malt flavors with moderate hop bitterness. Unlike a stout or porter, it uses debittered roasted malts to achieve a very smooth, clean, and crisp dark beer without heavy astringency.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Schwarzbier",
+    "min_abv": 4.4,
+    "max_abv": 5.4,
+    "min_ibu": 20,
+    "max_ibu": 30
+  },
+  {
+    "name": "Mild Ale",
+    "description": "A historic British style originally meaning young or unaged beer, it evolved into a low-gravity, malt-focused session ale. Usually dark brown, it features notes of caramel, chocolate, and mild roast, with very low hop presence.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Mild_ale",
+    "min_abv": 3.0,
+    "max_abv": 3.8,
+    "min_ibu": 10,
+    "max_ibu": 25
+  },
+  {
+    "name": "Baltic Porter",
+    "description": "Originating in countries bordering the Baltic Sea, this style adapted the strong, sweet British export porters to local ingredients and cold bottom-fermenting lager yeasts. It is dark, robust, and complex with rich dark fruit and molasses notes.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Porter_(beer)#Baltic_porter",
+    "min_abv": 6.5,
+    "max_abv": 9.5,
+    "min_ibu": 20,
+    "max_ibu": 40
+  },
+  {
+    "name": "California Common",
+    "description": "Also known as Steam Beer, this uniquely American style was born out of necessity during the Gold Rush. It is brewed with a special strain of lager yeast that ferments optimally at warmer, ale-like temperatures, resulting in a rustic, woody, and minty flavor profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Steam_beer",
+    "min_abv": 4.5,
+    "max_abv": 5.5,
+    "min_ibu": 30,
+    "max_ibu": 45
+  },
+  {
+    "name": "Kellerbier",
+    "description": "An unfiltered, unpasteurized German lager that is traditionally served directly from the lagering vessel ('Keller' means cellar). Because it retains its yeast, it is cloudy, naturally carbonated, and features a soft, bready, and highly aromatic profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Kellerbier",
+    "min_abv": 4.7,
+    "max_abv": 5.4,
+    "min_ibu": 20,
+    "max_ibu": 40
+  },
+  {
+    "name": "Faro",
+    "description": "A traditional, low-alcohol sweet beer from Belgium made by blending lambic with a much lighter, freshly brewed beer (or water) and adding brown sugar or candi sugar. The sugar provides sweetness to balance the lambic's tartness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Faro_(beer)",
+    "min_abv": 4.0,
+    "max_abv": 5.5,
+    "min_ibu": 0,
+    "max_ibu": 10
+  },
+  {
+    "name": "Grodziskie",
+    "description": "A highly carbonated, low-alcohol Polish beer nicknamed 'Polish Champagne.' It is brewed entirely from oak-smoked wheat malt, resulting in a pale, effervescent, brilliantly clear beer that combines crisp wheat tartness with a distinct smoky aroma.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Grodziskie",
+    "min_abv": 2.5,
+    "max_abv": 3.3,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Lichtenhainer",
+    "description": "A nearly extinct historical German style originating from Thuringia. It is a lightly sour, smoked wheat beer. Think of it as a cross between a Berliner Weisse and a Rauchbier—refreshingly tart with a gentle wood-smoke character.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Smoked_beer",
+    "min_abv": 3.5,
+    "max_abv": 4.7,
+    "min_ibu": 5,
+    "max_ibu": 12
+  },
+  {
+    "name": "Irish Dry Stout",
+    "description": "A very dark, roasty, bitter, creamy ale that gained global fame through breweries in Dublin. It relies heavily on roasted barley for its espresso-like bite and bone-dry finish, often served via a nitrogen draught system for a dense, pillowy head.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#Dry_stout",
+    "min_abv": 4.0,
+    "max_abv": 5.0,
+    "min_ibu": 30,
+    "max_ibu": 45
+  },
+  {
+    "name": "English Barleywine",
+    "description": "A showcase of malty richness and complex, intense flavors. This strong ale boasts a deep caramel to dark amber color with massive notes of dark fruit, toffee, and molasses, meant to be sipped and often aged for years like wine.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Barley_wine",
+    "min_abv": 8.0,
+    "max_abv": 12.0,
+    "min_ibu": 35,
+    "max_ibu": 70
+  },
+  {
+    "name": "Belgian Tripel",
+    "description": "A remarkably pale, strong, and highly carbonated Belgian ale forged by Trappist monks. Despite its high alcohol content, it hides its strength well behind a complex profile of spicy yeast phenols, fruity esters, and a surprisingly dry finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Tripel",
+    "min_abv": 7.5,
+    "max_abv": 9.5,
+    "min_ibu": 20,
+    "max_ibu": 40
+  },
+  {
+    "name": "Doppelbock",
+    "description": "A stronger and maltier version of a traditional German bock, originally brewed by monks in Munich as 'liquid bread' for sustenance during fasting. It is exceptionally rich, dark, and heavy with flavors of toasted bread and dark fruit.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bock#Doppelbock",
+    "min_abv": 7.0,
+    "max_abv": 10.0,
+    "min_ibu": 16,
+    "max_ibu": 26
+  },
+  {
+    "name": "Wee Heavy",
+    "description": "Also known as Strong Scotch Ale, this malty, copper-to-brown beer undergoes a long boil that caramelizes the wort, producing deep, sweet flavors of plum, toffee, and roasted nuts, historically fermented at cooler temperatures for a clean profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Scotch_ale",
+    "min_abv": 6.5,
+    "max_abv": 10.0,
+    "min_ibu": 17,
+    "max_ibu": 35
+  },
+  {
+    "name": "New England IPA",
+    "description": "An American IPA featuring intense, tropical fruit-centric hop aroma and flavor with heavily reduced bitterness. It is deliberately hazy or opaque—often resembling fruit juice—and has a soft, pillowy mouthfeel achieved through oats and wheat.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/New_England_IPA",
+    "min_abv": 6.0,
+    "max_abv": 9.0,
+    "min_ibu": 25,
+    "max_ibu": 60
+  },
+  {
+    "name": "Flanders Red Ale",
+    "description": "Often referred to as the 'Burgundy of Belgium,' this complex sour ale is aged for up to two years in massive oak vats. The result is an intensely fruity, wine-like beer with sharp acetic sourness balanced by notes of black cherry, plum, and red currant.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Flanders_red_ale",
+    "min_abv": 4.6,
+    "max_abv": 6.5,
+    "min_ibu": 10,
+    "max_ibu": 25
+  },
+  {
+    "name": "Witbier",
+    "description": "A 400-year-old Belgian beer style that was revived from near extinction. It is a pale, hazy, unfiltered wheat beer spiced gracefully with crushed coriander seed and bitter orange peel, resulting in a lively, zesty, and highly refreshing profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Witbier",
+    "min_abv": 4.5,
+    "max_abv": 5.5,
+    "min_ibu": 10,
+    "max_ibu": 20
+  },
+  {
+    "name": "Imperial Stout",
+    "description": "An intensely-flavored, big, dark ale with a wide range of flavor balances and regional interpretations. Originally brewed in England for export to the Russian imperial court, it features massive roasted malt character, dark fruit notes, and a warming alcohol presence.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#Imperial_stout",
+    "min_abv": 8.0,
+    "max_abv": 12.0,
+    "min_ibu": 50,
+    "max_ibu": 90
+  },
+  {
+    "name": "Hefeweizen",
+    "description": "A traditional, unfiltered Bavarian wheat beer featuring a uniquely expressive yeast strain. The yeast provides its signature flavors of clove and banana, while the high wheat content creates a fluffy, long-lasting head and a bready, refreshing body.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Wheat_beer#Hefeweizen",
+    "min_abv": 4.3,
+    "max_abv": 5.6,
+    "min_ibu": 8,
+    "max_ibu": 15
+  },
+  {
+    "name": "American Pale Ale",
+    "description": "An American adaptation of the English pale ale, revolutionized by the use of indigenous ingredients. It is defined by the bold, piney, and citrus-forward aromas of American hops (like Cascade) riding on a clean, supportive malt backbone.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/American_pale_ale",
+    "min_abv": 4.5,
+    "max_abv": 6.2,
+    "min_ibu": 30,
+    "max_ibu": 50
+  },
+  {
+    "name": "Bière de Garde",
+    "description": "A sturdy artisanal farmhouse ale from Northern France traditionally brewed in early spring and kept in cold cellars for consumption in warmer months. It is characterized by a toasted malt sweetness, earthy yeast character, and a dry finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bi%C3%A8re_de_Garde",
+    "min_abv": 6.0,
+    "max_abv": 8.5,
+    "min_ibu": 18,
+    "max_ibu": 28
+  },
+  {
+    "name": "Vienna Lager",
+    "description": "Developed in 1841 in Austria, this elegant amber lager relies on Vienna malt to provide a soft, complex, and lightly toasted malt profile. It maintains a crisp, clean lager finish with just enough noble hop bitterness to balance the malt sweetness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Vienna_lager",
+    "min_abv": 4.7,
+    "max_abv": 5.5,
+    "min_ibu": 18,
+    "max_ibu": 30
+  },
+  {
+    "name": "Gueuze",
+    "description": "A complex, tart Belgian beer created by blending one-, two-, and three-year-old lambics. The young lambic provides fermentable sugars for secondary bottle fermentation, creating a highly carbonated, bone-dry, deeply sour beer with a distinct 'barnyard' funk.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Gueuze",
+    "min_abv": 5.0,
+    "max_abv": 8.0,
+    "min_ibu": 0,
+    "max_ibu": 10
+  },
+  {
+    "name": "Dunkelweizen",
+    "description": "A dark, Bavarian wheat beer that marries the spicy, fruity yeast character of a Hefeweizen with the rich, bready, and caramel-driven malt profile of a Munich Dunkel. The result is a highly aromatic, dark but refreshing ale.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Wheat_beer#Dark_wheat_beer",
+    "min_abv": 4.3,
+    "max_abv": 5.6,
+    "min_ibu": 10,
+    "max_ibu": 18
+  },
+  {
+    "name": "Maibock",
+    "description": "Also known as a Helles Bock, this strong, pale Bavarian lager is traditionally brewed for spring festivals. It is paler and more hop-forward than a traditional bock, delivering a warming alcoholic strength wrapped in a crisp, bready malt body.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bock#Maibock",
+    "min_abv": 6.3,
+    "max_abv": 7.4,
+    "min_ibu": 23,
+    "max_ibu": 35
+  },
+  {
+    "name": "Extra Special Bitter",
+    "description": "The strongest and maltiest of the traditional English Bitter family. An ESB features an aggressive balance of earthy, floral English hops and a rich, biscuit-like malt backbone, traditionally served via cask conditioning at cellar temperatures.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bitter_(beer)#Extra_Special_Bitter",
+    "min_abv": 4.6,
+    "max_abv": 6.2,
+    "min_ibu": 30,
+    "max_ibu": 50
+  },
+  {
+    "name": "Cream Ale",
+    "description": "A clean, well-attenuated, and highly carbonated American 'lawnmower' beer. It is brewed with ale yeast but sometimes cold-conditioned or blended with lager, using corn adjuncts to lighten the body and create an incredibly crisp, refreshing finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Cream_ale",
+    "min_abv": 4.2,
+    "max_abv": 5.6,
+    "min_ibu": 15,
+    "max_ibu": 20
+  },
+  {
+    "name": "Irish Red Ale",
+    "description": "An approachable, malt-focused Irish ale characterized by an amber-to-red color. It features mild caramel sweetness, very low hop bitterness, and a signature dry, slightly roasted finish courtesy of a small addition of roasted barley.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Irish_red_ale",
+    "min_abv": 4.0,
+    "max_abv": 6.0,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Munich Helles",
+    "description": "Created in Munich in 1894 to compete with the rising popularity of Czech Pilsners. It is a clean, malty, gold-colored lager that showcases a soft, bready malt sweetness with just enough spicy German hops to provide a balanced finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Helles",
+    "min_abv": 4.7,
+    "max_abv": 5.4,
+    "min_ibu": 16,
+    "max_ibu": 22
+  },
+  {
+    "name": "American IPA",
+    "description": "A decidedly hoppy and bitter, moderately strong American pale ale. It showcases modern American or New World hop varieties with intense fruit, citrus, pine, or floral aromatics.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/India_pale_ale#American_IPA",
+    "min_abv": 5.5,
+    "max_abv": 7.5,
+    "min_ibu": 40,
+    "max_ibu": 70
+  },
+  {
+    "name": "English IPA",
+    "description": "A hoppy, moderately strong English pale ale that features the earthy, floral, and spicy characteristics of traditional English hops, supported by a solid biscuit or caramel malt backbone.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/India_pale_ale#England",
+    "min_abv": 5.0,
+    "max_abv": 7.5,
+    "min_ibu": 40,
+    "max_ibu": 60
+  },
+  {
+    "name": "Double IPA",
+    "description": "An intensely hoppy, fairly strong pale ale designed to showcase hop character without being overly harsh. It features a massive hop profile supported by a clean alcohol warmth and enough malt to prevent it from feeling thin.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Double_India_Pale_Ale",
+    "min_abv": 7.5,
+    "max_abv": 10.0,
+    "min_ibu": 60,
+    "max_ibu": 120
+  },
+  {
+    "name": "Session IPA",
+    "description": "A highly hop-forward ale that delivers the aroma and flavor intensity of an IPA but with a much lower alcohol content, making it highly drinkable over an extended session.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/India_pale_ale#Session_IPA",
+    "min_abv": 3.7,
+    "max_abv": 5.0,
+    "min_ibu": 40,
+    "max_ibu": 55
+  },
+  {
+    "name": "Black IPA",
+    "description": "A beer with the dryness, hop-forward balance, and flavor characteristics of an American IPA, but with a dark color and a restrained roasted malt character that doesn't clash with the hops.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Black_IPA",
+    "min_abv": 5.5,
+    "max_abv": 9.0,
+    "min_ibu": 50,
+    "max_ibu": 90
+  },
+  {
+    "name": "Belgian IPA",
+    "description": "An IPA that marries the fruity, spicy yeast character of a Belgian ale with the assertive hop profile of an American IPA. It is typically lighter in body and highly carbonated.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/India_pale_ale#Belgian_IPA",
+    "min_abv": 6.2,
+    "max_abv": 9.5,
+    "min_ibu": 50,
+    "max_ibu": 100
+  },
+  {
+    "name": "White IPA",
+    "description": "A fruity, spicy, and refreshing hybrid style that combines the crisp, wheat-based body and spice additions of a Belgian Witbier with the pronounced hop aroma and bitterness of an American IPA.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/India_pale_ale#White_IPA",
+    "min_abv": 5.5,
+    "max_abv": 7.0,
+    "min_ibu": 40,
+    "max_ibu": 70
+  },
+  {
+    "name": "American Stout",
+    "description": "A hoppy, bitter, strongly roasted dark ale. It features the bold, aggressive flavor of American hops alongside intense roasted malt, coffee, and dark chocolate notes.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#American_stout",
+    "min_abv": 5.0,
+    "max_abv": 7.0,
+    "min_ibu": 35,
+    "max_ibu": 60
+  },
+  {
+    "name": "Oatmeal Stout",
+    "description": "A very dark, full-bodied, roasty, malty ale featuring a complementary oatmeal addition. The oats provide a smooth, rich, and slightly oily texture that balances the roasted grain astringency.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#Oatmeal_stout",
+    "min_abv": 4.2,
+    "max_abv": 5.9,
+    "min_ibu": 25,
+    "max_ibu": 40
+  },
+  {
+    "name": "Sweet Stout",
+    "description": "Also known as Milk Stout. A very dark, sweet, full-bodied, slightly roasty ale. Historically sweetened with lactose, an unfermentable milk sugar, it has a creamy texture and espresso-and-cream-like flavor.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#Milk_stout",
+    "min_abv": 4.0,
+    "max_abv": 6.0,
+    "min_ibu": 15,
+    "max_ibu": 40
+  },
+  {
+    "name": "Foreign Extra Stout",
+    "description": "A darker and sweeter stout originally brewed for export to tropical markets. It is moderately strong and features pronounced roasted grain, chocolate, and dark fruit flavors.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Stout#Foreign_Extra_Stout",
+    "min_abv": 6.3,
+    "max_abv": 8.0,
+    "min_ibu": 50,
+    "max_ibu": 70
+  },
+  {
+    "name": "English Porter",
+    "description": "A moderate-strength brown beer with a restrained roasty character and bitterness. It features a complex malt profile with notes of chocolate, caramel, and nuts, without the burnt flavors of a stout.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Porter_(beer)",
+    "min_abv": 4.0,
+    "max_abv": 5.4,
+    "min_ibu": 18,
+    "max_ibu": 35
+  },
+  {
+    "name": "American Porter",
+    "description": "A substantial, malty dark beer with a complex and flavorful dark malt character. Compared to English Porter, it is generally stronger, more aggressively hopped, and features more roasted barley character.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Porter_(beer)#American_porter",
+    "min_abv": 4.8,
+    "max_abv": 6.5,
+    "min_ibu": 25,
+    "max_ibu": 50
+  },
+  {
+    "name": "Robust Porter",
+    "description": "A stronger, more bitter, and more roasted version of a porter. It bridges the gap between brown porter and stout, offering intense cocoa and dark caramel notes with a sharp roasted finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Porter_(beer)",
+    "min_abv": 5.1,
+    "max_abv": 6.6,
+    "min_ibu": 25,
+    "max_ibu": 50
+  },
+  {
+    "name": "American Brown Ale",
+    "description": "A malty but hoppy beer with prominent chocolate and caramel flavors. The hop character is noticeably American, providing a citrusy or piney contrast to the rich malt backbone.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Brown_ale#American_Brown_Ale",
+    "min_abv": 4.3,
+    "max_abv": 6.2,
+    "min_ibu": 20,
+    "max_ibu": 40
+  },
+  {
+    "name": "English Brown Ale",
+    "description": "A malty, brown caramel-centric British ale without the roasted flavors of a porter. It is known for its nutty, toffee, and light chocolate notes, paired with a subtle, earthy hop presence.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Brown_ale",
+    "min_abv": 4.2,
+    "max_abv": 5.4,
+    "min_ibu": 20,
+    "max_ibu": 30
+  },
+  {
+    "name": "Belgian Dubbel",
+    "description": "A deep reddish-copper, moderately strong, malty, complex Trappist ale. It features rich, malty flavors, dark fruit esters like plum and raisin, and mild phenolic spiciness from the Belgian yeast.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Dubbel",
+    "min_abv": 6.0,
+    "max_abv": 7.6,
+    "min_ibu": 15,
+    "max_ibu": 25
+  },
+  {
+    "name": "Belgian Quadrupel",
+    "description": "A massively strong, dark, rich, and complex Belgian ale. It pushes the boundaries of the Dubbel style, offering intense dark fruit, caramel, and peppery yeast spice with a smooth, warming alcohol finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Quadrupel",
+    "min_abv": 9.0,
+    "max_abv": 14.0,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Belgian Blonde Ale",
+    "description": "A moderate-strength golden ale with a subtle fruity-spicy Belgian yeast complexity, slightly sweet malty flavor, and a dry finish. It is highly approachable and brilliantly clear.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Blonde_ale#Belgian_blonde_ale",
+    "min_abv": 6.0,
+    "max_abv": 7.5,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Belgian Pale Ale",
+    "description": "A moderately malty, somewhat fruity, easy-drinking, copper-colored Belgian ale. It is less aggressive in yeast character than other Belgian styles, focusing on a balanced, biscuity malt and earthy hop profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Pale_ale#Belgian_pale_ale",
+    "min_abv": 4.8,
+    "max_abv": 5.5,
+    "min_ibu": 20,
+    "max_ibu": 30
+  },
+  {
+    "name": "Belgian Strong Golden Ale",
+    "description": "A pale, complex, effervescent, strong Belgian-style ale. It is highly attenuated and features fruity and hoppy notes in preference to phenolics, often with a surprisingly light body for its strength.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Strong_ale#Belgian_strong_ale",
+    "min_abv": 7.5,
+    "max_abv": 10.5,
+    "min_ibu": 22,
+    "max_ibu": 35
+  },
+  {
+    "name": "Belgian Strong Dark Ale",
+    "description": "A dark, complex, very strong Belgian ale with a delicious blend of malt richness, dark fruit flavors, and spicy elements. It is deep, warming, and often beautifully conditioned.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Strong_ale#Belgian_strong_ale",
+    "min_abv": 8.0,
+    "max_abv": 11.0,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Trappist Single",
+    "description": "A pale, bitter, highly attenuated and well-carbonated Trappist ale. Historically brewed for the monks' daily consumption (patersbier), it is dry, refreshing, and features prominent fruity and spicy yeast character.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Trappist_beer",
+    "min_abv": 4.8,
+    "max_abv": 6.0,
+    "min_ibu": 25,
+    "max_ibu": 45
+  },
+  {
+    "name": "Grisette",
+    "description": "A low-alcohol, light-bodied, and refreshing farmhouse ale historically brewed for miners in the Hainaut province of Belgium. It is similar to a Saison but typically lower in gravity and lacking strong tartness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Grisette_(beer)",
+    "min_abv": 3.5,
+    "max_abv": 5.0,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Weizenbock",
+    "description": "A strong, malty, fruity, wheat-based ale combining the best flavors of a dunkelweizen and the rich strength and dark fruit of a bock. It is robust, bready, and highly aromatic.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bock#Weizenbock",
+    "min_abv": 6.5,
+    "max_abv": 9.0,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Kristalweizen",
+    "description": "A filtered version of the traditional Bavarian Hefeweizen. By removing the yeast, the beer becomes brilliantly clear, offering a sharper, cleaner interpretation of the classic banana and clove flavors.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Wheat_beer#Kristalweizen",
+    "min_abv": 4.3,
+    "max_abv": 5.6,
+    "min_ibu": 8,
+    "max_ibu": 15
+  },
+  {
+    "name": "Wheatwine",
+    "description": "A richly textured, high-alcohol ale made with a significant portion of wheat malt. It features a soft, bready maltiness with complex caramel and fruity notes, aging beautifully much like a barleywine.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Barley_wine#Wheatwine",
+    "min_abv": 8.5,
+    "max_abv": 12.2,
+    "min_ibu": 45,
+    "max_ibu": 85
+  },
+  {
+    "name": "American Wheat Beer",
+    "description": "A pale, refreshing American ale brewed with a large proportion of wheat. Unlike German versions, it uses a clean-fermenting yeast, allowing the bready wheat malt and bright American hops to shine without clove or banana notes.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Wheat_beer#American_wheat_beer",
+    "min_abv": 4.0,
+    "max_abv": 5.5,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Traditional Bock",
+    "description": "A dark, strong, malty German lager. It is rich and complex, boasting robust flavors of toasted bread, caramel, and dark fruit, with very little hop bitterness and a smooth, clean lager finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bock",
+    "min_abv": 6.3,
+    "max_abv": 7.2,
+    "min_ibu": 20,
+    "max_ibu": 27
+  },
+  {
+    "name": "Munich Dunkel",
+    "description": "A classic brown Bavarian lager that celebrates the rich, complex flavors of Munich malt. It features deep, bready, and toast-like caramel qualities without any harsh or burnt roasted malt flavors.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Dunkel",
+    "min_abv": 4.5,
+    "max_abv": 5.6,
+    "min_ibu": 18,
+    "max_ibu": 28
+  },
+  {
+    "name": "Festbier",
+    "description": "A smooth, clean, pale German lager with a moderately strong malty flavor and a light hop character. This is the modern beer served at the Munich Oktoberfest, lighter in color and body than a traditional Märzen.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Oktoberfestbier",
+    "min_abv": 5.8,
+    "max_abv": 6.3,
+    "min_ibu": 18,
+    "max_ibu": 25
+  },
+  {
+    "name": "Märzen",
+    "description": "An elegant, malty German amber lager with a clean, rich, toasty and bready malt flavor, restrained bitterness, and a dry finish. Historically brewed in March and lagered in cold caves over the summer.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/M%C3%A4rzen",
+    "min_abv": 5.8,
+    "max_abv": 6.3,
+    "min_ibu": 18,
+    "max_ibu": 24
+  },
+  {
+    "name": "Czech Pale Lager",
+    "description": "A lighter, sessionable version of the famous Czech premium lagers. It features a prominent but soft Saaz hop spiciness balanced by a bready, slightly sweet malt backbone.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_the_Czech_Republic",
+    "min_abv": 3.0,
+    "max_abv": 4.1,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Czech Premium Pale Lager",
+    "description": "The original Pilsner style. It is a crisp, complex, and well-rounded pale lager featuring a rich, bready maltiness perfectly balanced by the pronounced, spicy bitterness of Saaz hops.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Pilsner",
+    "min_abv": 4.2,
+    "max_abv": 5.8,
+    "min_ibu": 30,
+    "max_ibu": 45
+  },
+  {
+    "name": "Czech Amber Lager",
+    "description": "A malt-driven amber lager with a balanced hop bitterness. It combines the rich, caramel and toasted malt flavors of a Vienna lager with the characteristic spicy hop profile of Czech brewing.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_the_Czech_Republic",
+    "min_abv": 4.4,
+    "max_abv": 5.8,
+    "min_ibu": 20,
+    "max_ibu": 35
+  },
+  {
+    "name": "Czech Dark Lager",
+    "description": "A rich, dark, and highly drinkable Czech lager. It balances a roasted, chocolatey, and caramel malt sweetness with a gentle but noticeable hop bitterness, maintaining a smooth lager finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_the_Czech_Republic",
+    "min_abv": 4.4,
+    "max_abv": 5.8,
+    "min_ibu": 18,
+    "max_ibu": 34
+  },
+  {
+    "name": "International Pale Lager",
+    "description": "A highly attenuated pale lager without strong flavors, typically well-balanced and highly carbonated. It serves as a thirst-quenching, mass-market style with a very clean, neutral profile.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Pale_lager",
+    "min_abv": 4.6,
+    "max_abv": 6.0,
+    "min_ibu": 18,
+    "max_ibu": 25
+  },
+  {
+    "name": "International Dark Lager",
+    "description": "A darker, somewhat sweeter version of an international pale lager. It features mild caramel or roasted malt notes, low hop bitterness, and a crisp, clean lager finish.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Dark_beer",
+    "min_abv": 4.2,
+    "max_abv": 6.0,
+    "min_ibu": 8,
+    "max_ibu": 20
+  },
+  {
+    "name": "American Lager",
+    "description": "A very pale, highly carbonated, light-bodied, well-attenuated lager. It is brewed with up to 40% corn or rice adjuncts to lighten the body and flavor, creating an extremely crisp and refreshing thirst-quencher.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_the_United_States#American_Lager",
+    "min_abv": 4.2,
+    "max_abv": 5.3,
+    "min_ibu": 8,
+    "max_ibu": 18
+  },
+  {
+    "name": "American Light Lager",
+    "description": "A lighter, lower-calorie version of an American lager. It is highly attenuated and very neutral in flavor, designed for extreme drinkability without bitterness or heavy malt character.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Light_beer",
+    "min_abv": 2.8,
+    "max_abv": 4.2,
+    "min_ibu": 8,
+    "max_ibu": 12
+  },
+  {
+    "name": "American Amber Ale",
+    "description": "A hoppy, moderately strong American ale featuring a caramel malt backbone. It strikes a balance between the citrusy, piney notes of American hops and a rich, toasted malt sweetness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Amber_ale",
+    "min_abv": 4.5,
+    "max_abv": 6.2,
+    "min_ibu": 25,
+    "max_ibu": 40
+  },
+  {
+    "name": "American Strong Ale",
+    "description": "A broad category for strong, intensely flavored American ales that don't quite fit into the barleywine or double IPA categories. They are typically aggressively hopped with a massive malt foundation.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Strong_ale#American_strong_ale",
+    "min_abv": 7.0,
+    "max_abv": 11.9,
+    "min_ibu": 50,
+    "max_ibu": 100
+  },
+  {
+    "name": "American Barleywine",
+    "description": "A well-hopped American interpretation of the richest and strongest of the English ales. The hop character is assertive and bitter, balancing a massive, complex, and intensely sweet malt body.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Barley_wine#American_Barleywine",
+    "min_abv": 8.0,
+    "max_abv": 12.0,
+    "min_ibu": 50,
+    "max_ibu": 100
+  },
+  {
+    "name": "Blonde Ale",
+    "description": "An easy-drinking, approachable, malt-oriented American craft beer. It has a light to medium body, gentle hop bitterness, and a clean, slightly sweet malt profile, often acting as a gateway to craft beer.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Blonde_ale",
+    "min_abv": 3.8,
+    "max_abv": 5.5,
+    "min_ibu": 15,
+    "max_ibu": 28
+  },
+  {
+    "name": "Scottish Light",
+    "description": "A traditional Scottish session ale. It is malt-focused, utilizing cool fermentation temperatures to produce a clean profile that emphasizes caramel and toffee notes over hop bitterness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_Scotland#Light",
+    "min_abv": 2.5,
+    "max_abv": 3.2,
+    "min_ibu": 10,
+    "max_ibu": 20
+  },
+  {
+    "name": "Scottish Heavy",
+    "description": "A slightly stronger version of the Scottish Light. It maintains the malt-forward, caramel-heavy profile and clean fermentation character, with just enough bitterness to prevent it from being cloying.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_Scotland#Heavy",
+    "min_abv": 3.2,
+    "max_abv": 3.9,
+    "min_ibu": 10,
+    "max_ibu": 20
+  },
+  {
+    "name": "Scottish Export",
+    "description": "The strongest of the standard Scottish session ales. It features a deep, complex maltiness with rich caramel, toffee, and occasionally faint roasted notes, perfectly balanced for drinkability.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_Scotland#Export",
+    "min_abv": 3.9,
+    "max_abv": 6.0,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "English Pale Ale",
+    "description": "A classic British ale with a balanced profile of earthy, floral hops and a biscuity, caramel-tinged malt base. It is moderate in strength and highly sessionable.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Pale_ale",
+    "min_abv": 4.5,
+    "max_abv": 5.5,
+    "min_ibu": 20,
+    "max_ibu": 40
+  },
+  {
+    "name": "Ordinary Bitter",
+    "description": "A low-gravity, low-alcohol, and highly drinkable British session ale. Despite its name, it focuses on a balance of biscuity malt and earthy hop flavor, traditionally served on cask.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bitter_(beer)",
+    "min_abv": 3.2,
+    "max_abv": 3.8,
+    "min_ibu": 25,
+    "max_ibu": 35
+  },
+  {
+    "name": "Best Bitter",
+    "description": "A moderately strong British bitter that provides a slightly richer malt backbone and more pronounced hop character than an Ordinary Bitter, while maintaining exceptional sessionability.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Bitter_(beer)",
+    "min_abv": 3.8,
+    "max_abv": 4.6,
+    "min_ibu": 25,
+    "max_ibu": 40
+  },
+  {
+    "name": "Old Ale",
+    "description": "A traditional English ale of moderate to significant strength, typically aged. It develops complex, sweet, and nutty malt flavors, often acquiring slight tartness or dark fruit notes from extended cellar maturation.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Old_ale",
+    "min_abv": 5.5,
+    "max_abv": 9.0,
+    "min_ibu": 30,
+    "max_ibu": 60
+  },
+  {
+    "name": "Brett Beer",
+    "description": "Any beer fermented primarily or secondarily with Brettanomyces yeast. It is characterized by complex, funky, rustic, and 'barnyard' or leather-like aromas, rather than outright sourness.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Brettanomyces",
+    "min_abv": 5.0,
+    "max_abv": 8.5,
+    "min_ibu": 10,
+    "max_ibu": 30
+  },
+  {
+    "name": "Mixed-Fermentation Sour Beer",
+    "description": "A sour ale fermented with a combination of brewer's yeast, Brettanomyces, and lactic acid bacteria. It offers a complex, deeply tart profile layered with rustic funk and fruity esters.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Sour_beer",
+    "min_abv": 4.0,
+    "max_abv": 8.0,
+    "min_ibu": 5,
+    "max_ibu": 20
+  },
+  {
+    "name": "Wild Ale",
+    "description": "A beer fermented with wild yeast or bacteria native to a specific environment, rather than cultivated strains. The result is uniquely tied to its terroir, often profoundly tart and funk-forward.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Sour_beer#American_wild_ale",
+    "min_abv": 5.0,
+    "max_abv": 8.0,
+    "min_ibu": 5,
+    "max_ibu": 30
+  },
+  {
+    "name": "Fruit Beer",
+    "description": "A harmonious marriage of fruit and beer, where the fruit character complements the underlying beer style without overwhelming it. The base can range from light wheat beers to heavy stouts.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Fruit_beer",
+    "min_abv": 4.0,
+    "max_abv": 8.0,
+    "min_ibu": 5,
+    "max_ibu": 45
+  },
+  {
+    "name": "Spice/Herb/Vegetable Beer",
+    "description": "A beer that incorporates culinary spices, herbs, or vegetables to enhance the flavor profile. The additions are meant to be noticeable but balanced with the base beer style.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Vegetable_beer",
+    "min_abv": 4.0,
+    "max_abv": 8.0,
+    "min_ibu": 5,
+    "max_ibu": 40
+  },
+  {
+    "name": "Pumpkin Ale",
+    "description": "A quintessential American seasonal beer brewed with pumpkin or winter squash and a blend of traditional autumn spices like cinnamon, nutmeg, ginger, and cloves, evoking the flavor of pumpkin pie.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Pumpkin_ale",
+    "min_abv": 4.0,
+    "max_abv": 7.5,
+    "min_ibu": 10,
+    "max_ibu": 35
+  },
+  {
+    "name": "Winter Warmer",
+    "description": "A traditional holiday seasonal ale. It is typically malty, dark, and strong, often featuring warming spices and a pronounced alcohol presence to combat the winter chill.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Old_ale#Winter_warmer",
+    "min_abv": 5.5,
+    "max_abv": 8.0,
+    "min_ibu": 20,
+    "max_ibu": 50
+  },
+  {
+    "name": "Bière Brut",
+    "description": "A highly specialized, effervescent Belgian beer style brewed using the méthode champenoise. It is extremely dry, highly carbonated, and features complex fruity and spicy yeast notes, resembling a fine sparkling wine.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Beer_in_Belgium",
+    "min_abv": 8.0,
+    "max_abv": 11.5,
+    "min_ibu": 15,
+    "max_ibu": 30
+  },
+  {
+    "name": "Kentucky Common",
+    "description": "A historical American style originating in Louisville. It is a fast-fermenting, dark, slightly sweet, and lightly roasty ale brewed with a large proportion of corn, intended to be consumed fresh.",
+    "wikipedia_link": "https://en.wikipedia.org/wiki/Kentucky_common_beer",
+    "min_abv": 4.0,
+    "max_abv": 5.5,
+    "min_ibu": 15,
+    "max_ibu": 30
+  }
+]
