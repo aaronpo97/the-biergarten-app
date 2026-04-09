@@ -5,21 +5,46 @@ project(biergarten-pipeline)
 # =============================================================================
 # GGML_CUDA / GGML_METAL are set here so that the llama.cpp FetchContent below
 # inherits them as cache variables before its CMakeLists.txt is processed.
+# =============================================================================
+# 1. Platform & GPU Detection
+# =============================================================================
+
 if(APPLE)
-    message(STATUS "[biergarten] Apple Silicon detected — enabling Metal acceleration.")
-    set(GGML_METAL ON CACHE BOOL "Enable Metal for Apple Silicon" FORCE)
+    # Check if this is an M-series Mac (arm64) or Intel Mac (x86_64)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+        message(STATUS "[biergarten] Apple Silicon detected — enabling Metal acceleration.")
+        set(GGML_METAL ON CACHE BOOL "Enable Metal for Apple Silicon" FORCE)
+    else()
+        message(STATUS "[biergarten] Intel Mac detected — using CPU / Accelerate framework.")
+        # Explicitly turn off Metal so the build doesn't fail on x86_64
+        set(GGML_METAL OFF CACHE BOOL "Disable Metal for Intel Macs" FORCE)
+        # Note: llama.cpp will automatically detect and enable Apple's Accelerate framework here
+    endif()
+
 elseif(UNIX AND NOT APPLE)
+    # Search for NVIDIA CUDA Toolkit
     find_package(CUDAToolkit QUIET)
+
+    # Search for AMD HIP/ROCm Toolkit
+    find_package(HIP QUIET)
+
     if(CUDAToolkit_FOUND)
         message(STATUS "[biergarten] NVIDIA GPU detected — enabling CUDA acceleration.")
         set(GGML_CUDA ON CACHE BOOL "Enable CUDA for NVIDIA GPUs" FORCE)
-        # 'native' resolves to the exact SM version of the present GPU at configure time
-        # (e.g. sm_89 for RTX 2000 Ada). Change to a concrete arch list for cross-compilation.
         set(CMAKE_CUDA_ARCHITECTURES native)
+
+    elseif(HIP_FOUND OR EXISTS "/opt/rocm")
+        message(STATUS "[biergarten] AMD GPU detected — enabling HIP/ROCm acceleration.")
+        set(GGML_HIPBLAS ON CACHE BOOL "Enable HIP for AMD GPUs" FORCE)
+
     else()
-        message(STATUS "[biergarten] No NVIDIA GPU found — falling back to CPU.")
+        message(STATUS "[biergarten] No NVIDIA or AMD GPU found — falling back to CPU.")
     endif()
+
+else()
+    message(FATAL_ERROR "[biergarten] Unrecognized platform. Windows is currently not supported.")
 endif()
+
 # =============================================================================
 # 2. Project-wide Settings
 # =============================================================================
@@ -40,12 +65,10 @@ if(NOT CURL_FOUND)
         "(e.g. 'sudo dnf install libcurl-devel') or set CURL_ROOT.")
 endif()
 # --- llama.cpp ----------------------------------------------------------------
-# Pinned to a specific commit for reproducible builds.
-# To update: pick a new commit SHA from https://github.com/ggml-org/llama.cpp
 FetchContent_Declare(
     llama-cpp
     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-    GIT_TAG        b8611
+    GIT_TAG        b8711
 )
 FetchContent_MakeAvailable(llama-cpp)
 # --- Boost (JSON + program_options) ------------------------------------------
