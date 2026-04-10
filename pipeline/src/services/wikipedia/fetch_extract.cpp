@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include "wikipedia/wikipedia_service.h"
+#include "services/wikipedia_service.h"
 
 auto WikipediaService::FetchExtract(std::string_view query) const
     -> std::string {

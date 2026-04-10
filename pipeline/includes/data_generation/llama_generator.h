@@ -11,6 +11,8 @@
 
 #include "data_generation/data_generator.h"
 
+struct ApplicationOptions;
+
 struct llama_model;
 struct llama_context;
 
@@ -19,34 +21,18 @@ struct llama_context;
  */
 class LlamaGenerator final : public DataGenerator {
   public:
-   /// @brief Constructs a generator with default sampling and context settings.
-   LlamaGenerator() = default;
+   /**
+    * @brief Constructs a generator using parsed application options and loads
+    * the configured model immediately.
+    *
+    * @param options Parsed application options.
+    * @param model_path Filesystem path to GGUF model assets.
+    */
+   LlamaGenerator(const ApplicationOptions& options,
+                  const std::string& model_path);
 
    /// @brief Releases model/context resources.
    ~LlamaGenerator() override;
-
-   /**
-    * @brief Configures sampling parameters for generation.
-    *
-    * @param temperature Sampling temperature.
-    * @param top_p Nucleus sampling threshold.
-    * @param seed Seed for sampling; use -1 for random seed.
-    */
-   void SetSamplingOptions(float temperature, float top_p, int seed = -1);
-
-   /**
-    * @brief Sets context window size used during model load.
-    *
-    * @param n_ctx Context size in tokens.
-    */
-   void SetContextSize(uint32_t n_ctx);
-
-   /**
-    * @brief Loads model and prepares inference context.
-    *
-    * @param model_path Filesystem path to GGUF model.
-    */
-   void Load(const std::string& model_path) override;
 
    /**
     * @brief Generates brewery data for a specific location.
@@ -69,6 +55,13 @@ class LlamaGenerator final : public DataGenerator {
    UserResult GenerateUser(const std::string& locale) override;
 
   private:
+   /**
+    * @brief Loads model and prepares inference context.
+    *
+    * @param model_path Filesystem path to GGUF model.
+    */
+   void Load(const std::string& model_path);
+
    /**
     * @brief Infers text from a user prompt.
     *

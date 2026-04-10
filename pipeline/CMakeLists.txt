@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(biergarten-pipeline)
+
+# Boost.DI still declares a very old minimum CMake version, which newer CMake
+# releases reject unless a policy version floor is provided.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 # =============================================================================
 # 1. GPU Detection
 # =============================================================================
@@ -71,6 +75,16 @@ FetchContent_Declare(
     GIT_TAG        b8711
 )
 FetchContent_MakeAvailable(llama-cpp)
+# --- boost-ext/di -------------------------------------------------------------
+FetchContent_Declare(
+    boost-di
+    GIT_REPOSITORY https://github.com/boost-ext/di.git
+    GIT_TAG        v1.3.0
+)
+FetchContent_MakeAvailable(boost-di)
+if(TARGET Boost.DI AND NOT TARGET boost::di)
+    add_library(boost::di ALIAS Boost.DI)
+endif()
 # --- Boost (JSON + program_options) ------------------------------------------
 FetchContent_Declare(
     boost
@@ -92,15 +106,13 @@ set(SOURCES
     # BiergartenDataGenerator methods
     src/biergarten_data_generator/constructor.cpp
     src/biergarten_data_generator/run.cpp
-    src/biergarten_data_generator/initialize_generator.cpp
     src/biergarten_data_generator/query_cities_with_countries.cpp
-    src/biergarten_data_generator/enrich_with_wikipedia.cpp
     src/biergarten_data_generator/generate_breweries.cpp
     src/biergarten_data_generator/log_results.cpp
     # WikipediaService methods
-    src/wikipedia/constructor.cpp
-    src/wikipedia/get_summary.cpp
-    src/wikipedia/fetch_extract.cpp
+    src/services/wikipedia/constructor.cpp
+    src/services/wikipedia/get_summary.cpp
+    src/services/wikipedia/fetch_extract.cpp
     # CURLWebClient and CurlGlobalState methods
     src/web_client/curl_global_state_constructor.cpp
     src/web_client/curl_global_state_destructor.cpp
@@ -111,18 +123,17 @@ set(SOURCES
     src/web_client/curl_web_client_url_encode.cpp
     # Data generation modules
     src/data_generation/llama/destructor.cpp
+    src/data_generation/llama/constructor.cpp
     src/data_generation/llama/generate_brewery.cpp
     src/data_generation/llama/generate_user.cpp
     src/data_generation/llama/helpers.cpp
     src/data_generation/llama/infer.cpp
     src/data_generation/llama/load.cpp
     src/data_generation/llama/load_brewery_prompt.cpp
-    src/data_generation/llama/set_sampling_options.cpp
     src/data_generation/mock/data.cpp
     src/data_generation/mock/deterministic_hash.cpp
     src/data_generation/mock/generate_brewery.cpp
     src/data_generation/mock/generate_user.cpp
-    src/data_generation/mock/load.cpp
     src/json_handling/json_loader.cpp
 )
 # =============================================================================
@@ -138,6 +149,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
     llama
+    boost::di
     boost_json
     boost_program_options
     spdlog::spdlog

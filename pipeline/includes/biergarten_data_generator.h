@@ -6,14 +6,14 @@
  * @brief Core orchestration class for pipeline data generation.
  */
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "data_generation/data_generator.h"
 #include "data_model/location.h"
-#include "web_client/web_client.h"
-#include "wikipedia/wikipedia_service.h"
+#include "services/enrichment_service.h"
 
 /**
  * @brief Program options for the Biergarten pipeline application.
@@ -53,18 +53,18 @@ class BiergartenDataGenerator {
    /**
     * @brief Construct a BiergartenDataGenerator with injected dependencies.
     *
-    * @param options Application configuration options.
-    * @param web_client HTTP client for downloading data.
+    * @param context_service Context provider for sampled locations.
+    * @param generator Brewery and user data generator.
     */
-   BiergartenDataGenerator(const ApplicationOptions& options,
-                           std::shared_ptr<WebClient> web_client);
+   BiergartenDataGenerator(std::shared_ptr<IEnrichmentService> context_service,
+                           std::unique_ptr<DataGenerator> generator);
 
    /**
     * @brief Run the data generation pipeline.
     *
     * Performs the following steps:
     * 1. Load curated locations from JSON
-    * 2. Initialize the generator (LLM or Mock)
+    * 2. Resolve context for each city using the injected context service
     * 3. Generate brewery data for sampled cities
     *
     * @return true if successful, false if not
@@ -72,11 +72,11 @@ class BiergartenDataGenerator {
    bool Run();
 
   private:
-   /// @brief Immutable application options.
-   const ApplicationOptions options_;
+   /// @brief Shared context provider dependency.
+   std::shared_ptr<IEnrichmentService> context_service_;
 
-   /// @brief Shared HTTP client dependency.
-   std::shared_ptr<WebClient> webClient_;
+   /// @brief Generator dependency selected in the composition root.
+   std::unique_ptr<DataGenerator> generator_;
 
    /**
     * @brief Enriched city data with Wikipedia context.
@@ -87,15 +87,6 @@ class BiergartenDataGenerator {
    };
 
    /**
-    * @brief Initialize the data generator based on options.
-    *
-    * Creates either a MockGenerator (if no model path) or LlamaGenerator.
-    *
-    * @return A unique_ptr to the initialized generator.
-    */
-   std::unique_ptr<DataGenerator> InitializeGenerator() const;
-
-   /**
     * @brief Load locations from JSON and sample cities.
     *
     * @return Vector of sampled locations capped at 30 entries.
@@ -103,22 +94,11 @@ class BiergartenDataGenerator {
    static std::vector<Location> QueryCitiesWithCountries();
 
    /**
-    * @brief Enrich cities with Wikipedia summaries.
-    *
-    * @param cities Vector of sampled locations.
-    * @return Vector of enriched city data with context.
-    */
-   std::vector<EnrichedCity> EnrichWithWikipedia(
-       const std::vector<Location>& cities);
-
-   /**
     * @brief Generate breweries for enriched cities.
     *
-    * @param generator The data generator instance.
     * @param cities Vector of enriched city data.
     */
-   void GenerateBreweries(DataGenerator& generator,
-                          const std::vector<EnrichedCity>& cities);
+   void GenerateBreweries(const std::vector<EnrichedCity>& cities);
 
    /**
     * @brief Log the generated brewery results.

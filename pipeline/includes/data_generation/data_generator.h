@@ -39,13 +39,6 @@ class DataGenerator {
    virtual ~DataGenerator() = default;
 
    /**
-    * @brief Loads and initializes generator resources.
-    *
-    * @param model_path Path to model assets. Implementations may ignore this.
-    */
-   virtual void Load(const std::string& model_path) = 0;
-
-   /**
     * @brief Generates brewery data for a location.
     *
     * @param city_name City name.

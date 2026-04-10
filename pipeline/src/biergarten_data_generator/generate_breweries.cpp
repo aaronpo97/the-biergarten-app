@@ -8,7 +8,7 @@
 #include "biergarten_data_generator.h"
 
 void BiergartenDataGenerator::GenerateBreweries(
-    DataGenerator& generator, const std::vector<EnrichedCity>& cities) {
+    const std::vector<EnrichedCity>& cities) {
    spdlog::info("\n=== SAMPLE BREWERY GENERATION ===");
    generatedBreweries_.clear();
 
@@ -16,7 +16,7 @@ void BiergartenDataGenerator::GenerateBreweries(
 
    for (const auto& enriched_city : cities) {
       try {
-         auto brewery = generator.GenerateBrewery(
+         auto brewery = generator_->GenerateBrewery(
              enriched_city.location.city, enriched_city.location.country,
              enriched_city.region_context);
          generatedBreweries_.push_back(GeneratedBrewery{

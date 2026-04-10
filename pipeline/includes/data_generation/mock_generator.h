@@ -17,13 +17,6 @@
 class MockGenerator final : public DataGenerator {
   public:
    /**
-    * @brief Initializes the mock generator.
-    *
-    * @param model_path Unused for mock generation.
-    */
-   void Load(const std::string& model_path) override;
-
-   /**
     * @brief Generates deterministic brewery data for a location.
     *
     * @param city_name City name.

@@ -1,7 +1,7 @@
 /**
  * @file data_generation/llama/load.cpp
  * @brief Initializes llama backend, loads model weights, creates inference
- * context, and resets prior resources during model reload.
+ * context, and resets prior resources during model initialization.
  */
 
 #include <spdlog/spdlog.h>
@@ -13,12 +13,6 @@
 #include "llama.h"
 
 void LlamaGenerator::Load(const std::string& model_path) {
-   /**
-    * Validate input and clean up any previously loaded model/context
-    */
-   if (model_path.empty())
-      throw std::runtime_error("LlamaGenerator: model path must not be empty");
-
    if (context_ != nullptr) {
       llama_free(context_);
       context_ = nullptr;

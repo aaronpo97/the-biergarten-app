@@ -6,15 +6,22 @@
 
 #include <spdlog/spdlog.h>
 
+#include <boost/di.hpp>
 #include <boost/program_options.hpp>
 #include <exception>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include "biergarten_data_generator.h"
+#include "data_generation/llama_generator.h"
+#include "data_generation/mock_generator.h"
+#include "services/enrichment_service.h"
+#include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
 
 namespace prog_opts = boost::program_options;
+namespace di = boost::di;
 
 /**
  * @brief Parse command-line arguments into ApplicationOptions.
@@ -44,26 +51,27 @@ auto ParseArguments(const int argc, char** argv,
    // Handle the "no arguments" or "help" case
    if (argc == 1) {
       spdlog::info("Biergarten Pipeline");
-      std::stringstream ss;
-      ss << "\nUsage: biergarten-pipeline [options]\n\n" << desc;
-      spdlog::info(ss.str());
+      std::stringstream usage_stream;
+      usage_stream << "\nUsage: biergarten-pipeline [options]\n\n" << desc;
+      spdlog::info(usage_stream.str());
       return false;
    }
 
    try {
-      prog_opts::variables_map vm;
-      prog_opts::store(prog_opts::parse_command_line(argc, argv, desc), vm);
-      prog_opts::notify(vm);
+      prog_opts::variables_map variables_map;
+      prog_opts::store(prog_opts::parse_command_line(argc, argv, desc),
+                       variables_map);
+      prog_opts::notify(variables_map);
 
-      if (vm.contains("help")) {
-         std::stringstream ss;
-         ss << "\n" << desc;
-         spdlog::info(ss.str());
+      if (variables_map.contains("help")) {
+         std::stringstream help_stream;
+         help_stream << "\n" << desc;
+         spdlog::info(help_stream.str());
          return false;
       }
 
-      const auto use_mocked = vm["mocked"].as<bool>();
-      const auto model_path = vm["model"].as<std::string>();
+      const auto use_mocked = variables_map["mocked"].as<bool>();
+      const auto model_path = variables_map["model"].as<std::string>();
 
       if (use_mocked && !model_path.empty()) {
          spdlog::error(
@@ -77,9 +85,9 @@ auto ParseArguments(const int argc, char** argv,
          return false;
       }
 
-      const bool has_llm_params = !vm["temperature"].defaulted() ||
-                                  !vm["top-p"].defaulted() ||
-                                  !vm["seed"].defaulted();
+      const bool has_llm_params = !variables_map["temperature"].defaulted() ||
+                                  !variables_map["top-p"].defaulted() ||
+                                  !variables_map["seed"].defaulted();
 
       if (use_mocked && has_llm_params) {
          spdlog::warn(
@@ -89,10 +97,10 @@ auto ParseArguments(const int argc, char** argv,
 
       options.use_mocked = use_mocked;
       options.model_path = model_path;
-      options.temperature = vm["temperature"].as<float>();
-      options.top_p = vm["top-p"].as<float>();
-      options.n_ctx = vm["n-ctx"].as<uint32_t>();
-      options.seed = vm["seed"].as<int>();
+      options.temperature = variables_map["temperature"].as<float>();
+      options.top_p = variables_map["top-p"].as<float>();
+      options.n_ctx = variables_map["n-ctx"].as<uint32_t>();
+      options.seed = variables_map["seed"].as<int>();
 
       return true;
    } catch (const std::exception& exception) {
@@ -115,8 +123,29 @@ auto main(const int argc, char** argv) noexcept -> int {
          return 0;
       }
 
-      auto webClient = std::make_shared<CURLWebClient>();
-      BiergartenDataGenerator generator(options, std::move(webClient));
+      const auto injector = di::make_injector(
+          di::bind<WebClient>().to<CURLWebClient>(),
+          di::bind<ApplicationOptions>().to(options),
+          di::bind<IEnrichmentService>().to<WikipediaService>(),
+          di::bind<std::string>().to(options.model_path),
+          di::bind<DataGenerator>().to([options](const auto& injector)
+                                           -> std::unique_ptr<DataGenerator> {
+             if (options.use_mocked) {
+                spdlog::info(
+                    "[Generator] Using MockGenerator (no model path provided)");
+                return std::make_unique<MockGenerator>();
+             }
+
+             spdlog::info(
+                 "[Generator] Using LlamaGenerator: {} (temperature={}, "
+                 "top-p={}, "
+                 "n_ctx={}, seed={})",
+                 options.model_path, options.temperature, options.top_p,
+                 options.n_ctx, options.seed);
+             return injector.template create<std::unique_ptr<LlamaGenerator>>();
+          }));
+
+      auto generator = injector.create<BiergartenDataGenerator>();
 
       if (!generator.Run()) {
          spdlog::error("Pipeline execution failed");

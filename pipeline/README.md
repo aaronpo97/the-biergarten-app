@@ -1,28 +1,29 @@
 # Biergarten Pipeline
 
-Biergarten Pipeline is a C++23 command-line tool that reads a local city list, looks up a short Wikipedia summary for each sampled city, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either a local GGUF model or the mock generator to produce the output.
+Biergarten Pipeline is a C++23 command-line tool that reads a local city list, resolves contextual enrichment for each sampled city through an injected service, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either a local GGUF model or the mock generator to produce the output.
 
 ## Pipeline
 
-| Stage    | What happens                                                                   |
-| -------- | ------------------------------------------------------------------------------ |
-| Load     | Reads `locations.json` and picks up to four city/country pairs.                |
-| Enrich   | Fetches a short Wikipedia summary for each city in parallel with `std::async`. |
-| Generate | Passes the city, country, and summary to the active generator.                 |
-| Log      | Writes the generated breweries and any warnings through `spdlog`.              |
+| Stage    | What happens                                                            |
+| -------- | ----------------------------------------------------------------------- |
+| Load     | Reads `locations.json` and picks up to four city/country pairs.         |
+| Enrich   | Calls the injected enrichment service for each sampled city.            |
+| Generate | Passes the city, country, and gathered context to the active generator. |
+| Log      | Writes the generated breweries and any warnings through `spdlog`.       |
 
-If one Wikipedia lookup fails, the pipeline skips that city and keeps going.
+If an enrichment lookup throws, the pipeline skips that city and keeps going. If the lookup returns an empty string, the city stays in the pipeline and is still passed to the generator.
 
 ## Core Components
 
-| Component               | Role                                                       |
-| ----------------------- | ---------------------------------------------------------- |
-| BiergartenDataGenerator | Orchestrates loading, enrichment, generation, and logging. |
-| WikipediaService        | Fetches city summaries from Wikipedia.                     |
-| LlamaGenerator          | Runs local GGUF inference and validates output.            |
-| MockGenerator           | Produces deterministic fallback data without a model.      |
-| JsonLoader              | Parses the local `locations.json` file.                    |
-| CURLWebClient           | Handles HTTP requests to Wikipedia.                        |
+| Component               | Role                                                                   |
+| ----------------------- | ---------------------------------------------------------------------- |
+| BiergartenDataGenerator | Orchestrates loading, enrichment lookup, generation, and logging.      |
+| IEnrichmentService      | Abstraction for location-context providers.                            |
+| WikipediaService        | Default enrichment provider backed by Wikipedia and in-memory caching. |
+| LlamaGenerator          | Runs local GGUF inference and validates output.                        |
+| MockGenerator           | Produces deterministic fallback data without a model.                  |
+| JsonLoader              | Parses the local `locations.json` file.                                |
+| CURLWebClient           | Handles HTTP requests to Wikipedia.                                    |
 
 ## Build
 
@@ -33,7 +34,7 @@ If one Wikipedia lookup fails, the pipeline skips that city and keeps going.
 | libcurl              | Required for Wikipedia requests.                                           |
 | Optional GPU tooling | CUDA on NVIDIA, HIP/ROCm on supported AMD systems, Metal on Apple Silicon. |
 
-Boost, spdlog, and llama.cpp are fetched by CMake. On Apple Silicon, Metal is enabled automatically. On Linux, the build looks for CUDA or HIP/ROCm when the matching toolkit is present. Windows is not supported.
+Boost, Boost.DI, spdlog, and llama.cpp are fetched by CMake. On Apple Silicon, Metal is enabled automatically. On Linux, the build looks for CUDA or HIP/ROCm when the matching toolkit is present. Windows is not supported.
 
 ```bash
 cmake -S . -B build
@@ -61,7 +62,7 @@ Run the executable from the build directory so the copied `locations.json` is av
 | `--seed`        | Random seed. Default: `-1`.                  |
 | `--help, -h`    | Prints usage.                                |
 
-`--mocked` and `--model` are mutually exclusive. If neither is set, the program exits with an error. The sampling flags only matter when a model is loaded.
+`--mocked` and `--model` are mutually exclusive. If neither is set, the program exits with an error. The sampling flags only matter when a model is loaded. The enrichment step is sequential now, and empty context is allowed.
 
 ## Layout
 
