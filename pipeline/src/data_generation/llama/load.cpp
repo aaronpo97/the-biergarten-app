@@ -23,7 +23,7 @@ void LlamaGenerator::Load(const std::string& model_path) {
       model_ = nullptr;
    }
 
-   llama_model_params model_params = llama_model_default_params();
+   const llama_model_params model_params = llama_model_default_params();
    model_ = llama_model_load_from_file(model_path.c_str(), model_params);
    if (model_ == nullptr) {
       throw std::runtime_error(

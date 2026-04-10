@@ -11,7 +11,7 @@
 
 #include "services/wikipedia_service.h"
 
-auto WikipediaService::FetchExtract(std::string_view query) -> std::string {
+std::string WikipediaService::FetchExtract(std::string_view query) {
    const std::string cache_key(query);
    const auto cache_it = this->extract_cache_.find(cache_key);
    if (cache_it != this->extract_cache_.end()) {
@@ -34,9 +34,13 @@ auto WikipediaService::FetchExtract(std::string_view query) -> std::string {
          if (!pages.empty()) {
             auto& page = pages.begin()->value().get_object();
             if (page.contains("extract") && page.at("extract").is_string()) {
-               std::string extract(page.at("extract").as_string().c_str());
+               const std::string_view extract_view =
+                  page.at("extract").as_string();
+               std::string extract(extract_view);
+
                spdlog::debug("WikipediaService fetched {} chars for '{}'",
                              extract.size(), query);
+
                this->extract_cache_.emplace(cache_key, extract);
                return extract;
             }

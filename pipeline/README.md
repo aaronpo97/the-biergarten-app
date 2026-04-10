@@ -1,8 +1,8 @@
 # Biergarten Pipeline
 
-Biergarten Pipeline is a C++23 command-line tool that reads a local city list, resolves contextual enrichment for each sampled city through an injected service, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either a local GGUF model or the mock generator to produce the output.
+Biergarten Pipeline is a C++20 command-line tool that reads a local city list, resolves contextual enrichment for each sampled city through an injected service, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either Gemma 4 or the mock generator to produce the output.
 
-## Hardware & GPU Config
+## Tested Hardware & OS
 
 ### x86/64 Linux, NVIDIA RTX 2000
 
@@ -10,7 +10,7 @@ Biergarten Pipeline is a C++23 command-line tool that reads a local city list, r
 - **CPU**: Intel Core Ultra 7 155H
 - **GPU**: NVIDIA RTX 2000 Ada Generation
 - **Memory**: 32GB
-- **Model**: Qwen3-8B-Q6-K
+- **Model**: Gemma 4 E4B: efficient local reasoning; released Apr 2, 2026.
 - **Inference**: llama.cpp with CUDA 12.x support
 
 ### ARM MacOS, M1 Pro
@@ -19,7 +19,7 @@ Biergarten Pipeline is a C++23 command-line tool that reads a local city list, r
 - **CPU**: Apple M1 Pro (8-core)
 - **GPU**: Apple M1 Pro (14-core) [Integrated]
 - **Memory**: 16GB
-- **Model**: Qwen3-8B-Q6-K
+- **Model**: Gemma 4 E4B: efficient local reasoning; released Apr 2, 2026.
 - **Inference**: llama.cpp with Metal (MPS) support
 
 ## Pipeline
@@ -54,7 +54,7 @@ If an enrichment lookup throws, the pipeline skips that city and keeps going. If
 | libcurl              | Required for Wikipedia requests.                                           |
 | Optional GPU tooling | CUDA on NVIDIA, HIP/ROCm on supported AMD systems, Metal on Apple Silicon. |
 
-Boost, Boost.DI, spdlog, and llama.cpp are fetched by CMake. On Apple Silicon, Metal is enabled automatically. On Linux, the build looks for CUDA or HIP/ROCm when the matching toolkit is present. Windows is not supported.
+Boost, Boost.DI, spdlog, and llama.cpp are fetched by CMake. On Apple Silicon, Metal is enabled automatically. On Linux, the build looks for CUDA or HIP/ROCm when the matching toolkit is present. There are no plans to support Windows.
 
 ```bash
 cmake -S . -B build
@@ -63,24 +63,36 @@ cmake --build build
 
 If the dependency build fails on macOS, check the repo build notes.
 
+## Model
+
+Create a `models/` directory and download the GGUF file there before running the app.
+
+```bash
+mkdir -p models
+curl -L \
+	-o models/google_gemma-4-E4B-it-Q6_K.gguf \
+	https://huggingface.co/bartowski/google_gemma-4-E4B-it-GGUF/resolve/main/google_gemma-4-E4B-it-Q6_K.gguf?download=true
+```
+
 ## Run
 
-Run the executable from the build directory so the copied `locations.json` is available.
+Run the executable from the build directory so the copied `locations.json` and `prompts/` directory are available.
 
 ```bash
 ./biergarten-pipeline --mocked
-./biergarten-pipeline --model /path/to/model.gguf --temperature 0.8 --top-p 0.92 --n-ctx 8192 --seed -1
+./biergarten-pipeline --model models/google_gemma-4-E4B-it-Q6_K.gguf --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
 ```
 
-| Flag            | Purpose                                      |
-| --------------- | -------------------------------------------- |
-| `--mocked`      | Uses the mock generator instead of a model.  |
-| `--model, -m`   | Path to a GGUF model file.                   |
-| `--temperature` | Sampling temperature. Default: `0.8`.        |
-| `--top-p`       | Nucleus sampling parameter. Default: `0.92`. |
-| `--n-ctx`       | Context window size. Default: `8192`.        |
-| `--seed`        | Random seed. Default: `-1`.                  |
-| `--help, -h`    | Prints usage.                                |
+| Flag            | Purpose                                                                      |
+| --------------- | ---------------------------------------------------------------------------- |
+| `--mocked`      | Uses the mock generator instead of a model.                                  |
+| `--model, -m`   | Path to a GGUF model file, such as `models/google_gemma-4-E4B-it-Q6_K.gguf`. |
+| `--temperature` | Sampling temperature. Default: `1.0`.                                        |
+| `--top-p`       | Nucleus sampling parameter. Default: `0.95`.                                 |
+| `--top-k`       | Top-k sampling parameter. Default: `64`.                                     |
+| `--n-ctx`       | Context window size. Default: `8192`.                                        |
+| `--seed`        | Random seed. Default: `-1`.                                                  |
+| `--help, -h`    | Prints usage.                                                                |
 
 `--mocked` and `--model` are mutually exclusive. If neither is set, the program exits with an error. The sampling flags only matter when a model is loaded. The enrichment step is sequential now, and empty context is allowed.
 

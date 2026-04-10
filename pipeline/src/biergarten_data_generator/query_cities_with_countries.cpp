@@ -7,24 +7,24 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <iterator>
 #include <random>
 
 #include "biergarten_data_generator.h"
 #include "json_handling/json_loader.h"
 
-static constexpr unsigned int brewery_amount = 4;
+static constexpr std::size_t kBreweryAmount = 4;
 
-auto BiergartenDataGenerator::QueryCitiesWithCountries()
-    -> std::vector<Location> {
+std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
    spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
    const std::filesystem::path locations_path = "locations.json";
 
-   auto all_locations = JsonLoader::LoadLocations(locations_path.string());
+   auto all_locations = JsonLoader::LoadLocations(locations_path);
    spdlog::info("  Locations available: {}", all_locations.size());
 
-   const size_t sample_count =
-       std::min<size_t>(brewery_amount, all_locations.size());
+   const std::size_t sample_count =
+       std::min(kBreweryAmount, all_locations.size());
    const auto sample_count_signed =
        static_cast<std::iter_difference_t<decltype(all_locations.cbegin())>>(
            sample_count);

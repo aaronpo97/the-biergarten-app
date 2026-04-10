@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
-#define BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_
 
 /**
  * @file services/wikipedia_service.h
@@ -14,20 +14,20 @@
 #include "services/enrichment_service.h"
 #include "web_client/web_client.h"
 
-/// @brief Provides cached Wikipedia summary lookups for city and country pairs.
+/// @brief Provides Wikipedia summary lookups backed by cached raw extracts.
 class WikipediaService final : public IEnrichmentService {
-  public:
-   /// @brief Creates a new Wikipedia service with the provided web client.
-   explicit WikipediaService(std::shared_ptr<WebClient> client);
+ public:
+  /// @brief Creates a new Wikipedia service with the provided web client.
+  explicit WikipediaService(std::unique_ptr<WebClient> client);
 
-   /// @brief Returns the Wikipedia-derived context for a location.
-   [[nodiscard]] std::string GetLocationContext(const Location& loc) override;
+  /// @brief Returns the Wikipedia-derived context for a location.
+  [[nodiscard]] std::string GetLocationContext(const Location& loc) override;
 
-  private:
-   std::string FetchExtract(std::string_view query);
-   std::shared_ptr<WebClient> client_;
-   std::unordered_map<std::string, std::string> cache_;
-   std::unordered_map<std::string, std::string> extract_cache_;
+ private:
+  std::string FetchExtract(std::string_view query);
+  std::unique_ptr<WebClient> client_;
+  /// @brief Canonical cache for raw Wikipedia query extracts.
+  std::unordered_map<std::string, std::string> extract_cache_;
 };
 
-#endif  // BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_

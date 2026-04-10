@@ -12,19 +12,21 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 
-static auto ReadRequiredString(const boost::json::object& object,
-                               const char* key) -> std::string {
+static std::string ReadRequiredString(const boost::json::object& object,
+                                      const char* key) {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_string()) {
       throw std::runtime_error(
           std::string("Missing or invalid string field: ") + key);
    }
-   return std::string(value->as_string().c_str());
+   const std::string_view text = value->as_string();
+   return std::string(text);
 }
 
-static auto ReadRequiredNumber(const boost::json::object& object,
-                               const char* key) -> double {
+static double ReadRequiredNumber(const boost::json::object& object,
+                                 const char* key) {
    const boost::json::value* value = object.if_contains(key);
    if (value == nullptr || !value->is_number()) {
       throw std::runtime_error(
@@ -33,18 +35,19 @@ static auto ReadRequiredNumber(const boost::json::object& object,
    return value->to_number<double>();
 }
 
-auto JsonLoader::LoadLocations(const std::string& filepath)
-    -> std::vector<Location> {
+std::vector<Location> JsonLoader::LoadLocations(
+    const std::filesystem::path& filepath) {
    std::ifstream input(filepath);
    if (!input.is_open()) {
-      throw std::runtime_error("Failed to open locations file: " + filepath);
+      throw std::runtime_error("Failed to open locations file: " +
+                               filepath.string());
    }
 
    std::stringstream buffer;
    buffer << input.rdbuf();
    const std::string content = buffer.str();
 
-   boost::json::error_code error;
+   boost::system::error_code error;
    boost::json::value root = boost::json::parse(content, error);
    if (error) {
       throw std::runtime_error("Failed to parse locations JSON: " +
@@ -79,6 +82,6 @@ auto JsonLoader::LoadLocations(const std::string& filepath)
    }
 
    spdlog::info("[JsonLoader] Loaded {} locations from {}", locations.size(),
-                filepath);
+                filepath.string());
    return locations;
 }

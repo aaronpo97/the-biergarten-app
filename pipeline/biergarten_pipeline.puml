@@ -1,7 +1,7 @@
-@startuml
+@startuml BiergartenPipeline
 title Biergarten Pipeline - Class and Composition Diagram
 
-left to right direction
+top to bottom direction
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
@@ -16,43 +16,54 @@ package "Composition root" {
     +~CurlGlobalState()
   }
 
+  class LlamaBackendState {
+    +LlamaBackendState()
+    +~LlamaBackendState()
+  }
+
   note right of Main
     Binds with Boost.DI:
     - WebClient -> CURLWebClient
     - IEnrichmentService -> WikipediaService
     - DataGenerator -> MockGenerator or LlamaGenerator
+    - std::string -> model_path
     - LlamaGenerator receives ApplicationOptions and model_path directly
   end note
 }
 
 package "Core orchestration" {
+  class BiergartenDataGenerator {
+    -context_service_: std::shared_ptr<IEnrichmentService>
+    -generator_: std::unique_ptr<DataGenerator>
+    -generated_breweries_: std::vector<GeneratedBrewery>
+    +BiergartenDataGenerator(context_service: std::shared_ptr<IEnrichmentService>, generator: std::unique_ptr<DataGenerator>)
+    +Run(): bool
+    {static} -QueryCitiesWithCountries(): std::vector<Location>
+    -GenerateBreweries(cities: const std::vector<EnrichedCity>&): void
+    -LogResults(): void
+  }
+}
+
+package "Data models" {
   class ApplicationOptions <<struct>> {
     +model_path: std::string
     +use_mocked: bool
     +temperature: float
     +top_p: float
+    +top_k: uint32_t
     +n_ctx: uint32_t
     +seed: int
   }
 
-  class BiergartenDataGenerator {
-    -context_service_: std::shared_ptr<IEnrichmentService>
-    -generator_: std::unique_ptr<DataGenerator>
-    +BiergartenDataGenerator(context_service: std::shared_ptr<IEnrichmentService>, generator: std::unique_ptr<DataGenerator>)
-    +Run(): bool
-    -QueryCitiesWithCountries(): std::vector<Location>
-    -GenerateBreweries(cities: std::vector<EnrichedCity>): void
-    -LogResults(): void
+  class Location <<struct>> {
+    +city: std::string
+    +state_province: std::string
+    +iso3166_2: std::string
+    +country: std::string
+    +iso3166_1: std::string
+    +latitude: double
+    +longitude: double
   }
-
-  class EnrichedCity <<struct>> {
-    +location: Location
-    +region_context: std::string
-  }
-}
-
-package "Shared models" {
-  class Location
 
   class BreweryResult <<struct>> {
     +name: std::string
@@ -63,68 +74,78 @@ package "Shared models" {
     +username: std::string
     +bio: std::string
   }
+
+  class EnrichedCity <<struct>> {
+    +location: Location
+    +region_context: std::string
+  }
+
+  class GeneratedBrewery <<struct>> {
+    +location: Location
+    +brewery: BreweryResult
+  }
 }
 
 package "Generation" {
   interface DataGenerator {
-    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
-    +GenerateUser(locale: std::string): UserResult
+    +GenerateBrewery(location: const Location&, region_context: const std::string&): BreweryResult
+    +GenerateUser(locale: const std::string&): UserResult
   }
 
   class MockGenerator {
-    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
-    +GenerateUser(locale: std::string): UserResult
+    +GenerateBrewery(location: const Location&, region_context: const std::string&): BreweryResult
+    +GenerateUser(locale: const std::string&): UserResult
   }
 
   class LlamaGenerator {
-    +LlamaGenerator(options: ApplicationOptions, model_path: std::string)
-    +GenerateBrewery(city_name: std::string, country_name: std::string, region_context: std::string): BreweryResult
-    +GenerateUser(locale: std::string): UserResult
+    +LlamaGenerator(options: const ApplicationOptions&, model_path: const std::string&)
+    +GenerateBrewery(location: const Location&, region_context: const std::string&): BreweryResult
+    +GenerateUser(locale: const std::string&): UserResult
   }
 }
 
 package "HTTP" {
   interface WebClient {
-    +DownloadToFile(url: std::string, file_path: std::string): void
-    +Get(url: std::string): std::string
-    +UrlEncode(value: std::string): std::string
+    +Get(url: const std::string&): std::string
+    +UrlEncode(value: const std::string&): std::string
   }
 
   class CURLWebClient {
-    +CURLWebClient()
-    +~CURLWebClient()
-    +DownloadToFile(url: std::string, file_path: std::string): void
-    +Get(url: std::string): std::string
-    +UrlEncode(value: std::string): std::string
+    +Get(url: const std::string&): std::string
+    +UrlEncode(value: const std::string&): std::string
+  }
+}
+
+package "JSON handling" {
+  class JsonLoader {
+    {static} +LoadLocations(filepath: const std::string&): std::vector<Location>
   }
 }
 
 package "Wikipedia" {
   interface IEnrichmentService {
-    +GetLocationContext(loc: Location): std::string
+    +GetLocationContext(loc: const Location&): std::string
   }
 
   class WikipediaService {
-    +WikipediaService(client: std::shared_ptr<WebClient>)
-    +GetLocationContext(loc: Location): std::string
-  }
-
-  class JsonLoader {
-    {static} +LoadLocations(filepath: std::string): std::vector<Location>
+    +WikipediaService(client: std::unique_ptr<WebClient>)
+    +GetLocationContext(loc: const Location&): std::string
   }
 }
 
 Main --> CurlGlobalState
+Main --> LlamaBackendState
 Main --> ApplicationOptions
 Main --> BiergartenDataGenerator
 Main ..> IEnrichmentService : DI binding
 Main ..> DataGenerator : DI factory
 Main ..> CURLWebClient : DI binding
 
-BiergartenDataGenerator *-- EnrichedCity
+BiergartenDataGenerator *-- GeneratedBrewery
 BiergartenDataGenerator ..> JsonLoader : LoadLocations()
 BiergartenDataGenerator --> IEnrichmentService : context lookup
 BiergartenDataGenerator --> DataGenerator : brewery generation
+BiergartenDataGenerator ..> EnrichedCity
 BiergartenDataGenerator ..> Location
 BiergartenDataGenerator ..> BreweryResult
 
@@ -133,7 +154,7 @@ DataGenerator <|.. LlamaGenerator
 WebClient <|.. CURLWebClient
 IEnrichmentService <|.. WikipediaService
 
-WikipediaService --> WebClient : shared_ptr
+WikipediaService *-- WebClient : unique_ptr
 
 note right of BiergartenDataGenerator
 Current behavior:

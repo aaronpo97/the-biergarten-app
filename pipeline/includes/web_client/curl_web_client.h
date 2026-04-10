@@ -1,12 +1,10 @@
-#ifndef BIERGARTEN_PIPELINE_WEB_CLIENT_CURL_WEB_CLIENT_H_
-#define BIERGARTEN_PIPELINE_WEB_CLIENT_CURL_WEB_CLIENT_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_CURL_WEB_CLIENT_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_CURL_WEB_CLIENT_H_
 
 /**
  * @file web_client/curl_web_client.h
  * @brief libcurl-based WebClient implementation.
  */
-
-#include <memory>
 
 #include "web_client/web_client.h"
 
@@ -36,21 +34,6 @@ class CurlGlobalState {
  */
 class CURLWebClient : public WebClient {
   public:
-   /// @brief Constructs a CURL web client.
-   CURLWebClient();
-
-   /// @brief Destroys the CURL web client.
-   ~CURLWebClient() override;
-
-   /**
-    * @brief Downloads URL contents to a file.
-    *
-    * @param url Source URL.
-    * @param file_path Destination file path.
-    */
-   void DownloadToFile(const std::string& url,
-                       const std::string& file_path) override;
-
    /**
     * @brief Executes an HTTP GET request.
     *
@@ -68,4 +51,4 @@ class CURLWebClient : public WebClient {
    std::string UrlEncode(const std::string& value) override;
 };
 
-#endif  // BIERGARTEN_PIPELINE_WEB_CLIENT_CURL_WEB_CLIENT_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_CURL_WEB_CLIENT_H_

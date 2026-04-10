@@ -1,11 +1,11 @@
 /**
- * @file wikipedia/constructor.cpp
+ * @file services/wikipedia/wikipedia_service.cpp
  * @brief WikipediaService constructor implementation.
  */
 
-#include <utility>
-
 #include "services/wikipedia_service.h"
 
-WikipediaService::WikipediaService(std::shared_ptr<WebClient> client)
+#include <utility>
+
+WikipediaService::WikipediaService(std::unique_ptr<WebClient> client)
     : client_(std::move(client)) {}

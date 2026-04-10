@@ -1,6 +1,6 @@
 /**
- * @file web_client/curl_global_state_constructor.cpp
- * @brief CurlGlobalState constructor implementation.
+ * @file web_client/curl_global_state.cpp
+ * @brief CurlGlobalState constructor and destructor implementation.
  */
 
 #include <curl/curl.h>
@@ -15,3 +15,5 @@ CurlGlobalState::CurlGlobalState() {
           "[CURLWebClient] Failed to initialize libcurl globally");
    }
 }
+
+CurlGlobalState::~CurlGlobalState() { curl_global_cleanup(); }

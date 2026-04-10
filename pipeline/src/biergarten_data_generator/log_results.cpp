@@ -10,7 +10,7 @@
 void BiergartenDataGenerator::LogResults() const {
    spdlog::info("\n=== GENERATED DATA DUMP ===");
    size_t index = 1;
-   for (const auto& [location, brewery] : generatedBreweries_) {
+   for (const auto& [location, brewery] : generated_breweries_) {
       spdlog::info(
           "{}. city=\"{}\" country=\"{}\" state=\"{}\" "
           "iso3166_2={} lat={} lon={}",

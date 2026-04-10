@@ -4,28 +4,39 @@
  * and country into fixed mock phrase catalogs.
  */
 
+#include <format>
 #include <string>
+#include <string_view>
 
 #include "data_generation/mock_generator.h"
 
-auto MockGenerator::GenerateBrewery(const std::string& city_name,
-                                    const std::string& country_name,
-                                    const std::string& /*region_context*/)
-    -> BreweryResult {
-   const std::size_t hash = DeterministicHash(city_name, country_name);
+BreweryResult MockGenerator::GenerateBrewery(
+    const Location& location, const std::string& /*region_context*/) {
+   const std::size_t hash = DeterministicHash(location);
 
-   const std::string& adjective =
+   const std::string_view adjective =
        kBreweryAdjectives.at(hash % kBreweryAdjectives.size());
-   const std::string& noun =
-       kBreweryNouns.at((hash / 7) % kBreweryNouns.size());
-   const std::string& base_description =
+   const std::string_view noun =
+       kBreweryNouns.at(hash / 7 % kBreweryNouns.size());
+   const std::string_view base_description =
        kBreweryDescriptions.at((hash / 13) % kBreweryDescriptions.size());
 
-   const std::string name = city_name + " " + adjective + " " + noun;
-   const std::string description =
-       base_description + " Based in " + city_name +
-       (country_name.empty() ? std::string(".")
-                             : std::string(", ") + country_name + ".");
+   const std::string name =
+       std::format("{} {} {}", location.city, adjective, noun);
 
-   return {name, description};
+   const std::string state_suffix =
+       location.state_province.empty()
+           ? std::string{}
+           : std::format(", {}", location.state_province);
+   const std::string country_suffix =
+       location.country.empty() ? std::string{}
+                                : std::format(", {}", location.country);
+   const std::string description = std::format(
+       "{} Located in {}{}{}.", base_description, location.city,
+       state_suffix, country_suffix);
+
+   return {
+       .name = name,
+       .description = description,
+   };
 }

@@ -7,9 +7,9 @@
 
 #include "biergarten_data_generator.h"
 
-auto BiergartenDataGenerator::Run() -> bool {
+bool BiergartenDataGenerator::Run() {
    try {
-      const std::vector<Location> cities = QueryCitiesWithCountries();
+      const std::vector<Location> cities = QueryCitiesWithCountries(); 
       std::vector<EnrichedCity> enriched;
       enriched.reserve(cities.size());
 

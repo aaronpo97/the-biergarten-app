@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_LLAMA_BACKEND_STATE_H_
-#define BIERGARTEN_PIPELINE_LLAMA_BACKEND_STATE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_LLAMA_BACKEND_STATE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_LLAMA_BACKEND_STATE_H_
 
 /**
  * @file llama_backend_state.h
@@ -29,4 +29,4 @@ class LlamaBackendState {
    LlamaBackendState& operator=(const LlamaBackendState&) = delete;
 };
 
-#endif  // BIERGARTEN_PIPELINE_LLAMA_BACKEND_STATE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_LLAMA_BACKEND_STATE_H_

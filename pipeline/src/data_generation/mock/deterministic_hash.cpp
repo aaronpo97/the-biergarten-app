@@ -5,14 +5,12 @@
  */
 
 #include <boost/container_hash/hash.hpp>
-#include <string>
 
 #include "data_generation/mock_generator.h"
 
-std::size_t MockGenerator::DeterministicHash(const std::string& a,
-                                             const std::string& b) {
-   std::size_t seed = 0;
-   boost::hash_combine(seed, a);
-   boost::hash_combine(seed, b);
+size_t MockGenerator::DeterministicHash(const Location& location) {
+   size_t seed = 0;
+   boost::hash_combine(seed, location.city);
+   boost::hash_combine(seed, location.country);
    return seed;
 }

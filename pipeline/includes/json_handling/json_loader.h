@@ -1,12 +1,12 @@
-#ifndef BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
-#define BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_
 
 /**
  * @file json_handling/json_loader.h
  * @brief Loader API for curated location data.
  */
 
-#include <string>
+#include <filesystem>
 #include <vector>
 
 #include "data_model/location.h"
@@ -15,7 +15,8 @@
 class JsonLoader {
   public:
    /// @brief Parses a JSON array file and returns all location records.
-   static std::vector<Location> LoadLocations(const std::string& filepath);
+   static std::vector<Location> LoadLocations(
+       const std::filesystem::path& filepath);
 };
 
-#endif  // BIERGARTEN_PIPELINE_JSON_HANDLING_JSON_LOADER_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_
