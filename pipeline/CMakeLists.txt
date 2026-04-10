@@ -72,7 +72,7 @@ endif()
 FetchContent_Declare(
     llama-cpp
     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-    GIT_TAG        b8711
+    GIT_TAG        b8739
 )
 FetchContent_MakeAvailable(llama-cpp)
 # --- boost-ext/di -------------------------------------------------------------

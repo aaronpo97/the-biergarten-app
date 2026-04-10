@@ -171,76 +171,68 @@ static std::pair<std::string, std::string> ParseTwoLineResponse(
    if (first.empty() || second.empty()) throw std::runtime_error(error_message);
    return {first, second};
 }
-
-/**
- * Apply model's chat template to user-only prompt, formatting it for the model
- */
-static std::string ToChatPrompt(const llama_model* model,
-                                const std::string& user_prompt) {
+std::string ToChatPrompt(const llama_model* model,
+                         const std::string& system_prompt,
+                         const std::string& user_prompt) {
    const char* tmpl = llama_model_chat_template(model, nullptr);
    if (tmpl == nullptr) {
-      return user_prompt;
-   }
-
-   const llama_chat_message message{"user", user_prompt.c_str()};
-
-   std::vector<char> buffer(
-       std::max<std::size_t>(1024, user_prompt.size() * 4));
-   int32_t required =
-       llama_chat_apply_template(tmpl, &message, 1, true, buffer.data(),
-                                 static_cast<int32_t>(buffer.size()));
-
-   if (required < 0) {
-      throw std::runtime_error("LlamaGenerator: failed to apply chat template");
-   }
-
-   if (required >= static_cast<int32_t>(buffer.size())) {
-      buffer.resize(static_cast<std::size_t>(required) + 1);
-      required =
-          llama_chat_apply_template(tmpl, &message, 1, true, buffer.data(),
-                                    static_cast<int32_t>(buffer.size()));
-      if (required < 0) {
-         throw std::runtime_error(
-             "LlamaGenerator: failed to apply chat template");
-      }
-   }
-
-   return std::string(buffer.data(), static_cast<std::size_t>(required));
-}
-
-/**
- * Apply model's chat template to system+user prompt pair, formatting for the
- * model
- */
-static std::string ToChatPrompt(const llama_model* model,
-                                const std::string& system_prompt,
-                                const std::string& user_prompt) {
-   const char* tmpl = llama_model_chat_template(model, nullptr);
-   if (tmpl == nullptr) {
+      // No template found, fallback to raw text
       return system_prompt + "\n\n" + user_prompt;
    }
 
-   const llama_chat_message messages[2] = {{"system", system_prompt.c_str()},
-                                           {"user", user_prompt.c_str()}};
+   const std::array<llama_chat_message, 2> messages = {
+       {{"system", system_prompt.c_str()}, {"user", user_prompt.c_str()}}};
 
    std::vector<char> buffer(std::max<std::size_t>(
        1024, (system_prompt.size() + user_prompt.size()) * 4));
+
    int32_t required =
-       llama_chat_apply_template(tmpl, messages, 2, true, buffer.data(),
+       llama_chat_apply_template(tmpl, messages.data(), 2, true, buffer.data(),
                                  static_cast<int32_t>(buffer.size()));
 
+   // FALLBACK: If the template fails (e.g., Gemma rejecting the "system" role),
+   // combine the system and user prompts into a single "user" message.
    if (required < 0) {
-      throw std::runtime_error("LlamaGenerator: failed to apply chat template");
+      std::string combined_prompt = system_prompt + "\n\n" + user_prompt;
+      const std::array<llama_chat_message, 1> fallback_msg = {
+          {{"user", combined_prompt.c_str()}}};
+
+      required = llama_chat_apply_template(tmpl, fallback_msg.data(), 1, true,
+                                           buffer.data(),
+                                           static_cast<int32_t>(buffer.size()));
+
+      // THE FIX: Ultimate fallback. If the GGUF's internal template is
+      // completely unparseable (which happens with complex Jinja macros),
+      // degrade gracefully to raw text instead of throwing a runtime_error.
+      if (required < 0) {
+         return combined_prompt;
+      }
+
+      if (required >= static_cast<int32_t>(buffer.size())) {
+         buffer.resize(static_cast<std::size_t>(required) + 1);
+         required = llama_chat_apply_template(
+             tmpl, fallback_msg.data(), 1, true, buffer.data(),
+             static_cast<int32_t>(buffer.size()));
+
+         if (required < 0) {
+            return combined_prompt;
+         }
+      }
+
+      return std::string(buffer.data(), static_cast<std::size_t>(required));
    }
 
+   // Standard buffer resize if the original "system" + "user" array succeeded
+   // but needed more space
    if (required >= static_cast<int32_t>(buffer.size())) {
       buffer.resize(static_cast<std::size_t>(required) + 1);
-      required =
-          llama_chat_apply_template(tmpl, messages, 2, true, buffer.data(),
-                                    static_cast<int32_t>(buffer.size()));
+      required = llama_chat_apply_template(tmpl, messages.data(), 2, true,
+                                           buffer.data(),
+                                           static_cast<int32_t>(buffer.size()));
+
+      // Final safety net on resize
       if (required < 0) {
-         throw std::runtime_error(
-             "LlamaGenerator: failed to apply chat template");
+         return system_prompt + "\n\n" + user_prompt;
       }
    }
 
@@ -416,7 +408,7 @@ std::pair<std::string, std::string> ParseTwoLineResponsePublic(
 
 std::string ToChatPromptPublic(const llama_model* model,
                                const std::string& user_prompt) {
-   return ToChatPrompt(model, user_prompt);
+   return ToChatPrompt(model, user_prompt, "");
 }
 
 std::string ToChatPromptPublic(const llama_model* model,
