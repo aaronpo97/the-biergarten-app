@@ -7,6 +7,7 @@
  */
 
 #include <cstdint>
+#include <random>
 #include <string>
 
 #include "data_generation/data_generator.h"
@@ -114,7 +115,7 @@ class LlamaGenerator final : public DataGenerator {
    llama_context* context_ = nullptr;
    float sampling_temperature_ = 0.8f;
    float sampling_top_p_ = 0.92f;
-   uint32_t sampling_seed_ = 0xFFFFFFFFu;
+   std::mt19937 rng_;
    uint32_t n_ctx_ = 8192;
    std::string brewery_system_prompt_;
 };

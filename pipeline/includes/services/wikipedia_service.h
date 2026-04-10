@@ -24,9 +24,10 @@ class WikipediaService final : public IEnrichmentService {
    [[nodiscard]] std::string GetLocationContext(const Location& loc) override;
 
   private:
-   std::string FetchExtract(std::string_view query) const;
+   std::string FetchExtract(std::string_view query);
    std::shared_ptr<WebClient> client_;
    std::unordered_map<std::string, std::string> cache_;
+   std::unordered_map<std::string, std::string> extract_cache_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_WIKIPEDIA_SERVICE_H_

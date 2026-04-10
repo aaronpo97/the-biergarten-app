@@ -23,9 +23,4 @@ LlamaGenerator::~LlamaGenerator() {
       llama_model_free(model_);
       model_ = nullptr;
    }
-
-   /**
-    * Clean up the backend (GPU/CPU acceleration resources)
-    */
-   llama_backend_free();
 }

@@ -21,7 +21,7 @@ typedef int llama_token;
  * @return Processed region context.
  */
 std::string PrepareRegionContextPublic(std::string_view region_context,
-                                       std::size_t max_chars = 700);
+                                       std::size_t max_chars = 2000);
 
 /**
  * @brief Parses a response expected to contain two logical lines.

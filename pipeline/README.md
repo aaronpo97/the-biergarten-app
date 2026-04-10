@@ -2,6 +2,26 @@
 
 Biergarten Pipeline is a C++23 command-line tool that reads a local city list, resolves contextual enrichment for each sampled city through an injected service, and generates brewery names and descriptions. The current code samples up to four locations per run, then uses either a local GGUF model or the mock generator to produce the output.
 
+## Hardware & GPU Config
+
+### x86/64 Linux, NVIDIA RTX 2000
+
+- **Host**: ThinkPad P1 Gen 7 (Fedora 43)
+- **CPU**: Intel Core Ultra 7 155H
+- **GPU**: NVIDIA RTX 2000 Ada Generation
+- **Memory**: 32GB
+- **Model**: Qwen3-8B-Q6-K
+- **Inference**: llama.cpp with CUDA 12.x support
+
+### ARM MacOS, M1 Pro
+
+- **Host**: MacBook Pro 14" (2021)
+- **CPU**: Apple M1 Pro (8-core)
+- **GPU**: Apple M1 Pro (14-core) [Integrated]
+- **Memory**: 16GB
+- **Model**: Qwen3-8B-Q6-K
+- **Inference**: llama.cpp with Metal (MPS) support
+
 ## Pipeline
 
 | Stage    | What happens                                                            |

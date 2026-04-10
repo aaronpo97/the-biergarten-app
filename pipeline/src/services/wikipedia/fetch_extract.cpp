@@ -11,19 +11,24 @@
 
 #include "services/wikipedia_service.h"
 
-auto WikipediaService::FetchExtract(std::string_view query) const
-    -> std::string {
-   const std::string encoded = client_->UrlEncode(std::string(query));
+auto WikipediaService::FetchExtract(std::string_view query) -> std::string {
+   const std::string cache_key(query);
+   const auto cache_it = this->extract_cache_.find(cache_key);
+   if (cache_it != this->extract_cache_.end()) {
+      return cache_it->second;
+   }
+
+   const std::string encoded = this->client_->UrlEncode(cache_key);
    const std::string url =
        "https://en.wikipedia.org/w/api.php?action=query&titles=" + encoded +
        "&prop=extracts&explaintext=1&format=json";
 
-   const std::string body = client_->Get(url);
+   const std::string body = this->client_->Get(url);
 
-   boost::system::error_code ec;
-   boost::json::value doc = boost::json::parse(body, ec);
+   boost::system::error_code parse_error;
+   boost::json::value doc = boost::json::parse(body, parse_error);
 
-   if (!ec && doc.is_object()) {
+   if (!parse_error && doc.is_object()) {
       try {
          auto& pages = doc.at("query").at("pages").get_object();
          if (!pages.empty()) {
@@ -32,9 +37,11 @@ auto WikipediaService::FetchExtract(std::string_view query) const
                std::string extract(page.at("extract").as_string().c_str());
                spdlog::debug("WikipediaService fetched {} chars for '{}'",
                              extract.size(), query);
+               this->extract_cache_.emplace(cache_key, extract);
                return extract;
             }
          }
+         this->extract_cache_.emplace(cache_key, std::string{});
       } catch (const std::exception& e) {
          spdlog::warn(
              "WikipediaService: failed to parse response structure for '{}': "
@@ -42,9 +49,9 @@ auto WikipediaService::FetchExtract(std::string_view query) const
              query, e.what());
          return {};
       }
-   } else if (ec) {
+   } else if (parse_error) {
       spdlog::warn("WikipediaService: JSON parse error for '{}': {}", query,
-                   ec.message());
+                   parse_error.message());
    }
 
    return {};

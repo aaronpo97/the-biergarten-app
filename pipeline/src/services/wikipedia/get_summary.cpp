@@ -30,20 +30,22 @@ auto WikipediaService::GetLocationContext(const Location& loc) -> std::string {
    }
 
    const std::string beer_query = "beer in " + loc.country;
+   const std::string city_beer_query = "beer in " + loc.city;
+
+   auto append_extract = [&result](const std::string& extract) -> void {
+      if (extract.empty()) {
+         return;
+      }
+      if (!result.empty()) {
+         result += "\n\n";
+      }
+      result += extract;
+   };
 
    try {
-      const std::string region_extract = FetchExtract(region_query);
-      const std::string beer_extract = FetchExtract(beer_query);
-
-      if (!region_extract.empty()) {
-         result += region_extract;
-      }
-      if (!beer_extract.empty()) {
-         if (!result.empty()) {
-            result += "\n\n";
-         }
-         result += beer_extract;
-      }
+      append_extract(FetchExtract(region_query));
+      append_extract(FetchExtract(beer_query));
+      append_extract(FetchExtract(city_beer_query));
    } catch (const std::runtime_error& e) {
       spdlog::debug("WikipediaService lookup failed for '{}': {}", region_query,
                     e.what());

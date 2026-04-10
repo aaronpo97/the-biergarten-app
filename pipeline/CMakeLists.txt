@@ -120,6 +120,7 @@ set(SOURCES
     src/web_client/curl_web_client_destructor.cpp
     src/web_client/curl_web_client_download_to_file.cpp
     src/web_client/curl_web_client_get.cpp
+    src/web_client/curl_web_client_utils.cpp
     src/web_client/curl_web_client_url_encode.cpp
     # Data generation modules
     src/data_generation/llama/destructor.cpp

@@ -145,8 +145,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
     * Distribution sampler: selects actual token using configured seed for
     * reproducibility
     */
-   llama_sampler_chain_add(sampler.get(),
-                           llama_sampler_init_dist(sampling_seed_));
+   llama_sampler_chain_add(sampler.get(), llama_sampler_init_dist(rng_()));
 
    /**
     * TOKEN GENERATION LOOP
@@ -186,11 +185,6 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    std::string output;
    for (const llama_token token : generated_tokens)
       AppendTokenPiecePublic(vocab, token, output);
-
-   /**
-    * Advance seed for next generation to improve output diversity
-    */
-   sampling_seed_ = (sampling_seed_ == 0xFFFFFFFFu) ? 0 : sampling_seed_ + 1;
 
    return output;
 }

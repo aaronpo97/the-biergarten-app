@@ -16,6 +16,7 @@
 #include "biergarten_data_generator.h"
 #include "data_generation/llama_generator.h"
 #include "data_generation/mock_generator.h"
+#include "llama_backend_state.h"
 #include "services/enrichment_service.h"
 #include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
@@ -116,6 +117,7 @@ auto ParseArguments(const int argc, char** argv,
 auto main(const int argc, char** argv) noexcept -> int {
    try {
       const CurlGlobalState curl_state;
+      const LlamaBackendState llama_backend_state;
       spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
       ApplicationOptions options;

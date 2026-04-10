@@ -3,8 +3,7 @@
  * @brief LlamaGenerator constructor implementation.
  */
 
-#include <llama.h>
-
+#include <random>
 #include <stdexcept>
 #include <string>
 
@@ -12,7 +11,8 @@
 #include "data_generation/llama_generator.h"
 
 LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
-                               const std::string& model_path) {
+                               const std::string& model_path)
+    : rng_() {
    if (model_path.empty()) {
       throw std::runtime_error("LlamaGenerator: model path must not be empty");
    }
@@ -39,15 +39,13 @@ LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
 
    sampling_temperature_ = options.temperature;
    sampling_top_p_ = options.top_p;
-   sampling_seed_ = (options.seed < 0)
-                        ? static_cast<uint32_t>(LLAMA_DEFAULT_SEED)
-                        : static_cast<uint32_t>(options.seed);
+   if (options.seed == -1) {
+      std::random_device random_device;
+      rng_.seed(random_device());
+   } else {
+      rng_.seed(static_cast<uint32_t>(options.seed));
+   }
    n_ctx_ = options.n_ctx;
 
-   try {
-      Load(model_path);
-   } catch (...) {
-      llama_backend_free();
-      throw;
-   }
+   Load(model_path);
 }
