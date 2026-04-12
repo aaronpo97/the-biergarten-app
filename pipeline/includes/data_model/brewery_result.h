@@ -13,10 +13,10 @@
  */
 struct BreweryResult {
    /// @brief Brewery display name.
-   std::string name;
+   std::string name{};
 
    /// @brief Brewery description text.
-   std::string description;
+   std::string description{};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_BREWERY_RESULT_H_

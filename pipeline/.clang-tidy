@@ -9,21 +9,23 @@ Checks: >
   -google-runtime-references
 
 CheckOptions:
-  # Enforce Google Naming Conventions
+  # Enforce Google Naming Conventions with valid clang-tidy strings
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
   - key: readability-identifier-naming.ClassMemberCase
-    value: snake_case
+    value: lower_case
   - key: readability-identifier-naming.ClassMemberSuffix
     value: _
-  - key: readability-identifier-naming.ClassCase
-    value: PascalCase
   - key: readability-identifier-naming.FunctionCase
-    value: PascalCase
+    value: CamelCase
   - key: readability-identifier-naming.StructCase
-    value: PascalCase
+    value: CamelCase
   - key: readability-identifier-naming.VariableCase
-    value: snake_case
+    value: lower_case
   - key: readability-identifier-naming.GlobalConstantCase
-    value: kPascalCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
 
   # Ensure C++20 Modernization
   - key: modernize-make-unique.MakeSmartPtrFunction

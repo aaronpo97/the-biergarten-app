@@ -13,10 +13,10 @@
  */
 struct UserResult {
    /// @brief Username handle.
-   std::string username;
+   std::string username{};
 
    /// @brief Short user biography.
-   std::string bio;
+   std::string bio{};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_USER_RESULT_H_

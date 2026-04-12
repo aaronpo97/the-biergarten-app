@@ -44,18 +44,18 @@ class MockGenerator final : public DataGenerator {
     */
    static std::size_t DeterministicHash(const Location& location);
 
-   inline static constexpr std::array<std::string_view, 18> kBreweryAdjectives =
+   static constexpr std::array<std::string_view, 18> kBreweryAdjectives =
        {"Craft",      "Heritage", "Local",  "Artisan",  "Pioneer",    "Golden",
         "Modern",     "Classic",  "Summit", "Northern", "Riverstone", "Barrel",
         "Hinterland", "Harbor",   "Wild",   "Granite",  "Copper",     "Maple"};
 
-   inline static constexpr std::array<std::string_view, 18> kBreweryNouns = {
+   static constexpr std::array<std::string_view, 18> kBreweryNouns = {
        "Brewing Co.", "Brewery",    "Bier Haus", "Taproom",      "Works",
        "House",       "Fermentery", "Ale Co.",   "Cellars",      "Collective",
        "Project",     "Foundry",    "Malthouse", "Public House", "Co-op",
        "Lab",         "Beer Hall",  "Guild"};
 
-   inline static constexpr std::array<std::string_view, 18>
+   static constexpr std::array<std::string_view, 18>
        kBreweryDescriptions = {
            "Handcrafted pale ales and seasonal IPAs with local ingredients.",
            "Traditional lagers and experimental sours in small batches.",
@@ -90,14 +90,14 @@ class MockGenerator final : public DataGenerator {
            "Destination taproom known for balanced IPAs and cocoa-rich "
            "stouts."};
 
-   inline static constexpr std::array<std::string_view, 18> kUsernames = {
+   static constexpr std::array<std::string_view, 18> kUsernames = {
        "hopseeker",     "malttrail",   "yeastwhisper",  "lagerlane",
        "barrelbound",   "foamfinder",  "taphunter",     "graingeist",
        "brewscout",     "aleatlas",    "caskcompass",   "hopsandmaps",
        "mashpilot",     "pintnomad",   "fermentfriend", "stoutsignal",
        "sessionwander", "kettlekeeper"};
 
-   inline static constexpr std::array<std::string_view, 18> kBios = {
+   static constexpr std::array<std::string_view, 18> kBios = {
        "Always chasing balanced IPAs and crisp lagers across local taprooms.",
        "Weekend brewery explorer with a soft spot for dark, roasty stouts.",
        "Documenting tiny brewpubs, fresh pours, and unforgettable beer "

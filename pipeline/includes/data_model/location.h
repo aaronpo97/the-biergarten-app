@@ -13,25 +13,25 @@
  */
 struct Location {
    /// @brief City name.
-   std::string city;
+   std::string city{};
 
    /// @brief State or province name.
-   std::string state_province;
+   std::string state_province{};
 
    /// @brief ISO 3166-2 subdivision code.
-   std::string iso3166_2;
+   std::string iso3166_2{};
 
    /// @brief Country name.
-   std::string country;
+   std::string country{};
 
    /// @brief ISO 3166-1 country code.
-   std::string iso3166_1;
+   std::string iso3166_1{};
 
    /// @brief Latitude in decimal degrees.
-   double latitude;
+   double latitude{};
 
    /// @brief Longitude in decimal degrees.
-   double longitude;
+   double longitude{};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_LOCATION_H_

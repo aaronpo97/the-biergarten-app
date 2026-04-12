@@ -16,7 +16,7 @@
 
 struct llama_model;
 struct llama_context;
-struct llama_sampler;
+struct LlamaSampler;
 
 /**
  * @brief Data generator implementation backed by llama.cpp.
@@ -74,7 +74,7 @@ class LlamaGenerator final : public DataGenerator {
     SamplerState(SamplerState&&) = delete;
     SamplerState& operator=(SamplerState&&) = delete;
 
-    llama_sampler* chain = nullptr;
+    LlamaSampler* chain = nullptr;
   };
 
   /**

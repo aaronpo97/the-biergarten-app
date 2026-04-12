@@ -103,7 +103,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc,
       const bool has_llm_params = !variables_map["temperature"].defaulted() ||
                                   !variables_map["top-p"].defaulted() ||
                                   !variables_map["top-k"].defaulted() ||
-                                  !variables_map["seed"].defaulted();
+                                  !variables_map["seed"].defaulted() = false;
 
       if (use_mocked && has_llm_params) {
          spdlog::warn(
