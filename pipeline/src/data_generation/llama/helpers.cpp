@@ -24,14 +24,14 @@
  * String trimming: removes leading and trailing whitespace
  */
 static std::string Trim(std::string_view value) {
-   constexpr std::string_view whitespace = " \t\n\r\f\v";
-   const std::size_t first_index = value.find_first_not_of(whitespace);
-   if (first_index == std::string_view::npos) {
-      return {};
-   }
+  constexpr std::string_view whitespace = " \t\n\r\f\v";
+  const std::size_t first_index = value.find_first_not_of(whitespace);
+  if (first_index == std::string_view::npos) {
+    return {};
+  }
 
-   const std::size_t last_index = value.find_last_not_of(whitespace);
-   return std::string(value.substr(first_index, last_index - first_index + 1));
+  const std::size_t last_index = value.find_last_not_of(whitespace);
+  return std::string(value.substr(first_index, last_index - first_index + 1));
 }
 
 /**
@@ -39,26 +39,26 @@ static std::string Trim(std::string_view value) {
  * spaces
  */
 static std::string CondenseWhitespace(std::string_view text) {
-   std::string out;
-   out.reserve(text.size());
+  std::string out;
+  out.reserve(text.size());
 
-   bool pending_space = false;
-   for (const unsigned char chr : text) {
-      if (std::isspace(chr) != 0) {
-         if (!out.empty()) {
-            pending_space = true;
-         }
-         continue;
+  bool pending_space = false;
+  for (const unsigned char chr : text) {
+    if (std::isspace(chr) != 0) {
+      if (!out.empty()) {
+        pending_space = true;
       }
+      continue;
+    }
 
-      if (pending_space) {
-         out.push_back(' ');
-         pending_space = false;
-      }
-      out.push_back(static_cast<char>(chr));
-   }
+    if (pending_space) {
+      out.push_back(' ');
+      pending_space = false;
+    }
+    out.push_back(static_cast<char>(chr));
+  }
 
-   return out;
+  return out;
 }
 
 /**
@@ -67,286 +67,285 @@ static std::string CondenseWhitespace(std::string_view text) {
  */
 static std::string PrepareRegionContext(std::string_view region_context,
                                         const size_t max_chars) {
-   std::string normalized = CondenseWhitespace(region_context);
-   if (normalized.size() <= max_chars) {
-      return normalized;
-   }
+  std::string normalized = CondenseWhitespace(region_context);
+  if (normalized.size() <= max_chars) {
+    return normalized;
+  }
 
-   normalized.resize(max_chars);
-   const size_t last_space = normalized.find_last_of(' ');
-   if (last_space != std::string::npos && last_space > max_chars / 2) {
-      normalized.resize(last_space);
-   }
+  normalized.resize(max_chars);
+  const size_t last_space = normalized.find_last_of(' ');
+  if (last_space != std::string::npos && last_space > max_chars / 2) {
+    normalized.resize(last_space);
+  }
 
-   normalized += "...";
-   return normalized;
+  normalized += "...";
+  return normalized;
 }
 
 static std::string ToChatPrompt(const llama_model* model,
-                               const std::string& system_prompt,
-                               const std::string& user_prompt) {
-   std::string combined_prompt;
-   combined_prompt.append(system_prompt);
-   combined_prompt.append("\n\n");
-   combined_prompt.append(user_prompt);
+                                const std::string& system_prompt,
+                                const std::string& user_prompt) {
+  std::string combined_prompt;
+  combined_prompt.append(system_prompt);
+  combined_prompt.append("\n\n");
+  combined_prompt.append(user_prompt);
 
-   const char* tmpl = llama_model_chat_template(model, nullptr);
-   if (tmpl == nullptr) {
-      // No template found, fallback to raw text
-      spdlog::warn(
-          "LlamaGenerator: missing chat template; using raw prompt fallback");
-      return combined_prompt;
-   }
+  const char* tmpl = llama_model_chat_template(model, nullptr);
+  if (tmpl == nullptr) {
+    // No template found, fallback to raw text
+    spdlog::warn(
+        "LlamaGenerator: missing chat template; using raw prompt fallback");
+    return combined_prompt;
+  }
 
-   const std::array<llama_chat_message, 2> messages = {
-       {{"system", system_prompt.c_str()}, {"user", user_prompt.c_str()}}};
+  const std::array<llama_chat_message, 2> messages = {
+      {{"system", system_prompt.c_str()}, {"user", user_prompt.c_str()}}};
 
-   std::vector<char> buffer(std::max<std::size_t>(
-       1024, (system_prompt.size() + user_prompt.size()) * 4));
+  std::vector<char> buffer(std::max<std::size_t>(
+      1024, (system_prompt.size() + user_prompt.size()) * 4));
 
-   auto apply_template_with_resize =
-       [&](const llama_chat_message* chat_messages,
-           int32_t message_count) -> int32_t {
-      int32_t result = llama_chat_apply_template(
-          tmpl, chat_messages, message_count, true, buffer.data(),
-          static_cast<int32_t>(buffer.size()));
+  auto apply_template_with_resize = [&](const llama_chat_message* chat_messages,
+                                        int32_t message_count) -> int32_t {
+    int32_t result = llama_chat_apply_template(
+        tmpl, chat_messages, message_count, true, buffer.data(),
+        static_cast<int32_t>(buffer.size()));
 
-      if (result < 0) {
-         return result;
-      }
-
-      if (result >= static_cast<int32_t>(buffer.size())) {
-         buffer.resize(static_cast<std::size_t>(result) + 1);
-         result = llama_chat_apply_template(
-             tmpl, chat_messages, message_count, true, buffer.data(),
-             static_cast<int32_t>(buffer.size()));
-      }
-
+    if (result < 0) {
       return result;
-   };
+    }
 
-   int32_t template_result = apply_template_with_resize(messages.data(), 2);
+    if (result >= static_cast<int32_t>(buffer.size())) {
+      buffer.resize(static_cast<std::size_t>(result) + 1);
+      result = llama_chat_apply_template(tmpl, chat_messages, message_count,
+                                         true, buffer.data(),
+                                         static_cast<int32_t>(buffer.size()));
+    }
 
-   if (template_result >= 0) {
-      return {buffer.data(), static_cast<std::size_t>(template_result)};
-   }
+    return result;
+  };
 
-   spdlog::warn(
-       "LlamaGenerator: chat template rejected system/user messages (result "
-       "{}); trying single user fallback",
-       template_result);
+  int32_t template_result = apply_template_with_resize(messages.data(), 2);
 
-   // FALLBACK: If the template fails (e.g., Model rejecting the "system" role),
-   // combine the system and user prompts into a single "user" message.
-   const std::array<llama_chat_message, 1> fallback_msg = {
-       {{"user", combined_prompt.c_str()}}};
+  if (template_result >= 0) {
+    return {buffer.data(), static_cast<std::size_t>(template_result)};
+  }
 
-   template_result = apply_template_with_resize(fallback_msg.data(), 1);
+  spdlog::warn(
+      "LlamaGenerator: chat template rejected system/user messages (result "
+      "{}); trying single user fallback",
+      template_result);
 
-   // Ultimate fallback: if GGUF template parsing still fails, use raw text.
-   if (template_result < 0) {
-      spdlog::warn(
-          "LlamaGenerator: chat template fallback failed (result {}); using "
-          "raw prompt text",
-          template_result);
-      return combined_prompt;
-   }
+  // FALLBACK: If the template fails (e.g., Model rejecting the "system" role),
+  // combine the system and user prompts into a single "user" message.
+  const std::array<llama_chat_message, 1> fallback_msg = {
+      {{"user", combined_prompt.c_str()}}};
 
-   return {buffer.data(), static_cast<std::size_t>(template_result)};
+  template_result = apply_template_with_resize(fallback_msg.data(), 1);
+
+  // Ultimate fallback: if GGUF template parsing still fails, use raw text.
+  if (template_result < 0) {
+    spdlog::warn(
+        "LlamaGenerator: chat template fallback failed (result {}); using "
+        "raw prompt text",
+        template_result);
+    return combined_prompt;
+  }
+
+  return {buffer.data(), static_cast<std::size_t>(template_result)};
 }
 
 static void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
                              std::string& output) {
-   std::array<char, 256> buffer{};
-   int32_t bytes = llama_token_to_piece(vocab, token, buffer.data(),
-                                        buffer.size(), 0, true);
+  std::array<char, 256> buffer{};
+  int32_t bytes =
+      llama_token_to_piece(vocab, token, buffer.data(), buffer.size(), 0, true);
 
-   if (bytes < 0) {
-      std::vector<char> dynamic_buffer(static_cast<std::size_t>(-bytes));
-      bytes = llama_token_to_piece(vocab, token, dynamic_buffer.data(),
-                                   static_cast<int32_t>(dynamic_buffer.size()),
-                                   0, true);
-      if (bytes < 0) {
-         throw std::runtime_error(
-             "LlamaGenerator: failed to decode sampled token piece");
-      }
+  if (bytes < 0) {
+    std::vector<char> dynamic_buffer(static_cast<std::size_t>(-bytes));
+    bytes = llama_token_to_piece(vocab, token, dynamic_buffer.data(),
+                                 static_cast<int32_t>(dynamic_buffer.size()), 0,
+                                 true);
+    if (bytes < 0) {
+      throw std::runtime_error(
+          "LlamaGenerator: failed to decode sampled token piece");
+    }
 
-      output.append(dynamic_buffer.data(), static_cast<std::size_t>(bytes));
-      return;
-   }
+    output.append(dynamic_buffer.data(), static_cast<std::size_t>(bytes));
+    return;
+  }
 
-   output.append(buffer.data(), static_cast<std::size_t>(bytes));
+  output.append(buffer.data(), static_cast<std::size_t>(bytes));
 }
 
 static bool ExtractLastJsonObject(const std::string& text,
                                   std::string& json_out) {
-   std::size_t start = std::string::npos;
-   int depth = 0;
-   bool in_string = false;
-   bool escaped = false;
-   bool found = false;
-   std::string candidate;
+  std::size_t start = std::string::npos;
+  int depth = 0;
+  bool in_string = false;
+  bool escaped = false;
+  bool found = false;
+  std::string candidate;
 
-   for (std::size_t i = 0; i < text.size(); ++i) {
-      const char ch = text[i];
+  for (std::size_t i = 0; i < text.size(); ++i) {
+    const char ch = text[i];
 
-      if (in_string) {
-         if (escaped) {
-            escaped = false;
-         } else if (ch == '\\') {
-            escaped = true;
-         } else if (ch == '"') {
-            in_string = false;
-         }
-         continue;
+    if (in_string) {
+      if (escaped) {
+        escaped = false;
+      } else if (ch == '\\') {
+        escaped = true;
+      } else if (ch == '"') {
+        in_string = false;
       }
+      continue;
+    }
 
-      if (ch == '"') {
-         in_string = true;
-         continue;
+    if (ch == '"') {
+      in_string = true;
+      continue;
+    }
+
+    if (ch == '{') {
+      if (depth == 0) {
+        start = i;
       }
+      ++depth;
+      continue;
+    }
 
-      if (ch == '{') {
-         if (depth == 0) {
-            start = i;
-         }
-         ++depth;
-         continue;
+    if (ch == '}') {
+      if (depth == 0) {
+        continue;
       }
-
-      if (ch == '}') {
-         if (depth == 0) {
-            continue;
-         }
-         --depth;
-         if (depth == 0 && start != std::string::npos) {
-            candidate = text.substr(start, i - start + 1);
-            found = true;
-         }
+      --depth;
+      if (depth == 0 && start != std::string::npos) {
+        candidate = text.substr(start, i - start + 1);
+        found = true;
       }
-   }
+    }
+  }
 
-   if (!found) {
-      return false;
-   }
+  if (!found) {
+    return false;
+  }
 
-   json_out = std::move(candidate);
-   return true;
+  json_out = std::move(candidate);
+  return true;
 }
 
 std::string ExtractLastJsonObjectPublic(const std::string& text) {
-   std::string extracted;
-   if (ExtractLastJsonObject(text, extracted)) {
-      return extracted;
-   }
+  std::string extracted;
+  if (ExtractLastJsonObject(text, extracted)) {
+    return extracted;
+  }
 
-   return {};
+  return {};
 }
 
 static std::optional<std::string> ValidateBreweryJson(
     const std::string& raw, std::string& name_out,
     std::string& description_out) {
-   auto validate_object = [&](const boost::json::value& jv,
-                              std::string& error_out) -> bool {
-      if (!jv.is_object()) {
-         error_out = "JSON root must be an object";
-         return false;
-      }
+  auto validate_object = [&](const boost::json::value& jv,
+                             std::string& error_out) -> bool {
+    if (!jv.is_object()) {
+      error_out = "JSON root must be an object";
+      return false;
+    }
 
-      const auto& obj = jv.get_object();
-      if (!obj.contains("name") || !obj.at("name").is_string()) {
-         error_out = "JSON field 'name' is missing or not a string";
-         return false;
-      }
+    const auto& obj = jv.get_object();
+    if (!obj.contains("name") || !obj.at("name").is_string()) {
+      error_out = "JSON field 'name' is missing or not a string";
+      return false;
+    }
 
-      if (!obj.contains("description") || !obj.at("description").is_string()) {
-         error_out = "JSON field 'description' is missing or not a string";
-         return false;
-      }
+    if (!obj.contains("description") || !obj.at("description").is_string()) {
+      error_out = "JSON field 'description' is missing or not a string";
+      return false;
+    }
 
-      const auto& name_value = obj.at("name").as_string();
-      const auto& description_value = obj.at("description").as_string();
-      name_out = Trim(std::string_view(name_value.data(), name_value.size()));
-      description_out = Trim(
-          std::string_view(description_value.data(), description_value.size()));
+    const auto& name_value = obj.at("name").as_string();
+    const auto& description_value = obj.at("description").as_string();
+    name_out = Trim(std::string_view(name_value.data(), name_value.size()));
+    description_out = Trim(
+        std::string_view(description_value.data(), description_value.size()));
 
-      if (name_out.empty()) {
-         error_out = "JSON field 'name' must not be empty";
-         return false;
-      }
+    if (name_out.empty()) {
+      error_out = "JSON field 'name' must not be empty";
+      return false;
+    }
 
-      if (description_out.empty()) {
-         error_out = "JSON field 'description' must not be empty";
-         return false;
-      }
+    if (description_out.empty()) {
+      error_out = "JSON field 'description' must not be empty";
+      return false;
+    }
 
-      std::string name_lower = name_out;
-      std::string description_lower = description_out;
-      std::transform(
-          name_lower.begin(), name_lower.end(), name_lower.begin(),
-          [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-      std::transform(description_lower.begin(), description_lower.end(),
-                     description_lower.begin(), [](unsigned char c) {
-                        return static_cast<char>(std::tolower(c));
-                     });
+    std::string name_lower = name_out;
+    std::string description_lower = description_out;
+    std::transform(
+        name_lower.begin(), name_lower.end(), name_lower.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    std::transform(description_lower.begin(), description_lower.end(),
+                   description_lower.begin(), [](unsigned char c) {
+                     return static_cast<char>(std::tolower(c));
+                   });
 
-      if (name_lower == "string" || description_lower == "string") {
-         error_out = "JSON appears to be a schema placeholder, not content";
-         return false;
-      }
+    if (name_lower == "string" || description_lower == "string") {
+      error_out = "JSON appears to be a schema placeholder, not content";
+      return false;
+    }
 
-      error_out.clear();
-      return true;
-   };
+    error_out.clear();
+    return true;
+  };
 
-   boost::system::error_code ec;
-   boost::json::value jv = boost::json::parse(raw, ec);
-   std::string validation_error;
-   if (ec) {
-      std::string extracted;
-      if (!ExtractLastJsonObject(raw, extracted)) {
-         return "JSON parse error: " + ec.message();
-      }
+  boost::system::error_code ec;
+  boost::json::value jv = boost::json::parse(raw, ec);
+  std::string validation_error;
+  if (ec) {
+    std::string extracted;
+    if (!ExtractLastJsonObject(raw, extracted)) {
+      return "JSON parse error: " + ec.message();
+    }
 
-      ec.clear();
-      jv = boost::json::parse(extracted, ec);
-      if (ec) {
-         return "JSON parse error: " + ec.message();
-      }
+    ec.clear();
+    jv = boost::json::parse(extracted, ec);
+    if (ec) {
+      return "JSON parse error: " + ec.message();
+    }
 
-      if (!validate_object(jv, validation_error)) {
-         return validation_error;
-      }
-
-      return std::nullopt;
-   }
-
-   if (!validate_object(jv, validation_error)) {
+    if (!validate_object(jv, validation_error)) {
       return validation_error;
-   }
+    }
 
-   return std::nullopt;
+    return std::nullopt;
+  }
+
+  if (!validate_object(jv, validation_error)) {
+    return validation_error;
+  }
+
+  return std::nullopt;
 }
 
 // Forward declarations for helper functions exposed to other translation units
 std::string PrepareRegionContextPublic(std::string_view region_context,
                                        std::size_t max_chars) {
-   return PrepareRegionContext(region_context, max_chars);
+  return PrepareRegionContext(region_context, max_chars);
 }
 
 std::string ToChatPromptPublic(const llama_model* model,
                                const std::string& system_prompt,
                                const std::string& user_prompt) {
-   return ToChatPrompt(model, system_prompt, user_prompt);
+  return ToChatPrompt(model, system_prompt, user_prompt);
 }
 
 void AppendTokenPiecePublic(const llama_vocab* vocab, llama_token token,
                             std::string& output) {
-   AppendTokenPiece(vocab, token, output);
+  AppendTokenPiece(vocab, token, output);
 }
 
 std::optional<std::string> ValidateBreweryJsonPublic(
     const std::string& raw, std::string& name_out,
     std::string& description_out) {
-   return ValidateBreweryJson(raw, name_out, description_out);
+  return ValidateBreweryJson(raw, name_out, description_out);
 }

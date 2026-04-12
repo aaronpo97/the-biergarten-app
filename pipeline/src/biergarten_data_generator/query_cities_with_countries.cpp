@@ -16,25 +16,25 @@
 static constexpr std::size_t kBreweryAmount = 4;
 
 std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
-   spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
+  spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
-   const std::filesystem::path locations_path = "locations.json";
+  const std::filesystem::path locations_path = "locations.json";
 
-   auto all_locations = JsonLoader::LoadLocations(locations_path);
-   spdlog::info("  Locations available: {}", all_locations.size());
+  auto all_locations = JsonLoader::LoadLocations(locations_path);
+  spdlog::info("  Locations available: {}", all_locations.size());
 
-   const std::size_t sample_count =
-       std::min(kBreweryAmount, all_locations.size());
-   const auto sample_count_signed =
-       static_cast<std::iter_difference_t<decltype(all_locations.cbegin())>>(
-           sample_count);
-   std::vector<Location> sampled_locations;
-   sampled_locations.reserve(sample_count);
+  const std::size_t sample_count =
+      std::min(kBreweryAmount, all_locations.size());
+  const auto sample_count_signed =
+      static_cast<std::iter_difference_t<decltype(all_locations.cbegin())>>(
+          sample_count);
+  std::vector<Location> sampled_locations;
+  sampled_locations.reserve(sample_count);
 
-   std::random_device random_generator;
-   std::ranges::sample(all_locations, std::back_inserter(sampled_locations),
-                       sample_count_signed, random_generator);
+  std::random_device random_generator;
+  std::ranges::sample(all_locations, std::back_inserter(sampled_locations),
+                      sample_count_signed, random_generator);
 
-   spdlog::info("  Sampled locations: {}", sampled_locations.size());
-   return sampled_locations;
+  spdlog::info("  Sampled locations: {}", sampled_locations.size());
+  return sampled_locations;
 }

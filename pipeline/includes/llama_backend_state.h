@@ -15,18 +15,18 @@
  * it alive for application lifetime.
  */
 class LlamaBackendState {
-  public:
-   /// @brief Initializes global llama backend state.
-   LlamaBackendState() { llama_backend_init(); }
+ public:
+  /// @brief Initializes global llama backend state.
+  LlamaBackendState() { llama_backend_init(); }
 
-   /// @brief Cleans up global llama backend state.
-   ~LlamaBackendState() { llama_backend_free(); }
+  /// @brief Cleans up global llama backend state.
+  ~LlamaBackendState() { llama_backend_free(); }
 
-   /// @brief Non-copyable type.
-   LlamaBackendState(const LlamaBackendState&) = delete;
+  /// @brief Non-copyable type.
+  LlamaBackendState(const LlamaBackendState&) = delete;
 
-   /// @brief Non-copyable type.
-   LlamaBackendState& operator=(const LlamaBackendState&) = delete;
+  /// @brief Non-copyable type.
+  LlamaBackendState& operator=(const LlamaBackendState&) = delete;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_LLAMA_BACKEND_STATE_H_

@@ -34,8 +34,7 @@ std::string PrepareRegionContextPublic(std::string_view region_context,
  * @return Pair containing first and second parsed fields.
  */
 std::pair<std::string, std::string> ParseTwoLineResponsePublic(
-   const std::string& raw, const std::string& error_message);
-
+    const std::string& raw, const std::string& error_message);
 
 /**
  * @brief Applies model chat template to system and user prompts.
@@ -68,7 +67,8 @@ void AppendTokenPiecePublic(const llama_vocab* vocab, llama_token token,
  * @return Validation error message if invalid, or std::nullopt on success.
  */
 std::optional<std::string> ValidateBreweryJsonPublic(
-   const std::string& raw, std::string& name_out, std::string& description_out);
+    const std::string& raw, std::string& name_out,
+    std::string& description_out);
 
 /**
  * @brief Extracts the last balanced JSON object from text.

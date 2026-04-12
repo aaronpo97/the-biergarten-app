@@ -14,17 +14,17 @@
  * @brief Interface for services that can enrich a location with context.
  */
 class IEnrichmentService {
-  public:
-   /// @brief Virtual destructor for polymorphic cleanup.
-   virtual ~IEnrichmentService() = default;
+ public:
+  /// @brief Virtual destructor for polymorphic cleanup.
+  virtual ~IEnrichmentService() = default;
 
-   /**
-    * @brief Resolves contextual enrichment for a location.
-    *
-    * @param loc Location to enrich.
-    * @return Context text, or an empty string if unavailable.
-    */
-   virtual std::string GetLocationContext(const Location& loc) = 0;
+  /**
+   * @brief Resolves contextual enrichment for a location.
+   *
+   * @param loc Location to enrich.
+   * @return Context text, or an empty string if unavailable.
+   */
+  virtual std::string GetLocationContext(const Location& loc) = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_SERVICE_H_

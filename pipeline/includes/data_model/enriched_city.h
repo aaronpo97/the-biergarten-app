@@ -14,8 +14,8 @@
  * @brief Enriched city data with Wikipedia context.
  */
 struct EnrichedCity {
-   Location location;
-   std::string region_context{};
+  Location location;
+  std::string region_context{};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_ENRICHED_CITY_H_

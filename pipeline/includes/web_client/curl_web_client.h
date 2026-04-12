@@ -15,40 +15,40 @@
  * alive for application lifetime.
  */
 class CurlGlobalState {
-  public:
-   /// @brief Initializes global libcurl state.
-   CurlGlobalState();
+ public:
+  /// @brief Initializes global libcurl state.
+  CurlGlobalState();
 
-   /// @brief Cleans up global libcurl state.
-   ~CurlGlobalState();
+  /// @brief Cleans up global libcurl state.
+  ~CurlGlobalState();
 
-   /// @brief Non-copyable type.
-   CurlGlobalState(const CurlGlobalState&) = delete;
+  /// @brief Non-copyable type.
+  CurlGlobalState(const CurlGlobalState&) = delete;
 
-   /// @brief Non-copyable type.
-   CurlGlobalState& operator=(const CurlGlobalState&) = delete;
+  /// @brief Non-copyable type.
+  CurlGlobalState& operator=(const CurlGlobalState&) = delete;
 };
 
 /**
  * @brief WebClient implementation backed by libcurl.
  */
 class CURLWebClient : public WebClient {
-  public:
-   /**
-    * @brief Executes an HTTP GET request.
-    *
-    * @param url Request URL.
-    * @return Response body.
-    */
-   std::string Get(const std::string& url) override;
+ public:
+  /**
+   * @brief Executes an HTTP GET request.
+   *
+   * @param url Request URL.
+   * @return Response body.
+   */
+  std::string Get(const std::string& url) override;
 
-   /**
-    * @brief URL-encodes a string value.
-    *
-    * @param value Raw value.
-    * @return URL-encoded string.
-    */
-   std::string UrlEncode(const std::string& value) override;
+  /**
+   * @brief URL-encodes a string value.
+   *
+   * @param value Raw value.
+   * @return URL-encoded string.
+   */
+  std::string UrlEncode(const std::string& value) override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_CURL_WEB_CLIENT_H_

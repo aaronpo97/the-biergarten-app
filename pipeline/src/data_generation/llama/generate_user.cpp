@@ -13,6 +13,6 @@
 #include "data_generation/llama_generator_helpers.h"
 
 UserResult LlamaGenerator::GenerateUser(const std::string& locale) {
-   return {.username = "test_user",
-           .bio = "This is a test user profile from " + locale + "."};
+  return {.username = "test_user",
+          .bio = "This is a test user profile from " + locale + "."};
 }

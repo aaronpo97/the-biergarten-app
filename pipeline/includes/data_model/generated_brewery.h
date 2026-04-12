@@ -13,8 +13,8 @@
  * @brief Helper struct to store generated brewery data.
  */
 struct GeneratedBrewery {
-   Location location;
-   BreweryResult brewery;
+  Location location;
+  BreweryResult brewery;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_GENERATED_BREWERY_H_
