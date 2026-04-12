@@ -102,7 +102,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     const bool has_llm_params = !variables_map["temperature"].defaulted() ||
                                 !variables_map["top-p"].defaulted() ||
                                 !variables_map["top-k"].defaulted() ||
-                                !variables_map["seed"].defaulted() = false;
+                                !variables_map["seed"].defaulted();
 
     if (use_mocked && has_llm_params) {
       spdlog::warn(
@@ -175,9 +175,6 @@ int main(const int argc, char** argv) {
     return 0;
   } catch (const std::exception& exception) {
     spdlog::critical("Unhandled fatal error in main: {}", exception.what());
-    return 1;
-  } catch (...) {
-    spdlog::critical("Unhandled fatal non-standard exception in main");
     return 1;
   }
 }
