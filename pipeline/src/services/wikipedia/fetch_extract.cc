@@ -1,5 +1,5 @@
 /**
- * @file wikipedia/fetch_extract.cpp
+ * @file wikipedia/fetch_extract.cc
  * @brief WikipediaService::FetchExtract() implementation.
  */
 

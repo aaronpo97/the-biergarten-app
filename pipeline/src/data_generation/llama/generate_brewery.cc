@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/generate_brewery.cpp
+ * @file data_generation/llama/generate_brewery.cc
  * @brief Builds brewery prompts with regional context, performs retry-based
  * inference, and validates structured JSON output for brewery records.
  */

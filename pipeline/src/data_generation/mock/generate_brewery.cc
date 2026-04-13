@@ -1,5 +1,5 @@
 /**
- * @file data_generation/mock/generate_brewery.cpp
+ * @file data_generation/mock/generate_brewery.cc
  * @brief Builds deterministic brewery names and descriptions by hashing city
  * and country into fixed mock phrase catalogs.
  */

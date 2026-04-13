@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/generate_breweries.cpp
+ * @file biergarten_data_generator/generate_breweries.cc
  * @brief BiergartenDataGenerator::GenerateBreweries() implementation.
  */
 

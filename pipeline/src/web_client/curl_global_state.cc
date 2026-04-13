@@ -1,5 +1,5 @@
 /**
- * @file web_client/curl_global_state.cpp
+ * @file web_client/curl_global_state.cc
  * @brief CurlGlobalState constructor and destructor implementation.
  */
 

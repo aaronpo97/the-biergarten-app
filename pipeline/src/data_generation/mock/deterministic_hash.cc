@@ -1,5 +1,5 @@
 /**
- * @file data_generation/mock/deterministic_hash.cpp
+ * @file data_generation/mock/deterministic_hash.cc
  * @brief Implements a stable hash combiner used by MockGenerator to derive
  * repeatable pseudo-random indices from location input.
  */

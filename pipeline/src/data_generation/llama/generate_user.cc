@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/generate_user.cpp
+ * @file data_generation/llama/generate_user.cc
  * @brief Generates locale-aware user profiles with strict two-line formatting,
  * retry handling, and output sanitization for downstream parsing.
  */

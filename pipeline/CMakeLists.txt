@@ -90,29 +90,29 @@ FetchContent_MakeAvailable(spdlog)
 # 4. Sources
 # =============================================================================
 set(SOURCES
-    src/main.cpp
-    src/biergarten_data_generator/biergarten_data_generator.cpp
-    src/biergarten_data_generator/run.cpp
-    src/biergarten_data_generator/query_cities_with_countries.cpp
-    src/biergarten_data_generator/generate_breweries.cpp
-    src/biergarten_data_generator/log_results.cpp
-    src/services/wikipedia/wikipedia_service.cpp
-    src/services/wikipedia/get_summary.cpp
-    src/services/wikipedia/fetch_extract.cpp
-    src/web_client/curl_global_state.cpp
-    src/web_client/curl_web_client_get.cpp
-    src/web_client/curl_web_client_url_encode.cpp
-    src/data_generation/llama/llama_generator.cpp
-    src/data_generation/llama/generate_brewery.cpp
-    src/data_generation/llama/generate_user.cpp
-    src/data_generation/llama/helpers.cpp
-    src/data_generation/llama/infer.cpp
-    src/data_generation/llama/load.cpp
-    src/data_generation/llama/load_brewery_prompt.cpp
-    src/data_generation/mock/deterministic_hash.cpp
-    src/data_generation/mock/generate_brewery.cpp
-    src/data_generation/mock/generate_user.cpp
-    src/json_handling/json_loader.cpp
+    src/main.cc
+    src/biergarten_data_generator/biergarten_data_generator.cc
+    src/biergarten_data_generator/run.cc
+    src/biergarten_data_generator/query_cities_with_countries.cc
+    src/biergarten_data_generator/generate_breweries.cc
+    src/biergarten_data_generator/log_results.cc
+    src/services/wikipedia/wikipedia_service.cc
+    src/services/wikipedia/get_summary.cc
+    src/services/wikipedia/fetch_extract.cc
+    src/web_client/curl_global_state.cc
+    src/web_client/curl_web_client_get.cc
+    src/web_client/curl_web_client_url_encode.cc
+    src/data_generation/llama/llama_generator.cc
+    src/data_generation/llama/generate_brewery.cc
+    src/data_generation/llama/generate_user.cc
+    src/data_generation/llama/helpers.cc
+    src/data_generation/llama/infer.cc
+    src/data_generation/llama/load.cc
+    src/data_generation/llama/load_brewery_prompt.cc
+    src/data_generation/mock/deterministic_hash.cc
+    src/data_generation/mock/generate_brewery.cc
+    src/data_generation/mock/generate_user.cc
+    src/json_handling/json_loader.cc
 )
 
 # =============================================================================

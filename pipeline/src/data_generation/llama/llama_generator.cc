@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/llama_generator.cpp
+ * @file data_generation/llama/llama_generator.cc
  * @brief LlamaGenerator constructor and destructor implementation.
  */
 

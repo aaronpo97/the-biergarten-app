@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/biergarten_data_generator.cpp
+ * @file biergarten_data_generator/biergarten_data_generator.cc
  * @brief BiergartenDataGenerator constructor implementation.
  */
 

@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/log_results.cpp
+ * @file biergarten_data_generator/log_results.cc
  * @brief BiergartenDataGenerator::LogResults() implementation.
  */
 

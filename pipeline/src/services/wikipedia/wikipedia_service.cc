@@ -1,5 +1,5 @@
 /**
- * @file services/wikipedia/wikipedia_service.cpp
+ * @file services/wikipedia/wikipedia_service.cc
  * @brief WikipediaService constructor implementation.
  */
 

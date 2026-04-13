@@ -1,5 +1,5 @@
 /**
- * @file json_handling/json_loader.cpp
+ * @file json_handling/json_loader.cc
  * @brief Parses curated location JSON input into strongly typed Location
  * records with strict field validation and descriptive error reporting.
  */

@@ -3,7 +3,7 @@
 
 /**
  * @file data_generation/llama_generator.h
- * @brief Llama.cpp-backed implementation of DataGenerator.
+ * @brief llama.cpp-backed implementation of DataGenerator.
  */
 
 #include <cstdint>
@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-#include "data_generation/data_generator.h"
+#include "data_generation/data_generator.h" k
 #include "data_model/application_options.h"
 
 struct llama_model;

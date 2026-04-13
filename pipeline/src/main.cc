@@ -1,5 +1,5 @@
 /**
- * @file main.cpp
+ * @file main.cc
  * @brief Parses command-line options, validates runtime mode selection,
  * initializes shared infrastructure, and executes the pipeline entry flow.
  */

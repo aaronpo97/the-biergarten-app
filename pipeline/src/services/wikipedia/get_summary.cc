@@ -1,5 +1,5 @@
 /**
- * @file wikipedia/get_summary.cpp
+ * @file wikipedia/get_summary.cc
  * @brief WikipediaService::GetLocationContext() implementation.
  */
 

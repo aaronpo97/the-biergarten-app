@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/query_cities_with_countries.cpp
+ * @file biergarten_data_generator/query_cities_with_countries.cc
  * @brief BiergartenDataGenerator::QueryCitiesWithCountries() implementation.
  */
 

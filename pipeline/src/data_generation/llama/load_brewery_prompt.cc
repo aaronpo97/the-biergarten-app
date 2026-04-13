@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/load_brewery_prompt.cpp
+ * @file data_generation/llama/load_brewery_prompt.cc
  * @brief Resolves brewery system prompt content from cache or a configured
  * filesystem path and provides a robust inline fallback prompt when absent.
  */

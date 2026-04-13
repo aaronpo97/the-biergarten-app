@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/run.cpp
+ * @file biergarten_data_generator/run.cc
  * @brief BiergartenDataGenerator::Run() implementation.
  */
 

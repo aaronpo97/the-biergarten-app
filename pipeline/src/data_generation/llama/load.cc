@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/load.cpp
+ * @file data_generation/llama/load.cc
  * @brief Initializes llama backend, loads model weights, creates inference
  * context, and resets prior resources during model initialization.
  */

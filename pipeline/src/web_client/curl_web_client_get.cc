@@ -1,5 +1,5 @@
 /**
- * @file web_client/curl_web_client_get.cpp
+ * @file web_client/curl_web_client_get.cc
  * @brief CURLWebClient::Get() implementation.
  */
 

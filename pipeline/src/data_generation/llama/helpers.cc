@@ -1,5 +1,5 @@
 /**
- * @file data_generation/llama/helpers.cpp
+ * @file data_generation/llama/helpers.cc
  * @brief Provides prompt formatting, whitespace normalization, response
  * parsing, token decoding, and JSON validation helpers for Llama modules.
  */
