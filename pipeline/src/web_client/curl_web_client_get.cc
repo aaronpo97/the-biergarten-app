@@ -14,24 +14,26 @@
 
 using CurlHandle = std::unique_ptr<CURL, decltype(&curl_easy_cleanup)>;
 
-static CurlHandle create_handle() {
+static constexpr int64_t kConnectionTimeout = 10;
+static constexpr int64_t kRequestTimeout = 30;
+static constexpr int64_t kOkHttpStatus = 200;
+
+static CurlHandle CreateHandle() {
   CURL* handle = curl_easy_init();
   if (handle == nullptr) {
     throw std::runtime_error(
         "[CURLWebClient] Failed to initialize libcurl handle");
   }
-  return CurlHandle(handle, &curl_easy_cleanup);
+  return {handle, &curl_easy_cleanup};
 }
 
-static void set_common_get_options(CURL* curl, const std::string& url) {
-  constexpr uint64_t connection_timeout = 10;
-  constexpr uint64_t request_timeout = 30;
+static void SetCommonGetOptions(CURL* curl, const std::string& url) {
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "biergarten-pipeline/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
   curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
-  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, connection_timeout);
-  curl_easy_setopt(curl, CURLOPT_TIMEOUT, request_timeout);
+  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, kConnectionTimeout);
+  curl_easy_setopt(curl, CURLOPT_TIMEOUT, kRequestTimeout);
   curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
 }
 
@@ -45,29 +47,29 @@ static size_t WriteCallbackString(void* contents, const size_t size,
 }
 
 std::string CURLWebClient::Get(const std::string& url) {
-  const CurlHandle curl = create_handle();
+  const CurlHandle curl = CreateHandle();
 
   std::string response_string;
 
-  set_common_get_options(curl.get(), url);
+  SetCommonGetOptions(curl.get(), url);
 
   curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, WriteCallbackString);
   curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, &response_string);
 
-  CURLcode res = curl_easy_perform(curl.get());
+  CURLcode curl_result = curl_easy_perform(curl.get());
 
-  if (res != CURLE_OK) {
-    const auto error =
-        std::string("[CURLWebClient] GET failed: ") + curl_easy_strerror(res);
+  if (curl_result != CURLE_OK) {
+    const auto error = std::string("[CURLWebClient] GET failed: ") +
+                       curl_easy_strerror(curl_result);
     throw std::runtime_error(error);
   }
 
-  int64_t httpCode = 0;
-  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
+  int64_t http_code = 0;
+  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &http_code);
 
-  if (httpCode != 200) {
+  if (http_code != kOkHttpStatus) {
     const std::string error = "[CURLWebClient] HTTP error " +
-                              std::to_string(httpCode) + " for URL " + url;
+                              std::to_string(http_code) + " for URL " + url;
     throw std::runtime_error(error);
   }
 
