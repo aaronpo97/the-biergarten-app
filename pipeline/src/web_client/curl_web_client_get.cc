@@ -3,14 +3,14 @@
  * @brief CURLWebClient::Get() implementation.
  */
 
-#include <curl/curl.h>
+#include "web_client/curl_web_client.h"
 
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
 
-#include "web_client/curl_web_client.h"
+#include <curl/curl.h>
 
 using CurlHandle = std::unique_ptr<CURL, decltype(&curl_easy_cleanup)>;
 

@@ -6,13 +6,13 @@
 
 #include "json_handling/json_loader.h"
 
-#include <spdlog/spdlog.h>
-
-#include <boost/json.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
+
+#include <boost/json.hpp>
+#include <spdlog/spdlog.h>
 
 static std::string ReadRequiredString(const boost::json::object& object,
                                       const char* key) {

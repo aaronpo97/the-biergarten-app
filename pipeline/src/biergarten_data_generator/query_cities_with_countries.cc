@@ -3,14 +3,15 @@
  * @brief BiergartenDataGenerator::QueryCitiesWithCountries() implementation.
  */
 
-#include <spdlog/spdlog.h>
+#include "biergarten_data_generator.h"
 
 #include <algorithm>
 #include <filesystem>
 #include <iterator>
 #include <random>
 
-#include "biergarten_data_generator.h"
+#include <spdlog/spdlog.h>
+
 #include "json_handling/json_loader.h"
 
 static constexpr std::size_t kBreweryAmount = 4;

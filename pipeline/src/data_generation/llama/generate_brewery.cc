@@ -4,7 +4,7 @@
  * inference, and validates structured JSON output for brewery records.
  */
 
-#include <spdlog/spdlog.h>
+#include "data_generation/llama_generator.h"
 
 #include <array>
 #include <format>
@@ -12,7 +12,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "data_generation/llama_generator.h"
+#include <spdlog/spdlog.h>
+
 #include "data_generation/llama_generator_helpers.h"
 
 static std::string ExtractFinalJsonPayload(std::string raw_response) {
