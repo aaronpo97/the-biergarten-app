@@ -3,26 +3,28 @@
  * @brief BiergartenDataGenerator::Run() implementation.
  */
 
+#include <utility>
+
 #include <spdlog/spdlog.h>
 
 #include "biergarten_data_generator.h"
 
 bool BiergartenDataGenerator::Run() {
   try {
-    const std::vector<Location> cities = QueryCitiesWithCountries();
+    std::vector<Location> cities = QueryCitiesWithCountries();
     std::vector<EnrichedCity> enriched;
     enriched.reserve(cities.size());
 
     size_t skipped_count = 0;
-    for (const auto& city : cities) {
+    for (auto& city : cities) {
       try {
-        const std::string region_context =
-            context_service_->GetLocationContext(city);
+        std::string region_context = context_service_->GetLocationContext(city);
         spdlog::info("[Pipeline] Context for '{}' ({}) gathered:\n{}",
                      city.city, city.country, region_context);
 
         enriched.push_back(
-            EnrichedCity{.location = city, .region_context = region_context});
+            EnrichedCity{.location = std::move(city),
+                         .region_context = std::move(region_context)});
       } catch (const std::exception& exception) {
         ++skipped_count;
         spdlog::warn(
