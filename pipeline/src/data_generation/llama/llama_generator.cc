@@ -24,6 +24,18 @@ struct SamplerConfig {
 using SamplerPtr =
     std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
 
+void LlamaGenerator::ModelDeleter::operator()(llama_model* model) const noexcept {
+  if (model != nullptr) {
+    llama_model_free(model);
+  }
+}
+
+void LlamaGenerator::ContextDeleter::operator()(llama_context* context) const noexcept {
+  if (context != nullptr) {
+    llama_free(context);
+  }
+}
+
 static SamplerPtr CreateSamplerChain(const SamplerConfig& config,
                                      std::mt19937& rng) {
   const llama_sampler_chain_params sampler_params =
@@ -88,6 +100,7 @@ LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
   sampling_temperature_ = options.temperature;
   sampling_top_p_ = options.top_p;
   sampling_top_k_ = options.top_k;
+
   if (options.seed == -1) {
     std::random_device random_device;
     rng_.seed(random_device());
@@ -100,26 +113,8 @@ LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
   const SamplerConfig sampler_config{sampling_temperature_, sampling_top_p_,
                                      sampling_top_k_};
   auto sampler_chain = CreateSamplerChain(sampler_config, rng_);
-  sampler_.reset(new SamplerState());
+  sampler_ = std::make_unique<SamplerState>();
   sampler_->chain = sampler_chain.release();
 }
 
-LlamaGenerator::~LlamaGenerator() {
-  sampler_.reset();
-
-  /**
-   * Free the inference context (contains KV cache and computation state)
-   */
-  if (context_ != nullptr) {
-    llama_free(context_);
-    context_ = nullptr;
-  }
-
-  /**
-   * Free the loaded model (contains weights and vocabulary)
-   */
-  if (model_ != nullptr) {
-    llama_model_free(model_);
-    model_ = nullptr;
-  }
-}
+LlamaGenerator::~LlamaGenerator() = default;

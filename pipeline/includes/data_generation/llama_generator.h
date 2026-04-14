@@ -7,6 +7,7 @@
  */
 
 #include <cstdint>
+#include <memory>
 #include <random>
 #include <string>
 #include <string_view>
@@ -65,6 +66,17 @@ class LlamaGenerator final : public DataGenerator {
   static constexpr uint32_t kDefaultSamplingTopK = 64;
   static constexpr uint32_t kDefaultContextSize = 8192;
 
+  struct ModelDeleter {
+    void operator()(llama_model* model) const noexcept;
+  };
+
+  struct ContextDeleter {
+    void operator()(llama_context* context) const noexcept;
+  };
+
+  using ModelHandle = std::unique_ptr<llama_model, ModelDeleter>;
+  using ContextHandle = std::unique_ptr<llama_context, ContextDeleter>;
+
   struct SamplerState {
     SamplerState() = default;
     ~SamplerState();
@@ -116,8 +128,8 @@ class LlamaGenerator final : public DataGenerator {
    */
   std::string LoadBrewerySystemPrompt(const std::string& prompt_file_path);
 
-  llama_model* model_ = nullptr;
-  llama_context* context_ = nullptr;
+  ModelHandle model_;
+  ContextHandle context_;
   /// @brief Persistent sampler chain reused across inference calls.
   std::unique_ptr<SamplerState> sampler_;
   float sampling_temperature_ = 1.0F;

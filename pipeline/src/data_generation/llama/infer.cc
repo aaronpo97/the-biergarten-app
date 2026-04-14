@@ -22,7 +22,7 @@ static constexpr std::size_t kPromptTokenSlack = 8;
 std::string LlamaGenerator::Infer(const std::string& system_prompt,
                                   const std::string& prompt,
                                   const int max_tokens) {
-  return InferFormatted(ToChatPromptPublic(model_, system_prompt, prompt),
+  return InferFormatted(ToChatPromptPublic(model_.get(), system_prompt, prompt),
                         max_tokens);
 }
 
@@ -31,14 +31,14 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   /**
    * Validate that model and context are loaded
    */
-  if (model_ == nullptr || context_ == nullptr) {
+  if (!model_ || !context_) {
     throw std::runtime_error("LlamaGenerator: model not loaded");
   }
 
   /**
    * Get vocabulary for tokenization and token-to-text conversion
    */
-  const llama_vocab* vocab = llama_model_get_vocab(model_);
+  const llama_vocab* vocab = llama_model_get_vocab(model_.get());
   if (vocab == nullptr) {
     throw std::runtime_error("LlamaGenerator: vocab unavailable");
   }
@@ -46,7 +46,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   /**
    * Clear KV cache to ensure clean inference state (no residual context)
    */
-  llama_memory_clear(llama_get_memory(context_), true);
+  llama_memory_clear(llama_get_memory(context_.get()), true);
 
   /**
    * TOKENIZATION PHASE
@@ -79,8 +79,8 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    * Validate and compute effective token budgets based on context window
    * constraints
    */
-  const auto n_ctx = static_cast<int32_t>(llama_n_ctx(context_));
-  const auto n_batch = static_cast<int32_t>(llama_n_batch(context_));
+  const auto n_ctx = static_cast<int32_t>(llama_n_ctx(context_.get()));
+  const auto n_batch = static_cast<int32_t>(llama_n_batch(context_.get()));
   if (n_ctx <= 1 || n_batch <= 0) {
     throw std::runtime_error("LlamaGenerator: invalid context or batch size");
   }
@@ -117,7 +117,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    */
   const llama_batch prompt_batch = llama_batch_get_one(
       prompt_tokens.data(), static_cast<int32_t>(prompt_tokens.size()));
-  if (llama_decode(context_, prompt_batch) != 0) {
+  if (llama_decode(context_.get(), prompt_batch) != 0) {
     throw std::runtime_error("LlamaGenerator: prompt decode failed");
   }
 
@@ -139,7 +139,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
      * Index -1 means use the last output position from previous batch
      */
     const llama_token next =
-        llama_sampler_sample(sampler_->chain, context_, -1);
+        llama_sampler_sample(sampler_->chain, context_.get(), -1);
     /**
      * Stop if model predicts end-of-generation token (EOS/EOT)
      */
@@ -153,7 +153,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
      */
     llama_token decode_token = next;
     const llama_batch one_token_batch = llama_batch_get_one(&decode_token, 1);
-    if (llama_decode(context_, one_token_batch) != 0) {
+    if (llama_decode(context_.get(), one_token_batch) != 0) {
       throw std::runtime_error(
           "LlamaGenerator: decode failed during generation");
     }
