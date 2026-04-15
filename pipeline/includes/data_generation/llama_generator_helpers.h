@@ -14,7 +14,7 @@
 
 struct llama_model;
 struct llama_vocab;
-typedef int32_t llama_token;
+using llama_token = int32_t;
 
 /**
  * @brief Normalizes and truncates regional context.
@@ -59,13 +59,5 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                std::string& name_out,
                                                std::string& description_out);
-
-/**
- * @brief Extracts the last balanced JSON object from text.
- *
- * @param text Input text.
- * @return Extracted JSON object or an empty string if none exists.
- */
-std::string ExtractLastJsonObject(const std::string& text);
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_HELPERS_H_

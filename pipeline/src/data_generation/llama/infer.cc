@@ -11,6 +11,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "data_generation/llama_generator.h"
@@ -19,15 +20,68 @@
 
 static constexpr size_t kPromptTokenSlack = 8;
 
+namespace {
+
+using SamplerHandle = std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
+
+struct SamplerConfig {
+  float temperature;
+  uint32_t top_k;
+  float top_p;
+  uint32_t seed;
+};
+
+SamplerHandle MakeSamplerChain(const llama_vocab* vocab,
+                               const SamplerConfig& config,
+                               std::string_view grammar) {
+  const llama_sampler_chain_params sampler_params =
+      llama_sampler_chain_default_params();
+
+  SamplerHandle chain(llama_sampler_chain_init(sampler_params),
+                      llama_sampler_free);
+  if (!chain) {
+    throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
+  }
+
+  auto add_sampler = [&](llama_sampler* sampler, const char* error_message) {
+    if (sampler == nullptr) {
+      throw std::runtime_error(error_message);
+    }
+
+    llama_sampler_chain_add(chain.get(), sampler);
+  };
+
+  if (!grammar.empty()) {
+    const std::string grammar_text(grammar);
+    add_sampler(llama_sampler_init_grammar(vocab, grammar_text.c_str(), "root"),
+                "LlamaGenerator: failed to initialize grammar sampler");
+  }
+
+  add_sampler(llama_sampler_init_temp(config.temperature),
+              "LlamaGenerator: failed to initialize temperature sampler");
+  add_sampler(llama_sampler_init_top_k(static_cast<int32_t>(config.top_k)),
+              "LlamaGenerator: failed to initialize top-k sampler");
+  add_sampler(llama_sampler_init_top_p(config.top_p, 1),
+              "LlamaGenerator: failed to initialize top-p sampler");
+  add_sampler(llama_sampler_init_dist(config.seed),
+              "LlamaGenerator: failed to initialize distribution sampler");
+
+  return chain;
+}
+
+}  // namespace
+
 std::string LlamaGenerator::Infer(const std::string& system_prompt,
                                   const std::string& prompt,
-                                  const int max_tokens) {
+                                  const int max_tokens,
+                                  std::string_view grammar) {
   return InferFormatted(ToChatPrompt(model_.get(), system_prompt, prompt),
-                        max_tokens);
+                        max_tokens, grammar);
 }
 
 std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
-                                           const int max_tokens) {
+                                           const int max_tokens,
+                                           std::string_view grammar) {
   /**
    * Validate that model and context are loaded
    */
@@ -42,6 +96,14 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   if (vocab == nullptr) {
     throw std::runtime_error("LlamaGenerator: vocab unavailable");
   }
+
+  const SamplerConfig sampler_config{
+      .temperature = sampling_temperature_,
+      .top_k = sampling_top_k_,
+      .top_p = sampling_top_p_,
+      .seed = rng_(),
+  };
+  auto sampler = MakeSamplerChain(vocab, sampler_config, grammar);
 
   /**
    * Clear KV cache to ensure clean inference state (no residual context)
@@ -140,17 +202,13 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   std::vector<llama_token> generated_tokens;
   generated_tokens.reserve(static_cast<size_t>(effective_max_tokens));
 
-  if (!sampler_) {
-    throw std::runtime_error("LlamaGenerator: sampler not initialized");
-  }
-
   for (int i = 0; i < effective_max_tokens; ++i) {
     /**
      * Sample next token using configured sampler chain and model logits
      * Index -1 means use the last output position from previous batch
      */
     const llama_token next =
-        llama_sampler_sample(sampler_.get(), context_.get(), -1);
+        llama_sampler_sample(sampler.get(), context_.get(), -1);
     /**
      * Stop if model predicts end-of-generation token (EOS/EOT)
      */

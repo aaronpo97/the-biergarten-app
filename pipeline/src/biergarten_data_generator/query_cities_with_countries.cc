@@ -13,7 +13,7 @@
 #include "biergarten_data_generator.h"
 #include "json_handling/json_loader.h"
 
-static constexpr size_t kBreweryAmount = 4;
+static constexpr size_t kBreweryAmount = 50;
 
 std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
   spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");

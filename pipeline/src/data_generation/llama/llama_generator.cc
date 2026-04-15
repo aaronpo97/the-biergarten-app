@@ -30,13 +30,6 @@ void LlamaGenerator::ContextDeleter::operator()(
   }
 }
 
-void LlamaGenerator::SamplerDeleter::operator()(
-    llama_sampler* sampler) const noexcept {
-  if (sampler != nullptr) {
-    llama_sampler_free(sampler);
-  }
-}
-
 LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
                                const std::string& model_path)
     : rng_(std::random_device{}()) {
@@ -81,25 +74,6 @@ LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
   n_ctx_ = options.n_ctx;
 
   this->Load(model_path);
-  const llama_sampler_chain_params sampler_params =
-      llama_sampler_chain_default_params();
-
-  sampler_ = SamplerChainHandle(llama_sampler_chain_init(sampler_params));
-  if (!sampler_) {
-    throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
-  }
-
-  llama_sampler_chain_add(sampler_.get(),
-                          llama_sampler_init_temp(sampling_temperature_));
-
-  llama_sampler_chain_add(
-      sampler_.get(),
-      llama_sampler_init_top_k(static_cast<int32_t>(sampling_top_k_)));
-
-  llama_sampler_chain_add(sampler_.get(),
-                          llama_sampler_init_top_p(sampling_top_p_, 1));
-
-  llama_sampler_chain_add(sampler_.get(), llama_sampler_init_dist(rng_()));
 }
 
 LlamaGenerator::~LlamaGenerator() = default;
