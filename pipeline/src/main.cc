@@ -4,15 +4,15 @@
  * initializes shared infrastructure, and executes the pipeline entry flow.
  */
 
+#include <spdlog/spdlog.h>
+
+#include <boost/di.hpp>
+#include <boost/program_options.hpp>
 #include <exception>
 #include <memory>
 #include <optional>
 #include <sstream>
 #include <string>
-
-#include <boost/di.hpp>
-#include <boost/program_options.hpp>
-#include <spdlog/spdlog.h>
 
 #include "biergarten_data_generator.h"
 #include "data_generation/llama_generator.h"

@@ -9,60 +9,31 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <filesystem>
 
 #include "data_model/application_options.h"
 #include "llama.h"
 
 static constexpr uint32_t kMaxContextSize = 32768U;
 
-struct SamplerConfig {
-  float temperature;
-  float top_p;
-  uint32_t top_k;
-};
-
-using SamplerPtr =
-    std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
-
-void LlamaGenerator::ModelDeleter::operator()(llama_model* model) const noexcept {
+void LlamaGenerator::ModelDeleter::operator()(
+    llama_model* model) const noexcept {
   if (model != nullptr) {
     llama_model_free(model);
   }
 }
 
-void LlamaGenerator::ContextDeleter::operator()(llama_context* context) const noexcept {
+void LlamaGenerator::ContextDeleter::operator()(
+    llama_context* context) const noexcept {
   if (context != nullptr) {
     llama_free(context);
   }
 }
 
-static SamplerPtr CreateSamplerChain(const SamplerConfig& config,
-                                     std::mt19937& rng) {
-  const llama_sampler_chain_params sampler_params =
-      llama_sampler_chain_default_params();
-
-  SamplerPtr sampler(llama_sampler_chain_init(sampler_params),
-                     &llama_sampler_free);
-  if (!sampler) {
-    throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
-  }
-
-  llama_sampler_chain_add(sampler.get(),
-                          llama_sampler_init_temp(config.temperature));
-  llama_sampler_chain_add(
-      sampler.get(),
-      llama_sampler_init_top_k(static_cast<int32_t>(config.top_k)));
-  llama_sampler_chain_add(sampler.get(),
-                          llama_sampler_init_top_p(config.top_p, 1));
-  llama_sampler_chain_add(sampler.get(), llama_sampler_init_dist(rng()));
-
-  return sampler;
-}
-
-LlamaGenerator::SamplerState::~SamplerState() {
-  if (chain != nullptr) {
-    llama_sampler_free(chain);
-    chain = nullptr;
+void LlamaGenerator::SamplerDeleter::operator()(
+    llama_sampler* sampler) const noexcept {
+  if (sampler != nullptr) {
+    llama_sampler_free(sampler);
   }
 }
 
@@ -110,11 +81,25 @@ LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
   n_ctx_ = options.n_ctx;
 
   this->Load(model_path);
-  const SamplerConfig sampler_config{sampling_temperature_, sampling_top_p_,
-                                     sampling_top_k_};
-  auto sampler_chain = CreateSamplerChain(sampler_config, rng_);
-  sampler_ = std::make_unique<SamplerState>();
-  sampler_->chain = sampler_chain.release();
+  const llama_sampler_chain_params sampler_params =
+      llama_sampler_chain_default_params();
+
+  sampler_ = SamplerChainHandle(llama_sampler_chain_init(sampler_params));
+  if (!sampler_) {
+    throw std::runtime_error("LlamaGenerator: failed to initialize sampler");
+  }
+
+  llama_sampler_chain_add(sampler_.get(),
+                          llama_sampler_init_temp(sampling_temperature_));
+
+  llama_sampler_chain_add(
+      sampler_.get(),
+      llama_sampler_init_top_k(static_cast<int32_t>(sampling_top_k_)));
+
+  llama_sampler_chain_add(sampler_.get(),
+                          llama_sampler_init_top_p(sampling_top_p_, 1));
+
+  llama_sampler_chain_add(sampler_.get(), llama_sampler_init_dist(rng_()));
 }
 
 LlamaGenerator::~LlamaGenerator() = default;

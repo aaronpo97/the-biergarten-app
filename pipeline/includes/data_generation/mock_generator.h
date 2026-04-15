@@ -42,7 +42,7 @@ class MockGenerator final : public DataGenerator {
    * @param location City and country names.
    * @return Deterministic hash value.
    */
-  static std::size_t DeterministicHash(const Location& location);
+  static size_t DeterministicHash(const Location& location);
 
   static constexpr std::array<std::string_view, 18> kBreweryAdjectives = {
       "Craft",      "Heritage", "Local",  "Artisan",  "Pioneer",    "Golden",

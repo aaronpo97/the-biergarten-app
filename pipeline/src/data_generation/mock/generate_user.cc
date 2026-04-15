@@ -11,7 +11,7 @@
 #include "data_generation/mock_generator.h"
 
 UserResult MockGenerator::GenerateUser(const std::string& locale) {
-  const std::size_t hash = std::hash<std::string>{}(locale);
+  const size_t hash = std::hash<std::string>{}(locale);
 
   UserResult result;
   const std::string_view username = kUsernames[hash % kUsernames.size()];

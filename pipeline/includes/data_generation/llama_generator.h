@@ -1,6 +1,8 @@
 #ifndef BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 #define BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 
+#include <filesystem>
+
 /**
  * @file data_generation/llama_generator.h
  * @brief llama.cpp-backed implementation of DataGenerator.
@@ -34,12 +36,16 @@ class LlamaGenerator final : public DataGenerator {
   LlamaGenerator(const ApplicationOptions& options,
                  const std::string& model_path);
 
-  /// @brief Releases model/context resources.
   ~LlamaGenerator() override;
 
+  // disable copy constructor
   LlamaGenerator(const LlamaGenerator&) = delete;
+
+  // disable copy assignment operator
   LlamaGenerator& operator=(const LlamaGenerator&) = delete;
+  // disable move constructor
   LlamaGenerator(LlamaGenerator&&) = delete;
+  // disable move assignment operator
   LlamaGenerator& operator=(LlamaGenerator&&) = delete;
 
   /**
@@ -61,7 +67,7 @@ class LlamaGenerator final : public DataGenerator {
   UserResult GenerateUser(const std::string& locale) override;
 
  private:
-  static constexpr int kDefaultMaxTokens = 10000;
+  static constexpr int32_t kDefaultMaxTokens = 10000;
   static constexpr float kDefaultSamplingTopP = 0.95F;
   static constexpr uint32_t kDefaultSamplingTopK = 64;
   static constexpr uint32_t kDefaultContextSize = 8192;
@@ -69,25 +75,16 @@ class LlamaGenerator final : public DataGenerator {
   struct ModelDeleter {
     void operator()(llama_model* model) const noexcept;
   };
-
   struct ContextDeleter {
     void operator()(llama_context* context) const noexcept;
+  };
+  struct SamplerDeleter {
+    void operator()(llama_sampler* sampler) const noexcept;
   };
 
   using ModelHandle = std::unique_ptr<llama_model, ModelDeleter>;
   using ContextHandle = std::unique_ptr<llama_context, ContextDeleter>;
-
-  struct SamplerState {
-    SamplerState() = default;
-    ~SamplerState();
-
-    SamplerState(const SamplerState&) = delete;
-    SamplerState& operator=(const SamplerState&) = delete;
-    SamplerState(SamplerState&&) = delete;
-    SamplerState& operator=(SamplerState&&) = delete;
-
-    llama_sampler* chain = nullptr;
-  };
+  using SamplerChainHandle = std::unique_ptr<llama_sampler, SamplerDeleter>;
 
   /**
    * @brief Loads model and prepares inference context.
@@ -126,12 +123,12 @@ class LlamaGenerator final : public DataGenerator {
    * @param prompt_file_path Prompt file path to try first.
    * @return Loaded prompt text.
    */
-  std::string LoadBrewerySystemPrompt(const std::string& prompt_file_path);
+  std::string LoadBrewerySystemPrompt(const std::filesystem::path& prompt_file_path);
 
   ModelHandle model_;
   ContextHandle context_;
   /// @brief Persistent sampler chain reused across inference calls.
-  std::unique_ptr<SamplerState> sampler_;
+  SamplerChainHandle sampler_;
   float sampling_temperature_ = 1.0F;
   float sampling_top_p_ = kDefaultSamplingTopP;
   uint32_t sampling_top_k_ = kDefaultSamplingTopK;

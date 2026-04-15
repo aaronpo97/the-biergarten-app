@@ -12,7 +12,7 @@
 
 BreweryResult MockGenerator::GenerateBrewery(
     const Location& location, const std::string& /*region_context*/) {
-  const std::size_t hash = DeterministicHash(location);
+  const size_t hash = DeterministicHash(location);
 
   const std::string_view adjective =
       kBreweryAdjectives.at(hash % kBreweryAdjectives.size());

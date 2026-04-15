@@ -18,12 +18,12 @@
 
 static std::string ExtractFinalJsonPayload(std::string raw_response) {
   auto trim = [](const std::string_view text) -> std::string_view {
-    const std::size_t first = text.find_first_not_of(" \t\n\r");
+    const size_t first = text.find_first_not_of(" \t\n\r");
     if (first == std::string_view::npos) {
       return {};
     }
 
-    const std::size_t last = text.find_last_not_of(" \t\n\r");
+    const size_t last = text.find_last_not_of(" \t\n\r");
     return text.substr(first, last - first + 1);
   };
 
@@ -31,10 +31,10 @@ static std::string ExtractFinalJsonPayload(std::string raw_response) {
       "<|think|>", "<think|>",   "<|turn|>",
       "<turn|>",   "<channel|>", "<|channel|>"};
 
-  std::size_t separator_pos = std::string::npos;
-  std::size_t separator_length = 0;
+  size_t separator_pos = std::string::npos;
+  size_t separator_length = 0;
   for (const std::string_view token : separator_tokens) {
-    const std::size_t candidate_pos = raw_response.rfind(token);
+    const size_t candidate_pos = raw_response.rfind(token);
     if (candidate_pos != std::string::npos &&
         (separator_pos == std::string::npos || candidate_pos > separator_pos)) {
       separator_pos = candidate_pos;
@@ -48,10 +48,10 @@ static std::string ExtractFinalJsonPayload(std::string raw_response) {
 
   const std::string_view trimmed = trim(raw_response);
   const std::string json_candidate =
-      ExtractLastJsonObjectPublic(std::string(trimmed));
+      ExtractLastJsonObject(std::string(trimmed));
 
   if (!json_candidate.empty()) {
-    return ExtractLastJsonObjectPublic(std::string(trimmed));
+    return json_candidate;
   }
 
   return std::string(trimmed);
@@ -63,7 +63,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
    * Preprocess and truncate region context to manageable size
    */
   const std::string safe_region_context =
-      PrepareRegionContextPublic(region_context);
+      PrepareRegionContext(region_context);
 
   const std::string country_suffix =
       location.country.empty() ? std::string{}
@@ -118,7 +118,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     std::string description;
     const std::string json_only = ExtractFinalJsonPayload(raw);
     const std::optional<std::string> validation_error =
-        ValidateBreweryJsonPublic(json_only, name, description);
+      ValidateBreweryJson(json_only, name, description);
     if (!validation_error.has_value()) {
       // Success: return parsed brewery data
       return BreweryResult{.name = std::move(name),

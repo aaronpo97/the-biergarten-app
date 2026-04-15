@@ -12,8 +12,6 @@
 
 #include "data_generation/llama_generator.h"
 
-namespace fs = std::filesystem;
-
 /**
  * @brief Loads brewery system prompt from disk or cache.
  *
@@ -21,22 +19,21 @@ namespace fs = std::filesystem;
  * @return Prompt text loaded from disk.
  */
 std::string LlamaGenerator::LoadBrewerySystemPrompt(
-    const std::string& prompt_file_path) {
+    const std::filesystem::path& prompt_file_path) {
   // Return cached version if already loaded
   if (!brewery_system_prompt_.empty()) {
     return brewery_system_prompt_;
   }
 
-  // Try the provided path only
-  const fs::path prompt_path(prompt_file_path);
-  std::ifstream prompt_file(prompt_path);
+
+  std::ifstream prompt_file(prompt_file_path);
   if (!prompt_file.is_open()) {
     spdlog::error(
         "LlamaGenerator: Failed to open brewery system prompt file '{}'",
-        prompt_path.string());
+        prompt_file_path.string());
     throw std::runtime_error(
         "LlamaGenerator: missing brewery system prompt file: " +
-        prompt_path.string());
+        prompt_file_path.string());
   }
 
   const std::string prompt((std::istreambuf_iterator(prompt_file)),
@@ -45,15 +42,15 @@ std::string LlamaGenerator::LoadBrewerySystemPrompt(
 
   if (prompt.empty()) {
     spdlog::error("LlamaGenerator: Brewery system prompt file '{}' is empty",
-                  prompt_path.string());
+                  prompt_file_path.string());
     throw std::runtime_error(
         "LlamaGenerator: empty brewery system prompt file: " +
-        prompt_path.string());
+        prompt_file_path.string());
   }
 
   spdlog::info(
       "LlamaGenerator: Loaded brewery system prompt from '{}' ({} chars)",
-      prompt_path.string(), prompt.length());
+      prompt_file_path.string(), prompt.length());
   brewery_system_prompt_ = prompt;
   return brewery_system_prompt_;
 }

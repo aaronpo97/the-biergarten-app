@@ -17,12 +17,12 @@
 #include "data_generation/llama_generator_helpers.h"
 #include "llama.h"
 
-static constexpr std::size_t kPromptTokenSlack = 8;
+static constexpr size_t kPromptTokenSlack = 8;
 
 std::string LlamaGenerator::Infer(const std::string& system_prompt,
                                   const std::string& prompt,
                                   const int max_tokens) {
-  return InferFormatted(ToChatPromptPublic(model_.get(), system_prompt, prompt),
+  return InferFormatted(ToChatPrompt(model_.get(), system_prompt, prompt),
                         max_tokens);
 }
 
@@ -54,16 +54,26 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    */
   std::vector<llama_token> prompt_tokens(formatted_prompt.size() +
                                          kPromptTokenSlack);
+
+
+
+
   int32_t token_count = llama_tokenize(
-      vocab, formatted_prompt.c_str(),
-      static_cast<int32_t>(formatted_prompt.size()), prompt_tokens.data(),
-      static_cast<int32_t>(prompt_tokens.size()), true, true);
+      vocab,
+      formatted_prompt.c_str(),
+      static_cast<int32_t>(formatted_prompt.size()),
+      prompt_tokens.data(),
+      static_cast<int32_t>(prompt_tokens.size()),
+      true,
+      true);
 
   /**
    * If buffer too small, negative return indicates required size
    */
   if (token_count < 0) {
-    prompt_tokens.resize(static_cast<std::size_t>(-token_count));
+    prompt_tokens.resize(static_cast<size_t>(-token_count));
+
+
     token_count = llama_tokenize(
         vocab, formatted_prompt.c_str(),
         static_cast<int32_t>(formatted_prompt.size()), prompt_tokens.data(),
@@ -91,6 +101,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    */
   const int32_t effective_max_tokens =
       std::max(1, std::min(max_tokens, n_ctx - 1));
+
   /**
    * Prompt can use remaining context after reserving space for generation
    */
@@ -100,13 +111,13 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   /**
    * Truncate prompt if necessary to fit within constraints
    */
-  prompt_tokens.resize(static_cast<std::size_t>(token_count));
+  prompt_tokens.resize(static_cast<size_t>(token_count));
   if (token_count > prompt_budget) {
     spdlog::warn(
         "LlamaGenerator: prompt too long ({} tokens), truncating to {} "
         "tokens to fit n_batch/n_ctx limits",
         token_count, prompt_budget);
-    prompt_tokens.resize(static_cast<std::size_t>(prompt_budget));
+    prompt_tokens.resize(static_cast<size_t>(prompt_budget));
     token_count = prompt_budget;
   }
 
@@ -127,9 +138,9 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    * end-of-sequence
    */
   std::vector<llama_token> generated_tokens;
-  generated_tokens.reserve(static_cast<std::size_t>(effective_max_tokens));
+  generated_tokens.reserve(static_cast<size_t>(effective_max_tokens));
 
-  if (sampler_ == nullptr || sampler_->chain == nullptr) {
+  if (!sampler_) {
     throw std::runtime_error("LlamaGenerator: sampler not initialized");
   }
 
@@ -139,7 +150,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
      * Index -1 means use the last output position from previous batch
      */
     const llama_token next =
-        llama_sampler_sample(sampler_->chain, context_.get(), -1);
+        llama_sampler_sample(sampler_.get(), context_.get(), -1);
     /**
      * Stop if model predicts end-of-generation token (EOS/EOT)
      */
@@ -165,7 +176,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    */
   std::string output;
   for (const llama_token token : generated_tokens) {
-    AppendTokenPiecePublic(vocab, token, output);
+    AppendTokenPiece(vocab, token, output);
   }
 
   return output;
