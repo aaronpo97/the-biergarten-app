@@ -63,7 +63,7 @@ find_package(Boost REQUIRED COMPONENTS json program_options)
 FetchContent_Declare(
     llama-cpp
     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-    GIT_TAG        b8739
+    GIT_TAG        b8742
 )
 FetchContent_MakeAvailable(llama-cpp)
 

@@ -82,79 +82,86 @@ std::string PrepareRegionContext(std::string_view region_context,
 }
 
 std::string ToChatPrompt(const llama_model* model,
-                         const std::string& system_prompt,
-                         const std::string& user_prompt) {
-  std::string combined_prompt =
-      std::format("{}\n\n{}", system_prompt, user_prompt);
+                          const std::string& system_prompt,
+                          const std::string& user_prompt) {
+   std::string combined_prompt =
+       std::format("{}\n\n{}", system_prompt, user_prompt);
 
-  const char* tmpl = llama_model_chat_template(model, nullptr);
-  if (tmpl == nullptr) {
-    // No template found, fallback to raw text
-    spdlog::warn(
-        "LlamaGenerator: missing chat template; using raw prompt fallback");
-    return combined_prompt;
-  }
+   const char* template_str = llama_model_chat_template(model, nullptr);
 
-  const std::array<llama_chat_message, 2> messages = {{
-      {.role = "system", .content = system_prompt.c_str()},
-      {.role = "user", .content = user_prompt.c_str()},
-  }};
+   // If metadata is missing (nullptr), attempt to use the built-in "gemma" alias
+   // to leverage the library's interleaved template for Gemma 4 support.
+   if (template_str == nullptr) {
+     template_str = "gemma";
+     spdlog::info(
+         "LlamaGenerator: model chat template metadata missing; attempting "
+         "built-in 'gemma' alias");
+   }
 
-  constexpr std::size_t min_template_buffer_size = 1024;
+   const std::array<llama_chat_message, 2> messages = {{
+       {.role = "system", .content = system_prompt.c_str()},
+       {.role = "user", .content = user_prompt.c_str()},
+   }};
 
-  std::vector<char> buffer(
-      std::max<std::size_t>(min_template_buffer_size,
-                            (system_prompt.size() + user_prompt.size()) * 4));
+   constexpr std::size_t min_template_buffer_size = 1024;
 
-  auto apply_template_with_resize = [&](const llama_chat_message* chat_messages,
-                                        int32_t message_count) -> int32_t {
-    int32_t result = llama_chat_apply_template(
-        tmpl, chat_messages, message_count, true, buffer.data(),
-        static_cast<int32_t>(buffer.size()));
+   std::vector<char> buffer(
+       std::max<std::size_t>(min_template_buffer_size,
+                             (system_prompt.size() + user_prompt.size()) * 4));
 
-    if (result < 0) {
-      return result;
-    }
+   auto apply_template_with_resize = [&](const char* tmpl,
+                                         const llama_chat_message* chat_messages,
+                                         int32_t message_count) -> int32_t {
+     int32_t result = llama_chat_apply_template(
+         tmpl, chat_messages, message_count, true, buffer.data(),
+         static_cast<int32_t>(buffer.size()));
 
-    const auto buffer_size = static_cast<int32_t>(buffer.size());
-    if (result >= buffer_size) {
-      buffer.resize(static_cast<std::size_t>(result) + 1);
-      result = llama_chat_apply_template(tmpl, chat_messages, message_count,
-                                         true, buffer.data(), buffer_size);
-    }
+     if (result < 0) {
+       return result;
+     }
 
-    return result;
-  };
+     const auto buffer_size = static_cast<int32_t>(buffer.size());
+     if (result >= buffer_size) {
+       buffer.resize(static_cast<std::size_t>(result) + 1);
+       result = llama_chat_apply_template(
+           tmpl, chat_messages, message_count, true, buffer.data(),
+           static_cast<int32_t>(buffer.size()));
+     }
 
-  int32_t template_result = apply_template_with_resize(messages.data(), 2);
+     return result;
+   };
 
-  if (template_result >= 0) {
-    return {buffer.data(), static_cast<size_t>(template_result)};
-  }
+   int32_t template_result =
+       apply_template_with_resize(template_str, messages.data(), 2);
 
-  spdlog::warn(
-      "LlamaGenerator: chat template rejected system/user messages (result "
-      "{}); trying single user fallback",
-      template_result);
+   if (template_result >= 0) {
+     return {buffer.data(), static_cast<size_t>(template_result)};
+   }
 
-  // FALLBACK: If the template fails (e.g., Model rejecting the "system" role),
-  // combine the system and user prompts into a single "user" message.
-  const std::array<llama_chat_message, 1> fallback_msg = {{
-      {.role = "user", .content = combined_prompt.c_str()},
-  }};
+   spdlog::warn(
+       "LlamaGenerator: chat template rejected system/user messages (result "
+       "{}); trying single user fallback",
+       template_result);
 
-  template_result = apply_template_with_resize(fallback_msg.data(), 1);
+   // FALLBACK: If the template fails (e.g., model rejecting the "system" role),
+   // combine the system and user prompts into a single "user" message.
+   const std::array<llama_chat_message, 1> fallback_msg = {{
+       {.role = "user", .content = combined_prompt.c_str()},
+   }};
 
-  // Ultimate fallback: if GGUF template parsing still fails, use raw text.
-  if (template_result < 0) {
-    spdlog::warn(
-        "LlamaGenerator: chat template fallback failed (result {}); using "
-        "raw prompt text",
-        template_result);
-    return combined_prompt;
-  }
+   template_result =
+       apply_template_with_resize(template_str, fallback_msg.data(), 1);
 
-  return {buffer.data(), static_cast<size_t>(template_result)};
+   // Ultimate fallback: if GGUF template parsing still fails, use raw text.
+   if (template_result < 0) {
+     spdlog::warn(
+         "LlamaGenerator: chat template fallback failed (result {}); using "
+         "raw prompt text",
+         template_result);
+     return combined_prompt;
+   }
+
+   return {buffer.data(), static_cast<size_t>(template_result)};
 }
 
 void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
