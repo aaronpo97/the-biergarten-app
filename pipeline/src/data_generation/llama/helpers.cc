@@ -84,9 +84,8 @@ std::string PrepareRegionContext(std::string_view region_context,
 std::string ToChatPrompt(const llama_model* model,
                          const std::string& system_prompt,
                          const std::string& user_prompt) {
-  std::string combined_prompt = system_prompt;
-  combined_prompt.append("\n\n");
-  combined_prompt.append(user_prompt);
+  std::string combined_prompt =
+      std::format("{}\n\n{}", system_prompt, user_prompt);
 
   const char* tmpl = llama_model_chat_template(model, nullptr);
   if (tmpl == nullptr) {
@@ -103,9 +102,9 @@ std::string ToChatPrompt(const llama_model* model,
 
   constexpr std::size_t min_template_buffer_size = 1024;
 
-  std::vector<char> buffer(std::max<std::size_t>(
-      min_template_buffer_size,
-      (system_prompt.size() + user_prompt.size()) * 4));
+  std::vector<char> buffer(
+      std::max<std::size_t>(min_template_buffer_size,
+                            (system_prompt.size() + user_prompt.size()) * 4));
 
   auto apply_template_with_resize = [&](const llama_chat_message* chat_messages,
                                         int32_t message_count) -> int32_t {

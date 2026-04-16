@@ -17,7 +17,7 @@
 #include "data_generation/llama_generator_helpers.h"
 
 static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
-root ::= ws "{" ws "\"name\"" ws ":" ws string ws "," ws "\"description\"" ws ":" ws string ws "}" ws
+root ::= ws "{" ws "\"reasoning\"" ws ":" ws string ws "," ws "\"name\"" ws ":" ws string ws "," ws "\"description\"" ws ":" ws string ws "}" ws
 ws ::= [ \t\n\r]*
 string ::= "\"" char+ "\""
 char ::= [^"\\\x7F\x00-\x1F] | [\\] escape
@@ -36,11 +36,6 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   const std::string country_suffix =
       location.country.empty() ? std::string{}
                                : std::format(", {}", location.country);
-  const std::string region_suffix =
-      safe_region_context.empty()
-          ? "."
-          : std::format(". Regional context: {}", safe_region_context);
-
   /**
    * Load brewery system prompt from file
    * Falls back to minimal inline prompt if file not found
@@ -53,9 +48,8 @@ BreweryResult LlamaGenerator::GenerateBrewery(
    * culturally relevant and locally-inspired brewery attributes
    */
   std::string prompt = std::format(
-      "Write a brewery name and place-specific long description for a craft "
-      "brewery in {}{}{}",
-      location.city, country_suffix, region_suffix);
+      "## CITY:\n{}\n\n## COUNTRY:\n{}\n\n## CONTEXT:\n{}",
+      location.city, location.country, safe_region_context);
 
   /**
    * Store location context for retry prompts (without repeating full context)
@@ -101,7 +95,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     // Update prompt with error details to guide LLM toward correct output.
     prompt = std::format(
         R"(Your previous response was invalid. Error: {}
-Return ONLY valid JSON with exactly these keys: {{"name": "<brewery name>", "description": "<single-paragraph description>"}}.
+Return ONLY valid JSON with exactly these keys, in this exact order: {{"reasoning": "<brief planning summary>", "name": "<brewery name>", "description": "<single-paragraph description>"}}.
 Do not include markdown, comments, extra keys, or literal placeholder values.
 
 {})",

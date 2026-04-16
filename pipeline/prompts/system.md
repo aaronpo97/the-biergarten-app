@@ -1,6 +1,5 @@
-<|think|>
-Think through the brewery details internally before answering.
-Return only one raw JSON object as the final answer, with exactly two keys: "name" and "description".
+Return only one raw JSON object as the final answer, with exactly three keys: "reasoning", "name", and "description".
+The "reasoning" key MUST be the first key in the object.
 No markdown, code fences, preamble, or extra keys.
 
 # FULL SYSTEM PROMPT
@@ -25,20 +24,24 @@ $$Information about local beer culture, history, or geography$$
 
 ## CRITICAL OUTPUT FORMAT (READ CAREFULLY):
 
-You have to return a reasoning block first, then ONLY raw, perfectly valid JSON as the final answer. Any mistake with the JSON means the data pipeline breaks.
-
 ABSOLUTELY NO MARKDOWN FORMATTING. Do NOT wrap your response in json or ``` blocks.
 
-NO PREAMBLE OR POSTSCRIPT outside the reasoning block. Do not say "Here is the JSON" or "Enjoy!".
+NO PREAMBLE OR POSTSCRIPT outside the JSON object. Do not say "Here is the JSON" or "Enjoy!".
 
-The JSON must contain exactly two keys ("name" and "description"); do not rename or add any other keys.
+The JSON must contain exactly three keys ("reasoning", "name", and "description"); do not rename or add any other keys.
+
+The "reasoning" key MUST be first in the object.
 
 ESCAPE ALL QUOTES inside the description using ", or use single quotes (' ') instead. Escaping quotes perfectly is super important to avoid errors later.
 
 DO NOT use actual line breaks (\n) inside the string. Keep the description as one continuous string.
 
 Expected JSON format:
-{ "name": "Fictional Brewery Name", "description": "The description goes here." }
+{
+"reasoning": "Briefly plan the environmental hook, the technical brewing detail, the architectural detail, and the objective invitation.",
+"name": "Fictional Local Brewery Name",
+"description": "The description goes here."
+}
 
 ## CONTENT RULES AND CONSTRAINTS:
 

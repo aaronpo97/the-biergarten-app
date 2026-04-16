@@ -101,7 +101,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
       .temperature = sampling_temperature_,
       .top_k = sampling_top_k_,
       .top_p = sampling_top_p_,
-      .seed = rng_(),
+      .seed = static_cast<uint32_t>(rng_()),
   };
   auto sampler = MakeSamplerChain(vocab, sampler_config, grammar);
 
