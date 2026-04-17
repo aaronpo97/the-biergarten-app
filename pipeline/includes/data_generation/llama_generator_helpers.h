@@ -12,7 +12,6 @@
 #include <string>
 #include <string_view>
 
-struct llama_model;
 struct llama_vocab;
 using llama_token = int32_t;
 
@@ -25,18 +24,6 @@ using llama_token = int32_t;
  */
 std::string PrepareRegionContext(std::string_view region_context,
                                  size_t max_chars = 2000);
-
-/**
- * @brief Applies model chat template to system and user prompts.
- *
- * @param model Loaded llama model.
- * @param system_prompt System prompt text.
- * @param user_prompt User prompt text.
- * @return Model-formatted prompt.
- */
-std::string ToChatPrompt(const llama_model* model,
-                         const std::string& system_prompt,
-                         const std::string& user_prompt);
 
 /**
  * @brief Decodes a sampled token and appends it to output text.
@@ -58,6 +45,7 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
  */
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                std::string& name_out,
-                                               std::string& description_out);
+                                               std::string& description_out,
+                                               std::string& reasoning_out);
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_HELPERS_H_

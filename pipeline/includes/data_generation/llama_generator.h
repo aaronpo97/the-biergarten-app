@@ -15,6 +15,7 @@
 #include <string_view>
 
 #include "data_generation/data_generator.h"
+#include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/application_options.h"
 
 struct llama_model;
@@ -31,9 +32,11 @@ class LlamaGenerator final : public DataGenerator {
    *
    * @param options Parsed application options.
    * @param model_path Filesystem path to GGUF model assets.
+  * @param prompt_formatter Formatter that produces model-specific prompts.
    */
   LlamaGenerator(const ApplicationOptions& options,
-                 const std::string& model_path);
+                 const std::string& model_path,
+                 std::shared_ptr<IPromptFormatter> prompt_formatter);
 
   ~LlamaGenerator() override;
 
@@ -132,6 +135,7 @@ class LlamaGenerator final : public DataGenerator {
   std::mt19937 rng_;
   uint32_t n_ctx_ = kDefaultContextSize;
   std::string brewery_system_prompt_;
+  std::shared_ptr<IPromptFormatter> prompt_formatter_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_

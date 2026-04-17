@@ -4,8 +4,6 @@
  * parsing, token decoding, and JSON validation helpers for Llama modules.
  */
 
-#include <spdlog/spdlog.h>
-
 #include <algorithm>
 #include <array>
 #include <boost/json.hpp>
@@ -81,89 +79,6 @@ std::string PrepareRegionContext(std::string_view region_context,
   return normalized;
 }
 
-std::string ToChatPrompt(const llama_model* model,
-                          const std::string& system_prompt,
-                          const std::string& user_prompt) {
-   std::string combined_prompt =
-       std::format("{}\n\n{}", system_prompt, user_prompt);
-
-   const char* template_str = llama_model_chat_template(model, nullptr);
-
-   // If metadata is missing (nullptr), attempt to use the built-in "gemma" alias
-   // to leverage the library's interleaved template for Gemma 4 support.
-   if (template_str == nullptr) {
-     template_str = "gemma";
-     spdlog::info(
-         "LlamaGenerator: model chat template metadata missing; attempting "
-         "built-in 'gemma' alias");
-   }
-
-   const std::array<llama_chat_message, 2> messages = {{
-       {.role = "system", .content = system_prompt.c_str()},
-       {.role = "user", .content = user_prompt.c_str()},
-   }};
-
-   constexpr std::size_t min_template_buffer_size = 1024;
-
-   std::vector<char> buffer(
-       std::max<std::size_t>(min_template_buffer_size,
-                             (system_prompt.size() + user_prompt.size()) * 4));
-
-   auto apply_template_with_resize = [&](const char* tmpl,
-                                         const llama_chat_message* chat_messages,
-                                         int32_t message_count) -> int32_t {
-     int32_t result = llama_chat_apply_template(
-         tmpl, chat_messages, message_count, true, buffer.data(),
-         static_cast<int32_t>(buffer.size()));
-
-     if (result < 0) {
-       return result;
-     }
-
-     const auto buffer_size = static_cast<int32_t>(buffer.size());
-     if (result >= buffer_size) {
-       buffer.resize(static_cast<std::size_t>(result) + 1);
-       result = llama_chat_apply_template(
-           tmpl, chat_messages, message_count, true, buffer.data(),
-           static_cast<int32_t>(buffer.size()));
-     }
-
-     return result;
-   };
-
-   int32_t template_result =
-       apply_template_with_resize(template_str, messages.data(), 2);
-
-   if (template_result >= 0) {
-     return {buffer.data(), static_cast<size_t>(template_result)};
-   }
-
-   spdlog::warn(
-       "LlamaGenerator: chat template rejected system/user messages (result "
-       "{}); trying single user fallback",
-       template_result);
-
-   // FALLBACK: If the template fails (e.g., model rejecting the "system" role),
-   // combine the system and user prompts into a single "user" message.
-   const std::array<llama_chat_message, 1> fallback_msg = {{
-       {.role = "user", .content = combined_prompt.c_str()},
-   }};
-
-   template_result =
-       apply_template_with_resize(template_str, fallback_msg.data(), 1);
-
-   // Ultimate fallback: if GGUF template parsing still fails, use raw text.
-   if (template_result < 0) {
-     spdlog::warn(
-         "LlamaGenerator: chat template fallback failed (result {}); using "
-         "raw prompt text",
-         template_result);
-     return combined_prompt;
-   }
-
-   return {buffer.data(), static_cast<size_t>(template_result)};
-}
-
 void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
                       std::string& output) {
   constexpr size_t initial_buffer_size = 256;
@@ -193,6 +108,7 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
 
   if (!buffer_too_small(bytes)) {
     output.append(dynamic_buffer.data(), static_cast<size_t>(bytes));
+    return;
   }
 
   throw std::runtime_error(
@@ -201,7 +117,8 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
 
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                std::string& name_out,
-                                               std::string& description_out) {
+                                               std::string& description_out,
+                                               std::string& reasoning_out) {
   auto validate_object = [&](const boost::json::value& json_value,
                              std::string& error_out) -> bool {
     if (!json_value.is_object()) {
@@ -209,7 +126,14 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
       return false;
     }
 
+
     const auto& obj = json_value.get_object();
+
+    if (!obj.contains("reasoning") || !obj.at("reasoning").is_string()) {
+      error_out = "JSON field 'reasoning' is missing or not a string";
+      return false;
+    }
+
     if (!obj.contains("name") || !obj.at("name").is_string()) {
       error_out = "JSON field 'name' is missing or not a string";
       return false;
@@ -217,6 +141,12 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
 
     if (!obj.contains("description") || !obj.at("description").is_string()) {
       error_out = "JSON field 'description' is missing or not a string";
+      return false;
+    }
+    const auto& reasoning_value = obj.at("reasoning").as_string();
+    reasoning_out = Trim(std::string_view(reasoning_value.data(), reasoning_value.size()));
+    if (reasoning_out.empty()) {
+      error_out = "JSON field 'reasoning' must not be empty";
       return false;
     }
 
@@ -239,15 +169,16 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
     std::string name_lower = name_out;
     std::string description_lower = description_out;
 
-    std::ranges::transform(name_lower, name_lower.begin(),
-                           [](unsigned char character) {
-                             return static_cast<char>(std::tolower(character));
-                           });
 
-    std::ranges::transform(description_lower, description_lower.begin(),
-                           [](unsigned char character) {
-                             return static_cast<char>(std::tolower(character));
-                           });
+    auto string_to_lower = [](std::string& str_out) {
+       std::ranges::transform(str_out, str_out.begin(),
+                             [](unsigned char character) {
+                               return static_cast<char>(std::tolower(character));
+                             });
+    };
+
+    string_to_lower(name_lower);
+    string_to_lower(description_lower);
 
     if (name_lower == "string" || description_lower == "string") {
       error_out = "JSON appears to be a schema placeholder, not content";

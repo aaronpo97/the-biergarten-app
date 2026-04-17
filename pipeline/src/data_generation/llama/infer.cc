@@ -75,7 +75,7 @@ std::string LlamaGenerator::Infer(const std::string& system_prompt,
                                   const std::string& prompt,
                                   const int max_tokens,
                                   std::string_view grammar) {
-  return InferFormatted(ToChatPrompt(model_.get(), system_prompt, prompt),
+  return InferFormatted(prompt_formatter_->Format(system_prompt, prompt),
                         max_tokens, grammar);
 }
 

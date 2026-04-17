@@ -1,4 +1,3 @@
-<|think|>
 Return only one raw JSON object as the final answer, with exactly three keys: "reasoning", "name", and "description".
 The "reasoning" key MUST be the first key in the object.
 No markdown, code fences, preamble, or extra keys.

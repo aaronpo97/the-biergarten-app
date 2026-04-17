@@ -107,6 +107,7 @@ set(SOURCES
     src/data_generation/llama/infer.cc
     src/data_generation/llama/load.cc
     src/data_generation/llama/load_brewery_prompt.cc
+    src/data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.cc
     src/data_generation/mock/deterministic_hash.cc
     src/data_generation/mock/generate_brewery.cc
     src/data_generation/mock/generate_user.cc

@@ -31,10 +31,17 @@ void LlamaGenerator::ContextDeleter::operator()(
 }
 
 LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
-                               const std::string& model_path)
-    : rng_(std::random_device{}()) {
+                               const std::string& model_path,
+                               std::shared_ptr<IPromptFormatter> prompt_formatter)
+    : rng_(std::random_device{}()),
+      prompt_formatter_(std::move(prompt_formatter)) {
   if (model_path.empty()) {
     throw std::runtime_error("LlamaGenerator: model path must not be empty");
+  }
+
+  if (!prompt_formatter_) {
+    throw std::runtime_error(
+        "LlamaGenerator: prompt formatter dependency must not be null");
   }
 
   if (options.temperature < 0.0F) {

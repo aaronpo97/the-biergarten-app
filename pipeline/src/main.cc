@@ -17,6 +17,7 @@
 #include "biergarten_data_generator.h"
 #include "data_generation/llama_generator.h"
 #include "data_generation/mock_generator.h"
+#include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
 #include "data_model/application_options.h"
 #include "llama_backend_state.h"
 #include "services/enrichment_service.h"
@@ -147,6 +148,7 @@ int main(const int argc, char** argv) {
         di::bind<WebClient>().to<CURLWebClient>(),
         di::bind<ApplicationOptions>().to(options),
         di::bind<IEnrichmentService>().to<WikipediaService>(),
+        di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
         di::bind<std::string>().to(options.model_path),
         di::bind<DataGenerator>().to(
             [options](const auto& inj) -> std::unique_ptr<DataGenerator> {
