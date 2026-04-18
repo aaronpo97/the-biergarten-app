@@ -1,0 +1,112 @@
+@startuml
+skinparam style strictuml
+skinparam defaultFontName "DM Sans"
+skinparam defaultFontSize 14
+skinparam titleFontName "Volkhov"
+skinparam titleFontSize 20
+skinparam backgroundColor #FAFCF9
+skinparam defaultFontColor #28342A
+skinparam titleFontColor #28342A
+skinparam ArrowColor #628A5B
+
+skinparam class {
+  BackgroundColor #FAFCF9
+  HeaderBackgroundColor #EAF0E8
+  BorderColor #547461
+  ArrowColor #628A5B
+  FontColor #28342A
+}
+
+skinparam note {
+  BackgroundColor #EAF0E8
+  BorderColor #547461
+  FontColor #28342A
+}
+
+title The Biergarten Data Pipeline - Class Diagram
+
+class BiergartenDataGenerator {
+  - context_service_ : std::unique_ptr<IEnrichmentService>
+  - generator_ : std::unique_ptr<DataGenerator>
+  - generated_breweries_ : std::vector<GeneratedBrewery>
+  + Run() : bool
+  - QueryCitiesWithCountries() : std::vector<Location>
+  - GenerateBreweries(cities : std::span<const EnrichedCity>) : void
+  - LogResults() : void
+}
+
+interface IEnrichmentService <<interface>> {
+  + GetLocationContext(loc : const Location&) : std::string
+}
+
+class WikipediaService {
+  - client_ : std::unique_ptr<WebClient>
+  - extract_cache_ : std::unordered_map<std::string, std::string>
+  + GetLocationContext(loc : const Location&) : std::string
+  - FetchExtract(query : std::string_view) : std::string
+}
+
+interface WebClient <<interface>> {
+  + Get(url : const std::string&) : std::string
+  + UrlEncode(value : const std::string&) : std::string
+}
+
+class CURLWebClient {
+  + Get(url : const std::string&) : std::string
+  + UrlEncode(value : const std::string&) : std::string
+}
+
+interface DataGenerator <<interface>> {
+  + GenerateBrewery(location : const Location&, region_context : const std::string&) : BreweryResult
+  + GenerateUser(locale : const std::string&) : UserResult
+}
+
+class MockGenerator {
+  + GenerateBrewery(...) : BreweryResult
+  + GenerateUser(...) : UserResult
+  - DeterministicHash(location : const Location&) : size_t
+}
+
+class LlamaGenerator {
+  - model_ : ModelHandle
+  - context_ : ContextHandle
+  - prompt_formatter_ : std::unique_ptr<IPromptFormatter>
+  - rng_ : std::mt19937
+  + GenerateBrewery(...) : BreweryResult
+  + GenerateUser(...) : UserResult
+  - Load(model_path : const std::string&) : void
+  - Infer(...) : std::string
+  - InferFormatted(...) : std::string
+  - LoadBrewerySystemPrompt(...) : std::string
+}
+
+interface IPromptFormatter <<interface>> {
+  + Format(system_prompt : std::string_view, user_prompt : std::string_view) : std::string
+}
+
+class Gemma4JinjaPromptFormatter {
+  + Format(system_prompt : std::string_view, user_prompt : std::string_view) : std::string
+}
+
+class JsonLoader {
+  + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+}
+
+' Structural Relationships / Dependency Injection
+BiergartenDataGenerator *-- IEnrichmentService : owns
+BiergartenDataGenerator *-- DataGenerator : owns
+
+IEnrichmentService <|.. WikipediaService : implements
+WikipediaService *-- WebClient : owns
+
+WebClient <|.. CURLWebClient : implements
+
+DataGenerator <|.. MockGenerator : implements
+DataGenerator <|.. LlamaGenerator : implements
+
+LlamaGenerator *-- IPromptFormatter : uses
+
+IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
+
+BiergartenDataGenerator ..> JsonLoader : uses
+@enduml

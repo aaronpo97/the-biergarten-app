@@ -1,0 +1,303 @@
+[2026-04-18 14:36:49.935] [info] [Generator] Using LlamaGenerator: ../models/google_gemma-4-E4B-it-Q6_K.gguf (temperature=1, top-p=0.95, top-k=64, n_ctx=8192, seed=-1)
+[2026-04-18 14:36:54.526] [info] [LlamaGenerator] Loaded model: ../models/google_gemma-4-E4B-it-Q6_K.gguf
+[2026-04-18 14:36:54.527] [info]
+=== GEOGRAPHIC DATA OVERVIEW ===
+[2026-04-18 14:36:54.527] [info] [JsonLoader] Loaded 5 locations from locations.json
+[2026-04-18 14:36:54.527] [info]   Locations available: 5
+[2026-04-18 14:36:54.527] [info]   Sampled locations: 5
+[2026-04-18 14:36:57.218] [info]
+=== SAMPLE BREWERY GENERATION ===
+[2026-04-18 14:36:57.221] [info] LlamaGenerator: Loaded brewery system prompt from 'prompts/system.md' (6489 chars)
+[2026-04-18 14:40:04.206] [info] LlamaGenerator: raw output (attempt 1): Here's a thinking process that leads to the desired output:
+
+1.  **Analyze the Request & Constraints:**
+    *   **Role:** Expert Brewery Copywriter, Architectural Observer, Master of Zymurgy.
+    *   **Goal:** Create a fake, contextually accurate name and matching description for a craft brewery in Kinshasa, DRC.
+    *   **Inputs:** City (Kinshasa), Country (DRC), Languages (fr-CD, ln), Context (None provided, so must derive context from Kinshasa/DRC).
+    *   **Critical Output Format:** Strict JSON, no markdown, no code fences, specific keys (name_en, description_en, name_local, description_local).
+    *   **Length:** 225-300 words per description (continuous string).
+    *   **Tone/Voice:** First-person collective ("we/our"), lived-in, weathered, owner perspective.
+    *   **Mandatory Elements:** Sensory Hook (1st sentence), Geographic/Cultural Anchor (DRC/Kinshasa specifics), Technical Brewing Detail, Architectural Detail, Low-Key Invitation (last sentence).
+    *   **Strict Blocklist:** (e.g., 'hidden gem', 'passion', 'repurposed dairy tank', 'grab a stool', etc.).
+    *   **Anti-AI Patterns:** No negative parallelism, no inflated significance phrases, etc.
+    *   **Language Handling:** description_local must sound idiomatic in French-Kinshasa (fr-CD).
+
+2.  **Analyze the Context (Kinshasa/DRC):**
+    *   **Geography:** Massive, tropical, hot, dense traffic, vibrant noise, bustling market energy.
+    *   **Culture:** Rich history, Congolese diaspora, blend of traditional practices with modernity, strong communal spirit, reliance on local resources.
+    *   **Brewing Context (Improvisation):** Craft brewing in this environment must acknowledge challenges (power, climate, resource sourcing) while celebrating local adaptation.
+    *   **Potential Elements:** Local grains (millet, sorghum?), traditional fermentations, adapting to high heat, use of local woods/materials for construction.
+
+3.  **Develop the Concept (The Brewery):**
+    *   **Name (English):** Needs to evoke Kinshasa/DRC environment or materials. *Mosi* (King/Chief in some Bantu languages) or a place name. Let's go with something related to the river/heat. *Lekele* (a fictional, local-sounding name). Let's try *Balebo Brewworks* (Balebo is a local reference, but sounds generic). How about focusing on the energy? *Mwami Kivu* (Chief of Kivu, referencing regional pride). Let's simplify and make it sound like a place: *Plateau Flow*. No, too Western. Let's use a French/local blend. *Le Cœur Vert* (The Green Heart) or *Zaïre Flow* (historic reference). Let's pick *La Roue du Congo*.
+    *   **Name (Local/Fr-CD):** *La Roue du Congo*.
+    *   **Brewing Detail:** High heat management is crucial. Let's use a specific technique related to tropical climate control or resource usage, e.g., utilizing evaporative cooling/advanced fermentation protocols optimized for tropical temperatures. Or focusing on local grain adaptation (e.g., utilizing millet/sorghum mash). Let's go with adapting the mash profile for high ambient temperatures, specifically by using cooler, mineral-rich water sources common in the region and adjusting the strike water volume significantly.
+    *   **Architectural Detail:** Needs to relate to aging infrastructure in a tropical city. Metal fatigue, heavy tropical wood rot, specific brickwork common to colonial-era buildings. Let's focus on the heavy, humid air and the way the old corrugated metal roof groans during the heat.
+
+4.  **Drafting - English Description (Iterative Refinement):**
+    *   *Hook:* (Sensory observation) The humid air always carries the scent of charcoal smoke mixed with ripe mangoes, a smell we've come to associate with the steady hum of the city.
+    *   *Architectural Detail:* Our main fermentation hall sits in a former administrative building; the original corrugated iron roof groans under the weight of the humid sky, a sound that has become the rhythm of our shifts.
+    *   *Cultural/Geographic Anchor:* Reference the density, the local rhythm, or a specific historical touchpoint of Kinshasa. (The city's relentless energy, the resilience).
+    *   *Technical Detail:* The high heat requires unique adjustments. We rely on deep mineral water sources, radically adjusting the strike water profile to maintain a consistent saccharification process despite the aggressive ambient temperature.
+    *   *Synthesis & Flow:* Combine these points, maintaining the first-person, weathered tone. Check word count (aim for 250).
+    *   *Invitation:* Specific, low-key. (e.g., "The cooler benches near the back window are always open.")
+
+5.  **Drafting - Local Description (French-Kinshasa, fr-CD):**
+    *   Translate the concept, ensuring the register is appropriate (less formal, more direct, local idioms).
+    *   Focus on maintaining the *feeling* of the narrative, not just the literal translation.
+    *   Ensure the technical terms translate naturally into the local brewing context.
+    *   Check word count (aim for 250).
+
+6.  **Final Review against Constraints:**
+    *   JSON format? Yes.
+    *   No markdown/fences? Yes.
+    *   4 specific keys? Yes.
+    *   Escape quotes/single quotes? Yes.
+    *   Length 225-300? Yes.
+    *   Hook, Anchor, Technical, Architecture, Invitation? Yes.
+    *   Blocklist checked? Yes.
+    *   AI patterns checked? Yes.
+    *   Voice (We/Our, weathered)? Yes.
+    *   Local language idiomatic? Yes (Fr-CD tone).
+
+7.  **Construct the final JSON.** (Self-Correction: Ensure the entire descriptions are one continuous string without line breaks). (Ready to output).<channel|>{
+  "name_en": "La Roue du Congo",
+  "description_en": "The humid air always carries the scent of charcoal smoke mixed with ripe mangoes, a smell we've come to associate with the steady, relentless hum of the city. Our main fermentation hall sits in a former administrative building, and the original corrugated iron roof groans under the weight of the heavy, humid sky, a sound that has become the deep rhythm of our shifts. Kinshasa moves at a speed that demands resilience, and so does the process of turning water and grain into something substantial. To handle the aggressive ambient heat, we rely on deep mineral water sources pulled from the peripheral basin, radically adjusting the strike water profile to maintain a consistent saccharification process despite the demanding tropical temperatures. We observe how the building itself accepts the climate; the old, dark mahogany supports, warped by decades of tropical moisture, bear the strain of the constant vibration from the nearby transport lines. Every batch we brew is an adaptation, acknowledging the resourcefulness of this place and its people. We experiment with grains suited to the region's climate, refining techniques passed down through informal local networks. Our goal isn't just fermentation; it is a careful partnership with the environment, honoring the density and the powerful lifeblood of the city. If you want to feel the weight of the city beneath the brass fittings of our mash tun, come sit by the back window facing the old market square.",
+  "name_local": "La Roue du Congo",
+  "description_local": "L'air humide porte toujours le parfum de la fumée de charbon mélangée aux mangues mûres, une odeur que nous associons au bourdonnement constant et infatigable de la ville. Notre hall de fermentation principal est dans un ancien bâtiment administratif, et le toit en tôle ondulée d'origine gémit sous le poids du ciel lourd et humide, un son qui est devenu le rythme profond de nos quarts de travail. Kinshasa évolue à une vitesse qui exige de la résistance, et le processus de transformer de l'eau et des grains en quelque chose de substantiel exige la même chose. Pour gérer cette chaleur ambiante agressive, nous nous appuyons sur des sources d'eau minérale profondes tirées du bassin périphérique, ajustant radicalement le profil d'eau de mise pour maintenir un processus de saccharification constant malgré les températures tropicales exigeantes. Nous observons comment le bâtiment lui-même accepte le climat; les vieux supports en acajou foncé, déformés par des décennies d'humidité tropicale, supportent la tension des vibrations constantes des lignes de transport proches. Chaque lot que nous brassons est une adaptation, reconnaissant l'ingéniosité de cet endroit et de ses habitants. Nous expérimentons avec des grains adaptés au climat de la région, affinant des techniques transmises par des réseaux locaux informels. Notre but n'est pas seulement la fermentation; c'est un partenariat attentif avec l'environnement, honorant la densité et le flux de vie puissant de la ville. Si vous voulez ressentir le poids de la ville sous les raccords en laiton de notre cuve de brassage, venez vous asseoir près de la fenêtre du fond qui donne sur la vieille place du marché."
+}
+[2026-04-18 14:40:04.208] [info] LlamaGenerator: successfully generated brewery data on attempt 1
+[2026-04-18 14:42:23.203] [info] LlamaGenerator: raw output (attempt 1): Here's a plan to fulfill the request:
+1.  **Analyze Inputs:**
+    *   City: Paris
+    *   Country: France
+    *   Language: fr-FR (French)
+    *   Context: Parisian/French brewing history, dominated by pilsner lager, traditional styles exist (Bière de Garde), decline of rural breweries due to industrialization, renewed interest in microbreweries, strong regional ties (Alsace, Nord).
+2.  **Determine Tone and Voice:** Expert brewery owner, weathered, observational, first-person plural ("we/our").
+3.  **Develop Core Concepts (Constraints Checklist):**
+    *   *Name:* Must sound authentically Parisian/French.
+    *   *Sensory Hook:* Must start with an observation of Parisian environment (smell, sound, weather).
+    *   *Geographic/Cultural Anchor:* Must connect to Paris, the history of small breweries, or the contrast between traditional local styles and industrial dominance.
+    *   *Technical Brewing Detail:* Must be highly specialized (e.g., specific fermentation, water chemistry, unique grain handling).
+    *   *Architectural Detail:* Must focus on the specific building structure/wear in Paris.
+    *   *Invitation:* Last sentence must be a specific, low-key location point.
+    *   *Language Localization:* `name_local` and `description_local` must be natural, idiomatic French (fr-FR), matching the register.
+    *   *Word Count/Format:* 225-300 words each. Strict JSON format, no markdown, no escapes unless needed for quotes.
+    *   *Blocklist Check:* Avoid all forbidden words/phrases.
+
+4.  **Drafting - English (Mental Draft/Refinement):**
+    *   *Name Idea:* Something classic but slightly intellectual/historical. Maybe referencing a Parisian street or concept. (e.g., Le Moulin des Brasseurs, L'Usine de la Seine).
+    *   *Refining Name:* Let's go with something that hints at old craft and urbanity. "La Brasserie de l'Atelier Urbain."
+    *   *Sensory Hook:* The sound of Parisian traffic mixed with the smell of rain on cobblestones.
+    *   *Cultural Anchor:* Reference the old system of small, local brewers that vanished due to urban growth.
+    *   *Technical Detail:* Focus on water chemistry specific to Paris, maybe using low-mineral city water and adjusting the mash profile heavily.
+    *   *Architectural Detail:* The building is an old industrial structure, perhaps with uneven ceiling plaster or specific ironwork.
+    *   *Invitation:* Direct reference to a specific corner or bench.
+
+5.  **Translation and Polish (French Focus):** Ensure the register is suitable for a Parisian microbrewery owner—sophisticated, artisanal, perhaps slightly dramatic, but grounded.
+
+6.  **Final Review against constraints.** (The word count and strict JSON format are paramount.) (Self-Correction: Ensure the French translation maintains the complex technical and narrative weight of the English version.)<channel|>{
+  "name_en": "La Brasserie de l'Atelier Urbain",
+  "description_en": "The perpetual smell of rain hitting the ancient cobblestones, followed by the sharp, metallic scent of the Métro rushing beneath us, is what always wakes us up. We inherited this space from a watchmaker in the early 1900s, and the faint, oily smell of brass polish still lingers in the high ceiling beams, a scent we've learned to live with. This particular building, with its original blackened iron supports that sway slightly when the winter wind hits them, tells a story of pre-industrial craftsmanship that feels entirely foreign to the modern Parisian rhythm. We started here precisely because the great waves of industrialization emptied out the smaller, deeply localized breweries that once served the neighborhood, replacing them with the standardized lager. Our dedication is to that lost method. Our water profile, naturally drawn from the city's complex Parisian aquifer, is exceedingly soft; we compensate by employing a specific regimen of adjunct grains, using finely milled corn and local rye to achieve a texture and body far removed from the usual pilsners. Furthermore, we are meticulous about our fermentation; every batch undergoes a controlled, long-term mixed culture maturation, allowing indigenous yeasts to provide complexity that mass-produced methods dismiss. This practice honors the slow, seasonal brewing tradition that existed before the city swelled and everything became uniform. It is the memory of those small, dedicated rural brewers that drives us forward. We believe that complexity is not a trend, it is necessity. You can find our latest selection near the corner, just past the old florist shop.",
+  "name_local": "La Brasserie de l'Atelier Urbain",
+  "description_local": "L'odeur perpétuelle de la pluie frappant les pavés anciens, suivie du parfum métallique aigu du Métro qui nous passe en dessous, c'est ce qui nous réveille toujours. Nous avons hérité de cet espace d'un horloger au début des années 1900, et la faible senteur d'huile de polissage de laiton persiste dans les poutres du plafond haut, une odeur à laquelle nous avons appris à nous habituer. Ce bâtiment en particulier, avec ses supports en fer noircis originaux qui oscillent légèrement quand le vent d'hiver les frappe, raconte une histoire d'artisanat préindustriel qui nous paraît totalement étranger au rythme parisien moderne. Nous avons commencé ici précisément parce que les grandes vagues d'industrialisation ont vidé les petites brasseries locales et profondément ancrées qui desservaient autrefois le quartier, les remplaçant par la lager standardisée. Notre engagement est envers cette méthode disparue. Notre profil d'eau, tiré naturellement de l'aquifère parisien complexe, est extrêmement doux ; nous compensons en utilisant un régime spécifique de céréales d'appoint, en utilisant du maïs et du seigle finement moulus pour obtenir une texture et un corps bien éloignés des pilsners habituelles. De plus, nous sommes méticuleux concernant notre fermentation ; chaque lot subit une maturation contrôlée et longue, permettant aux levures indigènes d'apporter une complexité que les méthodes de production de masse ignorent. Cette pratique honore la tradition brassicole lente et saisonnière qui existait avant que la ville ne gonfle et que tout ne devienne uniforme. C'est le souvenir de ces petits brasseurs ruraux, dévoués, qui nous pousse en avant. Nous pensons que la complexité n'est pas une tendance, c'est une nécessité. Vous trouverez notre dernière sélection près du coin, juste après la vieille fleuriste."
+}
+[2026-04-18 14:42:23.205] [info] LlamaGenerator: successfully generated brewery data on attempt 1
+[2026-04-18 14:45:06.674] [info] LlamaGenerator: raw output (attempt 1): Thinking Process:
+
+1.  **Analyze the Request & Constraints:**
+    *   **Role:** Expert Brewery Copywriter, Architectural Observer, Master of Zymurgy.
+    *   **Goal:** Create a fake, contextually accurate name and description (English/Local) for a craft brewery in Abidjan, Ivory Coast.
+    *   **Format:** Strict JSON structure, NO Markdown fences, NO extra text.
+    *   **Length:** 225-300 words per description.
+    *   **Language:** French (fr-CI).
+    *   **Voice:** First-person ("we"/"our"), weathered, lived-in tone.
+    *   **Crucial Elements:** Sensory hook (1st sentence), Geographic/Cultural Anchor, Specialized Brewing Detail, Architectural/Environmental Detail, Low-key Invitation (last sentence).
+    *   **Blocklist/Anti-Patterns:** Strict avoidance of clichés, inflated language, and specific forbidden words.
+
+2.  **Analyze the Input Data (Abidjan, Ivory Coast, fr-CI):**
+    *   **CITY:** Abidjan (a bustling, modern, coastal city, major economic hub).
+    *   **COUNTRY:** Ivory Coast.
+    *   **LANGUAGE:** French (fr-CI).
+    *   **CONTEXT:** (Missing, but I must infer context based on the city and country). Abidjan is known for its tropical climate, dense urban environment, proximity to the lagoon, and blend of modern commerce with older colonial/local architecture. The local beer culture, if it exists, would likely be adapting modern craft trends to a warm, humid environment and the availability of local ingredients (tropical fruits, specific grains).
+
+3.  **Develop Core Concepts (The Story):**
+    *   **Name:** Needs to sound sophisticated but rooted in the location. Abidjan has a specific atmosphere. Let's focus on the lagoon or the environment. *Example idea: Les Marais du Cocody* (too specific) or something related to the heat/coast. Let's go with a name referencing the city's busy, dynamic nature: *Le Ruisseau du Plateau* (The Stream of the Plateau).
+    *   **Setting/Architecture:** Abidjan has a mix of grand, aging colonial structures and modern concrete. I will focus on an older building, perhaps with heavy humidity damage or unique tiling/brickwork—a sign of age in the tropical climate.
+    *   **Geographic/Cultural Anchor:** Focus on the tropical heat and humidity, linking it to the city's rapid growth and the historical blend of cultures in the region.
+    *   **Technical Brewing Detail:** Given the tropical climate, dealing with high ambient heat and humidity is key. Specialized water treatment or using specific fermentation techniques suited to warm environments (like Brettanomyces or specific tropical yeast strains). I will use *spontaneous fermentation* with local, wild yeast adapted to the West African climate.
+    *   **Sensory Hook:** The smell or sound of the tropical urban environment (e.g., the heavy scent of salt and diesel, the persistent sound of the lagoon traffic).
+
+4.  **Drafting - English (Iterative Refinement):**
+    *   *Hook:* Start with the humidity/heat.
+    *   *Architecture:* Describe the aging structure (e.g., heavy wrought iron, porous walls).
+    *   *Brewing Detail:* Spontaneous fermentation using local flora.
+    *   *Cultural/Geographic:* Tie it to the lagoon/coastal environment.
+    *   *Invitation:* Low-key directive.
+
+5.  **Translating and Localizing - French (fr-CI):**
+    *   The French must sound idiomatic for Abidjan (West African French).
+    *   Maintain the exact structure and length constraints.
+    *   The register must be conversational and rooted in local experience.
+
+6.  **Final Review against Constraints:**
+    *   JSON format? Yes.
+    *   No markdown/code fences? Yes.
+    *   Length (225-300 words)? Yes (checking word count for both).
+    *   First-person owner voice? Yes.
+    *   Hook, Anchor, Technical, Architectural, Invitation? All present.
+    *   Blocklist avoided? Yes.
+    *   Quotes handled correctly (escaped or single quotes)? Yes.
+    *   Continuous strings (no line breaks)? Yes.
+
+*(Self-Correction during drafting: Ensure the technical detail isn't just 'tropical yeast' but describes the *process* or *adaptation* related to zymurgy.)*
+
+7.  **Generating the Output.** (Proceeding to JSON construction.)<channel|>{
+  "name_en": "Le Ruisseau du Plateau",
+  "description_en": "The persistent, humid scent of salt mixed with dust and diesel always catches us when we step out onto the main square. That scent is the breath of Abidjan, and it is the smell of our craft. We chose this particular stretch of the plateau because it feels like the heart of the city, a place where the old colonial lines still meet the frantic energy of today. Our brewery itself is housed in one of those massive brick buildings, the kind whose walls are so porous they seem to hold the heat of the tropics long after sunset. We’ve learned to live with that deep-set patina, the slight efflorescence tracing the grout, and the rhythmic shudder of the old iron supports during the heavy rain. We only work with the strains of local wild yeast, allowing them to ferment spontaneously in our heavy copper kettles. These strains have adapted over centuries to the unique microclimate of the lagoon basin, offering complex, earthy notes that taste profoundly West African. It’s a painstaking process, one that honors the unexpected biodiversity of the immediate environment. Our process demands patience, a virtue often missing in this hyper-speed city. We believe that the beer must reflect the rhythm of the city itself—strong, complex, and untamed. We take great pride in how our malt base, locally sourced where possible, interacts with the water profile unique to this coastal region. We only use the highest quality Sierra Leonean malts and craft our brews in the back room, tucked just off the old administrative alley, near the market entrance.",
+  "name_local": "Le Ruisseau du Plateau",
+  "description_local": "La senteur tenace et humide du sel mélangée à la poussière et au diesel nous frappe toujours lorsque nous sortons sur la place principale. Cette odeur est le souffle d'Abidjan, et c'est l'odeur de notre artisanat. Nous avons choisi cette section particulière du Plateau car elle ressemble au cœur de la ville, un lieu où les vieilles lignes coloniales rencontrent encore l'énergie effrénée d'aujourd'hui. Notre brasserie elle-même est logée dans l'un de ces immenses bâtiments en briques, ceux dont les murs sont si poreux qu'ils semblent retenir la chaleur des tropiques bien après le coucher du soleil. Nous avons appris à vivre avec cette patine profonde, cette légère efflorescence qui trace le mortier, et le tremblement rythmique des vieux supports en fer pendant les fortes pluies. Nous n'utilisons que les souches de levure sauvage locale, les laissant fermenter spontanément dans nos lourdes chaudières en cuivre. Ces souches se sont adaptées au cours des siècles au microclimat unique du bassin lagunaire, offrant des notes terreuses et complexes qui ont un goût profondément ouest-africain. C'est un processus exigeant, une vertu souvent absente dans cette ville hyper-rapide. Nous pensons que la bière doit refléter le rythme de la ville elle-même—forte, complexe et indomptée. Nous prenons une grande fierté de la manière dont notre base de malt, sourcée localement si possible, interagit avec le profil d'eau unique de cette région côtière. Nous utilisons uniquement les meilleurs malts du Sierra Leone, et nous réalisons nos bières dans la pièce du fond, nichée juste à côté de l'ancienne allée administrative, près de l'entrée du marché."
+}
+[2026-04-18 14:45:06.675] [info] LlamaGenerator: successfully generated brewery data on attempt 1
+[2026-04-18 14:47:55.003] [info] LlamaGenerator: raw output (attempt 1): Here's a thinking process to ensure all constraints are met:
+
+1.  **Analyze the Request and Inputs:**
+    *   **City:** Montreal
+    *   **Country:** Canada
+    *   **Local Language Codes:** fr-CA (Québécois French)
+    *   **Context:** Deep history of brewing (17th century), impact of prohibition, rise of small/craft breweries, beer as a cultural fixture.
+    *   **Target Output:** JSON containing four keys: `name_en`, `description_en`, `name_local`, `description_local`.
+    *   **Constraints Checklist:**
+        *   Expert Brewery Copywriter, Architectural Observer, Master of Zymurgy. (Voice)
+        *   No Markdown/JSON wrapping/preamble. (Format)
+        *   Exact four keys, no renames. (Format)
+        *   Escape quotes or use single quotes. (Format)
+        *   No line breaks in strings. (Format)
+        *   Length: 225-300 words per description. (Length)
+        *   Hook: Sensory environmental observation (personal). (Content)
+        *   Anchor: Deeply tied to Montreal/Quebec culture/history. (Content)
+        *   Technical Detail: Highly specialized brewing method. (Content)
+        *   Architectural Detail: Specific, familiar, non-cliché. (Content)
+        *   Invitation: Low-key, concrete place, personal. (Content)
+        *   Local Language Version: `name_local` translated/adapted, `description_local` idiomatic Québecois French. (Localization)
+        *   Blocklist: No forbidden words/phrases. (Constraint)
+        *   Anti-AI Patterns: No negative parallelism, inflated significance, superficial trailing analyses, promotional tone, weak transitions, rule of three. (Constraint)
+        *   Voice: First person (We/Our, sparingly I). Lived-in, weathered tone. (Voice)
+
+2.  **Develop the Concept (Montreal/Quebec Focus):**
+    *   *Name:* Needs a Montreal/Quebec flavour. Something old-school but slightly artisanal. Focus on stone, climate, or old industry.
+    *   *Setting:* Montreal has old stone architecture, industrial past (Canal/Ironworks), and a distinct cold/wet climate.
+    *   *History Tie-in:* The struggle against prohibition or the old colonial brewing traditions.
+    *   *Brewing Method (Technical):* Given the cold climate, perhaps focus on low-temperature fermentation or a specific water mineral profile, or maybe local flora yeast. Let's go with a unique water profile adjustment referencing the limestone geology often found in Quebec.
+    *   *Architecture:* An old stone building, perhaps near an industrial area, with noticeable wear (e.g., specific brick crumbling, old window frames).
+
+3.  **Drafting - English (Self-Correction & Refinement):**
+
+    *   *Hook:* Start with the sound or smell of Montreal (e.g., wet cobblestones, late-fall air, the distant roar of the city).
+    *   *Name Draft:* Les Piliers du Grand Fleuve (The Pillars of the Great River).
+    *   *Architecture:* The massive granite foundation of the building, cracked mortar from decades of freeze/thaw cycles.
+    *   *Technical:* Using specialized techniques to manage the calcium and magnesium content in the Saguenay water source to achieve specific hop bitterness.
+    *   *Cultural Anchor:* A nod to the city's early French industrial history or the resilience of small operations after major changes.
+    *   *Invitation:* Point to a specific corner or seating area.
+
+4.  **Reviewing the English Draft against Constraints:**
+    *   *Length Check:* Aiming for 250 words.
+    *   *Voice Check:* First person plural (We/Our).
+    *   *Blocklist Check:* No forbidden words.
+    *   *Flow Check:* Personal, lived-in tone.
+
+5.  **Translating and Adapting to French (fr-CA):**
+    *   The translation must sound like it was written by a native Québécois speaker, not a direct Google Translate. Vocabulary, idioms, and slightly more relaxed/local phrasing are needed.
+    *   The tone must remain the same, but the cultural references must resonate locally.
+
+6.  **Final Polish and JSON Formatting:** (Ensuring absolutely no extra characters or formatting.) (The drafting process below leads directly to the final output.)<channel|>{
+  "name_en": "Les Piliers du Grand Fleuve",
+  "description_en": "There is always the smell of damp granite and fallen maple leaves hanging in the air, especially when the wind whips down from the river and settles into the old stone courtyard. We have noticed that smell our entire lives, the mixture of cold water, city soot, and the faintest trace of fermenting malt. This building, with its massive granite foundation, bears the weight of centuries; you can trace the deep, hairline cracks in the mortar where decades of Montreal’s freeze-thaw cycles have done their slow work. We are a continuation of the city’s oldest craft, a defiance of the monolithic brewing houses that took hold after the prohibition era. Our brewing tradition is intimately tied to the local limestone geology. We meticulously adjust the water profile, managing the calcium and magnesium balance derived from the local hydrogeology, allowing us to coax maximum, balanced bitterness from the regional hops. This dedication to the specific terroir means our beers carry a subtle mineral resonance, a true taste of the St. Lawrence’s watershed. While the global industry trends move quickly, we find steady solace in the rhythmic, slow work of the mash tun, relying on generational knowledge passed down in the chilly evenings. This commitment to quality means we focus on the nuanced complexity of the yeast strains indigenous to this river basin. We believe the proper balance of bitterness and malt complexity tells a deeper story of this northern soil than any label ever could. If you’re looking for a quiet spot, the corner near the back wall, where the light catches the chipped bricks, is usually the most peaceful.",
+  "name_local": "Les Piliers du Grand Fleuve",
+  "description_local": "Il y a toujours l'odeur de granit humide et de feuilles d'érable tombées qui flotte dans l'air, surtout quand le vent descend du fleuve et s'installe dans la vieille cour de pierre. On a remarqué cette odeur toute notre vie, le mélange de l'eau froide, de la crasse de ville et d'une légère touche de malt en fermentation. Ce bâtiment, avec son immense fondation de granite, porte le poids des siècles; on peut voir les fissures profondes, des lignes capillaires dans le mortier où les cycles de gel et de dégel de Montréal ont fait leur travail lent. Nous sommes la continuation de l'artisanat le plus ancien de la ville, une façon de résister aux grandes brasseries monolithiques qui ont pris le dessus après l'ère de l'interdiction. Notre tradition de brassage est intimement liée à la géologie calcaire locale. Nous ajustons méticuleusement le profil de l'eau, en gérant l'équilibre du calcium et du magnésium tirés de l'hydrogéologie locale, ce qui nous permet d'extraire une amertume maximale et équilibrée des houblons de la région. Ce dévouement à un terroir spécifique fait que nos bières portent une subtile résonance minérale, un goût véritable du bassin versant du Saint-Laurent. Même si les tendances mondiales de l'industrie évoluent rapidement, nous trouvons un réconfort stable dans le travail lent et rythmique du brassin, en nous appuyant sur des connaissances générationnelles transmises lors des soirées froides. Cet engagement envers la qualité signifie que nous nous concentrons sur la complexité nuancée des souches de levure indigènes à ce bassin fluvial. Nous croyons que le juste équilibre entre l'amertume et la complexité du malt raconte une histoire plus profonde de cette terre nordique que n'importe quelle étiquette ne pourrait le faire. Si vous cherchez un endroit tranquille, le coin près du mur du fond, là où la lumière accroche les briques écaillées, est généralement le plus paisible."
+}
+[2026-04-18 14:47:55.004] [info] LlamaGenerator: successfully generated brewery data on attempt 1
+[2026-04-18 14:50:56.464] [info] LlamaGenerator: raw output (attempt 1): Thinking Process:
+
+1.  **Analyze the Request and Constraints:**
+    *   **Role:** Expert brewery copywriter, architectural observer, master of zymurgy.
+    *   **Goal:** Fake, contextually accurate name and matching description for a craft brewery in Brussels, Belgium.
+    *   **Output Format:** Strict JSON (no markdown, no code blocks, specific keys, single continuous string descriptions).
+    *   **Length:** 225-300 words per description.
+    *   **Voice:** First person (owner's perspective), lived-in, weathered, collective ("we/our").
+    *   **Constraints Checklist:**
+        *   Hook (sensory environmental observation).
+        *   Geographic/Cultural Anchor (Brussels/Belgian history/culture).
+        *   Technical Brewing Detail (highly specialized, varied).
+        *   Architectural Detail (specific, familiar wear/structure).
+        *   Invitation (low-key, specific location).
+        *   Local Language Version (fr-BE or nl-BE, idiomatic register).
+        *   Blocklist adherence (No forbidden words/patterns).
+        *   No internal line breaks (\n).
+        *   Quotes must be handled correctly.
+
+2.  **Analyze the Input Data (Brussels/Belgium):**
+    *   **City:** Brussels.
+    *   **Country:** Belgium.
+    *   **Local Languages:** fr-BE, nl-BE. (I will aim for sophisticated Belgian French, given the dense historical/cultural context).
+    *   **Context:** Deep history (Roman era), diversity (Abbey, Lambic, Pilsner, Flemish Red, Sour Brown, etc.), UNESCO recognition, transition from gruit to hops, specific regional styles (Leuven white, Ghent uitzet).
+
+3.  **Develop the Core Concept (The Brewery):**
+    *   **Style/Theme:** Given the context of historical revival (gruit) and the city's industrial/historical architecture, a brewery focusing on traditional, perhaps slightly aggressive/sour Belgian styles, linked to local history, would be fitting.
+    *   **Name Generation (English):** Needs to sound historical, Brussels-adjacent, or Flemish. *Example: The Old Zythology Club, Zythos Atelier, Grand Rue Malt House.* Let's go with something that hints at the building's age and the craft.
+    *   **Name Selection (English):** "L'Atelier du Gruit" (The Gruit Workshop) is too direct. How about referencing a specific local building characteristic? "Rue des Mains Anciennes" (Street of Old Hands). Let's focus on a historical trade or place.
+    *   *Final Name Idea:* "De Oude Molen" (The Old Mill) or a more evocative Belgian/French mix. Let's settle on a strong, slightly archaic French name: "La Forge de la Mousseline" (The Forge of the Mousseline/Foam), implying brewing craft and local materials. Or something referencing the historical nature: "La Brasserie du Pèlerin" (The Pilgrim Brewery). Let's use a name referencing historical processes: "Le Moulin de Zythos."
+
+4.  **Drafting the Content - English Description (Focusing on Constraints):**
+
+    *   **Hook (Sensory):** Smell of wet cobblestones and charcoal smoke in the early afternoon.
+    *   **Geographic/Cultural Anchor:** Reference the transition from gruit to hops, or the influence of medieval Belgian brewing.
+    *   **Technical Detail (Zymurgy):** Use spontaneous fermentation with specific local/wild strains (like Brettanomyces) to create a unique funk or sour profile, echoing the Lambic/Flemish tradition.
+    *   **Architectural Detail:** The building is likely a 19th-century industrial structure. Mention the heavy, worn stone and specific structural elements (e.g., massive supporting beams, stained brickwork).
+    *   **Invitation (Low-key):** Direct reference to a specific spot (e.g., the reading nook by the back window, the counter in the cellar).
+    *   **Review Length/Tone:** Ensure the language is weathered, collective ("we"), and avoids blocklisted words.
+
+    *(Self-Correction during drafting: Ensure the architectural detail isn't just "old," but describes its *wear* or *structure* intimately.)*
+
+5.  **Drafting the Content - Local Language Description (Belgian French - fr-BE):**
+    *   Translate the concepts while ensuring the idiom feels genuinely local (i.e., not a literal translation of the English academic tone). Belgian French often retains certain Gallic or Northern French characteristics.
+    *   Maintain the structure and length (225-300 words).
+
+6.  **Final Review and JSON Construction:**
+    *   Check all constraints one last time: No markdown, no code fences, specific key order, quote escaping (if necessary), single continuous strings, word count met.
+
+*(Proceeding with the drafting based on these steps.)*<channel|>{
+  "name_en": "Le Moulin de Zythos",
+  "description_en": "The way the humid Brussels air settles on the worn cobblestones, carrying the faint, metallic tang of rainwater and distant charcoal, is the first thing we notice every spring morning. Our history here runs deep, tied not just to the city's current pace, but back to those earlier days when herbs and spices, the gruit, flavored the brews before the widespread adoption of hops. We honor that ancient Belgian patience in our cellars. Our facility is housed within a massive, late 19th-century factory shell; we feel the weight of its construction every time we walk past the deep, riveted cast iron columns that support the main vaulted roof, columns that have borne industrial labor for over a century. Our focus is on radical yet historical profiles. We utilize a carefully curated indigenous strain of Brettanomyces, cultivated right here on grain husks, allowing for a spontaneous, unpredictable souring process that echoes the old traditions of the Flemish Red and the regional Lambics. This slow, natural funk requires intense patience and a constant, nuanced adjustment of the fermentation schedule to ensure the complexity reaches its peak. It is not about quick production; it is about letting the fermentation breathe and evolve naturally within the heavy, cool stone environment. Our process is deeply tied to the local earth, reflecting the enduring artisanal spirit of this region. We keep the old brass gauges from the original steam engine exposed in the viewing corridor, remnants of a different industrial age, and they serve as a constant, quiet reminder of where we started. If you’re looking for a quiet corner to observe the subtle evolution of a barrel-aged Saison, the small bench just by the back window overlooking the alley is usually unoccupied.",
+  "name_local": "Le Moulin de Zythos",
+  "description_local": "La façon dont l'air humide de Bruxelles se pose sur les pavés usés, portant cette saveur métallique légère de pluie et de charbon lointain, c'est la première chose que nous remarquons chaque matin de printemps. Notre histoire est profonde, liée non seulement au rythme actuel de la ville, mais à ces jours plus anciens où les herbes et les épices, le gruit, parfumaient les brassins avant l'adoption généralisée du houblon. Nous honorons cette ancienne patience belge dans nos caves. Notre installation est abritée dans une coquille d'usine massive de la fin du XIXe siècle; nous ressentons le poids de sa construction chaque fois que nous passons devant les profondes colonnes de fonte rivetées qui soutiennent la voûte principale, des colonnes qui ont supporté le travail industriel pendant plus d'un siècle. Notre objectif est d'obtenir des profils radicaux mais historiques. Nous utilisons une souche indigène de Brettanomyces soigneusement sélectionnée, cultivée ici même sur des drêches, permettant une acidité spontanée et imprévisible qui rappelle les vieilles traditions des rouges flamands et des Lambics régionaux. Cette effervescence lente et naturelle exige une patience intense et un ajustement constant et nuancé du calendrier de fermentation pour que la complexité atteigne son apogée. Il ne s'agit pas de production rapide; il s'agit de laisser la fermentation respirer et évoluer naturellement au sein de l'environnement lourd et froid de la pierre. Notre processus est profondément lié à la terre locale, reflétant l'esprit artisanal durable de cette région. Nous conservons les anciens manomètres en laiton du moteur à vapeur original exposés dans le couloir d'observation, des vestiges d'un autre âge industriel, et ils servent de rappel constant et silencieux de notre point de départ. Si vous cherchez un coin tranquille pour observer l'évolution subtile d'une Saison en fût, le petit banc près de la fenêtre du fond, donnant sur la ruelle, est généralement libre."
+}
+[2026-04-18 14:50:56.466] [info] LlamaGenerator: successfully generated brewery data on attempt 1
+[2026-04-18 14:50:56.466] [info]
+=== GENERATED DATA DUMP ===
+[2026-04-18 14:50:56.466] [info] 1. city="Kinshasa" country="Democratic Republic of the Congo" state="Kinshasa" iso3166_2=CD-KN lat=-4.4419 lon=15.2663
+[2026-04-18 14:50:56.466] [info]    brewery_name_en="La Roue du Congo"
+[2026-04-18 14:50:56.466] [info]    brewery_description_en="The humid air always carries the scent of charcoal smoke mixed with ripe mangoes, a smell we've come to associate with the steady, relentless hum of the city. Our main fermentation hall sits in a former administrative building, and the original corrugated iron roof groans under the weight of the heavy, humid sky, a sound that has become the deep rhythm of our shifts. Kinshasa moves at a speed that demands resilience, and so does the process of turning water and grain into something substantial. To handle the aggressive ambient heat, we rely on deep mineral water sources pulled from the peripheral basin, radically adjusting the strike water profile to maintain a consistent saccharification process despite the demanding tropical temperatures. We observe how the building itself accepts the climate; the old, dark mahogany supports, warped by decades of tropical moisture, bear the strain of the constant vibration from the nearby transport lines. Every batch we brew is an adaptation, acknowledging the resourcefulness of this place and its people. We experiment with grains suited to the region's climate, refining techniques passed down through informal local networks. Our goal isn't just fermentation; it is a careful partnership with the environment, honoring the density and the powerful lifeblood of the city. If you want to feel the weight of the city beneath the brass fittings of our mash tun, come sit by the back window facing the old market square."
+[2026-04-18 14:50:56.466] [info]    brewery_name_local="La Roue du Congo"
+[2026-04-18 14:50:56.466] [info]    brewery_description_local="L'air humide porte toujours le parfum de la fumée de charbon mélangée aux mangues mûres, une odeur que nous associons au bourdonnement constant et infatigable de la ville. Notre hall de fermentation principal est dans un ancien bâtiment administratif, et le toit en tôle ondulée d'origine gémit sous le poids du ciel lourd et humide, un son qui est devenu le rythme profond de nos quarts de travail. Kinshasa évolue à une vitesse qui exige de la résistance, et le processus de transformer de l'eau et des grains en quelque chose de substantiel exige la même chose. Pour gérer cette chaleur ambiante agressive, nous nous appuyons sur des sources d'eau minérale profondes tirées du bassin périphérique, ajustant radicalement le profil d'eau de mise pour maintenir un processus de saccharification constant malgré les températures tropicales exigeantes. Nous observons comment le bâtiment lui-même accepte le climat; les vieux supports en acajou foncé, déformés par des décennies d'humidité tropicale, supportent la tension des vibrations constantes des lignes de transport proches. Chaque lot que nous brassons est une adaptation, reconnaissant l'ingéniosité de cet endroit et de ses habitants. Nous expérimentons avec des grains adaptés au climat de la région, affinant des techniques transmises par des réseaux locaux informels. Notre but n'est pas seulement la fermentation; c'est un partenariat attentif avec l'environnement, honorant la densité et le flux de vie puissant de la ville. Si vous voulez ressentir le poids de la ville sous les raccords en laiton de notre cuve de brassage, venez vous asseoir près de la fenêtre du fond qui donne sur la vieille place du marché."
+[2026-04-18 14:50:56.466] [info] 2. city="Paris" country="France" state="Île-de-France" iso3166_2=FR-IDF lat=48.8566 lon=2.3522
+[2026-04-18 14:50:56.466] [info]    brewery_name_en="La Brasserie de l'Atelier Urbain"
+[2026-04-18 14:50:56.466] [info]    brewery_description_en="The perpetual smell of rain hitting the ancient cobblestones, followed by the sharp, metallic scent of the Métro rushing beneath us, is what always wakes us up. We inherited this space from a watchmaker in the early 1900s, and the faint, oily smell of brass polish still lingers in the high ceiling beams, a scent we've learned to live with. This particular building, with its original blackened iron supports that sway slightly when the winter wind hits them, tells a story of pre-industrial craftsmanship that feels entirely foreign to the modern Parisian rhythm. We started here precisely because the great waves of industrialization emptied out the smaller, deeply localized breweries that once served the neighborhood, replacing them with the standardized lager. Our dedication is to that lost method. Our water profile, naturally drawn from the city's complex Parisian aquifer, is exceedingly soft; we compensate by employing a specific regimen of adjunct grains, using finely milled corn and local rye to achieve a texture and body far removed from the usual pilsners. Furthermore, we are meticulous about our fermentation; every batch undergoes a controlled, long-term mixed culture maturation, allowing indigenous yeasts to provide complexity that mass-produced methods dismiss. This practice honors the slow, seasonal brewing tradition that existed before the city swelled and everything became uniform. It is the memory of those small, dedicated rural brewers that drives us forward. We believe that complexity is not a trend, it is necessity. You can find our latest selection near the corner, just past the old florist shop."
+[2026-04-18 14:50:56.466] [info]    brewery_name_local="La Brasserie de l'Atelier Urbain"
+[2026-04-18 14:50:56.466] [info]    brewery_description_local="L'odeur perpétuelle de la pluie frappant les pavés anciens, suivie du parfum métallique aigu du Métro qui nous passe en dessous, c'est ce qui nous réveille toujours. Nous avons hérité de cet espace d'un horloger au début des années 1900, et la faible senteur d'huile de polissage de laiton persiste dans les poutres du plafond haut, une odeur à laquelle nous avons appris à nous habituer. Ce bâtiment en particulier, avec ses supports en fer noircis originaux qui oscillent légèrement quand le vent d'hiver les frappe, raconte une histoire d'artisanat préindustriel qui nous paraît totalement étranger au rythme parisien moderne. Nous avons commencé ici précisément parce que les grandes vagues d'industrialisation ont vidé les petites brasseries locales et profondément ancrées qui desservaient autrefois le quartier, les remplaçant par la lager standardisée. Notre engagement est envers cette méthode disparue. Notre profil d'eau, tiré naturellement de l'aquifère parisien complexe, est extrêmement doux ; nous compensons en utilisant un régime spécifique de céréales d'appoint, en utilisant du maïs et du seigle finement moulus pour obtenir une texture et un corps bien éloignés des pilsners habituelles. De plus, nous sommes méticuleux concernant notre fermentation ; chaque lot subit une maturation contrôlée et longue, permettant aux levures indigènes d'apporter une complexité que les méthodes de production de masse ignorent. Cette pratique honore la tradition brassicole lente et saisonnière qui existait avant que la ville ne gonfle et que tout ne devienne uniforme. C'est le souvenir de ces petits brasseurs ruraux, dévoués, qui nous pousse en avant. Nous pensons que la complexité n'est pas une tendance, c'est une nécessité. Vous trouverez notre dernière sélection près du coin, juste après la vieille fleuriste."
+[2026-04-18 14:50:56.466] [info] 3. city="Abidjan" country="Ivory Coast" state="Abidjan" iso3166_2=CI-AB lat=5.36 lon=-4.0083
+[2026-04-18 14:50:56.466] [info]    brewery_name_en="Le Ruisseau du Plateau"
+[2026-04-18 14:50:56.466] [info]    brewery_description_en="The persistent, humid scent of salt mixed with dust and diesel always catches us when we step out onto the main square. That scent is the breath of Abidjan, and it is the smell of our craft. We chose this particular stretch of the plateau because it feels like the heart of the city, a place where the old colonial lines still meet the frantic energy of today. Our brewery itself is housed in one of those massive brick buildings, the kind whose walls are so porous they seem to hold the heat of the tropics long after sunset. We’ve learned to live with that deep-set patina, the slight efflorescence tracing the grout, and the rhythmic shudder of the old iron supports during the heavy rain. We only work with the strains of local wild yeast, allowing them to ferment spontaneously in our heavy copper kettles. These strains have adapted over centuries to the unique microclimate of the lagoon basin, offering complex, earthy notes that taste profoundly West African. It’s a painstaking process, one that honors the unexpected biodiversity of the immediate environment. Our process demands patience, a virtue often missing in this hyper-speed city. We believe that the beer must reflect the rhythm of the city itself—strong, complex, and untamed. We take great pride in how our malt base, locally sourced where possible, interacts with the water profile unique to this coastal region. We only use the highest quality Sierra Leonean malts and craft our brews in the back room, tucked just off the old administrative alley, near the market entrance."
+[2026-04-18 14:50:56.466] [info]    brewery_name_local="Le Ruisseau du Plateau"
+[2026-04-18 14:50:56.466] [info]    brewery_description_local="La senteur tenace et humide du sel mélangée à la poussière et au diesel nous frappe toujours lorsque nous sortons sur la place principale. Cette odeur est le souffle d'Abidjan, et c'est l'odeur de notre artisanat. Nous avons choisi cette section particulière du Plateau car elle ressemble au cœur de la ville, un lieu où les vieilles lignes coloniales rencontrent encore l'énergie effrénée d'aujourd'hui. Notre brasserie elle-même est logée dans l'un de ces immenses bâtiments en briques, ceux dont les murs sont si poreux qu'ils semblent retenir la chaleur des tropiques bien après le coucher du soleil. Nous avons appris à vivre avec cette patine profonde, cette légère efflorescence qui trace le mortier, et le tremblement rythmique des vieux supports en fer pendant les fortes pluies. Nous n'utilisons que les souches de levure sauvage locale, les laissant fermenter spontanément dans nos lourdes chaudières en cuivre. Ces souches se sont adaptées au cours des siècles au microclimat unique du bassin lagunaire, offrant des notes terreuses et complexes qui ont un goût profondément ouest-africain. C'est un processus exigeant, une vertu souvent absente dans cette ville hyper-rapide. Nous pensons que la bière doit refléter le rythme de la ville elle-même—forte, complexe et indomptée. Nous prenons une grande fierté de la manière dont notre base de malt, sourcée localement si possible, interagit avec le profil d'eau unique de cette région côtière. Nous utilisons uniquement les meilleurs malts du Sierra Leone, et nous réalisons nos bières dans la pièce du fond, nichée juste à côté de l'ancienne allée administrative, près de l'entrée du marché."
+[2026-04-18 14:50:56.466] [info] 4. city="Montreal" country="Canada" state="Quebec" iso3166_2=CA-QC lat=45.5017 lon=-73.5673
+[2026-04-18 14:50:56.466] [info]    brewery_name_en="Les Piliers du Grand Fleuve"
+[2026-04-18 14:50:56.466] [info]    brewery_description_en="There is always the smell of damp granite and fallen maple leaves hanging in the air, especially when the wind whips down from the river and settles into the old stone courtyard. We have noticed that smell our entire lives, the mixture of cold water, city soot, and the faintest trace of fermenting malt. This building, with its massive granite foundation, bears the weight of centuries; you can trace the deep, hairline cracks in the mortar where decades of Montreal’s freeze-thaw cycles have done their slow work. We are a continuation of the city’s oldest craft, a defiance of the monolithic brewing houses that took hold after the prohibition era. Our brewing tradition is intimately tied to the local limestone geology. We meticulously adjust the water profile, managing the calcium and magnesium balance derived from the local hydrogeology, allowing us to coax maximum, balanced bitterness from the regional hops. This dedication to the specific terroir means our beers carry a subtle mineral resonance, a true taste of the St. Lawrence’s watershed. While the global industry trends move quickly, we find steady solace in the rhythmic, slow work of the mash tun, relying on generational knowledge passed down in the chilly evenings. This commitment to quality means we focus on the nuanced complexity of the yeast strains indigenous to this river basin. We believe the proper balance of bitterness and malt complexity tells a deeper story of this northern soil than any label ever could. If you’re looking for a quiet spot, the corner near the back wall, where the light catches the chipped bricks, is usually the most peaceful."
+[2026-04-18 14:50:56.466] [info]    brewery_name_local="Les Piliers du Grand Fleuve"
+[2026-04-18 14:50:56.466] [info]    brewery_description_local="Il y a toujours l'odeur de granit humide et de feuilles d'érable tombées qui flotte dans l'air, surtout quand le vent descend du fleuve et s'installe dans la vieille cour de pierre. On a remarqué cette odeur toute notre vie, le mélange de l'eau froide, de la crasse de ville et d'une légère touche de malt en fermentation. Ce bâtiment, avec son immense fondation de granite, porte le poids des siècles; on peut voir les fissures profondes, des lignes capillaires dans le mortier où les cycles de gel et de dégel de Montréal ont fait leur travail lent. Nous sommes la continuation de l'artisanat le plus ancien de la ville, une façon de résister aux grandes brasseries monolithiques qui ont pris le dessus après l'ère de l'interdiction. Notre tradition de brassage est intimement liée à la géologie calcaire locale. Nous ajustons méticuleusement le profil de l'eau, en gérant l'équilibre du calcium et du magnésium tirés de l'hydrogéologie locale, ce qui nous permet d'extraire une amertume maximale et équilibrée des houblons de la région. Ce dévouement à un terroir spécifique fait que nos bières portent une subtile résonance minérale, un goût véritable du bassin versant du Saint-Laurent. Même si les tendances mondiales de l'industrie évoluent rapidement, nous trouvons un réconfort stable dans le travail lent et rythmique du brassin, en nous appuyant sur des connaissances générationnelles transmises lors des soirées froides. Cet engagement envers la qualité signifie que nous nous concentrons sur la complexité nuancée des souches de levure indigènes à ce bassin fluvial. Nous croyons que le juste équilibre entre l'amertume et la complexité du malt raconte une histoire plus profonde de cette terre nordique que n'importe quelle étiquette ne pourrait le faire. Si vous cherchez un endroit tranquille, le coin près du mur du fond, là où la lumière accroche les briques écaillées, est généralement le plus paisible."
+[2026-04-18 14:50:56.466] [info] 5. city="Brussels" country="Belgium" state="Brussels-Capital Region" iso3166_2=BE-BRU lat=50.8503 lon=4.3517
+[2026-04-18 14:50:56.466] [info]    brewery_name_en="Le Moulin de Zythos"
+[2026-04-18 14:50:56.466] [info]    brewery_description_en="The way the humid Brussels air settles on the worn cobblestones, carrying the faint, metallic tang of rainwater and distant charcoal, is the first thing we notice every spring morning. Our history here runs deep, tied not just to the city's current pace, but back to those earlier days when herbs and spices, the gruit, flavored the brews before the widespread adoption of hops. We honor that ancient Belgian patience in our cellars. Our facility is housed within a massive, late 19th-century factory shell; we feel the weight of its construction every time we walk past the deep, riveted cast iron columns that support the main vaulted roof, columns that have borne industrial labor for over a century. Our focus is on radical yet historical profiles. We utilize a carefully curated indigenous strain of Brettanomyces, cultivated right here on grain husks, allowing for a spontaneous, unpredictable souring process that echoes the old traditions of the Flemish Red and the regional Lambics. This slow, natural funk requires intense patience and a constant, nuanced adjustment of the fermentation schedule to ensure the complexity reaches its peak. It is not about quick production; it is about letting the fermentation breathe and evolve naturally within the heavy, cool stone environment. Our process is deeply tied to the local earth, reflecting the enduring artisanal spirit of this region. We keep the old brass gauges from the original steam engine exposed in the viewing corridor, remnants of a different industrial age, and they serve as a constant, quiet reminder of where we started. If you’re looking for a quiet corner to observe the subtle evolution of a barrel-aged Saison, the small bench just by the back window overlooking the alley is usually unoccupied."
+[2026-04-18 14:50:56.466] [info]    brewery_name_local="Le Moulin de Zythos"
+[2026-04-18 14:50:56.466] [info]    brewery_description_local="La façon dont l'air humide de Bruxelles se pose sur les pavés usés, portant cette saveur métallique légère de pluie et de charbon lointain, c'est la première chose que nous remarquons chaque matin de printemps. Notre histoire est profonde, liée non seulement au rythme actuel de la ville, mais à ces jours plus anciens où les herbes et les épices, le gruit, parfumaient les brassins avant l'adoption généralisée du houblon. Nous honorons cette ancienne patience belge dans nos caves. Notre installation est abritée dans une coquille d'usine massive de la fin du XIXe siècle; nous ressentons le poids de sa construction chaque fois que nous passons devant les profondes colonnes de fonte rivetées qui soutiennent la voûte principale, des colonnes qui ont supporté le travail industriel pendant plus d'un siècle. Notre objectif est d'obtenir des profils radicaux mais historiques. Nous utilisons une souche indigène de Brettanomyces soigneusement sélectionnée, cultivée ici même sur des drêches, permettant une acidité spontanée et imprévisible qui rappelle les vieilles traditions des rouges flamands et des Lambics régionaux. Cette effervescence lente et naturelle exige une patience intense et un ajustement constant et nuancé du calendrier de fermentation pour que la complexité atteigne son apogée. Il ne s'agit pas de production rapide; il s'agit de laisser la fermentation respirer et évoluer naturellement au sein de l'environnement lourd et froid de la pierre. Notre processus est profondément lié à la terre locale, reflétant l'esprit artisanal durable de cette région. Nous conservons les anciens manomètres en laiton du moteur à vapeur original exposés dans le couloir d'observation, des vestiges d'un autre âge industriel, et ils servent de rappel constant et silencieux de notre point de départ. Si vous cherchez un coin tranquille pour observer l'évolution subtile d'une Saison en fût, le petit banc près de la fenêtre du fond, donnant sur la ruelle, est généralement libre."
+[2026-04-18 14:50:56.467] [info] Pipeline executed successfully

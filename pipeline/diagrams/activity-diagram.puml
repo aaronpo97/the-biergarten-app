@@ -1,0 +1,128 @@
+@startuml
+skinparam style strictuml
+skinparam defaultFontName "DM Sans"
+skinparam defaultFontSize 14
+skinparam titleFontName "Volkhov"
+skinparam titleFontSize 20
+skinparam backgroundColor #FAFCF9
+skinparam defaultFontColor #28342A
+skinparam titleFontColor #28342A
+skinparam ArrowColor #628A5B
+skinparam NoteBackgroundColor #EAF0E8
+skinparam NoteBorderColor #547461
+skinparam ActivityBackgroundColor #FAFCF9
+skinparam ActivityBorderColor #547461
+skinparam ActivityDiamondBackgroundColor #FAFCF9
+skinparam ActivityDiamondBorderColor #628A5B
+skinparam ActivityBarColor #628A5B
+skinparam SwimlaneBorderColor transparent
+skinparam SwimlaneBorderThickness 0
+
+title The Biergarten Data Pipeline
+
+|#F2F6F0|main.cc|
+start
+:ParseArguments(argc, argv);
+note right
+  Validates --mocked, --model,
+  --temperature, --top-p, etc.
+end note
+
+if (Are arguments valid?) then (no)
+  :spdlog::error usage info;
+  stop
+else (yes)
+endif
+
+:Init CurlGlobalState & LlamaBackendState;
+:di::make_injector(...);
+note right
+  Binds CURLWebClient, WikipediaService,
+  Gemma4JinjaPromptFormatter, and
+  either MockGenerator or LlamaGenerator
+end note
+:injector.create<BiergartenDataGenerator>();
+:BiergartenDataGenerator::Run();
+
+|#EAF0E8|BiergartenDataGenerator|
+:QueryCitiesWithCountries();
+
+|#E2EBDC|JsonLoader|
+:JsonLoader::LoadLocations("locations.json");
+:std::ranges::sample(all_locations, 50);
+
+|#EAF0E8|BiergartenDataGenerator|
+while (For each sampled Location?) is (Remaining cities)
+  |#DCE8D8|WikipediaService|
+  :GetLocationContext(loc);
+  :FetchExtract("City, Country");
+  :FetchExtract("beer in Country");
+  :FetchExtract("beer in City");
+  note right: Backed by CURLWebClient::Get
+
+  |#EAF0E8|BiergartenDataGenerator|
+  if (Lookup failed?) then (yes)
+    :spdlog::warn "context lookup failed";
+  else (no)
+    :Store EnrichedCity{Location, region_context};
+  endif
+endwhile (Done)
+
+:GenerateBreweries(enriched_cities);
+
+|#E5EDE1|DataGenerator|
+while (For each EnrichedCity?) is (Remaining cities)
+  if (Generator Mode) then (MockGenerator)
+    :DeterministicHash(location);
+    :Select from kBreweryAdjectives, kBreweryNouns,\nkBreweryDescriptions;
+    :Format BreweryResult;
+  else (LlamaGenerator)
+    :PrepareRegionContext(region_context);
+    :LoadBrewerySystemPrompt("prompts/system.md");
+    :Format user_prompt;
+    :Attempt = 0;
+    repeat
+      :Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
+      note right
+        Uses Gemma4JinjaPromptFormatter,
+        llama_tokenize, and llama_sampler_sample
+      end note
+      :ValidateBreweryJson(raw, brewery);
+
+      if (Is JSON Valid?) then (yes)
+        break
+      else (no)
+        if (Error == "incomplete JSON") then (yes)
+          :max_tokens += 700;
+        endif
+        :Update user_prompt with validation error;
+        :Attempt++;
+      endif
+
+    repeat while (Attempt < 3?) is (yes)
+
+    if (Still Invalid?) then (yes)
+      :throw std::runtime_error;
+    else (no)
+      :Return BreweryResult;
+    endif
+  endif
+
+  |#EAF0E8|BiergartenDataGenerator|
+  if (Exception thrown?) then (yes)
+    :spdlog::warn "brewery generation failed";
+  else (no)
+    :Store GeneratedBrewery;
+  endif
+  |#E5EDE1|DataGenerator|
+endwhile (Done)
+
+|#EAF0E8|BiergartenDataGenerator|
+:LogResults();
+note right: spdlog::info dump of generated JSON fields
+
+|#F2F6F0|main.cc|
+:Return 0;
+stop
+
+@enduml

@@ -1,0 +1,8 @@
+dist
+build
+build-*
+cmake-build-*
+data
+models
+*.gguf
+BiergartenPipeline.png

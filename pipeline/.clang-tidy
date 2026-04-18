@@ -1,0 +1,39 @@
+Checks: >
+  -*,
+  bugprone-*,
+  google-*,
+  modernize-*,
+  readability-*,
+  cppcoreguidelines-*,
+  -modernize-use-trailing-return-type,
+  -google-runtime-references
+
+CheckOptions:
+  # Enforce Google Naming Conventions with valid clang-tidy strings
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassMemberCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassMemberSuffix
+    value: _
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
+
+  # Ensure C++20 Modernization
+  - key: modernize-make-unique.MakeSmartPtrFunction
+    value: std::make_unique
+  - key: modernize-make-shared.MakeSmartPtrFunction
+    value: std::make_shared
+  - key: modernize-use-override.IgnoreDestructors
+    value: "false"
+
+# Warnings as Errors to ensure compliance during build
+WarningsAsErrors: "*"
