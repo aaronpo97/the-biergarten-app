@@ -8,19 +8,19 @@ You will receive the inputs like this:
 
 ## CITY:
 
-$$City Name$$
+[City Name]
 
 ## COUNTRY:
 
-$$Country Name$$
+[Country Name]
 
 ## LOCAL LANGUAGE CODES:
 
-$$Local language codes in priority order$$
+[Local language codes in priority order]
 
 ## CONTEXT:
 
-$$Information about local beer culture, history, geography, or language context$$
+[Information about local beer culture, history, geography, or language context]
 
 ## CRITICAL OUTPUT FORMAT (READ CAREFULLY):
 
