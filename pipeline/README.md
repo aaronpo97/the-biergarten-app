@@ -124,14 +124,14 @@ If enrichment or generation fails for a city, that city is skipped and the pipel
 
 - `src/main.cc` — argument parsing and Boost.DI composition root.
 - `JsonLoader` — validates curated location input.
-- `WikipediaService` — queries English and local-language extracts, caches results, returns empty context on failure.
+- `WikipediaService` — queries Wikipedia extracts, caches results, returns empty context on failure.
 - `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
 - `MockGenerator` — stable hash-based output so the same city input always produces the same brewery.
 - Brewery payloads include English and local-language name and description fields.
 
 ### Runtime Behaviour
 
-`WikipediaService` queries city, country, and beer-related Wikipedia extracts in both English and the local language, then caches the first successful response per query string. Both extracts are passed into the prompt so the model can draw on local-language sources without a separate translation step.
+`WikipediaService` queries city, country, and beer-related Wikipedia extracts using its configured lookup, then caches the first successful response per query string. The fetched extract text is included in the prompt as context for generation.
 
 `GetLocationContext()` returns an empty string when the web client is unavailable or when lookup/parsing fails.
 
@@ -237,7 +237,7 @@ Output quality is reliable for high-resource languages such as French, though it
 ]
 ```
 
-Output sample: [./out-sample/french-cities.log.example](out-sample/french-cities.log.example)
+Output sample: [./out-sample/french-cities.example](out-sample/french-cities.example)
 
 ### Known Issues
 

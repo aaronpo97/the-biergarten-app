@@ -55,7 +55,7 @@ class BiergartenDataGenerator {
   /**
    * @brief Load locations from JSON and sample cities.
    *
-   * @return Vector of sampled locations capped at 4 entries.
+   * @return Vector of sampled locations capped at 50 entries.
    */
   static std::vector<Location> QueryCitiesWithCountries();
 
