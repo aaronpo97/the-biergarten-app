@@ -180,6 +180,10 @@ The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editi
 | `name_local`, `description_local`   | Local-language display content                   |
 | `region_context`                    | Richer copy for cards and detail pages           |
 
+## Process Flow
+
+![An activity diagram](./diagrams/activity-diagram.svg)
+
 ## Next Steps
 
 The pipeline currently produces city-aware brewery records. The next passes add SQLite output and additional fixture types so the app can exercise the full brewery domain without live data.
