@@ -135,7 +135,7 @@ class LlamaGenerator final : public DataGenerator {
   std::mt19937 rng_;
   uint32_t n_ctx_ = kDefaultContextSize;
   std::string brewery_system_prompt_;
-  std::shared_ptr<IPromptFormatter> prompt_formatter_;
+  std::unique_ptr<IPromptFormatter> prompt_formatter_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_

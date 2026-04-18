@@ -8,6 +8,7 @@
 
 #include <boost/di.hpp>
 #include <boost/program_options.hpp>
+#include <chrono>
 #include <exception>
 #include <memory>
 #include <optional>
@@ -131,8 +132,19 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   }
 }
 
+struct Timer {
+  std::chrono::steady_clock::time_point start_time =
+      std::chrono::steady_clock::now();
+  [[nodiscard]] int64_t Elapsed() const {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::steady_clock::now() - start_time)
+        .count();
+  }
+};
+
 int main(const int argc, char** argv) {
   try {
+    Timer timer;
     const CurlGlobalState curl_state;
     const LlamaBackendState llama_backend_state;
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
@@ -173,7 +185,7 @@ int main(const int argc, char** argv) {
       return 1;
     }
 
-    spdlog::info("Pipeline executed successfully");
+    spdlog::info("Pipeline executed successfully in {} ms", timer.Elapsed());
     return 0;
   } catch (const std::exception& exception) {
     spdlog::critical("Unhandled fatal error in main: {}", exception.what());
