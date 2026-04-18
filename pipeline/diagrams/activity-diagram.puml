@@ -1,0 +1,89 @@
+@startuml
+skinparam style strictuml
+skinparam ActivityBackgroundColor #FEFECE
+skinparam ActivityBorderColor #A80036
+
+title Biergarten Pipeline - Activity Diagram (Swimlanes)
+
+|Orchestrator|
+start
+:Parse Command-Line Arguments;
+note right
+  Determines mode (mocked vs model)
+  and LLM sampling parameters.
+end note
+
+if (Are arguments valid?) then (no)
+  :Log Error & Display Usage;
+  stop
+else (yes)
+endif
+
+:Initialize Global States;
+:Construct Dependency Injector (Boost.DI);
+:Instantiate BiergartenDataGenerator;
+
+|DataLoader|
+:JsonLoader::LoadLocations("locations.json");
+:Sample up to 50 Locations;
+note right: Randomly samples from loaded array
+
+|Enrichment|
+while (For each sampled Location?) is (Remaining locations)
+  :GetLocationContext(Location);
+  :Fetch extract for Region (City, Country);
+  :Fetch extract for "beer in <Country>";
+  :Fetch extract for "beer in <City>";
+  :Store EnrichedCity (Location + Context);
+endwhile (Done)
+
+|Generator|
+while (For each EnrichedCity?) is (Remaining enriched cities)
+  if (Generator Mode) then (MockGenerator)
+    :Calculate Deterministic Hash;
+    :Select Adjective, Noun, and Description;
+    :Build BreweryResult;
+    :Store GeneratedBrewery into results;
+
+  else (LlamaGenerator)
+    :Prepare System and User Prompts;
+    :Attempt Counter = 1;
+    repeat
+      :Run Model Inference (llama.cpp);
+      note right: Applies Gemma 4 Jinja formatting\nand GBNF JSON Grammar
+
+      :Validate JSON Output (ValidateBreweryJson);
+
+      if (Is JSON Valid?) then (yes)
+        :Parse into BreweryResult;
+        break
+      else (no)
+        if (Error == "incomplete JSON") then (yes)
+          :Increase max_tokens threshold;
+        else (no)
+        endif
+        :Append Error details to Prompt for LLM correction;
+        :Increment Attempt Counter;
+      endif
+
+    repeat while (Attempt <= 3?) is (yes)
+
+    if (Still Invalid after 3 attempts?) then (yes)
+      |Orchestrator|
+      :Log Warning;
+      |Generator|
+      :Skip City;
+    else (no)
+      :Store GeneratedBrewery into results;
+    endif
+  endif
+
+endwhile (Done)
+
+|Orchestrator|
+:LogResults();
+note right: Dumps generated JSON fields to spdlog
+:Exit Pipeline Successfully (0);
+stop
+
+@enduml
