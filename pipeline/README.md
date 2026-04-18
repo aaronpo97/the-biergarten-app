@@ -1,145 +1,55 @@
 # Biergarten Pipeline
 
-Biergarten Pipeline is a C++20 command-line pipeline that samples city records from local JSON, enriches each city with Wikipedia context, and generates bilingual brewery names and descriptions with either a local GGUF model or a deterministic mock generator.
+A C++20 command-line pipeline that samples city records from local JSON, enriches each with Wikipedia context, and generates bilingual brewery names and descriptions via a local GGUF model or a deterministic mock.
 
-## Key Components
+## How It Fits the Main App
 
-- `src/main.cc` wires dependencies with Boost.DI.
-- `JsonLoader` validates the curated location input.
-- `WikipediaService` caches extracts and returns empty context when a lookup fails.
-- `LlamaGenerator` formats prompts for Gemma 4, retries malformed output, and validates JSON before accepting it.
-- `MockGenerator` emits repeatable output for demos and smoke tests.
-- Brewery payloads include English and local-language name and description fields.
+The pipeline is a data ingestion layer. It sits outside the web app runtime and produces seed records the app imports at startup or during a dedicated seed step.
 
-A structural overview is available in [biergarten_pipeline.puml](biergarten_pipeline.puml).
+| Planned app area                 | Pipeline contribution                                              |
+| -------------------------------- | ------------------------------------------------------------------ |
+| Brewery discovery and management | Sampled city records, localized names, long-form descriptions      |
+| Beer reviews and ratings         | Stable brewery fixtures with enough context to anchor review pages |
+| Social follow relationships      | Repeatable brewery entities for feeds, follows, and saved lists    |
+| Geospatial brewery experiences   | Latitude, longitude, and country-level metadata                    |
+| Additional frontend routes       | Deterministic fixture data for Storybook, demos, and browser tests |
 
-## How It Fits The Main App
+## Pipeline Stages
 
-The parent app uses this pipeline as brewery seed data. Planned brewery discovery, reviews, follows, and map features use the records it emits.
-
-The planned brewery features called out in the parent README map directly to the output this pipeline produces:
-
-| Planned app area                 | Pipeline contribution                                                     |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| Brewery discovery and management | Sampled city records, localized brewery names, and long-form descriptions |
-| Beer reviews and ratings         | Stable brewery fixtures with enough context to anchor review pages        |
-| Social follow relationships      | Repeatable brewery entities for feeds, follows, and saved lists           |
-| Geospatial brewery experiences   | Latitude, longitude, and country-level metadata                           |
-| Additional frontend routes       | Deterministic fixture data for Storybook, demos, and browser tests        |
-
-The pipeline stays outside the web app runtime. That leaves room for a future import job, seed step, or fixture loader.
-
-## Tested Hardware & OS
-
-The local model path was run on both Apple Silicon and discrete-GPU Linux hardware.
-
-### ARM macOS, M1 Pro
-
-- **Host**: MacBook Pro 14" (2021)
-- **CPU**: Apple M1 Pro (8-core)
-- **GPU**: Apple M1 Pro (14-core) integrated GPU
-- **Memory**: 16 GB
-- **Model**: Gemma 4 E4B
-- **Inference**: llama.cpp with Metal support
-
-### x86_64 Linux, NVIDIA RTX 2000
-
-- **Host**: ThinkPad P1 Gen 7 (Fedora 43)
-- **CPU**: Intel Core Ultra 7 155H
-- **GPU**: NVIDIA RTX 2000 Ada Generation
-- **Memory**: 32 GB
-- **Model**: Gemma 4 E4B
-- **Inference**: llama.cpp with CUDA 12.x support
-
-## Pipeline
+```
+locations.json → Enrich (Wikipedia) → Generate (LLM / Mock) → log output
+```
 
 | Stage    | Implementation                                                                                                 |
 | -------- | -------------------------------------------------------------------------------------------------------------- |
 | Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                            |
 | Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                      |
-| Enrich   | `WikipediaService` looks up city and beer context and keeps going when a lookup fails.                         |
+| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                             |
 | Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language. |
 | Log      | `spdlog` writes results and warnings to the console.                                                           |
 
-If enrichment or generation fails for a city, the pipeline skips that city and continues with the rest.
+If enrichment or generation fails for a city, that city is skipped and the pipeline continues.
+
+## Key Components
+
+- `src/main.cc` — argument parsing and Boost.DI composition root.
+- `JsonLoader` — validates curated location input.
+- `WikipediaService` — queries English and local-language extracts, caches results, returns empty context on failure.
+- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
+- `MockGenerator` — stable hash-based output so the same city input always produces the same brewery.
+- Brewery payloads include English and local-language name and description fields.
+
+A structural overview is in [biergarten_pipeline.puml](biergarten_pipeline.puml).
 
 ## Runtime Behaviour
 
-- `WikipediaService` queries city, country, and beer-related Wikipedia extracts, then caches the first successful response for each query string.
-- `GetLocationContext()` returns an empty string when the web client is unavailable or when lookup/parsing fails, so the pipeline can continue.
-- `LlamaGenerator` validates the model output as structured JSON and retries malformed responses up to three times.
-- If the model output looks truncated, the retry path raises the token budget before trying again.
-- `MockGenerator` uses stable hashes so the same city input produces the same brewery result every time.
+`WikipediaService` queries city, country, and beer-related Wikipedia extracts in both English and the local language, then caches the first successful response per query string. Both extracts are passed into the prompt so the model can draw on local-language sources without a separate translation step.
 
-## Tech Stack
+`GetLocationContext()` returns an empty string when the web client is unavailable or when lookup/parsing fails.
 
-- C++20
-- CMake 3.24+
-- Boost.JSON
-- Boost.ProgramOptions
-- Boost.DI
-- spdlog
-- libcurl
-- llama.cpp
+`LlamaGenerator` validates model output as structured JSON. The retry path exists as a safety hatch for cases where the reasoning block consumes available token budget and compresses the JSON output space. All runs to date have produced valid output on the first pass; the path is kept for resilience.
 
-The build fetches Boost.DI, spdlog, and llama.cpp through CMake. The current configuration targets macOS and Linux; Metal is enabled on Apple Silicon, and CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
-
-## Code Style
-
-The codebase uses modern C++20, RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, and structured bindings in the pipeline loops.
-
-Formatting follows the Google C++ Style Guide via `.clang-format`, with a narrow column limit and two-space indentation.
-
-## Build
-
-Requirements:
-
-- C++20 compiler
-- CMake 3.24 or newer
-- libcurl
-- Boost with JSON and Program Options components installed
-
-```bash
-cmake -S . -B build
-cmake --build build
-```
-
-## Model
-
-If you plan to run the model-backed path, create a `models/` directory and download the GGUF file there. Skip this step if you only want `--mocked`.
-
-```bash
-mkdir -p models
-curl -L \
-  -o models/google_gemma-4-E4B-it-Q6_K.gguf \
-  https://huggingface.co/bartowski/google_gemma-4-E4B-it-GGUF/resolve/main/google_gemma-4-E4B-it-Q6_K.gguf?download=true
-```
-
-## Run
-
-Run the executable from the `build/` directory so the copied `locations.json` and `prompts/` directory are available.
-
-```bash
-./biergarten-pipeline --mocked
-./biergarten-pipeline --model models/google_gemma-4-E4B-it-Q6_K.gguf --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
-```
-
-## CLI Flags
-
-| Flag            | Purpose                                                                                                         |
-| --------------- | --------------------------------------------------------------------------------------------------------------- |
-| `--mocked`      | Uses the deterministic mock generator instead of loading a model.                                               |
-| `--model, -m`   | Path to a GGUF model file, such as `models/google_gemma-4-E4B-it-Q6_K.gguf`. Required unless `--mocked` is set. |
-| `--temperature` | Sampling temperature. Default: `1.0`. Ignored when `--mocked` is set.                                           |
-| `--top-p`       | Nucleus sampling parameter. Default: `0.95`. Ignored when `--mocked` is set.                                    |
-| `--top-k`       | Top-k sampling parameter. Default: `64`. Ignored when `--mocked` is set.                                        |
-| `--n-ctx`       | Context window size. Default: `8192`. Ignored when `--mocked` is set.                                           |
-| `--seed`        | Random seed. Default: `-1`, which selects a random seed at runtime. Ignored when `--mocked` is set.             |
-| `--help, -h`    | Prints the usage text and exits.                                                                                |
-
-`--mocked` and `--model` are mutually exclusive. If neither is provided, the program exits with an error before the pipeline starts.
-
-The post-build step copies `prompts/` into `build/prompts/`, so rebuild after changing [prompts/system.md](prompts/system.md).
+`MockGenerator` uses stable hashes for repeatable output in demos and Storybook runs.
 
 ## Generated Output
 
@@ -152,75 +62,248 @@ Each successful run stores a `GeneratedBrewery` pair with the source location an
 | `name_local`        | Brewery name in the local language.        |
 | `description_local` | Brewery description in the local language. |
 
-The final log dump also includes the city, country, state or province, ISO subdivision code, latitude, and longitude for each generated entry.
-
-## Consumer Data Shape
-
-| Field                               | Why it matters to the app                         |
-| ----------------------------------- | ------------------------------------------------- |
-| `city`, `state_province`, `country` | Human-readable location labels and page headings  |
-| `iso3166_1`, `iso3166_2`            | Filtering, regional grouping, and locale matching |
-| `latitude`, `longitude`             | Map pins and nearby brewery views                 |
-| `local_languages`                   | Locale-aware copy selection                       |
-| `name_en`, `description_en`         | Default English display content                   |
-| `name_local`, `description_local`   | Local-language display content                    |
-| `region_context`                    | Richer copy for cards and detail screens          |
-
-## Fixture Strategy
-
-- Use `--mocked` for stable fixtures and repeatable screenshots.
-- Use `--model` when you want geographically grounded content for demos.
-- Keep `locations.json` structured enough to support discovery and future filtering.
-- Rebuild after prompt changes so `build/prompts/system.md` stays aligned with the source prompt.
-- Treat the generated output as seed material for the app's brewery domain.
+The log dump also includes city, country, state or province, ISO subdivision code, latitude, and longitude for each entry.
 
 ## Next Steps
 
-The current pipeline produces city-aware brewery records. The next pass should add user, beer, check-in, and rating fixtures so the app can exercise more of the brewery domain without live data.
+| Field                               | Why it matters                                   |
+| ----------------------------------- | ------------------------------------------------ |
+| `city`, `state_province`, `country` | Human-readable location labels and page headings |
+| `iso3166_1`, `iso3166_2`            | Filtering, regional grouping, locale matching    |
+| `latitude`, `longitude`             | Map pins and nearby brewery views                |
+| `local_languages`                   | Locale-aware copy selection                      |
+| `name_en`, `description_en`         | Default English display content                  |
+| `name_local`, `description_local`   | Local-language display content                   |
+| `region_context`                    | Richer copy for cards and detail pages           |
 
-### User Generation
+## Tech Stack
 
-- Generate user profiles with stable names, bios, locale hints, and preference signals.
-- Keep the output deterministic for screenshots and Storybook runs, while still allowing larger randomized batches.
-- Include stable IDs so downstream fixtures can join on users.
-- Shape user data so it can support auth demos, follows, saved lists, and profile pages later.
+- C++20
+- CMake 3.24+
+- Boost.JSON, Boost.ProgramOptions, Boost.DI
+- spdlog
+- libcurl
+- llama.cpp
+
+The build fetches Boost.DI, spdlog, and llama.cpp via CMake. Metal is enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
+
+## Code Style
+
+Modern C++20 throughout: RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, structured bindings in pipeline loops. Formatting follows the Google C++ Style Guide via `.clang-format` with a narrow column limit and two-space indentation.
+
+## Tested Hardware
+
+### ARM macOS — M1 Pro
+
+|           |                                   |
+| --------- | --------------------------------- |
+| Host      | MacBook Pro 14" (2021)            |
+| CPU       | Apple M1 Pro (8-core)             |
+| GPU       | Apple M1 Pro (14-core integrated) |
+| Memory    | 16 GB                             |
+| Model     | Gemma 4 E4B                       |
+| Inference | llama.cpp with Metal              |
+
+### x86_64 Linux — NVIDIA RTX 2000
+
+|           |                                |
+| --------- | ------------------------------ |
+| Host      | ThinkPad P1 Gen 7 (Fedora 43)  |
+| CPU       | Intel Core Ultra 7 155H        |
+| GPU       | NVIDIA RTX 2000 Ada Generation |
+| Memory    | 32 GB                          |
+| Model     | Gemma 4 E4B                    |
+| Inference | llama.cpp with CUDA 12.x       |
+
+## Build
+
+Requirements: C++20 compiler, CMake 3.24+, libcurl, Boost (JSON and ProgramOptions).
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+## Model
+
+Skip this step if you only need `--mocked`.
+
+```bash
+mkdir -p models
+curl -L \
+  -o models/google_gemma-4-E4B-it-Q6_K.gguf \
+  https://huggingface.co/bartowski/google_gemma-4-E4B-it-GGUF/resolve/main/google_gemma-4-E4B-it-Q6_K.gguf?download=true
+```
+
+## Run
+
+Run from `build/` so the copied `locations.json` and `prompts/` are available.
+
+```bash
+./biergarten-pipeline --mocked
+./biergarten-pipeline --model models/google_gemma-4-E4B-it-Q6_K.gguf --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
+```
+
+## CLI Flags
+
+| Flag            | Purpose                                                 |
+| --------------- | ------------------------------------------------------- |
+| `--mocked`      | Deterministic mock generator, no model required.        |
+| `--model, -m`   | Path to a GGUF file. Required unless `--mocked` is set. |
+| `--temperature` | Sampling temperature. Default: `1.0`.                   |
+| `--top-p`       | Nucleus sampling. Default: `0.95`.                      |
+| `--top-k`       | Top-k sampling. Default: `64`.                          |
+| `--n-ctx`       | Context window size. Default: `8192`.                   |
+| `--seed`        | Random seed. Default: `-1` (random at runtime).         |
+| `--help, -h`    | Print usage and exit.                                   |
+
+`--mocked` and `--model` are mutually exclusive. Omitting both exits with an error before the pipeline starts. Sampling flags are ignored when `--mocked` is set.
+
+The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editing [prompts/system.md](prompts/system.md).
+
+## Fixture Strategy
+
+- `--mocked` for stable fixtures, repeatable screenshots, and Storybook runs.
+- `--model` when geographically grounded content matters for demos.
+- Keep `locations.json` structured enough to support discovery and future filtering.
+- Treat SQLite output as seed material for the app's brewery domain, not production data.
+
+## Consumer Data Shape
+
+| Field                               | Why it matters                                   |
+| ----------------------------------- | ------------------------------------------------ |
+| `city`, `state_province`, `country` | Human-readable location labels and page headings |
+| `iso3166_1`, `iso3166_2`            | Filtering, regional grouping, locale matching    |
+| `latitude`, `longitude`             | Map pins and nearby brewery views                |
+| `local_languages`                   | Locale-aware copy selection                      |
+| `name_en`, `description_en`         | Default English display content                  |
+| `name_local`, `description_local`   | Local-language display content                   |
+| `region_context`                    | Richer copy for cards and detail pages           |
+
+## Next Steps
+
+The pipeline currently produces city-aware brewery records. The next passes add SQLite output and additional fixture types so the app can exercise the full brewery domain without live data.
+
+### Testing [Very High Importance]
+
+- Unit test JSON validation and retry logic against malformed, truncated, and empty model outputs.
+- Integration test the enrichment pipeline with missing context, short context, and fake context inputs.
+- Adversarial context tests: feed plausible but geographically incorrect Wikipedia extracts and verify the model does not silently blend them with training data.
+- Verify bilingual enrichment behaviour when only an English extract is available versus when both extracts are present.
+- Confirm the retry path is reachable when the reasoning block consumes available token budget.
+
+### SQLite Output [Highest Importance]
+
+Write generated records to a SQLite database for downstream OLTP seeding. Normalized schema with foreign keys between locations and breweries. Output replaces the current log-only result so the pipeline functions as a proper ingestion layer.
 
 ### Beer Generation
 
-- Generate beer catalog entries with style, ABV, IBU, color, aroma notes, and food pairing hints.
-- Link beers back to breweries and cities so the app can build detail pages, related-content panels, and filtered views.
-- Keep brewery references and style metadata aligned with the rest of the fixture data.
-- Keep style coverage wide enough to exercise search, sort, and category filters.
+Generate catalog entries with style, ABV, IBU, color, aroma notes, and food pairing hints. Link beers back to breweries and cities. Keep style coverage wide enough to exercise search, sort, and category filters.
+
+### User Generation
+
+Generate user profiles with stable names, bios, locale hints, and preference signals. Include stable IDs for downstream fixture joins. Keep output deterministic for screenshots while allowing larger randomized batches.
 
 ### Check-In System
 
-- Produce check-in events as timestamped interactions between users and breweries.
-- Use a J-curve-like activity profile: a small set of users should account for most check-ins, while the rest appear only occasionally.
-- Add bursty behavior around weekends, travel, and brewery-heavy periods so the event stream resembles real usage.
-- Keep repeated visits to a smaller subset of breweries so popularity and recency views have something meaningful to rank.
+Produce timestamped check-in events between users and breweries. Use a J-curve activity profile — a small set of users accounts for most check-ins, the rest appear occasionally. Add bursty behaviour around weekends and travel periods.
 
 ### Beer Ratings
 
-- Generate rating events with a strong positive skew and a long tail of lower scores.
-- Avoid uniform distributions; the data should cluster around common values while still leaving room for outliers.
-- Attach timestamps and user IDs so the app can compute aggregates, trends, and recent-activity views.
-- Keep enough history to support average ratings, rating counts, and per-style comparisons.
+Generate rating events with a strong positive skew and a long tail of lower scores. Avoid uniform distributions. Attach timestamps and user IDs so the app can compute averages, trends, and per-style comparisons.
 
-## Suggested Code Tour
+## Code Tour
 
-- `src/main.cc` handles argument parsing and the dependency-injection composition root.
-- `src/biergarten_data_generator/` contains the orchestration, sampling, and logging flow.
-- `src/services/wikipedia/` contains the enrichment service and its cache.
-- `src/data_generation/llama/` contains local inference, prompt loading, and output validation.
-- `src/data_generation/mock/` contains the deterministic fallback path.
-- `includes/` holds the public interfaces and data models.
+- `src/main.cc` — argument parsing and DI composition root.
+- `src/biergarten_data_generator/` — orchestration, sampling, logging.
+- `src/services/wikipedia/` — enrichment service and cache.
+- `src/data_generation/llama/` — local inference, prompt loading, output validation.
+- `src/data_generation/mock/` — deterministic fallback.
+- `includes/` — public interfaces and data models.
 
 ## Repo Layout
 
-| Path                       | Purpose                                           |
-| -------------------------- | ------------------------------------------------- |
-| `includes/`                | Public headers and shared models.                 |
-| `src/`                     | Implementation files.                             |
-| `locations.json`           | Curated city input copied into the build tree.    |
-| `prompts/`                 | System prompt text used by the model-backed path. |
-| `biergarten_pipeline.puml` | Class and composition diagram.                    |
+| Path             | Purpose                                        |
+| ---------------- | ---------------------------------------------- |
+| `includes/`      | Public headers and shared models.              |
+| `src/`           | Implementation files.                          |
+| `locations.json` | Curated city input copied into the build tree. |
+| `prompts/`       | System prompt used by the model-backed path.   |
+| `diagrams/`      | Architecture and pipeline diagrams.            |
+
+## Known Issues
+
+### Language Generation Quality
+
+The generation pipeline passes local language codes to the model to retrieve a translated description_local.
+
+Output quality is reliable for high-resource languages such as French, though it may struggle with regional variants and idiomatic phrasing. This can be seen with these data points:
+
+```json
+[
+  {
+    "city": "Kinshasa",
+    "state_province": "Kinshasa",
+    "iso3166_2": "CD-KN",
+    "country": "Democratic Republic of the Congo",
+    "iso3166_1": "CD",
+    "latitude": -4.4419,
+    "longitude": 15.2663,
+    "local_languages": ["fr-CD", "ln"]
+  },
+  {
+    "city": "Paris",
+    "state_province": "Île-de-France",
+    "iso3166_2": "FR-IDF",
+    "country": "France",
+    "iso3166_1": "FR",
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "local_languages": ["fr-FR"]
+  },
+  {
+    "city": "Abidjan",
+    "state_province": "Abidjan",
+    "iso3166_2": "CI-AB",
+    "country": "Ivory Coast",
+    "iso3166_1": "CI",
+    "latitude": 5.36,
+    "longitude": -4.0083,
+    "local_languages": ["fr-CI"]
+  },
+  {
+    "city": "Montreal",
+    "state_province": "Quebec",
+    "iso3166_2": "CA-QC",
+    "country": "Canada",
+    "iso3166_1": "CA",
+    "latitude": 45.5017,
+    "longitude": -73.5673,
+    "local_languages": ["fr-CA"]
+  },
+  {
+    "city": "Brussels",
+    "state_province": "Brussels-Capital Region",
+    "iso3166_2": "BE-BRU",
+    "country": "Belgium",
+    "iso3166_1": "BE",
+    "latitude": 50.8503,
+    "longitude": 4.3517,
+    "local_languages": ["fr-BE", "nl-BE"]
+  }
+]
+```
+
+### Low-Resource Language Hallucination
+
+For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (Sicily, Italy), the model can generate text that looks syntactically plausible but is semantically incoherent. This comes from limited training-data coverage rather than prompt engineering.
+
+#### Proposed Mitigations
+
+- Prevention via allowlist: introduce a high-resource language allowlist. If a location's code is unlisted, skip description_local generation and fall back to English.
+- Upstream sanitization: strip known low-resource language codes from the locations.json payload before generation.
+- Downstream flagging: add a description_local_confidence column to the SQLite schema so downstream applications can filter or flag potentially hallucinated text by language tier.
+
+```
+
+```
