@@ -231,8 +231,6 @@ Generate rating events with a strong positive skew and a long tail of lower scor
 | `prompts/`       | System prompt used by the model-backed path.   |
 | `diagrams/`      | Architecture and pipeline diagrams.            |
 
-## Known Issues
-
 ### Language Generation Quality
 
 The generation pipeline passes local language codes to the model to retrieve a translated description_local.
@@ -294,16 +292,18 @@ Output quality is reliable for high-resource languages such as French, though it
 ]
 ```
 
-### Low-Resource Language Hallucination
+#### Output:
+
+seen in [./out-sample/french-cities.log.example](out-sample/french-cities.log.example)
+
+### Known Issues
+
+#### Low-Resource Language Hallucination
 
 For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (Sicily, Italy), the model can generate text that looks syntactically plausible but is semantically incoherent. This comes from limited training-data coverage rather than prompt engineering.
 
-#### Proposed Mitigations
+##### Proposed Mitigations
 
 - Prevention via allowlist: introduce a high-resource language allowlist. If a location's code is unlisted, skip description_local generation and fall back to English.
 - Upstream sanitization: strip known low-resource language codes from the locations.json payload before generation.
 - Downstream flagging: add a description_local_confidence column to the SQLite schema so downstream applications can filter or flag potentially hallucinated text by language tier.
-
-```
-
-```
