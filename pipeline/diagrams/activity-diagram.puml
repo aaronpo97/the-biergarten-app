@@ -1,89 +1,128 @@
 @startuml
 skinparam style strictuml
-skinparam ActivityBackgroundColor #FEFECE
-skinparam ActivityBorderColor #A80036
+skinparam defaultFontName "DM Sans"
+skinparam defaultFontSize 14
+skinparam titleFontName "Volkhov"
+skinparam titleFontSize 20
+skinparam backgroundColor #FAFCF9
+skinparam defaultFontColor #28342A
+skinparam titleFontColor #28342A
+skinparam ArrowColor #628A5B
+skinparam NoteBackgroundColor #EAF0E8
+skinparam NoteBorderColor #547461
+skinparam ActivityBackgroundColor #FAFCF9
+skinparam ActivityBorderColor #547461
+skinparam ActivityDiamondBackgroundColor #FAFCF9
+skinparam ActivityDiamondBorderColor #628A5B
+skinparam ActivityBarColor #628A5B
+skinparam SwimlaneBorderColor transparent
+skinparam SwimlaneBorderThickness 0
 
-title Biergarten Pipeline - Activity Diagram (Swimlanes)
+title The Biergarten Data Pipeline
 
-|Orchestrator|
+|#F2F6F0|main.cc|
 start
-:Parse Command-Line Arguments;
+:ParseArguments(argc, argv);
 note right
-  Determines mode (mocked vs model)
-  and LLM sampling parameters.
+  Validates --mocked, --model,
+  --temperature, --top-p, etc.
 end note
 
 if (Are arguments valid?) then (no)
-  :Log Error & Display Usage;
+  :spdlog::error usage info;
   stop
 else (yes)
 endif
 
-:Initialize Global States;
-:Construct Dependency Injector (Boost.DI);
-:Instantiate BiergartenDataGenerator;
+:Init CurlGlobalState & LlamaBackendState;
+:di::make_injector(...);
+note right
+  Binds CURLWebClient, WikipediaService,
+  Gemma4JinjaPromptFormatter, and
+  either MockGenerator or LlamaGenerator
+end note
+:injector.create<BiergartenDataGenerator>();
+:BiergartenDataGenerator::Run();
 
-|DataLoader|
+|#EAF0E8|BiergartenDataGenerator|
+:QueryCitiesWithCountries();
+
+|#E2EBDC|JsonLoader|
 :JsonLoader::LoadLocations("locations.json");
-:Sample up to 50 Locations;
-note right: Randomly samples from loaded array
+:std::ranges::sample(all_locations, 50);
 
-|Enrichment|
-while (For each sampled Location?) is (Remaining locations)
-  :GetLocationContext(Location);
-  :Fetch extract for Region (City, Country);
-  :Fetch extract for "beer in <Country>";
-  :Fetch extract for "beer in <City>";
-  :Store EnrichedCity (Location + Context);
+|#EAF0E8|BiergartenDataGenerator|
+while (For each sampled Location?) is (Remaining cities)
+  |#DCE8D8|WikipediaService|
+  :GetLocationContext(loc);
+  :FetchExtract("City, Country");
+  :FetchExtract("beer in Country");
+  :FetchExtract("beer in City");
+  note right: Backed by CURLWebClient::Get
+
+  |#EAF0E8|BiergartenDataGenerator|
+  if (Lookup failed?) then (yes)
+    :spdlog::warn "context lookup failed";
+  else (no)
+    :Store EnrichedCity{Location, region_context};
+  endif
 endwhile (Done)
 
-|Generator|
-while (For each EnrichedCity?) is (Remaining enriched cities)
+:GenerateBreweries(enriched_cities);
+
+|#E5EDE1|DataGenerator|
+while (For each EnrichedCity?) is (Remaining cities)
   if (Generator Mode) then (MockGenerator)
-    :Calculate Deterministic Hash;
-    :Select Adjective, Noun, and Description;
-    :Build BreweryResult;
-    :Store GeneratedBrewery into results;
-
+    :DeterministicHash(location);
+    :Select from kBreweryAdjectives, kBreweryNouns,\nkBreweryDescriptions;
+    :Format BreweryResult;
   else (LlamaGenerator)
-    :Prepare System and User Prompts;
-    :Attempt Counter = 1;
+    :PrepareRegionContext(region_context);
+    :LoadBrewerySystemPrompt("prompts/system.md");
+    :Format user_prompt;
+    :Attempt = 0;
     repeat
-      :Run Model Inference (llama.cpp);
-      note right: Applies Gemma 4 Jinja formatting\nand GBNF JSON Grammar
-
-      :Validate JSON Output (ValidateBreweryJson);
+      :Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
+      note right
+        Uses Gemma4JinjaPromptFormatter,
+        llama_tokenize, and llama_sampler_sample
+      end note
+      :ValidateBreweryJson(raw, brewery);
 
       if (Is JSON Valid?) then (yes)
-        :Parse into BreweryResult;
         break
       else (no)
         if (Error == "incomplete JSON") then (yes)
-          :Increase max_tokens threshold;
-        else (no)
+          :max_tokens += 700;
         endif
-        :Append Error details to Prompt for LLM correction;
-        :Increment Attempt Counter;
+        :Update user_prompt with validation error;
+        :Attempt++;
       endif
 
-    repeat while (Attempt <= 3?) is (yes)
+    repeat while (Attempt < 3?) is (yes)
 
-    if (Still Invalid after 3 attempts?) then (yes)
-      |Orchestrator|
-      :Log Warning;
-      |Generator|
-      :Skip City;
+    if (Still Invalid?) then (yes)
+      :throw std::runtime_error;
     else (no)
-      :Store GeneratedBrewery into results;
+      :Return BreweryResult;
     endif
   endif
 
+  |#EAF0E8|BiergartenDataGenerator|
+  if (Exception thrown?) then (yes)
+    :spdlog::warn "brewery generation failed";
+  else (no)
+    :Store GeneratedBrewery;
+  endif
+  |#E5EDE1|DataGenerator|
 endwhile (Done)
 
-|Orchestrator|
+|#EAF0E8|BiergartenDataGenerator|
 :LogResults();
-note right: Dumps generated JSON fields to spdlog
-:Exit Pipeline Successfully (0);
+note right: spdlog::info dump of generated JSON fields
+
+|#F2F6F0|main.cc|
+:Return 0;
 stop
 
 @enduml
