@@ -41,7 +41,7 @@ static std::string CondenseWhitespace(std::string_view text) {
 
   bool pending_space = false;
   for (const char chr : text) {
-    if (std::isspace(chr) != 0) {
+    if (std::isspace(static_cast<unsigned char>(chr)) != 0) {
       if (!out.empty()) {
         pending_space = true;
       }

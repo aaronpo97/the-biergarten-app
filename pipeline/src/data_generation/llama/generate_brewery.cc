@@ -44,8 +44,6 @@ hex ::= [0-9a-fA-F]
 )json_brewery";
 
 static constexpr int kBreweryInitialMaxTokens = 2800;
-static constexpr int kBreweryTruncationRetryTokenBump = 700;
-static constexpr int kBreweryMaxTokensCeiling = 5000;
 
 BreweryResult LlamaGenerator::GenerateBrewery(
     const Location& location, const std::string& region_context) {
@@ -98,8 +96,8 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     // Generate brewery data from LLM
     raw = this->Infer(system_prompt, user_prompt, max_tokens,
                       kBreweryJsonGrammar);
-    spdlog::info("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
-                 raw);
+    spdlog::debug("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
+                  raw);
 
     // Validate output: parse JSON and check required fields
 
@@ -122,18 +120,6 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     last_error = *validation_error;
     spdlog::warn("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
                  attempt + 1, *validation_error);
-
-    if (last_error == "JSON parse error: incomplete JSON") {
-      const int previous_max_tokens = max_tokens;
-      max_tokens = std::min(max_tokens + kBreweryTruncationRetryTokenBump,
-                            kBreweryMaxTokensCeiling);
-      spdlog::info(
-          "LlamaGenerator: detected truncated JSON; increasing max_tokens from "
-          "{} to {} and retrying",
-          previous_max_tokens, max_tokens);
-
-      continue;
-    }
 
     // Update prompt with error details to guide LLM toward correct output.
     user_prompt = std::format(

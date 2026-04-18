@@ -6,6 +6,7 @@
 #include "web_client/curl_web_client.h"
 
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -14,9 +15,9 @@
 
 using CurlHandle = std::unique_ptr<CURL, decltype(&curl_easy_cleanup)>;
 
-static constexpr int64_t kConnectionTimeout = 10;
-static constexpr int64_t kRequestTimeout = 30;
-static constexpr int64_t kOkHttpStatus = 200;
+static constexpr long kConnectionTimeout = 10;
+static constexpr long kRequestTimeout = 30;
+static constexpr int32_t kOkHttpStatus = 200;
 
 static CurlHandle CreateHandle() {
   CURL* handle = curl_easy_init();
@@ -64,8 +65,16 @@ std::string CURLWebClient::Get(const std::string& url) {
     throw std::runtime_error(error);
   }
 
-  int64_t http_code = 0;
-  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &http_code);
+  long curl_http_code = 0;
+  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &curl_http_code);
+
+  if (curl_http_code < std::numeric_limits<int32_t>::min() ||
+      curl_http_code > std::numeric_limits<int32_t>::max()) {
+    throw std::runtime_error("[CURLWebClient] Invalid HTTP status code: " +
+                             std::to_string(curl_http_code));
+  }
+
+  const int32_t http_code = static_cast<int32_t>(curl_http_code);
 
   if (http_code != kOkHttpStatus) {
     const std::string error = "[CURLWebClient] HTTP error " +
