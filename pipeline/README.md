@@ -4,15 +4,6 @@ Biergarten Pipeline is a C++20 command-line tool that reads a local city list, r
 
 ## Tested Hardware & OS
 
-### x86/64 Linux, NVIDIA RTX 2000
-
-- **Host**: ThinkPad P1 Gen 7 (Fedora 43)
-- **CPU**: Intel Core Ultra 7 155H
-- **GPU**: NVIDIA RTX 2000 Ada Generation
-- **Memory**: 32GB
-- **Model**: Gemma 4 E4B: efficient local reasoning; released Apr 2, 2026.
-- **Inference**: llama.cpp with CUDA 12.x support
-
 ### ARM MacOS, M1 Pro
 
 - **Host**: MacBook Pro 14" (2021)
@@ -21,6 +12,15 @@ Biergarten Pipeline is a C++20 command-line tool that reads a local city list, r
 - **Memory**: 16GB
 - **Model**: Gemma 4 E4B: efficient local reasoning; released Apr 2, 2026.
 - **Inference**: llama.cpp with Metal (MPS) support
+
+### x86/64 Linux, NVIDIA RTX 2000
+
+- **Host**: ThinkPad P1 Gen 7 (Fedora 43)
+- **CPU**: Intel Core Ultra 7 155H
+- **GPU**: NVIDIA RTX 2000 Ada Generation
+- **Memory**: 32GB
+- **Model**: Gemma 4 E4B: efficient local reasoning; released Apr 2, 2026.
+- **Inference**: llama.cpp with CUDA 12.x support
 
 ## Pipeline
 

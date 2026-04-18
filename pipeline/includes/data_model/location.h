@@ -7,6 +7,7 @@
  */
 
 #include <string>
+#include <vector>
 
 /**
  * @brief Canonical location record for city-level generation.
@@ -26,6 +27,9 @@ struct Location {
 
   /// @brief ISO 3166-1 country code.
   std::string iso3166_1{};
+
+  /// @brief Local language codes in priority order.
+  std::vector<std::string> local_languages{};
 
   /// @brief Latitude in decimal degrees.
   double latitude{};

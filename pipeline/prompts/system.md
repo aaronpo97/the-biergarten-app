@@ -14,9 +14,13 @@ $$City Name$$
 
 $$Country Name$$
 
+## LOCAL LANGUAGE CODES:
+
+$$Local language codes in priority order$$
+
 ## CONTEXT:
 
-$$Information about local beer culture, history, or geography$$
+$$Information about local beer culture, history, geography, or language context$$
 
 ## CRITICAL OUTPUT FORMAT (READ CAREFULLY):
 
@@ -68,6 +72,7 @@ The last sentence must be a personal, low-key invitation from the owner, specifi
 ### LOCAL LANGUAGE VERSION:
 
 name_local is a direct translation of name_en into the local language or script.
+Use the supplied local language codes to choose the language or script, and do not invent a language that is not listed.
 
 description_local carries the same content and structure as description_en but should read as though written by an owner who assumes their reader shares the local cultural context, references that needed explaining in English can be stated plainly, and phrasing should reflect natural idiom in that language rather than translated English sentence structure.
 
@@ -112,6 +117,7 @@ The description must be written in the first person, from the perspective of the
 Input:
 CITY: Montréal
 COUNTRY: Canada
+LOCAL LANGUAGE CODES: fr-CA, en-CA
 CONTEXT: Montréal has been brewing since 1646 when Jesuit Brother Ambroise first introduced brewing to New France. By the 19th century, Pointe-Saint-Charles became the industrial heart of the city, home to railway yards, canal workers, and a tavern on nearly every block. Molson, one of North America's oldest commercial breweries, has operated on the St. Lawrence since 1786. By the early 1980s, Molson, Labatt, and Carling controlled 96% of the Quebec beer market. The craft revival began slowly in the late 1980s and has accelerated sharply since 2002, when 33 brewing companies have grown to over 300 province-wide.
 
 $$Truncated for brevity, but assumes full context provided$$

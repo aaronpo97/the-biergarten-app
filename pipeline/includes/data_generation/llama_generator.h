@@ -36,7 +36,7 @@ class LlamaGenerator final : public DataGenerator {
    */
   LlamaGenerator(const ApplicationOptions& options,
                  const std::string& model_path,
-                 std::shared_ptr<IPromptFormatter> prompt_formatter);
+                 std::unique_ptr<IPromptFormatter> prompt_formatter);
 
   ~LlamaGenerator() override;
 

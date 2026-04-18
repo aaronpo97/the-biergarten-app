@@ -35,6 +35,27 @@ static double ReadRequiredNumber(const boost::json::object& object,
   return value->to_number<double>();
 }
 
+static std::vector<std::string> ReadRequiredStringArray(
+    const boost::json::object& object, const char* key) {
+  const boost::json::value* value = object.if_contains(key);
+  if (value == nullptr || !value->is_array()) {
+    throw std::runtime_error(std::string("Missing or invalid string array field: ") +
+                             key);
+  }
+
+  const auto& array = value->as_array();
+  std::vector<std::string> items;
+  items.reserve(array.size());
+  for (const auto& item : array) {
+    if (!item.is_string()) {
+      throw std::runtime_error(std::string("Missing or invalid string array field: ") +
+                               key);
+    }
+    items.emplace_back(item.as_string());
+  }
+  return items;
+}
+
 std::vector<Location> JsonLoader::LoadLocations(
     const std::filesystem::path& filepath) {
   std::ifstream input(filepath);
@@ -76,6 +97,8 @@ std::vector<Location> JsonLoader::LoadLocations(
         .iso3166_2 = ReadRequiredString(object, "iso3166_2"),
         .country = ReadRequiredString(object, "country"),
         .iso3166_1 = ReadRequiredString(object, "iso3166_1"),
+        .local_languages =
+            ReadRequiredStringArray(object, "local_languages"),
         .latitude = ReadRequiredNumber(object, "latitude"),
         .longitude = ReadRequiredNumber(object, "longitude"),
     });

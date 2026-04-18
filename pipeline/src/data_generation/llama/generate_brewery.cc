@@ -4,17 +4,34 @@
  * inference, and validates structured JSON output for brewery records.
  */
 
-#include "data_generation/llama_generator.h"
+#include <spdlog/spdlog.h>
 
 #include <format>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <vector>
 
-#include <spdlog/spdlog.h>
-
+#include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"
+
+static std::string FormatLocalLanguageCodes(
+    const std::vector<std::string>& codes) {
+  if (codes.empty()) {
+    return "Not provided";
+  }
+
+  std::string formatted;
+  for (const std::string& code : codes) {
+    if (!formatted.empty()) {
+      formatted += ", ";
+    }
+    formatted += code;
+  }
+
+  return formatted;
+}
 
 static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
 root ::= thought-block "{" ws "\"name_en\"" ws ":" ws string ws "," ws "\"description_en\"" ws ":" ws string ws "," ws "\"name_local\"" ws ":" ws string ws "," ws "\"description_local\"" ws ":" ws string ws "}" ws
@@ -35,8 +52,10 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   /**
    * Preprocess and truncate region context to manageable size
    */
-  const std::string safe_region_context =
-      PrepareRegionContext(region_context);
+  const std::string safe_region_context = PrepareRegionContext(region_context);
+
+  const std::string local_language_codes =
+      FormatLocalLanguageCodes(location.local_languages);
 
   const std::string country_suffix =
       location.country.empty() ? std::string{}
@@ -48,16 +67,18 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   const std::string system_prompt =
       LoadBrewerySystemPrompt("prompts/system.md");
 
-
   std::string user_prompt = std::format(
-      "## CITY:\n{}\n\n## COUNTRY:\n{}\n\n## CONTEXT:\n{}",
-      location.city, location.country, safe_region_context);
+      "## CITY:\n{}\n\n## COUNTRY:\n{}\n\n## LOCAL LANGUAGE CODES:\n{}\n\n## "
+      "CONTEXT:\n{}",
+      location.city, location.country, local_language_codes,
+      safe_region_context);
 
   /**
    * Store location context for retry prompts (without repeating full context)
    */
   const std::string retry_location =
-      std::format("Location: {}{}", location.city, country_suffix);
+      std::format("Location: {}{}\nLocal language codes: {}", location.city,
+                  country_suffix, local_language_codes);
 
   /**
    * RETRY LOOP with validation and error correction
@@ -68,16 +89,17 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   std::string raw;
   std::string last_error;
 
-    // Token budget: too small risks truncating valid JSON mid-string.
-    // Start conservatively but allow adaptive increases on truncation.
-    int max_tokens = kBreweryInitialMaxTokens;
+  // Token budget: too small risks truncating valid JSON mid-string.
+  // Start conservatively but allow adaptive increases on truncation.
+  int max_tokens = kBreweryInitialMaxTokens;
 
   // Limit output length to keep it concise and focused
   for (int attempt = 0; attempt < max_attempts; ++attempt) {
     // Generate brewery data from LLM
-    raw = this->Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
+    raw = this->Infer(system_prompt, user_prompt, max_tokens,
+                      kBreweryJsonGrammar);
     spdlog::info("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
-                  raw);
+                 raw);
 
     // Validate output: parse JSON and check required fields
 
@@ -89,9 +111,8 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       // Success: return parsed brewery data
 
       spdlog::info(
-          "LlamaGenerator: successfully generated brewery data on attempt {}:\n name_en='{}',\n description_en='{}',\n name_local='{}',\n description_local='{}'",
-          attempt + 1, brewery.name_en, brewery.description_en,
-          brewery.name_local, brewery.description_local);
+          "LlamaGenerator: successfully generated brewery data on attempt {}",
+          attempt + 1);
 
       return brewery;
     }
@@ -102,13 +123,13 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     spdlog::warn("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
                  attempt + 1, *validation_error);
 
-
-        if (last_error == "JSON parse error: incomplete JSON") {
-            const int previous_max_tokens = max_tokens;
-            max_tokens = std::min(max_tokens + kBreweryTruncationRetryTokenBump,
-                                                        kBreweryMaxTokensCeiling);
+    if (last_error == "JSON parse error: incomplete JSON") {
+      const int previous_max_tokens = max_tokens;
+      max_tokens = std::min(max_tokens + kBreweryTruncationRetryTokenBump,
+                            kBreweryMaxTokensCeiling);
       spdlog::info(
-          "LlamaGenerator: detected truncated JSON; increasing max_tokens from {} to {} and retrying",
+          "LlamaGenerator: detected truncated JSON; increasing max_tokens from "
+          "{} to {} and retrying",
           previous_max_tokens, max_tokens);
 
       continue;
@@ -116,13 +137,15 @@ BreweryResult LlamaGenerator::GenerateBrewery(
 
     // Update prompt with error details to guide LLM toward correct output.
     user_prompt = std::format(
-        R"(Your previous response was invalid. Error: {}
-Return the thought process before the JSON if needed, then return ONLY valid JSON with exactly these keys, in this exact order: {{"name_en": "<English brewery name>", "description_en": "<English single-paragraph description>", "name_local": "<local-language brewery name>", "description_local": "<local-language single-paragraph description>"}}.
-Do not include markdown, comments, extra keys, or literal placeholder values.
-
-Keep the JSON strings concise enough to fit within the token budget.
-
-{})",
+        "Your previous response was invalid. Error: {}\nReturn the thought "
+        "process before the JSON if needed, then return ONLY valid JSON with "
+        "exactly these keys, in this exact order: {{\"name_en\": \"<English "
+        "brewery name>\", \"description_en\": \"<English single-paragraph "
+        "description>\", \"name_local\": \"<local-language brewery name>\", "
+        "\"description_local\": \"<local-language single-paragraph "
+        "description>\"}}.\nDo not include markdown, comments, extra keys, or "
+        "literal placeholder values.\n\nKeep the JSON strings concise enough "
+        "to fit within the token budget.\n\n{}",
         *validation_error, retry_location);
   }
 

@@ -6,7 +6,8 @@
     "country": "South Africa",
     "iso3166_1": "ZA",
     "latitude": -33.9249,
-    "longitude": 18.4241
+    "longitude": 18.4241,
+    "local_languages": ["af", "en", "xh"]
   },
   {
     "city": "Johannesburg",
@@ -15,7 +16,8 @@
     "country": "South Africa",
     "iso3166_1": "ZA",
     "latitude": -26.2041,
-    "longitude": 28.0473
+    "longitude": 28.0473,
+    "local_languages": ["en", "zu", "st", "af"]
   },
   {
     "city": "Durban",
@@ -24,7 +26,8 @@
     "country": "South Africa",
     "iso3166_1": "ZA",
     "latitude": -29.8587,
-    "longitude": 31.0218
+    "longitude": 31.0218,
+    "local_languages": ["zu", "en"]
   },
   {
     "city": "Franschhoek",
@@ -33,7 +36,8 @@
     "country": "South Africa",
     "iso3166_1": "ZA",
     "latitude": -33.9146,
-    "longitude": 19.1198
+    "longitude": 19.1198,
+    "local_languages": ["af", "en"]
   },
   {
     "city": "Nairobi",
@@ -42,7 +46,8 @@
     "country": "Kenya",
     "iso3166_1": "KE",
     "latitude": -1.2921,
-    "longitude": 36.8219
+    "longitude": 36.8219,
+    "local_languages": ["sw", "en"]
   },
   {
     "city": "Buenos Aires",
@@ -51,7 +56,8 @@
     "country": "Argentina",
     "iso3166_1": "AR",
     "latitude": -34.6037,
-    "longitude": -58.3816
+    "longitude": -58.3816,
+    "local_languages": ["es-AR"]
   },
   {
     "city": "Bariloche",
@@ -60,7 +66,8 @@
     "country": "Argentina",
     "iso3166_1": "AR",
     "latitude": -41.1335,
-    "longitude": -71.3103
+    "longitude": -71.3103,
+    "local_languages": ["es-AR"]
   },
   {
     "city": "Bogotá",
@@ -69,7 +76,8 @@
     "country": "Colombia",
     "iso3166_1": "CO",
     "latitude": 4.711,
-    "longitude": -74.0721
+    "longitude": -74.0721,
+    "local_languages": ["es-CO"]
   },
   {
     "city": "Medellín",
@@ -78,7 +86,8 @@
     "country": "Colombia",
     "iso3166_1": "CO",
     "latitude": 6.2442,
-    "longitude": -75.5812
+    "longitude": -75.5812,
+    "local_languages": ["es-CO"]
   },
   {
     "city": "São Paulo",
@@ -87,7 +96,8 @@
     "country": "Brazil",
     "iso3166_1": "BR",
     "latitude": -23.5505,
-    "longitude": -46.6333
+    "longitude": -46.6333,
+    "local_languages": ["pt-BR"]
   },
   {
     "city": "Curitiba",
@@ -96,7 +106,8 @@
     "country": "Brazil",
     "iso3166_1": "BR",
     "latitude": -25.4284,
-    "longitude": -49.2733
+    "longitude": -49.2733,
+    "local_languages": ["pt-BR"]
   },
   {
     "city": "Rio de Janeiro",
@@ -105,7 +116,8 @@
     "country": "Brazil",
     "iso3166_1": "BR",
     "latitude": -22.9068,
-    "longitude": -43.1729
+    "longitude": -43.1729,
+    "local_languages": ["pt-BR"]
   },
   {
     "city": "Santiago",
@@ -114,7 +126,8 @@
     "country": "Chile",
     "iso3166_1": "CL",
     "latitude": -33.4489,
-    "longitude": -70.6693
+    "longitude": -70.6693,
+    "local_languages": ["es-CL"]
   },
   {
     "city": "Valdivia",
@@ -123,7 +136,8 @@
     "country": "Chile",
     "iso3166_1": "CL",
     "latitude": -39.8142,
-    "longitude": -73.2459
+    "longitude": -73.2459,
+    "local_languages": ["es-CL"]
   },
   {
     "city": "Lima",
@@ -132,7 +146,8 @@
     "country": "Peru",
     "iso3166_1": "PE",
     "latitude": -12.0464,
-    "longitude": -77.0428
+    "longitude": -77.0428,
+    "local_languages": ["es-PE"]
   },
   {
     "city": "Tokyo",
@@ -141,7 +156,8 @@
     "country": "Japan",
     "iso3166_1": "JP",
     "latitude": 35.6762,
-    "longitude": 139.6503
+    "longitude": 139.6503,
+    "local_languages": ["ja"]
   },
   {
     "city": "Osaka",
@@ -150,7 +166,8 @@
     "country": "Japan",
     "iso3166_1": "JP",
     "latitude": 34.6937,
-    "longitude": 135.5023
+    "longitude": 135.5023,
+    "local_languages": ["ja"]
   },
   {
     "city": "Kyoto",
@@ -159,7 +176,8 @@
     "country": "Japan",
     "iso3166_1": "JP",
     "latitude": 35.0116,
-    "longitude": 135.7681
+    "longitude": 135.7681,
+    "local_languages": ["ja"]
   },
   {
     "city": "Sapporo",
@@ -168,7 +186,8 @@
     "country": "Japan",
     "iso3166_1": "JP",
     "latitude": 43.0618,
-    "longitude": 141.3545
+    "longitude": 141.3545,
+    "local_languages": ["ja"]
   },
   {
     "city": "Seoul",
@@ -177,7 +196,8 @@
     "country": "South Korea",
     "iso3166_1": "KR",
     "latitude": 37.5665,
-    "longitude": 126.978
+    "longitude": 126.978,
+    "local_languages": ["ko"]
   },
   {
     "city": "Busan",
@@ -186,7 +206,8 @@
     "country": "South Korea",
     "iso3166_1": "KR",
     "latitude": 35.1796,
-    "longitude": 129.0756
+    "longitude": 129.0756,
+    "local_languages": ["ko"]
   },
   {
     "city": "Ho Chi Minh City",
@@ -195,7 +216,8 @@
     "country": "Vietnam",
     "iso3166_1": "VN",
     "latitude": 10.8231,
-    "longitude": 106.6297
+    "longitude": 106.6297,
+    "local_languages": ["vi"]
   },
   {
     "city": "Hanoi",
@@ -204,7 +226,8 @@
     "country": "Vietnam",
     "iso3166_1": "VN",
     "latitude": 21.0285,
-    "longitude": 105.8542
+    "longitude": 105.8542,
+    "local_languages": ["vi"]
   },
   {
     "city": "Da Nang",
@@ -213,7 +236,8 @@
     "country": "Vietnam",
     "iso3166_1": "VN",
     "latitude": 16.0544,
-    "longitude": 108.2022
+    "longitude": 108.2022,
+    "local_languages": ["vi"]
   },
   {
     "city": "Bangkok",
@@ -222,7 +246,8 @@
     "country": "Thailand",
     "iso3166_1": "TH",
     "latitude": 13.7563,
-    "longitude": 100.5018
+    "longitude": 100.5018,
+    "local_languages": ["th"]
   },
   {
     "city": "Taipei",
@@ -231,7 +256,8 @@
     "country": "Taiwan",
     "iso3166_1": "TW",
     "latitude": 25.033,
-    "longitude": 121.5654
+    "longitude": 121.5654,
+    "local_languages": ["zh-TW"]
   },
   {
     "city": "Beijing",
@@ -240,7 +266,8 @@
     "country": "China",
     "iso3166_1": "CN",
     "latitude": 39.9042,
-    "longitude": 116.4074
+    "longitude": 116.4074,
+    "local_languages": ["zh-CN"]
   },
   {
     "city": "Shanghai",
@@ -249,7 +276,8 @@
     "country": "China",
     "iso3166_1": "CN",
     "latitude": 31.2304,
-    "longitude": 121.4737
+    "longitude": 121.4737,
+    "local_languages": ["zh-CN"]
   },
   {
     "city": "Bengaluru",
@@ -258,7 +286,8 @@
     "country": "India",
     "iso3166_1": "IN",
     "latitude": 12.9716,
-    "longitude": 77.5946
+    "longitude": 77.5946,
+    "local_languages": ["kn", "en"]
   },
   {
     "city": "Singapore",
@@ -267,7 +296,8 @@
     "country": "Singapore",
     "iso3166_1": "SG",
     "latitude": 1.3521,
-    "longitude": 103.8198
+    "longitude": 103.8198,
+    "local_languages": ["en", "zh", "ms", "ta"]
   },
   {
     "city": "Melbourne",
@@ -276,7 +306,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -37.8136,
-    "longitude": 144.9631
+    "longitude": 144.9631,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Sydney",
@@ -285,7 +316,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -33.8688,
-    "longitude": 151.2093
+    "longitude": 151.2093,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Brisbane",
@@ -294,7 +326,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -27.4705,
-    "longitude": 153.026
+    "longitude": 153.026,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Adelaide",
@@ -303,7 +336,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -34.9285,
-    "longitude": 138.6007
+    "longitude": 138.6007,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Perth",
@@ -312,7 +346,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -31.9505,
-    "longitude": 115.8605
+    "longitude": 115.8605,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Hobart",
@@ -321,7 +356,8 @@
     "country": "Australia",
     "iso3166_1": "AU",
     "latitude": -42.8821,
-    "longitude": 147.3272
+    "longitude": 147.3272,
+    "local_languages": ["en-AU"]
   },
   {
     "city": "Wellington",
@@ -330,7 +366,8 @@
     "country": "New Zealand",
     "iso3166_1": "NZ",
     "latitude": -41.2865,
-    "longitude": 174.7762
+    "longitude": 174.7762,
+    "local_languages": ["en", "mi"]
   },
   {
     "city": "Auckland",
@@ -339,7 +376,8 @@
     "country": "New Zealand",
     "iso3166_1": "NZ",
     "latitude": -36.8485,
-    "longitude": 174.7633
+    "longitude": 174.7633,
+    "local_languages": ["en", "mi"]
   },
   {
     "city": "Christchurch",
@@ -348,7 +386,8 @@
     "country": "New Zealand",
     "iso3166_1": "NZ",
     "latitude": -43.532,
-    "longitude": 172.6306
+    "longitude": 172.6306,
+    "local_languages": ["en", "mi"]
   },
   {
     "city": "Nelson",
@@ -357,7 +396,8 @@
     "country": "New Zealand",
     "iso3166_1": "NZ",
     "latitude": -41.2706,
-    "longitude": 173.284
+    "longitude": 173.284,
+    "local_languages": ["en", "mi"]
   },
   {
     "city": "Munich",
@@ -366,7 +406,8 @@
     "country": "Germany",
     "iso3166_1": "DE",
     "latitude": 48.1351,
-    "longitude": 11.582
+    "longitude": 11.582,
+    "local_languages": ["de"]
   },
   {
     "city": "Berlin",
@@ -375,7 +416,8 @@
     "country": "Germany",
     "iso3166_1": "DE",
     "latitude": 52.52,
-    "longitude": 13.405
+    "longitude": 13.405,
+    "local_languages": ["de"]
   },
   {
     "city": "Cologne",
@@ -384,7 +426,8 @@
     "country": "Germany",
     "iso3166_1": "DE",
     "latitude": 50.9375,
-    "longitude": 6.9603
+    "longitude": 6.9603,
+    "local_languages": ["de"]
   },
   {
     "city": "Bamberg",
@@ -393,7 +436,8 @@
     "country": "Germany",
     "iso3166_1": "DE",
     "latitude": 49.8916,
-    "longitude": 10.8916
+    "longitude": 10.8916,
+    "local_languages": ["de"]
   },
   {
     "city": "Brussels",
@@ -402,7 +446,8 @@
     "country": "Belgium",
     "iso3166_1": "BE",
     "latitude": 50.8503,
-    "longitude": 4.3517
+    "longitude": 4.3517,
+    "local_languages": ["fr", "nl"]
   },
   {
     "city": "Antwerp",
@@ -411,7 +456,8 @@
     "country": "Belgium",
     "iso3166_1": "BE",
     "latitude": 51.2194,
-    "longitude": 4.4025
+    "longitude": 4.4025,
+    "local_languages": ["nl"]
   },
   {
     "city": "Bruges",
@@ -420,7 +466,8 @@
     "country": "Belgium",
     "iso3166_1": "BE",
     "latitude": 51.2093,
-    "longitude": 3.2247
+    "longitude": 3.2247,
+    "local_languages": ["nl"]
   },
   {
     "city": "London",
@@ -429,7 +476,8 @@
     "country": "United Kingdom",
     "iso3166_1": "GB",
     "latitude": 51.5074,
-    "longitude": -0.1278
+    "longitude": -0.1278,
+    "local_languages": ["en-GB"]
   },
   {
     "city": "Bristol",
@@ -438,7 +486,8 @@
     "country": "United Kingdom",
     "iso3166_1": "GB",
     "latitude": 51.4545,
-    "longitude": -2.5879
+    "longitude": -2.5879,
+    "local_languages": ["en-GB"]
   },
   {
     "city": "Edinburgh",
@@ -447,7 +496,8 @@
     "country": "United Kingdom",
     "iso3166_1": "GB",
     "latitude": 55.9533,
-    "longitude": -3.1883
+    "longitude": -3.1883,
+    "local_languages": ["en-GB", "gd"]
   },
   {
     "city": "Glasgow",
@@ -456,7 +506,8 @@
     "country": "United Kingdom",
     "iso3166_1": "GB",
     "latitude": 55.8642,
-    "longitude": -4.2518
+    "longitude": -4.2518,
+    "local_languages": ["en-GB", "gd"]
   },
   {
     "city": "Prague",
@@ -465,7 +516,8 @@
     "country": "Czechia",
     "iso3166_1": "CZ",
     "latitude": 50.0755,
-    "longitude": 14.4378
+    "longitude": 14.4378,
+    "local_languages": ["cs"]
   },
   {
     "city": "Pilsen",
@@ -474,7 +526,8 @@
     "country": "Czechia",
     "iso3166_1": "CZ",
     "latitude": 49.7384,
-    "longitude": 13.3736
+    "longitude": 13.3736,
+    "local_languages": ["cs"]
   },
   {
     "city": "Amsterdam",
@@ -483,7 +536,8 @@
     "country": "Netherlands",
     "iso3166_1": "NL",
     "latitude": 52.3676,
-    "longitude": 4.9041
+    "longitude": 4.9041,
+    "local_languages": ["nl"]
   },
   {
     "city": "Copenhagen",
@@ -492,7 +546,8 @@
     "country": "Denmark",
     "iso3166_1": "DK",
     "latitude": 55.6761,
-    "longitude": 12.5683
+    "longitude": 12.5683,
+    "local_languages": ["da"]
   },
   {
     "city": "Warsaw",
@@ -501,7 +556,8 @@
     "country": "Poland",
     "iso3166_1": "PL",
     "latitude": 52.2297,
-    "longitude": 21.0122
+    "longitude": 21.0122,
+    "local_languages": ["pl"]
   },
   {
     "city": "Krakow",
@@ -510,7 +566,8 @@
     "country": "Poland",
     "iso3166_1": "PL",
     "latitude": 50.0647,
-    "longitude": 19.945
+    "longitude": 19.945,
+    "local_languages": ["pl"]
   },
   {
     "city": "Rome",
@@ -519,7 +576,8 @@
     "country": "Italy",
     "iso3166_1": "IT",
     "latitude": 41.9028,
-    "longitude": 12.4964
+    "longitude": 12.4964,
+    "local_languages": ["it"]
   },
   {
     "city": "Milan",
@@ -528,7 +586,8 @@
     "country": "Italy",
     "iso3166_1": "IT",
     "latitude": 45.4642,
-    "longitude": 9.19
+    "longitude": 9.19,
+    "local_languages": ["it"]
   },
   {
     "city": "Barcelona",
@@ -537,7 +596,8 @@
     "country": "Spain",
     "iso3166_1": "ES",
     "latitude": 41.3851,
-    "longitude": 2.1734
+    "longitude": 2.1734,
+    "local_languages": ["ca", "es"]
   },
   {
     "city": "Madrid",
@@ -546,7 +606,8 @@
     "country": "Spain",
     "iso3166_1": "ES",
     "latitude": 40.4168,
-    "longitude": -3.7038
+    "longitude": -3.7038,
+    "local_languages": ["es"]
   },
   {
     "city": "Paris",
@@ -555,7 +616,8 @@
     "country": "France",
     "iso3166_1": "FR",
     "latitude": 48.8566,
-    "longitude": 2.3522
+    "longitude": 2.3522,
+    "local_languages": ["fr"]
   },
   {
     "city": "Lyon",
@@ -564,7 +626,8 @@
     "country": "France",
     "iso3166_1": "FR",
     "latitude": 45.764,
-    "longitude": 4.8357
+    "longitude": 4.8357,
+    "local_languages": ["fr"]
   },
   {
     "city": "Stockholm",
@@ -573,7 +636,8 @@
     "country": "Sweden",
     "iso3166_1": "SE",
     "latitude": 59.3293,
-    "longitude": 18.0686
+    "longitude": 18.0686,
+    "local_languages": ["sv"]
   },
   {
     "city": "Gothenburg",
@@ -582,7 +646,8 @@
     "country": "Sweden",
     "iso3166_1": "SE",
     "latitude": 57.7089,
-    "longitude": 11.9746
+    "longitude": 11.9746,
+    "local_languages": ["sv"]
   },
   {
     "city": "Oslo",
@@ -591,7 +656,8 @@
     "country": "Norway",
     "iso3166_1": "NO",
     "latitude": 59.9139,
-    "longitude": 10.7522
+    "longitude": 10.7522,
+    "local_languages": ["no"]
   },
   {
     "city": "Dublin",
@@ -600,7 +666,8 @@
     "country": "Ireland",
     "iso3166_1": "IE",
     "latitude": 53.3498,
-    "longitude": -6.2603
+    "longitude": -6.2603,
+    "local_languages": ["en", "ga"]
   },
   {
     "city": "Vienna",
@@ -609,7 +676,8 @@
     "country": "Austria",
     "iso3166_1": "AT",
     "latitude": 48.2082,
-    "longitude": 16.3738
+    "longitude": 16.3738,
+    "local_languages": ["de-AT"]
   },
   {
     "city": "Zurich",
@@ -618,7 +686,8 @@
     "country": "Switzerland",
     "iso3166_1": "CH",
     "latitude": 47.3769,
-    "longitude": 8.5417
+    "longitude": 8.5417,
+    "local_languages": ["de-CH"]
   },
   {
     "city": "Tallinn",
@@ -627,7 +696,8 @@
     "country": "Estonia",
     "iso3166_1": "EE",
     "latitude": 59.437,
-    "longitude": 24.7536
+    "longitude": 24.7536,
+    "local_languages": ["et"]
   },
   {
     "city": "Denver",
@@ -636,7 +706,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 39.7392,
-    "longitude": -104.9903
+    "longitude": -104.9903,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Portland",
@@ -645,7 +716,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 45.5152,
-    "longitude": -122.6784
+    "longitude": -122.6784,
+    "local_languages": ["en-US"]
   },
   {
     "city": "San Diego",
@@ -654,7 +726,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 32.7157,
-    "longitude": -117.1611
+    "longitude": -117.1611,
+    "local_languages": ["en-US", "es-US"]
   },
   {
     "city": "Asheville",
@@ -663,7 +736,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 35.5951,
-    "longitude": -82.5515
+    "longitude": -82.5515,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Grand Rapids",
@@ -672,7 +746,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 42.9634,
-    "longitude": -85.6681
+    "longitude": -85.6681,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Chicago",
@@ -681,7 +756,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 41.8781,
-    "longitude": -87.6298
+    "longitude": -87.6298,
+    "local_languages": ["en-US", "es-US"]
   },
   {
     "city": "Seattle",
@@ -690,7 +766,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 47.6062,
-    "longitude": -122.3321
+    "longitude": -122.3321,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Austin",
@@ -699,7 +776,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 30.2672,
-    "longitude": -97.7431
+    "longitude": -97.7431,
+    "local_languages": ["en-US", "es-US"]
   },
   {
     "city": "Boston",
@@ -708,7 +786,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 42.3601,
-    "longitude": -71.0589
+    "longitude": -71.0589,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Philadelphia",
@@ -717,7 +796,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 39.9526,
-    "longitude": -75.1652
+    "longitude": -75.1652,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Brooklyn",
@@ -726,7 +806,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 40.6782,
-    "longitude": -73.9442
+    "longitude": -73.9442,
+    "local_languages": ["en-US", "es-US"]
   },
   {
     "city": "Milwaukee",
@@ -735,7 +816,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 43.0389,
-    "longitude": -87.9065
+    "longitude": -87.9065,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Richmond",
@@ -744,7 +826,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 37.5407,
-    "longitude": -77.436
+    "longitude": -77.436,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Cincinnati",
@@ -753,7 +836,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 39.1031,
-    "longitude": -84.512
+    "longitude": -84.512,
+    "local_languages": ["en-US"]
   },
   {
     "city": "St. Louis",
@@ -762,7 +846,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 38.627,
-    "longitude": -90.1994
+    "longitude": -90.1994,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Tampa",
@@ -771,7 +856,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 27.9506,
-    "longitude": -82.4572
+    "longitude": -82.4572,
+    "local_languages": ["en-US", "es-US"]
   },
   {
     "city": "Minneapolis",
@@ -780,7 +866,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 44.9778,
-    "longitude": -93.265
+    "longitude": -93.265,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Burlington",
@@ -789,7 +876,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 44.4759,
-    "longitude": -73.2121
+    "longitude": -73.2121,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Portland",
@@ -798,7 +886,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 43.6591,
-    "longitude": -70.2568
+    "longitude": -70.2568,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Atlanta",
@@ -807,7 +896,8 @@
     "country": "United States",
     "iso3166_1": "US",
     "latitude": 33.749,
-    "longitude": -84.388
+    "longitude": -84.388,
+    "local_languages": ["en-US"]
   },
   {
     "city": "Toronto",
@@ -816,7 +906,8 @@
     "country": "Canada",
     "iso3166_1": "CA",
     "latitude": 43.651,
-    "longitude": -79.347
+    "longitude": -79.347,
+    "local_languages": ["en-CA"]
   },
   {
     "city": "Vancouver",
@@ -825,7 +916,8 @@
     "country": "Canada",
     "iso3166_1": "CA",
     "latitude": 49.2827,
-    "longitude": -123.1207
+    "longitude": -123.1207,
+    "local_languages": ["en-CA"]
   },
   {
     "city": "Montreal",
@@ -834,7 +926,8 @@
     "country": "Canada",
     "iso3166_1": "CA",
     "latitude": 45.5017,
-    "longitude": -73.5673
+    "longitude": -73.5673,
+    "local_languages": ["fr-CA", "en-CA"]
   },
   {
     "city": "Calgary",
@@ -843,7 +936,8 @@
     "country": "Canada",
     "iso3166_1": "CA",
     "latitude": 51.0447,
-    "longitude": -114.0719
+    "longitude": -114.0719,
+    "local_languages": ["en-CA"]
   },
   {
     "city": "Halifax",
@@ -852,7 +946,8 @@
     "country": "Canada",
     "iso3166_1": "CA",
     "latitude": 44.6488,
-    "longitude": -63.5752
+    "longitude": -63.5752,
+    "local_languages": ["en-CA"]
   },
   {
     "city": "Mexico City",
@@ -861,7 +956,8 @@
     "country": "Mexico",
     "iso3166_1": "MX",
     "latitude": 19.4326,
-    "longitude": -99.1332
+    "longitude": -99.1332,
+    "local_languages": ["es-MX"]
   },
   {
     "city": "Tijuana",
@@ -870,7 +966,8 @@
     "country": "Mexico",
     "iso3166_1": "MX",
     "latitude": 32.5149,
-    "longitude": -117.0382
+    "longitude": -117.0382,
+    "local_languages": ["es-MX"]
   },
   {
     "city": "Monterrey",
@@ -879,7 +976,8 @@
     "country": "Mexico",
     "iso3166_1": "MX",
     "latitude": 25.6866,
-    "longitude": -100.3161
+    "longitude": -100.3161,
+    "local_languages": ["es-MX"]
   },
   {
     "city": "Guadalajara",
@@ -888,7 +986,8 @@
     "country": "Mexico",
     "iso3166_1": "MX",
     "latitude": 20.6597,
-    "longitude": -103.3496
+    "longitude": -103.3496,
+    "local_languages": ["es-MX"]
   },
   {
     "city": "Ensenada",
@@ -897,6 +996,7 @@
     "country": "Mexico",
     "iso3166_1": "MX",
     "latitude": 31.8667,
-    "longitude": -116.5964
+    "longitude": -116.5964,
+    "local_languages": ["es-MX"]
   }
 ]

@@ -32,7 +32,7 @@ void LlamaGenerator::ContextDeleter::operator()(
 
 LlamaGenerator::LlamaGenerator(const ApplicationOptions& options,
                                const std::string& model_path,
-                               std::shared_ptr<IPromptFormatter> prompt_formatter)
+                               std::unique_ptr<IPromptFormatter> prompt_formatter)
     : rng_(std::random_device{}()),
       prompt_formatter_(std::move(prompt_formatter)) {
   if (model_path.empty()) {
