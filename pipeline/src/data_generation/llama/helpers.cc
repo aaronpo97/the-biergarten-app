@@ -115,89 +115,100 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
       "LlamaGenerator: failed to decode sampled token piece");
 }
 
+static bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
+                                           std::string_view key,
+                                           std::string& out,
+                                           std::string* error_out) {
+  const boost::json::value* field = obj.if_contains(key);
+  if (field == nullptr || !field->is_string()) {
+    if (error_out != nullptr) {
+      *error_out = "JSON field '" + std::string(key) +
+                   "' is missing or not a string";
+    }
+    return false;
+  }
+
+  const auto& string_value = field->as_string();
+  out = Trim(std::string_view(string_value.data(), string_value.size()));
+  if (out.empty()) {
+    if (error_out != nullptr) {
+      *error_out = "JSON field '" + std::string(key) + "' must not be empty";
+    }
+    return false;
+  }
+
+  return true;
+}
+
+static bool HasSchemaPlaceholder(const std::array<std::string*, 4>& values) {
+  for (const std::string* value : values) {
+    std::string lowered = *value;
+    std::ranges::transform(lowered, lowered.begin(),
+                           [](unsigned char character) {
+                             return static_cast<char>(std::tolower(character));
+                           });
+
+    if (lowered == "string") {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
-                                               std::string& name_out,
-                                               std::string& description_out,
-                                               std::string& reasoning_out) {
-  auto validate_object = [&](const boost::json::value& json_value,
-                             std::string& error_out) -> bool {
-    if (!json_value.is_object()) {
-      error_out = "JSON root must be an object";
-      return false;
-    }
-
-
-    const auto& obj = json_value.get_object();
-
-    if (!obj.contains("reasoning") || !obj.at("reasoning").is_string()) {
-      error_out = "JSON field 'reasoning' is missing or not a string";
-      return false;
-    }
-
-    if (!obj.contains("name") || !obj.at("name").is_string()) {
-      error_out = "JSON field 'name' is missing or not a string";
-      return false;
-    }
-
-    if (!obj.contains("description") || !obj.at("description").is_string()) {
-      error_out = "JSON field 'description' is missing or not a string";
-      return false;
-    }
-    const auto& reasoning_value = obj.at("reasoning").as_string();
-    reasoning_out = Trim(std::string_view(reasoning_value.data(), reasoning_value.size()));
-    if (reasoning_out.empty()) {
-      error_out = "JSON field 'reasoning' must not be empty";
-      return false;
-    }
-
-    const auto& name_value = obj.at("name").as_string();
-    const auto& description_value = obj.at("description").as_string();
-    name_out = Trim(std::string_view(name_value.data(), name_value.size()));
-    description_out = Trim(
-        std::string_view(description_value.data(), description_value.size()));
-
-    if (name_out.empty()) {
-      error_out = "JSON field 'name' must not be empty";
-      return false;
-    }
-
-    if (description_out.empty()) {
-      error_out = "JSON field 'description' must not be empty";
-      return false;
-    }
-
-    std::string name_lower = name_out;
-    std::string description_lower = description_out;
-
-
-    auto string_to_lower = [](std::string& str_out) {
-       std::ranges::transform(str_out, str_out.begin(),
-                             [](unsigned char character) {
-                               return static_cast<char>(std::tolower(character));
-                             });
-    };
-
-    string_to_lower(name_lower);
-    string_to_lower(description_lower);
-
-    if (name_lower == "string" || description_lower == "string") {
-      error_out = "JSON appears to be a schema placeholder, not content";
-      return false;
-    }
-
-    error_out.clear();
-    return true;
-  };
-
+                                               BreweryResult& brewery_out) {
   boost::system::error_code error_code;
-  boost::json::value json_value = boost::json::parse(raw, error_code);
-  std::string validation_error;
+  const std::string_view raw_view(raw);
+  const size_t opening_brace = raw_view.find('{');
+  if (opening_brace == std::string_view::npos) {
+    return "JSON parse error: missing opening brace '{'";
+  }
+
+  const std::string_view json_payload = raw_view.substr(opening_brace);
+  boost::json::value json_value = boost::json::parse(json_payload, error_code);
   if (error_code) {
     return "JSON parse error: " + error_code.message();
   }
 
-  if (!validate_object(json_value, validation_error)) {
+  if (!json_value.is_object()) {
+    return "JSON root must be an object";
+  }
+
+  const auto& obj = json_value.get_object();
+  if (obj.size() != 4) {
+    return "JSON object must contain exactly four keys";
+  }
+
+  std::string validation_error;
+  if (!ReadRequiredTrimmedStringField(obj, "name_en", brewery_out.name_en,
+                                      &validation_error)) {
     return validation_error;
+  }
+
+  if (!ReadRequiredTrimmedStringField(obj, "description_en",
+                                      brewery_out.description_en,
+                                      &validation_error)) {
+    return validation_error;
+  }
+
+  if (!ReadRequiredTrimmedStringField(obj, "name_local",
+                                      brewery_out.name_local,
+                                      &validation_error)) {
+    return validation_error;
+  }
+
+  if (!ReadRequiredTrimmedStringField(obj, "description_local",
+                                      brewery_out.description_local,
+                                      &validation_error)) {
+    return validation_error;
+  }
+
+  const std::array<std::string*, 4> schema_placeholders = {
+      &brewery_out.name_en, &brewery_out.description_en,
+      &brewery_out.name_local, &brewery_out.description_local};
+  if (HasSchemaPlaceholder(schema_placeholders)) {
+    return "JSON appears to be a schema placeholder, not content";
   }
 
   return std::nullopt;

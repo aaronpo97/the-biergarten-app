@@ -36,7 +36,9 @@ BreweryResult MockGenerator::GenerateBrewery(
                   state_suffix, country_suffix);
 
   return {
-      .name = name,
-      .description = description,
+      .name_en = name,
+      .description_en = description,
+      .name_local = name,
+      .description_local = description,
   };
 }

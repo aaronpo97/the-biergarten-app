@@ -12,11 +12,17 @@
  * @brief Generated brewery payload.
  */
 struct BreweryResult {
-  /// @brief Brewery display name.
-  std::string name{};
+  /// @brief Brewery display name in English.
+  std::string name_en;
 
-  /// @brief Brewery description text.
-  std::string description{};
+  /// @brief Brewery description text in English.
+  std::string description_en;
+
+  /// @brief Brewery display name in the local language.
+  std::string name_local;
+
+  /// @brief Brewery description text in the local language.
+  std::string description_local;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_BREWERY_RESULT_H_

@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include "data_model/brewery_result.h"
+
 struct llama_vocab;
 using llama_token = int32_t;
 
@@ -39,13 +41,10 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
  * @brief Validates and parses brewery JSON output.
  *
  * @param raw Raw model output.
- * @param name_out Parsed brewery name.
- * @param description_out Parsed brewery description.
+ * @param brewery_out Parsed brewery payload.
  * @return Validation error message if invalid, or std::nullopt on success.
  */
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
-                                               std::string& name_out,
-                                               std::string& description_out,
-                                               std::string& reasoning_out);
+                                               BreweryResult& brewery_out);
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_HELPERS_H_

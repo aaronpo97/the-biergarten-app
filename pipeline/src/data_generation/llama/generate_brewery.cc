@@ -17,7 +17,8 @@
 #include "data_generation/llama_generator_helpers.h"
 
 static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
-root ::= ws "{" ws "\"reasoning\"" ws ":" ws string ws "," ws "\"name\"" ws ":" ws string ws "," ws "\"description\"" ws ":" ws string ws "}" ws
+root ::= thought-block "{" ws "\"name_en\"" ws ":" ws string ws "," ws "\"description_en\"" ws ":" ws string ws "," ws "\"name_local\"" ws ":" ws string ws "," ws "\"description_local\"" ws ":" ws string ws "}" ws
+thought-block ::= [^{]*
 ws ::= [ \t\n\r]*
 string ::= "\"" char+ "\""
 char ::= [^"\\\x7F\x00-\x1F] | [\\] escape
@@ -75,25 +76,24 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   for (int attempt = 0; attempt < max_attempts; ++attempt) {
     // Generate brewery data from LLM
     raw = this->Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
-    spdlog::debug("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
+    spdlog::info("LlamaGenerator: raw output (attempt {}): {}", attempt + 1,
                   raw);
 
     // Validate output: parse JSON and check required fields
 
-    std::string name;
-    std::string description;
-    std::string reasoning;
+    BreweryResult brewery;
     const std::optional<std::string> validation_error =
-        ValidateBreweryJson(raw, name, description, reasoning);
+        ValidateBreweryJson(raw, brewery);
+
     if (!validation_error.has_value()) {
       // Success: return parsed brewery data
 
       spdlog::info(
-          "LlamaGenerator: successfully generated brewery data on attempt {}:\n reasoning='{}',\n name='{}',\n description='{}'",
-          attempt + 1, reasoning, name, description);
+          "LlamaGenerator: successfully generated brewery data on attempt {}:\n name_en='{}',\n description_en='{}',\n name_local='{}',\n description_local='{}'",
+          attempt + 1, brewery.name_en, brewery.description_en,
+          brewery.name_local, brewery.description_local);
 
-      return BreweryResult{.name = std::move(name),
-                           .description = std::move(description)};
+      return brewery;
     }
 
     // Validation failed: log error and prepare corrective feedback
@@ -103,14 +103,13 @@ BreweryResult LlamaGenerator::GenerateBrewery(
                  attempt + 1, *validation_error);
 
 
-    if (last_error == "JSON parse error: incomplete JSON") {
-      const int previous_max_tokens = max_tokens;
+        if (last_error == "JSON parse error: incomplete JSON") {
+            const int previous_max_tokens = max_tokens;
             max_tokens = std::min(max_tokens + kBreweryTruncationRetryTokenBump,
                                                         kBreweryMaxTokensCeiling);
       spdlog::info(
           "LlamaGenerator: detected truncated JSON; increasing max_tokens from {} to {} and retrying",
           previous_max_tokens, max_tokens);
-
 
       continue;
     }
@@ -118,7 +117,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     // Update prompt with error details to guide LLM toward correct output.
     user_prompt = std::format(
         R"(Your previous response was invalid. Error: {}
-Return ONLY valid JSON with exactly these keys, in this exact order: {{"reasoning": "<brief planning summary>", "name": "<brewery name>", "description": "<single-paragraph description>"}}.
+Return the thought process before the JSON if needed, then return ONLY valid JSON with exactly these keys, in this exact order: {{"name_en": "<English brewery name>", "description_en": "<English single-paragraph description>", "name_local": "<local-language brewery name>", "description_local": "<local-language single-paragraph description>"}}.
 Do not include markdown, comments, extra keys, or literal placeholder values.
 
 Keep the JSON strings concise enough to fit within the token budget.

@@ -66,8 +66,10 @@ package "Data models" {
   }
 
   class BreweryResult <<struct>> {
-    +name: std::string
-    +description: std::string
+    +name_en: std::string
+    +description_en: std::string
+    +name_local: std::string
+    +description_local: std::string
   }
 
   class UserResult <<struct>> {
