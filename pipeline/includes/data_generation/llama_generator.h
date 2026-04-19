@@ -32,7 +32,7 @@ class LlamaGenerator final : public DataGenerator {
    *
    * @param options Parsed application options.
    * @param model_path Filesystem path to GGUF model assets.
-  * @param prompt_formatter Formatter that produces model-specific prompts.
+   * @param prompt_formatter Formatter that produces model-specific prompts.
    */
   LlamaGenerator(const ApplicationOptions& options,
                  const std::string& model_path,
@@ -100,24 +100,24 @@ class LlamaGenerator final : public DataGenerator {
    * @param system_prompt System role prompt.
    * @param prompt User prompt.
    * @param max_tokens Maximum tokens to generate.
-  * @param grammar Optional GBNF grammar constraining generated output.
+   * @param grammar Optional GBNF grammar constraining generated output.
    * @return Generated text.
    */
   std::string Infer(const std::string& system_prompt, const std::string& prompt,
-              int max_tokens = kDefaultMaxTokens,
-              std::string_view grammar = {});
+                    int max_tokens = kDefaultMaxTokens,
+                    std::string_view grammar = {});
 
   /**
    * @brief Runs inference on an already-formatted prompt.
    *
    * @param formatted_prompt Prompt preformatted for model chat template.
    * @param max_tokens Maximum tokens to generate.
-  * @param grammar Optional GBNF grammar constraining generated output.
+   * @param grammar Optional GBNF grammar constraining generated output.
    * @return Generated text.
    */
   std::string InferFormatted(const std::string& formatted_prompt,
-                    int max_tokens = kDefaultMaxTokens,
-                    std::string_view grammar = {});
+                             int max_tokens = kDefaultMaxTokens,
+                             std::string_view grammar = {});
 
   /**
    * @brief Loads the brewery system prompt from disk.
@@ -125,7 +125,8 @@ class LlamaGenerator final : public DataGenerator {
    * @param prompt_file_path Prompt file path to try first.
    * @return Loaded prompt text.
    */
-  std::string LoadBrewerySystemPrompt(const std::filesystem::path& prompt_file_path);
+  std::string LoadBrewerySystemPrompt(
+      const std::filesystem::path& prompt_file_path);
 
   ModelHandle model_;
   ContextHandle context_;

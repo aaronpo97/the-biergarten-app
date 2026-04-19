@@ -122,8 +122,8 @@ static bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
   const boost::json::value* field = obj.if_contains(key);
   if (field == nullptr || !field->is_string()) {
     if (error_out != nullptr) {
-      *error_out = "JSON field '" + std::string(key) +
-                   "' is missing or not a string";
+      *error_out =
+          "JSON field '" + std::string(key) + "' is missing or not a string";
     }
     return false;
   }
@@ -192,8 +192,7 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
     return validation_error;
   }
 
-  if (!ReadRequiredTrimmedStringField(obj, "name_local",
-                                      brewery_out.name_local,
+  if (!ReadRequiredTrimmedStringField(obj, "name_local", brewery_out.name_local,
                                       &validation_error)) {
     return validation_error;
   }
