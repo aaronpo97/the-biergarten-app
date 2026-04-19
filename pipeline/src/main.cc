@@ -22,6 +22,8 @@
 #include "data_model/application_options.h"
 #include "llama_backend_state.h"
 #include "services/enrichment_service.h"
+#include "services/export_service.h"
+#include "services/sqlite_export_service.h"
 #include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
 
@@ -160,6 +162,7 @@ int main(const int argc, char** argv) {
         di::bind<WebClient>().to<CURLWebClient>(),
         di::bind<ApplicationOptions>().to(options),
         di::bind<IEnrichmentService>().to<WikipediaService>(),
+        di::bind<IExportService>().to<SqliteExportService>(),
         di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
         di::bind<std::string>().to(options.model_path),
         di::bind<DataGenerator>().to(
@@ -178,9 +181,10 @@ int main(const int argc, char** argv) {
               return inj.template create<std::unique_ptr<LlamaGenerator>>();
             }));
 
-    auto generator = injector.create<BiergartenDataGenerator>();
+    auto generator =
+        injector.create<std::unique_ptr<BiergartenDataGenerator>>();
 
-    if (!generator.Run()) {
+    if (!generator->Run()) {
       spdlog::error("Pipeline execution failed");
       return 1;
     }

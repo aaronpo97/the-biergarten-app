@@ -15,19 +15,14 @@ skinparam ActivityBorderColor #547461
 skinparam ActivityDiamondBackgroundColor #FAFCF9
 skinparam ActivityDiamondBorderColor #628A5B
 skinparam ActivityBarColor #628A5B
-skinparam SwimlaneBorderColor transparent
-skinparam SwimlaneBorderThickness 0
+skinparam SwimlaneBorderColor #547461
+skinparam SwimlaneBorderThickness 0.3
 
-title The Biergarten Data Pipeline
+title The Biergarten Data Pipeline (Streaming Architecture)
 
 |#F2F6F0|main.cc|
 start
 :ParseArguments(argc, argv);
-note right
-  Validates --mocked, --model,
-  --temperature, --top-p, etc.
-end note
-
 if (Are arguments valid?) then (no)
   :spdlog::error usage info;
   stop
@@ -36,13 +31,22 @@ endif
 
 :Init CurlGlobalState & LlamaBackendState;
 :di::make_injector(...);
-note right
-  Binds CURLWebClient, WikipediaService,
-  Gemma4JinjaPromptFormatter, and
-  either MockGenerator or LlamaGenerator
-end note
-:injector.create<BiergartenDataGenerator>();
+:injector.create<std::unique_ptr<BiergartenDataGenerator>>();
 :BiergartenDataGenerator::Run();
+
+|#EAF0E8|BiergartenDataGenerator|
+:Initialize SQLite export;
+
+|#E0EAE0|SqliteExportService|
+:GetUtcTimestamp() from SystemDateTimeProvider;
+:Initialize();
+note right
+  Builds a fresh biergarten_seed_<UTC datetime>.sqlite filename
+  Appends a numeric suffix if the timestamp already exists
+  Opens DB Connection
+  Executes Schema DDL
+  Begins Transaction
+end note
 
 |#EAF0E8|BiergartenDataGenerator|
 :QueryCitiesWithCountries();
@@ -55,71 +59,64 @@ end note
 while (For each sampled Location?) is (Remaining cities)
   |#DCE8D8|WikipediaService|
   :GetLocationContext(loc);
-  :FetchExtract("City, Country");
-  :FetchExtract("beer in Country");
-  :FetchExtract("beer in City");
-  note right: Backed by CURLWebClient::Get
-
+  :FetchExtracts(City, Country, Beer);
   |#EAF0E8|BiergartenDataGenerator|
-  if (Lookup failed?) then (yes)
-    :spdlog::warn "context lookup failed";
-  else (no)
-    :Store EnrichedCity{Location, region_context};
-  endif
+  :Store EnrichedCity{Location, region_context};
 endwhile (Done)
 
+|#EAF0E8|BiergartenDataGenerator|
 :GenerateBreweries(enriched_cities);
 
 |#E5EDE1|DataGenerator|
 while (For each EnrichedCity?) is (Remaining cities)
   if (Generator Mode) then (MockGenerator)
-    :DeterministicHash(location);
-    :Select from kBreweryAdjectives, kBreweryNouns,\nkBreweryDescriptions;
-    :Format BreweryResult;
+    :DeterministicHash & Format;
   else (LlamaGenerator)
-    :PrepareRegionContext(region_context);
+    :PrepareRegionContext;
     :LoadBrewerySystemPrompt("prompts/system.md");
-    :Format user_prompt;
-    :Attempt = 0;
     repeat
       :Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
-      note right
-        Uses Gemma4JinjaPromptFormatter,
-        llama_tokenize, and llama_sampler_sample
-      end note
       :ValidateBreweryJson(raw, brewery);
-
       if (Is JSON Valid?) then (yes)
         break
       else (no)
-        if (Error == "incomplete JSON") then (yes)
-          :max_tokens += 700;
-        endif
-        :Update user_prompt with validation error;
         :Attempt++;
       endif
-
     repeat while (Attempt < 3?) is (yes)
-
-    if (Still Invalid?) then (yes)
-      :throw std::runtime_error;
-    else (no)
-      :Return BreweryResult;
-    endif
   endif
 
   |#EAF0E8|BiergartenDataGenerator|
-  if (Exception thrown?) then (yes)
-    :spdlog::warn "brewery generation failed";
+  if (Generation successful?) then (yes)
+    |#E0EAE0|SqliteExportService|
+    :ProcessRecord(GeneratedBrewery);
+    if (Location in cache?) then (yes)
+      :Reuse location_id;
+    else (no)
+      :Insert Location & Cache ID;
+    endif
+    :Insert Brewery (FK: location_id);
+
+    if (Exception caught during insert?) then (yes)
+      |#EAF0E8|BiergartenDataGenerator|
+      :spdlog::warn "Failed to stream record to SQLite export";
+      note right
+        Data loss is prevented per-record.
+        The pipeline continues running.
+      end note
+    else (no)
+    endif
   else (no)
-    :Store GeneratedBrewery;
+    :spdlog::warn "Generation failed, skipping...";
   endif
   |#E5EDE1|DataGenerator|
 endwhile (Done)
 
-|#EAF0E8|BiergartenDataGenerator|
-:LogResults();
-note right: spdlog::info dump of generated JSON fields
+|#E0EAE0|SqliteExportService|
+:Finalize();
+note right
+  Commits Transaction
+  Closes Database Connection
+end note
 
 |#F2F6F0|main.cc|
 :Return 0;

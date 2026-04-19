@@ -1,0 +1,1415 @@
+diff --git a/pipeline/CMakeLists.txt b/pipeline/CMakeLists.txt
+index 02f769b..0c0aab1 100644
+--- a/pipeline/CMakeLists.txt
++++ b/pipeline/CMakeLists.txt
+@@ -60,6 +60,28 @@ endif()
+ # Require system Boost for JSON and Program Options to speed up build times
+ find_package(Boost REQUIRED COMPONENTS json program_options)
+ 
++FetchContent_Declare(
++    sqlite_amalgamation
++    URL https://www.sqlite.org/2026/sqlite-amalgamation-3530000.zip
++    URL_HASH SHA3_256=c2325c53b3b41761469f91cfb078e96882ac5d85bac10c11b0bd8f253b031e5b
++)
++FetchContent_GetProperties(sqlite_amalgamation)
++if(NOT sqlite_amalgamation_POPULATED)
++    FetchContent_Populate(sqlite_amalgamation)
++endif()
++
++if(NOT TARGET sqlite3)
++    add_library(sqlite3 STATIC
++        ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c
++    )
++    target_include_directories(sqlite3 PUBLIC
++        ${sqlite_amalgamation_SOURCE_DIR}
++    )
++    target_compile_definitions(sqlite3 PUBLIC
++        SQLITE_THREADSAFE=1
++    )
++endif()
++
+ FetchContent_Declare(
+     llama-cpp
+     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+@@ -97,6 +119,16 @@ set(SOURCES
+     src/services/wikipedia/wikipedia_service.cc
+     src/services/wikipedia/get_summary.cc
+     src/services/wikipedia/fetch_extract.cc
++    src/services/sqlite/sqlite_export_service.cc
++    src/services/sqlite/build_database_path.cc
++    src/services/sqlite/build_location_key.cc
++    src/services/sqlite/initialize_schema.cc
++    src/services/sqlite/prepare_statements.cc
++    src/services/sqlite/initialize.cc
++    src/services/sqlite/process_record.cc
++    src/services/sqlite/finalize_statements.cc
++    src/services/sqlite/rollback_and_close_no_throw.cc
++    src/services/sqlite/finalize.cc
+     src/web_client/curl_global_state.cc
+     src/web_client/curl_web_client_get.cc
+     src/web_client/curl_web_client_url_encode.cc
+@@ -129,6 +161,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
+     Boost::json
+     Boost::program_options
+     spdlog::spdlog
++    sqlite3
+     CURL::libcurl
+ )
+ 
+diff --git a/pipeline/README.md b/pipeline/README.md
+index 5463382..103d9dd 100644
+--- a/pipeline/README.md
++++ b/pipeline/README.md
+@@ -6,7 +6,7 @@ A C++20 command-line pipeline that samples city records from local JSON, enriche
+ 
+ ## Table of Contents
+ 
+-- [How It Fits the Main App](#how-it-fits-the-main-app)
++- [How It Fits The Main App](#how-it-fits-the-main-app)
+ - [Tech Stack](#tech-stack)
+ - [Build](#build)
+ - [Model](#model)
+@@ -26,7 +26,7 @@ A C++20 command-line pipeline that samples city records from local JSON, enriche
+ 
+ ---
+ 
+-## How It Fits the Main App
++## How It Fits The Main App
+ 
+ The pipeline is a data ingestion layer. It sits outside the web app runtime and produces seed records the app imports at startup or during a dedicated seed step.
+ 
+@@ -46,17 +46,19 @@ The pipeline is a data ingestion layer. It sits outside the web app runtime and
+ - Boost.JSON, Boost.ProgramOptions, Boost.DI
+ - spdlog
+ - libcurl
++- SQLite amalgamation fetched and compiled via CMake FetchContent
+ - llama.cpp
+ 
+-The build fetches Boost.DI, spdlog, and llama.cpp via CMake. Metal is enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
++The build fetches Boost.DI, spdlog, llama.cpp, and SQLite via CMake. Metal is enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
+ 
+-> **Code Style:** Modern C++20 throughout — RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, structured bindings in pipeline loops. Formatting follows the Google C++ Style Guide via `.clang-format` with a narrow column limit and two-space indentation.
++> **Code Style:** Modern C++20 throughout - RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, structured bindings in pipeline loops. Formatting follows the Google C++ Style Guide via `.clang-format` with a narrow column limit and two-space indentation.
+ 
+ ---
+ 
+ ## Build
+ 
+ Requirements: C++20 compiler, CMake 3.24+, libcurl, Boost (JSON and ProgramOptions).
++SQLite is fetched from the upstream amalgamation, so no system SQLite package is required.
+ 
+ ```bash
+ cmake -S . -B build
+@@ -80,7 +82,7 @@ curl -L \
+ 
+ ## Run
+ 
+-Run from `build/` so the copied `locations.json` and `prompts/` are available.
++Run from `build/` so the copied `locations.json` and `prompts/` are available. Each run also writes a fresh dated SQLite file such as `biergarten_seed_2026-04-19T15-30-45.123456Z.sqlite` into the working directory.
+ 
+ ```bash
+ ./biergarten-pipeline --mocked
+@@ -102,7 +104,7 @@ Run from `build/` so the copied `locations.json` and `prompts/` are available.
+ 
+ `--mocked` and `--model` are mutually exclusive. Omitting both exits with an error before the pipeline starts. Sampling flags are ignored when `--mocked` is set.
+ 
+-The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editing [prompts/system.md](prompts/system.md).
++The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editing `prompts/system.md`.
+ 
+ ---
+ 
+@@ -110,23 +112,25 @@ The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editi
+ 
+ ### Pipeline Stages
+ 
+-| Stage    | Implementation                                                                                                 |
+-| -------- | -------------------------------------------------------------------------------------------------------------- |
+-| Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                            |
+-| Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                      |
+-| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                             |
+-| Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language. |
+-| Log      | `spdlog` writes results and warnings to the console.                                                           |
++| Stage    | Implementation                                                                                                                          |
++| -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
++| Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                                                     |
++| Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                                               |
++| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                                                      |
++| Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language.                          |
++| Store    | `SqliteExportService` writes each successful brewery into a fresh dated `.sqlite` database with normalized location and brewery tables. |
++| Log      | `spdlog` writes results and warnings to the console.                                                                                    |
+ 
+ If enrichment or generation fails for a city, that city is skipped and the pipeline continues.
+ 
+ ### Key Components
+ 
+-- `src/main.cc` — argument parsing and Boost.DI composition root.
+-- `JsonLoader` — validates curated location input.
+-- `WikipediaService` — queries Wikipedia extracts, caches results, returns empty context on failure.
+-- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
+-- `MockGenerator` — stable hash-based output so the same city input always produces the same brewery.
++- `src/main.cc` - argument parsing and Boost.DI composition root.
++- `JsonLoader` - validates curated location input.
++- `WikipediaService` - queries Wikipedia extracts, caches results, returns empty context on failure.
++- `LlamaGenerator` - formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
++- `MockGenerator` - stable hash-based output so the same city input always produces the same brewery.
++- `SqliteExportService` - creates a dated SQLite file per run and persists each successful brewery into normalized tables.
+ - Brewery payloads include English and local-language name and description fields.
+ 
+ ### Runtime Behaviour
+@@ -139,11 +143,11 @@ If enrichment or generation fails for a city, that city is skipped and the pipel
+ 
+ `MockGenerator` uses stable hashes for repeatable output in demos and Storybook runs.
+ 
+-### Process Flow — Activity Diagram
++### Process Flow - Activity Diagram
+ 
+ ![An activity diagram](./diagrams/activity-diagram.svg)
+ 
+-### Architectural Overview — Class Diagram
++### Architectural Overview - Class Diagram
+ 
+ ![A class diagram](./diagrams/class-diagram.svg)
+ 
+@@ -151,7 +155,7 @@ If enrichment or generation fails for a city, that city is skipped and the pipel
+ 
+ ## Generated Output
+ 
+-Each successful run stores a `GeneratedBrewery` pair with the source location and a `BreweryResult` payload.
++Each successful run stores a `GeneratedBrewery` pair with the source location and a `BreweryResult` payload. The same generated records are also written to a fresh SQLite export file named with the current UTC timestamp.
+ 
+ | Field               | Meaning                                    |
+ | ------------------- | ------------------------------------------ |
+@@ -255,7 +259,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
+ 
+ ## Tested Hardware
+ 
+-### ARM macOS — M1 Pro
++### ARM macOS - M1 Pro
+ 
+ |           |                                   |
+ | --------- | --------------------------------- |
+@@ -266,7 +270,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
+ | Model     | Gemma 4 E4B                       |
+ | Inference | llama.cpp with Metal              |
+ 
+-### x86_64 Linux — NVIDIA RTX 2000
++### x86_64 Linux - NVIDIA RTX 2000
+ 
+ |           |                                |
+ | --------- | ------------------------------ |
+@@ -293,11 +297,12 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
+ 
+ ## Code Tour
+ 
+-- `src/main.cc` — argument parsing and DI composition root.
+-- `src/biergarten_data_generator/` — orchestration, sampling, logging.
+-- `src/services/wikipedia/` — enrichment service and cache.
+-- `src/data_generation/llama/` — local inference, prompt loading, output validation.
+-- `src/data_generation/mock/` — deterministic fallback.
++- `src/main.cc` - argument parsing and DI composition root.
++- `src/biergarten_data_generator/` - orchestration, sampling, logging, and export.
++- `src/services/wikipedia/` - enrichment service and cache.
++- `src/services/sqlite/` - SQLite export implementation.
++- `src/data_generation/llama/` - local inference, prompt loading, output validation.
++- `src/data_generation/mock/` - deterministic fallback.
+ 
+ ---
+ 
+@@ -312,11 +317,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
+ 
+ ## Next Steps
+ 
+-The pipeline currently produces city-aware brewery records. The next passes add SQLite output and additional fixture types so the app can exercise the full brewery domain without live data.
+-
+-### SQLite Output _(Highest Importance)_
+-
+-Write generated records to a SQLite database for downstream OLTP seeding. Normalized schema with foreign keys between locations and breweries. Output replaces the current log-only result so the pipeline functions as a proper ingestion layer.
++The pipeline currently produces city-aware brewery records and dated SQLite exports. The next passes add additional fixture types so the app can exercise the full brewery domain without live data.
+ 
+ ### Testing _(Very High Importance)_
+ 
+@@ -336,7 +337,7 @@ Generate user profiles with stable names, bios, locale hints, and preference sig
+ 
+ ### Check-In System
+ 
+-Produce timestamped check-in events between users and breweries. Use a J-curve activity profile — a small set of users accounts for most check-ins, the rest appear occasionally. Add bursty behaviour around weekends and travel periods.
++Produce timestamped check-in events between users and breweries. Use a J-curve activity profile - a small set of users accounts for most check-ins, the rest appear occasionally. Add bursty behaviour around weekends and travel periods.
+ 
+ ### Beer Ratings
+ 
+diff --git a/pipeline/diagrams/activity-diagram.puml b/pipeline/diagrams/activity-diagram.puml
+index bc95437..87caefb 100644
+--- a/pipeline/diagrams/activity-diagram.puml
++++ b/pipeline/diagrams/activity-diagram.puml
+@@ -15,19 +15,14 @@ skinparam ActivityBorderColor #547461
+ skinparam ActivityDiamondBackgroundColor #FAFCF9
+ skinparam ActivityDiamondBorderColor #628A5B
+ skinparam ActivityBarColor #628A5B
+-skinparam SwimlaneBorderColor transparent
+-skinparam SwimlaneBorderThickness 0
++skinparam SwimlaneBorderColor #547461
++skinparam SwimlaneBorderThickness 0.3
+ 
+-title The Biergarten Data Pipeline
++title The Biergarten Data Pipeline (Streaming Architecture)
+ 
+ |#F2F6F0|main.cc|
+ start
+ :ParseArguments(argc, argv);
+-note right
+-  Validates --mocked, --model,
+-  --temperature, --top-p, etc.
+-end note
+-
+ if (Are arguments valid?) then (no)
+   :spdlog::error usage info;
+   stop
+@@ -36,13 +31,22 @@ endif
+ 
+ :Init CurlGlobalState & LlamaBackendState;
+ :di::make_injector(...);
++:injector.create<std::unique_ptr<BiergartenDataGenerator>>();
++:BiergartenDataGenerator::Run();
++
++|#EAF0E8|BiergartenDataGenerator|
++:Initialize SQLite export;
++
++|#E0EAE0|SqliteExportService|
++:GetUtcTimestamp() from SystemDateTimeProvider;
++:Initialize();
+ note right
+-  Binds CURLWebClient, WikipediaService,
+-  Gemma4JinjaPromptFormatter, and
+-  either MockGenerator or LlamaGenerator
++  Builds a fresh biergarten_seed_<UTC datetime>.sqlite filename
++  Appends a numeric suffix if the timestamp already exists
++  Opens DB Connection
++  Executes Schema DDL
++  Begins Transaction
+ end note
+-:injector.create<BiergartenDataGenerator>();
+-:BiergartenDataGenerator::Run();
+ 
+ |#EAF0E8|BiergartenDataGenerator|
+ :QueryCitiesWithCountries();
+@@ -55,71 +59,64 @@ end note
+ while (For each sampled Location?) is (Remaining cities)
+   |#DCE8D8|WikipediaService|
+   :GetLocationContext(loc);
+-  :FetchExtract("City, Country");
+-  :FetchExtract("beer in Country");
+-  :FetchExtract("beer in City");
+-  note right: Backed by CURLWebClient::Get
+-
++  :FetchExtracts(City, Country, Beer);
+   |#EAF0E8|BiergartenDataGenerator|
+-  if (Lookup failed?) then (yes)
+-    :spdlog::warn "context lookup failed";
+-  else (no)
+-    :Store EnrichedCity{Location, region_context};
+-  endif
++  :Store EnrichedCity{Location, region_context};
+ endwhile (Done)
+ 
++|#EAF0E8|BiergartenDataGenerator|
+ :GenerateBreweries(enriched_cities);
+ 
+ |#E5EDE1|DataGenerator|
+ while (For each EnrichedCity?) is (Remaining cities)
+   if (Generator Mode) then (MockGenerator)
+-    :DeterministicHash(location);
+-    :Select from kBreweryAdjectives, kBreweryNouns,\nkBreweryDescriptions;
+-    :Format BreweryResult;
++    :DeterministicHash & Format;
+   else (LlamaGenerator)
+-    :PrepareRegionContext(region_context);
++    :PrepareRegionContext;
+     :LoadBrewerySystemPrompt("prompts/system.md");
+-    :Format user_prompt;
+-    :Attempt = 0;
+     repeat
+       :Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
+-      note right
+-        Uses Gemma4JinjaPromptFormatter,
+-        llama_tokenize, and llama_sampler_sample
+-      end note
+       :ValidateBreweryJson(raw, brewery);
+-
+       if (Is JSON Valid?) then (yes)
+         break
+       else (no)
+-        if (Error == "incomplete JSON") then (yes)
+-          :max_tokens += 700;
+-        endif
+-        :Update user_prompt with validation error;
+         :Attempt++;
+       endif
+-
+     repeat while (Attempt < 3?) is (yes)
++  endif
+ 
+-    if (Still Invalid?) then (yes)
+-      :throw std::runtime_error;
++  |#EAF0E8|BiergartenDataGenerator|
++  if (Generation successful?) then (yes)
++    |#E0EAE0|SqliteExportService|
++    :ProcessRecord(GeneratedBrewery);
++    if (Location in cache?) then (yes)
++      :Reuse location_id;
+     else (no)
+-      :Return BreweryResult;
++      :Insert Location & Cache ID;
+     endif
+-  endif
++    :Insert Brewery (FK: location_id);
+ 
+-  |#EAF0E8|BiergartenDataGenerator|
+-  if (Exception thrown?) then (yes)
+-    :spdlog::warn "brewery generation failed";
++    if (Exception caught during insert?) then (yes)
++      |#EAF0E8|BiergartenDataGenerator|
++      :spdlog::warn "Failed to stream record to SQLite export";
++      note right
++        Data loss is prevented per-record.
++        The pipeline continues running.
++      end note
++    else (no)
++    endif
+   else (no)
+-    :Store GeneratedBrewery;
++    :spdlog::warn "Generation failed, skipping...";
+   endif
+   |#E5EDE1|DataGenerator|
+ endwhile (Done)
+ 
+-|#EAF0E8|BiergartenDataGenerator|
+-:LogResults();
+-note right: spdlog::info dump of generated JSON fields
++|#E0EAE0|SqliteExportService|
++:Finalize();
++note right
++  Commits Transaction
++  Closes Database Connection
++end note
+ 
+ |#F2F6F0|main.cc|
+ :Return 0;
+diff --git a/pipeline/diagrams/class-diagram.puml b/pipeline/diagrams/class-diagram.puml
+index 9046b96..74acc97 100644
+--- a/pipeline/diagrams/class-diagram.puml
++++ b/pipeline/diagrams/class-diagram.puml
+@@ -28,6 +28,7 @@ title The Biergarten Data Pipeline - Class Diagram
+ class BiergartenDataGenerator {
+   - context_service_ : std::unique_ptr<IEnrichmentService>
+   - generator_ : std::unique_ptr<DataGenerator>
++  - exporter_ : std::unique_ptr<IExportService>
+   - generated_breweries_ : std::vector<GeneratedBrewery>
+   + Run() : bool
+   - QueryCitiesWithCountries() : std::vector<Location>
+@@ -92,9 +93,39 @@ class JsonLoader {
+   + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+ }
+ 
++interface IExportService <<interface>> {
++  + Initialize() : void
++  + ProcessRecord(brewery : const GeneratedBrewery&) : void
++  + Finalize() : void
++}
++
++class SqliteExportService {
++  - date_time_provider_ : std::unique_ptr<IDateTimeProvider>
++  - run_timestamp_utc_ : std::string
++  - database_path_ : std::filesystem::path
++  - db_handle_ : sqlite3*
++  - insert_location_stmt_ : sqlite3_stmt*
++  - insert_brewery_stmt_ : sqlite3_stmt*
++  - transaction_open_ : bool
++  - location_cache_ : std::unordered_map<std::string, sqlite3_int64>
++  + Initialize() : void
++  + ProcessRecord(brewery : const GeneratedBrewery&) : void
++  + Finalize() : void
++  - InitializeSchema() : void
++}
++
++interface IDateTimeProvider <<interface>> {
++  + GetUtcTimestamp() : std::string
++}
++
++class SystemDateTimeProvider {
++  + GetUtcTimestamp() : std::string
++}
++
+ ' Structural Relationships / Dependency Injection
+ BiergartenDataGenerator *-- IEnrichmentService : owns
+ BiergartenDataGenerator *-- DataGenerator : owns
++BiergartenDataGenerator *-- IExportService : owns
+ 
+ IEnrichmentService <|.. WikipediaService : implements
+ WikipediaService *-- WebClient : owns
+@@ -109,4 +140,9 @@ LlamaGenerator *-- IPromptFormatter : uses
+ IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
+ 
+ BiergartenDataGenerator ..> JsonLoader : uses
++
++IExportService <|.. SqliteExportService : implements
++SqliteExportService *-- IDateTimeProvider : owns
++IDateTimeProvider <|.. SystemDateTimeProvider : implements
++
+ @enduml
+diff --git a/pipeline/includes/biergarten_data_generator.h b/pipeline/includes/biergarten_data_generator.h
+index 260ea29..5663cd6 100644
+--- a/pipeline/includes/biergarten_data_generator.h
++++ b/pipeline/includes/biergarten_data_generator.h
+@@ -14,6 +14,7 @@
+ #include "data_model/enriched_city.h"
+ #include "data_model/generated_brewery.h"
+ #include "data_model/location.h"
++#include "services/export_service.h"
+ #include "services/enrichment_service.h"
+ 
+ /**
+@@ -28,10 +29,12 @@ class BiergartenDataGenerator {
+    * @brief Construct a BiergartenDataGenerator with injected dependencies.
+    *
+    * @param context_service Context provider for sampled locations.
+-   * @param generator Brewery and user data generator.
++  * @param generator Brewery and user data generator.
++  * @param exporter Storage backend for generated brewery data.
+    */
+   BiergartenDataGenerator(std::unique_ptr<IEnrichmentService> context_service,
+-                          std::unique_ptr<DataGenerator> generator);
++                  std::unique_ptr<DataGenerator> generator,
++                  std::unique_ptr<IExportService> exporter);
+ 
+   /**
+    * @brief Run the data generation pipeline.
+@@ -52,6 +55,9 @@ class BiergartenDataGenerator {
+   /// @brief Generator dependency selected in the composition root.
+   std::unique_ptr<DataGenerator> generator_;
+ 
++  /// @brief Storage backend for generated brewery records.
++  std::unique_ptr<IExportService> exporter_;
++
+   /**
+    * @brief Load locations from JSON and sample cities.
+    *
+diff --git a/pipeline/includes/services/date_time_provider.h b/pipeline/includes/services/date_time_provider.h
+new file mode 100644
+index 0000000..80c99d7
+--- /dev/null
++++ b/pipeline/includes/services/date_time_provider.h
+@@ -0,0 +1,68 @@
++#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATE_TIME_PROVIDER_H_
++#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATE_TIME_PROVIDER_H_
++
++/**
++ * @file services/date_time_provider.h
++ * @brief Abstraction for UTC timestamp generation.
++ */
++
++#include <chrono>
++#include <ctime>
++#include <iomanip>
++#include <sstream>
++#include <stdexcept>
++#include <string>
++
++/**
++ * @brief Interface for UTC timestamp providers.
++ */
++class IDateTimeProvider {
++   public:
++
++   /// @brief Virtual destructor for polymorphic cleanup.
++   virtual ~IDateTimeProvider() = default;
++
++
++   IDateTimeProvider() = default;
++  IDateTimeProvider(const IDateTimeProvider&) = delete;
++  IDateTimeProvider& operator=(const IDateTimeProvider&) = delete;
++  IDateTimeProvider(IDateTimeProvider&&) = delete;
++  IDateTimeProvider& operator=(IDateTimeProvider&&) = delete;
++
++  /**
++   * @brief Returns the current UTC timestamp in a file-safe format.
++   *
++   * @return UTC timestamp string.
++   */
++  virtual std::string GetUtcTimestamp() = 0;
++};
++
++/**
++ * @brief Timestamp provider backed by the system clock.
++ */
++class SystemDateTimeProvider final : public IDateTimeProvider {
++ public:
++  std::string GetUtcTimestamp() override {
++    constexpr int kFractionalSecondWidth = 6;
++
++    const auto now = std::chrono::system_clock::now();
++    const auto now_time = std::chrono::system_clock::to_time_t(now);
++    const std::tm* utc_time_ptr = std::gmtime(&now_time);
++    if (utc_time_ptr == nullptr) {
++      throw std::runtime_error("Failed to format UTC timestamp");
++    }
++
++    const auto fractional_seconds =
++        std::chrono::duration_cast<std::chrono::microseconds>(
++            now.time_since_epoch()) %
++        std::chrono::seconds(1);
++
++    std::ostringstream output;
++    output << std::put_time(utc_time_ptr, "%Y-%m-%dT%H-%M-%S");
++    output << '.' << std::setw(kFractionalSecondWidth) << std::setfill('0')
++           << fractional_seconds.count() << 'Z';
++    return output.str();
++  }
++};
++
++#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATE_TIME_PROVIDER_H_
+diff --git a/pipeline/includes/services/export_service.h b/pipeline/includes/services/export_service.h
+new file mode 100644
+index 0000000..a45c483
+--- /dev/null
++++ b/pipeline/includes/services/export_service.h
+@@ -0,0 +1,40 @@
++#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
++#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
++
++/**
++ * @file services/export_service.h
++ * @brief Abstraction for persisting generated brewery data.
++ */
++
++#include "data_model/generated_brewery.h"
++
++/**
++ * @brief Interface for services that persist generated brewery records.
++ */
++class IExportService {
++ public:
++  IExportService() = default;
++
++  /// @brief Virtual destructor for polymorphic cleanup.
++  virtual ~IExportService() = default;
++
++  IExportService(const IExportService&) = delete;
++  IExportService& operator=(const IExportService&) = delete;
++  IExportService(IExportService&&) = delete;
++  IExportService& operator=(IExportService&&) = delete;
++
++  /// @brief Prepares the export destination for a new run.
++  virtual void Initialize() = 0;
++
++  /**
++   * @brief Persists one generated brewery record.
++   *
++   * @param brewery Generated brewery payload to store.
++   */
++  virtual void ProcessRecord(const GeneratedBrewery& brewery) = 0;
++
++  /// @brief Finalizes the export destination.
++  virtual void Finalize() = 0;
++};
++
++#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
+diff --git a/pipeline/includes/services/sqlite_export_service.h b/pipeline/includes/services/sqlite_export_service.h
+new file mode 100644
+index 0000000..957c82a
+--- /dev/null
++++ b/pipeline/includes/services/sqlite_export_service.h
+@@ -0,0 +1,57 @@
++#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
++#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
++
++/**
++ * @file services/sqlite_export_service.h
++ * @brief SQLite-backed export service for generated brewery data.
++ */
++
++#include <filesystem>
++#include <memory>
++#include <string>
++#include <unordered_map>
++
++#include "services/date_time_provider.h"
++#include "services/export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++/**
++ * @brief Persists generated brewery records into a fresh SQLite database.
++ */
++class SqliteExportService final : public IExportService {
++ public:
++  SqliteExportService();
++  ~SqliteExportService() override;
++
++  SqliteExportService(const SqliteExportService&) = delete;
++  SqliteExportService& operator=(const SqliteExportService&) = delete;
++  SqliteExportService(SqliteExportService&&) = delete;
++  SqliteExportService& operator=(SqliteExportService&&) = delete;
++
++  void Initialize() override;
++  void ProcessRecord(const GeneratedBrewery& brewery) override;
++  void Finalize() override;
++
++ private:
++  using SqliteDatabaseHandle = sqlite_export_service_internal::SqliteDatabaseHandle;
++  using SqliteStatementHandle = sqlite_export_service_internal::SqliteStatementHandle;
++
++  void InitializeSchema();
++  void PrepareStatements();
++  void RollbackAndCloseNoThrow() noexcept;
++  void FinalizeStatements() noexcept;
++
++  [[nodiscard]] std::filesystem::path BuildDatabasePath() const;
++  [[nodiscard]] static std::string BuildLocationKey(const Location& location);
++
++  std::unique_ptr<IDateTimeProvider> date_time_provider_;
++  std::string run_timestamp_utc_;
++  std::filesystem::path database_path_;
++  SqliteDatabaseHandle db_handle_;
++  SqliteStatementHandle insert_location_stmt_;
++  SqliteStatementHandle insert_brewery_stmt_;
++  bool transaction_open_ = false;
++  std::unordered_map<std::string, sqlite3_int64> location_cache_;
++};
++
++#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
+diff --git a/pipeline/includes/services/sqlite_export_service_helpers.h b/pipeline/includes/services/sqlite_export_service_helpers.h
+new file mode 100644
+index 0000000..acdf890
+--- /dev/null
++++ b/pipeline/includes/services/sqlite_export_service_helpers.h
+@@ -0,0 +1,250 @@
++#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_HELPERS_H_
++#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_HELPERS_H_
++
++/**
++ * @file services/sqlite_export_service_helpers.h
++ * @brief Internal SQLite export helpers shared across per-method translation
++ * units.
++ */
++
++#include <sqlite3.h>
++
++#include <boost/json.hpp>
++#include <cstddef>
++#include <cstring>
++#include <filesystem>
++#include <limits>
++#include <memory>
++#include <stdexcept>
++#include <string>
++#include <string_view>
++#include <vector>
++
++namespace sqlite_export_service_internal {
++
++struct SqliteDatabaseDeleter {
++  void operator()(sqlite3* handle) const noexcept {
++    if (handle != nullptr) {
++      sqlite3_close(handle);
++    }
++  }
++};
++
++struct SqliteStatementDeleter {
++  void operator()(sqlite3_stmt* statement) const noexcept {
++    if (statement != nullptr) {
++      sqlite3_finalize(statement);
++    }
++  }
++};
++
++using SqliteDatabaseHandle = std::unique_ptr<sqlite3, SqliteDatabaseDeleter>;
++using SqliteStatementHandle =
++    std::unique_ptr<sqlite3_stmt, SqliteStatementDeleter>;
++
++inline constexpr std::string_view kCreateLocationsTableSql = R"sql(
++
++CREATE TABLE IF NOT EXISTS locations (
++  id INTEGER PRIMARY KEY AUTOINCREMENT,
++  city TEXT NOT NULL,
++  state_province TEXT NOT NULL,
++  iso3166_2 TEXT NOT NULL,
++  country TEXT NOT NULL,
++  iso3166_1 TEXT NOT NULL,
++  local_languages_json TEXT NOT NULL,
++  latitude REAL NOT NULL,
++  longitude REAL NOT NULL,
++  UNIQUE(city, state_province, iso3166_2, country, latitude, longitude)
++);
++
++)sql";
++
++inline constexpr std::string_view kCreateBreweriesTableSql = R"sql(
++
++CREATE TABLE IF NOT EXISTS breweries (
++  id INTEGER PRIMARY KEY AUTOINCREMENT,
++  location_id INTEGER NOT NULL,
++  name_en TEXT NOT NULL,
++  description_en TEXT NOT NULL,
++  name_local TEXT NOT NULL,
++  description_local TEXT NOT NULL,
++  FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE CASCADE
++);
++
++CREATE INDEX IF NOT EXISTS idx_breweries_location_id ON breweries(location_id);
++
++)sql";
++
++inline constexpr std::string_view kInsertLocationSql = R"sql(
++INSERT INTO locations (
++  city,
++  state_province,
++  iso3166_2,
++  country,
++  iso3166_1,
++  local_languages_json,
++  latitude,
++  longitude
++) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
++)sql";
++
++inline constexpr std::string_view kInsertBrewerySql = R"sql(
++INSERT INTO breweries (
++  location_id,
++  name_en,
++  description_en,
++  name_local,
++  description_local
++) VALUES (?, ?, ?, ?, ?);
++)sql";
++
++inline constexpr int kLocationCityBindIndex = 1;
++inline constexpr int kLocationStateProvinceBindIndex = 2;
++inline constexpr int kLocationIso31662BindIndex = 3;
++inline constexpr int kLocationCountryBindIndex = 4;
++inline constexpr int kLocationIso31661BindIndex = 5;
++inline constexpr int kLocationLanguagesBindIndex = 6;
++inline constexpr int kLocationLatitudeBindIndex = 7;
++inline constexpr int kLocationLongitudeBindIndex = 8;
++
++inline constexpr int kBreweryLocationIdBindIndex = 1;
++inline constexpr int kBreweryEnglishNameBindIndex = 2;
++inline constexpr int kBreweryEnglishDescriptionBindIndex = 3;
++inline constexpr int kBreweryLocalNameBindIndex = 4;
++inline constexpr int kBreweryLocalDescriptionBindIndex = 5;
++
++inline void ThrowSqliteError(sqlite3* db_handle, std::string_view action) {
++  const std::string message =
++      db_handle != nullptr ? sqlite3_errmsg(db_handle) : "unknown SQLite error";
++  throw std::runtime_error(std::string(action) + ": " + message);
++}
++
++inline SqliteDatabaseHandle OpenDatabase(const std::filesystem::path& path) {
++  sqlite3* raw_handle = nullptr;
++  const std::string path_string = path.string();
++  const int result = sqlite3_open(path_string.c_str(), &raw_handle);
++  SqliteDatabaseHandle handle(raw_handle);
++  if (result != SQLITE_OK) {
++    const std::string message = raw_handle != nullptr
++                                    ? sqlite3_errmsg(raw_handle)
++                                    : "unknown SQLite error";
++    throw std::runtime_error("Failed to open SQLite export database: " +
++                             message);
++  }
++
++  return handle;
++}
++
++inline void ExecSql(const SqliteDatabaseHandle& db_handle,
++                    std::string_view sql, const char* action) {
++  char* error_message = nullptr;
++  const std::string sql_text(sql);
++  const int result = sqlite3_exec(db_handle.get(), sql_text.c_str(), nullptr,
++                                  nullptr, &error_message);
++  if (result != SQLITE_OK) {
++    const std::string message = error_message != nullptr
++                                    ? error_message
++                                    : sqlite3_errmsg(db_handle.get());
++    sqlite3_free(error_message);
++    throw std::runtime_error(std::string(action) + ": " + message);
++  }
++}
++
++inline SqliteStatementHandle PrepareStatement(
++    const SqliteDatabaseHandle& db_handle, std::string_view sql,
++    const char* action) {
++  sqlite3_stmt* raw_statement = nullptr;
++  const std::string sql_text(sql);
++  const int result = sqlite3_prepare_v2(db_handle.get(), sql_text.c_str(), -1,
++                                        &raw_statement, nullptr);
++  SqliteStatementHandle statement(raw_statement);
++  if (result != SQLITE_OK) {
++    ThrowSqliteError(db_handle.get(), action);
++  }
++
++  return statement;
++}
++
++inline void ResetStatement(SqliteStatementHandle& statement) {
++  if (statement != nullptr) {
++    sqlite3_reset(statement.get());
++    sqlite3_clear_bindings(statement.get());
++  }
++}
++
++inline void DeleteCharArray(void* data) noexcept {
++  delete[] static_cast<char*>(data);
++}
++
++inline void BindText(const SqliteStatementHandle& statement, int index,
++                     std::string_view value, const char* action) {
++  const auto byte_count = value.size();
++  if (byte_count > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
++    ThrowSqliteError(sqlite3_db_handle(statement.get()), action);
++  }
++
++  auto buffer = std::make_unique<char[]>(byte_count + 1);
++  std::memcpy(buffer.get(), value.data(), byte_count);
++  buffer[byte_count] = '\0';
++
++  char* raw_buffer = buffer.release();
++  const int result = sqlite3_bind_text(statement.get(), index, raw_buffer,
++                                       static_cast<int>(byte_count),
++                                       DeleteCharArray);
++  if (result != SQLITE_OK) {
++    DeleteCharArray(raw_buffer);
++    ThrowSqliteError(sqlite3_db_handle(statement.get()), action);
++  }
++}
++
++inline void BindDouble(const SqliteStatementHandle& statement, int index,
++                       double value, std::string_view action) {
++  const int result = sqlite3_bind_double(statement.get(), index, value);
++  if (result != SQLITE_OK) {
++    ThrowSqliteError(sqlite3_db_handle(statement.get()), action);
++  }
++}
++
++inline void BindInt64(const SqliteStatementHandle& statement, int index,
++                      sqlite3_int64 value, std::string_view action) {
++  const int result = sqlite3_bind_int64(statement.get(), index, value);
++  if (result != SQLITE_OK) {
++    ThrowSqliteError(sqlite3_db_handle(statement.get()), action);
++  }
++}
++
++inline void StepStatement(const SqliteDatabaseHandle& db_handle,
++                          const SqliteStatementHandle& statement,
++                          std::string_view action) {
++  const int result = sqlite3_step(statement.get());
++  if (result != SQLITE_DONE) {
++    ThrowSqliteError(db_handle.get(), action);
++  }
++}
++
++inline sqlite3_int64 LastInsertRowId(const SqliteDatabaseHandle& db_handle) {
++  return sqlite3_last_insert_rowid(db_handle.get());
++}
++
++inline void RollbackTransactionNoThrow(
++    const SqliteDatabaseHandle& db_handle) noexcept {
++  if (!db_handle) {
++    return;
++  }
++
++  sqlite3_exec(db_handle.get(), "ROLLBACK;", nullptr, nullptr, nullptr);
++}
++
++inline std::string SerializeLocalLanguages(
++    const std::vector<std::string>& local_languages) {
++  boost::json::array array;
++  array.reserve(local_languages.size());
++  for (const auto& language : local_languages) {
++    array.emplace_back(language);
++  }
++  return boost::json::serialize(array);
++}
++
++}  // namespace sqlite_export_service_internal
++
++#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_HELPERS_H_
+diff --git a/pipeline/src/biergarten_data_generator/biergarten_data_generator.cc b/pipeline/src/biergarten_data_generator/biergarten_data_generator.cc
+index b3dd072..033795d 100644
+--- a/pipeline/src/biergarten_data_generator/biergarten_data_generator.cc
++++ b/pipeline/src/biergarten_data_generator/biergarten_data_generator.cc
+@@ -9,6 +9,8 @@
+ 
+ BiergartenDataGenerator::BiergartenDataGenerator(
+     std::unique_ptr<IEnrichmentService> context_service,
+-    std::unique_ptr<DataGenerator> generator)
++    std::unique_ptr<DataGenerator> generator,
++    std::unique_ptr<IExportService> exporter)
+     : context_service_(std::move(context_service)),
+-      generator_(std::move(generator)) {}
++      generator_(std::move(generator)),
++      exporter_(std::move(exporter)) {}
+diff --git a/pipeline/src/biergarten_data_generator/generate_breweries.cc b/pipeline/src/biergarten_data_generator/generate_breweries.cc
+index 93b2c85..934c3dd 100644
+--- a/pipeline/src/biergarten_data_generator/generate_breweries.cc
++++ b/pipeline/src/biergarten_data_generator/generate_breweries.cc
+@@ -13,6 +13,7 @@ void BiergartenDataGenerator::GenerateBreweries(
+ 
+   generated_breweries_.clear();
+   size_t skipped_count = 0;
++  size_t export_failed_count = 0;
+ 
+   for (const auto& [location, region_context] : cities) {
+     try {
+@@ -22,6 +23,17 @@ void BiergartenDataGenerator::GenerateBreweries(
+       const GeneratedBrewery gen{.location = location, .brewery = brewery};
+ 
+       generated_breweries_.push_back(gen);
++
++      try {
++        exporter_->ProcessRecord(gen);
++      } catch (const std::exception& export_exception) {
++        ++export_failed_count;
++
++        spdlog::warn(
++            "[Pipeline] Generated brewery for '{}' ({}) but SQLite export "
++            "failed: {}",
++            location.city, location.country, export_exception.what());
++      }
+     } catch (const std::exception& e) {
+       ++skipped_count;
+ 
+@@ -36,4 +48,11 @@ void BiergartenDataGenerator::GenerateBreweries(
+     spdlog::warn("[Pipeline] Skipped {} city/cities due to generation errors",
+                  skipped_count);
+   }
++
++  if (export_failed_count > 0) {
++    spdlog::warn(
++        "[Pipeline] Failed to export {} generated brewery/breweries to "
++        "SQLite",
++        export_failed_count);
++  }
+ }
+diff --git a/pipeline/src/biergarten_data_generator/run.cc b/pipeline/src/biergarten_data_generator/run.cc
+index 48f91ac..7ae3d06 100644
+--- a/pipeline/src/biergarten_data_generator/run.cc
++++ b/pipeline/src/biergarten_data_generator/run.cc
+@@ -11,6 +11,8 @@
+ 
+ bool BiergartenDataGenerator::Run() {
+   try {
++    exporter_->Initialize();
++
+     std::vector<Location> cities = QueryCitiesWithCountries();
+     std::vector<EnrichedCity> enriched;
+     enriched.reserve(cities.size());
+@@ -40,6 +42,7 @@ bool BiergartenDataGenerator::Run() {
+     }
+ 
+     this->GenerateBreweries(enriched);
++    exporter_->Finalize();
+     this->LogResults();
+     return true;
+   } catch (const std::exception& e) {
+diff --git a/pipeline/src/main.cc b/pipeline/src/main.cc
+index 896eb14..1a5cf81 100644
+--- a/pipeline/src/main.cc
++++ b/pipeline/src/main.cc
+@@ -20,8 +20,10 @@
+ #include "data_generation/mock_generator.h"
+ #include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
+ #include "data_model/application_options.h"
++#include "services/export_service.h"
+ #include "llama_backend_state.h"
+ #include "services/enrichment_service.h"
++#include "services/sqlite_export_service.h"
+ #include "services/wikipedia_service.h"
+ #include "web_client/curl_web_client.h"
+ 
+@@ -160,6 +162,7 @@ int main(const int argc, char** argv) {
+         di::bind<WebClient>().to<CURLWebClient>(),
+         di::bind<ApplicationOptions>().to(options),
+         di::bind<IEnrichmentService>().to<WikipediaService>(),
++      di::bind<IExportService>().to<SqliteExportService>(),
+         di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
+         di::bind<std::string>().to(options.model_path),
+         di::bind<DataGenerator>().to(
+@@ -178,9 +181,9 @@ int main(const int argc, char** argv) {
+               return inj.template create<std::unique_ptr<LlamaGenerator>>();
+             }));
+ 
+-    auto generator = injector.create<BiergartenDataGenerator>();
++    auto generator = injector.create<std::unique_ptr<BiergartenDataGenerator>>();
+ 
+-    if (!generator.Run()) {
++    if (!generator->Run()) {
+       spdlog::error("Pipeline execution failed");
+       return 1;
+     }
+diff --git a/pipeline/src/services/sqlite/build_database_path.cc b/pipeline/src/services/sqlite/build_database_path.cc
+new file mode 100644
+index 0000000..13101f0
+--- /dev/null
++++ b/pipeline/src/services/sqlite/build_database_path.cc
+@@ -0,0 +1,25 @@
++/**
++ * @file services/sqlite/build_database_path.cc
++ * @brief SqliteExportService::BuildDatabasePath() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++
++#include <filesystem>
++#include <string>
++
++std::filesystem::path SqliteExportService::BuildDatabasePath() const {
++  const auto base_filename =
++      std::filesystem::path("biergarten_seed_" + run_timestamp_utc_ + ".sqlite");
++  std::filesystem::path candidate =
++      std::filesystem::current_path() / base_filename;
++
++  for (int suffix = 1; std::filesystem::exists(candidate); ++suffix) {
++    candidate = std::filesystem::current_path() /
++                std::filesystem::path("biergarten_seed_" + run_timestamp_utc_ +
++                                      "-" + std::to_string(suffix) +
++                                      ".sqlite");
++  }
++
++  return candidate;
++}
+diff --git a/pipeline/src/services/sqlite/build_location_key.cc b/pipeline/src/services/sqlite/build_location_key.cc
+new file mode 100644
+index 0000000..085c0a7
+--- /dev/null
++++ b/pipeline/src/services/sqlite/build_location_key.cc
+@@ -0,0 +1,26 @@
++/**
++ * @file services/sqlite/build_location_key.cc
++ * @brief SqliteExportService::BuildLocationKey() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++#include <iomanip>
++#include <sstream>
++
++constexpr int kLocationPrecision = 17;
++
++std::string SqliteExportService::BuildLocationKey(const Location& location) {
++  std::ostringstream key_stream;
++  key_stream << location.city << '\n'
++             << location.state_province << '\n'
++             << location.iso3166_2 << '\n'
++             << location.country << '\n'
++             << location.iso3166_1 << '\n'
++             << std::setprecision(kLocationPrecision) << location.latitude << '\n'
++             << std::setprecision(kLocationPrecision) << location.longitude << '\n'
++             << sqlite_export_service_internal::SerializeLocalLanguages(
++                    location.local_languages);
++  return key_stream.str();
++}
+diff --git a/pipeline/src/services/sqlite/finalize.cc b/pipeline/src/services/sqlite/finalize.cc
+new file mode 100644
+index 0000000..d47f41f
+--- /dev/null
++++ b/pipeline/src/services/sqlite/finalize.cc
+@@ -0,0 +1,30 @@
++/**
++ * @file services/sqlite/finalize.cc
++ * @brief SqliteExportService::Finalize() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++#include <stdexcept>
++
++void SqliteExportService::Finalize() {
++  if (db_handle_ == nullptr) {
++    return;
++  }
++
++  try {
++    FinalizeStatements();
++    if (transaction_open_) {
++      sqlite_export_service_internal::ExecSql(
++          db_handle_, "COMMIT;", "Failed to commit SQLite transaction");
++      transaction_open_ = false;
++    }
++
++    db_handle_.reset();
++    location_cache_.clear();
++  } catch (...) {
++    RollbackAndCloseNoThrow();
++    throw;
++  }
++}
+diff --git a/pipeline/src/services/sqlite/finalize_statements.cc b/pipeline/src/services/sqlite/finalize_statements.cc
+new file mode 100644
+index 0000000..15b29a6
+--- /dev/null
++++ b/pipeline/src/services/sqlite/finalize_statements.cc
+@@ -0,0 +1,11 @@
++/**
++ * @file services/sqlite/finalize_statements.cc
++ * @brief SqliteExportService::FinalizeStatements() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++
++void SqliteExportService::FinalizeStatements() noexcept {
++  insert_brewery_stmt_.reset();
++  insert_location_stmt_.reset();
++}
+diff --git a/pipeline/src/services/sqlite/initialize.cc b/pipeline/src/services/sqlite/initialize.cc
+new file mode 100644
+index 0000000..4ffb235
+--- /dev/null
++++ b/pipeline/src/services/sqlite/initialize.cc
+@@ -0,0 +1,39 @@
++/**
++ * @file services/sqlite/initialize.cc
++ * @brief SqliteExportService::Initialize() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++#include <filesystem>
++#include <memory>
++#include <stdexcept>
++#include <string>
++
++void SqliteExportService::Initialize() {
++  if (db_handle_ != nullptr) {
++    throw std::runtime_error("SQLite export service is already initialized");
++  }
++
++  run_timestamp_utc_ = date_time_provider_->GetUtcTimestamp();
++  database_path_ = BuildDatabasePath();
++  std::filesystem::create_directories(database_path_.parent_path());
++
++    db_handle_ = sqlite_export_service_internal::OpenDatabase(database_path_);
++
++  try {
++      sqlite_export_service_internal::ExecSql(
++          db_handle_, "PRAGMA foreign_keys = ON;",
++          "Failed to enable SQLite foreign keys");
++    InitializeSchema();
++    PrepareStatements();
++      sqlite_export_service_internal::ExecSql(
++          db_handle_, "BEGIN IMMEDIATE TRANSACTION;",
++          "Failed to begin SQLite transaction");
++    transaction_open_ = true;
++  } catch (...) {
++    RollbackAndCloseNoThrow();
++    throw;
++  }
++}
+diff --git a/pipeline/src/services/sqlite/initialize_schema.cc b/pipeline/src/services/sqlite/initialize_schema.cc
+new file mode 100644
+index 0000000..e9e22ef
+--- /dev/null
++++ b/pipeline/src/services/sqlite/initialize_schema.cc
+@@ -0,0 +1,16 @@
++/**
++ * @file services/sqlite/initialize_schema.cc
++ * @brief SqliteExportService::InitializeSchema() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++void SqliteExportService::InitializeSchema() {
++  sqlite_export_service_internal::ExecSql(
++      db_handle_, sqlite_export_service_internal::kCreateLocationsTableSql,
++      "Failed to create SQLite locations table");
++  sqlite_export_service_internal::ExecSql(
++      db_handle_, sqlite_export_service_internal::kCreateBreweriesTableSql,
++      "Failed to create SQLite breweries table");
++}
+diff --git a/pipeline/src/services/sqlite/prepare_statements.cc b/pipeline/src/services/sqlite/prepare_statements.cc
+new file mode 100644
+index 0000000..ee61e4a
+--- /dev/null
++++ b/pipeline/src/services/sqlite/prepare_statements.cc
+@@ -0,0 +1,16 @@
++/**
++ * @file services/sqlite/prepare_statements.cc
++ * @brief SqliteExportService::PrepareStatements() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++void SqliteExportService::PrepareStatements() {
++  insert_location_stmt_ = sqlite_export_service_internal::PrepareStatement(
++      db_handle_, sqlite_export_service_internal::kInsertLocationSql,
++      "Failed to prepare SQLite location insert statement");
++  insert_brewery_stmt_ = sqlite_export_service_internal::PrepareStatement(
++      db_handle_, sqlite_export_service_internal::kInsertBrewerySql,
++      "Failed to prepare SQLite brewery insert statement");
++}
+diff --git a/pipeline/src/services/sqlite/process_record.cc b/pipeline/src/services/sqlite/process_record.cc
+new file mode 100644
+index 0000000..fa57c66
+--- /dev/null
++++ b/pipeline/src/services/sqlite/process_record.cc
+@@ -0,0 +1,106 @@
++/**
++ * @file services/sqlite/process_record.cc
++ * @brief SqliteExportService::ProcessRecord() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++#include "services/sqlite_export_service_helpers.h"
++
++#include <stdexcept>
++#include <string>
++
++void SqliteExportService::ProcessRecord(const GeneratedBrewery& brewery) {
++  if (db_handle_ == nullptr || !transaction_open_) {
++    throw std::runtime_error("SQLite export service is not initialized");
++  }
++
++  const std::string location_key = BuildLocationKey(brewery.location);
++  const auto cached_location = location_cache_.find(location_key);
++  sqlite3_int64 location_id = 0;
++
++  if (cached_location != location_cache_.end()) {
++    location_id = cached_location->second;
++  } else {
++    const std::string local_languages_json =
++        sqlite_export_service_internal::SerializeLocalLanguages(
++            brewery.location.local_languages);
++
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationCityBindIndex,
++        brewery.location.city, "Failed to bind SQLite location city");
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationStateProvinceBindIndex,
++        brewery.location.state_province,
++        "Failed to bind SQLite location state/province");
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationIso31662BindIndex,
++        brewery.location.iso3166_2,
++        "Failed to bind SQLite location ISO 3166-2 code");
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationCountryBindIndex,
++        brewery.location.country,
++        "Failed to bind SQLite location country");
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationIso31661BindIndex,
++        brewery.location.iso3166_1,
++        "Failed to bind SQLite location ISO 3166-1 code");
++    sqlite_export_service_internal::BindText(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationLanguagesBindIndex,
++        local_languages_json, "Failed to bind SQLite location languages");
++    sqlite_export_service_internal::BindDouble(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationLatitudeBindIndex,
++        brewery.location.latitude,
++        "Failed to bind SQLite location latitude");
++    sqlite_export_service_internal::BindDouble(
++        insert_location_stmt_,
++        sqlite_export_service_internal::kLocationLongitudeBindIndex,
++        brewery.location.longitude,
++        "Failed to bind SQLite location longitude");
++
++    sqlite_export_service_internal::StepStatement(
++        db_handle_, insert_location_stmt_,
++        "Failed to insert SQLite location row");
++
++    location_id = sqlite_export_service_internal::LastInsertRowId(db_handle_);
++    location_cache_.emplace(location_key, location_id);
++    sqlite_export_service_internal::ResetStatement(insert_location_stmt_);
++  }
++
++  sqlite_export_service_internal::BindInt64(
++      insert_brewery_stmt_,
++      sqlite_export_service_internal::kBreweryLocationIdBindIndex, location_id,
++      "Failed to bind SQLite brewery location id");
++  sqlite_export_service_internal::BindText(
++      insert_brewery_stmt_,
++      sqlite_export_service_internal::kBreweryEnglishNameBindIndex,
++      brewery.brewery.name_en,
++      "Failed to bind SQLite brewery English name");
++  sqlite_export_service_internal::BindText(
++      insert_brewery_stmt_,
++      sqlite_export_service_internal::kBreweryEnglishDescriptionBindIndex,
++      brewery.brewery.description_en,
++      "Failed to bind SQLite brewery English description");
++  sqlite_export_service_internal::BindText(
++      insert_brewery_stmt_,
++      sqlite_export_service_internal::kBreweryLocalNameBindIndex,
++      brewery.brewery.name_local,
++      "Failed to bind SQLite brewery local name");
++  sqlite_export_service_internal::BindText(
++      insert_brewery_stmt_,
++      sqlite_export_service_internal::kBreweryLocalDescriptionBindIndex,
++      brewery.brewery.description_local,
++      "Failed to bind SQLite brewery local description");
++
++  sqlite_export_service_internal::StepStatement(
++      db_handle_, insert_brewery_stmt_,
++      "Failed to insert SQLite brewery row");
++
++  sqlite_export_service_internal::ResetStatement(insert_brewery_stmt_);
++}
+diff --git a/pipeline/src/services/sqlite/rollback_and_close_no_throw.cc b/pipeline/src/services/sqlite/rollback_and_close_no_throw.cc
+new file mode 100644
+index 0000000..c90a395
+--- /dev/null
++++ b/pipeline/src/services/sqlite/rollback_and_close_no_throw.cc
+@@ -0,0 +1,21 @@
++/**
++ * @file services/sqlite/rollback_and_close_no_throw.cc
++ * @brief SqliteExportService::RollbackAndCloseNoThrow() implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++
++void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
++  if (db_handle_ == nullptr) {
++    return;
++  }
++
++  if (transaction_open_) {
++    sqlite_export_service_internal::RollbackTransactionNoThrow(db_handle_);
++    transaction_open_ = false;
++  }
++
++  FinalizeStatements();
++  db_handle_.reset();
++  location_cache_.clear();
++}
+diff --git a/pipeline/src/services/sqlite/sqlite_export_service.cc b/pipeline/src/services/sqlite/sqlite_export_service.cc
+new file mode 100644
+index 0000000..377c917
+--- /dev/null
++++ b/pipeline/src/services/sqlite/sqlite_export_service.cc
+@@ -0,0 +1,17 @@
++/**
++ * @file services/sqlite/sqlite_export_service.cc
++ * @brief SqliteExportService constructor and destructor implementation.
++ */
++
++#include "services/sqlite_export_service.h"
++
++#include <memory>
++
++SqliteExportService::SqliteExportService()
++    : date_time_provider_(std::make_unique<SystemDateTimeProvider>()) {}
++
++SqliteExportService::~SqliteExportService() {
++  if (db_handle_ != nullptr) {
++    RollbackAndCloseNoThrow();
++  }
++}
+\ No newline at end of file
