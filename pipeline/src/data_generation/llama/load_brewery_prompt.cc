@@ -25,7 +25,6 @@ std::string LlamaGenerator::LoadBrewerySystemPrompt(
     return brewery_system_prompt_;
   }
 
-
   std::ifstream prompt_file(prompt_file_path);
   if (!prompt_file.is_open()) {
     spdlog::error(
