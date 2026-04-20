@@ -13,6 +13,5 @@ class IPromptFormatter {
   virtual ~IPromptFormatter() = default;
 
   [[nodiscard]] virtual std::string Format(
-      std::string_view system_prompt,
-      std::string_view user_prompt) const = 0;
+      std::string_view system_prompt, std::string_view user_prompt) const = 0;
 };

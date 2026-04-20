@@ -3,9 +3,9 @@
  * @brief BiergartenDataGenerator::Run() implementation.
  */
 
-#include <utility>
-
 #include <spdlog/spdlog.h>
+
+#include <utility>
 
 #include "biergarten_data_generator.h"
 
@@ -20,7 +20,7 @@ bool BiergartenDataGenerator::Run() {
       try {
         std::string region_context = context_service_->GetLocationContext(city);
         spdlog::debug("[Pipeline] Context for '{}' ({}) gathered:\n{}",
-                     city.city, city.country, region_context);
+                      city.city, city.country, region_context);
 
         enriched.push_back(
             EnrichedCity{.location = std::move(city),

@@ -6,14 +6,14 @@
 
 #include "json_handling/json_loader.h"
 
+#include <spdlog/spdlog.h>
+
+#include <boost/json.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-
-#include <boost/json.hpp>
-#include <spdlog/spdlog.h>
 
 static std::string ReadRequiredString(const boost::json::object& object,
                                       const char* key) {
@@ -40,8 +40,8 @@ static std::vector<std::string> ReadRequiredStringArray(
     const boost::json::object& object, const char* key) {
   const boost::json::value* value = object.if_contains(key);
   if (value == nullptr || !value->is_array()) {
-    throw std::runtime_error(std::string("Missing or invalid string array field: ") +
-                             key);
+    throw std::runtime_error(
+        std::string("Missing or invalid string array field: ") + key);
   }
 
   const auto& array = value->as_array();
@@ -49,8 +49,8 @@ static std::vector<std::string> ReadRequiredStringArray(
   items.reserve(array.size());
   for (const auto& item : array) {
     if (!item.is_string()) {
-      throw std::runtime_error(std::string("Missing or invalid string array field: ") +
-                               key);
+      throw std::runtime_error(
+          std::string("Missing or invalid string array field: ") + key);
     }
     items.emplace_back(item.as_string());
   }
@@ -98,8 +98,7 @@ std::vector<Location> JsonLoader::LoadLocations(
         .iso3166_2 = ReadRequiredString(object, "iso3166_2"),
         .country = ReadRequiredString(object, "country"),
         .iso3166_1 = ReadRequiredString(object, "iso3166_1"),
-        .local_languages =
-            ReadRequiredStringArray(object, "local_languages"),
+        .local_languages = ReadRequiredStringArray(object, "local_languages"),
         .latitude = ReadRequiredNumber(object, "latitude"),
         .longitude = ReadRequiredNumber(object, "longitude"),
     });

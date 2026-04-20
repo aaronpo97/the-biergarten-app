@@ -22,7 +22,8 @@ static constexpr size_t kPromptTokenSlack = 8;
 
 namespace {
 
-using SamplerHandle = std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
+using SamplerHandle =
+    std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)>;
 
 struct SamplerConfig {
   float temperature;
@@ -117,24 +118,16 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
   std::vector<llama_token> prompt_tokens(formatted_prompt.size() +
                                          kPromptTokenSlack);
 
-
-
-
   int32_t token_count = llama_tokenize(
-      vocab,
-      formatted_prompt.c_str(),
-      static_cast<int32_t>(formatted_prompt.size()),
-      prompt_tokens.data(),
-      static_cast<int32_t>(prompt_tokens.size()),
-      true,
-      true);
+      vocab, formatted_prompt.c_str(),
+      static_cast<int32_t>(formatted_prompt.size()), prompt_tokens.data(),
+      static_cast<int32_t>(prompt_tokens.size()), true, true);
 
   /**
    * If buffer too small, negative return indicates required size
    */
   if (token_count < 0) {
     prompt_tokens.resize(static_cast<size_t>(-token_count));
-
 
     token_count = llama_tokenize(
         vocab, formatted_prompt.c_str(),

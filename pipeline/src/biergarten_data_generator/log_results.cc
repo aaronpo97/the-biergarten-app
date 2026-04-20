@@ -17,8 +17,7 @@ void BiergartenDataGenerator::LogResults() const {
         index, location.city, location.country, location.state_province,
         location.iso3166_2, location.latitude, location.longitude);
     spdlog::info("   brewery_name_en=\"{}\"", brewery.name_en);
-    spdlog::info("   brewery_description_en=\"{}\"",
-                 brewery.description_en);
+    spdlog::info("   brewery_description_en=\"{}\"", brewery.description_en);
     spdlog::info("   brewery_name_local=\"{}\"", brewery.name_local);
     spdlog::info("   brewery_description_local=\"{}\"",
                  brewery.description_local);
