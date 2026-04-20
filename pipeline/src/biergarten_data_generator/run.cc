@@ -11,6 +11,8 @@
 
 bool BiergartenDataGenerator::Run() {
   try {
+    exporter_->Initialize();
+
     std::vector<Location> cities = QueryCitiesWithCountries();
     std::vector<EnrichedCity> enriched;
     enriched.reserve(cities.size());
@@ -40,6 +42,7 @@ bool BiergartenDataGenerator::Run() {
     }
 
     this->GenerateBreweries(enriched);
+    exporter_->Finalize();
     this->LogResults();
     return true;
   } catch (const std::exception& e) {

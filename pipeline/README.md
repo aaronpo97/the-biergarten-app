@@ -6,7 +6,7 @@ A C++20 command-line pipeline that samples city records from local JSON, enriche
 
 ## Table of Contents
 
-- [How It Fits the Main App](#how-it-fits-the-main-app)
+- [How It Fits The Main App](#how-it-fits-the-main-app)
 - [Tech Stack](#tech-stack)
 - [Build](#build)
 - [Model](#model)
@@ -26,7 +26,7 @@ A C++20 command-line pipeline that samples city records from local JSON, enriche
 
 ---
 
-## How It Fits the Main App
+## How It Fits The Main App
 
 The pipeline is a data ingestion layer. It sits outside the web app runtime and produces seed records the app imports at startup or during a dedicated seed step.
 
@@ -46,17 +46,19 @@ The pipeline is a data ingestion layer. It sits outside the web app runtime and 
 - Boost.JSON, Boost.ProgramOptions, Boost.DI
 - spdlog
 - libcurl
+- SQLite amalgamation fetched and compiled via CMake FetchContent
 - llama.cpp
 
-The build fetches Boost.DI, spdlog, and llama.cpp via CMake. Metal is enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
+The build fetches Boost.DI, spdlog, llama.cpp, and SQLite via CMake. Metal is enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
-> **Code Style:** Modern C++20 throughout — RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, structured bindings in pipeline loops. Formatting follows the Google C++ Style Guide via `.clang-format` with a narrow column limit and two-space indentation.
+> **Code Style:** Modern C++20 throughout - RAII for ownership, `std::unique_ptr` for injected dependencies, `std::optional` for parse outcomes, `std::span` for read-only views over generated city data, structured bindings in pipeline loops. Formatting follows the Google C++ Style Guide via `.clang-format` with a narrow column limit and two-space indentation.
 
 ---
 
 ## Build
 
 Requirements: C++20 compiler, CMake 3.24+, libcurl, Boost (JSON and ProgramOptions).
+SQLite is fetched from the upstream amalgamation, so no system SQLite package is required.
 
 ```bash
 cmake -S . -B build
@@ -80,7 +82,7 @@ curl -L \
 
 ## Run
 
-Run from `build/` so the copied `locations.json` and `prompts/` are available.
+Run from `build/` so the copied `locations.json` and `prompts/` are available. Each run also writes a fresh dated SQLite file such as `biergarten_seed_2026-04-19T15-30-45.123456Z.sqlite` into the working directory.
 
 ```bash
 ./biergarten-pipeline --mocked
@@ -102,7 +104,7 @@ Run from `build/` so the copied `locations.json` and `prompts/` are available.
 
 `--mocked` and `--model` are mutually exclusive. Omitting both exits with an error before the pipeline starts. Sampling flags are ignored when `--mocked` is set.
 
-The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editing [prompts/system.md](prompts/system.md).
+The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editing `prompts/system.md`.
 
 ---
 
@@ -110,23 +112,25 @@ The post-build step copies `prompts/` into `build/prompts/`. Rebuild after editi
 
 ### Pipeline Stages
 
-| Stage    | Implementation                                                                                                 |
-| -------- | -------------------------------------------------------------------------------------------------------------- |
-| Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                            |
-| Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                      |
-| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                             |
-| Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language. |
-| Log      | `spdlog` writes results and warnings to the console.                                                           |
+| Stage    | Implementation                                                                                                                          |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                                                     |
+| Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                                               |
+| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                                                      |
+| Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language.                          |
+| Store    | `SqliteExportService` writes each successful brewery into a fresh dated `.sqlite` database with normalized location and brewery tables. |
+| Log      | `spdlog` writes results and warnings to the console.                                                                                    |
 
 If enrichment or generation fails for a city, that city is skipped and the pipeline continues.
 
 ### Key Components
 
-- `src/main.cc` — argument parsing and Boost.DI composition root.
-- `JsonLoader` — validates curated location input.
-- `WikipediaService` — queries Wikipedia extracts, caches results, returns empty context on failure.
-- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
-- `MockGenerator` — stable hash-based output so the same city input always produces the same brewery.
+- `src/main.cc` - argument parsing and Boost.DI composition root.
+- `JsonLoader` - validates curated location input.
+- `WikipediaService` - queries Wikipedia extracts, caches results, returns empty context on failure.
+- `LlamaGenerator` - formats prompts for Gemma 4, validates JSON output, retries malformed responses up to three times. If output looks truncated, the retry raises the token budget before trying again.
+- `MockGenerator` - stable hash-based output so the same city input always produces the same brewery.
+- `SqliteExportService` - creates a dated SQLite file per run and persists each successful brewery into normalized tables.
 - Brewery payloads include English and local-language name and description fields.
 
 ### Runtime Behaviour
@@ -139,11 +143,11 @@ If enrichment or generation fails for a city, that city is skipped and the pipel
 
 `MockGenerator` uses stable hashes for repeatable output in demos and Storybook runs.
 
-### Process Flow — Activity Diagram
+### Process Flow - Activity Diagram
 
 ![An activity diagram](./diagrams/activity-diagram.svg)
 
-### Architectural Overview — Class Diagram
+### Architectural Overview - Class Diagram
 
 ![A class diagram](./diagrams/class-diagram.svg)
 
@@ -151,7 +155,7 @@ If enrichment or generation fails for a city, that city is skipped and the pipel
 
 ## Generated Output
 
-Each successful run stores a `GeneratedBrewery` pair with the source location and a `BreweryResult` payload.
+Each successful run stores a `GeneratedBrewery` pair with the source location and a `BreweryResult` payload. The same generated records are also written to a fresh SQLite export file named with the current UTC timestamp.
 
 | Field               | Meaning                                    |
 | ------------------- | ------------------------------------------ |
@@ -255,7 +259,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
 
 ## Tested Hardware
 
-### ARM macOS — M1 Pro
+### ARM macOS - M1 Pro
 
 |           |                                   |
 | --------- | --------------------------------- |
@@ -266,7 +270,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
 | Model     | Gemma 4 E4B                       |
 | Inference | llama.cpp with Metal              |
 
-### x86_64 Linux — NVIDIA RTX 2000
+### x86_64 Linux - NVIDIA RTX 2000
 
 |           |                                |
 | --------- | ------------------------------ |
@@ -293,11 +297,12 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
 
 ## Code Tour
 
-- `src/main.cc` — argument parsing and DI composition root.
-- `src/biergarten_data_generator/` — orchestration, sampling, logging.
-- `src/services/wikipedia/` — enrichment service and cache.
-- `src/data_generation/llama/` — local inference, prompt loading, output validation.
-- `src/data_generation/mock/` — deterministic fallback.
+- `src/main.cc` - argument parsing and DI composition root.
+- `src/biergarten_data_generator/` - orchestration, sampling, logging, and export.
+- `src/services/wikipedia/` - enrichment service and cache.
+- `src/services/sqlite/` - SQLite export implementation.
+- `src/data_generation/llama/` - local inference, prompt loading, output validation.
+- `src/data_generation/mock/` - deterministic fallback.
 
 ---
 
@@ -312,11 +317,7 @@ For languages such as Welsh (Wales), Maori (Aotearoa/New Zealand), or Sicilian (
 
 ## Next Steps
 
-The pipeline currently produces city-aware brewery records. The next passes add SQLite output and additional fixture types so the app can exercise the full brewery domain without live data.
-
-### SQLite Output _(Highest Importance)_
-
-Write generated records to a SQLite database for downstream OLTP seeding. Normalized schema with foreign keys between locations and breweries. Output replaces the current log-only result so the pipeline functions as a proper ingestion layer.
+The pipeline currently produces city-aware brewery records and dated SQLite exports. The next passes add additional fixture types so the app can exercise the full brewery domain without live data.
 
 ### Testing _(Very High Importance)_
 
@@ -336,7 +337,7 @@ Generate user profiles with stable names, bios, locale hints, and preference sig
 
 ### Check-In System
 
-Produce timestamped check-in events between users and breweries. Use a J-curve activity profile — a small set of users accounts for most check-ins, the rest appear occasionally. Add bursty behaviour around weekends and travel periods.
+Produce timestamped check-in events between users and breweries. Use a J-curve activity profile - a small set of users accounts for most check-ins, the rest appear occasionally. Add bursty behaviour around weekends and travel periods.
 
 ### Beer Ratings
 

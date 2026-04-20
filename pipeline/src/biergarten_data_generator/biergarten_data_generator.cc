@@ -9,6 +9,8 @@
 
 BiergartenDataGenerator::BiergartenDataGenerator(
     std::unique_ptr<IEnrichmentService> context_service,
-    std::unique_ptr<DataGenerator> generator)
+    std::unique_ptr<DataGenerator> generator,
+    std::unique_ptr<IExportService> exporter)
     : context_service_(std::move(context_service)),
-      generator_(std::move(generator)) {}
+      generator_(std::move(generator)),
+      exporter_(std::move(exporter)) {}
