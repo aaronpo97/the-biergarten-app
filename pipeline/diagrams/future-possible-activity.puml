@@ -14,7 +14,7 @@ skinparam ActivityDiamondBorderColor #547461
 skinparam NoteBackgroundColor #EAF0E8
 skinparam NoteBorderColor #547461
 
-title The Biergarten Data Pipeline — Activity Diagram v7
+title The Biergarten Data Pipeline — Activity Diagram
 
 |Main|
 start

@@ -29,7 +29,7 @@ skinparam package {
   FontColor #28342A
 }
 
-title The Biergarten Data Pipeline — Architecture v6
+title The Biergarten Data Pipeline — Architecture
 
 ' ─────────────────────────────────────────────
 ' DOMAIN: VALUE OBJECTS
