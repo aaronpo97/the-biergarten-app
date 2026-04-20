@@ -12,7 +12,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
-    
+
     IF @BreweryName IS NULL
         THROW 50001, 'Brewery name cannot be null.', 1;
 
@@ -30,6 +30,7 @@ BEGIN
         THROW 50404, 'City not found.', 1;
 
     DECLARE @NewBreweryID UNIQUEIDENTIFIER = NEWID();
+    DECLARE @NewBrewerLocationID UNIQUEIDENTIFIER = NEWID();
 
     BEGIN TRANSACTION;
 
@@ -37,9 +38,13 @@ BEGIN
         (BreweryPostID, BreweryName, Description, PostedByID)
     VALUES (@NewBreweryID, @BreweryName, @Description, @PostedByID);
 
-    INSERT INTO dbo.BreweryPostLocation 
-        (@NewBreweryID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
-    VALUES (@NewBreweryID, @CityID, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates);
+    INSERT INTO dbo.BreweryPostLocation
+    (BreweryPostLocationID, BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
+    VALUES (@NewBrewerLocationID, @NewBreweryID, @CityID, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates);
 
     COMMIT TRANSACTION;
+
+    SELECT @NewBreweryID        AS BreweryPostID,
+           @NewBrewerLocationID AS BreweryPostLocationID;
+
 END

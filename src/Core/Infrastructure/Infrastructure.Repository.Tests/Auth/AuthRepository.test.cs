@@ -17,10 +17,34 @@ public class AuthRepositoryTest
         var conn = new MockDbConnection();
 
         conn.Mocks.When(cmd => cmd.CommandText == "USP_RegisterUser")
+            .ReturnsScalar(expectedUserId);
+
+        // Mock the subsequent read for the newly created user by id
+        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountById")
             .ReturnsTable(
                 MockTable
-                    .WithColumns(("UserAccountId", typeof(Guid)))
-                    .AddRow(expectedUserId)
+                    .WithColumns(
+                        ("UserAccountId", typeof(Guid)),
+                        ("Username", typeof(string)),
+                        ("FirstName", typeof(string)),
+                        ("LastName", typeof(string)),
+                        ("Email", typeof(string)),
+                        ("CreatedAt", typeof(DateTime)),
+                        ("UpdatedAt", typeof(DateTime?)),
+                        ("DateOfBirth", typeof(DateTime)),
+                        ("Timer", typeof(byte[]))
+                    )
+                    .AddRow(
+                        expectedUserId,
+                        "testuser",
+                        "Test",
+                        "User",
+                        "test@example.com",
+                        DateTime.UtcNow,
+                        null,
+                        new DateTime(1990, 1, 1),
+                        null
+                    )
             );
 
         var repo = CreateRepo(conn);
