@@ -1,0 +1,192 @@
+@startuml future_possible_activity
+skinparam defaultFontName "DM Sans"
+skinparam defaultFontSize 13
+skinparam titleFontName "Volkhov"
+skinparam titleFontSize 20
+skinparam backgroundColor #FAFCF9
+skinparam defaultFontColor #28342A
+skinparam titleFontColor #28342A
+skinparam ArrowColor #628A5B
+skinparam ActivityBackgroundColor #EAF0E8
+skinparam ActivityBorderColor #547461
+skinparam ActivityDiamondBackgroundColor #DCE8D8
+skinparam ActivityDiamondBorderColor #547461
+skinparam NoteBackgroundColor #EAF0E8
+skinparam NoteBorderColor #547461
+
+title The Biergarten Data Pipeline — Activity Diagram v7
+
+|Main|
+start
+:ParseArguments(argc, argv);
+if (Invalid args?) then (yes)
+  :spdlog::error;
+  stop
+else (no)
+endif
+:Init CurlGlobalState & LlamaBackendState;
+:Build DI injector;
+
+:JsonLoader::LoadLocations("locations.json");
+:JsonLoader::LoadBeerStyles("beer-styles.json");
+
+:EnrichmentService::PreWarmBeerStyleCache(beer_styles);
+note right
+  **NEW**: Beer styles do not need location context.
+  Wikipedia summaries for the entire palette are
+  fetched and cached globally at startup.
+end note
+
+:Initialize SqliteExportService;
+note right
+  Opens SQLite connection.
+  Begins a single transaction
+  covering all five fixture types.
+end note
+:BiergartenPipelineOrchestrator::Run();
+
+' ═══════════════════════════════════════════
+' PHASE 0 — USER GENERATION
+' ═══════════════════════════════════════════
+|Orchestrator|
+:RunUserPhase(sampled_locations);
+:Create BoundedChannels\n(user_llm_ch, user_exp_ch);
+
+fork
+  |Orchestrator|
+  :Loop: Send Locations → user_llm_ch;
+  :Close user_llm_ch;
+fork again
+  |LLM Worker|
+  while (user_llm_ch has items?) is (yes)
+    :Receive Location;
+    :GenerateUser(location)\nvia DataGenerator;
+    :Send GeneratedUser → user_exp_ch;
+  endwhile (no)
+  :Close user_exp_ch;
+fork again
+  |SQLite Worker|
+  while (user_exp_ch has items?) is (yes)
+    :Receive GeneratedUser;
+    :ProcessUser(user) → sqlite3_int64;
+    :Append → user_pool_;
+  endwhile (no)
+end fork
+
+|Orchestrator|
+:Join LLM Worker, SQLite Worker;
+
+' ═══════════════════════════════════════════
+' PHASE 1 — BREWERY & BEER GENERATION
+' Combined into a single dependent unit of work.
+' ═══════════════════════════════════════════
+:RunBreweryAndBeerPhase(sampled_locations);
+:Create BoundedChannels\n(loc_ch, llm_ch, exp_ch);
+
+fork
+  |Orchestrator|
+  :Loop: Send Locations → loc_ch;
+  :Close loc_ch;
+fork again
+  |Enrichment Workers (xN)|
+  while (loc_ch has items?) is (yes)
+    :Receive Location;
+    :GetLocationContext(location,\nBreweryContextStrategy);
+    :Send EnrichedCity → llm_ch;
+  endwhile (no)
+  |Orchestrator|
+  :Join Enrichment Workers;
+  :Close llm_ch;
+fork again
+  |LLM Worker|
+  while (llm_ch has items?) is (yes)
+    :Receive EnrichedCity;
+
+    :GenerateBrewery(location, context)\nvia DataGenerator;
+
+    :IBeerSelectionStrategy::SelectStyles(\n  brewery, beer_style_palette_);
+
+    while (For each selected BeerStyle?) is (remaining)
+      :GetStyleContextFromCache(style);
+      note right
+        Guaranteed cache hit from startup.
+      end note
+      :GenerateBeer(brewery, style_context)\nvia DataGenerator;
+      :Attach GeneratedBeer to Brewery bundle;
+    endwhile (done)
+
+    :Send BreweryWithBeers Bundle → exp_ch;
+    note right
+      The next generation of a brewery is
+      entirely dependent on the current
+      brewery and its beers completing.
+    end note
+  endwhile (no)
+  :Close exp_ch;
+fork again
+  |SQLite Worker|
+  while (exp_ch has items?) is (yes)
+    :Receive BreweryWithBeers Bundle;
+    :ProcessBrewery(brewery) → brewery_id;
+    :Append → brewery_pool_;
+
+    while (For each beer in bundle?) is (remaining)
+      :Set beer.brewery_id = brewery_id;
+      :ProcessBeer(beer) → sqlite3_int64;
+      :Append → beer_pool_;
+    endwhile (done)
+  endwhile (no)
+end fork
+
+|Orchestrator|
+:Join LLM Worker, SQLite Worker;
+note right
+  Both brewery_pool_ and beer_pool_
+  are now completely populated.
+end note
+
+' ═══════════════════════════════════════════
+' PHASE 2 — CHECKIN GENERATION
+' Sequential now that Breweries/Beers are done.
+' ═══════════════════════════════════════════
+:RunCheckinPhase();
+:ICheckinDistributionStrategy::\nAssignActivityWeights(user_pool_);
+
+while (For each GeneratedUser in user_pool_?) is (remaining)
+  :CheckinsForUser(user, brewery_pool_.size());
+  while (For each checkin index?) is (remaining)
+    :TimestampFor(user, index);
+    :Select brewery from brewery_pool_;
+    :GenerateCheckin(user, brewery, timestamp)\nvia DataGenerator;
+    :ProcessCheckin(checkin) → sqlite3_int64;
+    :Append → checkin_pool_;
+  endwhile (done)
+endwhile (done)
+
+' ═══════════════════════════════════════════
+' PHASE 3 — RATING GENERATION
+' ═══════════════════════════════════════════
+:RunRatingPhase();
+
+while (For each GeneratedCheckin in checkin_pool_?) is (remaining)
+  :Match brewery_id → select beer\nfrom beer_pool_ (same brewery_id);
+  if (Beer exists for brewery?) then (yes)
+    :GenerateRating(user, beer, checkin_id)\nvia DataGenerator;
+    :ProcessRating(rating);
+  else (no)
+    :Skip — brewery has no beers;
+  endif
+endwhile (done)
+
+' ═══════════════════════════════════════════
+' TEARDOWN
+' ═══════════════════════════════════════════
+|Main|
+:Finalize SqliteExportService;
+note right
+  COMMIT covers all five fixture types.
+end note
+:spdlog::info "Pipeline complete in X ms";
+stop
+
+@enduml

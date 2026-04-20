@@ -1,0 +1,528 @@
+@startuml future_possible_architecture
+skinparam style strictuml
+skinparam defaultFontName "DM Sans"
+skinparam defaultFontSize 14
+skinparam titleFontName "Volkhov"
+skinparam titleFontSize 20
+skinparam backgroundColor #FAFCF9
+skinparam defaultFontColor #28342A
+skinparam titleFontColor #28342A
+skinparam ArrowColor #628A5B
+
+skinparam class {
+  BackgroundColor #FAFCF9
+  HeaderBackgroundColor #EAF0E8
+  BorderColor #547461
+  ArrowColor #628A5B
+  FontColor #28342A
+}
+
+skinparam note {
+  BackgroundColor #EAF0E8
+  BorderColor #547461
+  FontColor #28342A
+}
+
+skinparam package {
+  BackgroundColor #F2F6F0
+  BorderColor #547461
+  FontColor #28342A
+}
+
+title The Biergarten Data Pipeline — Architecture v6
+
+' ─────────────────────────────────────────────
+' DOMAIN: VALUE OBJECTS
+' ─────────────────────────────────────────────
+package "Domain: Value Objects & Contracts" {
+
+  class Location {
+    + city : std::string
+    + state_province : std::string
+    + iso3166_2 : std::string
+    + country : std::string
+    + iso3166_1 : std::string
+    + local_languages : std::vector<std::string>
+    + latitude : double
+    + longitude : double
+  }
+
+  class LocationContext {
+    + text : std::string
+    + completeness : Completeness
+    + char_count : size_t
+    --
+    <<enum>> Completeness
+    Full
+    Partial
+    Absent
+  }
+
+  class EnrichedCity {
+    + location : Location
+    + context : LocationContext
+  }
+
+  class BeerStyle {
+    + name : std::string
+    + description : std::string
+    + min_abv : float
+    + max_abv : float
+    + min_ibu : int
+    + max_ibu : int
+  }
+  note right of BeerStyle
+    Loaded once at startup from
+    beer-styles.json via JsonLoader.
+    Passed as std::span<const BeerStyle>
+    to IBeerSelectionStrategy.
+    Generator receives the selected
+    style as a parameter — it never
+    reads the palette directly.
+  end note
+
+  class BreweryResult {
+    + name_en : std::string
+    + description_en : std::string
+    + name_local : std::string
+    + description_local : std::string
+  }
+
+  class BeerResult {
+    + name_en : std::string
+    + description_en : std::string
+    + name_local : std::string
+    + description_local : std::string
+    + style : std::string
+    + abv : float
+    + ibu : int
+  }
+
+  class UserResult {
+    + username : std::string
+    + bio : std::string
+    + activity_weight : float
+  }
+  note right of UserResult
+    activity_weight assigned by
+    ICheckinDistributionStrategy
+    after the full user pool is
+    committed. Drives J-curve
+    checkin volume per user.
+  end note
+
+  class CheckinResult {
+    + checked_in_at : std::string
+    + note : std::string
+  }
+
+  class RatingResult {
+    + score : float
+    + note : std::string
+  }
+
+  class GeneratedBrewery {
+    + brewery_id : sqlite3_int64
+    + location : Location
+    + brewery : BreweryResult
+    + context_completeness : LocationContext::Completeness
+    + generated_at : std::string
+  }
+
+  class GeneratedBeer {
+    + beer_id : sqlite3_int64
+    + brewery_id : sqlite3_int64
+    + location : Location
+    + beer : BeerResult
+    + generated_at : std::string
+  }
+
+  class GeneratedUser {
+    + user_id : sqlite3_int64
+    + location : Location
+    + user : UserResult
+    + generated_at : std::string
+  }
+  note right of GeneratedUser
+    user_id populated after SQLite
+    insert. Live FK carried in pool
+    for checkin and rating references.
+  end note
+
+  class GeneratedCheckin {
+    + checkin_id : sqlite3_int64
+    + user_id : sqlite3_int64
+    + brewery_id : sqlite3_int64
+    + checkin : CheckinResult
+    + generated_at : std::string
+  }
+
+  class GeneratedRating {
+    + user_id : sqlite3_int64
+    + beer_id : sqlite3_int64
+    + checkin_id : sqlite3_int64
+    + rating : RatingResult
+    + generated_at : std::string
+  }
+
+}
+
+' ─────────────────────────────────────────────
+' DOMAIN POLICY
+' ─────────────────────────────────────────────
+package "Domain Policy" {
+
+  interface IContextStrategy <<interface>> {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  class BreweryContextStrategy {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  class BeerContextStrategy {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  interface ISamplingStrategy <<interface>> {
+    + Sample(locations : const std::vector<Location>&) : std::vector<Location>
+  }
+
+  class UniformSamplingStrategy {
+    - sample_size_ : size_t
+    + Sample(locations : const std::vector<Location>&) : std::vector<Location>
+  }
+
+  interface IBeerSelectionStrategy <<interface>> {
+    + SelectStyles(brewery : const GeneratedBrewery&,\n  palette : std::span<const BeerStyle>) : std::vector<BeerStyle>
+  }
+  note right of IBeerSelectionStrategy
+    Decides how many beers a brewery
+    gets and which styles are selected.
+    Count distribution and style
+    deduplication logic live here,
+    not in the orchestrator or generator.
+  end note
+
+  class RandomBeerSelectionStrategy {
+    - rng_ : std::mt19937
+    - min_beers_ : size_t
+    - max_beers_ : size_t
+    + SelectStyles(brewery : const GeneratedBrewery&,\n  palette : std::span<const BeerStyle>) : std::vector<BeerStyle>
+  }
+  note right of RandomBeerSelectionStrategy
+    Draws a random count in [min, max].
+    Samples without replacement from
+    palette to avoid duplicate styles
+    per brewery.
+  end note
+
+  interface ICheckinDistributionStrategy <<interface>> {
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+  note right of ICheckinDistributionStrategy
+    Owns all statistical policy:
+    J-curve weight assignment,
+    bursty weekend timestamps,
+    per-user checkin volume.
+  end note
+
+  class JCurveCheckinStrategy {
+    - rng_ : std::mt19937
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+
+}
+
+' ─────────────────────────────────────────────
+' INFRASTRUCTURE: ENRICHMENT
+' ─────────────────────────────────────────────
+package "Infrastructure: Enrichment" {
+
+  interface IEnrichmentService <<interface>> {
+    + GetLocationContext(loc : const Location&,\n  strategy : const IContextStrategy&) : LocationContext
+  }
+
+  class WikipediaService {
+    - client_ : std::unique_ptr<WebClient>
+    - extract_cache_ : std::unordered_map<std::string, std::string>
+    + GetLocationContext(loc : const Location&,\n  strategy : const IContextStrategy&) : LocationContext
+    - FetchExtract(query : std::string_view) : std::string
+  }
+  note right of WikipediaService
+    extract_cache_ keyed by query string.
+    Beer pass gets near-100% cache hits
+    since locations were already fetched
+    during the brewery pass.
+  end note
+
+  interface WebClient <<interface>> {
+    + Get(url : const std::string&) : std::string
+    + UrlEncode(value : const std::string&) : std::string
+  }
+
+  class CURLWebClient {
+    + Get(url : const std::string&) : std::string
+    + UrlEncode(value : const std::string&) : std::string
+  }
+
+}
+
+' ─────────────────────────────────────────────
+' INFRASTRUCTURE: GENERATION
+' ─────────────────────────────────────────────
+package "Infrastructure: Generation" {
+
+  interface DataGenerator <<interface>> {
+    + GenerateBrewery(location : const Location&,\n  context : const LocationContext&) : BreweryResult
+    + GenerateBeer(brewery_id : sqlite3_int64,\n  location : const Location&,\n  context : const LocationContext&,\n  style : const BeerStyle&) : BeerResult
+    + GenerateUser(location : const Location&) : UserResult
+    + GenerateCheckin(user : const GeneratedUser&,\n  brewery : const GeneratedBrewery&,\n  timestamp : const std::string&) : CheckinResult
+    + GenerateRating(user : const GeneratedUser&,\n  beer : const GeneratedBeer&,\n  checkin_id : sqlite3_int64) : RatingResult
+  }
+  note right of DataGenerator
+    GenerateBeer receives BeerStyle
+    as a parameter. Style selection
+    and count decisions live in
+    IBeerSelectionStrategy, not here.
+  end note
+
+  class MockGenerator {
+    + GenerateBrewery(...) : BreweryResult
+    + GenerateBeer(...) : BeerResult
+    + GenerateUser(...) : UserResult
+    + GenerateCheckin(...) : CheckinResult
+    + GenerateRating(...) : RatingResult
+    - DeterministicHash(location : const Location&) : size_t
+  }
+
+  class LlamaGenerator {
+    - model_ : ModelHandle
+    - context_ : ContextHandle
+    - prompt_formatter_ : std::unique_ptr<IPromptFormatter>
+    - config_ : LlamaConfig
+    - rng_ : std::mt19937
+    + GenerateBrewery(...) : BreweryResult
+    + GenerateBeer(...) : BeerResult
+    + GenerateUser(...) : UserResult
+    + GenerateCheckin(...) : CheckinResult
+    + GenerateRating(...) : RatingResult
+    - Load(config : const LlamaConfig&) : void
+    - Infer(system_prompt, user_prompt,\n  max_tokens, grammar) : std::string
+    - ValidateModelArchitecture() : void
+  }
+
+  interface IPromptFormatter <<interface>> {
+    + Format(system_prompt : std::string_view,\n  user_prompt : std::string_view) : std::string
+    + ExpectedArchitecture() : std::string_view
+  }
+
+  class Gemma4JinjaPromptFormatter {
+    + Format(...) : std::string
+    + ExpectedArchitecture() : std::string_view
+  }
+
+  class LlamaConfig {
+    + model_path : std::string
+    + temperature : float
+    + top_p : float
+    + top_k : uint32_t
+    + n_ctx : uint32_t
+    + seed : int
+  }
+
+}
+
+' ─────────────────────────────────────────────
+' INFRASTRUCTURE: PIPELINE CHANNEL
+' ─────────────────────────────────────────────
+package "Infrastructure: Pipeline Channel" {
+
+  class "BoundedChannel<T>" as BoundedChannel {
+    - queue_ : std::queue<T>
+    - mutex_ : std::mutex
+    - not_full_ : std::condition_variable
+    - not_empty_ : std::condition_variable
+    - capacity_ : size_t
+    - closed_ : bool
+    + Send(item : T) : void
+    + Receive() : std::optional<T>
+    + Close() : void
+  }
+  note right of BoundedChannel
+    Used for user, brewery, and
+    checkin/rating phases.
+    Beer phase uses a simple
+    sequential loop — enrichment
+    is all cache hits, no fan-out
+    needed.
+  end note
+
+}
+
+' ─────────────────────────────────────────────
+' INFRASTRUCTURE: EXPORT
+' ─────────────────────────────────────────────
+package "Infrastructure: Export" {
+
+  interface IExportService <<interface>> {
+    + Initialize() : void
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : sqlite3_int64
+    + ProcessBeer(beer : const GeneratedBeer&) : sqlite3_int64
+    + ProcessUser(user : const GeneratedUser&) : sqlite3_int64
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : sqlite3_int64
+    + ProcessRating(rating : const GeneratedRating&) : void
+    + Finalize() : void
+  }
+
+  class SqliteExportService {
+    - date_time_provider_ : std::unique_ptr<IDateTimeProvider>
+    - db_handle_ : SqliteDatabaseHandle
+    - insert_location_stmt_ : SqliteStatementHandle
+    - insert_brewery_stmt_ : SqliteStatementHandle
+    - insert_beer_stmt_ : SqliteStatementHandle
+    - insert_user_stmt_ : SqliteStatementHandle
+    - insert_checkin_stmt_ : SqliteStatementHandle
+    - insert_rating_stmt_ : SqliteStatementHandle
+    - transaction_open_ : bool
+    - location_cache_ : std::unordered_map<std::string, sqlite3_int64>
+    - brewery_cache_ : std::unordered_map<std::string, sqlite3_int64>
+    + Initialize() : void
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : sqlite3_int64
+    + ProcessBeer(beer : const GeneratedBeer&) : sqlite3_int64
+    + ProcessUser(user : const GeneratedUser&) : sqlite3_int64
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : sqlite3_int64
+    + ProcessRating(rating : const GeneratedRating&) : void
+    + Finalize() : void
+    - InitializeSchema() : void
+    - PrepareStatements() : void
+    - RollbackAndCloseNoThrow() : void
+    - FinalizeStatements() : void
+  }
+  note right of SqliteExportService
+    brewery_cache_ restored.
+    Keyed by location string for
+    location deduplication, and
+    by brewery identity for beer
+    FK resolution without re-querying.
+  end note
+
+  interface IDateTimeProvider <<interface>> {
+    + GetUtcTimestamp() : std::string
+  }
+
+  class SystemDateTimeProvider {
+    + GetUtcTimestamp() : std::string
+  }
+
+}
+
+' ─────────────────────────────────────────────
+' ORCHESTRATION
+' ─────────────────────────────────────────────
+package "Orchestration" {
+
+  class BiergartenPipelineOrchestrator {
+    - enrichment_service_ : std::unique_ptr<IEnrichmentService>
+    - generator_ : std::unique_ptr<DataGenerator>
+    - exporter_ : std::unique_ptr<IExportService>
+    - brewery_context_strategy_ : std::unique_ptr<IContextStrategy>
+    - beer_context_strategy_ : std::unique_ptr<IContextStrategy>
+    - sampling_strategy_ : std::unique_ptr<ISamplingStrategy>
+    - beer_selection_strategy_ : std::unique_ptr<IBeerSelectionStrategy>
+    - checkin_strategy_ : std::unique_ptr<ICheckinDistributionStrategy>
+    - beer_style_palette_ : std::vector<BeerStyle>
+    --
+    - user_pool_ : std::vector<GeneratedUser>
+    - brewery_pool_ : std::vector<GeneratedBrewery>
+    - beer_pool_ : std::vector<GeneratedBeer>
+    - checkin_pool_ : std::vector<GeneratedCheckin>
+    --
+    + Run() : bool
+    - RunUserPhase(locations : const std::vector<Location>&) : void
+    - RunBreweryPhase(locations : const std::vector<Location>&) : void
+    - RunBeerPhase() : void
+    - RunCheckinPhase() : void
+    - RunRatingPhase() : void
+  }
+  note right of BiergartenPipelineOrchestrator
+    beer_style_palette_ loaded once
+    at startup from beer-styles.json.
+    Passed as std::span<const BeerStyle>
+    to IBeerSelectionStrategy per brewery.
+    RunBeerPhase() is a sequential loop —
+    no channels, no fan-out. Enrichment
+    is cache hits; LLM is the only cost.
+  end note
+
+  class JsonLoader {
+    + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+    + {static} LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
+  }
+  note right of JsonLoader
+    LoadBeerStyles() added.
+    Reads beer-styles.json once
+    at startup into the palette
+    held by the orchestrator.
+  end note
+
+}
+
+' ─────────────────────────────────────────────
+' RELATIONSHIPS
+' ─────────────────────────────────────────────
+
+' Orchestration
+BiergartenPipelineOrchestrator *-- IEnrichmentService : owns
+BiergartenPipelineOrchestrator *-- DataGenerator : owns
+BiergartenPipelineOrchestrator *-- IExportService : owns
+BiergartenPipelineOrchestrator *-- ICheckinDistributionStrategy : owns
+BiergartenPipelineOrchestrator *-- ISamplingStrategy : owns
+BiergartenPipelineOrchestrator *-- IBeerSelectionStrategy : owns
+BiergartenPipelineOrchestrator ..> JsonLoader : uses
+
+' Policy implementations
+IContextStrategy <|.. BreweryContextStrategy : implements
+IContextStrategy <|.. BeerContextStrategy : implements
+ISamplingStrategy <|.. UniformSamplingStrategy : implements
+IBeerSelectionStrategy <|.. RandomBeerSelectionStrategy : implements
+ICheckinDistributionStrategy <|.. JCurveCheckinStrategy : implements
+
+' Enrichment
+IEnrichmentService <|.. WikipediaService : implements
+WikipediaService *-- WebClient : owns
+WikipediaService ..> IContextStrategy : uses (parameter)
+WebClient <|.. CURLWebClient : implements
+
+' Generation
+DataGenerator <|.. MockGenerator : implements
+DataGenerator <|.. LlamaGenerator : implements
+LlamaGenerator *-- IPromptFormatter : owns
+LlamaGenerator ..> LlamaConfig : constructed with
+IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
+
+' Export
+IExportService <|.. SqliteExportService : implements
+SqliteExportService *-- IDateTimeProvider : owns
+IDateTimeProvider <|.. SystemDateTimeProvider : implements
+
+' Domain containment
+EnrichedCity *-- Location : contains
+EnrichedCity *-- LocationContext : contains
+GeneratedBrewery *-- Location : contains
+GeneratedBrewery *-- BreweryResult : contains
+GeneratedBeer *-- Location : contains
+GeneratedBeer *-- BeerResult : contains
+GeneratedUser *-- Location : contains
+GeneratedUser *-- UserResult : contains
+GeneratedCheckin *-- CheckinResult : contains
+GeneratedRating *-- RatingResult : contains
+
+@enduml
