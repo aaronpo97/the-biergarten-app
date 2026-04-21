@@ -8,7 +8,7 @@ skinparam backgroundColor #FAFCF9
 skinparam defaultFontColor #28342A
 skinparam titleFontColor #28342A
 skinparam ArrowColor #628A5B
-
+skinparam linetype ortho
 skinparam class {
   BackgroundColor #FAFCF9
   HeaderBackgroundColor #EAF0E8
@@ -29,13 +29,12 @@ skinparam package {
   FontColor #28342A
 }
 
-title The Biergarten Data Pipeline — Architecture
+title The Biergarten Data Pipeline — Planned Architecture
 
-' ─────────────────────────────────────────────
-' DOMAIN: VALUE OBJECTS
-' ─────────────────────────────────────────────
-package "Domain: Value Objects & Contracts" {
+left to right direction
 
+
+package "Domain Models" {
   class Location {
     + city : std::string
     + state_province : std::string
@@ -133,6 +132,7 @@ package "Domain: Value Objects & Contracts" {
     + beer_id : sqlite3_int64
     + brewery_id : sqlite3_int64
     + location : Location
+    + style : BeerStyle
     + beer : BeerResult
     + generated_at : std::string
   }
@@ -165,11 +165,42 @@ package "Domain: Value Objects & Contracts" {
     + generated_at : std::string
   }
 
+  class SamplingOptions {
+    + temperature : float = 1.0F
+    + top_p : float = 0.95F
+    + top_k : uint32_t = 64
+    + n_ctx : uint32_t = 8192
+    + seed : int = -1
+  }
+  note right of SamplingOptions
+    Ignored when GeneratorOptions::
+    use_mocked = true.
+  end note
+
+  class GeneratorOptions {
+    + model_path : std::string
+    + use_mocked : bool = false
+    + sampling : SamplingOptions
+  }
+
+  class PipelineOptions {
+  }
+  note right of PipelineOptions
+    Reserved for future config:
+    n_locations, concurrency,
+    output_path, etc.
+  end note
+
+  class ApplicationOptions {
+    + generator : GeneratorOptions
+    + pipeline : PipelineOptions
+  }
+
+  ApplicationOptions *-- GeneratorOptions
+  ApplicationOptions *-- PipelineOptions
+  GeneratorOptions *-- SamplingOptions
 }
 
-' ─────────────────────────────────────────────
-' DOMAIN POLICY
-' ─────────────────────────────────────────────
 package "Domain Policy" {
 
   interface IContextStrategy <<interface>> {
@@ -241,9 +272,41 @@ package "Domain Policy" {
 
 }
 
-' ─────────────────────────────────────────────
-' INFRASTRUCTURE: ENRICHMENT
-' ─────────────────────────────────────────────
+
+
+package "Orchestration" {
+
+  class BiergartenPipelineOrchestrator {
+    - enrichment_service_ : std::unique_ptr<IEnrichmentService>
+    - generator_ : std::unique_ptr<DataGenerator>
+    - exporter_ : std::unique_ptr<IExportService>
+    - brewery_context_strategy_ : std::unique_ptr<IContextStrategy>
+    - sampling_strategy_ : std::unique_ptr<ISamplingStrategy>
+    - beer_selection_strategy_ : std::unique_ptr<IBeerSelectionStrategy>
+    - checkin_strategy_ : std::unique_ptr<ICheckinDistributionStrategy>
+    - beer_style_palette_ : std::vector<BeerStyle>
+    - options_ : ApplicationOptions
+    --
+    - user_pool_ : std::vector<GeneratedUser>
+    - brewery_pool_ : std::vector<GeneratedBrewery>
+    - beer_pool_ : std::vector<GeneratedBeer>
+    - checkin_pool_ : std::vector<GeneratedCheckin>
+    --
+    + Run() : bool
+    - RunUserPhase(locations : const std::vector<Location>&) : void
+    - RunBreweryAndBeerPhase(locations : const std::vector<Location>&) : void
+    - RunCheckinPhase() : void
+    - RunRatingPhase() : void
+  }
+
+  class JsonLoader {
+    + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+    + {static} LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
+    + {static} LoadPersonas(filepath : const std::filesystem::path&) : std::vector<Persona>
+    + {static} LoadNamesByCountry(filepath : const std::filesystem::path&) : NamesByCountry
+  }
+}
+
 package "Infrastructure: Enrichment" {
 
   interface IEnrichmentService <<interface>> {
@@ -275,9 +338,6 @@ package "Infrastructure: Enrichment" {
 
 }
 
-' ─────────────────────────────────────────────
-' INFRASTRUCTURE: GENERATION
-' ─────────────────────────────────────────────
 package "Infrastructure: Generation" {
 
   interface DataGenerator <<interface>> {
@@ -307,17 +367,23 @@ package "Infrastructure: Generation" {
     - model_ : ModelHandle
     - context_ : ContextHandle
     - prompt_formatter_ : std::unique_ptr<IPromptFormatter>
-    - config_ : LlamaConfig
     - rng_ : std::mt19937
     + GenerateBrewery(...) : BreweryResult
     + GenerateBeer(...) : BeerResult
     + GenerateUser(...) : UserResult
     + GenerateCheckin(...) : CheckinResult
     + GenerateRating(...) : RatingResult
-    - Load(config : const LlamaConfig&) : void
+    - Load(opts : const GeneratorOptions&) : void
     - Infer(system_prompt, user_prompt,\n  max_tokens, grammar) : std::string
     - ValidateModelArchitecture() : void
   }
+  note right of LlamaGenerator
+    Constructed from GeneratorOptions.
+    SamplingOptions fields are applied
+    during Load(). LlamaConfig removed —
+    GeneratorOptions is the sole
+    configuration surface.
+  end note
 
   interface IPromptFormatter <<interface>> {
     + Format(system_prompt : std::string_view,\n  user_prompt : std::string_view) : std::string
@@ -329,20 +395,8 @@ package "Infrastructure: Generation" {
     + ExpectedArchitecture() : std::string_view
   }
 
-  class LlamaConfig {
-    + model_path : std::string
-    + temperature : float
-    + top_p : float
-    + top_k : uint32_t
-    + n_ctx : uint32_t
-    + seed : int
-  }
-
 }
 
-' ─────────────────────────────────────────────
-' INFRASTRUCTURE: PIPELINE CHANNEL
-' ─────────────────────────────────────────────
 package "Infrastructure: Pipeline Channel" {
 
   class "BoundedChannel<T>" as BoundedChannel {
@@ -357,19 +411,15 @@ package "Infrastructure: Pipeline Channel" {
     + Close() : void
   }
   note right of BoundedChannel
-    Used for user, brewery, and
-    checkin/rating phases.
-    Beer phase uses a simple
-    sequential loop — enrichment
-    is all cache hits, no fan-out
-    needed.
+    Back-pressure via capacity_ bound.
+    Stalls fast producers (enrichment ×N)
+    when the LLM worker cannot keep up.
+    Close() is the termination signal —
+    workers drain remaining items then exit.
   end note
 
 }
 
-' ─────────────────────────────────────────────
-' INFRASTRUCTURE: EXPORT
-' ─────────────────────────────────────────────
 package "Infrastructure: Export" {
 
   interface IExportService <<interface>> {
@@ -407,11 +457,11 @@ package "Infrastructure: Export" {
     - FinalizeStatements() : void
   }
   note right of SqliteExportService
-    brewery_cache_ restored.
-    Keyed by location string for
-    location deduplication, and
-    by brewery identity for beer
-    FK resolution without re-querying.
+    Single writer — no lock contention.
+    location_cache_ deduplicates city rows.
+    brewery_cache_ resolves beer FK without
+    re-querying. Single long-running
+    transaction committed in Finalize().
   end note
 
   interface IDateTimeProvider <<interface>> {
@@ -424,105 +474,54 @@ package "Infrastructure: Export" {
 
 }
 
-' ─────────────────────────────────────────────
-' ORCHESTRATION
-' ─────────────────────────────────────────────
-package "Orchestration" {
 
-  class BiergartenPipelineOrchestrator {
-    - enrichment_service_ : std::unique_ptr<IEnrichmentService>
-    - generator_ : std::unique_ptr<DataGenerator>
-    - exporter_ : std::unique_ptr<IExportService>
-    - brewery_context_strategy_ : std::unique_ptr<IContextStrategy>
-    - beer_context_strategy_ : std::unique_ptr<IContextStrategy>
-    - sampling_strategy_ : std::unique_ptr<ISamplingStrategy>
-    - beer_selection_strategy_ : std::unique_ptr<IBeerSelectionStrategy>
-    - checkin_strategy_ : std::unique_ptr<ICheckinDistributionStrategy>
-    - beer_style_palette_ : std::vector<BeerStyle>
-    --
-    - user_pool_ : std::vector<GeneratedUser>
-    - brewery_pool_ : std::vector<GeneratedBrewery>
-    - beer_pool_ : std::vector<GeneratedBeer>
-    - checkin_pool_ : std::vector<GeneratedCheckin>
-    --
-    + Run() : bool
-    - RunUserPhase(locations : const std::vector<Location>&) : void
-    - RunBreweryPhase(locations : const std::vector<Location>&) : void
-    - RunBeerPhase() : void
-    - RunCheckinPhase() : void
-    - RunRatingPhase() : void
-  }
-  note right of BiergartenPipelineOrchestrator
-    beer_style_palette_ loaded once
-    at startup from beer-styles.json.
-    Passed as std::span<const BeerStyle>
-    to IBeerSelectionStrategy per brewery.
-    RunBeerPhase() is a sequential loop —
-    no channels, no fan-out. Enrichment
-    is cache hits; LLM is the only cost.
-  end note
-
-  class JsonLoader {
-    + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
-    + {static} LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
-  }
-  note right of JsonLoader
-    LoadBeerStyles() added.
-    Reads beer-styles.json once
-    at startup into the palette
-    held by the orchestrator.
-  end note
-
-}
-
-' ─────────────────────────────────────────────
-' RELATIONSHIPS
-' ─────────────────────────────────────────────
 
 ' Orchestration
-BiergartenPipelineOrchestrator *-- IEnrichmentService : owns
-BiergartenPipelineOrchestrator *-- DataGenerator : owns
-BiergartenPipelineOrchestrator *-- IExportService : owns
-BiergartenPipelineOrchestrator *-- ICheckinDistributionStrategy : owns
-BiergartenPipelineOrchestrator *-- ISamplingStrategy : owns
-BiergartenPipelineOrchestrator *-- IBeerSelectionStrategy : owns
-BiergartenPipelineOrchestrator ..> JsonLoader : uses
+BiergartenPipelineOrchestrator *-- IEnrichmentService
+BiergartenPipelineOrchestrator *-- DataGenerator
+BiergartenPipelineOrchestrator *-- IExportService
+BiergartenPipelineOrchestrator *-- ICheckinDistributionStrategy
+BiergartenPipelineOrchestrator *-- ISamplingStrategy
+BiergartenPipelineOrchestrator *-- IBeerSelectionStrategy
+BiergartenPipelineOrchestrator *-- ApplicationOptions
+BiergartenPipelineOrchestrator ..> JsonLoader
 
 ' Policy implementations
-IContextStrategy <|.. BreweryContextStrategy : implements
-IContextStrategy <|.. BeerContextStrategy : implements
-ISamplingStrategy <|.. UniformSamplingStrategy : implements
-IBeerSelectionStrategy <|.. RandomBeerSelectionStrategy : implements
-ICheckinDistributionStrategy <|.. JCurveCheckinStrategy : implements
+IContextStrategy <|.. BreweryContextStrategy
+IContextStrategy <|.. BeerContextStrategy
+ISamplingStrategy <|.. UniformSamplingStrategy
+IBeerSelectionStrategy <|.. RandomBeerSelectionStrategy
+ICheckinDistributionStrategy <|.. JCurveCheckinStrategy
 
 ' Enrichment
-IEnrichmentService <|.. WikipediaService : implements
-WikipediaService *-- WebClient : owns
-WikipediaService ..> IContextStrategy : uses (parameter)
-WebClient <|.. CURLWebClient : implements
+IEnrichmentService <|.. WikipediaService
+WikipediaService *-- WebClient
+WikipediaService ..> IContextStrategy
+WebClient <|.. CURLWebClient
 
 ' Generation
-DataGenerator <|.. MockGenerator : implements
-DataGenerator <|.. LlamaGenerator : implements
-LlamaGenerator *-- IPromptFormatter : owns
-LlamaGenerator ..> LlamaConfig : constructed with
-IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
+DataGenerator <|.. MockGenerator
+DataGenerator <|.. LlamaGenerator
+LlamaGenerator *-- IPromptFormatter
+LlamaGenerator ..> GeneratorOptions
+IPromptFormatter <|.. Gemma4JinjaPromptFormatter
 
 ' Export
-IExportService <|.. SqliteExportService : implements
-SqliteExportService *-- IDateTimeProvider : owns
-IDateTimeProvider <|.. SystemDateTimeProvider : implements
+IExportService <|.. SqliteExportService
+SqliteExportService *-- IDateTimeProvider
+IDateTimeProvider <|.. SystemDateTimeProvider
 
 ' Domain containment
-EnrichedCity *-- Location : contains
-EnrichedCity *-- LocationContext : contains
-GeneratedBrewery *-- Location : contains
-GeneratedBrewery *-- BreweryResult : contains
-GeneratedBeer *-- Location : contains
-GeneratedBeer *-- BeerResult : contains
-GeneratedUser *-- Location : contains
-GeneratedUser *-- UserResult : contains
-GeneratedCheckin *-- CheckinResult : contains
-GeneratedRating *-- RatingResult : contains
+EnrichedCity *-- Location
+EnrichedCity *-- LocationContext
+GeneratedBrewery *-- Location
+GeneratedBrewery *-- BreweryResult
+GeneratedBeer *-- Location
+GeneratedBeer *-- BeerStyle
+GeneratedBeer *-- BeerResult
+GeneratedUser *-- Location
+GeneratedUser *-- UserResult
+GeneratedCheckin *-- CheckinResult
+GeneratedRating *-- RatingResult
 
 @enduml

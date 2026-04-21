@@ -29,12 +29,21 @@ endif
 
 :JsonLoader::LoadLocations("locations.json");
 :JsonLoader::LoadBeerStyles("beer-styles.json");
+:JsonLoader::LoadPersonas("personas.json");
+:JsonLoader::LoadNamesByCountry("names-by-country.json");
 
 :EnrichmentService::PreWarmBeerStyleCache(beer_styles);
 note right
-  **NEW**: Beer styles do not need location context.
+  Beer styles do not need location context.
   Wikipedia summaries for the entire palette are
   fetched and cached globally at startup.
+end note
+
+:EnrichmentService::PreWarmPersonaCache(personas);
+note right
+  Persona descriptions do not need location context.
+  All persona Wikipedia/description lookups are
+  resolved and cached globally at startup.
 end note
 
 :Initialize SqliteExportService;
@@ -50,23 +59,44 @@ end note
 ' ═══════════════════════════════════════════
 |Orchestrator|
 :RunUserPhase(sampled_locations);
-:Create BoundedChannels\n(user_llm_ch, user_exp_ch);
+:Create BoundedChannels\n(loc_ch, llm_ch, exp_ch);
 
 fork
   |Orchestrator|
-  :Loop: Send Locations → user_llm_ch;
-  :Close user_llm_ch;
+  :Loop: Send Locations → loc_ch;
+  :Close loc_ch;
 fork again
   |LLM Worker|
-  while (user_llm_ch has items?) is (yes)
+  while (loc_ch has items?) is (yes)
     :Receive Location;
-    :GenerateUser(location)\nvia DataGenerator;
-    :Send GeneratedUser → user_exp_ch;
+
+    :IPersonaSelectionStrategy::SelectPersona(\n  personas_palette_);
+    note right
+      Guaranteed cache hit from startup.
+      Returns a Persona struct with style_affinities,
+      abv_range, ibu_preference, checkin_weight.
+    end note
+
+    :NamesByCountry::SampleName(\n  location.iso3166_1);
+    note right
+      Deterministic lookup — no LLM involved.
+      Name is selected from a pre-keyed table
+      and passed into the generation prompt.
+    end note
+
+    :GenerateUser(location, persona, sampled_name)\nvia DataGenerator;
+    note right
+      LLM receives: Location fields + persona description
+      + sampled name. Generates bio and preference
+      signals grounded in both.
+    end note
+
+    :Send GeneratedUser → llm_ch;
   endwhile (no)
-  :Close user_exp_ch;
+  :Close llm_ch;
 fork again
   |SQLite Worker|
-  while (user_exp_ch has items?) is (yes)
+  while (llm_ch has items?) is (yes)
     :Receive GeneratedUser;
     :ProcessUser(user) → sqlite3_int64;
     :Append → user_pool_;
@@ -151,6 +181,13 @@ end note
 ' ═══════════════════════════════════════════
 :RunCheckinPhase();
 :ICheckinDistributionStrategy::\nAssignActivityWeights(user_pool_);
+note right
+  Weights are seeded from each user's
+  persona.checkin_weight — high-activity
+  personas (craft enthusiasts) check in more,
+  casual personas less. J-curve profile
+  emerges from the persona distribution.
+end note
 
 while (For each GeneratedUser in user_pool_?) is (remaining)
   :CheckinsForUser(user, brewery_pool_.size());
@@ -167,9 +204,16 @@ endwhile (done)
 ' PHASE 3 — RATING GENERATION
 ' ═══════════════════════════════════════════
 :RunRatingPhase();
+note right
+  Beer selection during rating is biased by
+  user.persona.style_affinities and abv_range —
+  users are more likely to rate beers matching
+  their persona profile. Rating skew (positive
+  with long tail) is also modulated per persona.
+end note
 
 while (For each GeneratedCheckin in checkin_pool_?) is (remaining)
-  :Match brewery_id → select beer\nfrom beer_pool_ (same brewery_id);
+  :Match brewery_id → select beer from beer_pool_\n(same brewery_id, biased by persona affinities);
   if (Beer exists for brewery?) then (yes)
     :GenerateRating(user, beer, checkin_id)\nvia DataGenerator;
     :ProcessRating(rating);
