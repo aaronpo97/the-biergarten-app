@@ -61,6 +61,28 @@ endif()
 find_package(Boost REQUIRED COMPONENTS json program_options)
 
 FetchContent_Declare(
+    sqlite_amalgamation
+    URL https://www.sqlite.org/2026/sqlite-amalgamation-3530000.zip
+    URL_HASH SHA3_256=c2325c53b3b41761469f91cfb078e96882ac5d85bac10c11b0bd8f253b031e5b
+)
+FetchContent_GetProperties(sqlite_amalgamation)
+if(NOT sqlite_amalgamation_POPULATED)
+    FetchContent_Populate(sqlite_amalgamation)
+endif()
+
+if(NOT TARGET sqlite3)
+    add_library(sqlite3 STATIC
+        ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c
+    )
+    target_include_directories(sqlite3 PUBLIC
+        ${sqlite_amalgamation_SOURCE_DIR}
+    )
+    target_compile_definitions(sqlite3 PUBLIC
+        SQLITE_THREADSAFE=1
+    )
+endif()
+
+FetchContent_Declare(
     llama-cpp
     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
     GIT_TAG        b8742
@@ -97,6 +119,16 @@ set(SOURCES
     src/services/wikipedia/wikipedia_service.cc
     src/services/wikipedia/get_summary.cc
     src/services/wikipedia/fetch_extract.cc
+    src/services/sqlite/sqlite_export_service.cc
+    src/services/sqlite/build_database_path.cc
+    src/services/sqlite/build_location_key.cc
+    src/services/sqlite/initialize_schema.cc
+    src/services/sqlite/prepare_statements.cc
+    src/services/sqlite/initialize.cc
+    src/services/sqlite/process_record.cc
+    src/services/sqlite/finalize_statements.cc
+    src/services/sqlite/rollback_and_close_no_throw.cc
+    src/services/sqlite/finalize.cc
     src/web_client/curl_global_state.cc
     src/web_client/curl_web_client_get.cc
     src/web_client/curl_web_client_url_encode.cc
@@ -129,6 +161,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::json
     Boost::program_options
     spdlog::spdlog
+    sqlite3
     CURL::libcurl
 )
 

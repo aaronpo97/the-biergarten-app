@@ -28,6 +28,7 @@ title The Biergarten Data Pipeline - Class Diagram
 class BiergartenDataGenerator {
   - context_service_ : std::unique_ptr<IEnrichmentService>
   - generator_ : std::unique_ptr<DataGenerator>
+  - exporter_ : std::unique_ptr<IExportService>
   - generated_breweries_ : std::vector<GeneratedBrewery>
   + Run() : bool
   - QueryCitiesWithCountries() : std::vector<Location>
@@ -92,9 +93,39 @@ class JsonLoader {
   + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
 }
 
+interface IExportService <<interface>> {
+  + Initialize() : void
+  + ProcessRecord(brewery : const GeneratedBrewery&) : void
+  + Finalize() : void
+}
+
+class SqliteExportService {
+  - date_time_provider_ : std::unique_ptr<IDateTimeProvider>
+  - run_timestamp_utc_ : std::string
+  - database_path_ : std::filesystem::path
+  - db_handle_ : sqlite3*
+  - insert_location_stmt_ : sqlite3_stmt*
+  - insert_brewery_stmt_ : sqlite3_stmt*
+  - transaction_open_ : bool
+  - location_cache_ : std::unordered_map<std::string, sqlite3_int64>
+  + Initialize() : void
+  + ProcessRecord(brewery : const GeneratedBrewery&) : void
+  + Finalize() : void
+  - InitializeSchema() : void
+}
+
+interface IDateTimeProvider <<interface>> {
+  + GetUtcTimestamp() : std::string
+}
+
+class SystemDateTimeProvider {
+  + GetUtcTimestamp() : std::string
+}
+
 ' Structural Relationships / Dependency Injection
 BiergartenDataGenerator *-- IEnrichmentService : owns
 BiergartenDataGenerator *-- DataGenerator : owns
+BiergartenDataGenerator *-- IExportService : owns
 
 IEnrichmentService <|.. WikipediaService : implements
 WikipediaService *-- WebClient : owns
@@ -109,4 +140,9 @@ LlamaGenerator *-- IPromptFormatter : uses
 IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
 
 BiergartenDataGenerator ..> JsonLoader : uses
+
+IExportService <|.. SqliteExportService : implements
+SqliteExportService *-- IDateTimeProvider : owns
+IDateTimeProvider <|.. SystemDateTimeProvider : implements
+
 @enduml
