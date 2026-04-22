@@ -1,51 +1,14 @@
-@startuml future_possible_architecture
+@startuml
 
 ' ==========================================
 ' CONFIGURATION & STYLING
 ' ==========================================
-left to right direction
-skinparam linetype ortho
+!include ../biergarten-weizen-theme.puml
+skinparam classAttributeFontSize 9
+skinparam defaultFontSize 25
+skinparam titleFontSize 30
 
-' --- Typography ---
-skinparam defaultFontName "DM Sans"
-skinparam defaultFontSize 14
-skinparam titleFontName "Volkhov"
-skinparam titleFontSize 20
-
-' --- Global Colors ---
-skinparam backgroundColor #FCFCF7
-skinparam defaultFontColor #14180C
-skinparam titleFontColor #14180C
-skinparam ArrowColor #656F33
-
-skinparam class {
-  BackgroundColor #EBECE3
-  HeaderBackgroundColor #CBD2B5
-  BorderColor #4A5837
-  ArrowColor #656F33
-  FontColor #14180C
-}
-
-skinparam package {
-  BackgroundColor #DBEEDD
-  BorderColor #4A5837
-  FontColor #14180C
-}
-
-skinparam note {
-  BackgroundColor #DBEEDD
-  BorderColor #4A5837
-  FontColor #14180C
-}
-
-skinparam monochrome reverse
-
-title The Biergarten Data Pipeline — Planned Architecture
-
-' ==========================================
-' DOMAIN MODELS
-' ==========================================
-package "Domain Models" {
+package "Domain: Models" {
 
   class Location {
     + city : std::string
@@ -62,8 +25,9 @@ package "Domain Models" {
     + text : std::string
     + completeness : Completeness
     + char_count : size_t
-    --
-    <<enum>> Completeness
+  }
+
+  enum Completeness {
     Full
     Partial
     Absent
@@ -116,46 +80,69 @@ package "Domain Models" {
     + note : std::string
   }
 
+  class GenerationMetadata {
+    + generation_id : uint64_t
+    + generated_time : std::string
+    + context_provided : bool
+    + generated_with : std::string
+  }
+
   class GeneratedBrewery {
-    + brewery_id : sqlite3_int64
+    + brewery_id : uint64_t
     + location : Location
     + brewery : BreweryResult
     + context_completeness : LocationContext::Completeness
-    + generated_at : std::string
+    + metadata : GenerationMetadata
   }
 
   class GeneratedBeer {
-    + beer_id : sqlite3_int64
-    + brewery_id : sqlite3_int64
+    + beer_id : uint64_t
+    + brewery_id : uint64_t
     + location : Location
     + style : BeerStyle
     + beer : BeerResult
-    + generated_at : std::string
+    + metadata : GenerationMetadata
   }
 
   class GeneratedUser {
-    + user_id : sqlite3_int64
+    + user_id : uint64_t
     + location : Location
     + user : UserResult
-    + generated_at : std::string
+    + metadata : GenerationMetadata
   }
 
   class GeneratedCheckin {
-    + checkin_id : sqlite3_int64
-    + user_id : sqlite3_int64
-    + brewery_id : sqlite3_int64
+    + checkin_id : uint64_t
+    + user_id : uint64_t
+    + brewery_id : uint64_t
     + checkin : CheckinResult
-    + generated_at : std::string
+    + metadata : GenerationMetadata
   }
 
   class GeneratedRating {
-    + user_id : sqlite3_int64
-    + beer_id : sqlite3_int64
-    + checkin_id : sqlite3_int64
+    + user_id : uint64_t
+    + beer_id : uint64_t
+    + checkin_id : uint64_t
     + rating : RatingResult
-    + generated_at : std::string
+    + metadata : GenerationMetadata
   }
 
+  class GeneratedFollow {
+    + follower_id : uint64_t
+    + followed_id : uint64_t
+    + metadata : GenerationMetadata
+  }
+
+  class UserPersona {
+    + name: std::string
+    + description: std::string
+    + style_affinities: std::vector<std::string>
+  }
+
+  LocationContext *-- Completeness
+}
+
+package "Domain: Application Configuration"{
   class SamplingOptions {
     + temperature : float = 1.0F
     + top_p : float = 0.95F
@@ -184,70 +171,9 @@ package "Domain Models" {
   ApplicationOptions *-- GeneratorOptions
   ApplicationOptions *-- PipelineOptions
   GeneratorOptions   *-- SamplingOptions
-  LocationContext    *-- Completeness
 }
 
-
-' ==========================================
-' LOGGING
-' ==========================================
-package "Logging" {
-
-  enum LogLevel {
-    Debug
-    Info
-    Warn
-    Error
-  }
-
-  enum PipelinePhase {
-    Startup
-    UserGeneration
-    BreweryAndBeerGeneration
-    CheckinGeneration
-    RatingGeneration
-    Teardown
-  }
-
-  class LogEntry {
-    + timestamp : std::chrono::system_clock::time_point
-    + level : LogLevel
-    + phase : PipelinePhase
-    + message : std::string
-    + city : std::optional<std::string>
-    + entity_id : std::optional<std::string>
-    + worker : std::optional<std::string>
-  }
-
-  interface Logger <<interface>> {
-    + Log(level, phase, message,\n  city, entity_id, worker) : void
-  }
-
-  class PipelineLogger {
-    - log_ch_ : BoundedChannel<LogEntry>&
-    + Log(level, phase, message,\n  city, entity_id, worker) : void
-  }
-
-  class LogWorker {
-    - log_ch_ : BoundedChannel<LogEntry>&
-    + Run() : void
-    - FormatTimestamp(tp) : std::string
-    - ToSpdlogLevel(level) : spdlog::level::level_enum
-    - ToString(phase) : std::string
-  }
-
-  ' --- Logging Relationships ---
-  LogEntry       *--  LogLevel
-  LogEntry       *--  PipelinePhase
-  PipelineLogger ..>  LogEntry       : emits
-  LogWorker      ..>  LogEntry       : consumes
-}
-
-
-' ==========================================
-' DOMAIN POLICY
-' ==========================================
-package "Domain Policy" {
+package "Domain: Policy" {
 
   interface ContextStrategy <<interface>> {
     + QueriesFor(loc : const Location&) : std::vector<std::string>
@@ -297,13 +223,103 @@ package "Domain Policy" {
     + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
   }
 
+  class RandomCheckinStrategy {
+    - rng_ : std::mt19937
+    - min_checkins_ : size_t
+    - max_checkins_ : size_t
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+
+  interface FollowGenerationStrategy <<interface>> {
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
+
+  class RandomFollowStrategy {
+    - rng_ : std::mt19937
+    - min_follows_ : size_t
+    - max_follows_ : size_t
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
+
+  class ActivityWeightedFollowStrategy {
+    - rng_ : std::mt19937
+    - min_follows_ : size_t
+    - max_follows_ : size_t
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
 }
 
+package "Infrastructure: Logging" {
+  enum LogLevel {
+    Debug
+    Info
+    Warn
+    Error
+  }
 
-' ==========================================
-' ORCHESTRATION
-' ==========================================
-package "Orchestration" {
+  enum PipelinePhase {
+    Startup
+    UserGeneration
+    BreweryAndBeerGeneration
+    CheckinGeneration
+    RatingGeneration
+    FollowGeneration
+    Teardown
+  }
+
+  class LogEntry {
+    + timestamp : std::chrono::system_clock::time_point
+    + level : LogLevel
+    + phase : PipelinePhase
+    + message : std::string
+    + city : std::optional<std::string>
+    + entity_id : std::optional<std::string>
+    + worker : std::optional<std::string>
+  }
+
+  interface Logger <<interface>> {
+    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  }
+
+  class PipelineLogger {
+    - log_ch_ : BoundedChannel<LogEntry>&
+    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  }
+
+  class LogWorker {
+    - log_ch_ : BoundedChannel<LogEntry>&
+    + Run() : void
+    - FormatTimestamp(tp) : std::string
+    - ToSpdlogLevel(level) : spdlog::level::level_enum
+    - ToString(phase) : std::string
+  }
+
+  ' --- Logging Relationships ---
+  LogEntry       *--  LogLevel
+  LogEntry       *--  PipelinePhase
+  PipelineLogger ..>  LogEntry       : emits
+  LogWorker      ..>  LogEntry       : consumes
+}
+
+package "Infrastructure: Pipeline Channel" {
+
+  class "BoundedChannel<T>" as BoundedChannel {
+    - queue_ : std::queue<T>
+    - mutex_ : std::mutex
+    - not_full_ : std::condition_variable
+    - not_empty_ : std::condition_variable
+    - capacity_ : size_t
+    - closed_ : bool
+    + Send(item : T) : void
+    + Receive() : std::optional<T>
+    + Close() : void
+  }
+
+}
+
+package "Infrastructure: Data Preloading" {
 
   interface DataPreloader <<interface>> {
     + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
@@ -311,38 +327,6 @@ package "Orchestration" {
     + LoadPersonas(filepath : const std::filesystem::path&) : std::vector<Persona>
     + LoadNamesByCountry(filepath : const std::filesystem::path&) : NamesByCountry
   }
-
-  class BiergartenPipelineOrchestrator {
-    - preloader_ : std::unique_ptr<DataPreloader>
-    - enrichment_service_ : std::unique_ptr<EnrichmentService>
-    - generator_ : std::unique_ptr<DataGenerator>
-    - logger_ : std::unique_ptr<Logger>
-    - exporter_ : std::unique_ptr<ExportService>
-    - brewery_context_strategy_ : std::unique_ptr<ContextStrategy>
-    - sampling_strategy_ : std::unique_ptr<SamplingStrategy>
-    - beer_selection_strategy_ : std::unique_ptr<BeerSelectionStrategy>
-    - checkin_strategy_ : std::unique_ptr<CheckinDistributionStrategy>
-    - beer_style_palette_ : std::vector<BeerStyle>
-    - options_ : ApplicationOptions
-    --
-    - user_pool_ : std::vector<GeneratedUser>
-    - brewery_pool_ : std::vector<GeneratedBrewery>
-    - beer_pool_ : std::vector<GeneratedBeer>
-    - checkin_pool_ : std::vector<GeneratedCheckin>
-    --
-    + Run() : bool
-    - RunUserPhase(locations : const std::vector<Location>&) : void
-    - RunBreweryAndBeerPhase(locations : const std::vector<Location>&) : void
-    - RunCheckinPhase() : void
-    - RunRatingPhase() : void
-  }
-}
-
-
-' ==========================================
-' INFRASTRUCTURE: PRELOADING
-' ==========================================
-package "Infrastructure: Preloading" {
 
   class JsonLoader {
     + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
@@ -353,10 +337,6 @@ package "Infrastructure: Preloading" {
 
 }
 
-
-' ==========================================
-' INFRASTRUCTURE: ENRICHMENT
-' ==========================================
 package "Infrastructure: Enrichment" {
 
   interface EnrichmentService <<interface>> {
@@ -382,18 +362,14 @@ package "Infrastructure: Enrichment" {
 
 }
 
-
-' ==========================================
-' INFRASTRUCTURE: GENERATION
-' ==========================================
-package "Infrastructure: Generation" {
+package "Infrastructure: Data Generation" {
 
   interface DataGenerator <<interface>> {
     + GenerateBrewery(location : const Location&,\n  context : const LocationContext&) : BreweryResult
-    + GenerateBeer(brewery_id : sqlite3_int64,\n  location : const Location&,\n  context : const LocationContext&,\n  style : const BeerStyle&) : BeerResult
+    + GenerateBeer(brewery_id : uint64_t,\n  location : const Location&,\n  context : const LocationContext&,\n  style : const BeerStyle&) : BeerResult
     + GenerateUser(location : const Location&) : UserResult
     + GenerateCheckin(user : const GeneratedUser&,\n  brewery : const GeneratedBrewery&,\n  timestamp : const std::string&) : CheckinResult
-    + GenerateRating(user : const GeneratedUser&,\n  beer : const GeneratedBeer&,\n  checkin_id : sqlite3_int64) : RatingResult
+    + GenerateRating(user : const GeneratedUser&,\n  beer : const GeneratedBeer&,\n  checkin_id : uint64_t) : RatingResult
   }
 
   class MockGenerator {
@@ -432,39 +408,16 @@ package "Infrastructure: Generation" {
 
 }
 
-
-' ==========================================
-' INFRASTRUCTURE: PIPELINE CHANNEL
-' ==========================================
-package "Infrastructure: Pipeline Channel" {
-
-  class "BoundedChannel<T>" as BoundedChannel {
-    - queue_ : std::queue<T>
-    - mutex_ : std::mutex
-    - not_full_ : std::condition_variable
-    - not_empty_ : std::condition_variable
-    - capacity_ : size_t
-    - closed_ : bool
-    + Send(item : T) : void
-    + Receive() : std::optional<T>
-    + Close() : void
-  }
-
-}
-
-
-' ==========================================
-' INFRASTRUCTURE: EXPORT
-' ==========================================
-package "Infrastructure: Export" {
+package "Infrastructure: Data Export" {
 
   interface ExportService <<interface>> {
     + Initialize() : void
-    + ProcessBrewery(brewery : const GeneratedBrewery&) : sqlite3_int64
-    + ProcessBeer(beer : const GeneratedBeer&) : sqlite3_int64
-    + ProcessUser(user : const GeneratedUser&) : sqlite3_int64
-    + ProcessCheckin(checkin : const GeneratedCheckin&) : sqlite3_int64
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : uint64_t
+    + ProcessBeer(beer : const GeneratedBeer&) : uint64_t
+    + ProcessUser(user : const GeneratedUser&) : uint64_t
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : uint64_t
     + ProcessRating(rating : const GeneratedRating&) : void
+    + ProcessFollow(follow : const GeneratedFollow&) : void
     + Finalize() : void
   }
 
@@ -477,15 +430,17 @@ package "Infrastructure: Export" {
     - insert_user_stmt_ : SqliteStatementHandle
     - insert_checkin_stmt_ : SqliteStatementHandle
     - insert_rating_stmt_ : SqliteStatementHandle
+    - insert_follow_stmt_ : SqliteStatementHandle
     - transaction_open_ : bool
-    - location_cache_ : std::unordered_map<std::string, sqlite3_int64>
-    - brewery_cache_ : std::unordered_map<std::string, sqlite3_int64>
+    - location_cache_ : std::unordered_map<std::string, uint64_t>
+    - brewery_cache_ : std::unordered_map<std::string, uint64_t>
     + Initialize() : void
-    + ProcessBrewery(brewery : const GeneratedBrewery&) : sqlite3_int64
-    + ProcessBeer(beer : const GeneratedBeer&) : sqlite3_int64
-    + ProcessUser(user : const GeneratedUser&) : sqlite3_int64
-    + ProcessCheckin(checkin : const GeneratedCheckin&) : sqlite3_int64
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : uint64_t
+    + ProcessBeer(beer : const GeneratedBeer&) : uint64_t
+    + ProcessUser(user : const GeneratedUser&) : uint64_t
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : uint64_t
     + ProcessRating(rating : const GeneratedRating&) : void
+    + ProcessFollow(follow : const GeneratedFollow&) : void
     + Finalize() : void
     - InitializeSchema() : void
     - PrepareStatements() : void
@@ -504,9 +459,34 @@ package "Infrastructure: Export" {
 }
 
 
-' ==========================================
-' GLOBAL RELATIONSHIPS
-' ==========================================
+
+class BiergartenPipelineOrchestrator {
+  - preloader_ : std::unique_ptr<DataPreloader>
+  - enrichment_service_ : std::unique_ptr<EnrichmentService>
+  - generator_ : std::unique_ptr<DataGenerator>
+  - logger_ : std::unique_ptr<Logger>
+  - exporter_ : std::unique_ptr<ExportService>
+  - brewery_context_strategy_ : std::unique_ptr<ContextStrategy>
+  - sampling_strategy_ : std::unique_ptr<SamplingStrategy>
+  - beer_selection_strategy_ : std::unique_ptr<BeerSelectionStrategy>
+  - checkin_strategy_ : std::unique_ptr<CheckinDistributionStrategy>
+  - follow_strategy_ : std::unique_ptr<FollowGenerationStrategy>
+  - beer_style_palette_ : std::vector<BeerStyle>
+  - options_ : ApplicationOptions
+  --
+  - user_pool_ : std::vector<GeneratedUser>
+  - brewery_pool_ : std::vector<GeneratedBrewery>
+  - beer_pool_ : std::vector<GeneratedBeer>
+  - checkin_pool_ : std::vector<GeneratedCheckin>
+  - follow_pool_ : std::vector<GeneratedFollow>
+  --
+  + Run() : bool
+  - RunUserPhase(locations : const std::vector<Location>&) : void
+  - RunBreweryAndBeerPhase(locations : const std::vector<Location>&) : void
+  - RunCheckinPhase() : void
+  - RunRatingPhase() : void
+  - RunFollowPhase() : void
+}
 
 ' --- Orchestration Aggregations (Services & Strategies) ---
 BiergartenPipelineOrchestrator *--  DataPreloader
@@ -514,6 +494,7 @@ BiergartenPipelineOrchestrator *--  EnrichmentService
 BiergartenPipelineOrchestrator *--  DataGenerator
 BiergartenPipelineOrchestrator *--  ExportService
 BiergartenPipelineOrchestrator *--  CheckinDistributionStrategy
+BiergartenPipelineOrchestrator *--  FollowGenerationStrategy
 BiergartenPipelineOrchestrator *--  SamplingStrategy
 BiergartenPipelineOrchestrator *--  BeerSelectionStrategy
 BiergartenPipelineOrchestrator *--  ApplicationOptions
@@ -524,6 +505,7 @@ BiergartenPipelineOrchestrator *-- "0..*" GeneratedUser    : user_pool_
 BiergartenPipelineOrchestrator *-- "0..*" GeneratedBrewery : brewery_pool_
 BiergartenPipelineOrchestrator *-- "0..*" GeneratedBeer    : beer_pool_
 BiergartenPipelineOrchestrator *-- "0..*" GeneratedCheckin : checkin_pool_
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedFollow  : follow_pool_
 
 ' --- Interfaces & Implementations ---
 DataPreloader                  <|.. JsonLoader
@@ -533,6 +515,9 @@ ContextStrategy                <|.. BeerContextStrategy
 SamplingStrategy               <|.. UniformSamplingStrategy
 BeerSelectionStrategy          <|.. RandomBeerSelectionStrategy
 CheckinDistributionStrategy    <|.. JCurveCheckinStrategy
+CheckinDistributionStrategy    <|.. RandomCheckinStrategy
+FollowGenerationStrategy       <|.. RandomFollowStrategy
+FollowGenerationStrategy       <|.. ActivityWeightedFollowStrategy
 EnrichmentService              <|.. WikipediaService
 WebClient                      <|.. CURLWebClient
 DataGenerator                  <|.. MockGenerator
@@ -557,12 +542,18 @@ EnrichedCity                   *--  Location
 EnrichedCity                   *--  LocationContext
 GeneratedBrewery               *--  Location
 GeneratedBrewery               *--  BreweryResult
+GeneratedBrewery               *--  GenerationMetadata
 GeneratedBeer                  *--  Location
 GeneratedBeer                  *--  BeerStyle
 GeneratedBeer                  *--  BeerResult
+GeneratedBeer                  *--  GenerationMetadata
 GeneratedUser                  *--  Location
 GeneratedUser                  *--  UserResult
+GeneratedUser                  *--  GenerationMetadata
 GeneratedCheckin               *--  CheckinResult
+GeneratedCheckin               *--  GenerationMetadata
 GeneratedRating                *--  RatingResult
+GeneratedRating                *--  GenerationMetadata
+GeneratedFollow                *--  GenerationMetadata
 
 @enduml
