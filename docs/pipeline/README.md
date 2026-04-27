@@ -6,8 +6,8 @@ descriptions via a local GGUF model or a deterministic mock.
 
 > **This pipeline produces AI-generated data.** It is not a source of truth for
 > brewing techniques, cultural representation, or local-language accuracy. See
-> [ETHICS-AND-KNOWN-ISSUES.md](./ETHICS-AND-KNOWN-ISSUES.md)
-> for a full documentation of limitations, hallucination patterns, and bias.
+> [ETHICS-AND-KNOWN-ISSUES.md](./ETHICS-AND-KNOWN-ISSUES.md) for a full
+> documentation of limitations, hallucination patterns, and bias.
 
 ---
 

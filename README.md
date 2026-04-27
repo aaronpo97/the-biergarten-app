@@ -1,49 +1,56 @@
 # The Biergarten App
 
-The Biergarten App is a multi-project monorepo with a .NET backend and an active
-React Router frontend in `src/Website`. The current website focuses on account
-flows, theme switching, shared UI components, Storybook coverage, and
-integration with the API.
+The Biergarten App is a full-stack directory and discovery platform for
+breweries. It features a robust user authentication system, a searchable
+database of brewery locations, and a custom offline data-generation pipeline
+that uses LLMs (Llama.cpp) and Wikipedia to synthesize realistic seed data.
 
-## Documentation
+It features:
 
-- [Getting Started](docs/getting-started.md) - Local setup for backend and
-  active website
-- [Architecture](docs/architecture.md) - Current backend and frontend
-  architecture
-- [Docker Guide](docs/docker.md) - Container-based backend development and
-  testing
-- [Testing](docs/testing.md) - Backend and frontend test commands
-- [Environment Variables](docs/environment-variables.md) - Active configuration
-  reference
-- [Token Validation](docs/token-validation.md) - JWT validation architecture
-- [Legacy Website Archive](docs/archive/legacy-website-v1.md) - Archived notes
-  for the old Next.js frontend
+- A .NET backend (Web API + database migrations/seed) under `web/backend/`
+- A server-rendered React website (React Router + Vite) under `web/frontend/`
+- A C++20 “pipeline” CLI for generating seed data under `tooling/pipeline/`
+
+Specialized documentation (setup, architecture, docker, testing, diagrams, and
+pipeline notes) lives under `docs/`.
+
+## Documentation (Start Here)
+
+Website + backend (active stack):
+
+- [Getting Started](docs/website/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [Docker Guide](docs/website/docker.md)
+- [Testing](docs/website/testing.md)
+- [Environment Variables](docs/website/environment-variables.md)
+- [Token Validation](docs/website/token-validation.md)
+
+Data generation pipeline (C++):
+
+- [Pipeline README](docs/pipeline/README.md)
+- [Ethics & Known Issues](docs/pipeline/ETHICS-AND-KNOWN-ISSUES.md)
 
 ## Diagrams
 
-- [Architecture](docs/diagrams-out/architecture.svg) - Layered architecture
-- [Deployment](docs/diagrams-out/deployment.svg) - Docker topology
-- [Authentication Flow](docs/diagrams-out/authentication-flow.svg) - Auth
-  sequence
-- [Database Schema](docs/diagrams-out/database-schema.svg) - Entity
-  relationships
+- [Architecture](docs/website/diagrams-out/architecture.svg)
+- [Deployment](docs/website/diagrams-out/deployment.svg)
+- [Authentication Flow](docs/website/diagrams-out/authentication-flow.svg)
+- [Database Schema](docs/website/diagrams-out/database-schema.svg)
 
 ## Current Status
 
 Active areas in the repository:
 
-- .NET 10 backend with layered architecture and SQL Server
-- React Router 7 website in `src/Website`
-- Shared Biergarten theme system with a theme guide route
-- Storybook stories and browser-based checks for shared UI
-- Auth demo flows for home, login, register, dashboard, logout, and confirmation
-- Toast-based feedback for auth outcomes
+- .NET 10 backend (layered architecture) + SQL Server
+- React 19 website (React Router 7 + Vite)
+- Shared Biergarten theme system + Storybook coverage
+- Auth flows and account/email integration (local Mailpit in dev compose)
+- Data generation pipeline with C++ and Llama.cpp
 
-Legacy area retained for reference:
+Archived/reference areas:
 
-- `src/Website-v1` contains the archived Next.js frontend and is no longer the
-  active website
+- `archive/next-js-web-app/` contains an older Next.js frontend retained for
+  reference
 
 ## Tech Stack
 
@@ -54,35 +61,41 @@ Legacy area retained for reference:
 - **Infrastructure**: Docker, Docker Compose
 - **Security**: Argon2id password hashing, JWT access/refresh/confirmation
   tokens
+- **Data Pipeline**: C++20, CMake, Boost, libcurl, SQLite, llama.cpp
 
 ## Quick Start
 
-### Backend
+For full setup details, use [Getting Started](docs/website/getting-started.md).
+This section is the shortest path to a working dev environment.
+
+### Backend (Docker)
 
 ```bash
 git clone https://github.com/aaronpo97/the-biergarten-app
 cd the-biergarten-app
-cp .env.example .env.dev
-docker compose -f docker-compose.dev.yaml up -d
+
+cp web/.env.example web/.env.dev
+docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up --build -d
 ```
 
 Backend access:
 
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
+- Mailpit UI (dev SMTP): http://localhost:8025
 
-### Frontend
+### Frontend (Node)
 
 ```bash
-cd src/Website
+cd web/frontend
 npm install
-API_BASE_URL=http://localhost:8080 SESSION_SECRET=dev-secret npm run dev
+API_BASE_URL=http://localhost:8080 SESSION_SECRET=dev-secret-change-me npm run dev
 ```
 
 Optional frontend tools:
 
 ```bash
-cd src/Website
+cd web/frontend
 npm run storybook
 npm run test:storybook
 npm run test:storybook:playwright
@@ -91,63 +104,45 @@ npm run test:storybook:playwright
 ## Repository Structure
 
 ```text
-src/Core/          Backend projects (.NET)
-src/Website/       Active React Router frontend
-src/Website-v1/    Archived legacy Next.js frontend
-docs/              Active project documentation
-docs/archive/      Archived legacy documentation
+web/
+  backend/          .NET API + domain/service/infrastructure + DB projects
+  frontend/         React Router website + Storybook + Playwright/Vitest
+
+tooling/
+  pipeline/         C++20 seed-data generation CLI (CMake)
+
+docs/
+  architecture.md   High-level architecture overview
+  website/          Backend/frontend setup, docker, testing, diagrams
+  pipeline/         Pipeline docs, ethics notes, PlantUML diagrams
+
+archive/
+  next-js-web-app/  Older Next.js frontend (reference only)
+
+misc/
+  raw-data/         Source CSV/JSON fixtures used during development
 ```
-
-## Key Features
-
-Implemented today:
-
-- User registration and login against the API
-- JWT-based auth with access, refresh, and confirmation flows
-- SQL Server migrations and seed projects
-- Shared form components and auth screens
-- Theme switching with Lager, Stout, Cassis, and Weizen variants
-- Storybook documentation and automated story interaction tests
-- Toast feedback for auth-related outcomes
-
-Planned next:
-
-- Brewery discovery and management
-- Beer reviews and ratings
-- Social follow relationships
-- Geospatial brewery experiences
-- Additional frontend routes beyond the auth demo
 
 ## Testing
 
-Backend suites:
-
-- `API.Specs` - integration tests
-- `Infrastructure.Repository.Tests` - repository unit tests
-- `Service.Auth.Tests` - service unit tests
-
-Frontend suites:
-
-- Storybook interaction tests via Vitest
-- Storybook browser regression checks via Playwright
-
-Run all backend tests with Docker:
+Run the backend test stack with Docker:
 
 ```bash
-docker compose -f docker-compose.test.yaml up --abort-on-container-exit
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
-See [Testing](docs/testing.md) for the full command list.
+See [Testing](docs/website/testing.md) for the full command list.
 
 ## Configuration
 
 Common active variables:
 
-- Backend: `DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`,
-  `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`
-- Frontend: `API_BASE_URL`, `SESSION_SECRET`, `NODE_ENV`
+- Backend/Docker: `DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`,
+  `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`,
+  `WEBSITE_BASE_URL`
+- Frontend runtime: `API_BASE_URL`, `SESSION_SECRET`, `NODE_ENV`
 
-See [Environment Variables](docs/environment-variables.md) for details.
+See [Environment Variables](docs/website/environment-variables.md) for details.
 
 ## Contributing
 
@@ -156,18 +151,3 @@ See [Environment Variables](docs/environment-variables.md) for details.
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-### Development Workflow
-
-1. Start development environment:
-   `docker compose -f docker-compose.dev.yaml up -d`
-2. Make changes to code
-3. Run tests:
-   `docker compose -f docker-compose.test.yaml up --abort-on-container-exit`
-4. Rebuild if needed:
-   `docker compose -f docker-compose.dev.yaml up -d --build api.core`
-
-## Support
-
-- **Documentation**: [docs/](docs/)
-- **Architecture**: See [Architecture Guide](docs/architecture.md)
