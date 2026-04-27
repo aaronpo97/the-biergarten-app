@@ -1,34 +1,38 @@
 services:
   sqlserver:
-    env_file: ".env.dev"
+    env_file: ".env.test"
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
-    container_name: dev-env-sqlserver
+    container_name: test-env-sqlserver
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "${DB_PASSWORD}"
       MSSQL_PID: "Express"
-    ports:
-      - "1433:1433"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
     volumes:
-      - sqlserverdata-dev:/var/opt/mssql
+      - sqlserverdata-test:/var/opt/mssql
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 30s
     networks:
-      - devnet
+      - testnet
+
   database.migrations:
-    env_file: ".env.dev"
+    env_file: ".env.test"
     image: database.migrations
-    container_name: dev-env-database-migrations
+    container_name: test-env-database-migrations
     depends_on:
       sqlserver:
         condition: service_healthy
     build:
-      context: ./src/Core/Database
+      context: ./backend/Database
       dockerfile: Database.Migrations/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
@@ -42,17 +46,17 @@ services:
       CLEAR_DATABASE: "true"
     restart: "no"
     networks:
-      - devnet
+      - testnet
 
   database.seed:
-    env_file: ".env.dev"
+    env_file: ".env.test"
     image: database.seed
-    container_name: dev-env-database-seed
+    container_name: test-env-database-seed
     depends_on:
       database.migrations:
         condition: service_completed_successfully
     build:
-      context: ./src/Core
+      context: ./backend
       dockerfile: Database/Database.Seed/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
@@ -65,27 +69,21 @@ services:
       DB_PASSWORD: "${DB_PASSWORD}"
     restart: "no"
     networks:
-      - devnet
+      - testnet
 
-  api.core:
-    env_file: ".env.dev"
-    image: api.core
-    container_name: dev-env-api-core
+  api.specs:
+    env_file: ".env.test"
+    image: api.specs
+    container_name: test-env-api-specs
     depends_on:
       database.seed:
         condition: service_completed_successfully
     build:
-      context: ./src/Core
-      dockerfile: API/API.Core/Dockerfile
+      context: ./backend
+      dockerfile: API/API.Specs/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
-        APP_UID: 1000
-    ports:
-      - "8080:8080"
-      - "8081:8081"
     environment:
-      ASPNETCORE_ENVIRONMENT: "Development"
-      ASPNETCORE_URLS: "http://0.0.0.0:8080"
       DOTNET_RUNNING_IN_CONTAINER: "true"
       DB_SERVER: "${DB_SERVER}"
       DB_NAME: "${DB_NAME}"
@@ -95,31 +93,56 @@ services:
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
       WEBSITE_BASE_URL: "${WEBSITE_BASE_URL}"
-    restart: unless-stopped
-    networks:
-      - devnet
     volumes:
-      - nuget-cache-dev:/root/.nuget/packages
-
-  mailpit:
-    image: axllent/mailpit:latest
-    container_name: dev-env-mailpit
-    ports:
-      - "8025:8025" # Web UI
-      - "1025:1025" # SMTP server
-
-    restart: unless-stopped
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      - ./test-results:/app/test-results
+    restart: "no"
     networks:
-      - devnet
+      - testnet
+
+  repository.tests:
+    env_file: ".env.test"
+    image: repository.tests
+    container_name: test-env-repository-tests
+    depends_on:
+      database.seed:
+        condition: service_completed_successfully
+    build:
+      context: ./backend
+      dockerfile: Infrastructure/Infrastructure.Repository.Tests/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+    volumes:
+      - ./test-results:/app/test-results
+    restart: "no"
+    networks:
+      - testnet
+
+  service.auth.tests:
+    env_file: ".env.test"
+    image: service.auth.tests
+    container_name: test-env-service-auth-tests
+    depends_on:
+      database.seed:
+        condition: service_completed_successfully
+    build:
+      context: ./backend
+      dockerfile: Service/Service.Auth.Tests/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+    volumes:
+      - ./test-results:/app/test-results
+    restart: "no"
+    networks:
+      - testnet
+
 volumes:
-  sqlserverdata-dev:
-    driver: local
-  nuget-cache-dev:
+  sqlserverdata-test:
     driver: local
 
 networks:
-  devnet:
+  testnet:
     driver: bridge

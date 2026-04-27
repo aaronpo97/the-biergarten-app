@@ -1,6 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/csharpier.json",
-
   "printWidth": 80,
   "useTabs": false,
   "indentSize": 4,
