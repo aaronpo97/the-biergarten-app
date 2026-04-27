@@ -1,0 +1,559 @@
+@startuml
+
+' ==========================================
+' CONFIGURATION & STYLING
+' ==========================================
+!include ../biergarten-weizen-theme.puml
+skinparam classAttributeFontSize 9
+skinparam defaultFontSize 25
+skinparam titleFontSize 30
+
+package "Domain: Models" {
+
+  class Location {
+    + city : std::string
+    + state_province : std::string
+    + iso3166_2 : std::string
+    + country : std::string
+    + iso3166_1 : std::string
+    + local_languages : std::vector<std::string>
+    + latitude : double
+    + longitude : double
+  }
+
+  class LocationContext {
+    + text : std::string
+    + completeness : Completeness
+    + char_count : size_t
+  }
+
+  enum Completeness {
+    Full
+    Partial
+    Absent
+  }
+
+  class EnrichedCity {
+    + location : Location
+    + context : LocationContext
+  }
+
+  class BeerStyle {
+    + name : std::string
+    + description : std::string
+    + min_abv : float
+    + max_abv : float
+    + min_ibu : int
+    + max_ibu : int
+  }
+
+  class BreweryResult {
+    + name_en : std::string
+    + description_en : std::string
+    + name_local : std::string
+    + description_local : std::string
+  }
+
+  class BeerResult {
+    + name_en : std::string
+    + description_en : std::string
+    + name_local : std::string
+    + description_local : std::string
+    + style : std::string
+    + abv : float
+    + ibu : int
+  }
+
+  class UserResult {
+    + username : std::string
+    + bio : std::string
+    + activity_weight : float
+  }
+
+  class CheckinResult {
+    + checked_in_at : std::string
+    + note : std::string
+  }
+
+  class RatingResult {
+    + score : float
+    + note : std::string
+  }
+
+  class GenerationMetadata {
+    + generation_id : uint64_t
+    + generated_time : std::string
+    + context_provided : bool
+    + generated_with : std::string
+  }
+
+  class GeneratedBrewery {
+    + brewery_id : uint64_t
+    + location : Location
+    + brewery : BreweryResult
+    + context_completeness : LocationContext::Completeness
+    + metadata : GenerationMetadata
+  }
+
+  class GeneratedBeer {
+    + beer_id : uint64_t
+    + brewery_id : uint64_t
+    + location : Location
+    + style : BeerStyle
+    + beer : BeerResult
+    + metadata : GenerationMetadata
+  }
+
+  class GeneratedUser {
+    + user_id : uint64_t
+    + location : Location
+    + user : UserResult
+    + metadata : GenerationMetadata
+  }
+
+  class GeneratedCheckin {
+    + checkin_id : uint64_t
+    + user_id : uint64_t
+    + brewery_id : uint64_t
+    + checkin : CheckinResult
+    + metadata : GenerationMetadata
+  }
+
+  class GeneratedRating {
+    + user_id : uint64_t
+    + beer_id : uint64_t
+    + checkin_id : uint64_t
+    + rating : RatingResult
+    + metadata : GenerationMetadata
+  }
+
+  class GeneratedFollow {
+    + follower_id : uint64_t
+    + followed_id : uint64_t
+    + metadata : GenerationMetadata
+  }
+
+  class UserPersona {
+    + name: std::string
+    + description: std::string
+    + style_affinities: std::vector<std::string>
+  }
+
+  LocationContext *-- Completeness
+}
+
+package "Domain: Application Configuration"{
+  class SamplingOptions {
+    + temperature : float = 1.0F
+    + top_p : float = 0.95F
+    + top_k : uint32_t = 64
+    + n_ctx : uint32_t = 8192
+    + seed : int = -1
+  }
+
+  class GeneratorOptions {
+    + model_path : std::filesystem::path
+    + use_mocked : bool = false
+    + sampling : SamplingOptions
+  }
+
+  class PipelineOptions {
+    + output_path : std::filesystem::path
+    + log_path : std::filesystem::path
+  }
+
+  class ApplicationOptions {
+    + generator : GeneratorOptions
+    + pipeline : PipelineOptions
+  }
+
+  ' --- Domain Model Relationships ---
+  ApplicationOptions *-- GeneratorOptions
+  ApplicationOptions *-- PipelineOptions
+  GeneratorOptions   *-- SamplingOptions
+}
+
+package "Domain: Policy" {
+
+  interface ContextStrategy <<interface>> {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  class BreweryContextStrategy {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  class BeerContextStrategy {
+    + QueriesFor(loc : const Location&) : std::vector<std::string>
+    + MaxContextChars() : size_t
+  }
+
+  interface SamplingStrategy <<interface>> {
+    + Sample(locations : const std::vector<Location>&) : std::vector<Location>
+  }
+
+  class UniformSamplingStrategy {
+    - sample_size_ : size_t
+    + Sample(locations : const std::vector<Location>&) : std::vector<Location>
+  }
+
+  interface BeerSelectionStrategy <<interface>> {
+    + SelectStyles(brewery : const GeneratedBrewery&,\n  palette : std::span<const BeerStyle>) : std::vector<BeerStyle>
+  }
+
+  class RandomBeerSelectionStrategy {
+    - rng_ : std::mt19937
+    - min_beers_ : size_t
+    - max_beers_ : size_t
+    + SelectStyles(brewery : const GeneratedBrewery&,\n  palette : std::span<const BeerStyle>) : std::vector<BeerStyle>
+  }
+
+  interface CheckinDistributionStrategy <<interface>> {
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+
+  class JCurveCheckinStrategy {
+    - rng_ : std::mt19937
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+
+  class RandomCheckinStrategy {
+    - rng_ : std::mt19937
+    - min_checkins_ : size_t
+    - max_checkins_ : size_t
+    + AssignActivityWeights(users : std::vector<GeneratedUser>&) : void
+    + CheckinsForUser(user : const GeneratedUser&,\n  brewery_count : size_t) : size_t
+    + TimestampFor(user : const GeneratedUser&,\n  index : size_t) : std::string
+  }
+
+  interface FollowGenerationStrategy <<interface>> {
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
+
+  class RandomFollowStrategy {
+    - rng_ : std::mt19937
+    - min_follows_ : size_t
+    - max_follows_ : size_t
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
+
+  class ActivityWeightedFollowStrategy {
+    - rng_ : std::mt19937
+    - min_follows_ : size_t
+    - max_follows_ : size_t
+    + GenerateFollows(users : const std::vector<GeneratedUser>&) : std::vector<GeneratedFollow>
+  }
+}
+
+package "Infrastructure: Logging" {
+  enum LogLevel {
+    Debug
+    Info
+    Warn
+    Error
+  }
+
+  enum PipelinePhase {
+    Startup
+    UserGeneration
+    BreweryAndBeerGeneration
+    CheckinGeneration
+    RatingGeneration
+    FollowGeneration
+    Teardown
+  }
+
+  class LogEntry {
+    + timestamp : std::chrono::system_clock::time_point
+    + level : LogLevel
+    + phase : PipelinePhase
+    + message : std::string
+    + city : std::optional<std::string>
+    + entity_id : std::optional<std::string>
+    + worker : std::optional<std::string>
+  }
+
+  interface Logger <<interface>> {
+    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  }
+
+  class PipelineLogger {
+    - log_ch_ : BoundedChannel<LogEntry>&
+    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  }
+
+  class LogWorker {
+    - log_ch_ : BoundedChannel<LogEntry>&
+    + Run() : void
+    - FormatTimestamp(tp) : std::string
+    - ToSpdlogLevel(level) : spdlog::level::level_enum
+    - ToString(phase) : std::string
+  }
+
+  ' --- Logging Relationships ---
+  LogEntry       *--  LogLevel
+  LogEntry       *--  PipelinePhase
+  PipelineLogger ..>  LogEntry       : emits
+  LogWorker      ..>  LogEntry       : consumes
+}
+
+package "Infrastructure: Pipeline Channel" {
+
+  class "BoundedChannel<T>" as BoundedChannel {
+    - queue_ : std::queue<T>
+    - mutex_ : std::mutex
+    - not_full_ : std::condition_variable
+    - not_empty_ : std::condition_variable
+    - capacity_ : size_t
+    - closed_ : bool
+    + Send(item : T) : void
+    + Receive() : std::optional<T>
+    + Close() : void
+  }
+
+}
+
+package "Infrastructure: Data Preloading" {
+
+  interface DataPreloader <<interface>> {
+    + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+    + LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
+    + LoadPersonas(filepath : const std::filesystem::path&) : std::vector<Persona>
+    + LoadNamesByCountry(filepath : const std::filesystem::path&) : NamesByCountry
+  }
+
+  class JsonLoader {
+    + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+    + LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
+    + LoadPersonas(filepath : const std::filesystem::path&) : std::vector<Persona>
+    + LoadNamesByCountry(filepath : const std::filesystem::path&) : NamesByCountry
+  }
+
+}
+
+package "Infrastructure: Enrichment" {
+
+  interface EnrichmentService <<interface>> {
+    + GetLocationContext(loc : const Location&,\n  strategy : const ContextStrategy&) : LocationContext
+  }
+
+  class WikipediaService {
+    - client_ : std::unique_ptr<WebClient>
+    - extract_cache_ : std::unordered_map<std::string, std::string>
+    + GetLocationContext(loc : const Location&,\n  strategy : const ContextStrategy&) : LocationContext
+    - FetchExtract(query : std::string_view) : std::string
+  }
+
+  interface WebClient <<interface>> {
+    + Get(url : const std::string&) : std::string
+    + UrlEncode(value : const std::string&) : std::string
+  }
+
+  class CURLWebClient {
+    + Get(url : const std::string&) : std::string
+    + UrlEncode(value : const std::string&) : std::string
+  }
+
+}
+
+package "Infrastructure: Data Generation" {
+
+  interface DataGenerator <<interface>> {
+    + GenerateBrewery(location : const Location&,\n  context : const LocationContext&) : BreweryResult
+    + GenerateBeer(brewery_id : uint64_t,\n  location : const Location&,\n  context : const LocationContext&,\n  style : const BeerStyle&) : BeerResult
+    + GenerateUser(location : const Location&) : UserResult
+    + GenerateCheckin(user : const GeneratedUser&,\n  brewery : const GeneratedBrewery&,\n  timestamp : const std::string&) : CheckinResult
+    + GenerateRating(user : const GeneratedUser&,\n  beer : const GeneratedBeer&,\n  checkin_id : uint64_t) : RatingResult
+  }
+
+  class MockGenerator {
+    + GenerateBrewery(...) : BreweryResult
+    + GenerateBeer(...) : BeerResult
+    + GenerateUser(...) : UserResult
+    + GenerateCheckin(...) : CheckinResult
+    + GenerateRating(...) : RatingResult
+    - DeterministicHash(location : const Location&) : size_t
+  }
+
+  class LlamaGenerator {
+    - model_ : ModelHandle
+    - context_ : ContextHandle
+    - prompt_formatter_ : std::unique_ptr<PromptFormatter>
+    - rng_ : std::mt19937
+    + GenerateBrewery(...) : BreweryResult
+    + GenerateBeer(...) : BeerResult
+    + GenerateUser(...) : UserResult
+    + GenerateCheckin(...) : CheckinResult
+    + GenerateRating(...) : RatingResult
+    - Load(opts : const GeneratorOptions&) : void
+    - Infer(system_prompt, user_prompt,\n  max_tokens, grammar) : std::string
+    - ValidateModelArchitecture() : void
+  }
+
+  interface PromptFormatter <<interface>> {
+    + Format(system_prompt : std::string_view,\n  user_prompt : std::string_view) : std::string
+    + ExpectedArchitecture() : std::string_view
+  }
+
+  class Gemma4JinjaPromptFormatter {
+    + Format(...) : std::string
+    + ExpectedArchitecture() : std::string_view
+  }
+
+}
+
+package "Infrastructure: Data Export" {
+
+  interface ExportService <<interface>> {
+    + Initialize() : void
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : uint64_t
+    + ProcessBeer(beer : const GeneratedBeer&) : uint64_t
+    + ProcessUser(user : const GeneratedUser&) : uint64_t
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : uint64_t
+    + ProcessRating(rating : const GeneratedRating&) : void
+    + ProcessFollow(follow : const GeneratedFollow&) : void
+    + Finalize() : void
+  }
+
+  class SqliteExportService {
+    - date_time_provider_ : std::unique_ptr<DateTimeProvider>
+    - db_handle_ : SqliteDatabaseHandle
+    - insert_location_stmt_ : SqliteStatementHandle
+    - insert_brewery_stmt_ : SqliteStatementHandle
+    - insert_beer_stmt_ : SqliteStatementHandle
+    - insert_user_stmt_ : SqliteStatementHandle
+    - insert_checkin_stmt_ : SqliteStatementHandle
+    - insert_rating_stmt_ : SqliteStatementHandle
+    - insert_follow_stmt_ : SqliteStatementHandle
+    - transaction_open_ : bool
+    - location_cache_ : std::unordered_map<std::string, uint64_t>
+    - brewery_cache_ : std::unordered_map<std::string, uint64_t>
+    + Initialize() : void
+    + ProcessBrewery(brewery : const GeneratedBrewery&) : uint64_t
+    + ProcessBeer(beer : const GeneratedBeer&) : uint64_t
+    + ProcessUser(user : const GeneratedUser&) : uint64_t
+    + ProcessCheckin(checkin : const GeneratedCheckin&) : uint64_t
+    + ProcessRating(rating : const GeneratedRating&) : void
+    + ProcessFollow(follow : const GeneratedFollow&) : void
+    + Finalize() : void
+    - InitializeSchema() : void
+    - PrepareStatements() : void
+    - RollbackAndCloseNoThrow() : void
+    - FinalizeStatements() : void
+  }
+
+  interface DateTimeProvider <<interface>> {
+    + GetUtcTimestamp() : std::string
+  }
+
+  class SystemDateTimeProvider {
+    + GetUtcTimestamp() : std::string
+  }
+
+}
+
+
+
+class BiergartenPipelineOrchestrator {
+  - preloader_ : std::unique_ptr<DataPreloader>
+  - enrichment_service_ : std::unique_ptr<EnrichmentService>
+  - generator_ : std::unique_ptr<DataGenerator>
+  - logger_ : std::unique_ptr<Logger>
+  - exporter_ : std::unique_ptr<ExportService>
+  - brewery_context_strategy_ : std::unique_ptr<ContextStrategy>
+  - sampling_strategy_ : std::unique_ptr<SamplingStrategy>
+  - beer_selection_strategy_ : std::unique_ptr<BeerSelectionStrategy>
+  - checkin_strategy_ : std::unique_ptr<CheckinDistributionStrategy>
+  - follow_strategy_ : std::unique_ptr<FollowGenerationStrategy>
+  - beer_style_palette_ : std::vector<BeerStyle>
+  - options_ : ApplicationOptions
+  --
+  - user_pool_ : std::vector<GeneratedUser>
+  - brewery_pool_ : std::vector<GeneratedBrewery>
+  - beer_pool_ : std::vector<GeneratedBeer>
+  - checkin_pool_ : std::vector<GeneratedCheckin>
+  - follow_pool_ : std::vector<GeneratedFollow>
+  --
+  + Run() : bool
+  - RunUserPhase(locations : const std::vector<Location>&) : void
+  - RunBreweryAndBeerPhase(locations : const std::vector<Location>&) : void
+  - RunCheckinPhase() : void
+  - RunRatingPhase() : void
+  - RunFollowPhase() : void
+}
+
+' --- Orchestration Aggregations (Services & Strategies) ---
+BiergartenPipelineOrchestrator *--  DataPreloader
+BiergartenPipelineOrchestrator *--  EnrichmentService
+BiergartenPipelineOrchestrator *--  DataGenerator
+BiergartenPipelineOrchestrator *--  ExportService
+BiergartenPipelineOrchestrator *--  CheckinDistributionStrategy
+BiergartenPipelineOrchestrator *--  FollowGenerationStrategy
+BiergartenPipelineOrchestrator *--  SamplingStrategy
+BiergartenPipelineOrchestrator *--  BeerSelectionStrategy
+BiergartenPipelineOrchestrator *--  ApplicationOptions
+BiergartenPipelineOrchestrator *--  Logger
+
+' --- Orchestration Aggregations (Data Pools) ---
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedUser    : user_pool_
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedBrewery : brewery_pool_
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedBeer    : beer_pool_
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedCheckin : checkin_pool_
+BiergartenPipelineOrchestrator *-- "0..*" GeneratedFollow  : follow_pool_
+
+' --- Interfaces & Implementations ---
+DataPreloader                  <|.. JsonLoader
+Logger                         <|.. PipelineLogger
+ContextStrategy                <|.. BreweryContextStrategy
+ContextStrategy                <|.. BeerContextStrategy
+SamplingStrategy               <|.. UniformSamplingStrategy
+BeerSelectionStrategy          <|.. RandomBeerSelectionStrategy
+CheckinDistributionStrategy    <|.. JCurveCheckinStrategy
+CheckinDistributionStrategy    <|.. RandomCheckinStrategy
+FollowGenerationStrategy       <|.. RandomFollowStrategy
+FollowGenerationStrategy       <|.. ActivityWeightedFollowStrategy
+EnrichmentService              <|.. WikipediaService
+WebClient                      <|.. CURLWebClient
+DataGenerator                  <|.. MockGenerator
+DataGenerator                  <|.. LlamaGenerator
+PromptFormatter                <|.. Gemma4JinjaPromptFormatter
+ExportService                  <|.. SqliteExportService
+DateTimeProvider               <|.. SystemDateTimeProvider
+
+' --- Service Compositions & Dependencies ---
+WikipediaService               *--  WebClient
+WikipediaService               ..>  ContextStrategy
+LlamaGenerator                 *--  PromptFormatter
+LlamaGenerator                 ..>  GeneratorOptions
+SqliteExportService            *--  DateTimeProvider
+
+' --- Cross-Component Aggregations (Held References) ---
+PipelineLogger                 o--  BoundedChannel : logs to
+LogWorker                      o--  BoundedChannel : drains from
+
+' --- Domain Containment ---
+EnrichedCity                   *--  Location
+EnrichedCity                   *--  LocationContext
+GeneratedBrewery               *--  Location
+GeneratedBrewery               *--  BreweryResult
+GeneratedBrewery               *--  GenerationMetadata
+GeneratedBeer                  *--  Location
+GeneratedBeer                  *--  BeerStyle
+GeneratedBeer                  *--  BeerResult
+GeneratedBeer                  *--  GenerationMetadata
+GeneratedUser                  *--  Location
+GeneratedUser                  *--  UserResult
+GeneratedUser                  *--  GenerationMetadata
+GeneratedCheckin               *--  CheckinResult
+GeneratedCheckin               *--  GenerationMetadata
+GeneratedRating                *--  RatingResult
+GeneratedRating                *--  GenerationMetadata
+GeneratedFollow                *--  GenerationMetadata
+
+@enduml
