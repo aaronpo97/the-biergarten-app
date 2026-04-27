@@ -1,25 +1,33 @@
 # The Biergarten App
 
-The Biergarten App is a multi-project monorepo with a .NET backend and an active React
-Router frontend in `src/Website`. The current website focuses on account flows, theme
-switching, shared UI components, Storybook coverage, and integration with the API.
+The Biergarten App is a multi-project monorepo with a .NET backend and an active
+React Router frontend in `src/Website`. The current website focuses on account
+flows, theme switching, shared UI components, Storybook coverage, and
+integration with the API.
 
 ## Documentation
 
-- [Getting Started](docs/getting-started.md) - Local setup for backend and active website
-- [Architecture](docs/architecture.md) - Current backend and frontend architecture
-- [Docker Guide](docs/docker.md) - Container-based backend development and testing
+- [Getting Started](docs/getting-started.md) - Local setup for backend and
+  active website
+- [Architecture](docs/architecture.md) - Current backend and frontend
+  architecture
+- [Docker Guide](docs/docker.md) - Container-based backend development and
+  testing
 - [Testing](docs/testing.md) - Backend and frontend test commands
-- [Environment Variables](docs/environment-variables.md) - Active configuration reference
+- [Environment Variables](docs/environment-variables.md) - Active configuration
+  reference
 - [Token Validation](docs/token-validation.md) - JWT validation architecture
-- [Legacy Website Archive](docs/archive/legacy-website-v1.md) - Archived notes for the old Next.js frontend
+- [Legacy Website Archive](docs/archive/legacy-website-v1.md) - Archived notes
+  for the old Next.js frontend
 
 ## Diagrams
 
 - [Architecture](docs/diagrams-out/architecture.svg) - Layered architecture
 - [Deployment](docs/diagrams-out/deployment.svg) - Docker topology
-- [Authentication Flow](docs/diagrams-out/authentication-flow.svg) - Auth sequence
-- [Database Schema](docs/diagrams-out/database-schema.svg) - Entity relationships
+- [Authentication Flow](docs/diagrams-out/authentication-flow.svg) - Auth
+  sequence
+- [Database Schema](docs/diagrams-out/database-schema.svg) - Entity
+  relationships
 
 ## Current Status
 
@@ -34,7 +42,8 @@ Active areas in the repository:
 
 Legacy area retained for reference:
 
-- `src/Website-v1` contains the archived Next.js frontend and is no longer the active website
+- `src/Website-v1` contains the archived Next.js frontend and is no longer the
+  active website
 
 ## Tech Stack
 
@@ -43,7 +52,8 @@ Legacy area retained for reference:
 - **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
 - **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
 - **Infrastructure**: Docker, Docker Compose
-- **Security**: Argon2id password hashing, JWT access/refresh/confirmation tokens
+- **Security**: Argon2id password hashing, JWT access/refresh/confirmation
+  tokens
 
 ## Quick Start
 
@@ -133,7 +143,8 @@ See [Testing](docs/testing.md) for the full command list.
 
 Common active variables:
 
-- Backend: `DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`
+- Backend: `DB_SERVER`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`,
+  `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`
 - Frontend: `API_BASE_URL`, `SESSION_SECRET`, `NODE_ENV`
 
 See [Environment Variables](docs/environment-variables.md) for details.
@@ -148,10 +159,13 @@ See [Environment Variables](docs/environment-variables.md) for details.
 
 ### Development Workflow
 
-1. Start development environment: `docker compose -f docker-compose.dev.yaml up -d`
+1. Start development environment:
+   `docker compose -f docker-compose.dev.yaml up -d`
 2. Make changes to code
-3. Run tests: `docker compose -f docker-compose.test.yaml up --abort-on-container-exit`
-4. Rebuild if needed: `docker compose -f docker-compose.dev.yaml up -d --build api.core`
+3. Run tests:
+   `docker compose -f docker-compose.test.yaml up --abort-on-container-exit`
+4. Rebuild if needed:
+   `docker compose -f docker-compose.dev.yaml up -d --build api.core`
 
 ## Support
 

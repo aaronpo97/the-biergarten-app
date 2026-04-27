@@ -1,7 +1,7 @@
 # Environment Variables
 
-This document covers the active environment variables used by the current Biergarten
-stack.
+This document covers the active environment variables used by the current
+Biergarten stack.
 
 ## Overview
 
@@ -19,8 +19,8 @@ Direct environment variable access via `Environment.GetEnvironmentVariable()`.
 
 ### Frontend (`src/Website`)
 
-The active website reads runtime values from the server environment for its auth and API
-integration.
+The active website reads runtime values from the server environment for its auth
+and API integration.
 
 ### Docker
 
@@ -54,14 +54,15 @@ Provide complete connection string:
 DB_CONNECTION_STRING="Server=localhost,1433;Database=Biergarten;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
 ```
 
-**Priority**: `DB_CONNECTION_STRING` is checked first. If not found, connection string is
-built from components.
+**Priority**: `DB_CONNECTION_STRING` is checked first. If not found, connection
+string is built from components.
 
 **Implementation**: See `DefaultSqlConnectionFactory.cs`
 
 ### JWT Authentication Secrets (Backend)
 
-The backend uses separate secrets for different token types to enable independent key rotation and validation isolation.
+The backend uses separate secrets for different token types to enable
+independent key rotation and validation isolation.
 
 ```bash
 # Access token secret (1-hour tokens)
@@ -131,8 +132,8 @@ DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 
 ## Frontend Variables (`src/Website`)
 
-The active website does not use the old Next.js/Prisma environment model. Its core runtime
-variables are:
+The active website does not use the old Next.js/Prisma environment model. Its
+core runtime variables are:
 
 ```bash
 API_BASE_URL=http://localhost:8080       # Base URL for the .NET API
@@ -208,9 +209,10 @@ cp .env.example .env.dev
 
 ## Legacy Frontend Variables
 
-Variables for the archived Next.js frontend (`src/Website-v1`) have been removed from this
-active reference. See [archive/legacy-website-v1.md](archive/legacy-website-v1.md) if you
-need the legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
+Variables for the archived Next.js frontend (`src/Website-v1`) have been removed
+from this active reference. See
+[archive/legacy-website-v1.md](archive/legacy-website-v1.md) if you need the
+legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
 
 **Docker Compose Mapping**:
 
@@ -243,8 +245,8 @@ need the legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
 | `MSSQL_PID`                   |         |          |   ✓    |    No    | SQL Server edition         |
 | `DOTNET_RUNNING_IN_CONTAINER` |    ✓    |          |   ✓    |    No    | Container flag             |
 
-\* Either `DB_CONNECTION_STRING` OR the component variables (`DB_SERVER`, `DB_NAME`,
-`DB_USER`, `DB_PASSWORD`) must be provided.
+\* Either `DB_CONNECTION_STRING` OR the component variables (`DB_SERVER`,
+`DB_NAME`, `DB_USER`, `DB_PASSWORD`) must be provided.
 
 ## Validation
 
@@ -258,8 +260,8 @@ Variables are validated at startup:
 
 ### Frontend Validation
 
-The active website relies on runtime defaults for local development and the surrounding
-server environment in deployed environments.
+The active website relies on runtime defaults for local development and the
+surrounding server environment in deployed environments.
 
 - `API_BASE_URL` defaults to `http://localhost:8080`
 - `SESSION_SECRET` falls back to a development-only local secret

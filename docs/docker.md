@@ -1,7 +1,7 @@
 # Docker Guide
 
-This document covers Docker deployment, configuration, and troubleshooting for The
-Biergarten App.
+This document covers Docker deployment, configuration, and troubleshooting for
+The Biergarten App.
 
 ## Overview
 
@@ -13,7 +13,8 @@ The project uses Docker Compose to orchestrate multiple services:
 - .NET API
 - Test runners
 
-See the [deployment diagram](diagrams/pdf/deployment.pdf) for visual representation.
+See the [deployment diagram](diagrams/pdf/deployment.pdf) for visual
+representation.
 
 ## Docker Compose Environments
 
@@ -144,7 +145,11 @@ api.core / tests (start when ready)
 
 ```yaml
 healthcheck:
-  test: ['CMD-SHELL', "sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1'"]
+  test:
+    [
+      "CMD-SHELL",
+      "sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1'",
+    ]
   interval: 10s
   timeout: 5s
   retries: 12
@@ -209,16 +214,16 @@ Each environment uses isolated bridge networks:
 All containers are configured via environment variables from `.env` files:
 
 ```yaml
-env_file: '.env.dev' # or .env.test, .env.prod
+env_file: ".env.dev" # or .env.test, .env.prod
 
 environment:
-  ASPNETCORE_ENVIRONMENT: 'Development'
-  DOTNET_RUNNING_IN_CONTAINER: 'true'
-  DB_SERVER: '${DB_SERVER}'
-  DB_NAME: '${DB_NAME}'
-  DB_USER: '${DB_USER}'
-  DB_PASSWORD: '${DB_PASSWORD}'
-  JWT_SECRET: '${JWT_SECRET}'
+  ASPNETCORE_ENVIRONMENT: "Development"
+  DOTNET_RUNNING_IN_CONTAINER: "true"
+  DB_SERVER: "${DB_SERVER}"
+  DB_NAME: "${DB_NAME}"
+  DB_USER: "${DB_USER}"
+  DB_PASSWORD: "${DB_PASSWORD}"
+  JWT_SECRET: "${JWT_SECRET}"
 ```
 
 For complete list, see [Environment Variables](environment-variables.md).
