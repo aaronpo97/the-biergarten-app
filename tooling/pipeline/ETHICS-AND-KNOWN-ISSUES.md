@@ -52,12 +52,12 @@ artificial intelligence is incapable of.**
 
 ## Model Bias and Language Quality
 
-The underlying model's training biases surface within this pipeline.
-Output quality tracks with how well a language is represented in the training
-corpus: standard French (`fr-FR`) produces coherent text; regional variants like
-`fr-CD` and `fr-CI` are noticeably weaker; low-resource languages like Welsh,
-Māori, and Sicilian produce output that is syntactically plausible but often
-semantically broken.
+The underlying model's training biases surface within this pipeline. Output
+quality tracks with how well a language is represented in the training corpus:
+standard French (`fr-FR`) produces coherent text; regional variants like `fr-CD`
+and `fr-CI` are noticeably weaker; low-resource languages like Welsh, Māori, and
+Sicilian produce output that is syntactically plausible but often semantically
+broken.
 
 This is a property of the training distribution, not something that can be
 mitigated through prompt design. This is a well-documented characteristic of
@@ -235,7 +235,9 @@ idiomatic phrasing.
 ]
 ```
 
-This dataset, when fed into the pipeline will often times reason that a local variant of French is needed, but will often times just default to a standardized dialect of French, devoid of any cultural or linguistic nuance.
+This dataset, when fed into the pipeline will often times reason that a local
+variant of French is needed, but will often times just default to a standardized
+dialect of French, devoid of any cultural or linguistic nuance.
 
 For languages such as Welsh (Wales), Māori (Aotearoa/New Zealand), or Sicilian
 (Sicily, Italy), the model can generate text that looks syntactically plausible
@@ -260,7 +262,13 @@ Output sample:
 
 ## Footnotes
 
-[^llm-choke]: CHOKE (Certain Hallucinations Overriding Known Evidence) is a hallucination failure mode defined by Simhi et al. (2025), in which a model that can consistently answer a question correctly produces a confident, wrong response when the prompt is trivially perturbed. Source: Trust Me, I'm Wrong: LLMs Hallucinate with Certainty Despite Knowing the Answer — Adi Simhi, Itay Itzhak, Fazl Barez, Gabriel Stanovsky, Yonatan Belinkov.
+[^llm-choke]:
+    CHOKE (Certain Hallucinations Overriding Known Evidence) is a hallucination
+    failure mode defined by Simhi et al. (2025), in which a model that can
+    consistently answer a question correctly produces a confident, wrong
+    response when the prompt is trivially perturbed. Source: Trust Me, I'm
+    Wrong: LLMs Hallucinate with Certainty Despite Knowing the Answer — Adi
+    Simhi, Itay Itzhak, Fazl Barez, Gabriel Stanovsky, Yonatan Belinkov.
 
 [^llm-bias]:
     e.g., Blasi et al. (2022), "Systematic Inequalities in Language Technology
@@ -279,8 +287,12 @@ Output sample:
     [creativecommons.org/licenses/by-sa/4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en).
 
 [^diacetyl-source]:
-    White Labs confirms that diacetyl is a yeast-derived fermentation byproduct: specifically, a compound produced during amino acid metabolism that leaks out of the yeast cell and oxidises into its characteristic buttery off-flavour. It is generally considered undesirable at any perceived level in most styles, though low levels are tolerated in some English ales and European lagers.
-    Source:
+    White Labs confirms that diacetyl is a yeast-derived fermentation byproduct:
+    specifically, a compound produced during amino acid metabolism that leaks
+    out of the yeast cell and oxidises into its characteristic buttery
+    off-flavour. It is generally considered undesirable at any perceived level
+    in most styles, though low levels are tolerated in some English ales and
+    European lagers. Source:
     [whitelabs.com — Compound Spotlight: Diacetyl](https://www.whitelabs.com/news-update-detail?id=54).
 
 [^diacetyl-rest]:

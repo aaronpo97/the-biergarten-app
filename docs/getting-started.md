@@ -1,7 +1,7 @@
 # Getting Started
 
-This guide covers local setup for the current Biergarten stack: the .NET backend in
-`src/Core` and the active React Router frontend in `src/Website`.
+This guide covers local setup for the current Biergarten stack: the .NET backend
+in `src/Core` and the active React Router frontend in `src/Website`.
 
 ## Prerequisites
 
@@ -128,8 +128,9 @@ dotnet run --project API/API.Core/API.Core.csproj
 
 ## Legacy Frontend Note
 
-The previous Next.js frontend now lives in `src/Website-v1` and is not the active website.
-Legacy setup details have been moved to [docs/archive/legacy-website-v1.md](archive/legacy-website-v1.md).
+The previous Next.js frontend now lives in `src/Website-v1` and is not the
+active website. Legacy setup details have been moved to
+[docs/archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Next Steps
 

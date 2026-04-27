@@ -1,6 +1,7 @@
 # Testing
 
-This document describes the testing strategy and how to run tests for The Biergarten App.
+This document describes the testing strategy and how to run tests for The
+Biergarten App.
 
 ## Overview
 
@@ -9,13 +10,15 @@ The project uses a multi-layered testing approach across backend and frontend:
 - **API.Specs** - BDD integration tests using Reqnroll (Gherkin)
 - **Infrastructure.Repository.Tests** - Unit tests for data access layer
 - **Service.Auth.Tests** - Unit tests for authentication business logic
-- **Storybook Vitest project** - Browser-based interaction tests for shared website stories
-- **Storybook Playwright suite** - Browser checks against Storybook-rendered components
+- **Storybook Vitest project** - Browser-based interaction tests for shared
+  website stories
+- **Storybook Playwright suite** - Browser checks against Storybook-rendered
+  components
 
 ## Running Tests with Docker (Recommended)
 
-The easiest way to run all tests is using Docker Compose, which sets up an isolated test
-environment:
+The easiest way to run all tests is using Docker Compose, which sets up an
+isolated test environment:
 
 ```bash
 docker compose -f docker-compose.test.yaml up --abort-on-container-exit
@@ -98,7 +101,8 @@ npm run test:storybook
 
 **Purpose**:
 
-- Verifies shared stories such as form fields, submit buttons, navbar states, toasts, and the theme gallery
+- Verifies shared stories such as form fields, submit buttons, navbar states,
+  toasts, and the theme gallery
 - Runs in browser mode via Vitest and Storybook integration
 
 ### Frontend Playwright Storybook Tests
@@ -113,7 +117,8 @@ npm run test:storybook:playwright
 
 - Storybook dependencies installed
 - Playwright browser dependencies installed
-- The command will start or reuse the Storybook server defined in `playwright.storybook.config.ts`
+- The command will start or reuse the Storybook server defined in
+  `playwright.storybook.config.ts`
 
 ## Test Coverage
 
@@ -278,7 +283,8 @@ Scenario: User login with valid credentials
 
 ## Continuous Integration
 
-Tests run automatically in CI/CD pipelines using the test Docker Compose configuration:
+Tests run automatically in CI/CD pipelines using the test Docker Compose
+configuration:
 
 ```bash
 # CI/CD command
@@ -292,7 +298,8 @@ Exit codes:
 - `0` - All tests passed
 - Non-zero - Test failures occurred
 
-Frontend UI checks should also be included in CI for the active website workspace:
+Frontend UI checks should also be included in CI for the active website
+workspace:
 
 ```bash
 cd src/Website

@@ -4,24 +4,28 @@ This document describes the active architecture of The Biergarten App.
 
 ## High-Level Overview
 
-The Biergarten App is a monorepo with a clear split between the backend and the active
-website:
+The Biergarten App is a monorepo with a clear split between the backend and the
+active website:
 
 - **Backend**: .NET 10 Web API with SQL Server and a layered architecture
 - **Frontend**: React 19 + React Router 7 website in `src/Website`
 - **Architecture Style**: Layered backend plus server-rendered React frontend
 
-The legacy Next.js frontend has been retained in `src/Website-v1` for reference only and is
-documented in [archive/legacy-website-v1.md](archive/legacy-website-v1.md).
+The legacy Next.js frontend has been retained in `src/Website-v1` for reference
+only and is documented in
+[archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Diagrams
 
 For visual representations, see:
 
-- [architecture.svg](diagrams-out/architecture.svg) - Layered architecture diagram
+- [architecture.svg](diagrams-out/architecture.svg) - Layered architecture
+  diagram
 - [deployment.svg](diagrams-out/deployment.svg) - Docker deployment diagram
-- [authentication-flow.svg](diagrams-out/authentication-flow.svg) - Authentication workflow
-- [database-schema.svg](diagrams-out/database-schema.svg) - Database relationships
+- [authentication-flow.svg](diagrams-out/authentication-flow.svg) -
+  Authentication workflow
+- [database-schema.svg](diagrams-out/database-schema.svg) - Database
+  relationships
 
 ## Backend Architecture
 
@@ -218,7 +222,8 @@ public interface IAuthRepository
 
 ### Active Website (`src/Website`)
 
-The current website is a React Router 7 application with server-side rendering enabled.
+The current website is a React Router 7 application with server-side rendering
+enabled.
 
 ```text
 src/Website/
@@ -244,20 +249,22 @@ src/Website/
 
 ### Theme System
 
-The active website uses semantic DaisyUI theme tokens backed by four Biergarten themes:
+The active website uses semantic DaisyUI theme tokens backed by four Biergarten
+themes:
 
 - Biergarten Lager
 - Biergarten Stout
 - Biergarten Cassis
 - Biergarten Weizen
 
-All component styling should prefer semantic tokens such as `primary`, `success`,
-`surface`, and `highlight` instead of hard-coded color values.
+All component styling should prefer semantic tokens such as `primary`,
+`success`, `surface`, and `highlight` instead of hard-coded color values.
 
 ### Legacy Frontend
 
-The previous Next.js frontend has been archived at `src/Website-v1`. Active product and
-engineering documentation should point to `src/Website`, while legacy notes live in
+The previous Next.js frontend has been archived at `src/Website-v1`. Active
+product and engineering documentation should point to `src/Website`, while
+legacy notes live in
 [archive/legacy-website-v1.md](archive/legacy-website-v1.md).
 
 ## Security Architecture
@@ -387,8 +394,8 @@ For details, see [Docker Guide](docker.md).
 
 ### Health Checks
 
-**SQL Server**: Validates database connectivity **API**: Checks service health and
-dependencies
+**SQL Server**: Validates database connectivity **API**: Checks service health
+and dependencies
 
 **Configuration**:
 
