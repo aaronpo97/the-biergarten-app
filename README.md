@@ -118,9 +118,6 @@ docs/
 
 archive/
   next-js-web-app/  Older Next.js frontend (reference only)
-
-misc/
-  raw-data/         Source CSV/JSON fixtures used during development
 ```
 
 ## Testing
