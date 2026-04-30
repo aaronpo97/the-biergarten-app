@@ -121,13 +121,8 @@ set(SOURCES
     src/services/wikipedia/fetch_extract.cc
     src/services/sqlite/sqlite_export_service.cc
     src/services/sqlite/build_database_path.cc
-    src/services/sqlite/build_location_key.cc
-    src/services/sqlite/initialize_schema.cc
-    src/services/sqlite/prepare_statements.cc
-    src/services/sqlite/initialize.cc
-    src/services/sqlite/process_record.cc
-    src/services/sqlite/finalize_statements.cc
-    src/services/sqlite/rollback_and_close_no_throw.cc
+        src/services/sqlite/process_record.cc
+        src/services/sqlite/initialize.cc
     src/services/sqlite/finalize.cc
     src/web_client/curl_global_state.cc
     src/web_client/curl_web_client_get.cc
@@ -144,6 +139,8 @@ set(SOURCES
     src/data_generation/mock/generate_brewery.cc
     src/data_generation/mock/generate_user.cc
     src/json_handling/json_loader.cc
+        src/services/sqlite/helpers/sqlite_connection_helpers.cpp
+        src/services/sqlite/helpers/sqlite_statement_helpers.cpp
 )
 
 # =============================================================================
