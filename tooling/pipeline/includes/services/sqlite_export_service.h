@@ -29,7 +29,7 @@ class SqliteExportService final : public IExportService {
   SqliteExportService& operator=(SqliteExportService&&) = delete;
 
   void Initialize() override;
-  void ProcessRecord(const GeneratedBrewery& brewery) override;
+  uint64_t ProcessRecord(const GeneratedBrewery& brewery) override;
   void Finalize() override;
 
  private:
@@ -38,7 +38,7 @@ class SqliteExportService final : public IExportService {
   using SqliteStatementHandle =
       sqlite_export_service_internal::SqliteStatementHandle;
 
-  void InitializeSchema();
+  void InitializeSchema() const;
   void PrepareStatements();
   void RollbackAndCloseNoThrow() noexcept;
   void FinalizeStatements() noexcept;

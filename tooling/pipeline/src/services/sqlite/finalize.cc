@@ -8,13 +8,15 @@
 #include "services/sqlite_export_service.h"
 #include "services/sqlite_export_service_helpers.h"
 
+
 void SqliteExportService::Finalize() {
   if (db_handle_ == nullptr) {
     return;
   }
 
   try {
-    FinalizeStatements();
+    insert_brewery_stmt_.reset();
+    insert_location_stmt_.reset();
     if (transaction_open_) {
       sqlite_export_service_internal::ExecSql(
           db_handle_, "COMMIT;", "Failed to commit SQLite transaction");

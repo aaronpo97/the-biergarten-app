@@ -435,12 +435,12 @@ package "Infrastructure: Data Export" {
     - location_cache_ : std::unordered_map<std::string, uint64_t>
     - brewery_cache_ : std::unordered_map<std::string, uint64_t>
     + Initialize() : void
-    + ProcessBrewery(brewery : const GeneratedBrewery&) : uint64_t
-    + ProcessBeer(beer : const GeneratedBeer&) : uint64_t
-    + ProcessUser(user : const GeneratedUser&) : uint64_t
-    + ProcessCheckin(checkin : const GeneratedCheckin&) : uint64_t
-    + ProcessRating(rating : const GeneratedRating&) : void
-    + ProcessFollow(follow : const GeneratedFollow&) : void
+    + ProcessRecord(brewery : const GeneratedBrewery&) : uint64_t
+    + ProcessRecord(beer : const GeneratedBeer&) : uint64_t
+    + ProcessRecord(user : const GeneratedUser&) : uint64_t
+    + ProcessRecord(checkin : const GeneratedCheckin&) : uint64_t
+    + ProcessRecord(rating : const GeneratedRating&) : void
+    + ProcessRecord(follow : const GeneratedFollow&) : void
     + Finalize() : void
     - InitializeSchema() : void
     - PrepareStatements() : void
