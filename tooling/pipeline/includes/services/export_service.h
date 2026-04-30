@@ -31,7 +31,7 @@ class IExportService {
    *
    * @param brewery Generated brewery payload to store.
    */
-  virtual void ProcessRecord(const GeneratedBrewery& brewery) = 0;
+  virtual uint64_t ProcessRecord(const GeneratedBrewery& brewery) = 0;
 
   /// @brief Finalizes the export destination.
   virtual void Finalize() = 0;
