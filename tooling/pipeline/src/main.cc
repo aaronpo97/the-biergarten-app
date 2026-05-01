@@ -53,16 +53,21 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   opt("model,m", prog_opts::value<std::string>()->default_value(""),
       "Path to LLM model (gguf)");
 
-  // Sampling Options
-  opt("temperature", prog_opts::value<float>()->default_value(1.0F),
+  // Sampling Options - defaults driven from SamplingOptions struct
+  const SamplingOptions kSamplingDefaults{};
+  opt("temperature",
+      prog_opts::value<float>()->default_value(kSamplingDefaults.temperature),
       "Sampling temperature (higher = more random)");
-  opt("top-p", prog_opts::value<float>()->default_value(0.95F),
+  opt("top-p",
+      prog_opts::value<float>()->default_value(kSamplingDefaults.top_p),
       "Nucleus sampling top-p in (0,1] (higher = more random)");
-  opt("top-k", prog_opts::value<uint32_t>()->default_value(64),
+  opt("top-k",
+      prog_opts::value<uint32_t>()->default_value(kSamplingDefaults.top_k),
       "Top-k sampling parameter (higher = more candidate tokens)");
-  opt("n-ctx", prog_opts::value<uint32_t>()->default_value(8192),
+  opt("n-ctx",
+      prog_opts::value<uint32_t>()->default_value(kSamplingDefaults.n_ctx),
       "Context window size in tokens");
-  opt("seed", prog_opts::value<int>()->default_value(-1),
+  opt("seed", prog_opts::value<int>()->default_value(kSamplingDefaults.seed),
       "Sampler seed: -1 for random, otherwise non-negative integer");
 
   // Pipeline Options
@@ -84,11 +89,11 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   }
 
   try {
-    prog_opts::variables_map vm;
-    prog_opts::store(prog_opts::parse_command_line(argc, argv, desc), vm);
-    prog_opts::notify(vm);
+    prog_opts::variables_map var_map;
+    prog_opts::store(prog_opts::parse_command_line(argc, argv, desc), var_map);
+    prog_opts::notify(var_map);
 
-    if (vm.contains("help")) {
+    if (var_map.contains("help")) {
       std::stringstream help_stream;
       help_stream << "\n" << desc;
       spdlog::info(help_stream.str());
@@ -97,12 +102,12 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
 
     ApplicationOptions options;
 
-    options.pipeline.output_path = vm["output"].as<std::string>();
-    options.pipeline.log_path = vm["log-path"].as<std::string>();
-    options.pipeline.prompt_dir = vm["prompt-dir"].as<std::string>();
+    options.pipeline.output_path = var_map["output"].as<std::string>();
+    options.pipeline.log_path = var_map["log-path"].as<std::string>();
+    options.pipeline.prompt_dir = var_map["prompt-dir"].as<std::string>();
 
-    const bool use_mocked = vm["mocked"].as<bool>();
-    const std::string model_path = vm["model"].as<std::string>();
+    const bool use_mocked = var_map["mocked"].as<bool>();
+    const std::string model_path = var_map["model"].as<std::string>();
 
     if (use_mocked && !model_path.empty()) {
       spdlog::error(
@@ -127,9 +132,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     options.generator.model_path = model_path;
 
     const bool user_provided_sampling =
-        !vm["temperature"].defaulted() || !vm["top-p"].defaulted() ||
-        !vm["top-k"].defaulted() || !vm["n-ctx"].defaulted() ||
-        !vm["seed"].defaulted();
+        !var_map["temperature"].defaulted() || !var_map["top-p"].defaulted() ||
+        !var_map["top-k"].defaulted() || !var_map["n-ctx"].defaulted() ||
+        !var_map["seed"].defaulted();
 
     if (use_mocked) {
       if (user_provided_sampling) {
@@ -137,11 +142,11 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
       }
     } else if (user_provided_sampling) {
       SamplingOptions sampling;
-      sampling.temperature = vm["temperature"].as<float>();
-      sampling.top_p = vm["top-p"].as<float>();
-      sampling.top_k = vm["top-k"].as<uint32_t>();
-      sampling.n_ctx = vm["n-ctx"].as<uint32_t>();
-      sampling.seed = vm["seed"].as<int>();
+      sampling.temperature = var_map["temperature"].as<float>();
+      sampling.top_p = var_map["top-p"].as<float>();
+      sampling.top_k = var_map["top-k"].as<uint32_t>();
+      sampling.n_ctx = var_map["n-ctx"].as<uint32_t>();
+      sampling.seed = var_map["seed"].as<int>();
 
       options.generator.sampling = sampling;
     }

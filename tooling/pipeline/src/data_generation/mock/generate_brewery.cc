@@ -17,9 +17,9 @@ BreweryResult MockGenerator::GenerateBrewery(
   const std::string_view adjective =
       kBreweryAdjectives.at(hash % kBreweryAdjectives.size());
   const std::string_view noun =
-      kBreweryNouns.at(hash / 7 % kBreweryNouns.size());
-  const std::string_view base_description =
-      kBreweryDescriptions.at((hash / 13) % kBreweryDescriptions.size());
+      kBreweryNouns.at(hash / kNounHashStride % kBreweryNouns.size());
+  const std::string_view base_description = kBreweryDescriptions.at(
+      (hash / kDescriptionHashStride) % kBreweryDescriptions.size());
 
   const std::string name =
       std::format("{} {} {}", location.city, adjective, noun);

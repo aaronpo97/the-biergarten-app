@@ -42,7 +42,6 @@ class SqliteExportService final : public IExportService {
   void InitializeSchema() const;
   void PrepareStatements();
   void RollbackAndCloseNoThrow() noexcept;
-  void FinalizeStatements() noexcept;
 
   [[nodiscard]] std::filesystem::path BuildDatabasePath() const;
   [[nodiscard]] static std::string BuildLocationKey(const Location& location);

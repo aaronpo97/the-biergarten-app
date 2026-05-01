@@ -3,6 +3,8 @@
  * @brief SqliteExportService::ProcessRecord() implementation.
  */
 
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 

@@ -86,16 +86,6 @@ sqlite3_int64 LastInsertRowId(const SqliteDatabaseHandle& db_handle) {
   return sqlite3_last_insert_rowid(db_handle.get());
 }
 
-std::string SerializeLocalLanguages(
-    const std::vector<std::string>& local_languages) {
-  boost::json::array array;
-  array.reserve(local_languages.size());
-  for (const auto& language : local_languages) {
-    array.emplace_back(language);
-  }
-  return boost::json::serialize(array);
-}
-
 std::string SerializeVector(const std::vector<std::string>& str_vec) {
   boost::json::array array(str_vec.size());
   for (const auto& s : str_vec) {

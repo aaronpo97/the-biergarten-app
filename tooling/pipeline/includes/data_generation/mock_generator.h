@@ -44,6 +44,13 @@ class MockGenerator final : public DataGenerator {
    */
   static size_t DeterministicHash(const Location& location);
 
+  // Hash stride constants for deterministic distribution across fixed-size
+  // arrays. These coprime strides spread hash values uniformly without
+  // clustering, ensuring diverse output across different hash inputs.
+  static constexpr size_t kNounHashStride = 7;
+  static constexpr size_t kDescriptionHashStride = 13;
+  static constexpr size_t kBioHashStride = 11;
+
   static constexpr std::array<std::string_view, 18> kBreweryAdjectives = {
       "Craft",      "Heritage", "Local",  "Artisan",  "Pioneer",    "Golden",
       "Modern",     "Classic",  "Summit", "Northern", "Riverstone", "Barrel",

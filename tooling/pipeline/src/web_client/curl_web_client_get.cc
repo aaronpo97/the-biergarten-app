@@ -17,6 +17,7 @@ using CurlHandle = std::unique_ptr<CURL, decltype(&curl_easy_cleanup)>;
 
 static constexpr long kConnectionTimeout = 10;
 static constexpr long kRequestTimeout = 30;
+static constexpr long kMaxRedirects = 5;
 static constexpr int32_t kOkHttpStatus = 200;
 
 static CurlHandle CreateHandle() {
@@ -32,7 +33,7 @@ static void SetCommonGetOptions(CURL* curl, const std::string& url) {
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "biergarten-pipeline/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-  curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
+  curl_easy_setopt(curl, CURLOPT_MAXREDIRS, kMaxRedirects);
   curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, kConnectionTimeout);
   curl_easy_setopt(curl, CURLOPT_TIMEOUT, kRequestTimeout);
   curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");

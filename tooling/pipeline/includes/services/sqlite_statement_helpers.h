@@ -107,7 +107,6 @@ void StepStatement(const SqliteDatabaseHandle& db_handle,
 
 sqlite3_int64 LastInsertRowId(const SqliteDatabaseHandle& db_handle);
 
-std::string SerializeLocalLanguages(const std::vector<std::string>& local_languages);
 std::string SerializeVector(const std::vector<std::string>& str_vec);
 
 }  // namespace sqlite_export_service_internal

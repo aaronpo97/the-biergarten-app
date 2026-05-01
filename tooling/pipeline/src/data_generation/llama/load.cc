@@ -14,6 +14,10 @@
 #include "data_generation/llama_generator.h"
 #include "llama.h"
 
+// Maximum batch size for decode operations. Capping the batch prevents
+// excessive memory allocation while maintaining inference performance.
+static constexpr uint32_t kMaxBatchSize = 5000U;
+
 void LlamaGenerator::Load(const std::string& model_path) {
   context_.reset();
   model_.reset();
@@ -28,7 +32,7 @@ void LlamaGenerator::Load(const std::string& model_path) {
 
   llama_context_params context_params = llama_context_default_params();
   context_params.n_ctx = n_ctx_;
-  context_params.n_batch = std::min(n_ctx_, static_cast<uint32_t>(5000));
+  context_params.n_batch = std::min(n_ctx_, kMaxBatchSize);
 
   LlamaGenerator::ContextHandle loaded_context(
       llama_init_from_model(loaded_model.get(), context_params));

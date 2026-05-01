@@ -19,6 +19,9 @@
 #include "llama.h"
 
 static constexpr size_t kPromptTokenSlack = 8;
+// Minimum tokens to keep when using top-p sampling. Ensures at least one
+// candidate token remains available even with very restrictive top-p values.
+static constexpr size_t kTopPMinKeep = 1;
 
 namespace {
 
@@ -62,7 +65,7 @@ SamplerHandle MakeSamplerChain(const llama_vocab* vocab,
               "LlamaGenerator: failed to initialize temperature sampler");
   add_sampler(llama_sampler_init_top_k(static_cast<int32_t>(config.top_k)),
               "LlamaGenerator: failed to initialize top-k sampler");
-  add_sampler(llama_sampler_init_top_p(config.top_p, 1),
+  add_sampler(llama_sampler_init_top_p(config.top_p, kTopPMinKeep),
               "LlamaGenerator: failed to initialize top-p sampler");
   add_sampler(llama_sampler_init_dist(config.seed),
               "LlamaGenerator: failed to initialize distribution sampler");

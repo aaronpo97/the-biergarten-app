@@ -33,6 +33,8 @@ static std::string FormatLocalLanguageCodes(
   return formatted;
 }
 
+// GBNF grammar for structured brewery JSON output.
+// @TODO move to a separate gbnf file if it grows in complexity or is shared across modules.
 static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
 root ::= thought-block "{" ws "\"name_en\"" ws ":" ws string ws "," ws "\"description_en\"" ws ":" ws string ws "," ws "\"name_local\"" ws ":" ws string ws "," ws "\"description_local\"" ws ":" ws string ws "}" ws
 thought-block ::= [^{]*
