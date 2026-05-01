@@ -7,36 +7,62 @@
  */
 
 #include <cstdint>
+#include <filesystem>
+#include <optional>
 #include <string>
 
 /**
- * @brief Program options for the Biergarten pipeline application.
+ * @brief LLM sampling parameters.
  */
-struct ApplicationOptions {
-  /// @brief Path to the LLM model file (gguf format); mutually exclusive with
-  /// use_mocked.
-  std::string model_path;
-
-  /// @brief Use mocked generator instead of LLM; mutually exclusive with
-  /// model_path.
-  bool use_mocked = false;
-
+struct SamplingOptions {
   /// @brief LLM sampling temperature (0.0 to 1.0, higher = more random).
   float temperature = 1.0F;
 
-  /// @brief LLM nucleus sampling top-p parameter (0.0 to 1.0, higher = more
-  /// random).
+  /// @brief LLM nucleus sampling top-p parameter.
   float top_p = 0.95F;
 
   /// @brief LLM top-k sampling parameter.
   uint32_t top_k = 64;
 
-  /// @brief Context window size (tokens) for LLM inference. Higher values
-  /// support longer prompts but use more memory.
+  /// @brief Context window size (tokens).
   uint32_t n_ctx = 8192;
 
-  /// @brief Random seed for sampling (-1 for random, otherwise non-negative).
+  /// @brief Random seed (-1 for random, otherwise non-negative).
   int seed = -1;
+};
+
+/**
+ * @brief Configuration for the LLM generator component.
+ */
+struct GeneratorOptions {
+  /// @brief Path to the LLM model file (gguf format).
+  std::filesystem::path model_path;
+
+  /// @brief Use mocked generator instead of actual LLM inference.
+  bool use_mocked = false;
+
+  /// @brief Specific sampling parameters for this generator.
+  /// If nullopt, the application should use global defaults.
+  std::optional<SamplingOptions> sampling;
+};
+
+/**
+ * @brief Configuration for the pipeline execution and output.
+ */
+struct PipelineOptions {
+  /// @brief Directory for generated artifacts.
+  std::filesystem::path output_path;
+
+  /// @brief Path for application logs.
+  std::filesystem::path log_path;
+};
+
+/**
+ * @brief Root configuration object for the Biergarten pipeline.
+ */
+struct ApplicationOptions {
+  GeneratorOptions generator;
+  PipelineOptions pipeline;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_APPLICATION_OPTIONS_H_

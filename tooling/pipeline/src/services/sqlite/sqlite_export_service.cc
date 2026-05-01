@@ -7,8 +7,9 @@
 
 #include <memory>
 
-SqliteExportService::SqliteExportService()
-    : date_time_provider_(std::make_unique<SystemDateTimeProvider>()) {}
+SqliteExportService::SqliteExportService(const ApplicationOptions& options)
+    : date_time_provider_(std::make_unique<SystemDateTimeProvider>()),
+      output_path_(options.pipeline.output_path) {}
 
 SqliteExportService::~SqliteExportService() {
   if (db_handle_ != nullptr) {

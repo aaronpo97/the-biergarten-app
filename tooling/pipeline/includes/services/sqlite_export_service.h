@@ -11,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "data_model/application_options.h"
 #include "services/date_time_provider.h"
 #include "services/export_service.h"
 #include "services/sqlite_export_service_helpers.h"
@@ -20,7 +21,7 @@
  */
 class SqliteExportService final : public IExportService {
  public:
-  SqliteExportService();
+  explicit SqliteExportService(const ApplicationOptions& options);
   ~SqliteExportService() override;
 
   SqliteExportService(const SqliteExportService&) = delete;
@@ -47,6 +48,7 @@ class SqliteExportService final : public IExportService {
   [[nodiscard]] static std::string BuildLocationKey(const Location& location);
 
   std::unique_ptr<IDateTimeProvider> date_time_provider_;
+  std::filesystem::path output_path_;
   std::string run_timestamp_utc_;
   std::filesystem::path database_path_;
   SqliteDatabaseHandle db_handle_;

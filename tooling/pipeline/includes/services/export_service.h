@@ -6,6 +6,8 @@
  * @brief Abstraction for persisting generated brewery data.
  */
 
+#include <cstdint>
+
 #include "data_model/generated_brewery.h"
 
 /**
