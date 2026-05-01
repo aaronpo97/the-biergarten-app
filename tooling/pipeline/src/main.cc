@@ -189,8 +189,6 @@ int main(const int argc, char** argv) {
     const auto sampling =
         options.generator.sampling.value_or(SamplingOptions{});
 
-    // Scenario 4: Validate the prompt directory up-front, before any DI
-    // wiring, so the error surfaces immediately with a clear message.
     std::unique_ptr<IPromptDirectory> prompt_directory;
     if (!options.generator.use_mocked) {
       try {
@@ -223,9 +221,6 @@ int main(const int argc, char** argv) {
                   "top-p={}, top-k={}, n_ctx={}, seed={})",
                   model_path, sampling.temperature, sampling.top_p,
                   sampling.top_k, sampling.n_ctx, sampling.seed);
-              // Transfer ownership of the pre-validated PromptDirectory into
-              // the LlamaGenerator.  The lambda captures by reference so the
-              // unique_ptr is moved exactly once.
               return std::make_unique<LlamaGenerator>(
                   options, model_path,
                   inj.template create<std::unique_ptr<IPromptFormatter>>(),
