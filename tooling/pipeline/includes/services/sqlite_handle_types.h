@@ -6,6 +6,7 @@
  */
 
 #include <sqlite3.h>
+
 #include <memory>
 #include <string_view>
 
@@ -33,4 +34,3 @@ struct BindParam {
 }  // namespace sqlite_export_service_internal
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_HANDLE_TYPES_H_
-

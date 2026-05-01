@@ -1,11 +1,12 @@
 #include "services/sqlite_statement_helpers.h"
-#include "services/sqlite_connection_helpers.h"
 
-#include <cstring>
-#include <memory>
-#include <limits>
-#include <stdexcept>
 #include <boost/json.hpp>
+#include <cstring>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+
+#include "services/sqlite_connection_helpers.h"
 
 namespace sqlite_export_service_internal {
 
@@ -95,4 +96,3 @@ std::string SerializeVector(const std::vector<std::string>& str_vec) {
 }
 
 }  // namespace sqlite_export_service_internal
-

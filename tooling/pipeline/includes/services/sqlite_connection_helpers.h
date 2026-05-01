@@ -7,6 +7,7 @@
  */
 
 #include <sqlite3.h>
+
 #include <filesystem>
 #include <string>
 #include <string_view>
@@ -20,12 +21,10 @@ void ThrowSqliteError(sqlite3* db_handle, std::string_view action);
 SqliteDatabaseHandle OpenDatabase(const std::filesystem::path& path);
 
 void ExecSql(const SqliteDatabaseHandle& db_handle, std::string_view sql,
-			 const char* action);
+             const char* action);
 
 void RollbackTransactionNoThrow(const SqliteDatabaseHandle& db_handle) noexcept;
 
 }  // namespace sqlite_export_service_internal
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_CONNECTION_HELPERS_H_
-
-

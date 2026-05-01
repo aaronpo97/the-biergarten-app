@@ -10,7 +10,8 @@ void SqliteDatabaseDeleter::operator()(sqlite3* handle) const noexcept {
   }
 }
 
-void SqliteStatementDeleter::operator()(sqlite3_stmt* statement) const noexcept {
+void SqliteStatementDeleter::operator()(
+    sqlite3_stmt* statement) const noexcept {
   if (statement != nullptr) {
     sqlite3_finalize(statement);
   }
@@ -23,7 +24,6 @@ void ThrowSqliteError(sqlite3* db_handle, std::string_view action) {
 }
 
 SqliteDatabaseHandle OpenDatabase(const std::filesystem::path& path) {
-
   sqlite3* raw_handle = nullptr;
   const int result = sqlite3_open(path.string().c_str(), &raw_handle);
 
@@ -54,7 +54,8 @@ void ExecSql(const SqliteDatabaseHandle& db_handle, std::string_view sql,
   }
 }
 
-void RollbackTransactionNoThrow(const SqliteDatabaseHandle& db_handle) noexcept {
+void RollbackTransactionNoThrow(
+    const SqliteDatabaseHandle& db_handle) noexcept {
   if (!db_handle) {
     return;
   }
@@ -63,4 +64,3 @@ void RollbackTransactionNoThrow(const SqliteDatabaseHandle& db_handle) noexcept 
 }
 
 }  // namespace sqlite_export_service_internal
-

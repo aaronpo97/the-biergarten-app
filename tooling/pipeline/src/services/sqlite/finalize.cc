@@ -8,7 +8,6 @@
 #include "services/sqlite_export_service.h"
 #include "services/sqlite_export_service_helpers.h"
 
-
 void SqliteExportService::Finalize() {
   if (db_handle_ == nullptr) {
     return;

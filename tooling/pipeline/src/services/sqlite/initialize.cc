@@ -11,7 +11,6 @@
 #include "services/sqlite_export_service.h"
 #include "services/sqlite_export_service_helpers.h"
 
-
 void SqliteExportService::InitializeSchema() const {
   sqlite_export_service_internal::ExecSql(
       db_handle_, sqlite_export_service_internal::kCreateLocationsTableSql,
@@ -45,7 +44,6 @@ void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
   db_handle_.reset();
   location_cache_.clear();
 }
-
 
 void SqliteExportService::Initialize() {
   if (db_handle_ != nullptr) {
