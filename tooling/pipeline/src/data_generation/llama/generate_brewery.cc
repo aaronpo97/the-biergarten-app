@@ -59,11 +59,12 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       location.country.empty() ? std::string{}
                                : std::format(", {}", location.country);
   /**
-   * Load brewery system prompt from file
-   * Falls back to minimal inline prompt if file not found
+   * Load brewery system prompt via the injected prompt directory.
+   * The key "BREWERY_GENERATION" resolves to BREWERY_GENERATION.md inside
+   * the configured --prompt-dir.  Throws on missing or empty file.
    */
   const std::string system_prompt =
-      LoadBrewerySystemPrompt("prompts/system.md");
+      prompt_directory_->Load("BREWERY_GENERATION");
 
   std::string user_prompt = std::format(
       "## CITY:\n{}\n\n## COUNTRY:\n{}\n\n## LOCAL LANGUAGE CODES:\n{}\n\n## "

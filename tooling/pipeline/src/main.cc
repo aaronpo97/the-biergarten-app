@@ -24,6 +24,7 @@
 #include "llama_backend_state.h"
 #include "services/enrichment_service.h"
 #include "services/export_service.h"
+#include "services/prompt_directory.h"
 #include "services/sqlite_export_service.h"
 #include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
@@ -70,6 +71,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   opt("log-path",
       prog_opts::value<std::string>()->default_value("pipeline.log"),
       "Path for application logs");
+  opt("prompt-dir", prog_opts::value<std::string>()->default_value(""),
+      "Directory containing named prompt files (e.g. BREWERY_GENERATION.md)."
+      " Required when not using --mocked.");
 
   if (argc == 1) {
     spdlog::info("Biergarten Pipeline");
@@ -95,6 +99,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
 
     options.pipeline.output_path = vm["output"].as<std::string>();
     options.pipeline.log_path = vm["log-path"].as<std::string>();
+    options.pipeline.prompt_dir = vm["prompt-dir"].as<std::string>();
 
     const bool use_mocked = vm["mocked"].as<bool>();
     const std::string model_path = vm["model"].as<std::string>();
@@ -108,6 +113,13 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     if (!use_mocked && model_path.empty()) {
       spdlog::error(
           "Invalid arguments: Either --mocked or --model must be specified");
+      return std::nullopt;
+    }
+
+    if (!use_mocked && options.pipeline.prompt_dir.empty()) {
+      spdlog::error(
+          "Invalid arguments: --prompt-dir is required when not using "
+          "--mocked");
       return std::nullopt;
     }
 
@@ -172,6 +184,19 @@ int main(const int argc, char** argv) {
     const auto sampling =
         options.generator.sampling.value_or(SamplingOptions{});
 
+    // Scenario 4: Validate the prompt directory up-front, before any DI
+    // wiring, so the error surfaces immediately with a clear message.
+    std::unique_ptr<IPromptDirectory> prompt_directory;
+    if (!options.generator.use_mocked) {
+      try {
+        prompt_directory =
+            std::make_unique<PromptDirectory>(options.pipeline.prompt_dir);
+      } catch (const std::exception& dir_error) {
+        spdlog::error("[Startup] Invalid --prompt-dir: {}", dir_error.what());
+        return 1;
+      }
+    }
+
     const auto injector = di::make_injector(
         di::bind<WebClient>().to<CURLWebClient>(),
         di::bind<ApplicationOptions>().to(options),
@@ -180,8 +205,8 @@ int main(const int argc, char** argv) {
         di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
         di::bind<std::string>().to(model_path),
         di::bind<DataGenerator>().to(
-            [options, model_path,
-             sampling](const auto& inj) -> std::unique_ptr<DataGenerator> {
+            [options, model_path, sampling, &prompt_directory](
+                const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
                 spdlog::info(
                     "[Generator] Using MockGenerator (no model path provided)");
@@ -193,7 +218,13 @@ int main(const int argc, char** argv) {
                   "top-p={}, top-k={}, n_ctx={}, seed={})",
                   model_path, sampling.temperature, sampling.top_p,
                   sampling.top_k, sampling.n_ctx, sampling.seed);
-              return inj.template create<std::unique_ptr<LlamaGenerator>>();
+              // Transfer ownership of the pre-validated PromptDirectory into
+              // the LlamaGenerator.  The lambda captures by reference so the
+              // unique_ptr is moved exactly once.
+              return std::make_unique<LlamaGenerator>(
+                  options, model_path,
+                  inj.template create<std::unique_ptr<IPromptFormatter>>(),
+                  std::move(prompt_directory));
             }));
 
     auto generator =

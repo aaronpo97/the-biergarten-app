@@ -6,3 +6,4 @@ data
 models
 *.gguf
 BiergartenPipeline.png
+output

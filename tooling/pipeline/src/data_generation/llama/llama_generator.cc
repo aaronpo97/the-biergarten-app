@@ -32,9 +32,11 @@ void LlamaGenerator::ContextDeleter::operator()(
 
 LlamaGenerator::LlamaGenerator(
     const ApplicationOptions& options, const std::string& model_path,
-    std::unique_ptr<IPromptFormatter> prompt_formatter)
+    std::unique_ptr<IPromptFormatter> prompt_formatter,
+    std::unique_ptr<IPromptDirectory> prompt_directory)
     : rng_(std::random_device{}()),
-      prompt_formatter_(std::move(prompt_formatter)) {
+      prompt_formatter_(std::move(prompt_formatter)),
+      prompt_directory_(std::move(prompt_directory)) {
   if (model_path.empty()) {
     throw std::runtime_error("LlamaGenerator: model path must not be empty");
   }
@@ -42,6 +44,11 @@ LlamaGenerator::LlamaGenerator(
   if (!prompt_formatter_) {
     throw std::runtime_error(
         "LlamaGenerator: prompt formatter dependency must not be null");
+  }
+
+  if (!prompt_directory_) {
+    throw std::runtime_error(
+        "LlamaGenerator: prompt directory dependency must not be null");
   }
 
   const auto sampling = options.generator.sampling.value_or(SamplingOptions{});

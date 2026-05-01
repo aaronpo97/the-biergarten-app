@@ -53,6 +53,10 @@ struct PipelineOptions {
   /// @brief Directory for generated artifacts.
   std::filesystem::path output_path;
 
+  /// @brief Directory that contains named prompt files (e.g.
+  /// BREWERY_GENERATION.md).
+  std::filesystem::path prompt_dir;
+
   /// @brief Path for application logs.
   std::filesystem::path log_path;
 };
