@@ -11,6 +11,10 @@
 #include <optional>
 #include <string>
 
+#include <boost/program_options.hpp>
+
+namespace prog_opts = boost::program_options;
+
 /**
  * @brief LLM sampling parameters.
  */
@@ -69,4 +73,5 @@ struct ApplicationOptions {
   PipelineOptions pipeline;
 };
 
+std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv);
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_APPLICATION_OPTIONS_H_
