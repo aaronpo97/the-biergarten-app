@@ -3,10 +3,12 @@
 
 /**
  * @file services/sqlite_statement_helpers.h
- * @brief Declarations for statement-level SQLite helper functions and constants.
+ * @brief Declarations for statement-level SQLite helper functions and
+ * constants.
  */
 
 #include <sqlite3.h>
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -107,10 +109,8 @@ void StepStatement(const SqliteDatabaseHandle& db_handle,
 
 sqlite3_int64 LastInsertRowId(const SqliteDatabaseHandle& db_handle);
 
-std::string SerializeLocalLanguages(const std::vector<std::string>& local_languages);
 std::string SerializeVector(const std::vector<std::string>& str_vec);
 
 }  // namespace sqlite_export_service_internal
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_STATEMENT_HELPERS_H_
-

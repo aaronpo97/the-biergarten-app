@@ -141,37 +141,38 @@ package "Domain: Models" {
 
   LocationContext *-- Completeness
 }
-
-package "Domain: Application Configuration"{
+@startuml
+package "Domain: Application Configuration" {
   class SamplingOptions {
-    + temperature : float = 1.0F
-    + top_p : float = 0.95F
-    + top_k : uint32_t = 64
-    + n_ctx : uint32_t = 8192
-    + seed : int = -1
+    + temperature: float = 1.0F
+    + top_p: float = 0.95F
+    + top_k: uint32_t = 64
+    + n_ctx: uint32_t = 8192
+    + seed: int = -1
   }
 
   class GeneratorOptions {
-    + model_path : std::filesystem::path
-    + use_mocked : bool = false
-    + sampling : SamplingOptions
+    + model_path: std::filesystem::path
+    + use_mocked: bool = false
+    + sampling: std::optional<SamplingOptions>
   }
 
   class PipelineOptions {
-    + output_path : std::filesystem::path
-    + log_path : std::filesystem::path
+    + output_path: std::filesystem::path
+    + log_path: std::filesystem::path
   }
 
   class ApplicationOptions {
-    + generator : GeneratorOptions
-    + pipeline : PipelineOptions
+    + generator: GeneratorOptions
+    + pipeline: PipelineOptions
   }
 
   ' --- Domain Model Relationships ---
   ApplicationOptions *-- GeneratorOptions
   ApplicationOptions *-- PipelineOptions
-  GeneratorOptions   *-- SamplingOptions
+  GeneratorOptions o-- SamplingOptions
 }
+@endum
 
 package "Domain: Policy" {
 

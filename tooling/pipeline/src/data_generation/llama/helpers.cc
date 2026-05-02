@@ -58,6 +58,11 @@ static std::string CondenseWhitespace(std::string_view text) {
   return out;
 }
 
+// Guard against truncating in the first half of the string.
+// This preserves the critical opening content and avoids cutting critical
+// context words early in the region description.
+static constexpr size_t kTruncationGuardDivisor = 2;
+
 /**
  * Truncate region context to fit within max length while preserving word
  * boundaries
@@ -71,7 +76,8 @@ std::string PrepareRegionContext(std::string_view region_context,
 
   normalized.resize(max_chars);
   const size_t last_space = normalized.find_last_of(' ');
-  if (last_space != std::string::npos && last_space > max_chars / 2) {
+  if (last_space != std::string::npos &&
+      last_space > max_chars / kTruncationGuardDivisor) {
     normalized.resize(last_space);
   }
 

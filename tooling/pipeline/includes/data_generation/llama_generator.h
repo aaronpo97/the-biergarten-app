@@ -17,6 +17,7 @@
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/application_options.h"
+#include "services/prompt_directory.h"
 
 struct llama_model;
 struct llama_context;
@@ -33,10 +34,12 @@ class LlamaGenerator final : public DataGenerator {
    * @param options Parsed application options.
    * @param model_path Filesystem path to GGUF model assets.
    * @param prompt_formatter Formatter that produces model-specific prompts.
+   * @param prompt_directory Directory service for loading named prompt files.
    */
   LlamaGenerator(const ApplicationOptions& options,
                  const std::string& model_path,
-                 std::unique_ptr<IPromptFormatter> prompt_formatter);
+                 std::unique_ptr<IPromptFormatter> prompt_formatter,
+                 std::unique_ptr<IPromptDirectory> prompt_directory);
 
   ~LlamaGenerator() override;
 
@@ -119,15 +122,6 @@ class LlamaGenerator final : public DataGenerator {
                              int max_tokens = kDefaultMaxTokens,
                              std::string_view grammar = {});
 
-  /**
-   * @brief Loads the brewery system prompt from disk.
-   *
-   * @param prompt_file_path Prompt file path to try first.
-   * @return Loaded prompt text.
-   */
-  std::string LoadBrewerySystemPrompt(
-      const std::filesystem::path& prompt_file_path);
-
   ModelHandle model_;
   ContextHandle context_;
   float sampling_temperature_ = 1.0F;
@@ -135,8 +129,8 @@ class LlamaGenerator final : public DataGenerator {
   uint32_t sampling_top_k_ = kDefaultSamplingTopK;
   std::mt19937 rng_;
   uint32_t n_ctx_ = kDefaultContextSize;
-  std::string brewery_system_prompt_;
   std::unique_ptr<IPromptFormatter> prompt_formatter_;
+  std::unique_ptr<IPromptDirectory> prompt_directory_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_

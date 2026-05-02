@@ -85,14 +85,14 @@ endif()
 FetchContent_Declare(
     llama-cpp
     GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-    GIT_TAG        b8742
+    GIT_TAG b8742
 )
 FetchContent_MakeAvailable(llama-cpp)
 
 FetchContent_Declare(
     boost-di
     GIT_REPOSITORY https://github.com/boost-ext/di.git
-    GIT_TAG        v1.3.0
+    GIT_TAG v1.3.0
 )
 FetchContent_MakeAvailable(boost-di)
 if(TARGET Boost.DI AND NOT TARGET boost::di)
@@ -102,7 +102,7 @@ endif()
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG        v1.15.3
+    GIT_TAG v1.15.3
 )
 FetchContent_MakeAvailable(spdlog)
 
@@ -121,8 +121,8 @@ set(SOURCES
     src/services/wikipedia/fetch_extract.cc
     src/services/sqlite/sqlite_export_service.cc
     src/services/sqlite/build_database_path.cc
-        src/services/sqlite/process_record.cc
-        src/services/sqlite/initialize.cc
+    src/services/sqlite/process_record.cc
+    src/services/sqlite/initialize.cc
     src/services/sqlite/finalize.cc
     src/web_client/curl_global_state.cc
     src/web_client/curl_web_client_get.cc
@@ -133,14 +133,14 @@ set(SOURCES
     src/data_generation/llama/helpers.cc
     src/data_generation/llama/infer.cc
     src/data_generation/llama/load.cc
-    src/data_generation/llama/load_brewery_prompt.cc
+    src/services/prompt_directory.cc
     src/data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.cc
     src/data_generation/mock/deterministic_hash.cc
     src/data_generation/mock/generate_brewery.cc
     src/data_generation/mock/generate_user.cc
     src/json_handling/json_loader.cc
-        src/services/sqlite/helpers/sqlite_connection_helpers.cpp
-        src/services/sqlite/helpers/sqlite_statement_helpers.cpp
+    src/services/sqlite/helpers/sqlite_connection_helpers.cpp
+    src/services/sqlite/helpers/sqlite_statement_helpers.cpp
 )
 
 # =============================================================================
@@ -173,6 +173,6 @@ configure_file(
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/prompts
-        ${CMAKE_BINARY_DIR}/prompts
+    ${CMAKE_SOURCE_DIR}/prompts
+    ${CMAKE_BINARY_DIR}/prompts
 )

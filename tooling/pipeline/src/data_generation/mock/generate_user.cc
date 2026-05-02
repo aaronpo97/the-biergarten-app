@@ -15,7 +15,7 @@ UserResult MockGenerator::GenerateUser(const std::string& locale) {
 
   UserResult result;
   const std::string_view username = kUsernames[hash % kUsernames.size()];
-  const std::string_view bio = kBios[hash / 11 % kBios.size()];
+  const std::string_view bio = kBios[hash / kBioHashStride % kBios.size()];
   result.username = username;
   result.bio = bio;
   return result;

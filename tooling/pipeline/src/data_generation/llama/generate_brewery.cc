@@ -33,6 +33,9 @@ static std::string FormatLocalLanguageCodes(
   return formatted;
 }
 
+// GBNF grammar for structured brewery JSON output.
+// @TODO move to a separate gbnf file if it grows in complexity or is shared
+// across modules.
 static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
 root ::= thought-block "{" ws "\"name_en\"" ws ":" ws string ws "," ws "\"description_en\"" ws ":" ws string ws "," ws "\"name_local\"" ws ":" ws string ws "," ws "\"description_local\"" ws ":" ws string ws "}" ws
 thought-block ::= [^{]*
@@ -59,11 +62,12 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       location.country.empty() ? std::string{}
                                : std::format(", {}", location.country);
   /**
-   * Load brewery system prompt from file
-   * Falls back to minimal inline prompt if file not found
+   * Load brewery system prompt via the injected prompt directory.
+   * The key "BREWERY_GENERATION" resolves to BREWERY_GENERATION.md inside
+   * the configured --prompt-dir.  Throws on missing or empty file.
    */
   const std::string system_prompt =
-      LoadBrewerySystemPrompt("prompts/system.md");
+      prompt_directory_->Load("BREWERY_GENERATION");
 
   std::string user_prompt = std::format(
       "## CITY:\n{}\n\n## COUNTRY:\n{}\n\n## LOCAL LANGUAGE CODES:\n{}\n\n## "
