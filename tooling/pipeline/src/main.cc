@@ -26,13 +26,11 @@
 #include "services/export_service.h"
 #include "services/prompt_directory.h"
 #include "services/sqlite_export_service.h"
+#include "services/timer.h"
 #include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
-#include "services/timer.h"
 
 namespace di = boost::di;
-
-
 
 int main(const int argc, char** argv) {
   try {

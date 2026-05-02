@@ -1,10 +1,10 @@
+#include <spdlog/spdlog.h>
+
 #include <optional>
 #include <sstream>
 #include <string>
-#include <spdlog/spdlog.h>
 
 #include "data_model/application_options.h"
-
 
 std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   prog_opts::options_description desc("Pipeline Options");

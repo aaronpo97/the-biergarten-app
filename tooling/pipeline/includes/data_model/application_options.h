@@ -6,12 +6,11 @@
  * @brief Program options for the Biergarten pipeline application.
  */
 
+#include <boost/program_options.hpp>
 #include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <string>
-
-#include <boost/program_options.hpp>
 
 namespace prog_opts = boost::program_options;
 

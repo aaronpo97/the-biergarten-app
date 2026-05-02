@@ -26,14 +26,10 @@ class Timer {
   }
 
   [[nodiscard]] int64_t Reset() {
-   auto previous_elapsed = Elapsed();
-   start_time = std::chrono::steady_clock::now();
-   return previous_elapsed;
- }
-
-
-
-
+    auto previous_elapsed = Elapsed();
+    start_time = std::chrono::steady_clock::now();
+    return previous_elapsed;
+  }
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_TIMER_H_
