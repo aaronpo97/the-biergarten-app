@@ -42,15 +42,24 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -flto")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}   -Og -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g")
 
 # 4. Dependencies
 include(FetchContent)
-find_package(CURL QUIET)
-if (NOT CURL_FOUND)
-    message(FATAL_ERROR "[biergarten] libcurl not found. Install it (e.g. 'sudo dnf install libcurl-devel').")
-endif ()
+
+# Boost (system install — via dnf/brew)
 find_package(Boost REQUIRED COMPONENTS json program_options)
+
+# Boost.DI (unofficial Boost extension, must declare separately from main Boost dependency)
+FetchContent_Declare(
+        boost-di
+        GIT_REPOSITORY https://github.com/boost-ext/di.git
+        GIT_TAG v1.3.0
+)
+FetchContent_MakeAvailable(boost-di)
+if (TARGET Boost.DI AND NOT TARGET boost::di)
+    add_library(boost::di ALIAS Boost.DI)
+endif ()
 
 # SQLite amalgamation
 FetchContent_Declare(
@@ -76,17 +85,6 @@ if (NOT BIERGARTEN_MOCK_ONLY)
     FetchContent_MakeAvailable(llama-cpp)
 endif ()
 
-# Boost.DI (unofficial Boost extension, must declare separately from main Boost dependency)
-FetchContent_Declare(
-        boost-di
-        GIT_REPOSITORY https://github.com/boost-ext/di.git
-        GIT_TAG v1.3.0
-)
-FetchContent_MakeAvailable(boost-di)
-if (TARGET Boost.DI AND NOT TARGET boost::di)
-    add_library(boost::di ALIAS Boost.DI)
-endif ()
-
 # spdlog
 FetchContent_Declare(
         spdlog
@@ -94,6 +92,21 @@ FetchContent_Declare(
         GIT_TAG v1.15.3
 )
 FetchContent_MakeAvailable(spdlog)
+
+# cpp-httplib — header-only HTTP/HTTPS client replacing libcurl.
+# OpenSSL is required for HTTPS (Wikipedia API). find_package locates
+# libssl/libcrypto; HTTPLIB_REQUIRE_OPENSSL causes a hard build failure
+# if OpenSSL is absent rather than silently producing an HTTP-only binary.
+find_package(OpenSSL REQUIRED)
+FetchContent_Declare(
+        cpp-httplib
+        GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+        GIT_TAG v0.43.2
+        GIT_SHALLOW TRUE
+        SYSTEM
+)
+set(HTTPLIB_REQUIRE_OPENSSL ON CACHE BOOL "Require OpenSSL for cpp-httplib" FORCE)
+FetchContent_MakeAvailable(cpp-httplib)
 
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME})
@@ -124,9 +137,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- web_client ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/web_client/curl_web_client_url_encode.cc
-        src/web_client/curl_web_client_get.cc
-        src/web_client/curl_global_state.cc
+        src/web_client/http_web_client.cc
 )
 
 # --- data_generation: prompt_formatting ---
@@ -175,7 +186,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/services/prompt_directory.cc
 )
 
-# 6. Include Directories & Link Libraries
+# 6. Include Directories, Link Libraries & Compile Definitions
 target_include_directories(${PROJECT_NAME} PRIVATE
         includes
         $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:${llama-cpp_SOURCE_DIR}/include>
@@ -189,12 +200,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Boost::program_options
         spdlog::spdlog
         sqlite3
-        CURL::libcurl
+        httplib::httplib
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
 
-if (BIERGARTEN_MOCK_ONLY)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE BIERGARTEN_MOCK_ONLY)
-endif ()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        # Defined when -DBIERGARTEN_MOCK_ONLY=ON — skips llama.cpp entirely.
+        # Use #ifdef BIERGARTEN_MOCK_ONLY in source to guard llama-specific code.
+        $<$<BOOL:${BIERGARTEN_MOCK_ONLY}>:BIERGARTEN_MOCK_ONLY>
+
+        # Defined for Debug configuration builds.
+        # Use #ifdef DEBUG in source to enable debug-only behaviour (e.g. verbose logging).
+        $<$<CONFIG:Debug>:DEBUG>
+)
 
 # 7. Runtime Assets
 configure_file(

@@ -8,12 +8,11 @@
 
 #include <boost/di.hpp>
 #include <boost/program_options.hpp>
-#include <chrono>
-#include <cstdint>
+
 #include <exception>
 #include <memory>
 #include <optional>
-#include <sstream>
+
 #include <string>
 
 #include "biergarten_data_generator.h"
@@ -29,15 +28,21 @@
 #include "services/timer.h"
 #include "services/wikipedia_service.h"
 #include "web_client/curl_web_client.h"
+#include "web_client/http_web_client.h"
 
 namespace di = boost::di;
 
 int main(const int argc, char** argv) {
   try {
     Timer timer;
-    const CurlGlobalState curl_state;
-    const LlamaBackendState llama_backend_state;
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+
+#ifndef BIERGARTEN_MOCK_ONLY
+    const LlamaBackendState llama_backend_state;
+#endif
+#ifdef DEBUG
+    spdlog::set_level(spdlog::level::debug);
+#endif
 
     const auto parsed_options = ParseArguments(argc, argv);
     if (!parsed_options.has_value()) {
@@ -61,7 +66,7 @@ int main(const int argc, char** argv) {
     }
 
     const auto injector = di::make_injector(
-        di::bind<WebClient>().to<CURLWebClient>(),
+        di::bind<WebClient>().to<HttpWebClient>(),
         di::bind<ApplicationOptions>().to(options),
         di::bind<IEnrichmentService>().to<WikipediaService>(),
         di::bind<IExportService>().to<SqliteExportService>(),
@@ -69,7 +74,7 @@ int main(const int argc, char** argv) {
         di::bind<std::string>().to(model_path),
         di::bind<DataGenerator>().to(
             [options, model_path, sampling, &prompt_directory](
-                const auto& inj) -> std::unique_ptr<DataGenerator> {
+            const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
                 spdlog::info(
                     "[Generator] Using MockGenerator (no model path provided)");
