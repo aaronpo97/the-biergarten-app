@@ -1,3 +1,4 @@
+# CMakeLists.txt (project root)
 cmake_minimum_required(VERSION 3.31)
 project(biergarten-pipeline)
 
@@ -46,10 +47,15 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}   -Og -g")
 
 # 4. Dependencies
 include(FetchContent)
+
+# DEPRECATED: libcurl — to be removed once all usages are migrated to cpp-httplib.
+# Tracked in: web_client/curl_web_client_get.cc, web_client/curl_web_client_url_encode.cc,
+#             web_client/curl_global_state.cc
 find_package(CURL QUIET)
 if (NOT CURL_FOUND)
     message(FATAL_ERROR "[biergarten] libcurl not found. Install it (e.g. 'sudo dnf install libcurl-devel').")
 endif ()
+
 find_package(Boost REQUIRED COMPONENTS json program_options)
 
 # SQLite amalgamation
@@ -95,6 +101,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
+# cpp-httplib — replaces direct libcurl usage in web_client.
+# OpenSSL is required for HTTPS (Wikipedia). find_package is called first so
+# CMake can locate libssl/libcrypto; cpp-httplib itself is header-only so the
+# CPPHTTPLIB_OPENSSL_SUPPORT compile definition is propagated via the target.
+find_package(OpenSSL REQUIRED)
+
+FetchContent_Declare(
+        cpp-httplib
+        GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+        GIT_TAG v0.41.0
+        GIT_SHALLOW TRUE
+        SYSTEM
+)
+set(HTTPLIB_REQUIRE_OPENSSL ON CACHE BOOL "Require OpenSSL for cpp-httplib" FORCE)
+FetchContent_MakeAvailable(cpp-httplib)
+
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME})
 
@@ -123,10 +145,15 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 # --- web_client ---
+# DEPRECATED: curl_web_client_* — to be replaced with cpp-httplib equivalents.
 target_sources(${PROJECT_NAME} PRIVATE
         src/web_client/curl_web_client_url_encode.cc
         src/web_client/curl_web_client_get.cc
         src/web_client/curl_global_state.cc
+)
+
+target_sources(${PROJECT_NAME} PRIVATE
+        src/web_client/http_web_client.cc
 )
 
 # --- data_generation: prompt_formatting ---
@@ -189,7 +216,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Boost::program_options
         spdlog::spdlog
         sqlite3
-        CURL::libcurl
+        httplib::httplib
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        CURL::libcurl          # DEPRECATED: remove once web_client is migrated to cpp-httplib
 )
 
 if (BIERGARTEN_MOCK_ONLY)
