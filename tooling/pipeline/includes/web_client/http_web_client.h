@@ -14,12 +14,13 @@
 /**
  * @brief WebClient implementation backed by cpp-httplib.
  *
- * Supports HTTP and HTTPS (requires
- * OpenSSL; see HTTPLIB_USE_OPENSSL_IF_AVAILABLE in CMakeLists.txt).
+ * Supports HTTP and HTTPS (requires OpenSSL; see HTTPLIB_REQUIRE_OPENSSL
+ * in CMakeLists.txt).
  *
- * URL parsing splits a full URL into scheme + host and path + query so that
- * httplib::Client can be constructed correctly. A new client instance is
- * created per request to ensure thread safety
+ * URL parsing splits a full URL into origin (scheme://host[:port]) and
+ * path + query so that httplib::Client can be constructed correctly.
+ * A new client instance is created per request because the client is
+ * bound to a single origin at construction time.
  */
 class HttpWebClient final : public WebClient {
 public:

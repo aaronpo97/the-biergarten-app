@@ -1,4 +1,3 @@
-# CMakeLists.txt (project root)
 cmake_minimum_required(VERSION 3.31)
 project(biergarten-pipeline)
 
@@ -43,20 +42,24 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -flto")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}   -Og -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g")
 
 # 4. Dependencies
 include(FetchContent)
 
-# DEPRECATED: libcurl — to be removed once all usages are migrated to cpp-httplib.
-# Tracked in: web_client/curl_web_client_get.cc, web_client/curl_web_client_url_encode.cc,
-#             web_client/curl_global_state.cc
-find_package(CURL QUIET)
-if (NOT CURL_FOUND)
-    message(FATAL_ERROR "[biergarten] libcurl not found. Install it (e.g. 'sudo dnf install libcurl-devel').")
-endif ()
-
+# Boost (system install — via dnf/brew)
 find_package(Boost REQUIRED COMPONENTS json program_options)
+
+# Boost.DI (unofficial Boost extension, must declare separately from main Boost dependency)
+FetchContent_Declare(
+        boost-di
+        GIT_REPOSITORY https://github.com/boost-ext/di.git
+        GIT_TAG v1.3.0
+)
+FetchContent_MakeAvailable(boost-di)
+if (TARGET Boost.DI AND NOT TARGET boost::di)
+    add_library(boost::di ALIAS Boost.DI)
+endif ()
 
 # SQLite amalgamation
 FetchContent_Declare(
@@ -82,17 +85,6 @@ if (NOT BIERGARTEN_MOCK_ONLY)
     FetchContent_MakeAvailable(llama-cpp)
 endif ()
 
-# Boost.DI (unofficial Boost extension, must declare separately from main Boost dependency)
-FetchContent_Declare(
-        boost-di
-        GIT_REPOSITORY https://github.com/boost-ext/di.git
-        GIT_TAG v1.3.0
-)
-FetchContent_MakeAvailable(boost-di)
-if (TARGET Boost.DI AND NOT TARGET boost::di)
-    add_library(boost::di ALIAS Boost.DI)
-endif ()
-
 # spdlog
 FetchContent_Declare(
         spdlog
@@ -101,16 +93,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
-# cpp-httplib — replaces direct libcurl usage in web_client.
-# OpenSSL is required for HTTPS (Wikipedia). find_package is called first so
-# CMake can locate libssl/libcrypto; cpp-httplib itself is header-only so the
-# CPPHTTPLIB_OPENSSL_SUPPORT compile definition is propagated via the target.
+# cpp-httplib — header-only HTTP/HTTPS client replacing libcurl.
+# OpenSSL is required for HTTPS (Wikipedia API). find_package locates
+# libssl/libcrypto; HTTPLIB_REQUIRE_OPENSSL causes a hard build failure
+# if OpenSSL is absent rather than silently producing an HTTP-only binary.
 find_package(OpenSSL REQUIRED)
-
 FetchContent_Declare(
         cpp-httplib
         GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-        GIT_TAG v0.41.0
+        GIT_TAG v0.43.2
         GIT_SHALLOW TRUE
         SYSTEM
 )
@@ -145,13 +136,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 # --- web_client ---
-# DEPRECATED: curl_web_client_* — to be replaced with cpp-httplib equivalents.
-target_sources(${PROJECT_NAME} PRIVATE
-        src/web_client/curl_web_client_url_encode.cc
-        src/web_client/curl_web_client_get.cc
-        src/web_client/curl_global_state.cc
-)
-
 target_sources(${PROJECT_NAME} PRIVATE
         src/web_client/http_web_client.cc
 )
@@ -202,7 +186,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/services/prompt_directory.cc
 )
 
-# 6. Include Directories & Link Libraries
+# 6. Include Directories, Link Libraries & Compile Definitions
 target_include_directories(${PROJECT_NAME} PRIVATE
         includes
         $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:${llama-cpp_SOURCE_DIR}/include>
@@ -219,12 +203,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         httplib::httplib
         OpenSSL::SSL
         OpenSSL::Crypto
-        CURL::libcurl          # DEPRECATED: remove once web_client is migrated to cpp-httplib
 )
 
-if (BIERGARTEN_MOCK_ONLY)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE BIERGARTEN_MOCK_ONLY)
-endif ()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        # Defined when -DBIERGARTEN_MOCK_ONLY=ON — skips llama.cpp entirely.
+        # Use #ifdef BIERGARTEN_MOCK_ONLY in source to guard llama-specific code.
+        $<$<BOOL:${BIERGARTEN_MOCK_ONLY}>:BIERGARTEN_MOCK_ONLY>
+
+        # Defined for Debug configuration builds.
+        # Use #ifdef DEBUG in source to enable debug-only behaviour (e.g. verbose logging).
+        $<$<CONFIG:Debug>:DEBUG>
+)
 
 # 7. Runtime Assets
 configure_file(
