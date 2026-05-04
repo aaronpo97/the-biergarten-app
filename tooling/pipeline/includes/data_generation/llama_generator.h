@@ -14,10 +14,10 @@
 #include <string>
 #include <string_view>
 
+#include "../services/prompting/prompt_directory.h"
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/models.h"
-#include "../services/prompting/prompt_directory.h"
 
 struct llama_model;
 struct llama_context;
@@ -129,6 +129,7 @@ class LlamaGenerator final : public DataGenerator {
   uint32_t sampling_top_k_ = kDefaultSamplingTopK;
   std::mt19937 rng_;
   uint32_t n_ctx_ = kDefaultContextSize;
+  int n_gpu_layers_ = 0;
   std::unique_ptr<IPromptFormatter> prompt_formatter_;
   std::unique_ptr<IPromptDirectory> prompt_directory_;
 };

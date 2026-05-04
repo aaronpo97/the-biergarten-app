@@ -1,0 +1,9 @@
+build/
+cmake-build-debug/
+.git/
+.idea/
+**/*.sqlite
+**/*.log
+**/*.sqlite3
+**/*.db
+

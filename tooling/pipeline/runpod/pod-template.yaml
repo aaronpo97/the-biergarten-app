@@ -1,0 +1,22 @@
+name: biergarten-pipeline-live
+imageName: biergarten-pipeline:latest
+category: NVIDIA
+containerDiskInGb: 50
+volumeInGb: 50
+volumeMountPath: /workspace
+dockerEntrypoint:
+  - /usr/local/bin/biergarten-start
+dockerStartCmd: []
+isPublic: false
+isServerless: false
+env:
+  BIERGARTEN_MODE: live
+  BIERGARTEN_MODEL_PATH: /workspace/models/google_gemma-4-E4B-it-Q6_K.gguf
+  BIERGARTEN_PROMPT_DIR: /workspace/app/build/prompts
+  BIERGARTEN_OUTPUT_DIR: /workspace/output
+  BIERGARTEN_LOG_PATH: /workspace/logs/pipeline.log
+  BIERGARTEN_TEMPERATURE: "1.0"
+  BIERGARTEN_TOP_P: "0.95"
+  BIERGARTEN_TOP_K: "64"
+  BIERGARTEN_N_CTX: "8192"
+  BIERGARTEN_SEED: "-1"

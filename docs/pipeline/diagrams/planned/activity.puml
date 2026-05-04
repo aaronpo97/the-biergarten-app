@@ -13,7 +13,7 @@ if (Invalid args?) then (yes)
   stop
 else (no)
 endif
-:Init CurlGlobalState & LlamaBackendState;
+:Init OpenSSL global state & LlamaBackendState;
 :Build DI injector;
 
 :Initialize SqliteExportService;
