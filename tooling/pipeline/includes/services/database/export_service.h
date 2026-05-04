@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_EXPORT_SERVICE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_EXPORT_SERVICE_H_
 
 /**
  * @file services/export_service.h
@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "data_model/generated_brewery.h"
+#include "data_model/generated_models.h"
 
 /**
  * @brief Interface for services that persist generated brewery records.
@@ -39,4 +39,4 @@ class IExportService {
   virtual void Finalize() = 0;
 };
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_EXPORT_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_EXPORT_SERVICE_H_

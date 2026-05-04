@@ -4,7 +4,7 @@
  * construction and loads named prompt files on demand with in-process caching.
  */
 
-#include "services/prompt_directory.h"
+#include "services/prompting/prompt_directory.h"
 
 #include <spdlog/spdlog.h>
 

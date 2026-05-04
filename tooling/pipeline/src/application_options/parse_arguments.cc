@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "data_model/application_options.h"
+#include "data_model/models.h"
 
 std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
   prog_opts::options_description desc("Pipeline Options");

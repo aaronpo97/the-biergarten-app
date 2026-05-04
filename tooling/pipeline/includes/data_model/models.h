@@ -1,9 +1,9 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_APPLICATION_OPTIONS_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_APPLICATION_OPTIONS_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_MODELS_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_MODELS_H_
 
 /**
- * @file data_model/application_options.h
- * @brief Program options for the Biergarten pipeline application.
+ * @file data_model/models.h
+ * @brief Core data models: locations, application configuration, and generation inputs.
  */
 
 #include <boost/program_options.hpp>
@@ -11,8 +11,58 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <vector>
 
 namespace prog_opts = boost::program_options;
+
+// ============================================================================
+// Location Models
+// ============================================================================
+
+/**
+ * @brief Canonical location record for city-level generation.
+ */
+struct Location {
+  /// @brief City name.
+  std::string city{};
+
+  /// @brief State or province name.
+  std::string state_province{};
+
+  /// @brief ISO 3166-2 subdivision code.
+  std::string iso3166_2{};
+
+  /// @brief Country name.
+  std::string country{};
+
+  /// @brief ISO 3166-1 country code.
+  std::string iso3166_1{};
+
+  /// @brief Local language codes in priority order.
+  std::vector<std::string> local_languages{};
+
+  /// @brief Latitude in decimal degrees.
+  double latitude{};
+
+  /// @brief Longitude in decimal degrees.
+  double longitude{};
+};
+
+/**
+ * @brief Non-owning brewery location input.
+ */
+struct BreweryLocation {
+  /// @brief City name.
+  std::string_view city_name;
+
+  /// @brief Country name.
+  std::string_view country_name;
+};
+
+// ============================================================================
+// Configuration Models
+// ============================================================================
 
 /**
  * @brief LLM sampling parameters.
@@ -72,5 +122,10 @@ struct ApplicationOptions {
   PipelineOptions pipeline;
 };
 
+// ============================================================================
+// Function Declarations
+// ============================================================================
+
 std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv);
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_APPLICATION_OPTIONS_H_
+
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_MODELS_H_

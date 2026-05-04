@@ -1,4 +1,4 @@
-#include "services/sqlite_connection_helpers.h"
+#include "services/database/sqlite_connection_helpers.h"
 
 #include <stdexcept>
 

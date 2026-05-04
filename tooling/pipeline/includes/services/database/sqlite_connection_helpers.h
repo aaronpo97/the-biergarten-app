@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_CONNECTION_HELPERS_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_CONNECTION_HELPERS_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_CONNECTION_HELPERS_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_CONNECTION_HELPERS_H_
 
 /**
  * @file services/sqlite_connection_helpers.h
@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include "services/sqlite_handle_types.h"
+#include "sqlite_handle_types.h"
 
 namespace sqlite_export_service_internal {
 
@@ -27,4 +27,4 @@ void RollbackTransactionNoThrow(const SqliteDatabaseHandle& db_handle) noexcept;
 
 }  // namespace sqlite_export_service_internal
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_CONNECTION_HELPERS_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_CONNECTION_HELPERS_H_

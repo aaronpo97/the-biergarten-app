@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_SERVICE_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_ENRICHMENT_SERVICE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_ENRICHMENT_SERVICE_H_
 
 /**
  * @file services/enrichment_service.h
@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "data_model/location.h"
+#include "data_model/models.h"
 
 /**
  * @brief Interface for services that can enrich a location with context.
@@ -27,4 +27,4 @@ class IEnrichmentService {
   virtual std::string GetLocationContext(const Location& loc) = 0;
 };
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_ENRICHMENT_SERVICE_H_

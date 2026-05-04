@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_STATEMENT_HELPERS_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_STATEMENT_HELPERS_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_STATEMENT_HELPERS_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_STATEMENT_HELPERS_H_
 
 /**
  * @file services/sqlite_statement_helpers.h
@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-#include "services/sqlite_handle_types.h"
+#include "sqlite_handle_types.h"
 
 namespace sqlite_export_service_internal {
 
@@ -113,4 +113,4 @@ std::string SerializeVector(const std::vector<std::string>& str_vec);
 
 }  // namespace sqlite_export_service_internal
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_STATEMENT_HELPERS_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_STATEMENT_HELPERS_H_

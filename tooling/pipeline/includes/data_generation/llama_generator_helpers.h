@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include "data_model/brewery_result.h"
+#include "data_model/generated_models.h"
 
 struct llama_vocab;
 using llama_token = int32_t;
