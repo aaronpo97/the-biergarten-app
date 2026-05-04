@@ -1,4 +1,4 @@
-#include "services/sqlite_statement_helpers.h"
+#include "services/database/sqlite_statement_helpers.h"
 
 #include <boost/json.hpp>
 #include <cstring>
@@ -6,7 +6,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "services/sqlite_connection_helpers.h"
+#include "services/database/sqlite_connection_helpers.h"
 
 namespace sqlite_export_service_internal {
 

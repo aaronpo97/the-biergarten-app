@@ -14,8 +14,8 @@
 #include "data_model/enriched_city.h"
 #include "data_model/generated_brewery.h"
 #include "data_model/location.h"
-#include "services/enrichment_service.h"
-#include "services/export_service.h"
+#include "services/enrichment/enrichment_service.h"
+#include "services/database/export_service.h"
 
 /**
  * @brief Main data generator class for the Biergarten pipeline.

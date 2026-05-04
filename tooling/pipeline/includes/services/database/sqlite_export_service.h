@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_EXPORT_SERVICE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_EXPORT_SERVICE_H_
 
 /**
  * @file services/sqlite_export_service.h
@@ -12,9 +12,9 @@
 #include <unordered_map>
 
 #include "data_model/application_options.h"
-#include "services/date_time_provider.h"
-#include "services/export_service.h"
-#include "services/sqlite_export_service_helpers.h"
+#include "../datetime/date_time_provider.h"
+#include "export_service.h"
+#include "sqlite_export_service_helpers.h"
 
 /**
  * @brief Persists generated brewery records into a fresh SQLite database.
@@ -57,4 +57,4 @@ class SqliteExportService final : public IExportService {
   std::unordered_map<std::string, sqlite3_int64> location_cache_;
 };
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_SQLITE_EXPORT_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_EXPORT_SERVICE_H_

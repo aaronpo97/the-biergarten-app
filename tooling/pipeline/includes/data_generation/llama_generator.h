@@ -17,7 +17,7 @@
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/application_options.h"
-#include "services/prompt_directory.h"
+#include "../services/prompting/prompt_directory.h"
 
 struct llama_model;
 struct llama_context;

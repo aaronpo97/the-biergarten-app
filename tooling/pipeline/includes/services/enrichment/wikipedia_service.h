@@ -1,5 +1,5 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_WIKIPEDIA_SERVICE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_WIKIPEDIA_SERVICE_H_
 
 /**
  * @file services/wikipedia_service.h
@@ -11,7 +11,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "services/enrichment_service.h"
+#include "enrichment_service.h"
 #include "web_client/web_client.h"
 
 /// @brief Provides Wikipedia summary lookups backed by cached raw extracts.
@@ -30,4 +30,4 @@ class WikipediaService final : public IEnrichmentService {
   std::unordered_map<std::string, std::string> extract_cache_;
 };
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_WIKIPEDIA_SERVICE_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_WIKIPEDIA_SERVICE_H_

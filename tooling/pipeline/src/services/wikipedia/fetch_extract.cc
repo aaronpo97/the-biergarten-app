@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include "services/wikipedia_service.h"
+#include "services/enrichment/wikipedia_service.h"
 
 std::string WikipediaService::FetchExtract(std::string_view query) {
   const std::string cache_key(query);

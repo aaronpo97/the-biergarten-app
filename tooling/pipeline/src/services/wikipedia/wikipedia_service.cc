@@ -3,7 +3,7 @@
  * @brief WikipediaService constructor implementation.
  */
 
-#include "services/wikipedia_service.h"
+#include "services/enrichment/wikipedia_service.h"
 
 #include <utility>
 

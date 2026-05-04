@@ -8,8 +8,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "services/sqlite_export_service.h"
-#include "services/sqlite_export_service_helpers.h"
+#include "services/database/sqlite_export_service.h"
+#include "services/database/sqlite_export_service_helpers.h"
 
 constexpr int kLocationPrecision = 17;
 

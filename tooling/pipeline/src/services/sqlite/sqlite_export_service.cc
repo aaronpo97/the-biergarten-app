@@ -3,7 +3,7 @@
  * @brief SqliteExportService constructor and destructor implementation.
  */
 
-#include "services/sqlite_export_service.h"
+#include "services/database/sqlite_export_service.h"
 
 #include <memory>
 

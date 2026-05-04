@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "services/wikipedia_service.h"
+#include "services/enrichment/wikipedia_service.h"
 
 std::string WikipediaService::GetLocationContext(const Location& loc) {
   if (!client_) {
