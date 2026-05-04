@@ -8,9 +8,7 @@
 
 #include <string>
 
-#include "data_model/brewery_result.h"
-#include "data_model/location.h"
-#include "data_model/user_result.h"
+#include "data_model/generated_models.h"
 
 /**
  * @brief Interface for data generator implementations.

@@ -19,7 +19,7 @@
 #include "data_generation/llama_generator.h"
 #include "data_generation/mock_generator.h"
 #include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
-#include "data_model/application_options.h"
+#include "data_model/models.h"
 #include "llama_backend_state.h"
 #include "services/enrichment/enrichment_service.h"
 #include "services/database/export_service.h"

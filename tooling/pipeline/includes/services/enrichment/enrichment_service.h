@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "data_model/location.h"
+#include "data_model/models.h"
 
 /**
  * @brief Interface for services that can enrich a location with context.

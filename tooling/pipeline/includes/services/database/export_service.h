@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "data_model/generated_brewery.h"
+#include "data_model/generated_models.h"
 
 /**
  * @brief Interface for services that persist generated brewery records.
