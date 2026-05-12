@@ -89,6 +89,7 @@ LlamaGenerator::LlamaGenerator(
   }
 
   n_ctx_ = sampling.n_ctx;
+  n_gpu_layers_ = options.generator.n_gpu_layers;
 
   this->Load(model_path);
 }

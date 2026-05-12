@@ -1,0 +1,9 @@
+# Ignore model files!
+*.gguf
+*.bin
+models/
+weights/
+
+# Ignore local build folders
+build/
+.git/

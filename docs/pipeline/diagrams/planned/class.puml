@@ -356,7 +356,7 @@ package "Infrastructure: Enrichment" {
     + UrlEncode(value : const std::string&) : std::string
   }
 
-  class CURLWebClient {
+  class HttpWebClient {
     + Get(url : const std::string&) : std::string
     + UrlEncode(value : const std::string&) : std::string
   }
@@ -520,7 +520,7 @@ CheckinDistributionStrategy    <|.. RandomCheckinStrategy
 FollowGenerationStrategy       <|.. RandomFollowStrategy
 FollowGenerationStrategy       <|.. ActivityWeightedFollowStrategy
 EnrichmentService              <|.. WikipediaService
-WebClient                      <|.. CURLWebClient
+WebClient                      <|.. HttpWebClient
 DataGenerator                  <|.. MockGenerator
 DataGenerator                  <|.. LlamaGenerator
 PromptFormatter                <|.. Gemma4JinjaPromptFormatter

@@ -18,6 +18,7 @@ descriptions via a local GGUF model or a deterministic mock.
   - [Build](#build)
   - [Model](#model)
   - [Run](#run)
+- [Docker / RunPod](#docker--runpod)
 - [Architecture](#architecture)
   - [Pipeline Stages](#pipeline-stages)
   - [Key Components](#key-components)
@@ -51,7 +52,7 @@ step.
 
 ### Build
 
-Requirements: C++20 compiler, CMake 3.24+, libcurl, Boost (JSON and
+Requirements: C++20 compiler, CMake 3.31+, OpenSSL, Boost (JSON and
 ProgramOptions). SQLite is fetched from the upstream amalgamation, so no system
 SQLite package is required.
 
@@ -59,6 +60,16 @@ SQLite package is required.
 cmake -S . -B build
 cmake --build build
 ```
+
+CMake automatically detects whether a compatible llama.cpp installation is
+present on the system (`libllama`, `libggml`, `libggml-base`, and `llama.h`
+visible on the default search paths). If found, it links against those
+libraries and skips the FetchContent build. If not found, it fetches and builds
+llama.cpp from source at tag `b9012`. No additional flags are required in
+either case.
+
+Metal is enabled automatically on Apple Silicon. CUDA or HIP/ROCm is detected
+automatically on Linux when the relevant toolkit is present.
 
 ### Model
 
@@ -74,33 +85,124 @@ curl -L \
 ### Run
 
 Run from `build/` so the copied `locations.json` and `prompts/` are available.
-Each run also writes a fresh dated SQLite file such as
+Each run writes a fresh dated SQLite file such as
 `biergarten_seed_2026-04-19T15-30-45.123456Z.sqlite` into the working directory.
 
 ```bash
 ./biergarten-pipeline --mocked
-./biergarten-pipeline --model models/google_gemma-4-E4B-it-Q6_K.gguf --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
+
+./biergarten-pipeline \
+  --model ../models/google_gemma-4-E4B-it-Q6_K.gguf \
+  --prompt-dir prompts \
+  --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
 ```
 
 #### CLI Flags
 
-| Flag            | Purpose                                                 |
-| --------------- | ------------------------------------------------------- |
-| `--mocked`      | Deterministic mock generator, no model required.        |
-| `--model, -m`   | Path to a GGUF file. Required unless `--mocked` is set. |
-| `--temperature` | Sampling temperature. Default: `1.0`.                   |
-| `--top-p`       | Nucleus sampling. Default: `0.95`.                      |
-| `--top-k`       | Top-k sampling. Default: `64`.                          |
-| `--n-ctx`       | Context window size. Default: `8192`.                   |
-| `--seed`        | Random seed. Default: `-1` (random at runtime).         |
-| `--help, -h`    | Print usage and exit.                                   |
+| Flag            | Purpose                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| `--mocked`      | Deterministic mock generator, no model required.                                                     |
+| `--model, -m`   | Path to a GGUF file. Required unless `--mocked` is set.                                              |
+| `--prompt-dir`  | Directory containing prompt files (e.g. `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
+| `--output, -o`  | Directory for generated SQLite artifacts. Default: `output`.                                         |
+| `--log-path`    | Path for application logs. Default: `pipeline.log`.                                                  |
+| `--temperature` | Sampling temperature. Default: `1.0`.                                                                |
+| `--top-p`       | Nucleus sampling. Default: `0.95`.                                                                   |
+| `--top-k`       | Top-k sampling. Default: `64`.                                                                       |
+| `--n-ctx`       | Context window size. Default: `8192`.                                                                |
+| `--seed`        | Random seed. Default: `-1` (random at runtime).                                                      |
+| `--help, -h`    | Print usage and exit.                                                                                |
 
 `--mocked` and `--model` are mutually exclusive. Omitting both exits with an
 error before the pipeline starts. Sampling flags are ignored when `--mocked` is
 set.
 
 The post-build step copies `prompts/` into `build/prompts/`. Rebuild after
-editing `prompts/system.md`.
+editing any prompt file.
+
+---
+
+## Docker / RunPod
+
+The `tooling/pipeline/runpod/` directory contains a GPU-ready container
+configuration for running the pipeline on RunPod or any Docker host with an
+NVIDIA GPU.
+
+### How it works
+
+The container uses a two-stage build. The first stage pulls prebuilt
+`libllama`, `libggml`, and backend plugin libraries (including `libggml-cuda.so`
+and the CPU variant plugins) from `ghcr.io/ggml-org/llama.cpp:full-cuda`. The
+second stage copies those libraries into `/usr/local/lib` and runs `ldconfig` so
+the dynamic linker and `dlopen` calls from `ggml_backend_load_all()` can resolve
+the CUDA backend plugin at runtime. llama.cpp headers are cloned at the matching
+tag and installed into `/usr/local/include`. CMake auto-detects both and skips
+the FetchContent source build entirely, keeping image build times short.
+
+`GGML_BACKEND_PATH` is set to `/usr/local/lib` so llama.cpp knows where to scan
+for backend plugins.
+
+### Build the image
+
+Run from the `tooling/pipeline/` directory (the CMake project root), not from
+inside `runpod/`, so the `COPY . .` step picks up the full project context.
+
+```bash
+docker build -t biergarten-pipeline:latest -f runpod/Dockerfile .
+```
+
+To monitor the full build output and confirm CMake selects the system llama.cpp:
+
+```bash
+docker build \
+  --progress=plain \
+  --no-cache \
+  -t biergarten-pipeline:latest \
+  -f runpod/Dockerfile \
+  . 2>&1 | tee build.log
+```
+
+Look for `[biergarten] Found system llama.cpp — skipping FetchContent` in the
+output to confirm the fast path was taken.
+
+### Run in mocked mode
+
+No model or GPU required. Useful for validating the pipeline logic and SQLite
+export path.
+
+```bash
+docker run --rm \
+  -e BIERGARTEN_MODE=mocked \
+  -v "$PWD/output:/workspace/output" \
+  -v "$PWD/logs:/workspace/logs" \
+  biergarten-pipeline:latest
+```
+
+### Run in live mode
+
+Mount your GGUF model before starting. The container validates the model path
+before launching the binary.
+
+```bash
+docker run --rm \
+  --runtime=nvidia \
+  -e BIERGARTEN_MODE=live \
+  -e GGML_BACKEND_PATH="/usr/local/lib/libggml-cuda.so" \
+  -v "$PWD/models:/workspace/models" \
+  -v "$PWD/output:/workspace/output" \
+  -v "$PWD/logs:/workspace/logs" \
+  biergarten-pipeline:latest
+```
+
+The model must be present at `./models/google_gemma-4-E4B-it-Q6_K.gguf` on the
+host. See [Model](#model) above for the download command.
+
+### RunPod deployment
+
+Use a GPU pod template. Mount persistent storage for `/workspace/models`,
+`/workspace/output`, and `/workspace/logs`. Set `BIERGARTEN_MODE=live` in the
+template environment. See `tooling/pipeline/runpod/pod-template.yaml` for a
+starter template.
 
 ---
 
@@ -197,16 +299,18 @@ code, latitude, and longitude for each entry.
 ## Tech Stack
 
 - C++20
-- CMake 3.24+
+- CMake 3.31+
 - Boost.JSON, Boost.ProgramOptions, Boost.DI
 - spdlog
-- libcurl
+- cpp-httplib (with OpenSSL)
 - SQLite amalgamation fetched and compiled via CMake FetchContent
-- llama.cpp
+- llama.cpp (auto-detected from system install or fetched via FetchContent)
+- Docker with NVIDIA CUDA 12.6 base image for GPU container builds
+- RunPod for cloud GPU inference
 
-The build fetches Boost.DI, spdlog, llama.cpp, and SQLite via CMake. Metal is
-enabled on Apple Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit
-is present.
+The build fetches Boost.DI, spdlog, and SQLite via CMake. llama.cpp is fetched
+only when a system installation is not detected. Metal is enabled on Apple
+Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 > **Code Style:** Modern C++20 throughout — RAII for ownership,
 > `std::unique_ptr` for injected dependencies, `std::optional` for parse
@@ -218,7 +322,7 @@ is present.
 
 ## Tested Hardware
 
-### ARM macOS - M1 Pro
+### ARM macOS — M1 Pro
 
 |           |                                   |
 | --------- | --------------------------------- |
@@ -229,7 +333,7 @@ is present.
 | Model     | Gemma 4 E4B                       |
 | Inference | llama.cpp with Metal              |
 
-### x86_64 Linux - NVIDIA RTX 2000
+### x86_64 Linux — NVIDIA RTX 2000
 
 |           |                                |
 | --------- | ------------------------------ |
@@ -239,6 +343,15 @@ is present.
 | Memory    | 32 GB                          |
 | Model     | Gemma 4 E4B                    |
 | Inference | llama.cpp with CUDA 12.x       |
+
+### x86_64 Linux — Docker / RunPod (NVIDIA CUDA)
+
+|           |                                             |
+| --------- | ------------------------------------------- |
+| Host      | RunPod GPU pod                              |
+| Base      | nvidia/cuda:12.6.3-devel-ubuntu24.04        |
+| Model     | Gemma 4 E4B Q6_K                            |
+| Inference | llama.cpp prebuilt CUDA backends via dlopen |
 
 ---
 
@@ -260,8 +373,9 @@ is present.
 | `includes/`                  | Public headers and shared models.                  |
 | `src/`                       | Implementation files.                              |
 | `locations.json`             | Curated city input copied into the build tree.     |
-| `prompts/`                   | System prompt used by the model-backed path.       |
+| `prompts/`                   | System prompts used by the model-backed path.      |
 | `diagrams/`                  | Architecture and pipeline diagrams.                |
+| `tooling/pipeline/runpod/`   | Dockerfile, launcher, and RunPod pod template.     |
 | `ETHICS-AND-KNOWN-ISSUES.md` | Ethics, bias, hallucination analysis, mitigations. |
 
 ---
@@ -276,6 +390,7 @@ is present.
 - `src/data_generation/llama/` — local inference, prompt loading, output
   validation.
 - `src/data_generation/mock/` — deterministic fallback.
+- `tooling/pipeline/runpod/` — container build and runtime launcher.
 
 ---
 

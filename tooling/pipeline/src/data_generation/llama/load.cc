@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "data_generation/llama_generator.h"
+#include "ggml-backend.h"
 #include "llama.h"
 
 // Maximum batch size for decode operations. Capping the batch prevents
@@ -22,7 +23,12 @@ void LlamaGenerator::Load(const std::string& model_path) {
   context_.reset();
   model_.reset();
 
-  const llama_model_params model_params = llama_model_default_params();
+  // Specifically load dynamic ggml backends (like CUDA) that are provided
+  // externally before attempting to load a model.
+  ggml_backend_load_all();
+
+  llama_model_params model_params = llama_model_default_params();
+  model_params.n_gpu_layers = n_gpu_layers_;
   LlamaGenerator::ModelHandle loaded_model(
       llama_model_load_from_file(model_path.c_str(), model_params));
   if (!loaded_model) {

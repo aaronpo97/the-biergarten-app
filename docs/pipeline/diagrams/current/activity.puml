@@ -29,7 +29,7 @@ if (Are arguments valid?) then (no)
 else (yes)
 endif
 
-:Init CurlGlobalState & LlamaBackendState;
+:Init OpenSSL global state & LlamaBackendState;
 :di::make_injector(...);
 :injector.create<std::unique_ptr<BiergartenDataGenerator>>();
 :BiergartenDataGenerator::Run();

@@ -52,7 +52,7 @@ interface WebClient <<interface>> {
   + UrlEncode(value : const std::string&) : std::string
 }
 
-class CURLWebClient {
+class HttpWebClient {
   + Get(url : const std::string&) : std::string
   + UrlEncode(value : const std::string&) : std::string
 }
@@ -130,7 +130,7 @@ BiergartenDataGenerator *-- IExportService : owns
 IEnrichmentService <|.. WikipediaService : implements
 WikipediaService *-- WebClient : owns
 
-WebClient <|.. CURLWebClient : implements
+WebClient <|.. HttpWebClient : implements
 
 DataGenerator <|.. MockGenerator : implements
 DataGenerator <|.. LlamaGenerator : implements

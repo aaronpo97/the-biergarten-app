@@ -1,41 +1,45 @@
 cmake_minimum_required(VERSION 3.31)
 project(biergarten-pipeline)
 
+# Set policy to allow FetchContent_Populate for header-only libraries
+# that have outdated CMakeLists.txt files
+cmake_policy(SET CMP0169 OLD)
+
 # 1. Build Options
 
 option(BIERGARTEN_MOCK_ONLY "Build with mock data generators only — skips llama.cpp" OFF)
-if (BIERGARTEN_MOCK_ONLY)
-    message(STATUS "[biergarten] MOCK_ONLY build — llama.cpp will not be compiled.")
-endif ()
+if(BIERGARTEN_MOCK_ONLY)
+        message(STATUS "[biergarten] MOCK_ONLY build — llama.cpp will not be compiled.")
+endif()
 
 # 2. Platform & GPU Detection
-if (NOT UNIX)
-    message(FATAL_ERROR "[biergarten] Windows is not supported. Please use Linux (Fedora 43) or macOS (M1 Pro).")
-endif ()
+if(NOT UNIX)
+        message(FATAL_ERROR "[biergarten] Windows is not supported. Please use Linux (Fedora 43) or macOS (M1 Pro).")
+endif()
 
-if (APPLE)
-    if (CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
-        message(STATUS "[biergarten] Apple Silicon detected — enabling Metal acceleration.")
-        set(GGML_METAL ON CACHE BOOL "Enable Metal for Apple Silicon" FORCE)
-    else ()
-        message(STATUS "[biergarten] Intel Mac detected — using CPU / Accelerate framework.")
-        set(GGML_METAL OFF CACHE BOOL "Disable Metal for Intel Macs" FORCE)
-    endif ()
-else ()
-    find_package(CUDAToolkit QUIET)
-    find_package(hip CONFIG QUIET)
+if(APPLE)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+                message(STATUS "[biergarten] Apple Silicon detected — enabling Metal acceleration.")
+                set(GGML_METAL ON CACHE BOOL "Enable Metal for Apple Silicon" FORCE)
+        else()
+                message(STATUS "[biergarten] Intel Mac detected — using CPU / Accelerate framework.")
+                set(GGML_METAL OFF CACHE BOOL "Disable Metal for Intel Macs" FORCE)
+        endif()
+else()
+        find_package(CUDAToolkit QUIET)
+        find_package(hip CONFIG QUIET)
 
-    if (CUDAToolkit_FOUND)
-        message(STATUS "[biergarten] NVIDIA GPU detected — enabling CUDA acceleration.")
-        set(GGML_CUDA ON CACHE BOOL "Enable CUDA for NVIDIA GPUs" FORCE)
-        set(CMAKE_CUDA_ARCHITECTURES native)
-    elseif (hip_FOUND OR DEFINED ENV{ROCM_PATH} OR EXISTS "/opt/rocm")
-        message(STATUS "[biergarten] AMD GPU detected — enabling HIP/ROCm acceleration.")
-        set(GGML_HIPBLAS ON CACHE BOOL "Enable HIP for AMD GPUs" FORCE)
-    else ()
-        message(STATUS "[biergarten] No NVIDIA or AMD GPU found — falling back to CPU.")
-    endif ()
-endif ()
+        if(CUDAToolkit_FOUND)
+                message(STATUS "[biergarten] NVIDIA GPU detected — enabling CUDA acceleration.")
+                set(GGML_CUDA ON CACHE BOOL "Enable CUDA for NVIDIA GPUs" FORCE)
+                set(CMAKE_CUDA_ARCHITECTURES native)
+        elseif(hip_FOUND OR DEFINED ENV{ROCM_PATH} OR EXISTS "/opt/rocm")
+                message(STATUS "[biergarten] AMD GPU detected — enabling HIP/ROCm acceleration.")
+                set(GGML_HIPBLAS ON CACHE BOOL "Enable HIP for AMD GPUs" FORCE)
+        else()
+                message(STATUS "[biergarten] No NVIDIA or AMD GPU found — falling back to CPU.")
+        endif()
+endif()
 
 # 3. Project-wide Settings
 set(CMAKE_CXX_STANDARD 20)
@@ -51,16 +55,23 @@ include(FetchContent)
 find_package(Boost REQUIRED COMPONENTS json program_options)
 
 # Boost.DI (unofficial Boost extension, must declare separately from main Boost dependency)
+# Header-only library, so we only fetch without invoking its CMakeLists.txt
 FetchContent_Declare(
         boost-di
         GIT_REPOSITORY https://github.com/boost-ext/di.git
         GIT_TAG v1.3.0
+        GIT_SHALLOW TRUE
 )
-FetchContent_MakeAvailable(boost-di)
-if (TARGET Boost.DI AND NOT TARGET boost::di)
-    add_library(boost::di ALIAS Boost.DI)
-endif ()
+FetchContent_GetProperties(boost-di)
+if(NOT boost-di_POPULATED)
+        FetchContent_Populate(boost-di)
+endif()
 
+add_library(boost_di INTERFACE)
+add_library(boost::di ALIAS boost_di)
+target_include_directories(boost_di INTERFACE
+        $<BUILD_INTERFACE:${boost-di_SOURCE_DIR}/include>
+)
 # SQLite amalgamation
 FetchContent_Declare(
         sqlite_amalgamation
@@ -69,21 +80,38 @@ FetchContent_Declare(
         EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(sqlite_amalgamation)
-if (NOT TARGET sqlite3)
-    add_library(sqlite3 STATIC ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c)
-    target_include_directories(sqlite3 PUBLIC ${sqlite_amalgamation_SOURCE_DIR})
-    target_compile_definitions(sqlite3 PUBLIC SQLITE_THREADSAFE=1)
-endif ()
+if(NOT TARGET sqlite3)
+        add_library(sqlite3 STATIC ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c)
+        target_include_directories(sqlite3 PUBLIC ${sqlite_amalgamation_SOURCE_DIR})
+        target_compile_definitions(sqlite3 PUBLIC SQLITE_THREADSAFE=1)
+endif()
 
 # llama.cpp — skipped for mock-only builds
-if (NOT BIERGARTEN_MOCK_ONLY)
-    FetchContent_Declare(
-            llama-cpp
-            GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-            GIT_TAG b8742
-    )
-    FetchContent_MakeAvailable(llama-cpp)
-endif ()
+if(NOT BIERGARTEN_MOCK_ONLY)
+        find_library(LLAMA_LIB NAMES llama)
+        find_library(GGML_LIB NAMES ggml)
+        find_library(GGML_BASE_LIB NAMES ggml-base)
+        find_path(LLAMA_INC_DIR NAMES llama.h PATH_SUFFIXES include)
+
+        if(LLAMA_LIB AND GGML_LIB AND GGML_BASE_LIB AND LLAMA_INC_DIR)
+                message(STATUS "[biergarten] Found system llama.cpp — skipping FetchContent")
+
+                add_library(llama SHARED IMPORTED)
+                set_target_properties(llama PROPERTIES
+                        IMPORTED_LOCATION "${LLAMA_LIB}"
+                        INTERFACE_INCLUDE_DIRECTORIES "${LLAMA_INC_DIR}"
+                        INTERFACE_LINK_LIBRARIES "${GGML_LIB};${GGML_BASE_LIB}"
+                )
+        else()
+                message(STATUS "[biergarten] System llama.cpp not found — fetching via FetchContent")
+                FetchContent_Declare(
+                        llama-cpp
+                        GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+                        GIT_TAG b9012
+                )
+                FetchContent_MakeAvailable(llama-cpp)
+        endif()
+endif()
 
 # spdlog
 FetchContent_Declare(
@@ -153,16 +181,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 # --- data_generation: llama (skipped for mock-only builds) ---
-if (NOT BIERGARTEN_MOCK_ONLY)
-    target_sources(${PROJECT_NAME} PRIVATE
-            src/data_generation/llama/load.cc
-            src/data_generation/llama/helpers.cc
-            src/data_generation/llama/generate_brewery.cc
-            src/data_generation/llama/infer.cc
-            src/data_generation/llama/llama_generator.cc
-            src/data_generation/llama/generate_user.cc
-    )
-endif ()
+if(NOT BIERGARTEN_MOCK_ONLY)
+        target_sources(${PROJECT_NAME} PRIVATE
+                src/data_generation/llama/load.cc
+                src/data_generation/llama/helpers.cc
+                src/data_generation/llama/generate_brewery.cc
+                src/data_generation/llama/infer.cc
+                src/data_generation/llama/llama_generator.cc
+                src/data_generation/llama/generate_user.cc
+        )
+endif()
 
 # --- services: wikipedia ---
 target_sources(${PROJECT_NAME} PRIVATE
@@ -189,8 +217,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 # 6. Include Directories, Link Libraries & Compile Definitions
 target_include_directories(${PROJECT_NAME} PRIVATE
         includes
-        $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:${llama-cpp_SOURCE_DIR}/include>
-        $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:${llama-cpp_SOURCE_DIR}/common>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

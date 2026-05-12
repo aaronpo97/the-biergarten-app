@@ -3,7 +3,8 @@
 
 /**
  * @file data_model/models.h
- * @brief Core data models: locations, application configuration, and generation inputs.
+ * @brief Core data models: locations, application configuration, and generation
+ * inputs.
  */
 
 #include <boost/program_options.hpp>
@@ -93,6 +94,9 @@ struct GeneratorOptions {
 
   /// @brief Use mocked generator instead of actual LLM inference.
   bool use_mocked = false;
+
+  /// @brief Number of layers to offload to GPU.
+  int n_gpu_layers = 0;
 
   /// @brief Specific sampling parameters for this generator.
   /// If nullopt, the application should use global defaults.
