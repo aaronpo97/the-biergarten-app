@@ -30,7 +30,7 @@ class WebClient {
    * @param value Raw string value.
    * @return Encoded value safe for URL usage.
    */
-  virtual std::string UrlEncode(const std::string& value) = 0;
+  virtual std::string EncodeURL(const std::string& value) = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_WEB_CLIENT_H_

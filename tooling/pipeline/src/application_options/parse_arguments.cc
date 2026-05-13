@@ -30,6 +30,8 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
         "Context window size in tokens");
     opt("seed", prog_opts::value<int>()->default_value(sampling_defaults.seed),
         "Sampler seed: -1 for random, otherwise non-negative integer");
+    opt("n-gpu-layers", prog_opts::value<int>()->default_value(0),
+    "Number of layers to offload to GPU");
   };
 
   // --mocked and --model are mutually exclusive; validation is enforced below
@@ -50,8 +52,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     opt("prompt-dir", prog_opts::value<std::string>()->default_value(""),
         "Directory containing named prompt files (e.g. BREWERY_GENERATION.md)."
         " Required when not using --mocked.");
-    opt("n-gpu-layers", prog_opts::value<int>()->default_value(0),
-        "Number of layers to offload to GPU");
+
   };
 
   add_sampling_options();
@@ -113,7 +114,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
 
     options.generator.use_mocked = use_mocked;
     options.generator.model_path = model_path;
-    options.generator.n_gpu_layers = n_gpu_layers;
+    // options.generator.n_gpu_layers = n_gpu_layers;
 
     // Only populate sampling config when the user explicitly overrides at
     // least one value. Leaving it as std::nullopt lets LlamaGenerator fall
@@ -122,7 +123,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     const bool user_provided_sampling =
         !var_map["temperature"].defaulted() || !var_map["top-p"].defaulted() ||
         !var_map["top-k"].defaulted() || !var_map["n-ctx"].defaulted() ||
-        !var_map["seed"].defaulted();
+        !var_map["seed"].defaulted() || !var_map["n_gpu_layers"].defaulted();
 
     if (user_provided_sampling) {
       // Warn but do not fail — the run is still valid, the flags are just
@@ -136,6 +137,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
         sampling.top_k = var_map["top-k"].as<uint32_t>();
         sampling.n_ctx = var_map["n-ctx"].as<uint32_t>();
         sampling.seed = var_map["seed"].as<int>();
+        sampling.n_gpu_layers = var_map["n-gpu-layers"].as<int>();
 
         options.generator.sampling = sampling;
       }

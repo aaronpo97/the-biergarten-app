@@ -12,6 +12,8 @@
 #include <string>
 #include <utility>
 
+#include "spdlog/spdlog.h"
+
 namespace {
 constexpr time_t kConnectionTimeoutSeconds = 5;
 constexpr time_t kReadTimeoutSeconds = 10;
@@ -38,8 +40,12 @@ std::string HttpWebClient::Get(const std::string& url) {
   client.set_follow_location(true);
   client.set_connection_timeout(kConnectionTimeoutSeconds);
   client.set_read_timeout(kReadTimeoutSeconds);
+  client.set_default_headers({
+     {"Accept", "application/json"},
+     {"User-Agent", "biergarten-pipeline/1.0"}
+ });
 
-  const auto result = client.Get(path);
+  const httplib::Result result = client.Get(path);
 
   if (!result) {
     throw std::runtime_error(
@@ -48,6 +54,7 @@ std::string HttpWebClient::Get(const std::string& url) {
   }
 
   if (result->status < kSuccessMin || result->status >= kSuccessMax) {
+    spdlog::error("[HttpWebClient] Request failed for URL: " + url);
     throw std::runtime_error(
         "[HttpWebClient] HTTP " + std::to_string(result->status) +
         " for URL: " + url);
@@ -56,6 +63,6 @@ std::string HttpWebClient::Get(const std::string& url) {
   return result->body;
 }
 
-std::string HttpWebClient::UrlEncode(const std::string& value) {
+std::string HttpWebClient::EncodeURL(const std::string& value) {
   return httplib::encode_uri_component(value);
 }
