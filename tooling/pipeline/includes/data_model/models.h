@@ -83,6 +83,9 @@ struct SamplingOptions {
 
   /// @brief Random seed (-1 for random, otherwise non-negative).
   int seed = -1;
+
+  /// @brief Number of layers to offload to GPU.
+  int n_gpu_layers = 0;
 };
 
 /**
@@ -95,8 +98,7 @@ struct GeneratorOptions {
   /// @brief Use mocked generator instead of actual LLM inference.
   bool use_mocked = false;
 
-  /// @brief Number of layers to offload to GPU.
-  int n_gpu_layers = 0;
+
 
   /// @brief Specific sampling parameters for this generator.
   /// If nullopt, the application should use global defaults.
@@ -116,6 +118,10 @@ struct PipelineOptions {
 
   /// @brief Path for application logs.
   std::filesystem::path log_path;
+
+  /// @brief Number of locations to sample from the dataset
+  /// More locations -> more users/more breweries
+  uint32_t location_count;
 };
 
 /**

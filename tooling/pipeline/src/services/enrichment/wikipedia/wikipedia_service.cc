@@ -7,5 +7,6 @@
 
 #include <utility>
 
-WikipediaService::WikipediaService(std::unique_ptr<WebClient> client)
+WikipediaEnrichmentService::WikipediaEnrichmentService(
+    std::unique_ptr<WebClient> client)
     : client_(std::move(client)) {}

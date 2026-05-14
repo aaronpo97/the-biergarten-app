@@ -15,10 +15,10 @@
 #include "web_client/web_client.h"
 
 /// @brief Provides Wikipedia summary lookups backed by cached raw extracts.
-class WikipediaService final : public IEnrichmentService {
+class WikipediaEnrichmentService final : public IEnrichmentService {
  public:
   /// @brief Creates a new Wikipedia service with the provided web client.
-  explicit WikipediaService(std::unique_ptr<WebClient> client);
+  explicit WikipediaEnrichmentService(std::unique_ptr<WebClient> client);
 
   /// @brief Returns the Wikipedia-derived context for a location.
   [[nodiscard]] std::string GetLocationContext(const Location& loc) override;

@@ -8,11 +8,9 @@
 
 #include <boost/di.hpp>
 #include <boost/program_options.hpp>
-
 #include <exception>
 #include <memory>
 #include <optional>
-
 #include <string>
 
 #include "biergarten_data_generator.h"
@@ -21,12 +19,13 @@
 #include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
 #include "data_model/models.h"
 #include "llama_backend_state.h"
-#include "services/enrichment/enrichment_service.h"
 #include "services/database/export_service.h"
-#include "services/prompting/prompt_directory.h"
 #include "services/database/sqlite_export_service.h"
 #include "services/datetime/timer.h"
+#include "services/enrichment/enrichment_service.h"
+#include "services/enrichment/mock_enrichment.h"
 #include "services/enrichment/wikipedia_service.h"
+#include "services/prompting/prompt_directory.h"
 #include "web_client/http_web_client.h"
 
 namespace di = boost::di;
@@ -43,7 +42,9 @@ int main(const int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    const auto parsed_options = ParseArguments(argc, argv);
+    const std::optional<ApplicationOptions> parsed_options =
+        ParseArguments(argc, argv);
+
     if (!parsed_options.has_value()) {
       return 0;
     }
@@ -65,15 +66,23 @@ int main(const int argc, char** argv) {
     }
 
     const auto injector = di::make_injector(
-        di::bind<WebClient>().to<HttpWebClient>(),
         di::bind<ApplicationOptions>().to(options),
-        di::bind<IEnrichmentService>().to<WikipediaService>(),
+        di::bind<std::string>().to(model_path),
+        di::bind<WebClient>().to<HttpWebClient>(),
         di::bind<IExportService>().to<SqliteExportService>(),
         di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
-        di::bind<std::string>().to(model_path),
+        di::bind<IEnrichmentService>().to(
+            [options](const auto& inj) -> std::unique_ptr<IEnrichmentService> {
+              if (options.generator.use_mocked) {
+                return std::make_unique<MockEnrichmentService>();
+              }
+
+              return std::make_unique<WikipediaEnrichmentService>(
+                  inj.template create<std::unique_ptr<WebClient>>());
+            }),
         di::bind<DataGenerator>().to(
             [options, model_path, sampling, &prompt_directory](
-            const auto& inj) -> std::unique_ptr<DataGenerator> {
+                const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
                 spdlog::info(
                     "[Generator] Using MockGenerator (no model path provided)");
@@ -89,9 +98,11 @@ int main(const int argc, char** argv) {
                   options, model_path,
                   inj.template create<std::unique_ptr<IPromptFormatter>>(),
                   std::move(prompt_directory));
-            }));
+            })
 
-    auto generator =
+    );
+
+    const auto generator =
         injector.create<std::unique_ptr<BiergartenDataGenerator>>();
 
     if (!generator->Run()) {

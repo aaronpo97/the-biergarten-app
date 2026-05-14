@@ -42,7 +42,7 @@ public:
    * @param value Raw string to encode.
    * @return Percent-encoded string safe for use in a URL.
    */
-  std::string UrlEncode(const std::string& value) override;
+  std::string EncodeURL(const std::string& value) override;
 };
 
 

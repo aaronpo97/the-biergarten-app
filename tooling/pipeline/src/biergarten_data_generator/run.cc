@@ -21,8 +21,8 @@ bool BiergartenDataGenerator::Run() {
     for (auto& city : cities) {
       try {
         std::string region_context = context_service_->GetLocationContext(city);
-        spdlog::debug("[Pipeline] Context for '{}' ({}) gathered:\n{}",
-                      city.city, city.country, region_context);
+        // spdlog::debug("[Pipeline] Context for '{}' ({}) gathered:\n{}",
+        //               city.city, city.iso3166_2, region_context);
 
         enriched.push_back(
             EnrichedCity{.location = std::move(city),

@@ -137,7 +137,8 @@ set(HTTPLIB_REQUIRE_OPENSSL ON CACHE BOOL "Require OpenSSL for cpp-httplib" FORC
 FetchContent_MakeAvailable(cpp-httplib)
 
 # 5. Executable & Sources
-add_executable(${PROJECT_NAME})
+add_executable(${PROJECT_NAME}
+        includes/services/enrichment/mock_enrichment.h)
 
 # --- Entry point ---
 target_sources(${PROJECT_NAME} PRIVATE
@@ -194,9 +195,9 @@ endif()
 
 # --- services: wikipedia ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/services/wikipedia/wikipedia_service.cc
-        src/services/wikipedia/fetch_extract.cc
-        src/services/wikipedia/get_summary.cc
+        src/services/enrichment/wikipedia/wikipedia_service.cc
+        src/services/enrichment/wikipedia/fetch_extract.cc
+        src/services/enrichment/wikipedia/get_summary.cc
 )
 
 # --- services: sqlite ---
