@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/biergarten_data_generator.cc
+ * @file biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
  * @brief BiergartenDataGenerator constructor implementation.
  */
 
@@ -7,7 +7,7 @@
 
 #include <utility>
 
-BiergartenDataGenerator::BiergartenDataGenerator(
+BiergartenPipelineOrchestrator::BiergartenPipelineOrchestrator(
     std::unique_ptr<IEnrichmentService> context_service,
     std::unique_ptr<DataGenerator> generator,
     std::unique_ptr<IExportService> exporter,

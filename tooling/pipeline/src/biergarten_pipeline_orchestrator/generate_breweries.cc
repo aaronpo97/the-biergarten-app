@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/generate_breweries.cc
+ * @file biergarten_pipeline_orchestrator/generate_breweries.cc
  * @brief BiergartenDataGenerator::GenerateBreweries() implementation.
  */
 
@@ -7,7 +7,7 @@
 
 #include "biergarten_data_generator.h"
 
-void BiergartenDataGenerator::GenerateBreweries(
+void BiergartenPipelineOrchestrator::GenerateBreweries(
     std::span<const EnrichedCity> cities) {
   spdlog::info("\n=== SAMPLE BREWERY GENERATION ===");
 

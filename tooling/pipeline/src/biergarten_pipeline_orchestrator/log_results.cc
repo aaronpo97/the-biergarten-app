@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/log_results.cc
+ * @file biergarten_pipeline_orchestrator/log_results.cc
  * @brief BiergartenDataGenerator::LogResults() implementation.
  */
 
@@ -7,7 +7,7 @@
 
 #include "biergarten_data_generator.h"
 
-void BiergartenDataGenerator::LogResults() const {
+void BiergartenPipelineOrchestrator::LogResults() const {
   spdlog::info("\n=== GENERATED DATA DUMP ===");
   size_t index = 1;
   for (const auto& [location, brewery] : generated_breweries_) {

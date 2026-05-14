@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/run.cc
+ * @file biergarten_pipeline_orchestrator/run.cc
  * @brief BiergartenDataGenerator::Run() implementation.
  */
 
@@ -9,7 +9,7 @@
 
 #include "biergarten_data_generator.h"
 
-bool BiergartenDataGenerator::Run() {
+bool BiergartenPipelineOrchestrator::Run() {
   try {
     exporter_->Initialize();
 

@@ -1,5 +1,5 @@
 /**
- * @file biergarten_data_generator/query_cities_with_countries.cc
+ * @file biergarten_pipeline_orchestrator/query_cities_with_countries.cc
  * @brief BiergartenDataGenerator::QueryCitiesWithCountries() implementation.
  */
 
@@ -13,7 +13,7 @@
 #include "biergarten_data_generator.h"
 #include "json_handling/json_loader.h"
 
-std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
+std::vector<Location> BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
   spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
   const std::filesystem::path locations_path = "locations.json";

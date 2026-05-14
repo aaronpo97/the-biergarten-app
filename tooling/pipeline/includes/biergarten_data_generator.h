@@ -3,7 +3,10 @@
 
 /**
  * @file biergarten_data_generator.h
- * @brief Core orchestration class for pipeline data generation.
+ * @brief Orchestration for end-to-end brewery data generation pipeline.
+ *
+ * Intent: Coordinates location loading, enrichment, and generation phases
+ * to produce a complete dataset. Coordinates dependencies via composition root.
  */
 
 #include <memory>
@@ -21,19 +24,21 @@
  * This class encapsulates the core logic for generating brewery data.
  * It handles location loading, city enrichment, and brewery generation.
  */
-class BiergartenDataGenerator {
+class BiergartenPipelineOrchestrator {
  public:
-  /**
-   * @brief Construct a BiergartenDataGenerator with injected dependencies.
-   *
-   * @param context_service Context provider for sampled locations.
-   * @param generator Brewery and user data generator.
-   * @param exporter Storage backend for generated brewery data.
-   */
-  BiergartenDataGenerator(std::unique_ptr<IEnrichmentService> context_service,
-                          std::unique_ptr<DataGenerator> generator,
-                          std::unique_ptr<IExportService> exporter,
-                          const ApplicationOptions& application_options);
+/**
+ * @brief Constructs the orchestrator with injected pipeline dependencies.
+ *
+ * @param context_service Provides regional context for locations.
+ * @param generator Implementation (Llama or Mock) for brewery/user generation.
+ * @param exporter Database backend for persisting generated records.
+ * @param application_options CLI configuration and paths.
+ */
+  BiergartenPipelineOrchestrator(
+      std::unique_ptr<IEnrichmentService> context_service,
+      std::unique_ptr<DataGenerator> generator,
+      std::unique_ptr<IExportService> exporter,
+      const ApplicationOptions& application_options);
 
   /**
    * @brief Run the data generation pipeline.
@@ -54,10 +59,11 @@ class BiergartenDataGenerator {
   /// @brief Generator dependency selected in the composition root.
   std::unique_ptr<DataGenerator> generator_;
 
-  /// @brief Storage backend for generated brewery records.
-  std::unique_ptr<IExportService> exporter_;
+   /// @brief Storage backend for generated brewery records.
+   std::unique_ptr<IExportService> exporter_;
 
-  const ApplicationOptions application_options_;
+   /// @brief CLI configuration: paths, model settings, generation parameters.
+   ApplicationOptions application_options_;
 
   /**
    * @brief Load locations from JSON and sample cities.
