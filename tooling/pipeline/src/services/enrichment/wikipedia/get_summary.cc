@@ -6,11 +6,13 @@
 #include <spdlog/spdlog.h>
 
 #include <chrono>
+#include <format>
 #include <string>
 #include <thread>
 
 #include "services/enrichment/wikipedia_service.h"
-std::string WikipediaService::GetLocationContext(const Location& loc) {
+
+std::string WikipediaEnrichmentService::GetLocationContext(const Location& loc) {
   using namespace std::literals::chrono_literals;
   if (!this->client_) {
     spdlog::warn("Client is nullptr.");

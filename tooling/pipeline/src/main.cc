@@ -23,6 +23,7 @@
 #include "services/database/sqlite_export_service.h"
 #include "services/datetime/timer.h"
 #include "services/enrichment/enrichment_service.h"
+#include "services/enrichment/mock_enrichment.h"
 #include "services/enrichment/wikipedia_service.h"
 #include "services/prompting/prompt_directory.h"
 #include "web_client/http_web_client.h"
@@ -65,12 +66,20 @@ int main(const int argc, char** argv) {
     }
 
     const auto injector = di::make_injector(
-        di::bind<WebClient>().to<HttpWebClient>(),
         di::bind<ApplicationOptions>().to(options),
-        di::bind<IEnrichmentService>().to<WikipediaService>(),
+        di::bind<std::string>().to(model_path),
+        di::bind<WebClient>().to<HttpWebClient>(),
         di::bind<IExportService>().to<SqliteExportService>(),
         di::bind<IPromptFormatter>().to<Gemma4JinjaPromptFormatter>(),
-        di::bind<std::string>().to(model_path),
+        di::bind<IEnrichmentService>().to(
+            [options](const auto& inj) -> std::unique_ptr<IEnrichmentService> {
+              if (options.generator.use_mocked) {
+                return std::make_unique<MockEnrichmentService>();
+              }
+
+              return std::make_unique<WikipediaEnrichmentService>(
+                  inj.template create<std::unique_ptr<WebClient>>());
+            }),
         di::bind<DataGenerator>().to(
             [options, model_path, sampling, &prompt_directory](
                 const auto& inj) -> std::unique_ptr<DataGenerator> {
@@ -93,7 +102,7 @@ int main(const int argc, char** argv) {
 
     );
 
-    auto generator =
+    const auto generator =
         injector.create<std::unique_ptr<BiergartenDataGenerator>>();
 
     if (!generator->Run()) {
