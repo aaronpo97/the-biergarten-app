@@ -118,6 +118,10 @@ struct PipelineOptions {
 
   /// @brief Path for application logs.
   std::filesystem::path log_path;
+
+  /// @brief Number of locations to sample from the dataset
+  /// More locations -> more users/more breweries
+  uint32_t location_count;
 };
 
 /**

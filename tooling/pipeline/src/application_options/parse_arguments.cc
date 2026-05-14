@@ -31,7 +31,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     opt("seed", prog_opts::value<int>()->default_value(sampling_defaults.seed),
         "Sampler seed: -1 for random, otherwise non-negative integer");
     opt("n-gpu-layers", prog_opts::value<int>()->default_value(0),
-    "Number of layers to offload to GPU");
+        "Number of layers to offload to GPU");
   };
 
   // --mocked and --model are mutually exclusive; validation is enforced below
@@ -52,7 +52,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     opt("prompt-dir", prog_opts::value<std::string>()->default_value(""),
         "Directory containing named prompt files (e.g. BREWERY_GENERATION.md)."
         " Required when not using --mocked.");
-
+    opt("location-count", prog_opts::value<uint32_t>()->default_value(10));
   };
 
   add_sampling_options();
@@ -85,6 +85,8 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv) {
     options.pipeline.output_path = var_map["output"].as<std::string>();
     options.pipeline.log_path = var_map["log-path"].as<std::string>();
     options.pipeline.prompt_dir = var_map["prompt-dir"].as<std::string>();
+    options.pipeline.location_count =
+      var_map["location-count"].as<uint32_t>();
 
     const bool use_mocked = var_map["mocked"].as<bool>();
     const std::string model_path = var_map["model"].as<std::string>();

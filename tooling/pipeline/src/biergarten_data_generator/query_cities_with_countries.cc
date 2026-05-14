@@ -13,8 +13,6 @@
 #include "biergarten_data_generator.h"
 #include "json_handling/json_loader.h"
 
-static constexpr size_t kBreweryAmount = 40;
-
 std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
   spdlog::info("\n=== GEOGRAPHIC DATA OVERVIEW ===");
 
@@ -23,7 +21,9 @@ std::vector<Location> BiergartenDataGenerator::QueryCitiesWithCountries() {
   auto all_locations = JsonLoader::LoadLocations(locations_path);
   spdlog::info("  Locations available: {}", all_locations.size());
 
-  const size_t sample_count = std::min(kBreweryAmount, all_locations.size());
+  const size_t sample_count = std::min(
+      static_cast<size_t>(application_options_.pipeline.location_count),
+      all_locations.size());
 
   const auto sample_count_signed =
       static_cast<std::iter_difference_t<decltype(all_locations.cbegin())>>(

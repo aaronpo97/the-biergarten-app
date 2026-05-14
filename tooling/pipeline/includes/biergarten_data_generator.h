@@ -12,8 +12,8 @@
 
 #include "data_generation/data_generator.h"
 #include "data_model/generated_models.h"
-#include "services/enrichment/enrichment_service.h"
 #include "services/database/export_service.h"
+#include "services/enrichment/enrichment_service.h"
 
 /**
  * @brief Main data generator class for the Biergarten pipeline.
@@ -32,7 +32,8 @@ class BiergartenDataGenerator {
    */
   BiergartenDataGenerator(std::unique_ptr<IEnrichmentService> context_service,
                           std::unique_ptr<DataGenerator> generator,
-                          std::unique_ptr<IExportService> exporter);
+                          std::unique_ptr<IExportService> exporter,
+                          const ApplicationOptions& application_options);
 
   /**
    * @brief Run the data generation pipeline.
@@ -56,12 +57,14 @@ class BiergartenDataGenerator {
   /// @brief Storage backend for generated brewery records.
   std::unique_ptr<IExportService> exporter_;
 
+  const ApplicationOptions application_options_;
+
   /**
    * @brief Load locations from JSON and sample cities.
    *
    * @return Vector of sampled locations capped at 50 entries.
    */
-  static std::vector<Location> QueryCitiesWithCountries();
+  std::vector<Location> QueryCitiesWithCountries();
 
   /**
    * @brief Generate breweries for enriched cities.
