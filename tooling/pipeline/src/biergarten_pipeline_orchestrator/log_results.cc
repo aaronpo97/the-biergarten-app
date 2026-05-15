@@ -3,24 +3,29 @@
  * @brief BiergartenDataGenerator::LogResults() implementation.
  */
 
-#include <spdlog/spdlog.h>
+#include "services/logging/logger.h"
 
-#include "biergarten_data_generator.h"
+#include "biergarten_pipeline_orchestrator.h"
+#include <sstream>
 
 void BiergartenPipelineOrchestrator::LogResults() const {
-  spdlog::info("\n=== GENERATED DATA DUMP ===");
+  std::ostringstream msg;
+  msg << "GENERATED DATA DUMP\n";
   size_t index = 1;
   for (const auto& [location, brewery] : generated_breweries_) {
-    spdlog::info(
-        "{}. city=\"{}\" country=\"{}\" state=\"{}\" "
-        "iso3166_2={} lat={} lon={}",
-        index, location.city, location.country, location.state_province,
-        location.iso3166_2, location.latitude, location.longitude);
-    spdlog::info("   brewery_name_en=\"{}\"", brewery.name_en);
-    spdlog::info("   brewery_description_en=\"{}\"", brewery.description_en);
-    spdlog::info("   brewery_name_local=\"{}\"", brewery.name_local);
-    spdlog::info("   brewery_description_local=\"{}\"",
-                 brewery.description_local);
+    msg << index << ". city=\"" << location.city << "\" country=\""
+        << location.country << "\" state=\"" << location.state_province
+        << "\" iso3166_2=" << location.iso3166_2 << " lat="
+        << location.latitude << " lon=" << location.longitude << "\n";
+
+    msg << "   brewery_name_en=\"" << brewery.name_en << "\"\n";
+    msg << "   brewery_description_en=\"" << brewery.description_en
+        << "\"\n";
+    msg << "   brewery_name_local=\"" << brewery.name_local << "\"\n";
+    msg << "   brewery_description_local=\"" << brewery.description_local
+        << "\"\n";
     ++index;
   }
+
+  logger_->Log(LogLevel::Debug, PipelinePhase::Teardown, msg.str());
 }

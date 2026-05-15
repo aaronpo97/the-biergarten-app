@@ -158,7 +158,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 # --- biergarten_pipeline_orchestrator ---
 target_sources(${PROJECT_NAME} PRIVATE
         src/biergarten_pipeline_orchestrator/log_results.cc
-        src/biergarten_pipeline_orchestrator/biergarten_data_generator.cc
+        src/biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
         src/biergarten_pipeline_orchestrator/generate_breweries.cc
         src/biergarten_pipeline_orchestrator/run.cc
         src/biergarten_pipeline_orchestrator/query_cities_with_countries.cc
@@ -212,8 +212,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- services: logging ---
 target_sources(${PROJECT_NAME} PRIVATE
-	"src/services/logging/channel_logger.cc"
-        src/services/logging/log_consumer.cc
+	"src/services/logging/log_producer.cc"
+        src/services/logging/log_dispatcher.cc
 )
 
 # --- services (top-level) ---

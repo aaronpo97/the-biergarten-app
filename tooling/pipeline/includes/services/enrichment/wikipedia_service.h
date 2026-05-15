@@ -12,13 +12,15 @@
 #include <unordered_map>
 
 #include "enrichment_service.h"
+#include "services/logging/logger.h"
 #include "web_client/web_client.h"
 
 /// @brief Provides Wikipedia summary lookups backed by cached raw extracts.
 class WikipediaEnrichmentService final : public IEnrichmentService {
  public:
   /// @brief Creates a new Wikipedia service with the provided web client.
-  explicit WikipediaEnrichmentService(std::unique_ptr<WebClient> client);
+  explicit WikipediaEnrichmentService(std::unique_ptr<WebClient> client,
+                                      std::shared_ptr<ILogger> logger);
 
   /// @brief Returns the Wikipedia-derived context for a location.
   [[nodiscard]] std::string GetLocationContext(const Location& loc) override;
@@ -26,6 +28,7 @@ class WikipediaEnrichmentService final : public IEnrichmentService {
  private:
   std::string FetchExtract(std::string_view query);
   std::unique_ptr<WebClient> client_;
+  std::shared_ptr<ILogger> logger_;
   /// @brief Canonical cache for raw Wikipedia query extracts.
   std::unordered_map<std::string, std::string> extract_cache_;
 };

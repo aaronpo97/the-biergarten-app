@@ -4,9 +4,7 @@
  * retry handling, and output sanitization for downstream parsing.
  */
 
-#include <spdlog/spdlog.h>
 
-#include <stdexcept>
 #include <string>
 
 #include "data_generation/llama_generator.h"

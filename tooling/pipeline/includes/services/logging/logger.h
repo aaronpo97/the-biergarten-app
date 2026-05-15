@@ -1,9 +1,9 @@
 /**
  * @file services/logging/logger.h
- * @brief Abstract logging interface for pipeline components.
+ * @brief Abstract logging interface used by pipeline components.
  *
- * Intent: Decouple logging from channel/worker implementation details.
- * All pipeline components depend on ILogger, enabling swappable backends.
+ * The interface keeps application code independent from the concrete logging
+ * transport, buffering, and formatting implementation.
  */
 
 #ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOGGER_H_
@@ -17,10 +17,10 @@
 
 /**
  * @class ILogger
- * @brief Minimal interface for submitting log entries.
+ * @brief Minimal interface for submitting structured log messages.
  *
- * Non-copyable and non-movable. Implementations are typically short-lived,
- * created and owned by the composition root.
+ * Implementations are non-copyable and non-movable. They are typically owned
+ * by the composition root and injected into services that emit diagnostics.
  */
 class ILogger {
  public:
@@ -32,11 +32,11 @@ class ILogger {
    virtual ~ILogger() = default;
 
    /**
-    * @brief Submit a log entry to the logging subsystem.
+     * @brief Submit a log message to the logging subsystem.
     *
-    * @param level Log level (Debug, Info, Warn, Error).
-    * @param phase Pipeline execution phase (Startup, Generation, Teardown, etc.).
-    * @param message Log message text.
+     * @param level Severity of the message.
+     * @param phase Pipeline execution phase associated with the message.
+     * @param message Log message text.
     */
    virtual void Log(LogLevel level, PipelinePhase phase,
                     std::string_view message) = 0;

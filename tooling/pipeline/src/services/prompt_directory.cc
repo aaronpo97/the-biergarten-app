@@ -6,20 +6,23 @@
 
 #include "services/prompting/prompt_directory.h"
 
-#include <spdlog/spdlog.h>
-
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 
 // ---------------------------------------------------------------------------
 // PromptDirectory
 // ---------------------------------------------------------------------------
 
 PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir)
-    : prompt_dir_(prompt_dir) {
+    : PromptDirectory(prompt_dir, nullptr) {}
+
+PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir,
+                                 std::shared_ptr<ILogger> logger)
+    : prompt_dir_(prompt_dir), logger_(std::move(logger)) {
   std::error_code ec;
 
   // Scenario 4: directory must exist.
@@ -44,8 +47,11 @@ PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir)
         prompt_dir_.string() + " (" + ec.message() + ")");
   }
 
-  spdlog::info("[PromptDirectory] Resolved prompt directory: {}",
-               prompt_dir_.string());
+  if (logger_) {
+    logger_->Log(LogLevel::Info, PipelinePhase::Startup,
+                 std::string("[PromptDirectory] Resolved prompt directory: ") +
+                     prompt_dir_.string());
+  }
 }
 
 std::string PromptDirectory::Load(std::string_view key) {
@@ -77,8 +83,12 @@ std::string PromptDirectory::Load(std::string_view key) {
                              key_str + "' is empty: " + file_path.string());
   }
 
-  spdlog::info("[PromptDirectory] Loaded prompt '{}' from '{}' ({} chars)",
-               key_str, file_path.string(), content.size());
+  if (logger_) {
+    logger_->Log(LogLevel::Info, PipelinePhase::Startup,
+                 std::string("[PromptDirectory] Loaded prompt '") + key_str +
+                     "' from '" + file_path.string() + "' (" +
+                     std::to_string(content.size()) + " chars)");
+  }
 
   cache_.emplace(key_str, content);
   return content;

@@ -8,5 +8,5 @@
 #include <utility>
 
 WikipediaEnrichmentService::WikipediaEnrichmentService(
-    std::unique_ptr<WebClient> client)
-    : client_(std::move(client)) {}
+    std::unique_ptr<WebClient> client, std::shared_ptr<ILogger> logger)
+    : client_(std::move(client)), logger_(std::move(logger)) {}

@@ -18,6 +18,7 @@
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/models.h"
+#include "services/logging/logger.h"
 
 struct llama_model;
 struct llama_context;
@@ -38,6 +39,7 @@ class LlamaGenerator final : public DataGenerator {
    */
   LlamaGenerator(const ApplicationOptions& options,
                  const std::string& model_path,
+                 std::shared_ptr<ILogger> logger,
                  std::unique_ptr<IPromptFormatter> prompt_formatter,
                  std::unique_ptr<IPromptDirectory> prompt_directory);
 
@@ -130,6 +132,7 @@ class LlamaGenerator final : public DataGenerator {
   std::mt19937 rng_;
   uint32_t n_ctx_ = kDefaultContextSize;
   int n_gpu_layers_ = 0;
+  std::shared_ptr<ILogger> logger_;
   std::unique_ptr<IPromptFormatter> prompt_formatter_;
   std::unique_ptr<IPromptDirectory> prompt_directory_;
 };

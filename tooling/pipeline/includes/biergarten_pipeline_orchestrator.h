@@ -18,6 +18,8 @@
 #include "services/database/export_service.h"
 #include "services/enrichment/enrichment_service.h"
 
+#include "services/logging/logger.h"
+
 /**
  * @brief Main data generator class for the Biergarten pipeline.
  *
@@ -35,6 +37,7 @@ class BiergartenPipelineOrchestrator {
  * @param application_options CLI configuration and paths.
  */
   BiergartenPipelineOrchestrator(
+      std::shared_ptr<ILogger> logger,
       std::unique_ptr<IEnrichmentService> context_service,
       std::unique_ptr<DataGenerator> generator,
       std::unique_ptr<IExportService> exporter,
@@ -53,6 +56,9 @@ class BiergartenPipelineOrchestrator {
   bool Run();
 
  private:
+  /// @brief Logger instance for emitting pipeline messages.
+  std::shared_ptr<ILogger> logger_;
+
   /// @brief Owning context provider dependency.
   std::unique_ptr<IEnrichmentService> context_service_;
 

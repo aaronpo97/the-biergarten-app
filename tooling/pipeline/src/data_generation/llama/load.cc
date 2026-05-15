@@ -4,8 +4,6 @@
  * context, and resets prior resources during model initialization.
  */
 
-#include <spdlog/spdlog.h>
-
 #include <algorithm>
 #include <stdexcept>
 #include <string>
@@ -49,5 +47,8 @@ void LlamaGenerator::Load(const std::string& model_path) {
   model_ = std::move(loaded_model);
   context_ = std::move(loaded_context);
 
-  spdlog::info("[LlamaGenerator] Loaded model: {}", model_path);
+  if (logger_) {
+    logger_->Log(LogLevel::Info, PipelinePhase::Startup,
+                 std::string("[LlamaGenerator] Loaded model: ") + model_path);
+  }
 }

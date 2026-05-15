@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-#include "spdlog/spdlog.h"
+#include "services/logging/logger.h"
 
 namespace {
 constexpr time_t kConnectionTimeoutSeconds = 5;
@@ -54,7 +54,11 @@ std::string HttpWebClient::Get(const std::string& url) {
   }
 
   if (result->status < kSuccessMin || result->status >= kSuccessMax) {
-    spdlog::error("[HttpWebClient] Request failed for URL: " + url);
+    if (logger_) {
+      logger_->Log(LogLevel::Error, PipelinePhase::UserGeneration,
+                   std::string("[HttpWebClient] Request failed for URL: ") +
+                       url);
+    }
     throw std::runtime_error(
         "[HttpWebClient] HTTP " + std::to_string(result->status) +
         " for URL: " + url);

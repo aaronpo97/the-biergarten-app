@@ -1,6 +1,9 @@
 /**
- * @file services/logging/channel_logger.cc
+ * @file src/services/logging/log_producer.cc
+ * @brief LogProducer implementation for asynchronous pipeline logging.
  */
+
+#include "services/logging/log_producer.h"
 
 #include <chrono>
 #include <optional>
@@ -8,14 +11,13 @@
 #include <string_view>
 
 #include "concurrency/bounded_channel.h"
-#include "services/logging/channel_logger.h"
 #include "services/logging/log_entry.h"
 
-ChannelLogger::ChannelLogger(BoundedChannel<LogEntry>& channel)
+LogProducer::LogProducer(BoundedChannel<LogEntry>& channel)
     : channel_(channel) {}
 
-void ChannelLogger::Log(LogLevel level, PipelinePhase phase,
-                         const std::string_view message) {
+void LogProducer::Log(LogLevel level, PipelinePhase phase,
+                      const std::string_view message) {
   channel_.Send(LogEntry{.timestamp = std::chrono::system_clock::now(),
                          .level = level,
                          .phase = phase,

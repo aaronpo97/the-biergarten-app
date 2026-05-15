@@ -6,7 +6,8 @@
 
 #include "json_handling/json_loader.h"
 
-#include <spdlog/spdlog.h>
+#include "services/logging/logger.h"
+#include <iostream>
 
 #include <boost/json.hpp>
 #include <fstream>
@@ -58,7 +59,7 @@ static std::vector<std::string> ReadRequiredStringArray(
 }
 
 std::vector<Location> JsonLoader::LoadLocations(
-    const std::filesystem::path& filepath) {
+    const std::filesystem::path& filepath, std::shared_ptr<ILogger> logger) {
   std::ifstream input(filepath);
   if (!input.is_open()) {
     throw std::runtime_error("Failed to open locations file: " +
@@ -104,7 +105,5 @@ std::vector<Location> JsonLoader::LoadLocations(
     });
   }
 
-  spdlog::info("[JsonLoader] Loaded {} locations from {}", locations.size(),
-               filepath.string());
   return locations;
 }
