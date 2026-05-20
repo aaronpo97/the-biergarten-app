@@ -10,8 +10,10 @@
 #define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOG_ENTRY_H_
 
 #include <chrono>
-#include <thread>
+#include <source_location>
 #include <string>
+#include <thread>
+#include <vector>
 
 /**
  * @enum LogLevel
@@ -52,6 +54,12 @@ struct LogEntry {
   /// @brief Timestamp when the entry was created.
   std::chrono::system_clock::time_point timestamp =
       std::chrono::system_clock::now();
+
+  /// @brief Source location where the log call was made.
+  std::source_location origin = std::source_location::current();
+
+  /// @brief Thread responsible for emitting the log.
+  std::thread::id thread_id = std::this_thread::get_id();
 
 
   /// @brief Severity level of this entry.

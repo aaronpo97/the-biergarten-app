@@ -1,14 +1,15 @@
-#include "services/logging/logger.h"
+#include <chrono>
+#include <format>
 #include <iostream>
-
 #include <optional>
 #include <sstream>
 #include <string>
 
 #include "data_model/models.h"
+#include "services/logging/logger.h"
 
-std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
-                                                std::shared_ptr<ILogger> logger) {
+std::optional<ApplicationOptions> ParseArguments(
+    const int argc, char** argv, std::shared_ptr<ILogger> logger) {
   prog_opts::options_description desc("Pipeline Options");
   auto opt = desc.add_options();
 
@@ -70,10 +71,12 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
       return usage_stream.str();
     })();
     if (logger) {
-      logger->Log(LogLevel::Info, PipelinePhase::Startup, title);
-      logger->Log(LogLevel::Info, PipelinePhase::Startup, usage);
-    } else {
-      std::cout << title << std::endl << usage << std::endl;
+      logger->Log({.level = LogLevel::Info,
+                   .phase = PipelinePhase::Startup,
+                   .message = title});
+      logger->Log({.level = LogLevel::Info,
+                   .phase = PipelinePhase::Startup,
+                   .message = usage});
     }
     return std::nullopt;
   }
@@ -87,9 +90,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
       std::stringstream help_stream;
       help_stream << "\n" << desc;
       if (logger) {
-        logger->Log(LogLevel::Info, PipelinePhase::Startup, help_stream.str());
-      } else {
-        std::cout << help_stream.str() << std::endl;
+        logger->Log({.level = LogLevel::Info,
+                     .phase = PipelinePhase::Startup,
+                     .message = help_stream.str()});
       }
       return std::nullopt;
     }
@@ -99,8 +102,7 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
     options.pipeline.output_path = var_map["output"].as<std::string>();
     options.pipeline.log_path = var_map["log-path"].as<std::string>();
     options.pipeline.prompt_dir = var_map["prompt-dir"].as<std::string>();
-    options.pipeline.location_count =
-      var_map["location-count"].as<uint32_t>();
+    options.pipeline.location_count = var_map["location-count"].as<uint32_t>();
 
     const bool use_mocked = var_map["mocked"].as<bool>();
     const std::string model_path = var_map["model"].as<std::string>();
@@ -111,7 +113,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
       const std::string msg =
           "Invalid arguments: --mocked and --model are mutually exclusive";
       if (logger) {
-        logger->Log(LogLevel::Error, PipelinePhase::Startup, msg);
+        logger->Log({.level = LogLevel::Error,
+                     .phase = PipelinePhase::Startup,
+                     .message = msg});
       } else {
         std::cerr << msg << std::endl;
       }
@@ -122,7 +126,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
       const std::string msg =
           "Invalid arguments: either --mocked or --model must be specified";
       if (logger) {
-        logger->Log(LogLevel::Error, PipelinePhase::Startup, msg);
+        logger->Log({.level = LogLevel::Error,
+                     .phase = PipelinePhase::Startup,
+                     .message = msg});
       } else {
         std::cerr << msg << std::endl;
       }
@@ -135,7 +141,9 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
       const std::string msg =
           "Invalid arguments: --prompt-dir is required when not using --mocked";
       if (logger) {
-        logger->Log(LogLevel::Error, PipelinePhase::Startup, msg);
+        logger->Log({.level = LogLevel::Error,
+                     .phase = PipelinePhase::Startup,
+                     .message = msg});
       } else {
         std::cerr << msg << std::endl;
       }
@@ -158,11 +166,13 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
     if (user_provided_sampling) {
       // Warn but do not fail — the run is still valid, the flags are just
       // silently irrelevant when no model is loaded.
-        if (use_mocked) {
+      if (use_mocked) {
         const std::string msg =
             "Sampling parameters are ignored when using --mocked";
         if (logger) {
-          logger->Log(LogLevel::Warn, PipelinePhase::Startup, msg);
+          logger->Log({.level = LogLevel::Warn,
+                       .phase = PipelinePhase::Startup,
+                       .message = msg});
         } else {
           std::cerr << msg << std::endl;
         }
@@ -186,17 +196,18 @@ std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
         std::string("Failed to parse command-line arguments: ") +
         exception.what();
     if (logger) {
-      logger->Log(LogLevel::Error, PipelinePhase::Startup, msg);
-    } else {
-      std::cerr << msg << std::endl;
+      logger->Log({.level = LogLevel::Error,
+                   .phase = PipelinePhase::Startup,
+                   .message = msg});
     }
     return std::nullopt;
   } catch (...) {
-    const std::string msg = "Failed to parse command-line arguments: unknown error";
+    const std::string msg =
+        "Failed to parse command-line arguments: unknown error";
     if (logger) {
-      logger->Log(LogLevel::Error, PipelinePhase::Startup, msg);
-    } else {
-      std::cerr << msg << std::endl;
+      logger->Log({.level = LogLevel::Error,
+                   .phase = PipelinePhase::Startup,
+                   .message = msg});
     }
     return std::nullopt;
   }

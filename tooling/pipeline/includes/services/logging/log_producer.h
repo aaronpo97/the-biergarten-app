@@ -43,8 +43,7 @@ class LogProducer final : public ILogger {
     *
      * Blocks while the channel applies backpressure.
     */
-   void Log(LogLevel level, PipelinePhase phase,
-            std::string_view message) override;
+  void Log(LogEntry log_entry) override;
 
  private:
    BoundedChannel<LogEntry>& channel_;
