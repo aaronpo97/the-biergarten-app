@@ -6,7 +6,9 @@
 
 #include "services/prompting/prompt_directory.h"
 
+#include <chrono>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -43,14 +45,17 @@ PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir,
   std::filesystem::directory_iterator probe(prompt_dir_, ec);
   if (ec) {
     throw std::runtime_error(
-        "PromptDirectory: prompt directory is not readable: " +
-        prompt_dir_.string() + " (" + ec.message() + ")");
+        std::format("PromptDirectory: prompt directory is not readable: {} ({})",
+        prompt_dir_.string(), ec.message()));
   }
 
   if (logger_) {
-    logger_->Log(LogLevel::Info, PipelinePhase::Startup,
-                 std::string("[PromptDirectory] Resolved prompt directory: ") +
-                     prompt_dir_.string());
+    logger_->Log(
+        {.level = LogLevel::Info,
+         .phase = PipelinePhase::Startup,
+         .message =
+             std::string("[PromptDirectory] Resolved prompt directory: ") +
+             prompt_dir_.string()});
   }
 }
 
@@ -65,13 +70,13 @@ std::string PromptDirectory::Load(std::string_view key) {
 
   // Scenario 3: resolve <prompt_dir>/<key>.md and require it to exist.
   const std::filesystem::path file_path =
-      prompt_dir_ / std::filesystem::path(key_str + ".md");
+      prompt_dir_ / std::filesystem::path(std::format("{}.md", key_str));
 
   std::ifstream file(file_path);
   if (!file.is_open()) {
     throw std::runtime_error(
-        "PromptDirectory: prompt file not found for key '" + key_str +
-        "': " + file_path.string());
+        std::format("PromptDirectory: prompt file not found for key '{}': {}",
+        key_str, file_path.string()));
   }
 
   std::string content((std::istreambuf_iterator<char>(file)),
@@ -79,15 +84,15 @@ std::string PromptDirectory::Load(std::string_view key) {
   file.close();
 
   if (content.empty()) {
-    throw std::runtime_error("PromptDirectory: prompt file for key '" +
-                             key_str + "' is empty: " + file_path.string());
+    throw std::runtime_error(std::format("PromptDirectory: prompt file for key '{}' is empty: {}",
+                             key_str, file_path.string()));
   }
 
   if (logger_) {
-    logger_->Log(LogLevel::Info, PipelinePhase::Startup,
-                 std::string("[PromptDirectory] Loaded prompt '") + key_str +
-                     "' from '" + file_path.string() + "' (" +
-                     std::to_string(content.size()) + " chars)");
+    logger_->Log({.level = LogLevel::Info,
+                  .phase = PipelinePhase::Startup,
+                  .message = std::format("[PromptDirectory] Loaded prompt '{}' from '{}' ({} chars)",
+                             key_str, file_path.string(), content.size())});
   }
 
   cache_.emplace(key_str, content);

@@ -16,10 +16,4 @@
 LogProducer::LogProducer(BoundedChannel<LogEntry>& channel)
     : channel_(channel) {}
 
-void LogProducer::Log(LogLevel level, PipelinePhase phase,
-                      const std::string_view message) {
-  channel_.Send(LogEntry{.timestamp = std::chrono::system_clock::now(),
-                         .level = level,
-                         .phase = phase,
-                         .message = std::string(message)});
-}
+void LogProducer::Log(const LogEntry& entry) { channel_.Send(entry); }

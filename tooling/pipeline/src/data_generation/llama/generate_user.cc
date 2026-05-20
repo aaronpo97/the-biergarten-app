@@ -5,6 +5,7 @@
  */
 
 
+#include <format>
 #include <string>
 
 #include "data_generation/llama_generator.h"
@@ -19,5 +20,5 @@
 // 4. Return locale-aware username and biography
 UserResult LlamaGenerator::GenerateUser(const std::string& locale) {
   return {.username = "test_user",
-          .bio = "This is a test user profile from " + locale + "."};
+          .bio = std::format("This is a test user profile from {}.", locale)};
 }

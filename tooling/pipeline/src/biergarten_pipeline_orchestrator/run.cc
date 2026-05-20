@@ -3,11 +3,12 @@
  * @brief BiergartenDataGenerator::Run() implementation.
  */
 
-#include "services/logging/logger.h"
-
+#include <chrono>
+#include <format>
 #include <utility>
 
 #include "biergarten_pipeline_orchestrator.h"
+#include "services/logging/logger.h"
 
 bool BiergartenPipelineOrchestrator::Run() {
   try {
@@ -30,18 +31,21 @@ bool BiergartenPipelineOrchestrator::Run() {
                          .region_context = std::move(region_context)});
       } catch (const std::exception& exception) {
         ++skipped_count;
-        logger_->Log(LogLevel::Warn, PipelinePhase::UserGeneration,
-                     std::string("[Pipeline] Skipping city '") + city.city +
-                         " (" + city.country + "): context lookup failed: " +
-                         exception.what());
+        logger_->Log(
+            {.level = LogLevel::Warn,
+             .phase = PipelinePhase::UserGeneration,
+             .message = std::format(
+                 "[Pipeline] Skipping city '{}' ({}): context lookup failed: {}",
+                 city.city, city.country, exception.what())});
       }
     }
 
     if (skipped_count > 0) {
-      logger_->Log(LogLevel::Warn, PipelinePhase::UserGeneration,
-                   std::string("[Pipeline] Skipped ") +
-                       std::to_string(skipped_count) +
-                       " city/cities due to context lookup errors");
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "[Pipeline] Skipped {} city/cities due to context lookup errors",
+                        skipped_count)});
     }
 
     this->GenerateBreweries(enriched);
@@ -49,9 +53,11 @@ bool BiergartenPipelineOrchestrator::Run() {
     this->LogResults();
     return true;
   } catch (const std::exception& e) {
-    logger_->Log(LogLevel::Error, PipelinePhase::Teardown,
-                 std::string("Pipeline execution failed with error: ") +
-                     e.what());
+    logger_->Log(
+        {.level = LogLevel::Error,
+         .phase = PipelinePhase::Teardown,
+         .message =
+             std::format("Pipeline execution failed with error: {}", e.what())});
     return false;
   }
 }

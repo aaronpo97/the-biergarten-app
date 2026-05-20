@@ -16,11 +16,11 @@
 
 #include "data_generation/llama_generator_helpers.h"
 #include "llama.h"
-
+namespace {
 /**
  * String trimming: removes leading and trailing whitespace
  */
-static std::string Trim(std::string_view value) {
+std::string Trim(std::string_view value) {
   constexpr std::string_view whitespace = " \t\n\r\f\v";
   const size_t first_index = value.find_first_not_of(whitespace);
   if (first_index == std::string_view::npos) {
@@ -35,7 +35,7 @@ static std::string Trim(std::string_view value) {
  * Normalize whitespace: collapses multiple spaces/tabs/newlines into single
  * spaces
  */
-static std::string CondenseWhitespace(std::string_view text) {
+std::string CondenseWhitespace(std::string_view text) {
   std::string out;
   out.reserve(text.size());
 
@@ -61,7 +61,37 @@ static std::string CondenseWhitespace(std::string_view text) {
 // Guard against truncating in the first half of the string.
 // This preserves the critical opening content and avoids cutting critical
 // context words early in the region description.
-static constexpr size_t kTruncationGuardDivisor = 2;
+constexpr size_t kTruncationGuardDivisor = 2;
+
+bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
+                                    std::string_view key, std::string& out,
+                                    std::string* error_out) {
+  const boost::json::value* field = obj.if_contains(key);
+  if (field == nullptr || !field->is_string()) {
+    return false;
+  }
+
+  const auto& string_value = field->as_string();
+  out = Trim(std::string_view(string_value.data(), string_value.size()));
+  return !out.empty();
+}
+
+bool HasSchemaPlaceholder(const std::array<std::string*, 4>& values) {
+  for (const std::string* value : values) {
+    std::string lowered = *value;
+    std::ranges::transform(lowered, lowered.begin(),
+                           [](const unsigned char character) {
+                             return static_cast<char>(std::tolower(character));
+                           });
+
+    if (lowered == "string") {
+      return true;
+    }
+  }
+
+  return false;
+}
+}  // namespace
 
 /**
  * Truncate region context to fit within max length while preserving word
@@ -121,47 +151,6 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
       "LlamaGenerator: failed to decode sampled token piece");
 }
 
-static bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
-                                           std::string_view key,
-                                           std::string& out,
-                                           std::string* error_out) {
-  const boost::json::value* field = obj.if_contains(key);
-  if (field == nullptr || !field->is_string()) {
-    if (error_out != nullptr) {
-      *error_out =
-          "JSON field '" + std::string(key) + "' is missing or not a string";
-    }
-    return false;
-  }
-
-  const auto& string_value = field->as_string();
-  out = Trim(std::string_view(string_value.data(), string_value.size()));
-  if (out.empty()) {
-    if (error_out != nullptr) {
-      *error_out = "JSON field '" + std::string(key) + "' must not be empty";
-    }
-    return false;
-  }
-
-  return true;
-}
-
-static bool HasSchemaPlaceholder(const std::array<std::string*, 4>& values) {
-  for (const std::string* value : values) {
-    std::string lowered = *value;
-    std::ranges::transform(lowered, lowered.begin(),
-                           [](unsigned char character) {
-                             return static_cast<char>(std::tolower(character));
-                           });
-
-    if (lowered == "string") {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                BreweryResult& brewery_out) {
   boost::system::error_code error_code;
@@ -209,7 +198,7 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
     return validation_error;
   }
 
-  const std::array<std::string*, 4> schema_placeholders = {
+  const std::array schema_placeholders = {
       &brewery_out.name_en, &brewery_out.description_en,
       &brewery_out.name_local, &brewery_out.description_local};
   if (HasSchemaPlaceholder(schema_placeholders)) {

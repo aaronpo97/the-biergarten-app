@@ -4,6 +4,7 @@
  * inference, and validates structured JSON output for brewery records.
  */
 
+#include <chrono>
 #include <format>
 #include <optional>
 #include <stdexcept>
@@ -99,9 +100,11 @@ BreweryResult LlamaGenerator::GenerateBrewery(
     raw = this->Infer(system_prompt, user_prompt, max_tokens,
                       kBreweryJsonGrammar);
     if (logger_) {
-      logger_->Log(LogLevel::Debug, PipelinePhase::BreweryAndBeerGeneration,
-                   std::string("LlamaGenerator: raw output (attempt ") +
-                       std::to_string(attempt + 1) + "): " + raw);
+      logger_->Log(
+          {.level = LogLevel::Debug,
+           .phase = PipelinePhase::BreweryAndBeerGeneration,
+           .message = std::format("LlamaGenerator: raw output (attempt {}): {}",
+                      attempt + 1, raw)});
     }
 
     // Validate output: parse JSON and check required fields
@@ -114,10 +117,11 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       // Success: return parsed brewery data
 
       if (logger_) {
-        logger_->Log(LogLevel::Info, PipelinePhase::BreweryAndBeerGeneration,
-                     std::string(
-                         "LlamaGenerator: successfully generated brewery data on attempt ") +
-                         std::to_string(attempt + 1));
+        logger_->Log(
+            {.level = LogLevel::Info,
+             .phase = PipelinePhase::BreweryAndBeerGeneration,
+             .message = std::format("LlamaGenerator: successfully generated brewery data on attempt {}",
+                        attempt + 1)});
       }
 
       return brewery;
@@ -127,9 +131,12 @@ BreweryResult LlamaGenerator::GenerateBrewery(
 
     last_error = *validation_error;
     if (logger_) {
-      logger_->Log(LogLevel::Warn, PipelinePhase::BreweryAndBeerGeneration,
-                   std::string("LlamaGenerator: malformed brewery JSON (attempt ") +
-                       std::to_string(attempt + 1) + "): " + *validation_error);
+      logger_->Log(
+          {.level = LogLevel::Warn,
+           .phase = PipelinePhase::BreweryAndBeerGeneration,
+           .message =
+               std::format("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
+               attempt + 1, *validation_error)});
     }
 
     // Update prompt with error details to guide LLM toward correct output.
@@ -148,10 +155,12 @@ BreweryResult LlamaGenerator::GenerateBrewery(
 
   // All retry attempts exhausted: log failure and throw exception
   if (logger_) {
-    logger_->Log(LogLevel::Error, PipelinePhase::BreweryAndBeerGeneration,
-                 std::string("LlamaGenerator: malformed brewery response after ") +
-                     std::to_string(max_attempts) + " attempts: " +
-                     (last_error.empty() ? raw : last_error));
+    logger_->Log(
+        {.level = LogLevel::Error,
+         .phase = PipelinePhase::BreweryAndBeerGeneration,
+       .message = std::format(
+         "LlamaGenerator: malformed brewery response after {} attempts: {}",
+         max_attempts, last_error.empty() ? raw : last_error)});
   }
   throw std::runtime_error("LlamaGenerator: malformed brewery response");
 }

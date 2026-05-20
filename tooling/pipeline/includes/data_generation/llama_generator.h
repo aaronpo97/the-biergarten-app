@@ -38,8 +38,7 @@ class LlamaGenerator final : public DataGenerator {
    * @param prompt_directory Directory service for loading named prompt files.
    */
   LlamaGenerator(const ApplicationOptions& options,
-                 const std::string& model_path,
-                 std::shared_ptr<ILogger> logger,
+                 const std::string& model_path, std::shared_ptr<ILogger> logger,
                  std::unique_ptr<IPromptFormatter> prompt_formatter,
                  std::unique_ptr<IPromptDirectory> prompt_directory);
 

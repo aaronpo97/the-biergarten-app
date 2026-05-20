@@ -6,6 +6,7 @@
 
 #include "json_handling/json_loader.h"
 
+#include <format>
 #include "services/logging/logger.h"
 #include <iostream>
 
@@ -20,8 +21,8 @@ static std::string ReadRequiredString(const boost::json::object& object,
                                       const char* key) {
   const boost::json::value* value = object.if_contains(key);
   if (value == nullptr || !value->is_string()) {
-    throw std::runtime_error(std::string("Missing or invalid string field: ") +
-                             key);
+    throw std::runtime_error(
+        std::format("Missing or invalid string field: {}", key));
   }
   const std::string_view text = value->as_string();
   return std::string(text);
@@ -31,8 +32,8 @@ static double ReadRequiredNumber(const boost::json::object& object,
                                  const char* key) {
   const boost::json::value* value = object.if_contains(key);
   if (value == nullptr || !value->is_number()) {
-    throw std::runtime_error(std::string("Missing or invalid numeric field: ") +
-                             key);
+    throw std::runtime_error(
+        std::format("Missing or invalid numeric field: {}", key));
   }
   return value->to_number<double>();
 }
@@ -42,7 +43,7 @@ static std::vector<std::string> ReadRequiredStringArray(
   const boost::json::value* value = object.if_contains(key);
   if (value == nullptr || !value->is_array()) {
     throw std::runtime_error(
-        std::string("Missing or invalid string array field: ") + key);
+      std::format("Missing or invalid string array field: {}", key));
   }
 
   const auto& array = value->as_array();
@@ -51,7 +52,7 @@ static std::vector<std::string> ReadRequiredStringArray(
   for (const auto& item : array) {
     if (!item.is_string()) {
       throw std::runtime_error(
-          std::string("Missing or invalid string array field: ") + key);
+          std::format("Missing or invalid string array field: {}", key));
     }
     items.emplace_back(item.as_string());
   }

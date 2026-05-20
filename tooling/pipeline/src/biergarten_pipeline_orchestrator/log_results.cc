@@ -3,29 +3,35 @@
  * @brief BiergartenDataGenerator::LogResults() implementation.
  */
 
-#include "services/logging/logger.h"
+#include <boost/json/array.hpp>
+#include <chrono>
+#include <format>
 
+#include "../../includes/json_handling/pretty_print.h"
 #include "biergarten_pipeline_orchestrator.h"
-#include <sstream>
-
+#include "services/logging/logger.h"
 void BiergartenPipelineOrchestrator::LogResults() const {
-  std::ostringstream msg;
-  msg << "GENERATED DATA DUMP\n";
-  size_t index = 1;
-  for (const auto& [location, brewery] : generated_breweries_) {
-    msg << index << ". city=\"" << location.city << "\" country=\""
-        << location.country << "\" state=\"" << location.state_province
-        << "\" iso3166_2=" << location.iso3166_2 << " lat="
-        << location.latitude << " lon=" << location.longitude << "\n";
+  boost::json::array output;
 
-    msg << "   brewery_name_en=\"" << brewery.name_en << "\"\n";
-    msg << "   brewery_description_en=\"" << brewery.description_en
-        << "\"\n";
-    msg << "   brewery_name_local=\"" << brewery.name_local << "\"\n";
-    msg << "   brewery_description_local=\"" << brewery.description_local
-        << "\"\n";
-    ++index;
+  for (const auto& [location, brewery] : generated_breweries_) {
+    output.push_back(boost::json::object{
+        {"name_en", brewery.name_en},
+        {"description_en", brewery.description_en},
+        {"name_local", brewery.name_local},
+        {"description_local", brewery.description_local},
+        {"location", boost::json::object{
+                         {"city", location.city},
+                         {"country", location.country},
+                         {"state_province", location.state_province},
+                         {"iso3166_2", location.iso3166_2},
+                         {"latitude", location.latitude},
+                         {"longitude", location.longitude},
+                     }}});
   }
 
-  logger_->Log(LogLevel::Debug, PipelinePhase::Teardown, msg.str());
+  std::ostringstream oss;
+  PrettyPrint(oss, output);
+  logger_->Log({.level = LogLevel::Info,
+                .phase = PipelinePhase::Teardown,
+                .message = oss.str()});
 }

@@ -10,12 +10,14 @@
 
 #include "services/enrichment/wikipedia_service.h"
 
-std::string WikipediaEnrichmentService::GetLocationContext(const Location& loc) {
+std::string WikipediaEnrichmentService::GetLocationContext(
+    const Location& loc) {
   using namespace std::literals::chrono_literals;
   if (!this->client_) {
     if (logger_) {
-      logger_->Log(LogLevel::Warn, PipelinePhase::UserGeneration,
-                   "Wikipedia client is nullptr.");
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = "Wikipedia client is nullptr."});
     }
     return {};
   }
@@ -48,17 +50,20 @@ std::string WikipediaEnrichmentService::GetLocationContext(const Location& loc) 
     append_extract(FetchExtract(brewing_query));
     append_extract(FetchExtract(beer_query));
     if (logger_) {
-      logger_->Log(LogLevel::Info, PipelinePhase::UserGeneration,
-                   std::string("Done fetching for ") + location_query +
-                       ". Sleeping for 10 seconds.");
+      logger_->Log({.level = LogLevel::Info,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format("Done fetching for {}. Sleeping for 10 seconds.",
+                               location_query)});
     }
     std::this_thread::sleep_for(10s);
 
   } catch (const std::runtime_error& e) {
     if (logger_) {
-      logger_->Log(LogLevel::Debug, PipelinePhase::UserGeneration,
-                   std::string("WikipediaService lookup failed for '") +
-                       location_query + "': " + e.what());
+      logger_->Log(
+          {.level = LogLevel::Debug,
+           .phase = PipelinePhase::UserGeneration,
+           .message = std::format("WikipediaService lookup failed for '{}': {}",
+                      location_query, e.what())});
     }
   }
   return result;

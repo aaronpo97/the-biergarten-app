@@ -138,7 +138,8 @@ FetchContent_MakeAvailable(cpp-httplib)
 
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME}
-        includes/services/enrichment/mock_enrichment.h)
+        includes/services/enrichment/mock_enrichment.h
+        includes/json_handling/pretty_print.h)
 
 # --- Entry point ---
 target_sources(${PROJECT_NAME} PRIVATE

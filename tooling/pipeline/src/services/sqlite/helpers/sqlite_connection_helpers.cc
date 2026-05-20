@@ -1,5 +1,6 @@
 #include "services/database/sqlite_connection_helpers.h"
 
+#include <format>
 #include <stdexcept>
 
 namespace sqlite_export_service_internal {
@@ -20,7 +21,7 @@ void SqliteStatementDeleter::operator()(
 void ThrowSqliteError(sqlite3* db_handle, std::string_view action) {
   const std::string message =
       db_handle != nullptr ? sqlite3_errmsg(db_handle) : "unknown SQLite error";
-  throw std::runtime_error(std::string(action) + ": " + message);
+  throw std::runtime_error(std::format("{}: {}", action, message));
 }
 
 SqliteDatabaseHandle OpenDatabase(const std::filesystem::path& path) {
@@ -50,7 +51,7 @@ void ExecSql(const SqliteDatabaseHandle& db_handle, std::string_view sql,
                                     ? error_message
                                     : sqlite3_errmsg(db_handle.get());
     sqlite3_free(error_message);
-    throw std::runtime_error(std::string(action) + ": " + message);
+    throw std::runtime_error(std::format("{}: {}", action, message));
   }
 }
 

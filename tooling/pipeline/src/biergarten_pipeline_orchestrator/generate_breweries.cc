@@ -3,13 +3,17 @@
  * @brief BiergartenDataGenerator::GenerateBreweries() implementation.
  */
 
-#include "services/logging/logger.h"
+#include <chrono>
+#include <format>
+
 #include "biergarten_pipeline_orchestrator.h"
+#include "services/logging/logger.h"
 
 void BiergartenPipelineOrchestrator::GenerateBreweries(
     std::span<const EnrichedCity> cities) {
-  logger_->Log(LogLevel::Info, PipelinePhase::BreweryAndBeerGeneration,
-               "=== SAMPLE BREWERY GENERATION ===");
+  logger_->Log({.level = LogLevel::Info,
+                .phase = PipelinePhase::BreweryAndBeerGeneration,
+                .message = "=== SAMPLE BREWERY GENERATION ==="});
 
   generated_breweries_.clear();
   size_t skipped_count = 0;
@@ -29,33 +33,36 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
       } catch (const std::exception& export_exception) {
         ++export_failed_count;
 
-        logger_->Log(LogLevel::Warn, PipelinePhase::BreweryAndBeerGeneration,
-                     std::string("[Pipeline] Generated brewery for '") +
-                         location.city + "' (" + location.country +
-                         ") but SQLite export failed: " +
-                         export_exception.what());
+        logger_->Log(
+            {.level = LogLevel::Warn,
+             .phase = PipelinePhase::BreweryAndBeerGeneration,
+             .message =
+                 std::format("[Pipeline] Generated brewery for '{}' ({}) but SQLite export failed: {}",
+                 location.city, location.country, export_exception.what())});
       }
     } catch (const std::exception& e) {
       ++skipped_count;
 
-      logger_->Log(LogLevel::Warn, PipelinePhase::BreweryAndBeerGeneration,
-                   std::string("[Pipeline] Skipping city '") + location.city +
-                       " (" + location.country + "): brewery generation failed: " +
-                       e.what());
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::BreweryAndBeerGeneration,
+                    .message = std::format("[Pipeline] Skipping city '{}' ({}): brewery generation failed: {}",
+                               location.city, location.country, e.what())});
     }
   }
 
   if (skipped_count > 0) {
-    logger_->Log(LogLevel::Warn, PipelinePhase::BreweryAndBeerGeneration,
-                 std::string("[Pipeline] Skipped ") +
-                     std::to_string(skipped_count) +
-                     " city/cities due to generation errors");
+    logger_->Log({.level = LogLevel::Warn,
+                  .phase = PipelinePhase::BreweryAndBeerGeneration,
+                  .message = std::format(
+                      "[Pipeline] Skipped {} city/cities due to generation errors",
+                      skipped_count)});
   }
 
   if (export_failed_count > 0) {
-    logger_->Log(LogLevel::Warn, PipelinePhase::Teardown,
-                 std::string("[Pipeline] Failed to export ") +
-                     std::to_string(export_failed_count) +
-                     " generated brewery/breweries to SQLite");
+    logger_->Log({.level = LogLevel::Warn,
+                  .phase = PipelinePhase::Teardown,
+                  .message = std::format(
+                      "[Pipeline] Failed to export {} generated brewery/breweries to SQLite",
+                      export_failed_count)});
   }
 }
