@@ -44,22 +44,34 @@ enum class PipelinePhase {
 };
 
 /**
+ * @struct LogDTO
+ * @brief User-provided subset of log fields. Used to capture call-site info transparently.
+ */
+struct LogDTO {
+  LogLevel level;
+  PipelinePhase phase;
+  std::string message;
+};
+
+/**
  * @struct LogEntry
  * @brief Single structured log event.
  *
  * All fields are value types, which keeps transfer across the bounded channel
  * simple and avoids shared ownership.
+ *
+ * NOTE: timestamp, thread_id, and origin must be populated by ILogger::Log()
+ * before the entry is dispatched.
  */
 struct LogEntry {
   /// @brief Timestamp when the entry was created.
-  std::chrono::system_clock::time_point timestamp =
-      std::chrono::system_clock::now();
+  std::chrono::system_clock::time_point timestamp{};
 
   /// @brief Source location where the log call was made.
-  std::source_location origin = std::source_location::current();
+  std::source_location origin{};
 
   /// @brief Thread responsible for emitting the log.
-  std::thread::id thread_id = std::this_thread::get_id();
+  std::thread::id thread_id{};
 
 
   /// @brief Severity level of this entry.

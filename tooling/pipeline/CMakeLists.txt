@@ -249,6 +249,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG>
 )
 
+target_compile_options(biergarten-pipeline PRIVATE
+   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/tooling/pipeline/src/=
+)
+
+
 # 7. Runtime Assets
 configure_file(
         ${CMAKE_SOURCE_DIR}/locations.json
@@ -260,3 +265,4 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         ${CMAKE_SOURCE_DIR}/prompts
         ${CMAKE_BINARY_DIR}/prompts
 )
+

@@ -51,6 +51,12 @@ class BiergartenPipelineOrchestrator {
    * 2. Resolve context for each city using the injected context service
    * 3. Generate brewery data for sampled cities
    *
+   * @note STRUCTURAL CONCURRENCY REQUIREMENT:
+   * When transitioned to a multithreaded design, this method MUST structurally
+   * enforce that all deployed worker threads are joined before returning (e.g.
+   * by using std::jthread or a structured concurrency primitive). This ensures
+   * workers do not attempt to log to a closed channel during application teardown.
+   *
    * @return true if successful, false if not
    */
   bool Run();

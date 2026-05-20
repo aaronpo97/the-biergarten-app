@@ -24,29 +24,30 @@
  */
 class LogProducer final : public ILogger {
  public:
-   /**
-     * @brief Construct a channel-backed producer.
-    *
-     * @param channel Reference to the bounded channel used for log transfer.
-    */
-   explicit LogProducer(BoundedChannel<LogEntry>& channel);
+  /**
+   * @brief Construct a channel-backed producer.
+   *
+   * @param channel Reference to the bounded channel used for log transfer.
+   */
+  explicit LogProducer(BoundedChannel<LogEntry>& channel);
 
-   LogProducer(const LogProducer&) = delete;
-   LogProducer& operator=(const LogProducer&) = delete;
-   LogProducer(LogProducer&&) = delete;
-   LogProducer& operator=(LogProducer&&) = delete;
+  LogProducer(const LogProducer&) = delete;
+  LogProducer& operator=(const LogProducer&) = delete;
+  LogProducer(LogProducer&&) = delete;
+  LogProducer& operator=(LogProducer&&) = delete;
 
-   ~LogProducer() override = default;
+  ~LogProducer() override = default;
 
-   /**
-     * @brief Queue a log message for asynchronous processing.
-    *
-     * Blocks while the channel applies backpressure.
-    */
-  void Log(LogEntry log_entry) override;
+  /**
+   * @brief Queue a log message for asynchronous processing.
+   *
+   * Blocks while the channel applies backpressure. This blocking behavior
+   * under heavy load is an accepted trade-off for simplicity.
+   */
+  void DoLog(LogEntry log_entry) override;
 
  private:
-   BoundedChannel<LogEntry>& channel_;
+  BoundedChannel<LogEntry>& channel_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_CHANNEL_LOGGER_H_

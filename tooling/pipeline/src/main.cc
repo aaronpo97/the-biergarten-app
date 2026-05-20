@@ -66,8 +66,8 @@ int main(const int argc, char** argv) {
     const LlamaBackendState llama_backend_state;
 #endif
 
-    log_producer->Log({.level = LogLevel::Info,
-                       .phase = PipelinePhase::Startup,
+    log_producer->Log({.level   = LogLevel::Info,
+                       .phase   = PipelinePhase::Startup,
                        .message = "STARTING PIPELINE"});
 
     const std::optional<ApplicationOptions> parsed_options =
@@ -89,8 +89,8 @@ int main(const int argc, char** argv) {
         prompt_directory = std::make_unique<PromptDirectory>(
             options.pipeline.prompt_dir, log_producer);
       } catch (const std::exception& dir_error) {
-        log_producer->Log({.level = LogLevel::Error,
-                           .phase = PipelinePhase::Startup,
+        log_producer->Log({.level   = LogLevel::Error,
+                           .phase   = PipelinePhase::Startup,
                            .message = std::format("Invalid --prompt-dir: {}",
                                                   dir_error.what())});
 
@@ -108,7 +108,7 @@ int main(const int argc, char** argv) {
             {
               log_producer->Log(
                   {.level = LogLevel::Info,
-                   .phase = PipelinePhase::Startup,
+                   .phase   = PipelinePhase::Startup,
                    .message = "Prompt formatter: none (mock mode)"});
             }
             return std::unique_ptr<IPromptFormatter>(nullptr);
@@ -116,7 +116,7 @@ int main(const int argc, char** argv) {
           {
             log_producer->Log(
                 {.level = LogLevel::Info,
-                 .phase = PipelinePhase::Startup,
+                 .phase   = PipelinePhase::Startup,
                  .message = "Prompt formatter: Gemma4JinjaPromptFormatter"});
           }
           return std::unique_ptr<IPromptFormatter>(
@@ -125,15 +125,15 @@ int main(const int argc, char** argv) {
         di::bind<WebClient>().to([options, log_producer] {
           if (options.generator.use_mocked) {
             {
-              log_producer->Log({.level = LogLevel::Info,
-                                 .phase = PipelinePhase::Startup,
+              log_producer->Log({.level   = LogLevel::Info,
+                                 .phase   = PipelinePhase::Startup,
                                  .message = "Web client: none (mock mode)"});
             }
             return std::unique_ptr<WebClient>(nullptr);
           }
           {
-            log_producer->Log({.level = LogLevel::Info,
-                               .phase = PipelinePhase::Startup,
+            log_producer->Log({.level   = LogLevel::Info,
+                               .phase   = PipelinePhase::Startup,
                                .message = "Web client: HttpWebClient"});
           }
           return std::unique_ptr<WebClient>(
@@ -144,15 +144,15 @@ int main(const int argc, char** argv) {
                 const auto& inj) -> std::unique_ptr<IEnrichmentService> {
               if (options.generator.use_mocked) {
                 {
-                  log_producer->Log({.level = LogLevel::Info,
-                                     .phase = PipelinePhase::Startup,
+                  log_producer->Log({.level   = LogLevel::Info,
+                                     .phase   = PipelinePhase::Startup,
                                      .message = "Enrichment: mock"});
                 }
                 return std::make_unique<MockEnrichmentService>();
               }
               {
-                log_producer->Log({.level = LogLevel::Info,
-                                   .phase = PipelinePhase::Startup,
+                log_producer->Log({.level   = LogLevel::Info,
+                                   .phase   = PipelinePhase::Startup,
                                    .message = "Enrichment: Wikipedia"});
               }
               return std::make_unique<WikipediaEnrichmentService>(
@@ -164,8 +164,8 @@ int main(const int argc, char** argv) {
              &log_producer](const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
                 {
-                  log_producer->Log({.level = LogLevel::Info,
-                                     .phase = PipelinePhase::Startup,
+                  log_producer->Log({.level   = LogLevel::Info,
+                                     .phase   = PipelinePhase::Startup,
                                      .message = "Generator: mock"});
                 }
                 return std::make_unique<MockGenerator>();
@@ -173,7 +173,7 @@ int main(const int argc, char** argv) {
               {
                 log_producer->Log(
                     {.level = LogLevel::Info,
-                     .phase = PipelinePhase::Startup,
+                     .phase   = PipelinePhase::Startup,
                      .message = std::format(
                          "Generator: LlamaGenerator | model={} | temp={:.2f} "
                          "top_p={:.2f} top_k={} n_ctx={} seed={}",
@@ -190,23 +190,23 @@ int main(const int argc, char** argv) {
         injector.create<std::unique_ptr<BiergartenPipelineOrchestrator>>();
 
     if (!orchestrator->Run()) {
-      log_producer->Log({.level = LogLevel::Error,
-                         .phase = PipelinePhase::Teardown,
+      log_producer->Log({.level   = LogLevel::Error,
+                         .phase   = PipelinePhase::Teardown,
                          .message = "Pipeline execution failed"});
       return shutdown(EXIT_FAILURE);
     }
 
-    log_producer->Log({.level = LogLevel::Info,
-                       .phase = PipelinePhase::Teardown,
+    log_producer->Log({.level   = LogLevel::Info,
+                       .phase   = PipelinePhase::Teardown,
                        .message = std::format("Pipeline complete in {} ms",
                                               timer.Elapsed())});
 
     return shutdown(EXIT_SUCCESS);
 
   } catch (const std::exception& exception) {
-    const LogEntry log_entry{.level = LogLevel::Error,
-                             .phase = PipelinePhase::Teardown,
-                             .message = exception.what()};
+    const LogDTO log_entry{.level = LogLevel::Error,
+                               .phase   = PipelinePhase::Teardown,
+                               .message = exception.what()};
     if (log_producer) {
       log_producer->Log(log_entry);
     } else {

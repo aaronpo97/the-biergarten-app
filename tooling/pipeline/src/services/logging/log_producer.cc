@@ -16,4 +16,4 @@
 LogProducer::LogProducer(BoundedChannel<LogEntry>& channel)
     : channel_(channel) {}
 
-void LogProducer::Log(LogEntry entry) { channel_.Send(std::move(entry)); }
+void LogProducer::DoLog(LogEntry entry) { channel_.Send(std::move(entry)); }

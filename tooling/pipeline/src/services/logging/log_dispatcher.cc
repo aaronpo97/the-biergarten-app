@@ -13,6 +13,29 @@
 #include "concurrency/bounded_channel.h"
 #include "services/logging/log_entry.h"
 
+namespace {
+[[nodiscard]] constexpr std::string_view PipelinePhaseToString(
+    PipelinePhase phase) {
+  switch (phase) {
+    case PipelinePhase::Startup:
+      return "Startup";
+    case PipelinePhase::UserGeneration:
+      return "User Generation";
+    case PipelinePhase::BreweryAndBeerGeneration:
+      return "Brewery & Beer Gen";
+    case PipelinePhase::CheckinGeneration:
+      return "Checkin Gen";
+    case PipelinePhase::RatingGeneration:
+      return "Rating Gen";
+    case PipelinePhase::FollowGeneration:
+      return "Follow Gen";
+    case PipelinePhase::Teardown:
+      return "Teardown";
+  }
+  return "Unknown";
+}
+}  // namespace
+
 LogDispatcher::LogDispatcher(BoundedChannel<LogEntry>& channel)
     : channel_(channel) {}
 
@@ -28,7 +51,11 @@ void LogDispatcher::Run() {
 
     const auto& log = entry.value();
 
-    logger->log(ToSpdlogLevel(log.level), log.message);
+    logger->log(ToSpdlogLevel(log.level),
+                "{:<20} │ thread: {:016x} │ [{}:{}] │ {}",
+                PipelinePhaseToString(log.phase),
+                std::hash<std::thread::id>{}(log.thread_id),
+                log.origin.file_name(), log.origin.line(), log.message);
   }
 }
 

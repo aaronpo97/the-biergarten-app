@@ -34,9 +34,31 @@ class ILogger {
   /**
    * @brief Submit a log message to the logging subsystem.
    *
-   * @param log_entry Structured log entry data.
+   * @param payload User-provided log data (level, phase, message).
+   * @param origin Auto-captured source location of the call site.
    */
-  virtual void Log(LogEntry log_entry) = 0;
+  void Log(LogDTO payload,
+           std::source_location origin = std::source_location::current(),
+           std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
+           std::thread::id thread_id = std::this_thread::get_id()) {
+    LogEntry entry;
+    entry.timestamp = timestamp;
+    entry.thread_id = thread_id;
+    entry.level = payload.level;
+    entry.phase = payload.phase;
+    entry.message = std::move(payload.message);
+    entry.origin = origin;
+    DoLog(std::move(entry));
+  }
+
+ protected:
+  /**
+   * @brief Underlying implementation to transport the log entry.
+   *
+   * Implementations must be thread-safe as DoLog can be called concurrently
+   * from multiple worker threads.
+   */
+  virtual void DoLog(LogEntry log_entry) = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOGGER_H_

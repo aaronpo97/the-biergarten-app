@@ -71,10 +71,10 @@ std::optional<ApplicationOptions> ParseArguments(
       return usage_stream.str();
     })();
     if (logger) {
-      logger->Log({.level = LogLevel::Info,
+      logger->Log(LogDTO{.level = LogLevel::Info,
                    .phase = PipelinePhase::Startup,
                    .message = title});
-      logger->Log({.level = LogLevel::Info,
+      logger->Log(LogDTO{.level = LogLevel::Info,
                    .phase = PipelinePhase::Startup,
                    .message = usage});
     }
@@ -90,7 +90,7 @@ std::optional<ApplicationOptions> ParseArguments(
       std::stringstream help_stream;
       help_stream << "\n" << desc;
       if (logger) {
-        logger->Log({.level = LogLevel::Info,
+        logger->Log(LogDTO{.level = LogLevel::Info,
                      .phase = PipelinePhase::Startup,
                      .message = help_stream.str()});
       }
@@ -113,7 +113,7 @@ std::optional<ApplicationOptions> ParseArguments(
       const std::string msg =
           "Invalid arguments: --mocked and --model are mutually exclusive";
       if (logger) {
-        logger->Log({.level = LogLevel::Error,
+        logger->Log(LogDTO{.level = LogLevel::Error,
                      .phase = PipelinePhase::Startup,
                      .message = msg});
       } else {
@@ -126,7 +126,7 @@ std::optional<ApplicationOptions> ParseArguments(
       const std::string msg =
           "Invalid arguments: either --mocked or --model must be specified";
       if (logger) {
-        logger->Log({.level = LogLevel::Error,
+        logger->Log(LogDTO{.level = LogLevel::Error,
                      .phase = PipelinePhase::Startup,
                      .message = msg});
       } else {
@@ -170,7 +170,7 @@ std::optional<ApplicationOptions> ParseArguments(
         const std::string msg =
             "Sampling parameters are ignored when using --mocked";
         if (logger) {
-          logger->Log({.level = LogLevel::Warn,
+          logger->Log(LogDTO{.level = LogLevel::Warn,
                        .phase = PipelinePhase::Startup,
                        .message = msg});
         } else {
@@ -196,7 +196,7 @@ std::optional<ApplicationOptions> ParseArguments(
         std::string("Failed to parse command-line arguments: ") +
         exception.what();
     if (logger) {
-      logger->Log({.level = LogLevel::Error,
+      logger->Log(LogDTO{.level = LogLevel::Error,
                    .phase = PipelinePhase::Startup,
                    .message = msg});
     }
@@ -205,7 +205,7 @@ std::optional<ApplicationOptions> ParseArguments(
     const std::string msg =
         "Failed to parse command-line arguments: unknown error";
     if (logger) {
-      logger->Log({.level = LogLevel::Error,
+      logger->Log(LogDTO{.level = LogLevel::Error,
                    .phase = PipelinePhase::Startup,
                    .message = msg});
     }
