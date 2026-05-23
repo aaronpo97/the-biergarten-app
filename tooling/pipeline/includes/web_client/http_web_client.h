@@ -8,8 +8,11 @@
 
 
 #include "web_client/web_client.h"
+#include "services/logging/logger.h"
 
+#include <memory>
 #include <string>
+#include <utility>
 
 /**
  * @brief WebClient implementation backed by cpp-httplib.
@@ -24,7 +27,8 @@
  */
 class HttpWebClient final : public WebClient {
 public:
-  HttpWebClient() = default;
+  explicit HttpWebClient(std::shared_ptr<ILogger> logger)
+      : logger_(std::move(logger)) {}
   ~HttpWebClient() override = default;
 
   /**
@@ -43,6 +47,9 @@ public:
    * @return Percent-encoded string safe for use in a URL.
    */
   std::string EncodeURL(const std::string& value) override;
+
+ private:
+  std::shared_ptr<ILogger> logger_;
 };
 
 

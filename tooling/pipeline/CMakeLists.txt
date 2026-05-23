@@ -138,7 +138,8 @@ FetchContent_MakeAvailable(cpp-httplib)
 
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME}
-        includes/services/enrichment/mock_enrichment.h)
+        includes/services/enrichment/mock_enrichment.h
+        includes/json_handling/pretty_print.h)
 
 # --- Entry point ---
 target_sources(${PROJECT_NAME} PRIVATE
@@ -155,13 +156,13 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/application_options/parse_arguments.cc
 )
 
-# --- biergarten_data_generator ---
+# --- biergarten_pipeline_orchestrator ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/biergarten_data_generator/log_results.cc
-        src/biergarten_data_generator/biergarten_data_generator.cc
-        src/biergarten_data_generator/generate_breweries.cc
-        src/biergarten_data_generator/run.cc
-        src/biergarten_data_generator/query_cities_with_countries.cc
+        src/biergarten_pipeline_orchestrator/log_results.cc
+        src/biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
+        src/biergarten_pipeline_orchestrator/generate_breweries.cc
+        src/biergarten_pipeline_orchestrator/run.cc
+        src/biergarten_pipeline_orchestrator/query_cities_with_countries.cc
 )
 
 # --- web_client ---
@@ -202,17 +203,23 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- services: sqlite ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/services/sqlite/process_record.cc
-        src/services/sqlite/sqlite_export_service.cc
-        src/services/sqlite/finalize.cc
-        src/services/sqlite/initialize.cc
-        src/services/sqlite/helpers/sqlite_connection_helpers.cc
-        src/services/sqlite/helpers/sqlite_statement_helpers.cc
+	src/services/sqlite/process_record.cc
+	src/services/sqlite/sqlite_export_service.cc
+	src/services/sqlite/finalize.cc
+	src/services/sqlite/initialize.cc
+	src/services/sqlite/helpers/sqlite_connection_helpers.cc
+	src/services/sqlite/helpers/sqlite_statement_helpers.cc
+)
+
+# --- services: logging ---
+target_sources(${PROJECT_NAME} PRIVATE
+	"src/services/logging/log_producer.cc"
+        src/services/logging/log_dispatcher.cc
 )
 
 # --- services (top-level) ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/services/prompt_directory.cc
+	src/services/prompt_directory.cc
 )
 
 # 6. Include Directories, Link Libraries & Compile Definitions
@@ -242,6 +249,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG>
 )
 
+target_compile_options(biergarten-pipeline PRIVATE
+   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/tooling/pipeline/src/=
+)
+
+
 # 7. Runtime Assets
 configure_file(
         ${CMAKE_SOURCE_DIR}/locations.json
@@ -253,3 +265,4 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         ${CMAKE_SOURCE_DIR}/prompts
         ${CMAKE_BINARY_DIR}/prompts
 )
+

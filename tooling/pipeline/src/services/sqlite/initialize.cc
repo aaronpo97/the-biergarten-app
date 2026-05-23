@@ -4,6 +4,7 @@
  */
 
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -18,8 +19,8 @@ std::filesystem::path SqliteExportService::BuildDatabasePath() const {
 
   for (int suffix = 1; std::filesystem::exists(candidate); ++suffix) {
     candidate = output_path_ /
-                std::filesystem::path("biergarten_seed_" + run_timestamp_utc_ +
-                                      "-" + std::to_string(suffix) + ".sqlite");
+                std::filesystem::path(std::format("biergarten_seed_{}-{}.sqlite",
+                                      run_timestamp_utc_, suffix));
   }
 
   return candidate;

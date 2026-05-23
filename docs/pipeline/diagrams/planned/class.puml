@@ -1,4 +1,4 @@
-@startuml
+@startuml class_diagram
 
 ' ==========================================
 ' CONFIGURATION & STYLING
@@ -7,6 +7,8 @@
 skinparam classAttributeFontSize 9
 skinparam defaultFontSize 25
 skinparam titleFontSize 30
+
+title Biergarten Data Pipeline — Class Diagram
 
 package "Domain: Models" {
 
@@ -141,7 +143,7 @@ package "Domain: Models" {
 
   LocationContext *-- Completeness
 }
-@startuml
+
 package "Domain: Application Configuration" {
   class SamplingOptions {
     + temperature: float = 1.0F
@@ -167,12 +169,10 @@ package "Domain: Application Configuration" {
     + pipeline: PipelineOptions
   }
 
-  ' --- Domain Model Relationships ---
   ApplicationOptions *-- GeneratorOptions
   ApplicationOptions *-- PipelineOptions
   GeneratorOptions o-- SamplingOptions
 }
-@endum
 
 package "Domain: Policy" {
 
@@ -275,33 +275,29 @@ package "Infrastructure: Logging" {
     + level : LogLevel
     + phase : PipelinePhase
     + message : std::string
-    + city : std::optional<std::string>
-    + entity_id : std::optional<std::string>
     + worker : std::optional<std::string>
   }
 
-  interface Logger <<interface>> {
-    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  interface ILogger <<interface>> {
+    + Log(entry : const LogEntry&) : void
   }
 
-  class PipelineLogger {
-    - log_ch_ : BoundedChannel<LogEntry>&
-    + Log(level, phase, message,\n  city, entity_id, worker) : void
+  class LogProducer {
+    - channel_ : BoundedChannel<LogEntry>&
+    + Log(entry : const LogEntry&) : void
   }
 
-  class LogWorker {
-    - log_ch_ : BoundedChannel<LogEntry>&
+  class LogDispatcher {
+    - channel_ : BoundedChannel<LogEntry>&
     + Run() : void
-    - FormatTimestamp(tp) : std::string
     - ToSpdlogLevel(level) : spdlog::level::level_enum
-    - ToString(phase) : std::string
   }
 
-  ' --- Logging Relationships ---
   LogEntry       *--  LogLevel
   LogEntry       *--  PipelinePhase
-  PipelineLogger ..>  LogEntry       : emits
-  LogWorker      ..>  LogEntry       : consumes
+  ILogger        <|.. LogProducer
+  LogProducer    ..>  LogEntry       : emits
+  LogDispatcher  ..>  LogEntry       : consumes
 }
 
 package "Infrastructure: Pipeline Channel" {
@@ -363,6 +359,22 @@ package "Infrastructure: Enrichment" {
 
 }
 
+package "Infrastructure: Prompting" {
+
+  interface IPromptDirectory <<interface>> {
+    + Load(key : std::string_view) : std::string
+  }
+
+  class PromptDirectory {
+    - prompt_dir_ : std::filesystem::path
+    - cache_ : std::unordered_map<std::string, std::string>
+    + PromptDirectory(prompt_dir : const std::filesystem::path&)
+    + Load(key : std::string_view) : std::string
+  }
+
+  IPromptDirectory <|.. PromptDirectory
+}
+
 package "Infrastructure: Data Generation" {
 
   interface DataGenerator <<interface>> {
@@ -386,6 +398,7 @@ package "Infrastructure: Data Generation" {
     - model_ : ModelHandle
     - context_ : ContextHandle
     - prompt_formatter_ : std::unique_ptr<PromptFormatter>
+    - prompt_directory_ : std::unique_ptr<IPromptDirectory>
     - rng_ : std::mt19937
     + GenerateBrewery(...) : BreweryResult
     + GenerateBeer(...) : BeerResult
@@ -459,8 +472,6 @@ package "Infrastructure: Data Export" {
 
 }
 
-
-
 class BiergartenPipelineOrchestrator {
   - preloader_ : std::unique_ptr<DataPreloader>
   - enrichment_service_ : std::unique_ptr<EnrichmentService>
@@ -531,6 +542,7 @@ DateTimeProvider               <|.. SystemDateTimeProvider
 WikipediaService               *--  WebClient
 WikipediaService               ..>  ContextStrategy
 LlamaGenerator                 *--  PromptFormatter
+LlamaGenerator                 *--  IPromptDirectory
 LlamaGenerator                 ..>  GeneratorOptions
 SqliteExportService            *--  DateTimeProvider
 

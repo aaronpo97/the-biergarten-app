@@ -12,10 +12,13 @@
  */
 
 #include <filesystem>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+
+#include "services/logging/logger.h"
 
 /**
  * @brief Interface for loading named prompt files.
@@ -56,6 +59,8 @@ class PromptDirectory final : public IPromptDirectory {
    *         directory.
    */
   explicit PromptDirectory(const std::filesystem::path& prompt_dir);
+  PromptDirectory(const std::filesystem::path& prompt_dir,
+                  std::shared_ptr<ILogger> logger);
 
   /**
    * @brief Loads the prompt for @p key, caching the result.
@@ -70,6 +75,7 @@ class PromptDirectory final : public IPromptDirectory {
 
  private:
   std::filesystem::path prompt_dir_;
+  std::shared_ptr<ILogger> logger_;
   std::unordered_map<std::string, std::string> cache_;
 };
 

@@ -5,9 +5,9 @@
  * output tokens back to text for system+user chat prompts.
  */
 
-#include <spdlog/spdlog.h>
-
 #include <algorithm>
+#include <chrono>
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -107,7 +107,7 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
       .top_p = sampling_top_p_,
       .seed = static_cast<uint32_t>(rng_()),
   };
-  auto sampler = MakeSamplerChain(vocab, sampler_config, grammar);
+  const auto sampler = MakeSamplerChain(vocab, sampler_config, grammar);
 
   /**
    * Clear KV cache to ensure clean inference state (no residual context)
@@ -171,10 +171,14 @@ std::string LlamaGenerator::InferFormatted(const std::string& formatted_prompt,
    */
   prompt_tokens.resize(static_cast<size_t>(token_count));
   if (token_count > prompt_budget) {
-    spdlog::warn(
-        "LlamaGenerator: prompt too long ({} tokens), truncating to {} "
-        "tokens to fit n_batch/n_ctx limits",
-        token_count, prompt_budget);
+    if (logger_) {
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::BreweryAndBeerGeneration,
+                    .message = std::format(
+                        "LlamaGenerator: prompt too long ({} tokens), "
+                        "truncating to {} tokens to fit n_batch/n_ctx limits",
+                        token_count, prompt_budget)});
+    }
     prompt_tokens.resize(static_cast<size_t>(prompt_budget));
     token_count = prompt_budget;
   }

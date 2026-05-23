@@ -10,10 +10,13 @@
 #include <boost/program_options.hpp>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
+
+class ILogger;
 
 namespace prog_opts = boost::program_options;
 
@@ -136,6 +139,7 @@ struct ApplicationOptions {
 // Function Declarations
 // ============================================================================
 
-std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv);
+std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
+                                                std::shared_ptr<ILogger> logger = nullptr);
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_MODELS_H_

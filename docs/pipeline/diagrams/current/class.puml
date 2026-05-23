@@ -26,6 +26,7 @@ skinparam note {
 title The Biergarten Data Pipeline - Class Diagram
 
 class BiergartenDataGenerator {
+  - logger_ : std::shared_ptr<ILogger>
   - context_service_ : std::unique_ptr<IEnrichmentService>
   - generator_ : std::unique_ptr<DataGenerator>
   - exporter_ : std::unique_ptr<IExportService>
@@ -34,6 +35,46 @@ class BiergartenDataGenerator {
   - QueryCitiesWithCountries() : std::vector<Location>
   - GenerateBreweries(cities : std::span<const EnrichedCity>) : void
   - LogResults() : void
+}
+
+class LogLevel <<enumeration>> {
+  Debug
+  Info
+  Warn
+  Error
+}
+
+class PipelinePhase <<enumeration>> {
+  Startup
+  UserGeneration
+  BreweryAndBeerGeneration
+  CheckinGeneration
+  RatingGeneration
+  FollowGeneration
+  Teardown
+}
+
+struct LogEntry {
+  + timestamp : std::chrono::system_clock::time_point
+  + level : LogLevel
+  + phase : PipelinePhase
+  + message : std::string
+  + worker : std::optional<std::string>
+}
+
+interface ILogger <<interface>> {
+  + Log(entry : const LogEntry&) : void
+}
+
+class LogProducer {
+  - channel_ : BoundedChannel<LogEntry>&
+  + Log(entry : const LogEntry&) : void
+}
+
+class LogDispatcher {
+  - channel_ : BoundedChannel<LogEntry>&
+  + Run() : void
+  - ToSpdlogLevel(level) : spdlog::level::level_enum
 }
 
 interface IEnrichmentService <<interface>> {
@@ -123,9 +164,16 @@ class SystemDateTimeProvider {
 }
 
 ' Structural Relationships / Dependency Injection
+BiergartenDataGenerator *-- ILogger : owns
 BiergartenDataGenerator *-- IEnrichmentService : owns
 BiergartenDataGenerator *-- DataGenerator : owns
 BiergartenDataGenerator *-- IExportService : owns
+
+LogEntry *-- LogLevel
+LogEntry *-- PipelinePhase
+ILogger <|.. LogProducer : implements
+LogProducer ..> LogEntry : emits
+LogDispatcher ..> LogEntry : consumes
 
 IEnrichmentService <|.. WikipediaService : implements
 WikipediaService *-- WebClient : owns
