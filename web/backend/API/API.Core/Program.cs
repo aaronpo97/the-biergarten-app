@@ -11,6 +11,7 @@ using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
 using Infrastructure.Repository.Breweries;
 using Service.Auth;
+using Service.Breweries;
 using Service.Emails;
 using Service.UserManagement.User;
 
@@ -51,6 +52,7 @@ builder.Services.AddSingleton<
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IBreweryRepository, BreweryRepository>();
+builder.Services.AddScoped<IBreweryService, BreweryService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
