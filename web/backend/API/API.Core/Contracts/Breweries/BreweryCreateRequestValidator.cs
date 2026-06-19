@@ -2,8 +2,17 @@ using FluentValidation;
 
 namespace API.Core.Contracts.Breweries;
 
+/// <summary>
+/// Validates <see cref="BreweryCreateDto"/> instances before they are processed by the brewery creation endpoint.
+/// </summary>
 public class BreweryCreateDtoValidator : AbstractValidator<BreweryCreateDto>
 {
+    /// <summary>
+    /// Configures validation rules requiring <see cref="BreweryCreateDto.PostedById"/>,
+    /// <see cref="BreweryCreateDto.BreweryName"/>, <see cref="BreweryCreateDto.Description"/>, and
+    /// <see cref="BreweryCreateDto.Location"/> to be present, with length limits on the name, description,
+    /// address line 1, and postal code fields.
+    /// </summary>
     public BreweryCreateDtoValidator()
     {
         RuleFor(x => x.PostedById)

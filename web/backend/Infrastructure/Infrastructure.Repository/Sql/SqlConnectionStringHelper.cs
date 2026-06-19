@@ -2,6 +2,9 @@ using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Repository.Sql;
 
+/// <summary>
+/// Helper for building SQL Server connection strings from environment variables.
+/// </summary>
 public static class SqlConnectionStringHelper
 {
     /// <summary>
