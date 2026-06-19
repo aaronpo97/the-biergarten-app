@@ -7,8 +7,18 @@ using Microsoft.Data.SqlClient;
 
 namespace Database.Seed;
 
+/// <summary>
+/// Seeds user accounts, credentials, and verification records. Creates one fixed
+/// "Test User" account (<c>test.user@thebiergarten.app</c> / password <c>"password"</c>)
+/// for testing, followed by a randomly-generated account for each name in
+/// <see cref="SeedNames"/>, each with a random password and date of birth. Skips
+/// adding a verification record for a user that already has one, so this seeder is
+/// safe to re-run, though re-running will still attempt to register (and may fail on)
+/// users that already exist.
+/// </summary>
 internal class UserSeeder : ISeeder
 {
+    /// <summary>The first/last name pairs used to generate seed user accounts.</summary>
     private static readonly IReadOnlyList<(
         string FirstName,
         string LastName
@@ -116,6 +126,14 @@ internal class UserSeeder : ISeeder
         ("Zoie", "Armstrong"),
     ];
 
+    /// <summary>
+    /// Registers a fixed test user account followed by one randomly-generated account
+    /// per entry in <see cref="SeedNames"/>, adding a user verification record for each
+    /// newly created account that does not already have one. Progress counts are
+    /// written to the console on completion.
+    /// </summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <returns>A task that completes when all users have been seeded.</returns>
     public async Task SeedAsync(SqlConnection connection)
     {
         var generator = new PasswordGenerator();
@@ -184,6 +202,18 @@ internal class UserSeeder : ISeeder
         Console.WriteLine($"Added {createdVerifications} user verifications.");
     }
 
+    /// <summary>
+    /// Registers a new user account and its credential by invoking the
+    /// <c>dbo.USP_RegisterUser</c> stored procedure.
+    /// </summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="username">The unique username for the account.</param>
+    /// <param name="firstName">The user's first name.</param>
+    /// <param name="lastName">The user's last name.</param>
+    /// <param name="dateOfBirth">The user's date of birth.</param>
+    /// <param name="email">The user's email address.</param>
+    /// <param name="hash">The salted password hash, as produced by <see cref="GeneratePasswordHash"/>.</param>
+    /// <returns>The newly created user account's <see cref="Guid"/> identifier.</returns>
     private static async Task<Guid> RegisterUserAsync(
         SqlConnection connection,
         string username,
@@ -211,6 +241,13 @@ internal class UserSeeder : ISeeder
         return (Guid)result!;
     }
 
+    /// <summary>
+    /// Hashes a plaintext password using Argon2id with a randomly generated 16-byte
+    /// salt, a degree of parallelism matching the available processor count, 64 MB of
+    /// memory, and 4 iterations.
+    /// </summary>
+    /// <param name="pwd">The plaintext password to hash.</param>
+    /// <returns>A string containing the base64-encoded salt and hash, separated by a colon.</returns>
     private static string GeneratePasswordHash(string pwd)
     {
         byte[] salt = RandomNumberGenerator.GetBytes(16);
@@ -227,6 +264,10 @@ internal class UserSeeder : ISeeder
         return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
+    /// <summary>Checks whether a user verification record already exists for the given user account.</summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="userAccountId">The user account identifier to check.</param>
+    /// <returns><c>true</c> if a verification record already exists; otherwise <c>false</c>.</returns>
     private static async Task<bool> HasUserVerificationAsync(
         SqlConnection connection,
         Guid userAccountId
@@ -243,6 +284,10 @@ internal class UserSeeder : ISeeder
         return result is not null;
     }
 
+    /// <summary>Creates a user verification record by invoking the <c>dbo.USP_CreateUserVerification</c> stored procedure.</summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="userAccountId">The identifier of the user account to verify.</param>
+    /// <returns>A task that completes when the verification record has been created.</returns>
     private static async Task AddUserVerificationAsync(
         SqlConnection connection,
         Guid userAccountId
@@ -258,6 +303,12 @@ internal class UserSeeder : ISeeder
         await command.ExecuteNonQueryAsync();
     }
 
+    /// <summary>
+    /// Generates a random date of birth corresponding to an age between 19 and 48
+    /// years (inclusive), with a random day offset within that birth year.
+    /// </summary>
+    /// <param name="random">The random number source to use.</param>
+    /// <returns>A randomly generated date of birth.</returns>
     private static DateTime GenerateDateOfBirth(Random random)
     {
         int age = 19 + random.Next(0, 30);

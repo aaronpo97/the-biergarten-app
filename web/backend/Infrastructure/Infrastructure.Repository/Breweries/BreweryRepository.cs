@@ -4,11 +4,22 @@ using Infrastructure.Repository.Sql;
 
 namespace Infrastructure.Repository.Breweries;
 
+/// <summary>
+/// ADO.NET-based implementation of <see cref="IBreweryRepository"/> backed by SQL Server stored
+/// procedures.
+/// </summary>
+/// <param name="connectionFactory">The factory used to create database connections.</param>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : Repository<BreweryPost>(connectionFactory), IBreweryRepository
 {
     private readonly ISqlConnectionFactory _connectionFactory = connectionFactory;
 
+    /// <summary>
+    /// Retrieves a brewery post by ID using the <c>USP_GetBreweryById</c> stored procedure.
+    /// </summary>
+    /// <param name="id">The unique identifier of the brewery post.</param>
+    /// <returns>The matching <see cref="BreweryPost"/>, or <c>null</c> if not found.</returns>
+    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using var connection = await CreateConnection();
@@ -26,21 +37,44 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return null;
     }
 
+    /// <summary>
+    /// Not yet implemented.
+    /// </summary>
+    /// <param name="limit">The maximum number of records to return, or <c>null</c> for no limit.</param>
+    /// <param name="offset">The number of records to skip, or <c>null</c> for no offset.</param>
+    /// <returns>Never returns; always throws.</returns>
+    /// <exception cref="NotImplementedException">Always thrown.</exception>
     public Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Not yet implemented.
+    /// </summary>
+    /// <param name="brewery">The brewery post containing updated values.</param>
+    /// <exception cref="NotImplementedException">Always thrown.</exception>
     public Task UpdateAsync(BreweryPost brewery)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Not yet implemented.
+    /// </summary>
+    /// <param name="id">The unique identifier of the brewery post to delete.</param>
+    /// <exception cref="NotImplementedException">Always thrown.</exception>
     public Task DeleteAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Creates a new brewery post and its location using the <c>USP_CreateBrewery</c> stored procedure.
+    /// </summary>
+    /// <param name="brewery">The brewery post to create. Must have a non-null <c>Location</c>.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="brewery"/>.<c>Location</c> is <c>null</c>.</exception>
+    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task CreateAsync(BreweryPost brewery)
     {
         await using var connection = await CreateConnection();
@@ -66,6 +100,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
 
     }
 
+    /// <summary>
+    /// Maps the current row of a data reader to a <see cref="BreweryPost"/> entity, including its
+    /// rowversion <c>Timer</c> field and, if location columns are present in the result set, its
+    /// associated <see cref="BreweryPostLocation"/>.
+    /// </summary>
+    /// <param name="reader">The data reader positioned on the row to map.</param>
+    /// <returns>The mapped <see cref="BreweryPost"/> instance.</returns>
     protected override BreweryPost MapToEntity(DbDataReader reader)
     {
         var brewery = new BreweryPost();
@@ -133,6 +174,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return brewery;
     }
 
+    /// <summary>
+    /// Helper method to add a parameter to a database command, converting <c>null</c> values to
+    /// <see cref="DBNull.Value"/>.
+    /// </summary>
+    /// <param name="command">The command to add the parameter to.</param>
+    /// <param name="name">The parameter name (including any prefix, e.g. "@BreweryName").</param>
+    /// <param name="value">The parameter value, or <c>null</c> to bind <see cref="DBNull.Value"/>.</param>
     private static void AddParameter(
         DbCommand command,
         string name,

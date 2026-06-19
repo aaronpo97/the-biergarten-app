@@ -5,8 +5,27 @@ using Microsoft.Data.SqlClient;
 
 namespace Database.Migrations;
 
+/// <summary>
+/// Entry point for the database migration runner. Reads connection details from
+/// environment variables, optionally clears and recreates the target database, and
+/// applies all SQL migration scripts embedded in this assembly using DbUp.
+/// </summary>
 public static class Program
 {
+    /// <summary>
+    /// Builds a SQL Server connection string from the <c>DB_SERVER</c>, <c>DB_NAME</c>,
+    /// <c>DB_USER</c>, <c>DB_PASSWORD</c>, and <c>DB_TRUST_SERVER_CERTIFICATE</c>
+    /// environment variables.
+    /// </summary>
+    /// <param name="databaseName">
+    /// The database (initial catalog) to connect to. When <c>null</c>, falls back to the
+    /// <c>DB_NAME</c> environment variable.
+    /// </param>
+    /// <returns>A fully built SQL Server connection string.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <c>DB_SERVER</c>, <c>DB_USER</c>, <c>DB_PASSWORD</c>, or (when
+    /// <paramref name="databaseName"/> is <c>null</c>) <c>DB_NAME</c> is not set.
+    /// </exception>
     private static string BuildConnectionString(string? databaseName = null)
     {
         var server = Environment.GetEnvironmentVariable("DB_SERVER")
@@ -38,9 +57,17 @@ public static class Program
         return builder.ConnectionString;
     }
 
+    /// <summary>The connection string for the target application database (<c>DB_NAME</c>).</summary>
     private static readonly string connectionString = BuildConnectionString();
+
+    /// <summary>The connection string for the <c>master</c> database, used for create/drop operations.</summary>
     private static readonly string masterConnectionString = BuildConnectionString("master");
 
+    /// <summary>
+    /// Applies all pending SQL migration scripts embedded in this assembly to the target
+    /// database using DbUp, logging progress to the console.
+    /// </summary>
+    /// <returns><c>true</c> if the upgrade completed successfully; otherwise <c>false</c>.</returns>
     private static bool DeployMigrations()
     {
         var upgrader = DeployChanges
@@ -53,6 +80,14 @@ public static class Program
         return result.Successful;
     }
 
+    /// <summary>
+    /// Drops the <c>Biergarten</c> database if it exists, first forcing it into single-user
+    /// mode with rollback to terminate any existing connections.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the database was dropped (or did not exist) without error; <c>false</c>
+    /// if an error occurred while connecting or dropping the database.
+    /// </returns>
     private static bool ClearDatabase()
     {
         var myConn = new SqlConnection(masterConnectionString);
@@ -104,6 +139,12 @@ public static class Program
         return true;
     }
 
+    /// <summary>
+    /// Creates the <c>Biergarten</c> database on the master connection if it does not
+    /// already exist. Errors encountered while creating the database are logged but do
+    /// not stop execution.
+    /// </summary>
+    /// <returns><c>true</c> always; this method does not propagate database errors as a failure result.</returns>
     private static bool CreateDatabaseIfNotExists()
     {
         var myConn = new SqlConnection(masterConnectionString);
@@ -134,6 +175,13 @@ public static class Program
         return true;
     }
 
+    /// <summary>
+    /// Migration runner entry point. Optionally clears the existing database when the
+    /// <c>CLEAR_DATABASE</c> environment variable is set to <c>"true"</c>, ensures the
+    /// database exists, then deploys all pending migrations.
+    /// </summary>
+    /// <param name="args">Command-line arguments (unused).</param>
+    /// <returns><c>0</c> if migrations completed successfully; <c>1</c> if they failed or an error occurred.</returns>
     public static int Main(string[] args)
     {
         Console.WriteLine("Starting database migrations...");

@@ -3,8 +3,18 @@ using Microsoft.Data.SqlClient;
 
 namespace Database.Seed;
 
+/// <summary>
+/// Seeds the location hierarchy (countries, states/provinces, and cities) used to
+/// associate other entities (e.g. breweries, users) with a geographic location.
+/// Countries must be seeded before states/provinces, which must be seeded before
+/// cities, since each level references its parent by code. The underlying stored
+/// procedures (<c>USP_CreateCountry</c>, <c>USP_CreateStateProvince</c>,
+/// <c>USP_CreateCity</c>) are expected to be idempotent, so re-running this seeder
+/// against an already-seeded database is safe.
+/// </summary>
 internal class LocationSeeder : ISeeder
 {
+    /// <summary>The set of countries to seed, identified by name and ISO 3166-1 code.</summary>
     private static readonly IReadOnlyList<(
         string CountryName,
         string CountryCode
@@ -15,6 +25,10 @@ internal class LocationSeeder : ISeeder
         ("United States", "US"),
     ];
 
+    /// <summary>
+    /// The set of states/provinces to seed, each identified by name, ISO 3166-2 code,
+    /// and the ISO 3166-1 code of its parent country.
+    /// </summary>
     private static IReadOnlyList<(string StateProvinceName, string StateProvinceCode, string CountryCode)> States
     {
         get;
@@ -123,6 +137,10 @@ internal class LocationSeeder : ISeeder
         ("Ciudad de México", "MX-CMX", "MX"),
     ];
 
+    /// <summary>
+    /// The set of cities to seed, each identified by name and the ISO 3166-2 code of its
+    /// parent state/province.
+    /// </summary>
     private static IReadOnlyList<(string StateProvinceCode, string CityName)> Cities { get; } =
     [
         ("US-CA", "Los Angeles"),
@@ -240,6 +258,12 @@ internal class LocationSeeder : ISeeder
         ("MX-ZAC", "Zacatecas"),
     ];
 
+    /// <summary>
+    /// Seeds all countries, then states/provinces, then cities, in that order, so that
+    /// each level's parent reference already exists by the time it is created.
+    /// </summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <returns>A task that completes when all locations have been seeded.</returns>
     public async Task SeedAsync(SqlConnection connection)
     {
         foreach (var (countryName, countryCode) in Countries)
@@ -265,6 +289,11 @@ internal class LocationSeeder : ISeeder
         }
     }
 
+    /// <summary>Creates a single country by invoking the <c>dbo.USP_CreateCountry</c> stored procedure.</summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="countryName">The display name of the country.</param>
+    /// <param name="countryCode">The ISO 3166-1 code of the country.</param>
+    /// <returns>A task that completes when the country has been created.</returns>
     private static async Task CreateCountryAsync(
         SqlConnection connection,
         string countryName,
@@ -282,6 +311,12 @@ internal class LocationSeeder : ISeeder
         await command.ExecuteNonQueryAsync();
     }
 
+    /// <summary>Creates a single state/province by invoking the <c>dbo.USP_CreateStateProvince</c> stored procedure.</summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="stateProvinceName">The display name of the state/province.</param>
+    /// <param name="stateProvinceCode">The ISO 3166-2 code of the state/province.</param>
+    /// <param name="countryCode">The ISO 3166-1 code of the parent country, which must already exist.</param>
+    /// <returns>A task that completes when the state/province has been created.</returns>
     private static async Task CreateStateProvinceAsync(
         SqlConnection connection,
         string stateProvinceName,
@@ -304,6 +339,11 @@ internal class LocationSeeder : ISeeder
         await command.ExecuteNonQueryAsync();
     }
 
+    /// <summary>Creates a single city by invoking the <c>dbo.USP_CreateCity</c> stored procedure.</summary>
+    /// <param name="connection">An open connection to the target database.</param>
+    /// <param name="cityName">The display name of the city.</param>
+    /// <param name="stateProvinceCode">The ISO 3166-2 code of the parent state/province, which must already exist.</param>
+    /// <returns>A task that completes when the city has been created.</returns>
     private static async Task CreateCityAsync(
         SqlConnection connection,
         string cityName,

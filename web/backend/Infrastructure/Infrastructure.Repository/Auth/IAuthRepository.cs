@@ -65,8 +65,7 @@ public interface IAuthRepository
     /// Marks a user account as confirmed.
     /// </summary>
     /// <param name="userAccountId">ID of the user account to confirm</param>
-    /// <returns>The confirmed UserAccount entity</returns>
-    /// <exception cref="UnauthorizedException">If user account not found</exception>
+    /// <returns>The confirmed UserAccount entity, or null if the user account does not exist</returns>
     Task<Domain.Entities.UserAccount?> ConfirmUserAccountAsync(Guid userAccountId);
 
     /// <summary>

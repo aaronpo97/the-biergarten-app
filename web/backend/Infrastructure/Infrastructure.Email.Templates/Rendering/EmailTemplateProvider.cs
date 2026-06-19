@@ -8,6 +8,8 @@ namespace Infrastructure.Email.Templates.Rendering;
 /// <summary>
 /// Service for rendering Razor email templates to HTML using HtmlRenderer.
 /// </summary>
+/// <param name="serviceProvider">The service provider used to resolve dependencies for the Razor component rendering pipeline.</param>
+/// <param name="loggerFactory">The logger factory passed to the <see cref="HtmlRenderer"/> used to render components.</param>
 public class EmailTemplateProvider(
     IServiceProvider serviceProvider,
     ILoggerFactory loggerFactory
@@ -16,6 +18,9 @@ public class EmailTemplateProvider(
     /// <summary>
     /// Renders the UserRegisteredEmail template with the specified parameters.
     /// </summary>
+    /// <param name="username">The username to include in the email</param>
+    /// <param name="confirmationLink">The email confirmation link</param>
+    /// <returns>The rendered HTML string</returns>
     public async Task<string> RenderUserRegisteredEmailAsync(
         string username,
         string confirmationLink
@@ -33,6 +38,9 @@ public class EmailTemplateProvider(
     /// <summary>
     /// Renders the ResendConfirmation template with the specified parameters.
     /// </summary>
+    /// <param name="username">The username to include in the email</param>
+    /// <param name="confirmationLink">The new confirmation link</param>
+    /// <returns>The rendered HTML string</returns>
     public async Task<string> RenderResendConfirmationEmailAsync(
         string username,
         string confirmationLink
@@ -49,7 +57,12 @@ public class EmailTemplateProvider(
 
     /// <summary>
     /// Generic method to render any Razor component to HTML.
+    /// Creates a scoped <see cref="HtmlRenderer"/>, dispatches the render onto its renderer thread,
+    /// and returns the resulting HTML string.
     /// </summary>
+    /// <typeparam name="TComponent">The type of the Razor component to render.</typeparam>
+    /// <param name="parameters">A dictionary of parameter names and values to pass to the component.</param>
+    /// <returns>The rendered HTML string for the component.</returns>
     private async Task<string> RenderComponentAsync<TComponent>(
         Dictionary<string, object?> parameters
     )
