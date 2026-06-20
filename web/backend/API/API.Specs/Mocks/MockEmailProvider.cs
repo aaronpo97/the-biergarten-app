@@ -10,12 +10,7 @@ public class MockEmailProvider : IEmailProvider
 {
     public List<SentEmail> SentEmails { get; } = new();
 
-    public Task SendAsync(
-        string to,
-        string subject,
-        string body,
-        bool isHtml = true
-    )
+    public Task SendAsync(string to, string subject, string body, bool isHtml = true)
     {
         SentEmails.Add(
             new SentEmail
@@ -24,19 +19,14 @@ public class MockEmailProvider : IEmailProvider
                 Subject = subject,
                 Body = body,
                 IsHtml = isHtml,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.UtcNow,
             }
         );
 
         return Task.CompletedTask;
     }
 
-    public Task SendAsync(
-        IEnumerable<string> to,
-        string subject,
-        string body,
-        bool isHtml = true
-    )
+    public Task SendAsync(IEnumerable<string> to, string subject, string body, bool isHtml = true)
     {
         SentEmails.Add(
             new SentEmail
@@ -45,7 +35,7 @@ public class MockEmailProvider : IEmailProvider
                 Subject = subject,
                 Body = body,
                 IsHtml = isHtml,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.UtcNow,
             }
         );
 
