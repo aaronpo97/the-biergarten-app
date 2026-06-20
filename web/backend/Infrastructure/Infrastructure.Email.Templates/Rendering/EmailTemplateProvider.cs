@@ -14,10 +14,8 @@ namespace Infrastructure.Email.Templates.Rendering;
 ///     pipeline.
 /// </param>
 /// <param name="loggerFactory">The logger factory passed to the <see cref="HtmlRenderer" /> used to render components.</param>
-public class EmailTemplateProvider(
-    IServiceProvider serviceProvider,
-    ILoggerFactory loggerFactory
-) : IEmailTemplateProvider
+public class EmailTemplateProvider(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+    : IEmailTemplateProvider
 {
     /// <summary>
     ///     Renders the UserRegisteredEmail template with the specified parameters.
@@ -33,7 +31,7 @@ public class EmailTemplateProvider(
         Dictionary<string, object?> parameters = new()
         {
             { nameof(UserRegistration.Username), username },
-            { nameof(UserRegistration.ConfirmationLink), confirmationLink }
+            { nameof(UserRegistration.ConfirmationLink), confirmationLink },
         };
 
         return await RenderComponentAsync<UserRegistration>(parameters);
@@ -53,7 +51,7 @@ public class EmailTemplateProvider(
         Dictionary<string, object?> parameters = new()
         {
             { nameof(ResendConfirmation.Username), username },
-            { nameof(ResendConfirmation.ConfirmationLink), confirmationLink }
+            { nameof(ResendConfirmation.ConfirmationLink), confirmationLink },
         };
 
         return await RenderComponentAsync<ResendConfirmation>(parameters);
@@ -72,10 +70,7 @@ public class EmailTemplateProvider(
     )
         where TComponent : IComponent
     {
-        await using HtmlRenderer htmlRenderer = new(
-            serviceProvider,
-            loggerFactory
-        );
+        await using HtmlRenderer htmlRenderer = new(serviceProvider, loggerFactory);
 
         string html = await htmlRenderer.Dispatcher.InvokeAsync(async () =>
         {
