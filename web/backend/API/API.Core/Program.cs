@@ -17,7 +17,11 @@ using Shared.Application.Behaviors;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Global Exception Filter
-builder.Services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); })
+builder
+    .Services.AddControllers(options =>
+    {
+        options.Filters.Add<GlobalExceptionFilter>();
+    })
     .AddApplicationPart(typeof(BreweryController).Assembly)
     .AddApplicationPart(typeof(UserController).Assembly)
     .AddApplicationPart(typeof(AuthController).Assembly);
@@ -51,14 +55,12 @@ builder.Services.AddHealthChecks();
 // Configure logging for container output
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-if (!builder.Environment.IsProduction()) builder.Logging.AddDebug();
+if (!builder.Environment.IsProduction())
+    builder.Logging.AddDebug();
 
 // Configure Dependency Injection -------------------------------------------------------------------------------------
 
-builder.Services.AddSingleton<
-    ISqlConnectionFactory,
-    DefaultSqlConnectionFactory
->();
+builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
 
 builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();
@@ -75,10 +77,7 @@ builder.Services.AddScoped<GlobalExceptionFilter>();
 // Configure JWT Authentication
 builder
     .Services.AddAuthentication("JWT")
-    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>(
-        "JWT",
-        options => { }
-    );
+    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>("JWT", options => { });
 
 builder.Services.AddAuthorization();
 
