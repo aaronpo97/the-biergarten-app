@@ -61,8 +61,6 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
             .Matches("[0-9]")
             .WithMessage("Password must contain at least one number")
             .Matches("[^a-zA-Z0-9]")
-            .WithMessage(
-                "Password must contain at least one special character"
-            );
+            .WithMessage("Password must contain at least one special character");
     }
 }

@@ -15,7 +15,7 @@ public enum TokenType
     RefreshToken,
 
     /// <summary>A short-lived token used to confirm a user's email/account.</summary>
-    ConfirmationToken
+    ConfirmationToken,
 }
 
 /// <summary>
@@ -32,11 +32,7 @@ public record ValidatedToken(Guid UserId, string Username, ClaimsPrincipal Princ
 /// <param name="UserAccount">The user account associated with the refreshed session.</param>
 /// <param name="RefreshToken">The newly issued refresh token.</param>
 /// <param name="AccessToken">The newly issued access token.</param>
-public record RefreshTokenResult(
-    UserAccount UserAccount,
-    string RefreshToken,
-    string AccessToken
-);
+public record RefreshTokenResult(UserAccount UserAccount, string RefreshToken, string AccessToken);
 
 /// <summary>
 ///     Defines the expiration windows, in hours, for each type of token issued by <see cref="ITokenService" />.
@@ -85,7 +81,8 @@ public interface ITokenService
     /// <typeparam name="T">The enum type identifying which kind of token to generate. Must be <see cref="TokenType" />.</typeparam>
     /// <param name="user">The user account to generate the token for.</param>
     /// <returns>The signed token string corresponding to the requested token type.</returns>
-    string GenerateToken<T>(UserAccount user) where T : struct, Enum;
+    string GenerateToken<T>(UserAccount user)
+        where T : struct, Enum;
 
     /// <summary>
     ///     Validates an access token.

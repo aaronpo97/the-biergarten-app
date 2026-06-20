@@ -49,9 +49,7 @@ public interface IAuthRepository
     /// </summary>
     /// <param name="userAccountId">ID of the user account</param>
     /// <returns>Active UserCredential if found, null otherwise</returns>
-    Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(
-        Guid userAccountId
-    );
+    Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId);
 
     /// <summary>
     ///     Rotates a user's credential by invalidating all existing credentials and creating a new one.

@@ -28,7 +28,10 @@ public class RegisterUserHandler(
     /// <exception cref="ConflictException">
     ///     Thrown when an existing account already has the same username or email address.
     /// </exception>
-    public async Task<RegistrationPayload> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<RegistrationPayload> Handle(
+        RegisterUserCommand request,
+        CancellationToken cancellationToken
+    )
     {
         await ValidateUserDoesNotExist(request.Username, request.Email);
 
@@ -48,14 +51,23 @@ public class RegisterUserHandler(
         string confirmationToken = tokenService.GenerateConfirmationToken(createdUser);
 
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            return new RegistrationPayload(createdUser.UserAccountId, createdUser.Username, string.Empty, string.Empty,
-                false);
+            return new RegistrationPayload(
+                createdUser.UserAccountId,
+                createdUser.Username,
+                string.Empty,
+                string.Empty,
+                false
+            );
 
         bool emailSent = false;
         try
         {
             await mediator.Send(
-                new SendRegistrationEmailCommand(createdUser.FirstName, createdUser.Email, confirmationToken),
+                new SendRegistrationEmailCommand(
+                    createdUser.FirstName,
+                    createdUser.Email,
+                    confirmationToken
+                ),
                 cancellationToken
             );
             emailSent = true;
@@ -67,8 +79,13 @@ public class RegisterUserHandler(
             // ignored
         }
 
-        return new RegistrationPayload(createdUser.UserAccountId, createdUser.Username, refreshToken, accessToken,
-            emailSent);
+        return new RegistrationPayload(
+            createdUser.UserAccountId,
+            createdUser.Username,
+            refreshToken,
+            accessToken,
+            emailSent
+        );
     }
 
     /// <exception cref="ConflictException">

@@ -12,10 +12,17 @@ namespace Features.Auth.Commands.RefreshToken;
 public class RefreshTokenHandler(ITokenService tokenService)
     : IRequestHandler<RefreshTokenCommand, LoginPayload>
 {
-    public async Task<LoginPayload> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<LoginPayload> Handle(
+        RefreshTokenCommand request,
+        CancellationToken cancellationToken
+    )
     {
         RefreshTokenResult result = await tokenService.RefreshTokenAsync(request.RefreshToken);
-        return new LoginPayload(result.UserAccount.UserAccountId, result.UserAccount.Username, result.RefreshToken,
-            result.AccessToken);
+        return new LoginPayload(
+            result.UserAccount.UserAccountId,
+            result.UserAccount.Username,
+            result.RefreshToken,
+            result.AccessToken
+        );
     }
 }
