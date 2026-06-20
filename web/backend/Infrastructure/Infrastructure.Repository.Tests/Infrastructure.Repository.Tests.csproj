@@ -22,5 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+    <ProjectReference Include="..\Infrastructure.Sql\Infrastructure.Sql.csproj" />
   </ItemGroup>
 </Project>

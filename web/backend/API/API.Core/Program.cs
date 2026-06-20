@@ -1,5 +1,7 @@
 using API.Core;
 using API.Core.Authentication;
+using Features.Breweries.Controllers;
+using Features.Breweries.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Email;
@@ -7,11 +9,9 @@ using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.Jwt;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.Sql;
 using Infrastructure.Repository.UserAccount;
-using Infrastructure.Repository.Breweries;
+using Infrastructure.Sql;
 using Service.Auth;
-using Service.Breweries;
 using Service.Emails;
 using Service.UserManagement.User;
 using Shared.Application.Behaviors;
@@ -22,7 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionFilter>();
-});
+})
+    .AddApplicationPart(typeof(BreweryController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -30,6 +31,7 @@ builder.Services.AddOpenApi();
 
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
 // Add MediatR. Each Features.* slice's assembly is registered here as it's introduced;
@@ -37,6 +39,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<Program>();
+    cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
@@ -60,8 +63,7 @@ builder.Services.AddSingleton<
 
 builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IBreweryRepository, BreweryRepository>();
-builder.Services.AddScoped<IBreweryService, BreweryService>();
+builder.Services.AddFeaturesBreweries();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoginService, LoginService>();

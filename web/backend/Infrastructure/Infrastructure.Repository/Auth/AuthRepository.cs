@@ -1,7 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using Domain.Entities;
-using Infrastructure.Repository.Sql;
+using Infrastructure.Sql;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Repository.Auth;

@@ -1,6 +1,6 @@
 using System.Data;
 using System.Data.Common;
-using Infrastructure.Repository.Sql;
+using Infrastructure.Sql;
 
 namespace Infrastructure.Repository.UserAccount;
 
