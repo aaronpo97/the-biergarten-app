@@ -19,24 +19,13 @@ public class CreateBreweryHandlerTests
 
     private static CreateBreweryLocation ValidLocation()
     {
-        return new CreateBreweryLocation(
-            Guid.NewGuid(),
-            "123 Main St",
-            null,
-            "12345",
-            null
-        );
+        return new CreateBreweryLocation(Guid.NewGuid(), "123 Main St", null, "12345", null);
     }
 
     [Fact]
     public async Task Handle_PersistsEntity_WithNewIdsAndCreatedAt()
     {
-        CreateBreweryCommand command = new(
-            Guid.NewGuid(),
-            "MyBrew",
-            "Desc",
-            ValidLocation()
-        );
+        CreateBreweryCommand command = new(Guid.NewGuid(), "MyBrew", "Desc", ValidLocation());
 
         BreweryPost? persisted = null;
         _repoMock
