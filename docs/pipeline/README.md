@@ -94,24 +94,27 @@ Each run writes a fresh dated SQLite file such as
 ./biergarten-pipeline \
   --model ../models/google_gemma-4-E4B-it-Q6_K.gguf \
   --prompt-dir prompts \
+  --location-count 25 \
   --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
 ```
 
 #### CLI Flags
 
-| Flag            | Purpose                                                                                              |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
-| `--mocked`      | Deterministic mock generator, no model required.                                                     |
-| `--model, -m`   | Path to a GGUF file. Required unless `--mocked` is set.                                              |
-| `--prompt-dir`  | Directory containing prompt files (e.g. `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
-| `--output, -o`  | Directory for generated SQLite artifacts. Default: `output`.                                         |
-| `--log-path`    | Path for application logs. Default: `pipeline.log`.                                                  |
-| `--temperature` | Sampling temperature. Default: `1.0`.                                                                |
-| `--top-p`       | Nucleus sampling. Default: `0.95`.                                                                   |
-| `--top-k`       | Top-k sampling. Default: `64`.                                                                       |
-| `--n-ctx`       | Context window size. Default: `8192`.                                                                |
-| `--seed`        | Random seed. Default: `-1` (random at runtime).                                                      |
-| `--help, -h`    | Print usage and exit.                                                                                |
+| Flag               | Purpose                                                                                              |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| `--mocked`         | Deterministic mock generator, no model required.                                                     |
+| `--model, -m`      | Path to a GGUF file. Required unless `--mocked` is set.                                              |
+| `--prompt-dir`     | Directory containing prompt files (e.g. `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
+| `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                         |
+| `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                  |
+| `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                             |
+| `--temperature`    | Sampling temperature. Default: `1.0`.                                                                |
+| `--top-p`          | Nucleus sampling. Default: `0.95`.                                                                   |
+| `--top-k`          | Top-k sampling. Default: `64`.                                                                       |
+| `--n-ctx`          | Context window size. Default: `8192`.                                                                |
+| `--seed`           | Random seed. Default: `-1` (random at runtime).                                                      |
+| `--n-gpu-layers`   | Number of model layers to offload to GPU. Default: `0`.                                              |
+| `--help, -h`       | Print usage and exit.                                                                                |
 
 `--mocked` and `--model` are mutually exclusive. Omitting both exits with an
 error before the pipeline starts. Sampling flags are ignored when `--mocked` is
@@ -130,17 +133,20 @@ NVIDIA GPU.
 
 ### How it works
 
-The container uses a two-stage build. The first stage pulls prebuilt
-`libllama`, `libggml`, and backend plugin libraries (including `libggml-cuda.so`
-and the CPU variant plugins) from `ghcr.io/ggml-org/llama.cpp:full-cuda`. The
-second stage copies those libraries into `/usr/local/lib` and runs `ldconfig` so
-the dynamic linker and `dlopen` calls from `ggml_backend_load_all()` can resolve
-the CUDA backend plugin at runtime. llama.cpp headers are cloned at the matching
-tag and installed into `/usr/local/include`. CMake auto-detects both and skips
-the FetchContent source build entirely, keeping image build times short.
+The container uses a two-stage build. The builder stage installs CMake/Ninja,
+clones the matching llama.cpp release tag for its headers only (installed into
+`/usr/local/include`), and copies prebuilt shared libraries (`libllama`,
+`libggml`, and CUDA/CPU backend plugins) from `ghcr.io/ggml-org/llama.cpp:full-cuda`
+into `/usr/local/lib`. With both headers and libraries present, CMake's
+system-library detection (see [Build](#build) above) finds them and skips the
+FetchContent source build, keeping image build times short.
 
-`GGML_BACKEND_PATH` is set to `/usr/local/lib` so llama.cpp knows where to scan
-for backend plugins.
+The runtime stage copies the compiled binary, the same prebuilt shared
+libraries, and config/prompt assets into a slim CUDA runtime image. It sets
+`LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH` so the dynamic linker
+resolves `libllama`/`libggml` at startup, and also co-locates
+`libggml-cuda.so` and the CPU backend plugins next to the binary for
+`ggml_backend_load_all()`'s `dlopen` scan.
 
 ### Build the image
 
@@ -165,44 +171,46 @@ docker build \
 Look for `[biergarten] Found system llama.cpp — skipping FetchContent` in the
 output to confirm the fast path was taken.
 
-### Run in mocked mode
+### Run the container
 
-No model or GPU required. Useful for validating the pipeline logic and SQLite
-export path.
-
-```bash
-docker run --rm \
-  -e BIERGARTEN_MODE=mocked \
-  -v "$PWD/output:/workspace/output" \
-  -v "$PWD/logs:/workspace/logs" \
-  biergarten-pipeline:latest
-```
-
-### Run in live mode
-
-Mount your GGUF model before starting. The container validates the model path
-before launching the binary.
+The container always runs the model-backed path; there is no `--mocked`
+container mode (use a native build for that — see [Quick Start](#quick-start)).
+The entrypoint, `runpod/start.sh`, downloads the GGUF model automatically if
+it is not already present at the configured path.
 
 ```bash
 docker run --rm \
   --runtime=nvidia \
-  -e BIERGARTEN_MODE=live \
-  -e GGML_BACKEND_PATH="/usr/local/lib/libggml-cuda.so" \
   -v "$PWD/models:/workspace/models" \
   -v "$PWD/output:/workspace/output" \
   -v "$PWD/logs:/workspace/logs" \
   biergarten-pipeline:latest
 ```
 
-The model must be present at `./models/google_gemma-4-E4B-it-Q6_K.gguf` on the
-host. See [Model](#model) above for the download command.
+By default this downloads `google_gemma-4-E4B-it-Q6_K.gguf` to
+`./models/` on first run if it isn't already there. To use a pre-downloaded
+model, place it at that path first — see [Model](#model) above.
+
+#### Environment variables
+
+| Variable                 | Purpose                                                          |
+| ------------------------- | ----------------------------------------------------------------- |
+| `BIERGARTEN_MODEL_PATH`   | GGUF model path. Default: `/workspace/models/google_gemma-4-E4B-it-Q6_K.gguf`. |
+| `BIERGARTEN_OUTPUT_DIR`   | SQLite output directory. Default: `/workspace/output`.            |
+| `BIERGARTEN_LOG_PATH`     | Log file path. Default: `/workspace/logs/pipeline.log`.           |
+| `BIERGARTEN_GL_LAYERS`    | GPU layers to offload (`--n-gpu-layers`). Default: `40`.          |
+| `BIERGARTEN_TEMPERATURE`, `BIERGARTEN_TOP_P`, `BIERGARTEN_TOP_K`, `BIERGARTEN_N_CTX`, `BIERGARTEN_SEED` | Optional sampling overrides, unset by default (binary defaults apply). |
+| `BIERGARTEN_EXTRA_ARGS`   | Additional raw CLI args appended verbatim.                       |
+
+`--prompt-dir` is hardcoded to `/app/prompts` inside the container and is not
+configurable via environment variable.
 
 ### RunPod deployment
 
 Use a GPU pod template. Mount persistent storage for `/workspace/models`,
-`/workspace/output`, and `/workspace/logs`. Set `BIERGARTEN_MODE=live` in the
-template environment. See `tooling/pipeline/runpod/pod-template.yaml` for a
-starter template.
+`/workspace/output`, and `/workspace/logs`. See
+`tooling/pipeline/runpod/pod-template.yaml` for a starter template — set the
+environment variables listed above to match your run.
 
 ---
 
@@ -213,8 +221,8 @@ starter template.
 | Stage    | Implementation                                                                                                                          |
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                                                     |
-| Sample   | `BiergartenDataGenerator::QueryCitiesWithCountries()` samples up to 50 locations per run.                                               |
-| Enrich   | `WikipediaService` fetches city and beer context. Keeps going when a lookup fails.                                                      |
+| Sample   | `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()` samples `--location-count` locations per run (default `10`).               |
+| Enrich   | `WikipediaEnrichmentService` fetches brewing and beer-related context. Keeps going when a lookup fails. `--mocked` runs use `MockEnrichmentService` instead and skip Wikipedia entirely. |
 | Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language.                          |
 | Store    | `SqliteExportService` writes each successful brewery into a fresh dated `.sqlite` database with normalized location and brewery tables. |
 | Log      | `spdlog` writes results and warnings to the console.                                                                                    |
@@ -226,11 +234,13 @@ pipeline continues.
 
 - `src/main.cc` — argument parsing and Boost.DI composition root.
 - `JsonLoader` — validates curated location input.
-- `WikipediaService` — queries Wikipedia extracts, caches results, returns empty
-  context on failure.
+- `WikipediaEnrichmentService` — queries Wikipedia extracts, caches results,
+  returns empty context on failure. `MockEnrichmentService` is the no-op
+  substitute used in `--mocked` runs.
 - `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries
-  malformed responses up to three times. If output looks truncated, the retry
-  raises the token budget before trying again.
+  malformed responses up to three times with corrective feedback in the
+  retry prompt. The token budget is fixed across attempts; it is not raised
+  automatically on truncation.
 - `MockGenerator` — stable hash-based output so the same city input always
   produces the same brewery.
 - `SqliteExportService` — creates a dated SQLite file per run and persists each
@@ -240,18 +250,18 @@ pipeline continues.
 
 ### Runtime Behaviour
 
-`WikipediaService` queries city, country, and beer-related Wikipedia extracts
-using its configured lookup, then caches the first successful response per query
-string. The fetched extract text is included in the prompt as context for
-generation.
+`WikipediaEnrichmentService` fetches two Wikipedia extracts per city: a
+generic "brewing" extract and a "beer in `{country}`" extract. It does not
+currently query a city- or region-specific page. Each query string is cached
+after its first successful (or empty) lookup.
 
 `GetLocationContext()` returns an empty string when the web client is
 unavailable or when lookup/parsing fails.
 
-`LlamaGenerator` validates model output as structured JSON. The retry path
-exists as a safety hatch for cases where the reasoning block consumes available
-token budget and compresses the JSON output space. All runs to date have
-produced valid output on the first pass; the path is kept for resilience.
+`LlamaGenerator` validates model output as structured JSON. On validation
+failure it retries up to three times, replaying the previous error message in
+the next prompt so the model can self-correct. All runs to date have produced
+valid output on the first pass; the retry path is kept for resilience.
 
 `MockGenerator` uses stable hashes for repeatable output in demos and Storybook
 runs.
@@ -292,7 +302,6 @@ code, latitude, and longitude for each entry.
 | `local_languages`                   | Locale-aware copy selection                      |
 | `name_en`, `description_en`         | Default English display content                  |
 | `name_local`, `description_local`   | Local-language display content                   |
-| `region_context`                    | Richer copy for cards and detail pages           |
 
 ---
 
@@ -368,29 +377,31 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 ## Repo Layout
 
-| Path                         | Purpose                                            |
-| ---------------------------- | -------------------------------------------------- |
-| `includes/`                  | Public headers and shared models.                  |
-| `src/`                       | Implementation files.                              |
-| `locations.json`             | Curated city input copied into the build tree.     |
-| `prompts/`                   | System prompts used by the model-backed path.      |
-| `diagrams/`                  | Architecture and pipeline diagrams.                |
-| `tooling/pipeline/runpod/`   | Dockerfile, launcher, and RunPod pod template.     |
-| `ETHICS-AND-KNOWN-ISSUES.md` | Ethics, bias, hallucination analysis, mitigations. |
+| Path                                  | Purpose                                            |
+| -------------------------------------- | -------------------------------------------------- |
+| `tooling/pipeline/includes/`           | Public headers and shared models.                  |
+| `tooling/pipeline/src/`                | Implementation files.                              |
+| `tooling/pipeline/locations.json`      | Curated city input copied into the build tree.     |
+| `tooling/pipeline/prompts/`            | System prompts used by the model-backed path.      |
+| `tooling/pipeline/runpod/`             | Dockerfile, launcher, and RunPod pod template.      |
+| `docs/pipeline/diagrams/`              | Architecture and pipeline diagrams.                |
+| `docs/pipeline/ETHICS-AND-KNOWN-ISSUES.md` | Ethics, bias, hallucination analysis, mitigations. |
 
 ---
 
 ## Code Tour
 
+Paths below are relative to `tooling/pipeline/`.
+
 - `src/main.cc` — argument parsing and DI composition root.
-- `src/biergarten_data_generator/` — orchestration, sampling, logging, and
-  export.
-- `src/services/wikipedia/` — enrichment service and cache.
+- `src/biergarten_pipeline_orchestrator/` — orchestration, sampling, logging,
+  and export.
+- `src/services/enrichment/wikipedia/` — enrichment service and cache.
 - `src/services/sqlite/` — SQLite export implementation.
 - `src/data_generation/llama/` — local inference, prompt loading, output
   validation.
 - `src/data_generation/mock/` — deterministic fallback.
-- `tooling/pipeline/runpod/` — container build and runtime launcher.
+- `runpod/` — container build and runtime launcher.
 
 ---
 
@@ -398,7 +409,9 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 The pipeline currently produces city-aware brewery records and dated SQLite
 exports. The next passes add additional fixture types so the app can exercise
-the full brewery domain without live data.
+the full brewery domain without live data. For the detailed engineering
+breakdown of what's needed to reach the architecture in
+[`diagrams/planned/`](./diagrams/planned/), see [ROADMAP.md](./ROADMAP.md).
 
 ### Testing — Very High Priority
 

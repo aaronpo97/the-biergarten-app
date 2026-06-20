@@ -245,7 +245,7 @@ but is semantically incoherent. This comes from limited training-data coverage
 rather than prompt engineering.
 
 Output sample:
-[./out-sample/french-cities.example](out-sample/french-cities.example)
+[./french-cities.example](french-cities.example)
 
 #### Proposed Mitigations
 
