@@ -2,8 +2,7 @@
 
 ## Overview
 
-The Core project implements comprehensive JWT token validation across three
-token types:
+The Core project validates JWTs across three token types:
 
 - **Access Tokens**: Short-lived (1 hour) tokens for API authentication
 - **Refresh Tokens**: Long-lived (21 days) tokens for obtaining new access
@@ -15,7 +14,7 @@ token types:
 
 ### Infrastructure Layer
 
-#### [ITokenInfrastructure](Infrastructure.Jwt/ITokenInfrastructure.cs)
+#### [ITokenInfrastructure](../../web/backend/Infrastructure/Infrastructure.Jwt/ITokenInfrastructure.cs)
 
 Low-level JWT operations.
 
@@ -25,77 +24,92 @@ Low-level JWT operations.
 - `ValidateJwtAsync()` - Validates token signature, expiration, and format
 
 **Implementation:**
-[JwtInfrastructure.cs](Infrastructure.Jwt/JwtInfrastructure.cs)
+[JwtInfrastructure.cs](../../web/backend/Infrastructure/Infrastructure.Jwt/JwtInfrastructure.cs)
 
 - Uses Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler
 - Algorithm: HS256 (HMAC-SHA256)
 - Validates token lifetime, signature, and well-formedness
 
-### Service Layer
+### Features.Auth Slice
 
-#### [ITokenValidationService](Service.Auth/ITokenValidationService.cs)
+#### [ITokenService](../../web/backend/Features/Features.Auth/Services/ITokenService.cs)
 
-High-level token validation with context (token type, user extraction).
+Both token generation and validation live on the same slice-internal
+service (there is no separate validation service/class).
 
-**Methods:**
-
-- `ValidateAccessTokenAsync(string token)` - Validates access tokens
-- `ValidateRefreshTokenAsync(string token)` - Validates refresh tokens
-- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation tokens
-
-**Returns:** `ValidatedToken` record containing:
-
-- `UserId` (Guid)
-- `Username` (string)
-- `Principal` (ClaimsPrincipal) - Full JWT claims
-
-**Implementation:**
-[TokenValidationService.cs](Service.Auth/TokenValidationService.cs)
-
-- Reads token secrets from environment variables
-- Extracts and validates claims (Sub, UniqueName)
-- Throws `UnauthorizedException` on validation failure
-
-#### [ITokenService](Service.Auth/ITokenService.cs)
-
-Token generation (existing service extended).
-
-**Methods:**
+**Generation methods:**
 
 - `GenerateAccessToken(UserAccount)` - Creates 1-hour access token
 - `GenerateRefreshToken(UserAccount)` - Creates 21-day refresh token
 - `GenerateConfirmationToken(UserAccount)` - Creates 30-minute confirmation
   token
 
+**Validation methods:**
+
+- `ValidateAccessTokenAsync(string token)` - Validates access tokens
+- `ValidateRefreshTokenAsync(string token)` - Validates refresh tokens
+- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation tokens
+
+**Returns (validation):** `ValidatedToken` record containing:
+
+- `UserId` (Guid)
+- `Username` (string)
+- `Principal` (ClaimsPrincipal) - Full JWT claims
+
+**Implementation:** [TokenService.cs](../../web/backend/Features/Features.Auth/Services/TokenService.cs)
+
+- Reads token secrets from environment variables
+- Extracts and validates claims (Sub, UniqueName)
+- Throws `UnauthorizedException` on validation failure
+
+`TokenService` is registered by `Features.Auth`'s own
+`AddFeaturesAuth()` extension method, except for the lower-level
+`ITokenInfrastructure` (JWT signing/verification) it depends on, which is
+registered by the host (`API.Core/Program.cs`) since
+`JwtAuthenticationHandler` (host-level auth middleware) also depends on
+it directly.
+
 ### Integration Points
 
-#### [ConfirmationService](Service.Auth/IConfirmationService.cs)
+#### [ConfirmUserHandler](../../web/backend/Features/Features.Auth/Commands/ConfirmUser/ConfirmUserHandler.cs)
 
 **Flow:**
 
-1. Receives confirmation token from user
-2. Calls `TokenValidationService.ValidateConfirmationTokenAsync()`
+1. Receives confirmation token from user via `ConfirmUserCommand`
+2. Calls `ITokenService.ValidateConfirmationTokenAsync()`
 3. Extracts user ID from validated token
-4. Calls `AuthRepository.ConfirmUserAccountAsync()` to update database
+4. Calls `IAuthRepository.ConfirmUserAccountAsync()` to update database
 5. Returns confirmation result
 
-#### [RefreshTokenService](Service.Auth/RefreshTokenService.cs)
+#### [ResendConfirmationEmailHandler](../../web/backend/Features/Features.Auth/Commands/ResendConfirmationEmail/ResendConfirmationEmailHandler.cs)
 
 **Flow:**
 
-1. Receives refresh token from user
-2. Calls `TokenValidationService.ValidateRefreshTokenAsync()`
-3. Retrieves user account via `AuthRepository.GetUserByIdAsync()`
-4. Issues new access and refresh tokens via `TokenService`
-5. Returns new token pair
+1. Receives a user ID via `ResendConfirmationEmailCommand`
+2. Looks up the user and checks they aren't already verified
+3. Generates a fresh confirmation token via `ITokenService`
+4. Sends `SendResendConfirmationEmailCommand` over MediatR, handled by the
+   `Features.Emails` slice, with no direct project reference between the two
+   slices
 
-#### [AuthController](API.Core/Controllers/AuthController.cs)
+#### [RefreshTokenHandler](../../web/backend/Features/Features.Auth/Commands/RefreshToken/RefreshTokenHandler.cs)
+
+**Flow:**
+
+1. Receives a refresh token via `RefreshTokenCommand`
+2. Delegates to `ITokenService.RefreshTokenAsync()`, which validates the
+   token, retrieves the user account via `IAuthRepository.GetUserByIdAsync()`,
+   and issues a new access/refresh token pair
+3. Maps the result onto `LoginPayload`
+
+#### [AuthController](../../web/backend/Features/Features.Auth/Controllers/AuthController.cs)
 
 **Endpoints:**
 
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Authenticate user
 - `POST /api/auth/confirm?token=...` - Confirm email
+- `POST /api/auth/confirm/resend?userId=...` - Resend the confirmation email
 - `POST /api/auth/refresh` - Refresh access token
 
 ## Validation Security
@@ -158,31 +172,43 @@ Validation failures return HTTP 401 Unauthorized:
 1. **Generation**: During user registration (30-minute validity)
 2. **Delivery**: Emailed to user in confirmation link
 3. **Usage**: User clicks link, token posted to `/api/auth/confirm`
-4. **Validation**: Validated by ConfirmationService
+4. **Validation**: Validated by `ConfirmUserHandler`
 5. **Completion**: User account marked as confirmed
 6. **Expiration**: Token becomes invalid after 30 minutes
 
 ## Testing
 
+All of the following live in `Features.Auth.Tests`.
+
 ### Unit Tests
 
-**TokenValidationService.test.cs**
+**Services/TokenServiceValidationTests.cs**
 
 - Happy path: Valid token extraction
 - Error cases: Invalid, expired, malformed tokens
 - Missing/invalid claims scenarios
 
-**RefreshTokenService.test.cs**
+**Services/TokenServiceRefreshTests.cs**
 
 - Successful refresh with valid token
 - Invalid/expired refresh token rejection
 - Non-existent user handling
 
-**ConfirmationService.test.cs**
+**Commands/RefreshTokenHandlerTests.cs**
+
+- Verifies the handler maps `ITokenService.RefreshTokenAsync()`'s result onto
+  `LoginPayload`
+
+**Commands/ConfirmUserHandlerTests.cs**
 
 - Successful confirmation with valid token
 - Token validation failures
 - User not found scenarios
+
+**Commands/ResendConfirmationEmailHandlerTests.cs**
+
+- Sends a fresh confirmation email when the user exists and is unverified
+- No-ops when the user doesn't exist or is already verified
 
 ### BDD Tests (Reqnroll)
 

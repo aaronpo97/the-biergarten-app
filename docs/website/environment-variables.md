@@ -17,7 +17,7 @@ The application uses environment variables for:
 
 Direct environment variable access via `Environment.GetEnvironmentVariable()`.
 
-### Frontend (`src/Website`)
+### Frontend (`web/frontend`)
 
 The active website reads runtime values from the server environment for its auth
 and API integration.
@@ -130,7 +130,7 @@ ASPNETCORE_URLS=http://0.0.0.0:8080  # Binding address and port
 DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 ```
 
-## Frontend Variables (`src/Website`)
+## Frontend Variables (`web/frontend`)
 
 The active website does not use the old Next.js/Prisma environment model. Its
 core runtime variables are:
@@ -147,7 +147,7 @@ NODE_ENV=development                     # Standard Node runtime mode
 
 - **Required**: Yes for local development
 - **Default in code**: `http://localhost:8080`
-- **Used by**: `src/Website/app/lib/auth.server.ts`
+- **Used by**: `web/frontend/app/lib/auth.server.ts`
 - **Purpose**: Routes website auth actions to the .NET API
 
 #### `SESSION_SECRET`
@@ -163,15 +163,27 @@ NODE_ENV=development                     # Standard Node runtime mode
 - **Typical values**: `development`, `production`, `test`
 - **Purpose**: Controls secure cookie behavior and runtime mode
 
-### Admin Account (Seeding)
+### SMTP Configuration (Backend)
+
+Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation
+and account emails.
 
 ```bash
-ADMIN_PASSWORD=SecureAdminPassword123!   # Initial admin password for seeding
+SMTP_HOST=mailpit                        # Required, no default
+SMTP_PORT=1025                           # Optional, defaults to 587
+SMTP_USERNAME=<username>                 # Optional, no default
+SMTP_PASSWORD=<password>                 # Optional, no default
+SMTP_USE_SSL=false                       # Optional, defaults to true
+SMTP_FROM_EMAIL=noreply@thebiergarten.app # Required, no default
+SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten"
 ```
 
-- **Required**: No (only needed for seeding)
-- **Purpose**: Sets admin account password during database seeding
-- **Security**: Use strong password, change immediately in production
+- **Implementation**: `Infrastructure.Email/SmtpEmailProvider.cs` throws on
+  startup if `SMTP_HOST` or `SMTP_FROM_EMAIL` is missing
+- **Local dev**: point at the `mailpit` Docker service (SMTP on port 1025, web
+  UI on http://localhost:8025)
+- **Production**: point at a real provider (SendGrid, Mailgun, Amazon SES,
+  etc.)
 
 ## Docker-Specific Variables
 
@@ -191,34 +203,33 @@ MSSQL_PID=Express                 # SQL Server edition (Express, Developer, Ente
 
 ## Environment File Structure
 
-### Backend/Docker (Root Directory)
+### Backend/Docker (`web/` Directory)
 
 ```
-.env.example          # Template (tracked in Git)
-.env.dev             # Development config (gitignored)
-.env.test            # Testing config (gitignored)
-.env.prod            # Production config (gitignored)
+web/.env.example          # Template (tracked in Git)
+web/.env.dev             # Development config (gitignored)
+web/.env.test            # Testing config (gitignored)
+web/.env.prod            # Production config (gitignored)
 ```
 
 **Setup**:
 
 ```bash
-cp .env.example .env.dev
-# Edit .env.dev with your values
+cp web/.env.example web/.env.dev
+# Edit web/.env.dev with your values
 ```
 
 ## Legacy Frontend Variables
 
-Variables for the archived Next.js frontend (`src/Website-v1`) have been removed
-from this active reference. See
-[archive/legacy-website-v1.md](archive/legacy-website-v1.md) if you need the
-legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
+Variables for the archived Next.js frontend (`archive/next-js-web-app/`) have
+been removed from this active reference, since that app is retained for
+reference only and is not run as part of the active stack.
 
 **Docker Compose Mapping**:
 
-- `docker-compose.dev.yaml` → `.env.dev`
-- `docker-compose.test.yaml` → `.env.test`
-- `docker-compose.prod.yaml` → `.env.prod`
+- `web/docker-compose.dev.yaml` → `web/.env.dev`
+- `web/docker-compose.test.yaml` → `web/.env.test`
+- `web/docker-compose.prod.yaml` → `web/.env.prod`
 
 ## Variable Reference Table
 
@@ -234,6 +245,13 @@ legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
 | `REFRESH_TOKEN_SECRET`        |    ✓    |          |   ✓    |   Yes    | Refresh token signing      |
 | `CONFIRMATION_TOKEN_SECRET`   |    ✓    |          |   ✓    |   Yes    | Confirmation token signing |
 | `WEBSITE_BASE_URL`            |    ✓    |          |        |   Yes    | Website URL for emails     |
+| `SMTP_HOST`                   |    ✓    |          |   ✓    |   Yes    | SMTP server host           |
+| `SMTP_PORT`                   |    ✓    |          |   ✓    |    No    | Defaults to `587`          |
+| `SMTP_USERNAME`                |    ✓    |          |   ✓    |    No    | SMTP auth username         |
+| `SMTP_PASSWORD`                |    ✓    |          |   ✓    |    No    | SMTP auth password         |
+| `SMTP_USE_SSL`                 |    ✓    |          |   ✓    |    No    | Defaults to `true`         |
+| `SMTP_FROM_EMAIL`              |    ✓    |          |   ✓    |   Yes    | Email sender address       |
+| `SMTP_FROM_NAME`               |    ✓    |          |   ✓    |    No    | Defaults to `The Biergarten` |
 | `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL    |
 | `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing    |
 | `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode               |
@@ -254,9 +272,12 @@ legacy Prisma, Cloudinary, Mapbox, or SparkPost notes.
 
 Variables are validated at startup:
 
-- Missing required variables cause application to fail
-- JWT_SECRET length is enforced (min 32 chars)
-- Connection string format is validated
+- Missing required variables (`ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`,
+  `CONFIRMATION_TOKEN_SECRET`, `SMTP_HOST`, `SMTP_FROM_EMAIL`, DB connection
+  values) cause the application to fail with an `InvalidOperationException`
+- No minimum length is enforced on the token secrets in code; the
+  "minimum 32 characters" guidance above is a recommendation, not an
+  enforced check
 
 ### Frontend Validation
 
@@ -283,6 +304,13 @@ ACCESS_TOKEN_SECRET=<generated-with-openssl>
 REFRESH_TOKEN_SECRET=<generated-with-openssl>
 CONFIRMATION_TOKEN_SECRET=<generated-with-openssl>
 WEBSITE_BASE_URL=http://localhost:3000
+
+# SMTP (Mailpit in dev)
+SMTP_HOST=mailpit
+SMTP_PORT=1025
+SMTP_USE_SSL=false
+SMTP_FROM_EMAIL=noreply@thebiergarten.app
+SMTP_FROM_NAME=The Biergarten App
 
 # Migration
 CLEAR_DATABASE=true

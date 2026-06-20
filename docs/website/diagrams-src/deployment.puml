@@ -112,29 +112,21 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
     end note
   }
 
-  node "Infrastructure.Repository.Tests\n(Unit Tests)" as RepoTests {
-    component "xUnit + DbMocker" as RepoComp
+  node "unit.tests\n(Features.*.Tests, one container)" as UnitTests {
+    component "xUnit + Moq + DbMocker" as UnitComp
     note right
-      Tests:
-      - AuthRepository
-      - UserAccountRepository
-      - SQL command building
+      Builds Dockerfile.tests, which
+      restores/builds against Core.slnx
+      then runs `dotnet test` for every
+      Features/*.Tests project in turn:
+      - Features.Auth.Tests
+      - Features.Breweries.Tests
+      - Features.UserManagement.Tests
+      - Features.Emails.Tests
 
-      Uses: Mock connections
+      Uses: Moq for handlers,
+      DbMocker for repositories
       No real database needed
-    end note
-  }
-
-  node "Service.Auth.Tests\n(Unit Tests)" as SvcTests {
-    component "xUnit + Moq" as SvcComp
-    note right
-      Tests:
-      - RegisterService
-      - LoginService
-      - Token generation
-
-      Uses: Mocked dependencies
-      No database or infrastructure
     end note
   }
 
@@ -142,8 +134,10 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
 
 folder "test-results/\n(mounted volume)" as Results {
   file "api-specs/\n  results.trx" as Result1
-  file "repository-tests/\n  results.trx" as Result2
-  file "service-auth-tests/\n  results.trx" as Result3
+  file "Features.Auth.Tests.trx" as Result2
+  file "Features.Breweries.Tests.trx" as Result3
+  file "Features.UserManagement.Tests.trx" as Result4
+  file "Features.Emails.Tests.trx" as Result5
 
   note bottom
     TRX format
@@ -170,17 +164,16 @@ DevAPI .up.> DevSeed : depends_on
 TestMig --> TestDB : 1. Migrate
 TestSeed --> TestDB : 2. Seed
 Specs --> TestDB : 3. Integration test
-RepoTests ..> TestDB : Mock (no connection)
-SvcTests ..> TestDB : Mock (no connection)
+UnitTests ..> TestDB : depends_on for startup\nordering only (Moq/DbMocker,\nno real connection)
 
 TestMig .up.> TestDB : depends_on
 TestSeed .up.> TestMig : depends_on
 Specs .up.> TestSeed : depends_on
+UnitTests .up.> TestSeed : depends_on
 
 ' Test results export
 Specs --> Results : Export TRX
-RepoTests --> Results : Export TRX
-SvcTests --> Results : Export TRX
+UnitTests --> Results : Export TRX (one .trx per slice)
 
 ' Network notes
 note bottom of DevDB
