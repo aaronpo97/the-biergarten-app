@@ -1,5 +1,5 @@
 using API.Core.Contracts.Auth;
-using API.Core.Contracts.Common;
+using Shared.Contracts;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

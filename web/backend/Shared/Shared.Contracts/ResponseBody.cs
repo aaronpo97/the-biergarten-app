@@ -1,4 +1,4 @@
-namespace API.Core.Contracts.Common;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Generic envelope used to wrap API responses that carry a data payload alongside a human-readable message.

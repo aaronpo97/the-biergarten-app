@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using API.Core.Contracts.Common;
+using Shared.Contracts;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;

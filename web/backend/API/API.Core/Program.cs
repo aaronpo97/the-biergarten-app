@@ -14,6 +14,7 @@ using Service.Auth;
 using Service.Breweries;
 using Service.Emails;
 using Service.UserManagement.User;
+using Shared.Application.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,14 @@ builder.Services.AddOpenApi();
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
+
+// Add MediatR. Each Features.* slice's assembly is registered here as it's introduced;
+// ValidationBehavior runs FluentValidation validators in the MediatR pipeline for command/query handlers.
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<Program>();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
 
 // Add health checks
 builder.Services.AddHealthChecks();

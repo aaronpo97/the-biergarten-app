@@ -1,6 +1,6 @@
 // API.Core/Filters/GlobalExceptionFilter.cs
 
-using API.Core.Contracts.Common;
+using Shared.Contracts;
 using Domain.Exceptions;
 using FluentValidation;
 using Microsoft.Data.SqlClient;
