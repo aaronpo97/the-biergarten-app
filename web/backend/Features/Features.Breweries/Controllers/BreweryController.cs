@@ -41,11 +41,13 @@ public class BreweryController(IMediator mediator) : ControllerBase
         if (brewery is null)
             return NotFound(new ResponseBody { Message = $"Brewery with ID {id} not found." });
 
-        return Ok(new ResponseBody<BreweryDto>
-        {
-            Message = "Brewery retrieved successfully.",
-            Payload = brewery
-        });
+        return Ok(
+            new ResponseBody<BreweryDto>
+            {
+                Message = "Brewery retrieved successfully.",
+                Payload = brewery,
+            }
+        );
     }
 
     /// <summary>
@@ -59,14 +61,19 @@ public class BreweryController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ResponseBody<IEnumerable<BreweryDto>>>> GetAll(
         [FromQuery] int? limit,
-        [FromQuery] int? offset)
+        [FromQuery] int? offset
+    )
     {
-        IEnumerable<BreweryDto> breweries = await mediator.Send(new GetAllBreweriesQuery(limit, offset));
-        return Ok(new ResponseBody<IEnumerable<BreweryDto>>
-        {
-            Message = "Breweries retrieved successfully.",
-            Payload = breweries
-        });
+        IEnumerable<BreweryDto> breweries = await mediator.Send(
+            new GetAllBreweriesQuery(limit, offset)
+        );
+        return Ok(
+            new ResponseBody<IEnumerable<BreweryDto>>
+            {
+                Message = "Breweries retrieved successfully.",
+                Payload = breweries,
+            }
+        );
     }
 
     /// <summary>
@@ -78,14 +85,19 @@ public class BreweryController(IMediator mediator) : ControllerBase
     ///     <see cref="BreweryDto" />.
     /// </returns>
     [HttpPost]
-    public async Task<ActionResult<ResponseBody<BreweryDto>>> Create([FromBody] CreateBreweryCommand command)
+    public async Task<ActionResult<ResponseBody<BreweryDto>>> Create(
+        [FromBody] CreateBreweryCommand command
+    )
     {
         BreweryDto brewery = await mediator.Send(command);
-        return Created($"/api/brewery/{brewery.BreweryPostId}", new ResponseBody<BreweryDto>
-        {
-            Message = "Brewery created successfully.",
-            Payload = brewery
-        });
+        return Created(
+            $"/api/brewery/{brewery.BreweryPostId}",
+            new ResponseBody<BreweryDto>
+            {
+                Message = "Brewery created successfully.",
+                Payload = brewery,
+            }
+        );
     }
 
     /// <summary>
@@ -105,17 +117,22 @@ public class BreweryController(IMediator mediator) : ControllerBase
     ///     when the route ID does not match the payload ID.
     /// </returns>
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(Guid id, [FromBody] UpdateBreweryCommand command)
+    public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(
+        Guid id,
+        [FromBody] UpdateBreweryCommand command
+    )
     {
         if (command.BreweryPostId != id)
             return BadRequest(new ResponseBody { Message = "Route ID does not match payload ID." });
 
         BreweryDto brewery = await mediator.Send(command);
-        return Ok(new ResponseBody<BreweryDto>
-        {
-            Message = "Brewery updated successfully.",
-            Payload = brewery
-        });
+        return Ok(
+            new ResponseBody<BreweryDto>
+            {
+                Message = "Brewery updated successfully.",
+                Payload = brewery,
+            }
+        );
     }
 
     /// <summary>

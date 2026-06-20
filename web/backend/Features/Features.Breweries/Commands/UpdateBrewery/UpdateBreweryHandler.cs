@@ -19,7 +19,10 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
     /// <param name="request">The updated details of the brewery post.</param>
     /// <param name="cancellationToken">A token to observe for cancellation requests.</param>
     /// <returns>The updated brewery post.</returns>
-    public async Task<BreweryDto> Handle(UpdateBreweryCommand request, CancellationToken cancellationToken)
+    public async Task<BreweryDto> Handle(
+        UpdateBreweryCommand request,
+        CancellationToken cancellationToken
+    )
     {
         BreweryPost entity = new()
         {
@@ -38,8 +41,8 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
                     AddressLine1 = request.Location.AddressLine1,
                     AddressLine2 = request.Location.AddressLine2,
                     PostalCode = request.Location.PostalCode,
-                    Coordinates = request.Location.Coordinates
-                }
+                    Coordinates = request.Location.Coordinates,
+                },
         };
 
         await repository.UpdateAsync(entity);

@@ -15,9 +15,7 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
     /// </summary>
     public CreateBreweryValidator()
     {
-        RuleFor(x => x.PostedById)
-            .NotEmpty()
-            .WithMessage("PostedById is required.");
+        RuleFor(x => x.PostedById).NotEmpty().WithMessage("PostedById is required.");
 
         RuleFor(x => x.BreweryName)
             .NotEmpty()
@@ -31,9 +29,7 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
             .MaximumLength(512)
             .WithMessage("Description cannot exceed 512 characters.");
 
-        RuleFor(x => x.Location)
-            .NotNull()
-            .WithMessage("Location is required.");
+        RuleFor(x => x.Location).NotNull().WithMessage("Location is required.");
 
         RuleFor(x => x.Location.CityId)
             .NotEmpty()
