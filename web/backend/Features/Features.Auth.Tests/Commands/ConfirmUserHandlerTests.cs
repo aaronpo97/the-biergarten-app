@@ -30,7 +30,7 @@ public class ConfirmUserHandlerTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
         ClaimsPrincipal principal = new(new ClaimsIdentity(claims));
         return new ValidatedToken(userId, username, principal);
@@ -46,10 +46,15 @@ public class ConfirmUserHandlerTests
         ValidatedToken validatedToken = MakeValidatedToken(userId, username);
         UserAccount userAccount = new() { UserAccountId = userId, Username = username };
 
-        _tokenServiceMock.Setup(x => x.ValidateConfirmationTokenAsync(confirmationToken)).ReturnsAsync(validatedToken);
+        _tokenServiceMock
+            .Setup(x => x.ValidateConfirmationTokenAsync(confirmationToken))
+            .ReturnsAsync(validatedToken);
         _authRepositoryMock.Setup(x => x.ConfirmUserAccountAsync(userId)).ReturnsAsync(userAccount);
 
-        ConfirmationPayload result = await _handler.Handle(new ConfirmUserCommand(confirmationToken), CancellationToken.None);
+        ConfirmationPayload result = await _handler.Handle(
+            new ConfirmUserCommand(confirmationToken),
+            CancellationToken.None
+        );
 
         result.Should().NotBeNull();
         result.UserAccountId.Should().Be(userId);
@@ -64,7 +69,8 @@ public class ConfirmUserHandlerTests
             .Setup(x => x.ValidateConfirmationTokenAsync(invalidToken))
             .ThrowsAsync(new UnauthorizedException("Invalid confirmation token"));
 
-        Func<Task<ConfirmationPayload>> act = async () => await _handler.Handle(new ConfirmUserCommand(invalidToken), CancellationToken.None);
+        Func<Task<ConfirmationPayload>> act = async () =>
+            await _handler.Handle(new ConfirmUserCommand(invalidToken), CancellationToken.None);
 
         await act.Should().ThrowAsync<UnauthorizedException>();
     }
@@ -79,10 +85,18 @@ public class ConfirmUserHandlerTests
         _tokenServiceMock
             .Setup(x => x.ValidateConfirmationTokenAsync(confirmationToken))
             .ReturnsAsync(MakeValidatedToken(userId, username));
-        _authRepositoryMock.Setup(x => x.ConfirmUserAccountAsync(userId)).ReturnsAsync((UserAccount?)null);
+        _authRepositoryMock
+            .Setup(x => x.ConfirmUserAccountAsync(userId))
+            .ReturnsAsync((UserAccount?)null);
 
-        Func<Task<ConfirmationPayload>> act = async () => await _handler.Handle(new ConfirmUserCommand(confirmationToken), CancellationToken.None);
+        Func<Task<ConfirmationPayload>> act = async () =>
+            await _handler.Handle(
+                new ConfirmUserCommand(confirmationToken),
+                CancellationToken.None
+            );
 
-        await act.Should().ThrowAsync<UnauthorizedException>().WithMessage("*User account not found*");
+        await act.Should()
+            .ThrowAsync<UnauthorizedException>()
+            .WithMessage("*User account not found*");
     }
 }
