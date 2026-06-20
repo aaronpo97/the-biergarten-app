@@ -17,15 +17,23 @@ public class ResendConfirmationEmailHandlerTests
 
     public ResendConfirmationEmailHandlerTests()
     {
-        _handler = new ResendConfirmationEmailHandler(_authRepositoryMock.Object, _tokenServiceMock.Object,
-            _mediatorMock.Object);
+        _handler = new ResendConfirmationEmailHandler(
+            _authRepositoryMock.Object,
+            _tokenServiceMock.Object,
+            _mediatorMock.Object
+        );
     }
 
     [Fact]
     public async Task Handle_SendsFreshConfirmationEmail_WhenUserExistsAndUnverified()
     {
         Guid userId = Guid.NewGuid();
-        UserAccount user = new() { UserAccountId = userId, FirstName = "Aaron", Email = "aaron@example.com" };
+        UserAccount user = new()
+        {
+            UserAccountId = userId,
+            FirstName = "Aaron",
+            Email = "aaron@example.com",
+        };
 
         _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(user);
         _authRepositoryMock.Setup(x => x.IsUserVerifiedAsync(userId)).ReturnsAsync(false);
@@ -34,9 +42,15 @@ public class ResendConfirmationEmailHandlerTests
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 
         _mediatorMock.Verify(
-            x => x.Send(It.Is<SendResendConfirmationEmailCommand>(c =>
-                c.FirstName == "Aaron" && c.Email == "aaron@example.com" && c.ConfirmationToken == "fresh-token"
-            ), It.IsAny<CancellationToken>()),
+            x =>
+                x.Send(
+                    It.Is<SendResendConfirmationEmailCommand>(c =>
+                        c.FirstName == "Aaron"
+                        && c.Email == "aaron@example.com"
+                        && c.ConfirmationToken == "fresh-token"
+                    ),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
     }
@@ -50,7 +64,11 @@ public class ResendConfirmationEmailHandlerTests
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 
         _mediatorMock.Verify(
-            x => x.Send(It.IsAny<SendResendConfirmationEmailCommand>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.Send(
+                    It.IsAny<SendResendConfirmationEmailCommand>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -67,7 +85,11 @@ public class ResendConfirmationEmailHandlerTests
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 
         _mediatorMock.Verify(
-            x => x.Send(It.IsAny<SendResendConfirmationEmailCommand>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.Send(
+                    It.IsAny<SendResendConfirmationEmailCommand>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }

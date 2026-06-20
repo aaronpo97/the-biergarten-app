@@ -35,9 +35,19 @@ public class RegisterUserHandlerTests
         );
     }
 
-    private static RegisterUserCommand ValidCommand(string username = "newuser", string email = "john.doe@example.com")
+    private static RegisterUserCommand ValidCommand(
+        string username = "newuser",
+        string email = "john.doe@example.com"
+    )
     {
-        return new RegisterUserCommand(username, "John", "Doe", email, new DateTime(1990, 1, 1), "SecurePassword123!");
+        return new RegisterUserCommand(
+            username,
+            "John",
+            "Doe",
+            email,
+            new DateTime(1990, 1, 1),
+            "SecurePassword123!"
+        );
     }
 
     [Fact]
@@ -47,27 +57,46 @@ public class RegisterUserHandlerTests
         const string hashedPassword = "hashed_password_value";
         Guid expectedUserId = Guid.NewGuid();
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(command.Username)).ReturnsAsync((UserAccount?)null);
-        _authRepoMock.Setup(x => x.GetUserByEmailAsync(command.Email)).ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByUsernameAsync(command.Username))
+            .ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByEmailAsync(command.Email))
+            .ReturnsAsync((UserAccount?)null);
         _passwordInfraMock.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
 
         _authRepoMock
-            .Setup(x => x.RegisterUserAsync(command.Username, command.FirstName, command.LastName, command.Email,
-                command.DateOfBirth, hashedPassword))
-            .ReturnsAsync(new UserAccount
-            {
-                UserAccountId = expectedUserId,
-                Username = command.Username,
-                FirstName = command.FirstName,
-                LastName = command.LastName,
-                Email = command.Email,
-                DateOfBirth = command.DateOfBirth,
-                CreatedAt = DateTime.UtcNow
-            });
+            .Setup(x =>
+                x.RegisterUserAsync(
+                    command.Username,
+                    command.FirstName,
+                    command.LastName,
+                    command.Email,
+                    command.DateOfBirth,
+                    hashedPassword
+                )
+            )
+            .ReturnsAsync(
+                new UserAccount
+                {
+                    UserAccountId = expectedUserId,
+                    Username = command.Username,
+                    FirstName = command.FirstName,
+                    LastName = command.LastName,
+                    Email = command.Email,
+                    DateOfBirth = command.DateOfBirth,
+                    CreatedAt = DateTime.UtcNow,
+                }
+            );
 
-        _tokenServiceMock.Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>())).Returns("access-token");
-        _tokenServiceMock.Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>())).Returns("refresh-token");
-        _tokenServiceMock.Setup(x => x.GenerateConfirmationToken(It.IsAny<UserAccount>()))
+        _tokenServiceMock
+            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Returns("access-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Returns("refresh-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateConfirmationToken(It.IsAny<UserAccount>()))
             .Returns("confirmation-token");
 
         RegistrationPayload result = await _handler.Handle(command, CancellationToken.None);
@@ -89,18 +118,36 @@ public class RegisterUserHandlerTests
     public async Task Handle_WithExistingUsername_ThrowsConflictException()
     {
         RegisterUserCommand command = ValidCommand("existinguser");
-        UserAccount existingUser = new() { UserAccountId = Guid.NewGuid(), Username = "existinguser" };
+        UserAccount existingUser = new()
+        {
+            UserAccountId = Guid.NewGuid(),
+            Username = "existinguser",
+        };
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(command.Username)).ReturnsAsync(existingUser);
-        _authRepoMock.Setup(x => x.GetUserByEmailAsync(command.Email)).ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByUsernameAsync(command.Username))
+            .ReturnsAsync(existingUser);
+        _authRepoMock
+            .Setup(x => x.GetUserByEmailAsync(command.Email))
+            .ReturnsAsync((UserAccount?)null);
 
-        Func<Task<RegistrationPayload>> act = async () => await _handler.Handle(command, CancellationToken.None);
+        Func<Task<RegistrationPayload>> act = async () =>
+            await _handler.Handle(command, CancellationToken.None);
 
-        await act.Should().ThrowAsync<ConflictException>().WithMessage("Username or email already exists");
+        await act.Should()
+            .ThrowAsync<ConflictException>()
+            .WithMessage("Username or email already exists");
 
         _authRepoMock.Verify(
-            x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<DateTime>(), It.IsAny<string>()),
+            x =>
+                x.RegisterUserAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<string>()
+                ),
             Times.Never
         );
     }
@@ -109,14 +156,23 @@ public class RegisterUserHandlerTests
     public async Task Handle_WithExistingEmail_ThrowsConflictException()
     {
         RegisterUserCommand command = ValidCommand(email: "existing@example.com");
-        UserAccount existingUser = new() { UserAccountId = Guid.NewGuid(), Email = "existing@example.com" };
+        UserAccount existingUser = new()
+        {
+            UserAccountId = Guid.NewGuid(),
+            Email = "existing@example.com",
+        };
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(command.Username)).ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByUsernameAsync(command.Username))
+            .ReturnsAsync((UserAccount?)null);
         _authRepoMock.Setup(x => x.GetUserByEmailAsync(command.Email)).ReturnsAsync(existingUser);
 
-        Func<Task<RegistrationPayload>> act = async () => await _handler.Handle(command, CancellationToken.None);
+        Func<Task<RegistrationPayload>> act = async () =>
+            await _handler.Handle(command, CancellationToken.None);
 
-        await act.Should().ThrowAsync<ConflictException>().WithMessage("Username or email already exists");
+        await act.Should()
+            .ThrowAsync<ConflictException>()
+            .WithMessage("Username or email already exists");
     }
 
     [Fact]
@@ -125,24 +181,47 @@ public class RegisterUserHandlerTests
         RegisterUserCommand command = ValidCommand();
         const string hashedPassword = "hashed_secure_password";
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(It.IsAny<string>())).ReturnsAsync((UserAccount?)null);
-        _authRepoMock.Setup(x => x.GetUserByEmailAsync(It.IsAny<string>())).ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByUsernameAsync(It.IsAny<string>()))
+            .ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByEmailAsync(It.IsAny<string>()))
+            .ReturnsAsync((UserAccount?)null);
         _passwordInfraMock.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
 
         _authRepoMock
-            .Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<DateTime>(), hashedPassword))
+            .Setup(x =>
+                x.RegisterUserAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>(),
+                    hashedPassword
+                )
+            )
             .ReturnsAsync(new UserAccount { UserAccountId = Guid.NewGuid() });
 
-        _tokenServiceMock.Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>())).Returns("access-token");
-        _tokenServiceMock.Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>())).Returns("refresh-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Returns("access-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Returns("refresh-token");
 
         await _handler.Handle(command, CancellationToken.None);
 
         _passwordInfraMock.Verify(x => x.Hash(command.Password), Times.Once);
         _authRepoMock.Verify(
-            x => x.RegisterUserAsync(command.Username, command.FirstName, command.LastName, command.Email,
-                command.DateOfBirth, hashedPassword),
+            x =>
+                x.RegisterUserAsync(
+                    command.Username,
+                    command.FirstName,
+                    command.LastName,
+                    command.Email,
+                    command.DateOfBirth,
+                    hashedPassword
+                ),
             Times.Once
         );
     }
@@ -152,19 +231,43 @@ public class RegisterUserHandlerTests
     {
         RegisterUserCommand command = ValidCommand();
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(It.IsAny<string>())).ReturnsAsync((UserAccount?)null);
-        _authRepoMock.Setup(x => x.GetUserByEmailAsync(It.IsAny<string>())).ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByUsernameAsync(It.IsAny<string>()))
+            .ReturnsAsync((UserAccount?)null);
+        _authRepoMock
+            .Setup(x => x.GetUserByEmailAsync(It.IsAny<string>()))
+            .ReturnsAsync((UserAccount?)null);
         _passwordInfraMock.Setup(x => x.Hash(It.IsAny<string>())).Returns("hashed");
         _authRepoMock
-            .Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>()))
-            .ReturnsAsync(new UserAccount
-                { UserAccountId = Guid.NewGuid(), Username = command.Username, Email = command.Email });
+            .Setup(x =>
+                x.RegisterUserAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<string>()
+                )
+            )
+            .ReturnsAsync(
+                new UserAccount
+                {
+                    UserAccountId = Guid.NewGuid(),
+                    Username = command.Username,
+                    Email = command.Email,
+                }
+            );
 
-        _tokenServiceMock.Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>())).Returns("access-token");
-        _tokenServiceMock.Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>())).Returns("refresh-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Returns("access-token");
+        _tokenServiceMock
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Returns("refresh-token");
         _mediatorMock
-            .Setup(x => x.Send(It.IsAny<SendRegistrationEmailCommand>(), It.IsAny<CancellationToken>()))
+            .Setup(x =>
+                x.Send(It.IsAny<SendRegistrationEmailCommand>(), It.IsAny<CancellationToken>())
+            )
             .ThrowsAsync(new Exception("smtp down"));
 
         RegistrationPayload result = await _handler.Handle(command, CancellationToken.None);

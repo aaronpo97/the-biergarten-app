@@ -21,15 +21,20 @@ public class TokenServiceValidationTests
         _authRepositoryMock = new Mock<IAuthRepository>();
 
         // Set environment variables for tokens
-        Environment.SetEnvironmentVariable("ACCESS_TOKEN_SECRET", "test-access-secret-that-is-very-long-1234567890");
-        Environment.SetEnvironmentVariable("REFRESH_TOKEN_SECRET", "test-refresh-secret-that-is-very-long-1234567890");
-        Environment.SetEnvironmentVariable("CONFIRMATION_TOKEN_SECRET",
-            "test-confirmation-secret-that-is-very-long-1234567890");
-
-        _tokenService = new TokenService(
-            _tokenInfraMock.Object,
-            _authRepositoryMock.Object
+        Environment.SetEnvironmentVariable(
+            "ACCESS_TOKEN_SECRET",
+            "test-access-secret-that-is-very-long-1234567890"
         );
+        Environment.SetEnvironmentVariable(
+            "REFRESH_TOKEN_SECRET",
+            "test-refresh-secret-that-is-very-long-1234567890"
+        );
+        Environment.SetEnvironmentVariable(
+            "CONFIRMATION_TOKEN_SECRET",
+            "test-confirmation-secret-that-is-very-long-1234567890"
+        );
+
+        _tokenService = new TokenService(_tokenInfraMock.Object, _authRepositoryMock.Object);
     }
 
     [Fact]
@@ -44,7 +49,7 @@ public class TokenServiceValidationTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -55,15 +60,17 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act
-        ValidatedToken result =
-            await _tokenService.ValidateAccessTokenAsync(token);
+        ValidatedToken result = await _tokenService.ValidateAccessTokenAsync(token);
 
         // Assert
         result.Should().NotBeNull();
         result.UserId.Should().Be(userId);
         result.Username.Should().Be(username);
         result.Principal.Should().NotBeNull();
-        result.Principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value.Should().Be(userId.ToString());
+        result
+            .Principal.FindFirst(JwtRegisteredClaimNames.Sub)
+            ?.Value.Should()
+            .Be(userId.ToString());
     }
 
     [Fact]
@@ -78,7 +85,7 @@ public class TokenServiceValidationTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -89,8 +96,7 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act
-        ValidatedToken result =
-            await _tokenService.ValidateRefreshTokenAsync(token);
+        ValidatedToken result = await _tokenService.ValidateRefreshTokenAsync(token);
 
         // Assert
         result.Should().NotBeNull();
@@ -110,7 +116,7 @@ public class TokenServiceValidationTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -121,8 +127,7 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act
-        ValidatedToken result =
-            await _tokenService.ValidateConfirmationTokenAsync(token);
+        ValidatedToken result = await _tokenService.ValidateConfirmationTokenAsync(token);
 
         // Assert
         result.Should().NotBeNull();
@@ -141,9 +146,10 @@ public class TokenServiceValidationTests
             .ThrowsAsync(new UnauthorizedException("Invalid token"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.ValidateAccessTokenAsync(token)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
@@ -154,14 +160,13 @@ public class TokenServiceValidationTests
 
         _tokenInfraMock
             .Setup(x => x.ValidateJwtAsync(token, It.IsAny<string>()))
-            .ThrowsAsync(new UnauthorizedException(
-                "Token has expired"
-            ));
+            .ThrowsAsync(new UnauthorizedException("Token has expired"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.ValidateAccessTokenAsync(token)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
@@ -175,7 +180,7 @@ public class TokenServiceValidationTests
         List<Claim> claims = new()
         {
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -186,9 +191,10 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-                await _tokenService.ValidateAccessTokenAsync(token)
-            ).Should().ThrowAsync<UnauthorizedException>()
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>()
             .WithMessage("*missing required claims*");
     }
 
@@ -203,7 +209,7 @@ public class TokenServiceValidationTests
         List<Claim> claims = new()
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -214,9 +220,10 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-                await _tokenService.ValidateAccessTokenAsync(token)
-            ).Should().ThrowAsync<UnauthorizedException>()
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>()
             .WithMessage("*missing required claims*");
     }
 
@@ -232,7 +239,7 @@ public class TokenServiceValidationTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, "not-a-valid-guid"),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -243,9 +250,10 @@ public class TokenServiceValidationTests
             .ReturnsAsync(principal);
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-                await _tokenService.ValidateAccessTokenAsync(token)
-            ).Should().ThrowAsync<UnauthorizedException>()
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>()
             .WithMessage("*malformed user ID*");
     }
 
@@ -260,9 +268,10 @@ public class TokenServiceValidationTests
             .ThrowsAsync(new UnauthorizedException("Invalid token"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.ValidateRefreshTokenAsync(token)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateRefreshTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
@@ -276,8 +285,9 @@ public class TokenServiceValidationTests
             .ThrowsAsync(new UnauthorizedException("Invalid token"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.ValidateConfirmationTokenAsync(token)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.ValidateConfirmationTokenAsync(token))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 }

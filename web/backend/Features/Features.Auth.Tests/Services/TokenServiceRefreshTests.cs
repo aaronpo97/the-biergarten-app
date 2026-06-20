@@ -22,15 +22,20 @@ public class TokenServiceRefreshTests
         _authRepositoryMock = new Mock<IAuthRepository>();
 
         // Set environment variables for tokens
-        Environment.SetEnvironmentVariable("ACCESS_TOKEN_SECRET", "test-access-secret-that-is-very-long-1234567890");
-        Environment.SetEnvironmentVariable("REFRESH_TOKEN_SECRET", "test-refresh-secret-that-is-very-long-1234567890");
-        Environment.SetEnvironmentVariable("CONFIRMATION_TOKEN_SECRET",
-            "test-confirmation-secret-that-is-very-long-1234567890");
-
-        _tokenService = new TokenService(
-            _tokenInfraMock.Object,
-            _authRepositoryMock.Object
+        Environment.SetEnvironmentVariable(
+            "ACCESS_TOKEN_SECRET",
+            "test-access-secret-that-is-very-long-1234567890"
         );
+        Environment.SetEnvironmentVariable(
+            "REFRESH_TOKEN_SECRET",
+            "test-refresh-secret-that-is-very-long-1234567890"
+        );
+        Environment.SetEnvironmentVariable(
+            "CONFIRMATION_TOKEN_SECRET",
+            "test-confirmation-secret-that-is-very-long-1234567890"
+        );
+
+        _tokenService = new TokenService(_tokenInfraMock.Object, _authRepositoryMock.Object);
     }
 
     [Fact]
@@ -45,7 +50,7 @@ public class TokenServiceRefreshTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -58,7 +63,7 @@ public class TokenServiceRefreshTests
             FirstName = "Test",
             LastName = "User",
             Email = "test@example.com",
-            DateOfBirth = new DateTime(1990, 1, 1)
+            DateOfBirth = new DateTime(1990, 1, 1),
         };
 
         // Mock the validation of refresh token
@@ -69,11 +74,11 @@ public class TokenServiceRefreshTests
         // Mock the generation of new tokens
         _tokenInfraMock
             .Setup(x => x.GenerateJwt(userId, username, It.IsAny<DateTime>(), It.IsAny<string>()))
-            .Returns((Guid _, string _, DateTime _, string _) => $"generated-token-{Guid.NewGuid()}");
+            .Returns(
+                (Guid _, string _, DateTime _, string _) => $"generated-token-{Guid.NewGuid()}"
+            );
 
-        _authRepositoryMock
-            .Setup(x => x.GetUserByIdAsync(userId))
-            .ReturnsAsync(userAccount);
+        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(userAccount);
 
         // Act
         RefreshTokenResult result = await _tokenService.RefreshTokenAsync(refreshToken);
@@ -85,14 +90,17 @@ public class TokenServiceRefreshTests
         result.AccessToken.Should().NotBeEmpty();
         result.RefreshToken.Should().NotBeEmpty();
 
-        _authRepositoryMock.Verify(
-            x => x.GetUserByIdAsync(userId),
-            Times.Once
-        );
+        _authRepositoryMock.Verify(x => x.GetUserByIdAsync(userId), Times.Once);
 
         // Verify tokens were generated (called twice - once for access, once for refresh)
         _tokenInfraMock.Verify(
-            x => x.GenerateJwt(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>()),
+            x =>
+                x.GenerateJwt(
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<string>()
+                ),
             Times.Exactly(2)
         );
     }
@@ -108,9 +116,10 @@ public class TokenServiceRefreshTests
             .ThrowsAsync(new UnauthorizedException("Invalid refresh token"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.RefreshTokenAsync(invalidToken)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.RefreshTokenAsync(invalidToken))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
@@ -124,9 +133,10 @@ public class TokenServiceRefreshTests
             .ThrowsAsync(new UnauthorizedException("Refresh token has expired"));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-            await _tokenService.RefreshTokenAsync(expiredToken)
-        ).Should().ThrowAsync<UnauthorizedException>();
+        await FluentActions
+            .Invoking(async () => await _tokenService.RefreshTokenAsync(expiredToken))
+            .Should()
+            .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
@@ -141,7 +151,7 @@ public class TokenServiceRefreshTests
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         ClaimsIdentity claimsIdentity = new(claims);
@@ -151,14 +161,13 @@ public class TokenServiceRefreshTests
             .Setup(x => x.ValidateJwtAsync(refreshToken, It.IsAny<string>()))
             .ReturnsAsync(principal);
 
-        _authRepositoryMock
-            .Setup(x => x.GetUserByIdAsync(userId))
-            .ReturnsAsync((UserAccount?)null);
+        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync((UserAccount?)null);
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-                await _tokenService.RefreshTokenAsync(refreshToken)
-            ).Should().ThrowAsync<UnauthorizedException>()
+        await FluentActions
+            .Invoking(async () => await _tokenService.RefreshTokenAsync(refreshToken))
+            .Should()
+            .ThrowAsync<UnauthorizedException>()
             .WithMessage("*User account not found*");
     }
 }

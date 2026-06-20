@@ -21,7 +21,10 @@ public class RefreshTokenHandlerTests
             .Setup(x => x.RefreshTokenAsync("old-refresh-token"))
             .ReturnsAsync(new RefreshTokenResult(user, "new-refresh-token", "new-access-token"));
 
-        LoginPayload result = await handler.Handle(new RefreshTokenCommand("old-refresh-token"), CancellationToken.None);
+        LoginPayload result = await handler.Handle(
+            new RefreshTokenCommand("old-refresh-token"),
+            CancellationToken.None
+        );
 
         result.UserAccountId.Should().Be(userId);
         result.Username.Should().Be("testuser");
