@@ -19,20 +19,20 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
         CancellationToken cancellationToken
     )
     {
-        if (!validators.Any()) return await next();
+        if (!validators.Any())
+            return await next();
 
         ValidationContext<TRequest> context = new(request);
 
         List<ValidationFailure> failures = (
-                await Task.WhenAll(
-                    validators.Select(v => v.ValidateAsync(context, cancellationToken))
-                )
-            )
+            await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken)))
+        )
             .SelectMany(result => result.Errors)
             .Where(failure => failure != null)
             .ToList();
 
-        if (failures.Count > 0) throw new ValidationException(failures);
+        if (failures.Count > 0)
+            throw new ValidationException(failures);
 
         return await next();
     }
