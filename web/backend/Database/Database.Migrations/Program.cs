@@ -35,21 +35,25 @@ public static class Program
     /// </exception>
     private static string BuildConnectionString(string? databaseName = null)
     {
-        string server = Environment.GetEnvironmentVariable("DB_SERVER")
-                        ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+        string server =
+            Environment.GetEnvironmentVariable("DB_SERVER")
+            ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
-        string dbName = databaseName
-                        ?? Environment.GetEnvironmentVariable("DB_NAME")
-                        ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+        string dbName =
+            databaseName
+            ?? Environment.GetEnvironmentVariable("DB_NAME")
+            ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
-        string user = Environment.GetEnvironmentVariable("DB_USER")
-                      ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+        string user =
+            Environment.GetEnvironmentVariable("DB_USER")
+            ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
-        string password = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                          ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+        string password =
+            Environment.GetEnvironmentVariable("DB_PASSWORD")
+            ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
-        string trustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE")
-                                        ?? "True";
+        string trustServerCertificate =
+            Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE") ?? "True";
 
         SqlConnectionStringBuilder builder = new()
         {
@@ -58,7 +62,7 @@ public static class Program
             UserID = user,
             Password = password,
             TrustServerCertificate = bool.Parse(trustServerCertificate),
-            Encrypt = true
+            Encrypt = true,
         };
 
         return builder.ConnectionString;
@@ -99,9 +103,10 @@ public static class Program
 
             // First, set the database to single user mode to close all connections
             SqlCommand setModeCommand = new(
-                "IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten') " +
-                "ALTER DATABASE [Biergarten] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;",
-                myConn);
+                "IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten') "
+                    + "ALTER DATABASE [Biergarten] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;",
+                myConn
+            );
             try
             {
                 setModeCommand.ExecuteNonQuery();
@@ -132,7 +137,8 @@ public static class Program
         }
         finally
         {
-            if (myConn.State == ConnectionState.Open) myConn.Close();
+            if (myConn.State == ConnectionState.Open)
+                myConn.Close();
         }
 
         return true;
@@ -149,9 +155,9 @@ public static class Program
         SqlConnection myConn = new(masterConnectionString);
 
         const string str = """
-                           IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten')
-                           CREATE DATABASE [Biergarten]
-                           """;
+            IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten')
+            CREATE DATABASE [Biergarten]
+            """;
 
         SqlCommand myCommand = new(str, myConn);
         try
@@ -166,7 +172,8 @@ public static class Program
         }
         finally
         {
-            if (myConn.State == ConnectionState.Open) myConn.Close();
+            if (myConn.State == ConnectionState.Open)
+                myConn.Close();
         }
 
         return true;
