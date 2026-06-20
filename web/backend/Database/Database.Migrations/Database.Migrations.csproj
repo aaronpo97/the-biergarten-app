@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="dbup" Version="5.0.41"/>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2"/>
+        <PackageReference Include="dbup" Version="5.0.41" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Include="scripts/**/*.sql"/>
+        <EmbeddedResource Include="scripts/**/*.sql" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="..\..\.dockerignore">
