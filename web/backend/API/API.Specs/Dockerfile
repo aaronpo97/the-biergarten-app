@@ -1,17 +1,32 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# See API.Core/Dockerfile for why this copies every project file (with real relative paths) and
+# restores against Core.slnx rather than hand-listing API.Specs' transitive dependencies.
+COPY ["Core.slnx", "./"]
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
 COPY ["API/API.Specs/API.Specs.csproj", "API/API.Specs/"]
-COPY ["Domain/Domain.Entities/Domain.Entities.csproj", "Domain.Entities/"]
-COPY ["Domain/Domain.Exceptions/Domain.Exceptions.csproj", "Domain.Exceptions/"]
-COPY ["Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj", "Infrastructure/Infrastructure.Repository/"]
+COPY ["Database/Database.Migrations/Database.Migrations.csproj", "Database/Database.Migrations/"]
+COPY ["Database/Database.Seed/Database.Seed.csproj", "Database/Database.Seed/"]
+COPY ["Domain/Domain.Entities/Domain.Entities.csproj", "Domain/Domain.Entities/"]
+COPY ["Domain/Domain.Exceptions/Domain.Exceptions.csproj", "Domain/Domain.Exceptions/"]
+COPY ["Features/Features.Auth/Features.Auth.csproj", "Features/Features.Auth/"]
+COPY ["Features/Features.Auth.Tests/Features.Auth.Tests.csproj", "Features/Features.Auth.Tests/"]
+COPY ["Features/Features.Breweries/Features.Breweries.csproj", "Features/Features.Breweries/"]
+COPY ["Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj", "Features/Features.Breweries.Tests/"]
+COPY ["Features/Features.Emails/Features.Emails.csproj", "Features/Features.Emails/"]
+COPY ["Features/Features.Emails.Tests/Features.Emails.Tests.csproj", "Features/Features.Emails.Tests/"]
+COPY ["Features/Features.UserManagement/Features.UserManagement.csproj", "Features/Features.UserManagement/"]
+COPY ["Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj", "Features/Features.UserManagement.Tests/"]
+COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
+COPY ["Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj", "Infrastructure/Infrastructure.Email.Templates/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
 COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
-COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
-COPY ["Service/Service.Auth/Service.Auth.csproj", "Service/Service.Auth/"]
-COPY ["Service/Service.UserManagement/Service.UserManagement.csproj", "Service/Service.UserManagement/"]
-RUN dotnet restore "API/API.Specs/API.Specs.csproj"
+COPY ["Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj", "Infrastructure/Infrastructure.Sql/"]
+COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
+COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
+RUN dotnet restore "Core.slnx"
 COPY . .
 WORKDIR "/src/API/API.Specs"
 RUN dotnet build "./API.Specs.csproj" -c $BUILD_CONFIGURATION -o /app/build

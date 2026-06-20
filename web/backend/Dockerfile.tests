@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY . .
+RUN dotnet restore "Core.slnx"
+RUN dotnet build "Core.slnx" -c $BUILD_CONFIGURATION
+
+# Runs every Features.*.Tests project (unit + DbMocker-backed repository tests). API.Specs is
+# excluded here since it's a separate BDD/integration suite, run by its own compose service
+# against the live, seeded database.
+FROM build AS final
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+RUN mkdir -p /app/test-results
+ENTRYPOINT ["sh", "-c", "set -e; for proj in Features/*.Tests; do dotnet test \"$proj\" -c ${BUILD_CONFIGURATION:-Release} --logger \"trx;LogFileName=/app/test-results/$(basename \"$proj\").trx\"; done"]
