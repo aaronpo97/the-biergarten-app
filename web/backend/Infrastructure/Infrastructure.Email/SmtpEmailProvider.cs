@@ -58,22 +58,16 @@ public class SmtpEmailProvider : IEmailProvider
     {
         _host =
             Environment.GetEnvironmentVariable("SMTP_HOST")
-            ?? throw new InvalidOperationException(
-                "SMTP_HOST environment variable is not set"
-            );
+            ?? throw new InvalidOperationException("SMTP_HOST environment variable is not set");
 
-        string portString =
-            Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587";
+        string portString = Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587";
         if (!int.TryParse(portString, out _port))
-            throw new InvalidOperationException(
-                $"SMTP_PORT '{portString}' is not a valid integer"
-            );
+            throw new InvalidOperationException($"SMTP_PORT '{portString}' is not a valid integer");
 
         _username = Environment.GetEnvironmentVariable("SMTP_USERNAME");
         _password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
-        string useSslString =
-            Environment.GetEnvironmentVariable("SMTP_USE_SSL") ?? "true";
+        string useSslString = Environment.GetEnvironmentVariable("SMTP_USE_SSL") ?? "true";
         _useSsl = bool.Parse(useSslString);
 
         _fromEmail =
@@ -82,9 +76,7 @@ public class SmtpEmailProvider : IEmailProvider
                 "SMTP_FROM_EMAIL environment variable is not set"
             );
 
-        _fromName =
-            Environment.GetEnvironmentVariable("SMTP_FROM_NAME")
-            ?? "The Biergarten";
+        _fromName = Environment.GetEnvironmentVariable("SMTP_FROM_NAME") ?? "The Biergarten";
     }
 
     /// <summary>
@@ -95,12 +87,7 @@ public class SmtpEmailProvider : IEmailProvider
     /// <param name="body">Email body (HTML or plain text)</param>
     /// <param name="isHtml">Whether the body is HTML (default: true)</param>
     /// <exception cref="InvalidOperationException">Thrown when connecting, authenticating, or sending via SMTP fails.</exception>
-    public async Task SendAsync(
-        string to,
-        string subject,
-        string body,
-        bool isHtml = true
-    )
+    public async Task SendAsync(string to, string subject, string body, bool isHtml = true)
     {
         await SendAsync([to], subject, body, isHtml);
     }
@@ -128,7 +115,8 @@ public class SmtpEmailProvider : IEmailProvider
         MimeMessage message = new();
         message.From.Add(new MailboxAddress(_fromName, _fromEmail));
 
-        foreach (string recipient in to) message.To.Add(MailboxAddress.Parse(recipient));
+        foreach (string recipient in to)
+            message.To.Add(MailboxAddress.Parse(recipient));
 
         message.Subject = subject;
 
@@ -152,10 +140,7 @@ public class SmtpEmailProvider : IEmailProvider
             await client.ConnectAsync(_host, _port, secureSocketOptions);
 
             // Authenticate if credentials are provided
-            if (
-                !string.IsNullOrEmpty(_username)
-                && !string.IsNullOrEmpty(_password)
-            )
+            if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password))
                 await client.AuthenticateAsync(_username, _password);
 
             await client.SendAsync(message);
@@ -163,10 +148,7 @@ public class SmtpEmailProvider : IEmailProvider
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                $"Failed to send email: {ex.Message}",
-                ex
-            );
+            throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
         }
     }
 }
