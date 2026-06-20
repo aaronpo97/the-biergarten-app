@@ -29,39 +29,38 @@ public class EmailDispatcher(
     ///     Builds a confirmation link from the given token, renders the registration welcome email template,
     ///     and sends it to the newly created user.
     /// </summary>
-    public async Task SendRegistrationEmailAsync(string firstName, string email, string confirmationToken)
+    public async Task SendRegistrationEmailAsync(
+        string firstName,
+        string email,
+        string confirmationToken
+    )
     {
-        string confirmationLink =
-            $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
+        string confirmationLink = $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
 
-        string emailHtml =
-            await emailTemplateProvider.RenderUserRegisteredEmailAsync(
-                firstName,
-                confirmationLink
-            );
-
-        await emailProvider.SendAsync(
-            email,
-            "Welcome to The Biergarten App!",
-            emailHtml,
-            true
+        string emailHtml = await emailTemplateProvider.RenderUserRegisteredEmailAsync(
+            firstName,
+            confirmationLink
         );
+
+        await emailProvider.SendAsync(email, "Welcome to The Biergarten App!", emailHtml, true);
     }
 
     /// <summary>
     ///     Builds a confirmation link from the given token, renders the resend-confirmation email template,
     ///     and sends it to the user.
     /// </summary>
-    public async Task SendResendConfirmationEmailAsync(string firstName, string email, string confirmationToken)
+    public async Task SendResendConfirmationEmailAsync(
+        string firstName,
+        string email,
+        string confirmationToken
+    )
     {
-        string confirmationLink =
-            $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
+        string confirmationLink = $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
 
-        string emailHtml =
-            await emailTemplateProvider.RenderResendConfirmationEmailAsync(
-                firstName,
-                confirmationLink
-            );
+        string emailHtml = await emailTemplateProvider.RenderResendConfirmationEmailAsync(
+            firstName,
+            confirmationLink
+        );
 
         await emailProvider.SendAsync(
             email,

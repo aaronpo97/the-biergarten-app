@@ -14,6 +14,10 @@ public class SendRegistrationEmailHandler(IEmailDispatcher emailDispatcher)
 {
     public Task Handle(SendRegistrationEmailCommand request, CancellationToken cancellationToken)
     {
-        return emailDispatcher.SendRegistrationEmailAsync(request.FirstName, request.Email, request.ConfirmationToken);
+        return emailDispatcher.SendRegistrationEmailAsync(
+            request.FirstName,
+            request.Email,
+            request.ConfirmationToken
+        );
     }
 }

@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj"/>
-        <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+        <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
 </Project>
