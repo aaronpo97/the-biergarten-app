@@ -30,10 +30,11 @@
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
         <ProjectReference Include="..\..\Service\Service.Auth\Service.Auth.csproj" />
-        <ProjectReference Include="..\..\Service\Service.Breweries\Service.Breweries.csproj" />
         <ProjectReference Include="..\..\Service\Service.UserManagement\Service.UserManagement.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
