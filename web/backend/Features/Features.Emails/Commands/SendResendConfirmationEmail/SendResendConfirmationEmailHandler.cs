@@ -12,9 +12,15 @@ namespace Features.Emails.Commands.SendResendConfirmationEmail;
 public class SendResendConfirmationEmailHandler(IEmailDispatcher emailDispatcher)
     : IRequestHandler<SendResendConfirmationEmailCommand>
 {
-    public Task Handle(SendResendConfirmationEmailCommand request, CancellationToken cancellationToken)
+    public Task Handle(
+        SendResendConfirmationEmailCommand request,
+        CancellationToken cancellationToken
+    )
     {
-        return emailDispatcher.SendResendConfirmationEmailAsync(request.FirstName, request.Email,
-            request.ConfirmationToken);
+        return emailDispatcher.SendResendConfirmationEmailAsync(
+            request.FirstName,
+            request.Email,
+            request.ConfirmationToken
+        );
     }
 }
