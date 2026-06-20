@@ -1,16 +1,18 @@
 using Domain.Entities;
+using Features.UserManagement.Queries.GetAllUsers;
+using Features.UserManagement.Queries.GetUserById;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Service.UserManagement.User;
 
-namespace API.Core.Controllers
+namespace Features.UserManagement.Controllers
 {
     /// <summary>
     /// Provides read-only endpoints for retrieving user accounts.
     /// </summary>
-    /// <param name="userService">Service used to query user account data.</param>
+    /// <param name="mediator">Used to dispatch user queries to their handlers.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController(IUserService userService) : ControllerBase
+    public class UserController(IMediator mediator) : ControllerBase
     {
         /// <summary>
         /// Retrieves a paginated list of user accounts.
@@ -24,7 +26,7 @@ namespace API.Core.Controllers
             [FromQuery] int? offset
         )
         {
-            var users = await userService.GetAllAsync(limit, offset);
+            var users = await mediator.Send(new GetAllUsersQuery(limit, offset));
             return Ok(users);
         }
 
@@ -36,7 +38,7 @@ namespace API.Core.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<UserAccount>> GetById(Guid id)
         {
-            var user = await userService.GetByIdAsync(id);
+            var user = await mediator.Send(new GetUserByIdQuery(id));
             return Ok(user);
         }
     }

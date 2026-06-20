@@ -2,7 +2,7 @@ using System.Data;
 using System.Data.Common;
 using Infrastructure.Sql;
 
-namespace Infrastructure.Repository.UserAccount;
+namespace Features.UserManagement.Repository;
 
 /// <summary>
 /// ADO.NET-based implementation of <see cref="IUserAccountRepository"/> backed by SQL Server
@@ -10,7 +10,7 @@ namespace Infrastructure.Repository.UserAccount;
 /// </summary>
 /// <param name="connectionFactory">The factory used to create database connections.</param>
 public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
-    : Repository<Domain.Entities.UserAccount>(connectionFactory),
+    : Infrastructure.Sql.Repository<Domain.Entities.UserAccount>(connectionFactory),
         IUserAccountRepository
 {
     /// <summary>

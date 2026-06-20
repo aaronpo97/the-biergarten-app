@@ -23,6 +23,8 @@ COPY ["Domain/Domain.Entities/Domain.Entities.csproj", "Domain/Domain.Entities/"
 COPY ["Domain/Domain.Exceptions/Domain.Exceptions.csproj", "Domain/Domain.Exceptions/"]
 COPY ["Features/Features.Breweries/Features.Breweries.csproj", "Features/Features.Breweries/"]
 COPY ["Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj", "Features/Features.Breweries.Tests/"]
+COPY ["Features/Features.UserManagement/Features.UserManagement.csproj", "Features/Features.UserManagement/"]
+COPY ["Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj", "Features/Features.UserManagement.Tests/"]
 COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
 COPY ["Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj", "Infrastructure/Infrastructure.Email.Templates/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
@@ -33,7 +35,6 @@ COPY ["Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj", "Infrastruc
 COPY ["Service/Service.Auth/Service.Auth.csproj", "Service/Service.Auth/"]
 COPY ["Service/Service.Auth.Tests/Service.Auth.Tests.csproj", "Service/Service.Auth.Tests/"]
 COPY ["Service/Service.Emails/Service.Emails.csproj", "Service/Service.Emails/"]
-COPY ["Service/Service.UserManagement/Service.UserManagement.csproj", "Service/Service.UserManagement/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
 RUN dotnet restore "Core.slnx"

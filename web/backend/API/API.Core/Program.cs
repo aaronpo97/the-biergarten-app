@@ -2,6 +2,8 @@ using API.Core;
 using API.Core.Authentication;
 using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
+using Features.UserManagement.Controllers;
+using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Email;
@@ -9,11 +11,9 @@ using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.Jwt;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.UserAccount;
 using Infrastructure.Sql;
 using Service.Auth;
 using Service.Emails;
-using Service.UserManagement.User;
 using Shared.Application.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +23,8 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionFilter>();
 })
-    .AddApplicationPart(typeof(BreweryController).Assembly);
+    .AddApplicationPart(typeof(BreweryController).Assembly)
+    .AddApplicationPart(typeof(UserController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,6 +33,7 @@ builder.Services.AddOpenApi();
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
 // Add MediatR. Each Features.* slice's assembly is registered here as it's introduced;
@@ -40,6 +42,7 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<Program>();
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
@@ -61,11 +64,10 @@ builder.Services.AddSingleton<
     DefaultSqlConnectionFactory
 >();
 
-builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddFeaturesBreweries();
+builder.Services.AddFeaturesUserManagement();
 
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
