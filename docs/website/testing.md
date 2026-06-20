@@ -7,9 +7,13 @@ Biergarten App.
 
 The project uses a multi-layered testing approach across backend and frontend:
 
-- **API.Specs** - BDD integration tests using Reqnroll (Gherkin)
-- **Infrastructure.Repository.Tests** - Unit tests for data access layer
-- **Service.Auth.Tests** - Unit tests for authentication business logic
+- **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against
+  a live, seeded database
+- **Features.\*.Tests** - One unit test project per backend feature slice
+  (`Features.Auth.Tests`, `Features.Breweries.Tests`,
+  `Features.UserManagement.Tests`, `Features.Emails.Tests`), covering that
+  slice's command/query handlers and its own repository (mocked with Moq /
+  DbMocker, no real database required)
 - **Storybook Vitest project** - Browser-based interaction tests for shared
   website stories
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
@@ -21,7 +25,7 @@ The easiest way to run all tests is using Docker Compose, which sets up an
 isolated test environment:
 
 ```bash
-docker compose -f docker-compose.test.yaml up --abort-on-container-exit
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
 This command:
@@ -41,15 +45,17 @@ ls -la test-results/
 
 # View specific test results
 cat test-results/api-specs/results.trx
-cat test-results/repository-tests/results.trx
-cat test-results/service-auth-tests/results.trx
+cat test-results/Features.Auth.Tests.trx
+cat test-results/Features.Breweries.Tests.trx
+cat test-results/Features.UserManagement.Tests.trx
+cat test-results/Features.Emails.Tests.trx
 ```
 
 ### Clean Up
 
 ```bash
 # Remove test containers and volumes
-docker compose -f docker-compose.test.yaml down -v
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
 ## Running Tests Locally
@@ -59,7 +65,7 @@ You can run individual test projects locally without Docker:
 ### Integration Tests (API.Specs)
 
 ```bash
-cd src/Core
+cd web/backend
 dotnet test API/API.Specs/API.Specs.csproj
 ```
 
@@ -69,32 +75,31 @@ dotnet test API/API.Specs/API.Specs.csproj
 - Database migrated and seeded
 - Environment variables set (DB connection, JWT secret)
 
-### Repository Tests
+### Feature Slice Unit Tests
+
+Each feature slice has its own test project, covering its command/query
+handlers and repository:
 
 ```bash
-cd src/Core
-dotnet test Infrastructure/Infrastructure.Repository.Tests/Infrastructure.Repository.Tests.csproj
+cd web/backend
+dotnet test Features/Features.Auth.Tests/Features.Auth.Tests.csproj
+dotnet test Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj
+dotnet test Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj
+dotnet test Features/Features.Emails.Tests/Features.Emails.Tests.csproj
+
+# Or run all of them at once via the solution:
+for proj in Features/*.Tests; do dotnet test "$proj"; done
 ```
 
 **Requirements**:
 
-- SQL Server instance running (uses mock data)
-
-### Service Tests
-
-```bash
-cd src/Core
-dotnet test Service/Service.Auth.Tests/Service.Auth.Tests.csproj
-```
-
-**Requirements**:
-
-- No database required (uses Moq for mocking)
+- No database required (handlers use Moq; repository tests use DbMocker to
+  simulate SQL Server responses)
 
 ### Frontend Storybook Tests
 
 ```bash
-cd src/Website
+cd web/frontend
 npm install
 npm run test:storybook
 ```
@@ -108,7 +113,7 @@ npm run test:storybook
 ### Frontend Playwright Storybook Tests
 
 ```bash
-cd src/Website
+cd web/frontend
 npm install
 npm run test:storybook:playwright
 ```
@@ -124,27 +129,28 @@ npm run test:storybook:playwright
 
 ### Current Coverage
 
-**Authentication & User Management**:
+**Features.Auth.Tests**:
 
 - User registration with validation
 - User login with JWT token generation
 - Password hashing and verification (Argon2id)
-- JWT token generation and claims
-- Invalid credentials handling
-- 404 error responses
+- Email confirmation and confirmation-email resend
+- Refresh token exchange
+- JWT token generation, validation, and claims handling
+- `IAuthRepository` data access (DbMocker-backed)
+- Invalid credentials and 404 error responses (via API.Specs)
 
-**Repository Layer**:
+**Features.Breweries.Tests**:
 
-- User account creation
-- User credential management
-- GetUserByUsername queries
-- Stored procedure execution
+- Brewery create/update/delete commands and get-by-id/get-all queries
 
-**Service Layer**:
+**Features.UserManagement.Tests**:
 
-- Login service with password verification
-- Register service with validation
-- Business logic for authentication flow
+- User get-by-id/get-all queries and the (currently unrouted) update command
+
+**Features.Emails.Tests**:
+
+- Registration and resend-confirmation email dispatch handlers
 
 **Frontend UI Coverage**:
 
@@ -156,10 +162,7 @@ npm run test:storybook:playwright
 
 ### Planned Coverage
 
-- [ ] Email verification workflow
 - [ ] Password reset functionality
-- [ ] Token refresh mechanism
-- [ ] Brewery data management
 - [ ] Beer post operations
 - [ ] User follow/unfollow
 - [ ] Image upload service
@@ -204,21 +207,28 @@ npm run test:storybook:playwright
 ```
 API.Specs/
 ├── Features/
-│   ├── Authentication.feature          # Login/register scenarios
-│   └── UserManagement.feature          # User CRUD scenarios
+│   ├── Registration.feature            # Registration scenarios
+│   ├── Login.feature                   # Login scenarios
+│   ├── Confirmation.feature            # Email confirmation scenarios
+│   ├── ResendConfirmation.feature      # Resend-confirmation scenarios
+│   ├── TokenRefresh.feature            # Refresh token scenarios
+│   ├── AccessTokenValidation.feature   # Protected endpoint access scenarios
+│   └── NotFound.feature                # 404 handling
 ├── Steps/
-│   ├── AuthenticationSteps.cs          # Step definitions
-│   └── UserManagementSteps.cs
-└── Mocks/
-    └── TestApiFactory.cs               # Test server setup
+│   ├── AuthSteps.cs                    # Step definitions for the Auth features
+│   └── ApiGeneralSteps.cs              # Shared/general step definitions
+├── Mocks/
+│   ├── MockEmailDispatcher.cs          # Substitutes Features.Emails' IEmailDispatcher
+│   └── MockEmailProvider.cs            # Substitutes Infrastructure.Email's IEmailProvider
+└── TestApiFactory.cs                   # Test server setup (swaps in the mocks above)
 ```
 
 **Example Feature**:
 
 ```gherkin
-Feature: User Authentication
+Feature: User Registration
   As a user
-  I want to register and login
+  I want to register
   So that I can access the platform
 
 Scenario: Successful user registration
@@ -228,45 +238,51 @@ Scenario: Successful user registration
   And my account should be created
 ```
 
-### Infrastructure.Repository.Tests
+### Features.Auth.Tests
 
 ```
-Infrastructure.Repository.Tests/
-├── AuthRepositoryTests.cs              # Auth repository tests
-├── UserAccountRepositoryTests.cs       # User account tests
-└── TestFixtures/
-    └── DatabaseFixture.cs              # Shared test setup
+Features.Auth.Tests/
+├── Commands/
+│   ├── RegisterUserHandlerTests.cs
+│   ├── ConfirmUserHandlerTests.cs
+│   ├── ResendConfirmationEmailHandlerTests.cs
+│   └── RefreshTokenHandlerTests.cs
+├── Queries/
+│   └── LoginHandlerTests.cs
+├── Repository/
+│   └── AuthRepositoryTests.cs          # DbMocker-backed repository tests
+└── Services/
+    ├── TokenServiceRefreshTests.cs
+    └── TokenServiceValidationTests.cs
 ```
 
-### Service.Auth.Tests
-
-```
-Service.Auth.Tests/
-├── LoginService.test.cs                # Login business logic tests
-└── RegisterService.test.cs             # Registration business logic tests
-```
+Each of the other three slices (`Features.Breweries.Tests`,
+`Features.UserManagement.Tests`, `Features.Emails.Tests`) follows the same
+shape: a `Commands/`/`Queries/` folder with one test file per handler.
 
 ## Writing Tests
 
 ### Unit Test Example (xUnit)
 
 ```csharp
-public class LoginServiceTests
+public class LoginHandlerTests
 {
     [Fact]
-    public async Task LoginAsync_ValidCredentials_ReturnsToken()
+    public async Task Handle_WithValidData_ReturnsPayloadWithMatchingUsername()
     {
         // Arrange
-        var mockRepo = new Mock<IAuthRepository>();
-        var mockJwt = new Mock<IJwtService>();
-        var service = new AuthService(mockRepo.Object, mockJwt.Object);
+        var authRepoMock = new Mock<IAuthRepository>();
+        var passwordInfraMock = new Mock<IPasswordInfrastructure>();
+        var tokenServiceMock = new Mock<ITokenService>();
+        var handler = new LoginHandler(authRepoMock.Object, passwordInfraMock.Object, tokenServiceMock.Object);
+        // ...set up mocks for a known user/credential...
 
         // Act
-        var result = await service.LoginAsync("testuser", "password123");
+        var result = await handler.Handle(new LoginQuery("testuser", "password123"), CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
-        result.Token.Should().NotBeNullOrEmpty();
+        result.AccessToken.Should().NotBeNullOrEmpty();
     }
 }
 ```
@@ -288,9 +304,9 @@ configuration:
 
 ```bash
 # CI/CD command
-docker compose -f docker-compose.test.yaml build
-docker compose -f docker-compose.test.yaml up --abort-on-container-exit
-docker compose -f docker-compose.test.yaml down -v
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml build
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
 Exit codes:
@@ -302,7 +318,7 @@ Frontend UI checks should also be included in CI for the active website
 workspace:
 
 ```bash
-cd src/Website
+cd web/frontend
 npm ci
 npm run test:storybook
 npm run test:storybook:playwright
@@ -315,7 +331,7 @@ npm run test:storybook:playwright
 Ensure SQL Server is running and environment variables are set:
 
 ```bash
-docker compose -f docker-compose.test.yaml ps
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml ps
 ```
 
 ### Port Conflicts
@@ -328,13 +344,13 @@ If port 1433 is in use, stop other SQL Server instances or modify the port in
 Clean up test database:
 
 ```bash
-docker compose -f docker-compose.test.yaml down -v
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
 ### View Container Logs
 
 ```bash
-docker compose -f docker-compose.test.yaml logs <service-name>
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml logs <service-name>
 ```
 
 ## Best Practices

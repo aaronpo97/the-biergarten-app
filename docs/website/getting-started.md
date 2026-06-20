@@ -1,7 +1,7 @@
 # Getting Started
 
 This guide covers local setup for the current Biergarten stack: the .NET backend
-in `src/Core` and the active React Router frontend in `src/Website`.
+in `web/backend` and the active React Router frontend in `web/frontend`.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ cd the-biergarten-app
 ### 2. Configure Backend Environment Variables
 
 ```bash
-cp .env.example .env.dev
+cp web/.env.example web/.env.dev
 ```
 
 At minimum, ensure `.env.dev` includes valid database and token values:
@@ -43,20 +43,21 @@ See [Environment Variables](environment-variables.md) for the full list.
 ### 3. Start the Backend Stack
 
 ```bash
-docker compose -f docker-compose.dev.yaml up -d
+docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 ```
 
-This starts SQL Server, migrations, seeding, and the API.
+This starts SQL Server, migrations, seeding, the API, and Mailpit (local dev SMTP).
 
 Available endpoints:
 
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
+- Mailpit UI: http://localhost:8025
 
 ### 4. Start the Active Frontend
 
 ```bash
-cd src/Website
+cd web/frontend
 npm install
 API_BASE_URL=http://localhost:8080 SESSION_SECRET=dev-secret-change-me npm run dev
 ```
@@ -71,7 +72,7 @@ Required frontend runtime variables for local work:
 ### 5. Optional: Run Storybook
 
 ```bash
-cd src/Website
+cd web/frontend
 npm run storybook
 ```
 
@@ -82,15 +83,15 @@ Storybook runs at http://localhost:6006 by default.
 ### Backend
 
 ```bash
-docker compose -f docker-compose.dev.yaml logs -f
-docker compose -f docker-compose.dev.yaml down
-docker compose -f docker-compose.dev.yaml down -v
+docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml logs -f
+docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml down
+docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml down -v
 ```
 
 ### Frontend
 
 ```bash
-cd src/Website
+cd web/frontend
 npm run lint
 npm run typecheck
 npm run format:check
@@ -115,7 +116,7 @@ export WEBSITE_BASE_URL="http://localhost:3000"
 ### 2. Run Migrations and Seed
 
 ```bash
-cd src/Core
+cd web/backend
 dotnet run --project Database/Database.Migrations/Database.Migrations.csproj
 dotnet run --project Database/Database.Seed/Database.Seed.csproj
 ```
@@ -128,12 +129,11 @@ dotnet run --project API/API.Core/API.Core.csproj
 
 ## Legacy Frontend Note
 
-The previous Next.js frontend now lives in `src/Website-v1` and is not the
-active website. Legacy setup details have been moved to
-[docs/archive/legacy-website-v1.md](archive/legacy-website-v1.md).
+The previous Next.js frontend lives in `archive/next-js-web-app/` for reference
+only and is not the active website.
 
 ## Next Steps
 
-- Review [Architecture](architecture.md)
+- Review [Architecture](../architecture.md)
 - Run backend and frontend checks from [Testing](testing.md)
 - Use [Docker Guide](docker.md) for container troubleshooting

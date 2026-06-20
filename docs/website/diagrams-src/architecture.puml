@@ -4,41 +4,67 @@ skinparam backgroundColor #FFFFFF
 skinparam defaultFontName Arial
 skinparam packageStyle rectangle
 
-title The Biergarten App - Layered Architecture
+title The Biergarten App - Vertical Slice Architecture
 
-package "API Layer" #E3F2FD {
-  [API.Core\nASP.NET Core Web API] as API
+package "API.Core (thin host)" #E3F2FD {
+  [API.Core\nASP.NET Core Web API host] as API
   note right of API
-    - Controllers (Auth, User)
-    - Swagger/OpenAPI
-    - Middleware
-    - Health Checks
+    - Program.cs wiring only
+    - MediatR + AddApplicationPart
+      per Features.* assembly
+    - Swagger/OpenAPI, health checks
+    - JWT auth middleware
+    - Global exception filter
   end note
 }
 
-package "Service Layer" #F3E5F5 {
-  [Service.Auth] as AuthSvc
-  [Service.UserManagement] as UserSvc
-  note right of AuthSvc
-    - Business Logic
-    - Validation
-    - Orchestration
+package "Feature Slices" #F3E5F5 {
+  [Features.Auth] as AuthSlice
+  [Features.Breweries] as BrewerySlice
+  [Features.UserManagement] as UserSlice
+  [Features.Emails] as EmailsSlice
+  note right of AuthSlice
+    Each slice owns its own:
+    - Controller (HTTP endpoints)
+    - Commands/Queries + Handlers
+    - Validators
+    - Repository
+  end note
+  note right of EmailsSlice
+    No controller - invoked only
+    via MediatR commands sent
+    from other slices
+  end note
+}
+
+package "Shared" #FCE4EC {
+  [Shared.Contracts] as SharedContracts
+  [Shared.Application] as SharedApp
+  note right of SharedApp
+    - ValidationBehavior
+      (MediatR pipeline)
+    - Cross-slice email commands
+      (SendRegistrationEmailCommand,
+      SendResendConfirmationEmailCommand)
   end note
 }
 
 package "Infrastructure Layer" #FFF3E0 {
-  [Infrastructure.Repository] as Repo
+  [Infrastructure.Sql] as Sql
   [Infrastructure.Jwt] as JWT
   [Infrastructure.PasswordHashing] as PwdHash
   [Infrastructure.Email] as Email
+  [Infrastructure.Email.Templates] as EmailTemplates
 }
 
 package "Domain Layer" #E8F5E9 {
   [Domain.Entities] as Domain
+  [Domain.Exceptions] as DomainExceptions
   note right of Domain
     - UserAccount
     - UserCredential
     - UserVerification
+    - BreweryPost
   end note
 }
 
@@ -48,28 +74,53 @@ database "SQL Server" {
 }
 
 ' Relationships
-API --> AuthSvc
-API --> UserSvc
+API ..> AuthSlice : AddApplicationPart\n+ MediatR scan
+API ..> BrewerySlice : AddApplicationPart\n+ MediatR scan
+API ..> UserSlice : AddApplicationPart\n+ MediatR scan
+API ..> EmailsSlice : MediatR scan only\n(no controller)
 
-AuthSvc --> Repo
-AuthSvc --> JWT
-AuthSvc --> PwdHash
-AuthSvc --> Email
+AuthSlice --> Sql
+AuthSlice --> JWT
+AuthSlice --> PwdHash
+AuthSlice --> SharedContracts
+AuthSlice --> SharedApp
 
-UserSvc --> Repo
+BrewerySlice --> Sql
+BrewerySlice --> SharedContracts
+BrewerySlice --> SharedApp
 
-Repo --> SP
-Repo --> Domain
+UserSlice --> Sql
+UserSlice --> SharedContracts
+UserSlice --> SharedApp
+
+EmailsSlice --> Email
+EmailsSlice --> EmailTemplates
+EmailsSlice --> SharedApp
+
+' The one cross-slice interaction: a MediatR command contract, not a project reference
+AuthSlice ..> SharedApp : sends\nSendRegistrationEmailCommand
+EmailsSlice ..> SharedApp : handles\nSendRegistrationEmailCommand
+
+Sql --> SP
+Sql --> Domain
 SP --> Tables
 
-AuthSvc --> Domain
-UserSvc --> Domain
+AuthSlice --> Domain
+BrewerySlice --> Domain
+UserSlice --> Domain
+AuthSlice --> DomainExceptions
 
 ' Notes
-note left of Repo
+note left of Sql
   SQL-first approach
   All queries via
   stored procedures
+end note
+
+note bottom of AuthSlice
+  No Features.* project
+  ever references another
+  Features.* project directly
 end note
 
 @enduml

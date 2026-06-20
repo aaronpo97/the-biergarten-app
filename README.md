@@ -41,7 +41,7 @@ Data generation pipeline (C++):
 
 Active areas in the repository:
 
-- .NET 10 backend (layered architecture) + SQL Server
+- .NET 10 backend (vertical-slice architecture with MediatR) + SQL Server
 - React 19 website (React Router 7 + Vite)
 - Shared Biergarten theme system + Storybook coverage
 - Auth flows and account/email integration (local Mailpit in dev compose)
@@ -105,7 +105,8 @@ npm run test:storybook:playwright
 
 ```text
 web/
-  backend/          .NET API + domain/service/infrastructure + DB projects
+  backend/          .NET API: API.Core (host), Features.* (vertical slices),
+                     Shared.*, Domain.*, Infrastructure.*, Database.* projects
   frontend/         React Router website + Storybook + Playwright/Vitest
 
 tooling/
