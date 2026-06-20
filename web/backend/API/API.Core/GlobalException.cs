@@ -14,8 +14,7 @@ namespace API.Core;
 ///     consistent JSON error responses with appropriate HTTP status codes.
 /// </summary>
 /// <param name="logger">Logger used to record unhandled exceptions before they are translated into a response.</param>
-public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
-    : IExceptionFilter
+public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExceptionFilter
 {
     /// <summary>
     ///     Logs the exception and sets <see cref="ExceptionContext.Result" /> to an appropriate error response,
@@ -84,10 +83,7 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
             case ValidationException fluentValidationException:
                 Dictionary<string, string[]> errors = fluentValidationException
                     .Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
 
                 context.Result = new BadRequestObjectResult(
                     new { message = "Validation failed", errors }
@@ -96,41 +92,33 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
                 break;
 
             case ConflictException ex:
-                context.Result = new ObjectResult(
-                    new ResponseBody { Message = ex.Message }
-                )
+                context.Result = new ObjectResult(new ResponseBody { Message = ex.Message })
                 {
-                    StatusCode = 409
+                    StatusCode = 409,
                 };
                 context.ExceptionHandled = true;
                 break;
 
             case NotFoundException ex:
-                context.Result = new ObjectResult(
-                    new ResponseBody { Message = ex.Message }
-                )
+                context.Result = new ObjectResult(new ResponseBody { Message = ex.Message })
                 {
-                    StatusCode = 404
+                    StatusCode = 404,
                 };
                 context.ExceptionHandled = true;
                 break;
 
             case UnauthorizedException ex:
-                context.Result = new ObjectResult(
-                    new ResponseBody { Message = ex.Message }
-                )
+                context.Result = new ObjectResult(new ResponseBody { Message = ex.Message })
                 {
-                    StatusCode = 401
+                    StatusCode = 401,
                 };
                 context.ExceptionHandled = true;
                 break;
 
             case ForbiddenException ex:
-                context.Result = new ObjectResult(
-                    new ResponseBody { Message = ex.Message }
-                )
+                context.Result = new ObjectResult(new ResponseBody { Message = ex.Message })
                 {
-                    StatusCode = 403
+                    StatusCode = 403,
                 };
                 context.ExceptionHandled = true;
                 break;
@@ -140,30 +128,25 @@ public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
                     new ResponseBody { Message = "A database error occurred." }
                 )
                 {
-                    StatusCode = 503
+                    StatusCode = 503,
                 };
                 context.ExceptionHandled = true;
                 break;
 
             case Domain.Exceptions.ValidationException ex:
-                context.Result = new ObjectResult(
-                    new ResponseBody { Message = ex.Message }
-                )
+                context.Result = new ObjectResult(new ResponseBody { Message = ex.Message })
                 {
-                    StatusCode = 400
+                    StatusCode = 400,
                 };
                 context.ExceptionHandled = true;
                 break;
 
             default:
                 context.Result = new ObjectResult(
-                    new ResponseBody
-                    {
-                        Message = "An unexpected error occurred"
-                    }
+                    new ResponseBody { Message = "An unexpected error occurred" }
                 )
                 {
-                    StatusCode = 500
+                    StatusCode = 500,
                 };
                 context.ExceptionHandled = true;
                 break;

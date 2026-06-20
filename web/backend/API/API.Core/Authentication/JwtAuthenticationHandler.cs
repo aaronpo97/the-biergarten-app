@@ -44,29 +44,19 @@ public class JwtAuthenticationHandler(
     {
         // Use the same access-token secret source as TokenService to avoid mismatched validation.
         string? secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET");
-        if (string.IsNullOrWhiteSpace(secret)) secret = configuration["Jwt:SecretKey"];
+        if (string.IsNullOrWhiteSpace(secret))
+            secret = configuration["Jwt:SecretKey"];
 
-        if (string.IsNullOrWhiteSpace(secret)) return AuthenticateResult.Fail("JWT secret is not configured");
+        if (string.IsNullOrWhiteSpace(secret))
+            return AuthenticateResult.Fail("JWT secret is not configured");
 
         // Check if Authorization header exists
-        if (
-            !Request.Headers.TryGetValue(
-                "Authorization",
-                out StringValues authHeaderValue
-            )
-        )
+        if (!Request.Headers.TryGetValue("Authorization", out StringValues authHeaderValue))
             return AuthenticateResult.Fail("Authorization header is missing");
 
         string authHeader = authHeaderValue.ToString();
-        if (
-            !authHeader.StartsWith(
-                "Bearer ",
-                StringComparison.OrdinalIgnoreCase
-            )
-        )
-            return AuthenticateResult.Fail(
-                "Invalid authorization header format"
-            );
+        if (!authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            return AuthenticateResult.Fail("Invalid authorization header format");
 
         string token = authHeader.Substring("Bearer ".Length).Trim();
 
@@ -81,9 +71,7 @@ public class JwtAuthenticationHandler(
         }
         catch (Exception ex)
         {
-            return AuthenticateResult.Fail(
-                $"Token validation failed: {ex.Message}"
-            );
+            return AuthenticateResult.Fail($"Token validation failed: {ex.Message}");
         }
     }
 
@@ -97,7 +85,10 @@ public class JwtAuthenticationHandler(
         Response.ContentType = "application/json";
         Response.StatusCode = 401;
 
-        ResponseBody response = new() { Message = "Unauthorized: Invalid or missing authentication token" };
+        ResponseBody response = new()
+        {
+            Message = "Unauthorized: Invalid or missing authentication token",
+        };
         await Response.WriteAsJsonAsync(response);
     }
 }
@@ -106,6 +97,4 @@ public class JwtAuthenticationHandler(
 ///     Options for the <c>JWT</c> authentication scheme handled by <see cref="JwtAuthenticationHandler" />.
 /// </summary>
 /// <remarks>No additional options are defined beyond those provided by <see cref="AuthenticationSchemeOptions" />.</remarks>
-public class JwtAuthenticationOptions : AuthenticationSchemeOptions
-{
-}
+public class JwtAuthenticationOptions : AuthenticationSchemeOptions { }
