@@ -20,10 +20,7 @@ public interface IUserAccountRepository
     /// <param name="limit">The maximum number of records to return, or <c>null</c> for no limit.</param>
     /// <param name="offset">The number of records to skip, or <c>null</c> for no offset.</param>
     /// <returns>The collection of matching <see cref="Domain.Entities.UserAccount" /> records.</returns>
-    Task<IEnumerable<UserAccount>> GetAllAsync(
-        int? limit,
-        int? offset
-    );
+    Task<IEnumerable<UserAccount>> GetAllAsync(int? limit, int? offset);
 
     /// <summary>
     ///     Updates an existing user account's details.
