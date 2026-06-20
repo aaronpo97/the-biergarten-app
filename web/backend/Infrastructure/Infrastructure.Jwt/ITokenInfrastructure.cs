@@ -3,12 +3,12 @@ using System.Security.Claims;
 namespace Infrastructure.Jwt;
 
 /// <summary>
-/// Service for generating and validating JSON Web Tokens (JWTs) used for authentication.
+///     Service for generating and validating JSON Web Tokens (JWTs) used for authentication.
 /// </summary>
 public interface ITokenInfrastructure
 {
     /// <summary>
-    /// Generates a signed JWT for the given user.
+    ///     Generates a signed JWT for the given user.
     /// </summary>
     /// <param name="userId">The unique identifier of the user the token is issued for.</param>
     /// <param name="username">The username of the user, included as a claim.</param>
@@ -23,11 +23,14 @@ public interface ITokenInfrastructure
     );
 
     /// <summary>
-    /// Validates a JWT and returns the resulting claims principal.
+    ///     Validates a JWT and returns the resulting claims principal.
     /// </summary>
     /// <param name="token">The JWT string to validate.</param>
     /// <param name="secret">The symmetric secret used to verify the token's signature.</param>
-    /// <returns>A <see cref="ClaimsPrincipal"/> representing the validated token's claims.</returns>
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">Thrown when the token is invalid, expired, or fails validation.</exception>
+    /// <returns>A <see cref="ClaimsPrincipal" /> representing the validated token's claims.</returns>
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the token is invalid, expired, or fails
+    ///     validation.
+    /// </exception>
     Task<ClaimsPrincipal> ValidateJwtAsync(string token, string secret);
 }

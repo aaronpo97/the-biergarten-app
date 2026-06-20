@@ -1,20 +1,24 @@
-
-CREATE OR ALTER PROCEDURE usp_DeleteUserAccount
-(
+CREATE
+OR
+ALTER PROCEDURE usp_DeleteUserAccount
+    (
     @UserAccountId UNIQUEIDENTIFIER
-)
-AS
+    )
+    AS
 BEGIN
-    SET NOCOUNT ON
+    SET
+NOCOUNT ON
 
     IF NOT EXISTS (SELECT 1 FROM UserAccount WHERE UserAccountId = @UserAccountId)
-    BEGIN
-        RAISERROR('UserAccount with the specified ID does not exist.', 16,
+BEGIN
+        RAISERROR
+('UserAccount with the specified ID does not exist.', 16,
         1);
-        ROLLBACK TRANSACTION
+ROLLBACK TRANSACTION
         RETURN
-    END
+END
 
-    DELETE FROM UserAccount 
-    WHERE UserAccountId = @UserAccountId;
+DELETE
+FROM UserAccount
+WHERE UserAccountId = @UserAccountId;
 END;

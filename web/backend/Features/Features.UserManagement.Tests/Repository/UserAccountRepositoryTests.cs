@@ -1,18 +1,21 @@
 using Apps72.Dev.Data.DbMocker;
-using FluentAssertions;
+using Domain.Entities;
 using Features.UserManagement.Repository;
+using FluentAssertions;
 
 namespace Features.UserManagement.Tests.Repository;
 
 public class UserAccountRepositoryTests
 {
-    private static UserAccountRepository CreateRepo(MockDbConnection conn) =>
-        new(new TestConnectionFactory(conn));
+    private static UserAccountRepository CreateRepo(MockDbConnection conn)
+    {
+        return new UserAccountRepository(new TestConnectionFactory(conn));
+    }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsRow_Mapped()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountById")
             .ReturnsTable(
                 MockTable
@@ -40,8 +43,8 @@ public class UserAccountRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetByIdAsync(
+        UserAccountRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetByIdAsync(
             Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
         );
 
@@ -53,7 +56,7 @@ public class UserAccountRepositoryTests
     [Fact]
     public async Task GetAllAsync_ReturnsMultipleRows()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd => cmd.CommandText == "usp_GetAllUserAccounts")
             .ReturnsTable(
                 MockTable
@@ -92,19 +95,19 @@ public class UserAccountRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var results = (await repo.GetAllAsync(null, null)).ToList();
+        UserAccountRepository repo = CreateRepo(conn);
+        List<UserAccount> results = (await repo.GetAllAsync(null, null)).ToList();
         results.Should().HaveCount(2);
         results
             .Select(r => r.Username)
             .Should()
-            .BeEquivalentTo(new[] { "a", "b" });
+            .BeEquivalentTo("a", "b");
     }
 
     [Fact]
     public async Task GetByUsername_ReturnsRow()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd =>
                 cmd.CommandText == "usp_GetUserAccountByUsername"
             )
@@ -134,8 +137,8 @@ public class UserAccountRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetByUsernameAsync("lookupuser");
+        UserAccountRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetByUsernameAsync("lookupuser");
         result.Should().NotBeNull();
         result!.Email.Should().Be("lookup@example.com");
     }
@@ -143,7 +146,7 @@ public class UserAccountRepositoryTests
     [Fact]
     public async Task GetByEmail_ReturnsRow()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
             .ReturnsTable(
                 MockTable
@@ -171,8 +174,8 @@ public class UserAccountRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetByEmailAsync("byemail@example.com");
+        UserAccountRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetByEmailAsync("byemail@example.com");
         result.Should().NotBeNull();
         result!.Username.Should().Be("byemail");
     }

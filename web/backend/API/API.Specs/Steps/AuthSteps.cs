@@ -1,5 +1,5 @@
+using System.Text;
 using System.Text.Json;
-using API.Specs;
 using FluentAssertions;
 using Infrastructure.Jwt;
 using Reqnroll;
@@ -21,14 +21,11 @@ public class AuthSteps(ScenarioContext scenario)
 
     private HttpClient GetClient()
     {
-        if (scenario.TryGetValue<HttpClient>(ClientKey, out var client))
-        {
-            return client;
-        }
+        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client)) return client;
 
-        var factory = scenario.TryGetValue<TestApiFactory>(
+        TestApiFactory? factory = scenario.TryGetValue<TestApiFactory>(
             FactoryKey,
-            out var f
+            out TestApiFactory? f
         )
             ? f
             : new TestApiFactory();
@@ -42,9 +39,9 @@ public class AuthSteps(ScenarioContext scenario)
     private static string GetRequiredEnvVar(string name)
     {
         return Environment.GetEnvironmentVariable(name)
-            ?? throw new InvalidOperationException(
-                $"{name} environment variable is not set"
-            );
+               ?? throw new InvalidOperationException(
+                   $"{name} environment variable is not set"
+               );
     }
 
     private static string GenerateJwtToken(
@@ -54,7 +51,7 @@ public class AuthSteps(ScenarioContext scenario)
         DateTime expiry
     )
     {
-        var infra = new JwtInfrastructure();
+        JwtInfrastructure infra = new();
         return infra.GenerateJwt(userId, username, expiry, secret);
     }
 
@@ -69,12 +66,12 @@ public class AuthSteps(ScenarioContext scenario)
     private static string ParseRegisteredUsername(JsonElement root)
     {
         return root
-            .GetProperty("payload")
-            .GetProperty("username")
-            .GetString()
-            ?? throw new InvalidOperationException(
-                "username missing from registration payload"
-            );
+                   .GetProperty("payload")
+                   .GetProperty("username")
+                   .GetString()
+               ?? throw new InvalidOperationException(
+                   "username missing from registration payload"
+               );
     }
 
     private static string ParseTokenFromPayload(
@@ -84,15 +81,13 @@ public class AuthSteps(ScenarioContext scenario)
     )
     {
         if (
-            payload.TryGetProperty(camelCaseName, out var tokenElem)
+            payload.TryGetProperty(camelCaseName, out JsonElement tokenElem)
             || payload.TryGetProperty(pascalCaseName, out tokenElem)
         )
-        {
             return tokenElem.GetString()
-                ?? throw new InvalidOperationException(
-                    $"{camelCaseName} is null"
-                );
-        }
+                   ?? throw new InvalidOperationException(
+                       $"{camelCaseName} is null"
+                   );
 
         throw new InvalidOperationException(
             $"Could not find token field '{camelCaseName}' in payload"
@@ -114,30 +109,30 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a login request with a username and password")]
     public async Task WhenISubmitALoginRequestWithAUsernameAndPassword()
     {
-        var client = GetClient();
-        var (username, password) = scenario.TryGetValue<(
+        HttpClient client = GetClient();
+        (string username, string password) = scenario.TryGetValue<(
             string username,
             string password
-        )>(TestUserKey, out var user)
+            )>(TestUserKey, out (string username, string password) user)
             ? user
             : ("test.user", "password");
 
-        var body = JsonSerializer.Serialize(new { username, password });
+        string body = JsonSerializer.Serialize(new { username, password });
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -146,23 +141,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a login request with a missing username")]
     public async Task WhenISubmitALoginRequestWithAMissingUsername()
     {
-        var client = GetClient();
-        var body = JsonSerializer.Serialize(new { password = "test" });
+        HttpClient client = GetClient();
+        string body = JsonSerializer.Serialize(new { password = "test" });
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -171,23 +166,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a login request with a missing password")]
     public async Task WhenISubmitALoginRequestWithAMissingPassword()
     {
-        var client = GetClient();
-        var body = JsonSerializer.Serialize(new { username = "test" });
+        HttpClient client = GetClient();
+        string body = JsonSerializer.Serialize(new { username = "test" });
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -196,21 +191,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a login request with both username and password missing")]
     public async Task WhenISubmitALoginRequestWithBothUsernameAndPasswordMissing()
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 "{}",
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -220,28 +215,26 @@ public class AuthSteps(ScenarioContext scenario)
     public void ThenTheResponseJsonShouldHaveAnAccessToken()
     {
         scenario
-            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
         scenario
-            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
             .Should()
             .BeTrue();
 
-        var doc = JsonDocument.Parse(responseBody!);
-        var root = doc.RootElement;
+        JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
         JsonElement tokenElem = default;
-        var hasToken = false;
+        bool hasToken = false;
 
         if (
-            root.TryGetProperty("payload", out var payloadElem)
+            root.TryGetProperty("payload", out JsonElement payloadElem)
             && payloadElem.ValueKind == JsonValueKind.Object
         )
-        {
             hasToken =
                 payloadElem.TryGetProperty("accessToken", out tokenElem)
                 || payloadElem.TryGetProperty("AccessToken", out tokenElem);
-        }
 
         hasToken
             .Should()
@@ -249,29 +242,29 @@ public class AuthSteps(ScenarioContext scenario)
                 "Expected an access token either at the root or inside 'payload'"
             );
 
-        var token = tokenElem.GetString();
+        string? token = tokenElem.GetString();
         token.Should().NotBeNullOrEmpty();
     }
 
     [When("I submit a login request using a GET request")]
     public async Task WhenISubmitALoginRequestUsingAgetRequest()
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
         // testing GET
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 "{}",
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -280,33 +273,27 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a registration request with values:")]
     public async Task WhenISubmitARegistrationRequestWithValues(Table table)
     {
-        var client = GetClient();
-        var row = table.Rows[0];
+        HttpClient client = GetClient();
+        DataTableRow? row = table.Rows[0];
 
-        var username = row["Username"] ?? "";
-        var firstName = row["FirstName"] ?? "";
-        var lastName = row["LastName"] ?? "";
-        var email = row["Email"] ?? "";
-        var dateOfBirth = row["DateOfBirth"] ?? "";
+        string username = row["Username"] ?? "";
+        string firstName = row["FirstName"] ?? "";
+        string lastName = row["LastName"] ?? "";
+        string email = row["Email"] ?? "";
+        string dateOfBirth = row["DateOfBirth"] ?? "";
 
-        if (dateOfBirth == "{underage_date}")
-        {
-            dateOfBirth = DateTime.UtcNow.AddYears(-18).ToString("yyyy-MM-dd");
-        }
+        if (dateOfBirth == "{underage_date}") dateOfBirth = DateTime.UtcNow.AddYears(-18).ToString("yyyy-MM-dd");
 
         // Keep default registration fixture values unique across repeated runs.
         if (email == "newuser@example.com")
         {
-            var suffix = Guid.NewGuid().ToString("N")[..8];
+            string suffix = Guid.NewGuid().ToString("N")[..8];
             email = $"newuser-{suffix}@example.com";
 
-            if (username == "newuser")
-            {
-                username = $"newuser-{suffix}";
-            }
+            if (username == "newuser") username = $"newuser-{suffix}";
         }
 
-        var password = row["Password"];
+        string? password = row["Password"];
 
         var registrationData = new
         {
@@ -315,25 +302,25 @@ public class AuthSteps(ScenarioContext scenario)
             lastName,
             email,
             dateOfBirth,
-            password,
+            password
         };
 
-        var body = JsonSerializer.Serialize(registrationData);
+        string body = JsonSerializer.Serialize(registrationData);
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/register"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -342,21 +329,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a registration request using a GET request")]
     public async Task WhenISubmitARegistrationRequestUsingAGetRequest()
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/auth/register"
         )
         {
             Content = new StringContent(
                 "{}",
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -365,8 +352,8 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have registered a new account")]
     public async Task GivenIHaveRegisteredANewAccount()
     {
-        var client = GetClient();
-        var suffix = Guid.NewGuid().ToString("N")[..8];
+        HttpClient client = GetClient();
+        string suffix = Guid.NewGuid().ToString("N")[..8];
         var registrationData = new
         {
             username = $"newuser-{suffix}",
@@ -374,29 +361,29 @@ public class AuthSteps(ScenarioContext scenario)
             lastName = "User",
             email = $"newuser-{suffix}@example.com",
             dateOfBirth = "1990-01-01",
-            password = "Password1!",
+            password = "Password1!"
         };
 
-        var body = JsonSerializer.Serialize(registrationData);
-        var requestMessage = new HttpRequestMessage(
+        string body = JsonSerializer.Serialize(registrationData);
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/register"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
 
-        using var doc = JsonDocument.Parse(responseBody);
-        var root = doc.RootElement;
+        using JsonDocument doc = JsonDocument.Parse(responseBody);
+        JsonElement root = doc.RootElement;
         scenario[RegisteredUserIdKey] = ParseRegisteredUserId(root);
         scenario[RegisteredUsernameKey] = ParseRegisteredUsername(root);
     }
@@ -404,43 +391,39 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I am logged in")]
     public async Task GivenIAmLoggedIn()
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
         var loginData = new { username = "test.user", password = "password" };
-        var body = JsonSerializer.Serialize(loginData);
+        string body = JsonSerializer.Serialize(loginData);
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/login"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
-        var doc = JsonDocument.Parse(responseBody);
-        var root = doc.RootElement;
-        if (root.TryGetProperty("payload", out var payloadElem))
+        JsonDocument doc = JsonDocument.Parse(responseBody);
+        JsonElement root = doc.RootElement;
+        if (root.TryGetProperty("payload", out JsonElement payloadElem))
         {
             if (
-                payloadElem.TryGetProperty("accessToken", out var tokenElem)
+                payloadElem.TryGetProperty("accessToken", out JsonElement tokenElem)
                 || payloadElem.TryGetProperty("AccessToken", out tokenElem)
             )
-            {
                 scenario["accessToken"] = tokenElem.GetString();
-            }
             if (
-                payloadElem.TryGetProperty("refreshToken", out var refreshElem)
+                payloadElem.TryGetProperty("refreshToken", out JsonElement refreshElem)
                 || payloadElem.TryGetProperty("RefreshToken", out refreshElem)
             )
-            {
                 scenario["refreshToken"] = refreshElem.GetString();
-            }
         }
     }
 
@@ -460,21 +443,21 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a valid access token for my account")]
     public void GivenIHaveAValidAccessTokenForMyAccount()
     {
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException(
                 "registered user ID not found in scenario"
             );
-        var username = scenario.TryGetValue<string>(
+        string? username = scenario.TryGetValue<string>(
             RegisteredUsernameKey,
-            out var user
+            out string? user
         )
             ? user
             : throw new InvalidOperationException(
                 "registered username not found in scenario"
             );
 
-        var secret = GetRequiredEnvVar("ACCESS_TOKEN_SECRET");
+        string secret = GetRequiredEnvVar("ACCESS_TOKEN_SECRET");
         scenario["accessToken"] = GenerateJwtToken(
             userId,
             username,
@@ -486,21 +469,21 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a valid confirmation token for my account")]
     public void GivenIHaveAValidConfirmationTokenForMyAccount()
     {
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException(
                 "registered user ID not found in scenario"
             );
-        var username = scenario.TryGetValue<string>(
+        string? username = scenario.TryGetValue<string>(
             RegisteredUsernameKey,
-            out var user
+            out string? user
         )
             ? user
             : throw new InvalidOperationException(
                 "registered username not found in scenario"
             );
 
-        var secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,
@@ -512,21 +495,21 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have an expired confirmation token for my account")]
     public void GivenIHaveAnExpiredConfirmationTokenForMyAccount()
     {
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException(
                 "registered user ID not found in scenario"
             );
-        var username = scenario.TryGetValue<string>(
+        string? username = scenario.TryGetValue<string>(
             RegisteredUsernameKey,
-            out var user
+            out string? user
         )
             ? user
             : throw new InvalidOperationException(
                 "registered username not found in scenario"
             );
 
-        var secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,
@@ -538,14 +521,14 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a confirmation token signed with the wrong secret")]
     public void GivenIHaveAConfirmationTokenSignedWithTheWrongSecret()
     {
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException(
                 "registered user ID not found in scenario"
             );
-        var username = scenario.TryGetValue<string>(
+        string? username = scenario.TryGetValue<string>(
             RegisteredUsernameKey,
-            out var user
+            out string? user
         )
             ? user
             : throw new InvalidOperationException(
@@ -567,21 +550,21 @@ public class AuthSteps(ScenarioContext scenario)
     )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithAValidAccessToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("accessToken", out string? t)
             ? t
             : "invalid-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", $"Bearer {token}" } },
+            Headers = { { "Authorization", $"Bearer {token}" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -591,17 +574,17 @@ public class AuthSteps(ScenarioContext scenario)
     )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithAnInvalidAccessToken()
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", "Bearer invalid-token-format" } },
+            Headers = { { "Authorization", "Bearer invalid-token-format" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -609,23 +592,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with the valid token")]
     public async Task WhenISubmitAConfirmationRequestWithTheValidToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "valid-token";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -633,23 +616,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit the same confirmation request again")]
     public async Task WhenISubmitTheSameConfirmationRequestAgain()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "valid-token";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -657,21 +640,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with a malformed token")]
     public async Task WhenISubmitAConfirmationRequestWithAMalformedToken()
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
         const string token = "malformed-token-not-jwt";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -679,35 +662,31 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a refresh token request with a valid refresh token")]
     public async Task WhenISubmitARefreshTokenRequestWithTheValidRefreshToken()
     {
-        var client = GetClient();
-        if (scenario.TryGetValue<string>("accessToken", out var oldAccessToken))
-        {
+        HttpClient client = GetClient();
+        if (scenario.TryGetValue<string>("accessToken", out string? oldAccessToken))
             scenario[PreviousAccessTokenKey] = oldAccessToken;
-        }
-        if (scenario.TryGetValue<string>("refreshToken", out var oldRefreshToken))
-        {
+        if (scenario.TryGetValue<string>("refreshToken", out string? oldRefreshToken))
             scenario[PreviousRefreshTokenKey] = oldRefreshToken;
-        }
 
-        var token = scenario.TryGetValue<string>("refreshToken", out var t)
+        string? token = scenario.TryGetValue<string>("refreshToken", out string? t)
             ? t
             : "valid-refresh-token";
-        var body = JsonSerializer.Serialize(new { refreshToken = token });
+        string body = JsonSerializer.Serialize(new { refreshToken = token });
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/refresh"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -715,25 +694,25 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a refresh token request with an invalid refresh token")]
     public async Task WhenISubmitARefreshTokenRequestWithAnInvalidRefreshToken()
     {
-        var client = GetClient();
-        var body = JsonSerializer.Serialize(
+        HttpClient client = GetClient();
+        string body = JsonSerializer.Serialize(
             new { refreshToken = "invalid-refresh-token" }
         );
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/refresh"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -741,26 +720,26 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a refresh token request with the expired refresh token")]
     public async Task WhenISubmitARefreshTokenRequestWithTheExpiredRefreshToken()
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
         // Use an expired token
-        var body = JsonSerializer.Serialize(
+        string body = JsonSerializer.Serialize(
             new { refreshToken = "expired-refresh-token" }
         );
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/refresh"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -768,23 +747,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a refresh token request with a missing refresh token")]
     public async Task WhenISubmitARefreshTokenRequestWithAMissingRefreshToken()
     {
-        var client = GetClient();
-        var body = JsonSerializer.Serialize(new { });
+        HttpClient client = GetClient();
+        string body = JsonSerializer.Serialize(new { });
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             "/api/auth/refresh"
         )
         {
             Content = new StringContent(
                 body,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -792,21 +771,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a refresh token request using a GET request")]
     public async Task WhenISubmitARefreshTokenRequestUsingAGETRequest()
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/auth/refresh"
         )
         {
             Content = new StringContent(
                 "{}",
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -815,14 +794,14 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a request to a protected endpoint without an access token")]
     public async Task WhenISubmitARequestToAProtectedEndpointWithoutAnAccessToken()
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         );
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -846,21 +825,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a request to a protected endpoint with the expired token")]
     public async Task WhenISubmitARequestToAProtectedEndpointWithTheExpiredToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("accessToken", out string? t)
             ? t
             : "expired-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", $"Bearer {token}" } },
+            Headers = { { "Authorization", $"Bearer {token}" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -868,21 +847,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a request to a protected endpoint with the tampered token")]
     public async Task WhenISubmitARequestToAProtectedEndpointWithTheTamperedToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("accessToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("accessToken", out string? t)
             ? t
             : "tampered-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", $"Bearer {token}" } },
+            Headers = { { "Authorization", $"Bearer {token}" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -892,21 +871,21 @@ public class AuthSteps(ScenarioContext scenario)
     )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithMyRefreshTokenInsteadOfAccessToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("refreshToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("refreshToken", out string? t)
             ? t
             : "refresh-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", $"Bearer {token}" } },
+            Headers = { { "Authorization", $"Bearer {token}" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -920,23 +899,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with the expired token")]
     public async Task WhenISubmitAConfirmationRequestWithTheExpiredToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "expired-confirmation-token";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -944,23 +923,23 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with the tampered token")]
     public async Task WhenISubmitAConfirmationRequestWithTheTamperedToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "tampered-confirmation-token";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -968,17 +947,17 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with a missing token")]
     public async Task WhenISubmitAConfirmationRequestWithAMissingToken()
     {
-        var client = GetClient();
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        HttpClient client = GetClient();
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/auth/confirm");
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/confirm");
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -986,18 +965,18 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request using an invalid HTTP method")]
     public async Task WhenISubmitAConfirmationRequestUsingAnInvalidHttpMethod()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "valid-confirmation-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1007,21 +986,21 @@ public class AuthSteps(ScenarioContext scenario)
     )]
     public async Task WhenISubmitARequestToAProtectedEndpointWithMyConfirmationTokenInsteadOfAccessToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "confirmation-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Get,
             "/api/protected"
         )
         {
-            Headers = { { "Authorization", $"Bearer {token}" } },
+            Headers = { { "Authorization", $"Bearer {token}" } }
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1029,21 +1008,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with an invalid token")]
     public async Task WhenISubmitAConfirmationRequestWithAnInvalidToken()
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
         const string token = "invalid-confirmation-token";
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1051,18 +1030,18 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a confirmation request with the valid token without an access token")]
     public async Task WhenISubmitAConfirmationRequestWithTheValidTokenWithoutAnAccessToken()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : "valid-token";
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1071,13 +1050,13 @@ public class AuthSteps(ScenarioContext scenario)
     public void ThenTheResponseJsonShouldHaveANewAccessToken()
     {
         scenario
-            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
             .Should()
             .BeTrue();
 
-        using var doc = JsonDocument.Parse(responseBody!);
-        var payload = doc.RootElement.GetProperty("payload");
-        var accessToken = ParseTokenFromPayload(
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement payload = doc.RootElement.GetProperty("payload");
+        string accessToken = ParseTokenFromPayload(
             payload,
             "accessToken",
             "AccessToken"
@@ -1088,25 +1067,23 @@ public class AuthSteps(ScenarioContext scenario)
         if (
             scenario.TryGetValue<string>(
                 PreviousAccessTokenKey,
-                out var previousAccessToken
+                out string? previousAccessToken
             )
         )
-        {
             accessToken.Should().NotBe(previousAccessToken);
-        }
     }
 
     [Then("the response JSON should have a new refresh token")]
     public void ThenTheResponseJsonShouldHaveANewRefreshToken()
     {
         scenario
-            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
             .Should()
             .BeTrue();
 
-        using var doc = JsonDocument.Parse(responseBody!);
-        var payload = doc.RootElement.GetProperty("payload");
-        var refreshToken = ParseTokenFromPayload(
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement payload = doc.RootElement.GetProperty("payload");
+        string refreshToken = ParseTokenFromPayload(
             payload,
             "refreshToken",
             "RefreshToken"
@@ -1117,56 +1094,54 @@ public class AuthSteps(ScenarioContext scenario)
         if (
             scenario.TryGetValue<string>(
                 PreviousRefreshTokenKey,
-                out var previousRefreshToken
+                out string? previousRefreshToken
             )
         )
-        {
             refreshToken.Should().NotBe(previousRefreshToken);
-        }
     }
 
     [Given("I have confirmed my account")]
     public async Task GivenIHaveConfirmedMyAccount()
     {
-        var client = GetClient();
-        var token = scenario.TryGetValue<string>("confirmationToken", out var t)
+        HttpClient client = GetClient();
+        string? token = scenario.TryGetValue<string>("confirmationToken", out string? t)
             ? t
             : throw new InvalidOperationException("confirmation token not found");
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm?token={Uri.EscapeDataString(token)}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
     }
 
     [When("I submit a resend confirmation request for my account")]
     public async Task WhenISubmitAResendConfirmationRequestForMyAccount()
     {
-        var client = GetClient();
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        HttpClient client = GetClient();
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found");
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm/resend?userId={userId}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1174,21 +1149,21 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a resend confirmation request for a non-existent user")]
     public async Task WhenISubmitAResendConfirmationRequestForANonExistentUser()
     {
-        var client = GetClient();
-        var fakeUserId = Guid.NewGuid();
-        var accessToken = scenario.TryGetValue<string>("accessToken", out var at)
+        HttpClient client = GetClient();
+        Guid fakeUserId = Guid.NewGuid();
+        string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
             ? at
             : string.Empty;
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm/resend?userId={fakeUserId}"
         );
         if (!string.IsNullOrEmpty(accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }
@@ -1196,18 +1171,18 @@ public class AuthSteps(ScenarioContext scenario)
     [When("I submit a resend confirmation request without an access token")]
     public async Task WhenISubmitAResendConfirmationRequestWithoutAnAccessToken()
     {
-        var client = GetClient();
-        var userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out var id)
+        HttpClient client = GetClient();
+        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
             ? id
             : Guid.NewGuid();
 
-        var requestMessage = new HttpRequestMessage(
+        HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
             $"/api/auth/confirm/resend?userId={userId}"
         );
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
     }

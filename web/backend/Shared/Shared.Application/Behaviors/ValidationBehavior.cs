@@ -1,12 +1,13 @@
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace Shared.Application.Behaviors;
 
 /// <summary>
-/// MediatR pipeline behavior that runs all registered FluentValidation validators for a
-/// request before invoking its handler, short-circuiting with a <see cref="ValidationException"/>
-/// when any validator reports failures.
+///     MediatR pipeline behavior that runs all registered FluentValidation validators for a
+///     request before invoking its handler, short-circuiting with a <see cref="ValidationException" />
+///     when any validator reports failures.
 /// </summary>
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
@@ -18,26 +19,20 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
         CancellationToken cancellationToken
     )
     {
-        if (!validators.Any())
-        {
-            return await next();
-        }
+        if (!validators.Any()) return await next();
 
-        var context = new ValidationContext<TRequest>(request);
+        ValidationContext<TRequest> context = new(request);
 
-        var failures = (
-            await Task.WhenAll(
-                validators.Select(v => v.ValidateAsync(context, cancellationToken))
+        List<ValidationFailure> failures = (
+                await Task.WhenAll(
+                    validators.Select(v => v.ValidateAsync(context, cancellationToken))
+                )
             )
-        )
             .SelectMany(result => result.Errors)
             .Where(failure => failure != null)
             .ToList();
 
-        if (failures.Count > 0)
-        {
-            throw new ValidationException(failures);
-        }
+        if (failures.Count > 0) throw new ValidationException(failures);
 
         return await next();
     }

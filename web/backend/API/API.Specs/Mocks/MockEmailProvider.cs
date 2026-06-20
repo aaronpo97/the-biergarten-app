@@ -3,8 +3,8 @@ using Infrastructure.Email;
 namespace API.Specs.Mocks;
 
 /// <summary>
-/// Mock email provider for testing that doesn't actually send emails.
-/// Tracks sent emails for verification in tests if needed.
+///     Mock email provider for testing that doesn't actually send emails.
+///     Tracks sent emails for verification in tests if needed.
 /// </summary>
 public class MockEmailProvider : IEmailProvider
 {
@@ -24,7 +24,7 @@ public class MockEmailProvider : IEmailProvider
                 Subject = subject,
                 Body = body,
                 IsHtml = isHtml,
-                SentAt = DateTime.UtcNow,
+                SentAt = DateTime.UtcNow
             }
         );
 
@@ -45,7 +45,7 @@ public class MockEmailProvider : IEmailProvider
                 Subject = subject,
                 Body = body,
                 IsHtml = isHtml,
-                SentAt = DateTime.UtcNow,
+                SentAt = DateTime.UtcNow
             }
         );
 

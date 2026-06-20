@@ -20,7 +20,7 @@ public class MockEmailDispatcher : IEmailDispatcher
                 FirstName = firstName,
                 Email = email,
                 ConfirmationToken = confirmationToken,
-                SentAt = DateTime.UtcNow,
+                SentAt = DateTime.UtcNow
             }
         );
 
@@ -39,7 +39,7 @@ public class MockEmailDispatcher : IEmailDispatcher
                 FirstName = firstName,
                 Email = email,
                 ConfirmationToken = confirmationToken,
-                SentAt = DateTime.UtcNow,
+                SentAt = DateTime.UtcNow
             }
         );
 

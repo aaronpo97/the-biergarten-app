@@ -1,12 +1,12 @@
 namespace Infrastructure.Email.Templates.Rendering;
 
 /// <summary>
-/// Service for rendering Razor email templates to HTML.
+///     Service for rendering Razor email templates to HTML.
 /// </summary>
 public interface IEmailTemplateProvider
 {
     /// <summary>
-    /// Renders the UserRegisteredEmail template with the specified parameters.
+    ///     Renders the UserRegisteredEmail template with the specified parameters.
     /// </summary>
     /// <param name="username">The username to include in the email</param>
     /// <param name="confirmationLink">The email confirmation link</param>
@@ -17,7 +17,7 @@ public interface IEmailTemplateProvider
     );
 
     /// <summary>
-    /// Renders the ResendConfirmation template with the specified parameters.
+    ///     Renders the ResendConfirmation template with the specified parameters.
     /// </summary>
     /// <param name="username">The username to include in the email</param>
     /// <param name="confirmationLink">The new confirmation link</param>

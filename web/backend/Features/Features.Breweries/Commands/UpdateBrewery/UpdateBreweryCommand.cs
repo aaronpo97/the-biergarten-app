@@ -4,7 +4,7 @@ using MediatR;
 namespace Features.Breweries.Commands.UpdateBrewery;
 
 /// <summary>
-/// Location data for an existing brewery post, supplied as part of <see cref="UpdateBreweryCommand"/>.
+///     Location data for an existing brewery post, supplied as part of <see cref="UpdateBreweryCommand" />.
 /// </summary>
 public record UpdateBreweryLocation(
     Guid BreweryPostLocationId,
@@ -16,8 +16,8 @@ public record UpdateBreweryLocation(
 );
 
 /// <summary>
-/// Updates an existing brewery post. Bound directly from the request body of <c>PUT /api/brewery/{id}</c>.
-/// A <c>null</c> <see cref="Location"/> clears the brewery's location.
+///     Updates an existing brewery post. Bound directly from the request body of <c>PUT /api/brewery/{id}</c>.
+///     A <c>null</c> <see cref="Location" /> clears the brewery's location.
 /// </summary>
 public record UpdateBreweryCommand(
     Guid BreweryPostId,

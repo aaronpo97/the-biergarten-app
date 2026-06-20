@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Features.Breweries.DependencyInjection;
 
 /// <summary>
-/// Registers the services owned by the Breweries feature slice.
+///     Registers the services owned by the Breweries feature slice.
 /// </summary>
 public static class FeaturesBreweriesServiceCollectionExtensions
 {

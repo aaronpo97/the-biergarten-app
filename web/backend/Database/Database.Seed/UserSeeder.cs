@@ -8,13 +8,13 @@ using Microsoft.Data.SqlClient;
 namespace Database.Seed;
 
 /// <summary>
-/// Seeds user accounts, credentials, and verification records. Creates one fixed
-/// "Test User" account (<c>test.user@thebiergarten.app</c> / password <c>"password"</c>)
-/// for testing, followed by a randomly-generated account for each name in
-/// <see cref="SeedNames"/>, each with a random password and date of birth. Skips
-/// adding a verification record for a user that already has one, so this seeder is
-/// safe to re-run, though re-running will still attempt to register (and may fail on)
-/// users that already exist.
+///     Seeds user accounts, credentials, and verification records. Creates one fixed
+///     "Test User" account (<c>test.user@thebiergarten.app</c> / password <c>"password"</c>)
+///     for testing, followed by a randomly-generated account for each name in
+///     <see cref="SeedNames" />, each with a random password and date of birth. Skips
+///     adding a verification record for a user that already has one, so this seeder is
+///     safe to re-run, though re-running will still attempt to register (and may fail on)
+///     users that already exist.
 /// </summary>
 internal class UserSeeder : ISeeder
 {
@@ -123,21 +123,21 @@ internal class UserSeeder : ISeeder
         ("Zara", "Wilkinson"),
         ("Zaria", "Gibson"),
         ("Zion", "Watkins"),
-        ("Zoie", "Armstrong"),
+        ("Zoie", "Armstrong")
     ];
 
     /// <summary>
-    /// Registers a fixed test user account followed by one randomly-generated account
-    /// per entry in <see cref="SeedNames"/>, adding a user verification record for each
-    /// newly created account that does not already have one. Progress counts are
-    /// written to the console on completion.
+    ///     Registers a fixed test user account followed by one randomly-generated account
+    ///     per entry in <see cref="SeedNames" />, adding a user verification record for each
+    ///     newly created account that does not already have one. Progress counts are
+    ///     written to the console on completion.
     /// </summary>
     /// <param name="connection">An open connection to the target database.</param>
     /// <returns>A task that completes when all users have been seeded.</returns>
     public async Task SeedAsync(SqlConnection connection)
     {
-        var generator = new PasswordGenerator();
-        var rng = new Random();
+        PasswordGenerator generator = new();
+        Random rng = new();
         int createdUsers = 0;
         int createdCredentials = 0;
         int createdVerifications = 0;
@@ -147,8 +147,8 @@ internal class UserSeeder : ISeeder
             const string firstName = "Test";
             const string lastName = "User";
             const string email = "test.user@thebiergarten.app";
-            var dob = new DateTime(1985, 03, 01);
-            var hash = GeneratePasswordHash("password");
+            DateTime dob = new(1985, 03, 01);
+            string hash = GeneratePasswordHash("password");
 
             await RegisterUserAsync(
                 connection,
@@ -160,24 +160,24 @@ internal class UserSeeder : ISeeder
                 hash
             );
         }
-        foreach (var (firstName, lastName) in SeedNames)
+        foreach ((string firstName, string lastName) in SeedNames)
         {
             // prepare user fields
-            var username = $"{firstName[0]}.{lastName}";
-            var email = $"{firstName}.{lastName}@thebiergarten.app";
-            var dob = GenerateDateOfBirth(rng);
+            string username = $"{firstName[0]}.{lastName}";
+            string email = $"{firstName}.{lastName}@thebiergarten.app";
+            DateTime dob = GenerateDateOfBirth(rng);
 
             // generate a password and hash it
             string pwd = generator.Generate(
-                length: 64,
-                numberOfDigits: 10,
-                numberOfSymbols: 10
+                64,
+                10,
+                10
             );
             string hash = GeneratePasswordHash(pwd);
 
 
             // register the user (creates account + credential)
-            var id = await RegisterUserAsync(
+            Guid id = await RegisterUserAsync(
                 connection,
                 username,
                 firstName,
@@ -203,8 +203,8 @@ internal class UserSeeder : ISeeder
     }
 
     /// <summary>
-    /// Registers a new user account and its credential by invoking the
-    /// <c>dbo.USP_RegisterUser</c> stored procedure.
+    ///     Registers a new user account and its credential by invoking the
+    ///     <c>dbo.USP_RegisterUser</c> stored procedure.
     /// </summary>
     /// <param name="connection">An open connection to the target database.</param>
     /// <param name="username">The unique username for the account.</param>
@@ -212,8 +212,8 @@ internal class UserSeeder : ISeeder
     /// <param name="lastName">The user's last name.</param>
     /// <param name="dateOfBirth">The user's date of birth.</param>
     /// <param name="email">The user's email address.</param>
-    /// <param name="hash">The salted password hash, as produced by <see cref="GeneratePasswordHash"/>.</param>
-    /// <returns>The newly created user account's <see cref="Guid"/> identifier.</returns>
+    /// <param name="hash">The salted password hash, as produced by <see cref="GeneratePasswordHash" />.</param>
+    /// <returns>The newly created user account's <see cref="Guid" /> identifier.</returns>
     private static async Task<Guid> RegisterUserAsync(
         SqlConnection connection,
         string username,
@@ -224,7 +224,7 @@ internal class UserSeeder : ISeeder
         string hash
     )
     {
-        await using var command = new SqlCommand("dbo.USP_RegisterUser", connection);
+        await using SqlCommand command = new("dbo.USP_RegisterUser", connection);
         command.CommandType = CommandType.StoredProcedure;
 
 
@@ -235,16 +235,16 @@ internal class UserSeeder : ISeeder
         command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = email;
         command.Parameters.Add("@Hash", SqlDbType.NVarChar, -1).Value = hash;
 
-        var result = await command.ExecuteScalarAsync();
+        object? result = await command.ExecuteScalarAsync();
 
 
         return (Guid)result!;
     }
 
     /// <summary>
-    /// Hashes a plaintext password using Argon2id with a randomly generated 16-byte
-    /// salt, a degree of parallelism matching the available processor count, 64 MB of
-    /// memory, and 4 iterations.
+    ///     Hashes a plaintext password using Argon2id with a randomly generated 16-byte
+    ///     salt, a degree of parallelism matching the available processor count, 64 MB of
+    ///     memory, and 4 iterations.
     /// </summary>
     /// <param name="pwd">The plaintext password to hash.</param>
     /// <returns>A string containing the base64-encoded salt and hash, separated by a colon.</returns>
@@ -252,12 +252,12 @@ internal class UserSeeder : ISeeder
     {
         byte[] salt = RandomNumberGenerator.GetBytes(16);
 
-        var argon2 = new Argon2id(Encoding.UTF8.GetBytes(pwd))
+        Argon2id argon2 = new(Encoding.UTF8.GetBytes(pwd))
         {
             Salt = salt,
             DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
             MemorySize = 65536,
-            Iterations = 4,
+            Iterations = 4
         };
 
         byte[] hash = argon2.GetBytes(32);
@@ -278,9 +278,9 @@ internal class UserSeeder : ISeeder
                            FROM dbo.UserVerification
                            WHERE UserAccountId = @UserAccountId;
                            """;
-        await using var command = new SqlCommand(sql, connection);
+        await using SqlCommand command = new(sql, connection);
         command.Parameters.AddWithValue("@UserAccountId", userAccountId);
-        var result = await command.ExecuteScalarAsync();
+        object? result = await command.ExecuteScalarAsync();
         return result is not null;
     }
 
@@ -293,7 +293,7 @@ internal class UserSeeder : ISeeder
         Guid userAccountId
     )
     {
-        await using var command = new SqlCommand(
+        await using SqlCommand command = new(
             "dbo.USP_CreateUserVerification",
             connection
         );
@@ -304,8 +304,8 @@ internal class UserSeeder : ISeeder
     }
 
     /// <summary>
-    /// Generates a random date of birth corresponding to an age between 19 and 48
-    /// years (inclusive), with a random day offset within that birth year.
+    ///     Generates a random date of birth corresponding to an age between 19 and 48
+    ///     years (inclusive), with a random day offset within that birth year.
     /// </summary>
     /// <param name="random">The random number source to use.</param>
     /// <returns>A randomly generated date of birth.</returns>

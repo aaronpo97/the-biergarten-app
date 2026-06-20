@@ -1,26 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
+    <ItemGroup>
+        <SupportedPlatform Include="browser"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference
-      Include="Microsoft.AspNetCore.Components.Web"
-      Version="10.0.1"
-    />
-    <PackageReference
-      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
-      Version="10.0.1"
-    />
-    <PackageReference
-      Include="Microsoft.Extensions.Logging.Abstractions"
-      Version="10.0.1"
-    />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference
+                Include="Microsoft.AspNetCore.Components.Web"
+                Version="10.0.1"
+        />
+        <PackageReference
+                Include="Microsoft.Extensions.DependencyInjection.Abstractions"
+                Version="10.0.1"
+        />
+        <PackageReference
+                Include="Microsoft.Extensions.Logging.Abstractions"
+                Version="10.0.1"
+        />
+    </ItemGroup>
 </Project>

@@ -10,9 +10,9 @@ public class SendRegistrationEmailHandlerTests
     [Fact]
     public async Task Handle_DelegatesToEmailDispatcher()
     {
-        var dispatcherMock = new Mock<IEmailDispatcher>();
-        var handler = new SendRegistrationEmailHandler(dispatcherMock.Object);
-        var command = new SendRegistrationEmailCommand("Aaron", "aaron@example.com", "token-123");
+        Mock<IEmailDispatcher> dispatcherMock = new();
+        SendRegistrationEmailHandler handler = new(dispatcherMock.Object);
+        SendRegistrationEmailCommand command = new("Aaron", "aaron@example.com", "token-123");
 
         await handler.Handle(command, CancellationToken.None);
 

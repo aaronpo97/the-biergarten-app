@@ -3,15 +3,15 @@ using FluentValidation;
 namespace Features.Breweries.Commands.CreateBrewery;
 
 /// <summary>
-/// Validates <see cref="CreateBreweryCommand"/> instances before they are processed.
+///     Validates <see cref="CreateBreweryCommand" /> instances before they are processed.
 /// </summary>
 public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 {
     /// <summary>
-    /// Configures validation rules requiring <see cref="CreateBreweryCommand.PostedById"/>,
-    /// <see cref="CreateBreweryCommand.BreweryName"/>, <see cref="CreateBreweryCommand.Description"/>, and
-    /// <see cref="CreateBreweryCommand.Location"/> to be present, with length limits on the name, description,
-    /// address line 1, and postal code fields.
+    ///     Configures validation rules requiring <see cref="CreateBreweryCommand.PostedById" />,
+    ///     <see cref="CreateBreweryCommand.BreweryName" />, <see cref="CreateBreweryCommand.Description" />, and
+    ///     <see cref="CreateBreweryCommand.Location" /> to be present, with length limits on the name, description,
+    ///     address line 1, and postal code fields.
     /// </summary>
     public CreateBreweryValidator()
     {

@@ -1,12 +1,12 @@
 namespace Infrastructure.Email;
 
 /// <summary>
-/// Service for sending emails via SMTP.
+///     Service for sending emails via SMTP.
 /// </summary>
 public interface IEmailProvider
 {
     /// <summary>
-    /// Sends an email to a single recipient.
+    ///     Sends an email to a single recipient.
     /// </summary>
     /// <param name="to">Recipient email address</param>
     /// <param name="subject">Email subject line</param>
@@ -15,7 +15,7 @@ public interface IEmailProvider
     Task SendAsync(string to, string subject, string body, bool isHtml = true);
 
     /// <summary>
-    /// Sends an email to multiple recipients.
+    ///     Sends an email to multiple recipients.
     /// </summary>
     /// <param name="to">List of recipient email addresses</param>
     /// <param name="subject">Email subject line</param>

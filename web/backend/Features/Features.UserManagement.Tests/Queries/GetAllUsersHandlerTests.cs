@@ -1,7 +1,7 @@
 using Domain.Entities;
-using FluentAssertions;
 using Features.UserManagement.Queries.GetAllUsers;
 using Features.UserManagement.Repository;
+using FluentAssertions;
 using Moq;
 
 namespace Features.UserManagement.Tests.Queries;
@@ -11,11 +11,11 @@ public class GetAllUsersHandlerTests
     [Fact]
     public async Task Handle_PassesLimitAndOffset_ToRepository()
     {
-        var repoMock = new Mock<IUserAccountRepository>();
-        var handler = new GetAllUsersHandler(repoMock.Object);
+        Mock<IUserAccountRepository> repoMock = new();
+        GetAllUsersHandler handler = new(repoMock.Object);
         repoMock.Setup(r => r.GetAllAsync(10, 5)).ReturnsAsync(Array.Empty<UserAccount>());
 
-        var result = await handler.Handle(new GetAllUsersQuery(10, 5), CancellationToken.None);
+        IEnumerable<UserAccount> result = await handler.Handle(new GetAllUsersQuery(10, 5), CancellationToken.None);
 
         result.Should().BeEmpty();
         repoMock.Verify(r => r.GetAllAsync(10, 5), Times.Once);

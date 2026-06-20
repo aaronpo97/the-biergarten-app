@@ -1,38 +1,41 @@
 using Domain.Entities;
-using FluentAssertions;
 using Features.Breweries.Commands.CreateBrewery;
+using Features.Breweries.Dtos;
 using Features.Breweries.Repository;
+using FluentAssertions;
 using Moq;
 
 namespace Features.Breweries.Tests.Commands;
 
 public class CreateBreweryHandlerTests
 {
-    private readonly Mock<IBreweryRepository> _repoMock = new();
     private readonly CreateBreweryHandler _handler;
+    private readonly Mock<IBreweryRepository> _repoMock = new();
 
     public CreateBreweryHandlerTests()
     {
         _handler = new CreateBreweryHandler(_repoMock.Object);
     }
 
-    private static CreateBreweryLocation ValidLocation() =>
-        new(
-            CityId: Guid.NewGuid(),
-            AddressLine1: "123 Main St",
-            AddressLine2: null,
-            PostalCode: "12345",
-            Coordinates: null
+    private static CreateBreweryLocation ValidLocation()
+    {
+        return new CreateBreweryLocation(
+            Guid.NewGuid(),
+            "123 Main St",
+            null,
+            "12345",
+            null
         );
+    }
 
     [Fact]
     public async Task Handle_PersistsEntity_WithNewIdsAndCreatedAt()
     {
-        var command = new CreateBreweryCommand(
-            PostedById: Guid.NewGuid(),
-            BreweryName: "MyBrew",
-            Description: "Desc",
-            Location: ValidLocation()
+        CreateBreweryCommand command = new(
+            Guid.NewGuid(),
+            "MyBrew",
+            "Desc",
+            ValidLocation()
         );
 
         BreweryPost? persisted = null;
@@ -41,9 +44,9 @@ public class CreateBreweryHandlerTests
             .Callback<BreweryPost>(b => persisted = b)
             .Returns(Task.CompletedTask);
 
-        var before = DateTime.UtcNow;
-        var result = await _handler.Handle(command, CancellationToken.None);
-        var after = DateTime.UtcNow;
+        DateTime before = DateTime.UtcNow;
+        BreweryDto result = await _handler.Handle(command, CancellationToken.None);
+        DateTime after = DateTime.UtcNow;
 
         persisted.Should().NotBeNull();
         persisted!.BreweryPostId.Should().NotBe(Guid.Empty);

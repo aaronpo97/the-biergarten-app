@@ -10,9 +10,9 @@ public class UpdateUserHandlerTests
     [Fact]
     public async Task Handle_DelegatesToRepository()
     {
-        var repoMock = new Mock<IUserAccountRepository>();
-        var handler = new UpdateUserHandler(repoMock.Object);
-        var user = new UserAccount { UserAccountId = Guid.NewGuid() };
+        Mock<IUserAccountRepository> repoMock = new();
+        UpdateUserHandler handler = new(repoMock.Object);
+        UserAccount user = new() { UserAccountId = Guid.NewGuid() };
         repoMock.Setup(r => r.UpdateAsync(user)).Returns(Task.CompletedTask);
 
         await handler.Handle(new UpdateUserCommand(user), CancellationToken.None);

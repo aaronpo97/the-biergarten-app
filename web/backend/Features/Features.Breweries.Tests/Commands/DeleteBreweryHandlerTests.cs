@@ -9,9 +9,9 @@ public class DeleteBreweryHandlerTests
     [Fact]
     public async Task Handle_DelegatesToRepository()
     {
-        var repoMock = new Mock<IBreweryRepository>();
-        var handler = new DeleteBreweryHandler(repoMock.Object);
-        var id = Guid.NewGuid();
+        Mock<IBreweryRepository> repoMock = new();
+        DeleteBreweryHandler handler = new(repoMock.Object);
+        Guid id = Guid.NewGuid();
         repoMock.Setup(r => r.DeleteAsync(id)).Returns(Task.CompletedTask);
 
         await handler.Handle(new DeleteBreweryCommand(id), CancellationToken.None);
