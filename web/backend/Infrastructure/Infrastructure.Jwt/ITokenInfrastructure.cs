@@ -15,12 +15,7 @@ public interface ITokenInfrastructure
     /// <param name="expiry">The date and time at which the token expires.</param>
     /// <param name="secret">The symmetric secret used to sign the token.</param>
     /// <returns>The serialized, signed JWT string.</returns>
-    string GenerateJwt(
-        Guid userId,
-        string username,
-        DateTime expiry,
-        string secret
-    );
+    string GenerateJwt(Guid userId, string username, DateTime expiry, string secret);
 
     /// <summary>
     ///     Validates a JWT and returns the resulting claims principal.
