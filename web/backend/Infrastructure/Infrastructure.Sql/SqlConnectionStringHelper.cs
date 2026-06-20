@@ -17,28 +17,20 @@ public static class SqlConnectionStringHelper
     {
         string server =
             Environment.GetEnvironmentVariable("DB_SERVER")
-            ?? throw new InvalidOperationException(
-                "DB_SERVER environment variable is not set"
-            );
+            ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
         string dbName =
             databaseName
             ?? Environment.GetEnvironmentVariable("DB_NAME")
-            ?? throw new InvalidOperationException(
-                "DB_NAME environment variable is not set"
-            );
+            ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
         string user =
             Environment.GetEnvironmentVariable("DB_USER")
-            ?? throw new InvalidOperationException(
-                "DB_USER environment variable is not set"
-            );
+            ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
         string password =
             Environment.GetEnvironmentVariable("DB_PASSWORD")
-            ?? throw new InvalidOperationException(
-                "DB_PASSWORD environment variable is not set"
-            );
+            ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
         SqlConnectionStringBuilder builder = new()
         {
@@ -47,7 +39,7 @@ public static class SqlConnectionStringHelper
             UserID = user,
             Password = password,
             TrustServerCertificate = true,
-            Encrypt = true
+            Encrypt = true,
         };
 
         return builder.ConnectionString;

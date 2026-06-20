@@ -11,10 +11,7 @@ public interface IEmailTemplateProvider
     /// <param name="username">The username to include in the email</param>
     /// <param name="confirmationLink">The email confirmation link</param>
     /// <returns>The rendered HTML string</returns>
-    Task<string> RenderUserRegisteredEmailAsync(
-        string username,
-        string confirmationLink
-    );
+    Task<string> RenderUserRegisteredEmailAsync(string username, string confirmationLink);
 
     /// <summary>
     ///     Renders the ResendConfirmation template with the specified parameters.
@@ -22,8 +19,5 @@ public interface IEmailTemplateProvider
     /// <param name="username">The username to include in the email</param>
     /// <param name="confirmationLink">The new confirmation link</param>
     /// <returns>The rendered HTML string</returns>
-    Task<string> RenderResendConfirmationEmailAsync(
-        string username,
-        string confirmationLink
-    );
+    Task<string> RenderResendConfirmationEmailAsync(string username, string confirmationLink);
 }

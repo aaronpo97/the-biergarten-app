@@ -34,8 +34,8 @@ public static class BreweryDtoMapper
                     AddressLine1 = brewery.Location.AddressLine1,
                     AddressLine2 = brewery.Location.AddressLine2,
                     PostalCode = brewery.Location.PostalCode,
-                    Coordinates = brewery.Location.Coordinates
-                }
+                    Coordinates = brewery.Location.Coordinates,
+                },
         };
     }
 }

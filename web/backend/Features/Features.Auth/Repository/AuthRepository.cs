@@ -81,8 +81,8 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
                 }
         }
 
-        return await GetUserByIdAsync(userAccountId) ??
-               throw new Exception("Failed to retrieve newly registered user.");
+        return await GetUserByIdAsync(userAccountId)
+            ?? throw new Exception("Failed to retrieve newly registered user.");
     }
 
     /// <summary>
@@ -92,9 +92,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="email">Email address to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
-    public async Task<UserAccount?> GetUserByEmailAsync(
-        string email
-    )
+    public async Task<UserAccount?> GetUserByEmailAsync(string email)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -114,9 +112,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="username">Username to search for</param>
     /// <returns>UserAccount if found, null otherwise</returns>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
-    public async Task<UserAccount?> GetUserByUsernameAsync(
-        string username
-    )
+    public async Task<UserAccount?> GetUserByUsernameAsync(string username)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -136,9 +132,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="userAccountId">ID of the user account</param>
     /// <returns>Active UserCredential if found, null otherwise</returns>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
-    public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(
-        Guid userAccountId
-    )
+    public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -158,10 +152,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="userAccountId">ID of the user account</param>
     /// <param name="newPasswordHash">New hashed password</param>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
-    public async Task RotateCredentialAsync(
-        Guid userAccountId,
-        string newPasswordHash
-    )
+    public async Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -180,9 +171,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="userAccountId">ID of the user account</param>
     /// <returns>UserAccount if found, null otherwise</returns>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
-    public async Task<UserAccount?> GetUserByIdAsync(
-        Guid userAccountId
-    )
+    public async Task<UserAccount?> GetUserByIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -207,15 +196,15 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     Thrown when the database command fails for a reason other than
     ///     a duplicate verification record.
     /// </exception>
-    public async Task<UserAccount?> ConfirmUserAccountAsync(
-        Guid userAccountId
-    )
+    public async Task<UserAccount?> ConfirmUserAccountAsync(Guid userAccountId)
     {
         UserAccount? user = await GetUserByIdAsync(userAccountId);
-        if (user == null) return null;
+        if (user == null)
+            return null;
 
         // Idempotency: if already verified, treat as successful confirmation.
-        if (await IsUserVerifiedAsync(userAccountId)) return user;
+        if (await IsUserVerifiedAsync(userAccountId))
+            return user;
 
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -270,15 +259,12 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return ex.Number == 2601 || ex.Number == 2627;
     }
 
-
     /// <summary>
     ///     Maps a data reader row to a UserAccount entity.
     /// </summary>
     /// <param name="reader">The data reader positioned on the row to map.</param>
     /// <returns>The mapped <see cref="Domain.Entities.UserAccount" /> instance.</returns>
-    protected override UserAccount MapToEntity(
-        DbDataReader reader
-    )
+    protected override UserAccount MapToEntity(DbDataReader reader)
     {
         return new UserAccount
         {
@@ -292,9 +278,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
                 ? null
                 : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
             DateOfBirth = reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
-            Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
-                ? null
-                : (byte[])reader["Timer"]
+            Timer = reader.IsDBNull(reader.GetOrdinal("Timer")) ? null : (byte[])reader["Timer"],
         };
     }
 
@@ -308,12 +292,10 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         UserCredential entity = new()
         {
-            UserCredentialId = reader.GetGuid(
-                reader.GetOrdinal("UserCredentialId")
-            ),
+            UserCredentialId = reader.GetGuid(reader.GetOrdinal("UserCredentialId")),
             UserAccountId = reader.GetGuid(reader.GetOrdinal("UserAccountId")),
             Hash = reader.GetString(reader.GetOrdinal("Hash")),
-            CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+            CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
         };
 
         // Optional columns
@@ -327,7 +309,8 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
                         "Timer",
                         StringComparison.OrdinalIgnoreCase
                     )
-                ) ?? false;
+                )
+            ?? false;
 
         if (hasTimer)
             entity.Timer = reader.IsDBNull(reader.GetOrdinal("Timer"))
@@ -344,11 +327,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="command">The command to add the parameter to.</param>
     /// <param name="name">The parameter name (including any prefix, e.g. "@Username").</param>
     /// <param name="value">The parameter value, or <c>null</c> to bind <see cref="DBNull.Value" />.</param>
-    private static void AddParameter(
-        DbCommand command,
-        string name,
-        object? value
-    )
+    private static void AddParameter(DbCommand command, string name, object? value)
     {
         DbParameter p = command.CreateParameter();
         p.ParameterName = name;

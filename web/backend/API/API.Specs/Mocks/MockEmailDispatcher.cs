@@ -8,11 +8,7 @@ public class MockEmailDispatcher : IEmailDispatcher
 
     public List<ResendConfirmationEmail> SentResendConfirmationEmails { get; } = new();
 
-    public Task SendRegistrationEmailAsync(
-        string firstName,
-        string email,
-        string confirmationToken
-    )
+    public Task SendRegistrationEmailAsync(string firstName, string email, string confirmationToken)
     {
         SentRegistrationEmails.Add(
             new RegistrationEmail
@@ -20,7 +16,7 @@ public class MockEmailDispatcher : IEmailDispatcher
                 FirstName = firstName,
                 Email = email,
                 ConfirmationToken = confirmationToken,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.UtcNow,
             }
         );
 
@@ -39,7 +35,7 @@ public class MockEmailDispatcher : IEmailDispatcher
                 FirstName = firstName,
                 Email = email,
                 ConfirmationToken = confirmationToken,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.UtcNow,
             }
         );
 

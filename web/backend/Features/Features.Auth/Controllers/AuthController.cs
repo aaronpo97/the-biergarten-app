@@ -40,11 +40,14 @@ public class AuthController(IMediator mediator) : ControllerBase
     )
     {
         RegistrationPayload payload = await mediator.Send(command);
-        return Created("/", new ResponseBody<RegistrationPayload>
-        {
-            Message = "User registered successfully.",
-            Payload = payload
-        });
+        return Created(
+            "/",
+            new ResponseBody<RegistrationPayload>
+            {
+                Message = "User registered successfully.",
+                Payload = payload,
+            }
+        );
     }
 
     /// <summary>
@@ -61,11 +64,13 @@ public class AuthController(IMediator mediator) : ControllerBase
     public async Task<ActionResult<ResponseBody<LoginPayload>>> Login([FromBody] LoginQuery query)
     {
         LoginPayload payload = await mediator.Send(query);
-        return Ok(new ResponseBody<LoginPayload>
-        {
-            Message = "Logged in successfully.",
-            Payload = payload
-        });
+        return Ok(
+            new ResponseBody<LoginPayload>
+            {
+                Message = "Logged in successfully.",
+                Payload = payload,
+            }
+        );
     }
 
     /// <summary>
@@ -78,14 +83,18 @@ public class AuthController(IMediator mediator) : ControllerBase
     /// <param name="token">The confirmation token supplied via the confirmation email link.</param>
     /// <returns>A <c>200 OK</c> result wrapping a <see cref="ResponseBody{T}" /> of <see cref="ConfirmationPayload" />.</returns>
     [HttpPost("confirm")]
-    public async Task<ActionResult<ResponseBody<ConfirmationPayload>>> Confirm([FromQuery] string token)
+    public async Task<ActionResult<ResponseBody<ConfirmationPayload>>> Confirm(
+        [FromQuery] string token
+    )
     {
         ConfirmationPayload payload = await mediator.Send(new ConfirmUserCommand(token));
-        return Ok(new ResponseBody<ConfirmationPayload>
-        {
-            Message = "User with ID " + payload.UserAccountId + " is confirmed.",
-            Payload = payload
-        });
+        return Ok(
+            new ResponseBody<ConfirmationPayload>
+            {
+                Message = "User with ID " + payload.UserAccountId + " is confirmed.",
+                Payload = payload,
+            }
+        );
     }
 
     /// <summary>
@@ -119,10 +128,12 @@ public class AuthController(IMediator mediator) : ControllerBase
     )
     {
         LoginPayload payload = await mediator.Send(command);
-        return Ok(new ResponseBody<LoginPayload>
-        {
-            Message = "Token refreshed successfully.",
-            Payload = payload
-        });
+        return Ok(
+            new ResponseBody<LoginPayload>
+            {
+                Message = "Token refreshed successfully.",
+                Payload = payload,
+            }
+        );
     }
 }

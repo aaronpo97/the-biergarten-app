@@ -25,12 +25,7 @@ public class JwtInfrastructure : ITokenInfrastructure
     /// <param name="expiry">The date and time at which the token expires.</param>
     /// <param name="secret">The symmetric secret used to sign the token (encoded as UTF-8 bytes).</param>
     /// <returns>The serialized, signed JWT string.</returns>
-    public string GenerateJwt(
-        Guid userId,
-        string username,
-        DateTime expiry,
-        string secret
-    )
+    public string GenerateJwt(Guid userId, string username, DateTime expiry, string secret)
     {
         JsonWebTokenHandler handler = new();
         byte[] key = Encoding.UTF8.GetBytes(secret);
@@ -46,7 +41,7 @@ public class JwtInfrastructure : ITokenInfrastructure
                 JwtRegisteredClaimNames.Exp,
                 new DateTimeOffset(expiry).ToUnixTimeSeconds().ToString()
             ),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         SecurityTokenDescriptor tokenDescriptor = new()
@@ -56,12 +51,11 @@ public class JwtInfrastructure : ITokenInfrastructure
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256
-            )
+            ),
         };
 
         return handler.CreateToken(tokenDescriptor);
     }
-
 
     /// <summary>
     ///     Validates a JWT's signature and lifetime (issuer and audience validation are disabled),
@@ -74,21 +68,16 @@ public class JwtInfrastructure : ITokenInfrastructure
     ///     Thrown when the token is invalid, has no claims identity, is expired, or otherwise fails validation
     ///     (including when validation itself throws, e.g. due to a malformed token or signature mismatch).
     /// </exception>
-    public async Task<ClaimsPrincipal> ValidateJwtAsync(
-        string token,
-        string secret
-    )
+    public async Task<ClaimsPrincipal> ValidateJwtAsync(string token, string secret)
     {
         JsonWebTokenHandler handler = new();
-        byte[] keyBytes = Encoding.UTF8.GetBytes(
-            secret
-        );
+        byte[] keyBytes = Encoding.UTF8.GetBytes(secret);
         TokenValidationParameters parameters = new()
         {
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
         };
 
         try

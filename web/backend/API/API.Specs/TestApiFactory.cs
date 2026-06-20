@@ -20,7 +20,8 @@ public class TestApiFactory : WebApplicationFactory<Program>
                 d.ServiceType == typeof(IEmailProvider)
             );
 
-            if (emailProviderDescriptor != null) services.Remove(emailProviderDescriptor);
+            if (emailProviderDescriptor != null)
+                services.Remove(emailProviderDescriptor);
 
             services.AddScoped<IEmailProvider, MockEmailProvider>();
 
@@ -29,7 +30,8 @@ public class TestApiFactory : WebApplicationFactory<Program>
                 d.ServiceType == typeof(IEmailDispatcher)
             );
 
-            if (emailDispatcherDescriptor != null) services.Remove(emailDispatcherDescriptor);
+            if (emailDispatcherDescriptor != null)
+                services.Remove(emailDispatcherDescriptor);
 
             services.AddScoped<IEmailDispatcher, MockEmailDispatcher>();
         });

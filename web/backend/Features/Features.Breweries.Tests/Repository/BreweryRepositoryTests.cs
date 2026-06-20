@@ -81,8 +81,7 @@ public class BreweryRepositoryTests
     public async Task CreateAsync_ExecutesSuccessfully()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText == "USP_CreateBrewery")
-            .ReturnsScalar(1);
+        conn.Mocks.When(cmd => cmd.CommandText == "USP_CreateBrewery").ReturnsScalar(1);
         BreweryRepository repo = CreateRepo(conn);
         BreweryPost brewery = new()
         {
@@ -97,8 +96,8 @@ public class BreweryRepositoryTests
                 CityId = Guid.NewGuid(),
                 AddressLine1 = "123 Main St",
                 PostalCode = "12345",
-                Coordinates = [0x00, 0x01]
-            }
+                Coordinates = [0x00, 0x01],
+            },
         };
 
         // Should not throw

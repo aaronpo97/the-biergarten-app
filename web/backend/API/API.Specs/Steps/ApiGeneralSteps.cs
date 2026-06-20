@@ -15,7 +15,8 @@ public class ApiGeneralSteps(ScenarioContext scenario)
 
     private HttpClient GetClient()
     {
-        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client)) return client;
+        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client))
+            return client;
 
         TestApiFactory? factory = scenario.TryGetValue<TestApiFactory>(
             FactoryKey,
@@ -47,11 +48,7 @@ public class ApiGeneralSteps(ScenarioContext scenario)
 
         HttpRequestMessage requestMessage = new(new HttpMethod(method), url)
         {
-            Content = new StringContent(
-                jsonBody,
-                Encoding.UTF8,
-                "application/json"
-            )
+            Content = new StringContent(jsonBody, Encoding.UTF8, "application/json"),
         };
 
         HttpResponseMessage response = await client.SendAsync(requestMessage);
@@ -62,16 +59,10 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     }
 
     [When("I send an HTTP request {string} to {string}")]
-    public async Task WhenISendAnHttpRequestStringToString(
-        string method,
-        string url
-    )
+    public async Task WhenISendAnHttpRequestStringToString(string method, string url)
     {
         HttpClient client = GetClient();
-        HttpRequestMessage requestMessage = new(
-            new HttpMethod(method),
-            url
-        );
+        HttpRequestMessage requestMessage = new(new HttpMethod(method), url);
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -100,19 +91,13 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     }
 
     [Then("the response JSON should have {string} equal {string}")]
-    public void ThenTheResponseJsonShouldHaveStringEqualString(
-        string field,
-        string expected
-    )
+    public void ThenTheResponseJsonShouldHaveStringEqualString(string field, string expected)
     {
         scenario
             .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
-        scenario
-            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
-            .Should()
-            .BeTrue();
+        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
 
         using JsonDocument doc = JsonDocument.Parse(responseBody!);
         JsonElement root = doc.RootElement;
@@ -125,25 +110,16 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                     "Expected field '{0}' to be present either at the root or inside 'payload'",
                     field
                 );
-            payloadElem
-                .ValueKind.Should()
-                .Be(JsonValueKind.Object, "payload must be an object");
+            payloadElem.ValueKind.Should().Be(JsonValueKind.Object, "payload must be an object");
             payloadElem
                 .TryGetProperty(field, out value)
                 .Should()
-                .BeTrue(
-                    "Expected field '{0}' to be present inside 'payload'",
-                    field
-                );
+                .BeTrue("Expected field '{0}' to be present inside 'payload'", field);
         }
 
         value
             .ValueKind.Should()
-            .Be(
-                JsonValueKind.String,
-                "Expected field '{0}' to be a string",
-                field
-            );
+            .Be(JsonValueKind.String, "Expected field '{0}' to be a string", field);
         value.GetString().Should().Be(expected);
     }
 
@@ -157,10 +133,7 @@ public class ApiGeneralSteps(ScenarioContext scenario)
             .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
-        scenario
-            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
-            .Should()
-            .BeTrue();
+        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
 
         using JsonDocument doc = JsonDocument.Parse(responseBody!);
         JsonElement root = doc.RootElement;
@@ -173,25 +146,16 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                     "Expected field '{0}' to be present either at the root or inside 'payload'",
                     field
                 );
-            payloadElem
-                .ValueKind.Should()
-                .Be(JsonValueKind.Object, "payload must be an object");
+            payloadElem.ValueKind.Should().Be(JsonValueKind.Object, "payload must be an object");
             payloadElem
                 .TryGetProperty(field, out value)
                 .Should()
-                .BeTrue(
-                    "Expected field '{0}' to be present inside 'payload'",
-                    field
-                );
+                .BeTrue("Expected field '{0}' to be present inside 'payload'", field);
         }
 
         value
             .ValueKind.Should()
-            .Be(
-                JsonValueKind.String,
-                "Expected field '{0}' to be a string",
-                field
-            );
+            .Be(JsonValueKind.String, "Expected field '{0}' to be a string", field);
         string? actualValue = value.GetString();
         actualValue
             .Should()

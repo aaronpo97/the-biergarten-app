@@ -23,12 +23,17 @@ public class ResendConfirmationEmailHandler(
     IMediator mediator
 ) : IRequestHandler<ResendConfirmationEmailCommand>
 {
-    public async Task Handle(ResendConfirmationEmailCommand request, CancellationToken cancellationToken)
+    public async Task Handle(
+        ResendConfirmationEmailCommand request,
+        CancellationToken cancellationToken
+    )
     {
         UserAccount? user = await authRepository.GetUserByIdAsync(request.UserId);
-        if (user == null) return; // Silent return to prevent user enumeration
+        if (user == null)
+            return; // Silent return to prevent user enumeration
 
-        if (await authRepository.IsUserVerifiedAsync(request.UserId)) return; // Already confirmed, no-op
+        if (await authRepository.IsUserVerifiedAsync(request.UserId))
+            return; // Already confirmed, no-op
 
         string confirmationToken = tokenService.GenerateConfirmationToken(user);
         await mediator.Send(

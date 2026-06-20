@@ -13,21 +13,25 @@ namespace Features.Auth.Commands.ConfirmUser;
 /// </summary>
 /// <param name="authRepository">Repository used to look up and confirm user accounts.</param>
 /// <param name="tokenService">Service used to validate the confirmation token.</param>
-public class ConfirmUserHandler(
-    IAuthRepository authRepository,
-    ITokenService tokenService
-) : IRequestHandler<ConfirmUserCommand, ConfirmationPayload>
+public class ConfirmUserHandler(IAuthRepository authRepository, ITokenService tokenService)
+    : IRequestHandler<ConfirmUserCommand, ConfirmationPayload>
 {
     /// <exception cref="UnauthorizedException">
     ///     Thrown when the confirmation token is invalid or expired, or when the associated user account cannot be found.
     /// </exception>
-    public async Task<ConfirmationPayload> Handle(ConfirmUserCommand request, CancellationToken cancellationToken)
+    public async Task<ConfirmationPayload> Handle(
+        ConfirmUserCommand request,
+        CancellationToken cancellationToken
+    )
     {
-        ValidatedToken validatedToken = await tokenService.ValidateConfirmationTokenAsync(request.Token);
+        ValidatedToken validatedToken = await tokenService.ValidateConfirmationTokenAsync(
+            request.Token
+        );
 
         UserAccount? user = await authRepository.ConfirmUserAccountAsync(validatedToken.UserId);
 
-        if (user == null) throw new UnauthorizedException("User account not found");
+        if (user == null)
+            throw new UnauthorizedException("User account not found");
 
         return new ConfirmationPayload(user.UserAccountId, DateTime.UtcNow);
     }

@@ -31,7 +31,7 @@ public class ProtectedController : ControllerBase
             new ResponseBody<object>
             {
                 Message = "Protected endpoint accessed successfully",
-                Payload = new { userId, username }
+                Payload = new { userId, username },
             }
         );
     }

@@ -23,7 +23,10 @@ public class GetUserByIdHandlerTests
         UserAccount user = new() { UserAccountId = Guid.NewGuid(), Username = "test" };
         _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
 
-        UserAccount result = await _handler.Handle(new GetUserByIdQuery(user.UserAccountId), CancellationToken.None);
+        UserAccount result = await _handler.Handle(
+            new GetUserByIdQuery(user.UserAccountId),
+            CancellationToken.None
+        );
 
         result.Should().Be(user);
     }
@@ -34,7 +37,8 @@ public class GetUserByIdHandlerTests
         Guid id = Guid.NewGuid();
         _repoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((UserAccount?)null);
 
-        Func<Task<UserAccount>> act = async () => await _handler.Handle(new GetUserByIdQuery(id), CancellationToken.None);
+        Func<Task<UserAccount>> act = async () =>
+            await _handler.Handle(new GetUserByIdQuery(id), CancellationToken.None);
 
         await act.Should().ThrowAsync<NotFoundException>();
     }

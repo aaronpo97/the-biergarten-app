@@ -98,19 +98,14 @@ public class UserAccountRepositoryTests
         UserAccountRepository repo = CreateRepo(conn);
         List<UserAccount> results = (await repo.GetAllAsync(null, null)).ToList();
         results.Should().HaveCount(2);
-        results
-            .Select(r => r.Username)
-            .Should()
-            .BeEquivalentTo("a", "b");
+        results.Select(r => r.Username).Should().BeEquivalentTo("a", "b");
     }
 
     [Fact]
     public async Task GetByUsername_ReturnsRow()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd =>
-                cmd.CommandText == "usp_GetUserAccountByUsername"
-            )
+        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
             .ReturnsTable(
                 MockTable
                     .WithColumns(
