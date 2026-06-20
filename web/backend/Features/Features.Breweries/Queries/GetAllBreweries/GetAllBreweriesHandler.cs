@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Features.Breweries.Dtos;
 using Features.Breweries.Repository;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace Features.Breweries.Queries.GetAllBreweries;
 
 /// <summary>
-/// Handles <see cref="GetAllBreweriesQuery"/> by retrieving a paginated list of brewery posts.
+///     Handles <see cref="GetAllBreweriesQuery" /> by retrieving a paginated list of brewery posts.
 /// </summary>
 /// <param name="repository">Repository used to query brewery post data.</param>
 public class GetAllBreweriesHandler(IBreweryRepository repository)
@@ -13,7 +14,7 @@ public class GetAllBreweriesHandler(IBreweryRepository repository)
 {
     public async Task<IEnumerable<BreweryDto>> Handle(GetAllBreweriesQuery request, CancellationToken cancellationToken)
     {
-        var breweries = await repository.GetAllAsync(request.Limit, request.Offset);
+        IEnumerable<BreweryPost> breweries = await repository.GetAllAsync(request.Limit, request.Offset);
         return breweries.Select(b => b.ToDto());
     }
 }

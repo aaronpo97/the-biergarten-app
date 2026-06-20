@@ -5,8 +5,8 @@ using MediatR;
 namespace Features.Auth.Commands.RefreshToken;
 
 /// <summary>
-/// Handles <see cref="RefreshTokenCommand"/> by validating the refresh token and issuing a new
-/// access/refresh token pair.
+///     Handles <see cref="RefreshTokenCommand" /> by validating the refresh token and issuing a new
+///     access/refresh token pair.
 /// </summary>
 /// <param name="tokenService">Service used to validate and exchange the refresh token.</param>
 public class RefreshTokenHandler(ITokenService tokenService)
@@ -14,7 +14,8 @@ public class RefreshTokenHandler(ITokenService tokenService)
 {
     public async Task<LoginPayload> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var result = await tokenService.RefreshTokenAsync(request.RefreshToken);
-        return new LoginPayload(result.UserAccount.UserAccountId, result.UserAccount.Username, result.RefreshToken, result.AccessToken);
+        RefreshTokenResult result = await tokenService.RefreshTokenAsync(request.RefreshToken);
+        return new LoginPayload(result.UserAccount.UserAccountId, result.UserAccount.Username, result.RefreshToken,
+            result.AccessToken);
     }
 }

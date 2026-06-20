@@ -1,25 +1,27 @@
 using Apps72.Dev.Data.DbMocker;
-using FluentAssertions;
-using Features.Breweries.Repository;
 using Domain.Entities;
+using Features.Breweries.Repository;
+using FluentAssertions;
 
 namespace Features.Breweries.Tests.Repository;
 
 public class BreweryRepositoryTests
 {
-    private static BreweryRepository CreateRepo(MockDbConnection conn) =>
-        new(new TestConnectionFactory(conn));
+    private static BreweryRepository CreateRepo(MockDbConnection conn)
+    {
+        return new BreweryRepository(new TestConnectionFactory(conn));
+    }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsBrewery_WhenExists()
     {
-        var breweryId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid breweryId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         // Repository calls the stored procedure
         const string getByIdSql = "USP_GetBreweryById";
 
-        var locationId = Guid.NewGuid();
+        Guid locationId = Guid.NewGuid();
 
         conn.Mocks.When(cmd => cmd.CommandText == getByIdSql)
             .ReturnsTable(
@@ -56,8 +58,8 @@ public class BreweryRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetByIdAsync(breweryId);
+        BreweryRepository repo = CreateRepo(conn);
+        BreweryPost? result = await repo.GetByIdAsync(breweryId);
         result.Should().NotBeNull();
         result!.BreweryPostId.Should().Be(breweryId);
         result.Location.Should().NotBeNull();
@@ -67,23 +69,22 @@ public class BreweryRepositoryTests
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenNotExists()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd => cmd.CommandText == "USP_GetBreweryById")
             .ReturnsTable(MockTable.Empty());
-        var repo = CreateRepo(conn);
-        var result = await repo.GetByIdAsync(Guid.NewGuid());
+        BreweryRepository repo = CreateRepo(conn);
+        BreweryPost? result = await repo.GetByIdAsync(Guid.NewGuid());
         result.Should().BeNull();
-
     }
 
     [Fact]
     public async Task CreateAsync_ExecutesSuccessfully()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
         conn.Mocks.When(cmd => cmd.CommandText == "USP_CreateBrewery")
             .ReturnsScalar(1);
-        var repo = CreateRepo(conn);
-        var brewery = new BreweryPost
+        BreweryRepository repo = CreateRepo(conn);
+        BreweryPost brewery = new()
         {
             BreweryPostId = Guid.NewGuid(),
             PostedById = Guid.NewGuid(),
@@ -101,7 +102,7 @@ public class BreweryRepositoryTests
         };
 
         // Should not throw
-        var act = async () => await repo.CreateAsync(brewery);
+        Func<Task> act = async () => await repo.CreateAsync(brewery);
         await act.Should().NotThrowAsync();
     }
 }

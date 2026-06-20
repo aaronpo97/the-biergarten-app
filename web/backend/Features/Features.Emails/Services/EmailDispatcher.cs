@@ -4,8 +4,8 @@ using Infrastructure.Email.Templates.Rendering;
 namespace Features.Emails.Services;
 
 /// <summary>
-/// Default implementation of <see cref="IEmailDispatcher"/> that renders email templates and dispatches
-/// them via an <see cref="IEmailProvider"/>.
+///     Default implementation of <see cref="IEmailDispatcher" /> that renders email templates and dispatches
+///     them via an <see cref="IEmailProvider" />.
 /// </summary>
 /// <param name="emailProvider">Provider used to deliver the rendered emails.</param>
 /// <param name="emailTemplateProvider">Provider used to render HTML email bodies from templates.</param>
@@ -15,26 +15,26 @@ public class EmailDispatcher(
 ) : IEmailDispatcher
 {
     /// <summary>
-    /// The base URL of the website, used to build confirmation links. Read from the
-    /// <c>WEBSITE_BASE_URL</c> environment variable.
+    ///     The base URL of the website, used to build confirmation links. Read from the
+    ///     <c>WEBSITE_BASE_URL</c> environment variable.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    /// Thrown at type initialization time when the <c>WEBSITE_BASE_URL</c> environment variable is not set.
+    ///     Thrown at type initialization time when the <c>WEBSITE_BASE_URL</c> environment variable is not set.
     /// </exception>
     private static readonly string WebsiteBaseUrl =
         Environment.GetEnvironmentVariable("WEBSITE_BASE_URL")
         ?? throw new InvalidOperationException("WEBSITE_BASE_URL environment variable is not set");
 
     /// <summary>
-    /// Builds a confirmation link from the given token, renders the registration welcome email template,
-    /// and sends it to the newly created user.
+    ///     Builds a confirmation link from the given token, renders the registration welcome email template,
+    ///     and sends it to the newly created user.
     /// </summary>
     public async Task SendRegistrationEmailAsync(string firstName, string email, string confirmationToken)
     {
-        var confirmationLink =
+        string confirmationLink =
             $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
 
-        var emailHtml =
+        string emailHtml =
             await emailTemplateProvider.RenderUserRegisteredEmailAsync(
                 firstName,
                 confirmationLink
@@ -44,20 +44,20 @@ public class EmailDispatcher(
             email,
             "Welcome to The Biergarten App!",
             emailHtml,
-            isHtml: true
+            true
         );
     }
 
     /// <summary>
-    /// Builds a confirmation link from the given token, renders the resend-confirmation email template,
-    /// and sends it to the user.
+    ///     Builds a confirmation link from the given token, renders the resend-confirmation email template,
+    ///     and sends it to the user.
     /// </summary>
     public async Task SendResendConfirmationEmailAsync(string firstName, string email, string confirmationToken)
     {
-        var confirmationLink =
+        string confirmationLink =
             $"{WebsiteBaseUrl}/users/confirm?token={confirmationToken}";
 
-        var emailHtml =
+        string emailHtml =
             await emailTemplateProvider.RenderResendConfirmationEmailAsync(
                 firstName,
                 confirmationLink
@@ -67,7 +67,7 @@ public class EmailDispatcher(
             email,
             "Confirm Your Email - The Biergarten App",
             emailHtml,
-            isHtml: true
+            true
         );
     }
 }

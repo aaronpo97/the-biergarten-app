@@ -1,7 +1,7 @@
 namespace Features.Auth.Dtos;
 
 /// <summary>
-/// Payload returned to the client after a successful login or token refresh.
+///     Payload returned to the client after a successful login or token refresh.
 /// </summary>
 /// <param name="UserAccountId">The unique identifier of the authenticated user account.</param>
 /// <param name="Username">The username of the authenticated user account.</param>
@@ -15,7 +15,7 @@ public record LoginPayload(
 );
 
 /// <summary>
-/// Payload returned to the client after a successful registration.
+///     Payload returned to the client after a successful registration.
 /// </summary>
 /// <param name="UserAccountId">The unique identifier of the newly created user account.</param>
 /// <param name="Username">The username of the newly created user account.</param>
@@ -31,7 +31,7 @@ public record RegistrationPayload(
 );
 
 /// <summary>
-/// Payload returned to the client after a user account's email has been confirmed.
+///     Payload returned to the client after a user account's email has been confirmed.
 /// </summary>
 /// <param name="UserAccountId">The unique identifier of the user account that was confirmed.</param>
 /// <param name="ConfirmedDate">The date and time at which the account was confirmed.</param>

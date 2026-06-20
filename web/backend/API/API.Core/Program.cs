@@ -14,13 +14,10 @@ using Infrastructure.Jwt;
 using Infrastructure.Sql;
 using Shared.Application.Behaviors;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Global Exception Filter
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<GlobalExceptionFilter>();
-})
+builder.Services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); })
     .AddApplicationPart(typeof(BreweryController).Assembly)
     .AddApplicationPart(typeof(UserController).Assembly)
     .AddApplicationPart(typeof(AuthController).Assembly);
@@ -54,10 +51,7 @@ builder.Services.AddHealthChecks();
 // Configure logging for container output
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-if (!builder.Environment.IsProduction())
-{
-    builder.Logging.AddDebug();
-}
+if (!builder.Environment.IsProduction()) builder.Logging.AddDebug();
 
 // Configure Dependency Injection -------------------------------------------------------------------------------------
 
@@ -88,7 +82,7 @@ builder
 
 builder.Services.AddAuthorization();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -106,7 +100,7 @@ app.MapControllers();
 app.MapFallbackToController("Handle404", "NotFound");
 
 // Graceful shutdown handling
-var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 lifetime.ApplicationStopping.Register(() =>
 {
     app.Logger.LogInformation("Application is shutting down gracefully...");

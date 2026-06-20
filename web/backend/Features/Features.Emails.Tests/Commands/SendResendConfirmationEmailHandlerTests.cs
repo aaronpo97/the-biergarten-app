@@ -10,9 +10,9 @@ public class SendResendConfirmationEmailHandlerTests
     [Fact]
     public async Task Handle_DelegatesToEmailDispatcher()
     {
-        var dispatcherMock = new Mock<IEmailDispatcher>();
-        var handler = new SendResendConfirmationEmailHandler(dispatcherMock.Object);
-        var command = new SendResendConfirmationEmailCommand("Aaron", "aaron@example.com", "token-456");
+        Mock<IEmailDispatcher> dispatcherMock = new();
+        SendResendConfirmationEmailHandler handler = new(dispatcherMock.Object);
+        SendResendConfirmationEmailCommand command = new("Aaron", "aaron@example.com", "token-456");
 
         await handler.Handle(command, CancellationToken.None);
 

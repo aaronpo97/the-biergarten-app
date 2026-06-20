@@ -1,15 +1,15 @@
 using Domain.Entities;
-using FluentAssertions;
 using Features.Breweries.Commands.UpdateBrewery;
 using Features.Breweries.Repository;
+using FluentAssertions;
 using Moq;
 
 namespace Features.Breweries.Tests.Commands;
 
 public class UpdateBreweryHandlerTests
 {
-    private readonly Mock<IBreweryRepository> _repoMock = new();
     private readonly UpdateBreweryHandler _handler;
+    private readonly Mock<IBreweryRepository> _repoMock = new();
 
     public UpdateBreweryHandlerTests()
     {
@@ -19,12 +19,12 @@ public class UpdateBreweryHandlerTests
     [Fact]
     public async Task Handle_UpdatesNameDescription_AndSetsUpdatedAt()
     {
-        var command = new UpdateBreweryCommand(
-            BreweryPostId: Guid.NewGuid(),
-            PostedById: Guid.NewGuid(),
-            BreweryName: "Renamed",
-            Description: "New description",
-            Location: null
+        UpdateBreweryCommand command = new(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Renamed",
+            "New description",
+            null
         );
 
         BreweryPost? persisted = null;
@@ -33,9 +33,9 @@ public class UpdateBreweryHandlerTests
             .Callback<BreweryPost>(b => persisted = b)
             .Returns(Task.CompletedTask);
 
-        var before = DateTime.UtcNow;
+        DateTime before = DateTime.UtcNow;
         await _handler.Handle(command, CancellationToken.None);
-        var after = DateTime.UtcNow;
+        DateTime after = DateTime.UtcNow;
 
         persisted.Should().NotBeNull();
         persisted!.BreweryPostId.Should().Be(command.BreweryPostId);
@@ -49,12 +49,12 @@ public class UpdateBreweryHandlerTests
     [Fact]
     public async Task Handle_ClearsLocation_WhenCommandLocationIsNull()
     {
-        var command = new UpdateBreweryCommand(
-            BreweryPostId: Guid.NewGuid(),
-            PostedById: Guid.NewGuid(),
-            BreweryName: "Name",
-            Description: "Description",
-            Location: null
+        UpdateBreweryCommand command = new(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Name",
+            "Description",
+            null
         );
 
         BreweryPost? persisted = null;
@@ -71,20 +71,20 @@ public class UpdateBreweryHandlerTests
     [Fact]
     public async Task Handle_SetsLocation_WhenCommandLocationProvided()
     {
-        var locationCommand = new UpdateBreweryLocation(
-            BreweryPostLocationId: Guid.NewGuid(),
-            CityId: Guid.NewGuid(),
-            AddressLine1: "456 Oak Ave",
-            AddressLine2: "Suite 2",
-            PostalCode: "54321",
-            Coordinates: null
+        UpdateBreweryLocation locationCommand = new(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "456 Oak Ave",
+            "Suite 2",
+            "54321",
+            null
         );
-        var command = new UpdateBreweryCommand(
-            BreweryPostId: Guid.NewGuid(),
-            PostedById: Guid.NewGuid(),
-            BreweryName: "Name",
-            Description: "Description",
-            Location: locationCommand
+        UpdateBreweryCommand command = new(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Name",
+            "Description",
+            locationCommand
         );
 
         BreweryPost? persisted = null;

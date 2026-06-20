@@ -1,19 +1,22 @@
 using Apps72.Dev.Data.DbMocker;
-using FluentAssertions;
+using Domain.Entities;
 using Features.Auth.Repository;
+using FluentAssertions;
 
 namespace Features.Auth.Tests.Repository;
 
 public class AuthRepositoryTests
 {
-    private static AuthRepository CreateRepo(MockDbConnection conn) =>
-        new(new TestConnectionFactory(conn));
+    private static AuthRepository CreateRepo(MockDbConnection conn)
+    {
+        return new AuthRepository(new TestConnectionFactory(conn));
+    }
 
     [Fact]
     public async Task RegisterUserAsync_CreatesUserWithCredential_ReturnsUserAccount()
     {
-        var expectedUserId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid expectedUserId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd => cmd.CommandText == "USP_RegisterUser")
             .ReturnsScalar(expectedUserId);
@@ -46,14 +49,14 @@ public class AuthRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.RegisterUserAsync(
-            username: "testuser",
-            firstName: "Test",
-            lastName: "User",
-            email: "test@example.com",
-            dateOfBirth: new DateTime(1990, 1, 1),
-            passwordHash: "hashedpassword123"
+        AuthRepository repo = CreateRepo(conn);
+        UserAccount result = await repo.RegisterUserAsync(
+            "testuser",
+            "Test",
+            "User",
+            "test@example.com",
+            new DateTime(1990, 1, 1),
+            "hashedpassword123"
         );
 
         result.Should().NotBeNull();
@@ -68,8 +71,8 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetUserByEmailAsync_ReturnsUser_WhenExists()
     {
-        var userId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid userId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
             .ReturnsTable(
@@ -98,8 +101,8 @@ public class AuthRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetUserByEmailAsync("emailuser@example.com");
+        AuthRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetUserByEmailAsync("emailuser@example.com");
 
         result.Should().NotBeNull();
         result!.UserAccountId.Should().Be(userId);
@@ -112,13 +115,13 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetUserByEmailAsync_ReturnsNull_WhenNotExists()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
             .ReturnsTable(MockTable.Empty());
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetUserByEmailAsync("nonexistent@example.com");
+        AuthRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetUserByEmailAsync("nonexistent@example.com");
 
         result.Should().BeNull();
     }
@@ -126,8 +129,8 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetUserByUsernameAsync_ReturnsUser_WhenExists()
     {
-        var userId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid userId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd =>
                 cmd.CommandText == "usp_GetUserAccountByUsername"
@@ -158,8 +161,8 @@ public class AuthRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetUserByUsernameAsync("usernameuser");
+        AuthRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetUserByUsernameAsync("usernameuser");
 
         result.Should().NotBeNull();
         result!.UserAccountId.Should().Be(userId);
@@ -170,15 +173,15 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetUserByUsernameAsync_ReturnsNull_WhenNotExists()
     {
-        var conn = new MockDbConnection();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd =>
                 cmd.CommandText == "usp_GetUserAccountByUsername"
             )
             .ReturnsTable(MockTable.Empty());
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetUserByUsernameAsync("nonexistent");
+        AuthRepository repo = CreateRepo(conn);
+        UserAccount? result = await repo.GetUserByUsernameAsync("nonexistent");
 
         result.Should().BeNull();
     }
@@ -186,9 +189,9 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetActiveCredentialByUserAccountIdAsync_ReturnsCredential_WhenExists()
     {
-        var userId = Guid.NewGuid();
-        var credentialId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid userId = Guid.NewGuid();
+        Guid credentialId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd =>
                 cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId"
@@ -211,8 +214,8 @@ public class AuthRepositoryTests
                     )
             );
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetActiveCredentialByUserAccountIdAsync(userId);
+        AuthRepository repo = CreateRepo(conn);
+        UserCredential? result = await repo.GetActiveCredentialByUserAccountIdAsync(userId);
 
         result.Should().NotBeNull();
         result!.UserCredentialId.Should().Be(credentialId);
@@ -223,16 +226,16 @@ public class AuthRepositoryTests
     [Fact]
     public async Task GetActiveCredentialByUserAccountIdAsync_ReturnsNull_WhenNotExists()
     {
-        var userId = Guid.NewGuid();
-        var conn = new MockDbConnection();
+        Guid userId = Guid.NewGuid();
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd =>
                 cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId"
             )
             .ReturnsTable(MockTable.Empty());
 
-        var repo = CreateRepo(conn);
-        var result = await repo.GetActiveCredentialByUserAccountIdAsync(userId);
+        AuthRepository repo = CreateRepo(conn);
+        UserCredential? result = await repo.GetActiveCredentialByUserAccountIdAsync(userId);
 
         result.Should().BeNull();
     }
@@ -240,17 +243,17 @@ public class AuthRepositoryTests
     [Fact]
     public async Task RotateCredentialAsync_ExecutesSuccessfully()
     {
-        var userId = Guid.NewGuid();
-        var newPasswordHash = "new_hashed_password";
-        var conn = new MockDbConnection();
+        Guid userId = Guid.NewGuid();
+        string newPasswordHash = "new_hashed_password";
+        MockDbConnection conn = new();
 
         conn.Mocks.When(cmd => cmd.CommandText == "USP_RotateUserCredential")
             .ReturnsScalar(1);
 
-        var repo = CreateRepo(conn);
+        AuthRepository repo = CreateRepo(conn);
 
         // Should not throw
-        var act = async () =>
+        Func<Task> act = async () =>
             await repo.RotateCredentialAsync(userId, newPasswordHash);
         await act.Should().NotThrowAsync();
     }

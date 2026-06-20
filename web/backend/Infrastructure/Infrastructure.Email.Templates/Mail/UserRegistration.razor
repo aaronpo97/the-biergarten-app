@@ -1,5 +1,4 @@
 @using Infrastructure.Email.Templates.Components
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
       xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -11,108 +10,117 @@
    <meta name="x-apple-disable-message-reformatting">
    <title>Welcome to The Biergarten App!</title>
    <!--[if mso]>
-    <style>
-        * { font-family: Arial, sans-serif !important; }
-        table { border-collapse: collapse; }
-    </style>
-    <![endif]-->
+   <style>
+      * {
+         font-family: Arial, sans-serif !important;
+      }
+
+      table {
+         border-collapse: collapse;
+      }
+   </style>
+   <![endif]-->
    <!--[if !mso]><!-->
    <style>
-         * {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-         }
+      * {
+         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      }
    </style>
    <!--<![endif]-->
 </head>
 
 <body style="margin: 0; padding: 0; background-color: #f4f4f4; width: 100%;">
-   <!-- Wrapper table for email clients -->
-   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
-          style="background-color: #f4f4f4;">
-      <tr>
-         <td align="center" style="padding: 40px 10px;">
-            <!-- Main container -->
-            <!--[if mso]>
-                <table border="0" cellpadding="0" cellspacing="0" width="600" style="width: 600px;">
-                <tr>
-                <td>
-                <![endif]-->
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
-                   style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+<!-- Wrapper table for email clients -->
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+       style="background-color: #f4f4f4;">
+   <tr>
+      <td align="center" style="padding: 40px 10px;">
+         <!-- Main container -->
+         <!--[if mso]>
+         <table border="0" cellpadding="0" cellspacing="0" width="600" style="width: 600px;">
+            <tr>
+               <td>
+         <![endif]-->
+         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+                style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
 
-               <!-- Include branded header component -->
-               <Header />
+            <!-- Include branded header component -->
+            <Header/>
 
-               <!-- Welcome message -->
-               <tr>
-                  <td style="padding: 40px 40px 20px 40px; text-align: center;">
-                     <h1 style="margin: 0; font-size: 28px; color: #333333; font-weight: 600;">
-                        Welcome Aboard!
-                     </h1>
-                  </td>
-               </tr>
+            <!-- Welcome message -->
+            <tr>
+               <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                  <h1 style="margin: 0; font-size: 28px; color: #333333; font-weight: 600;">
+                     Welcome Aboard!
+                  </h1>
+               </td>
+            </tr>
 
-               <!-- Body content -->
-               <tr>
-                  <td style="padding: 10px 40px 30px 40px; text-align: center;">
-                     <p style="margin: 0; font-size: 16px; line-height: 24px; color: #666666;">
-                        Hi <strong style="color: #333333;">@Username</strong>, we're excited to have you join our
-                        community of beer enthusiasts!
-                     </p>
-                  </td>
-               </tr>
+            <!-- Body content -->
+            <tr>
+               <td style="padding: 10px 40px 30px 40px; text-align: center;">
+                  <p style="margin: 0; font-size: 16px; line-height: 24px; color: #666666;">
+                     Hi <strong style="color: #333333;">@Username</strong>, we're excited to have you join our
+                     community of beer enthusiasts!
+                  </p>
+               </td>
+            </tr>
 
-               <!-- Confirmation button -->
-               <tr>
-                  <td style="padding: 10px 40px;">
-                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                        <tr>
-                           <td align="center">
-                              <!--[if mso]>
-                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="@ConfirmationLink" style="height:50px;v-text-anchor:middle;width:250px;" arcsize="10%" stroke="f" fillcolor="#f59e0b">
-                                        <w:anchorlock/>
-                                        <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:600;">Confirm Your Email</center>
-                                        </v:roundrect>
-                                        <![endif]-->
-                              <!--[if !mso]><!-->
-                              <a href="@ConfirmationLink" target="_blank" rel="noopener noreferrer"
-                                 style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600; min-width: 170px; text-align: center; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+            <!-- Confirmation button -->
+            <tr>
+               <td style="padding: 10px 40px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                     <tr>
+                        <td align="center">
+                           <!--[if mso]>
+                           <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml"
+                                        xmlns:w="urn:schemas-microsoft-com:office:word" href="@ConfirmationLink"
+                                        style="height:50px;v-text-anchor:middle;width:250px;" arcsize="10%" stroke="f"
+                                        fillcolor="#f59e0b">
+                              <w:anchorlock/>
+                              <center
+                                 style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:600;">
                                  Confirm Your Email
-                              </a>
-                              <!--<![endif]-->
-                           </td>
-                        </tr>
-                     </table>
-                  </td>
-               </tr>
+                              </center>
+                           </v:roundrect>
+                           <![endif]-->
+                           <!--[if !mso]><!-->
+                           <a href="@ConfirmationLink" target="_blank" rel="noopener noreferrer"
+                              style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600; min-width: 170px; text-align: center; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+                              Confirm Your Email
+                           </a>
+                           <!--<![endif]-->
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
 
-               <!-- Link expiry notice -->
-               <tr>
-                  <td style="padding: 20px 40px 10px 40px; text-align: center;">
-                     <p style="margin: 0; font-size: 13px; line-height: 20px; color: #999999;">
-                        This confirmation link expires in 24 hours.
-                     </p>
-                  </td>
-               </tr>
+            <!-- Link expiry notice -->
+            <tr>
+               <td style="padding: 20px 40px 10px 40px; text-align: center;">
+                  <p style="margin: 0; font-size: 13px; line-height: 20px; color: #999999;">
+                     This confirmation link expires in 24 hours.
+                  </p>
+               </td>
+            </tr>
 
-               <!-- Footer info -->
-               <EmailFooter FooterText="Cheers, The Biergarten App Team" />
-            </table>
-            <!--[if mso]>
-                </td>
-                </tr>
-                </table>
-                <![endif]-->
+            <!-- Footer info -->
+            <EmailFooter FooterText="Cheers, The Biergarten App Team"/>
+         </table>
+         <!--[if mso]>
          </td>
-      </tr>
-   </table>
+         </tr>
+         </table>
+         <![endif]-->
+      </td>
+   </tr>
+</table>
 </body>
 </html>
 
 @code {
-   [Parameter]
-   public string Username { get; set; } = string.Empty;
+   [Parameter] public string Username { get; set; } = string.Empty;
 
-   [Parameter]
-   public string ConfirmationLink { get; set; } = string.Empty;
+   [Parameter] public string ConfirmationLink { get; set; } = string.Empty;
 }

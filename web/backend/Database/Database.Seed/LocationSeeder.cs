@@ -4,13 +4,13 @@ using Microsoft.Data.SqlClient;
 namespace Database.Seed;
 
 /// <summary>
-/// Seeds the location hierarchy (countries, states/provinces, and cities) used to
-/// associate other entities (e.g. breweries, users) with a geographic location.
-/// Countries must be seeded before states/provinces, which must be seeded before
-/// cities, since each level references its parent by code. The underlying stored
-/// procedures (<c>USP_CreateCountry</c>, <c>USP_CreateStateProvince</c>,
-/// <c>USP_CreateCity</c>) are expected to be idempotent, so re-running this seeder
-/// against an already-seeded database is safe.
+///     Seeds the location hierarchy (countries, states/provinces, and cities) used to
+///     associate other entities (e.g. breweries, users) with a geographic location.
+///     Countries must be seeded before states/provinces, which must be seeded before
+///     cities, since each level references its parent by code. The underlying stored
+///     procedures (<c>USP_CreateCountry</c>, <c>USP_CreateStateProvince</c>,
+///     <c>USP_CreateCity</c>) are expected to be idempotent, so re-running this seeder
+///     against an already-seeded database is safe.
 /// </summary>
 internal class LocationSeeder : ISeeder
 {
@@ -22,12 +22,12 @@ internal class LocationSeeder : ISeeder
     [
         ("Canada", "CA"),
         ("Mexico", "MX"),
-        ("United States", "US"),
+        ("United States", "US")
     ];
 
     /// <summary>
-    /// The set of states/provinces to seed, each identified by name, ISO 3166-2 code,
-    /// and the ISO 3166-1 code of its parent country.
+    ///     The set of states/provinces to seed, each identified by name, ISO 3166-2 code,
+    ///     and the ISO 3166-1 code of its parent country.
     /// </summary>
     private static IReadOnlyList<(string StateProvinceName, string StateProvinceCode, string CountryCode)> States
     {
@@ -134,12 +134,12 @@ internal class LocationSeeder : ISeeder
         ("Veracruz de Ignacio de la Llave", "MX-VER", "MX"),
         ("Yucatán", "MX-YUC", "MX"),
         ("Zacatecas", "MX-ZAC", "MX"),
-        ("Ciudad de México", "MX-CMX", "MX"),
+        ("Ciudad de México", "MX-CMX", "MX")
     ];
 
     /// <summary>
-    /// The set of cities to seed, each identified by name and the ISO 3166-2 code of its
-    /// parent state/province.
+    ///     The set of cities to seed, each identified by name and the ISO 3166-2 code of its
+    ///     parent state/province.
     /// </summary>
     private static IReadOnlyList<(string StateProvinceCode, string CityName)> Cities { get; } =
     [
@@ -255,38 +255,32 @@ internal class LocationSeeder : ISeeder
         ("MX-COA", "Saltillo"),
         ("MX-BCS", "La Paz"),
         ("MX-NAY", "Tepic"),
-        ("MX-ZAC", "Zacatecas"),
+        ("MX-ZAC", "Zacatecas")
     ];
 
     /// <summary>
-    /// Seeds all countries, then states/provinces, then cities, in that order, so that
-    /// each level's parent reference already exists by the time it is created.
+    ///     Seeds all countries, then states/provinces, then cities, in that order, so that
+    ///     each level's parent reference already exists by the time it is created.
     /// </summary>
     /// <param name="connection">An open connection to the target database.</param>
     /// <returns>A task that completes when all locations have been seeded.</returns>
     public async Task SeedAsync(SqlConnection connection)
     {
-        foreach (var (countryName, countryCode) in Countries)
-        {
+        foreach ((string countryName, string countryCode) in Countries)
             await CreateCountryAsync(connection, countryName, countryCode);
-        }
 
         foreach (
-            var (stateProvinceName, stateProvinceCode, countryCode) in States
+            (string stateProvinceName, string stateProvinceCode, string countryCode) in States
         )
-        {
             await CreateStateProvinceAsync(
                 connection,
                 stateProvinceName,
                 stateProvinceCode,
                 countryCode
             );
-        }
 
-        foreach (var (stateProvinceCode, cityName) in Cities)
-        {
+        foreach ((string stateProvinceCode, string cityName) in Cities)
             await CreateCityAsync(connection, cityName, stateProvinceCode);
-        }
     }
 
     /// <summary>Creates a single country by invoking the <c>dbo.USP_CreateCountry</c> stored procedure.</summary>
@@ -300,7 +294,7 @@ internal class LocationSeeder : ISeeder
         string countryCode
     )
     {
-        await using var command = new SqlCommand(
+        await using SqlCommand command = new(
             "dbo.USP_CreateCountry",
             connection
         );
@@ -324,7 +318,7 @@ internal class LocationSeeder : ISeeder
         string countryCode
     )
     {
-        await using var command = new SqlCommand(
+        await using SqlCommand command = new(
             "dbo.USP_CreateStateProvince",
             connection
         );
@@ -350,7 +344,7 @@ internal class LocationSeeder : ISeeder
         string stateProvinceCode
     )
     {
-        await using var command = new SqlCommand(
+        await using SqlCommand command = new(
             "dbo.USP_CreateCity",
             connection
         );

@@ -1,37 +1,37 @@
 <Solution>
     <Folder Name="/API/">
-        <Project Path="API/API.Core/API.Core.csproj" />
-        <Project Path="API/API.Specs/API.Specs.csproj" />
+        <Project Path="API/API.Core/API.Core.csproj"/>
+        <Project Path="API/API.Specs/API.Specs.csproj"/>
     </Folder>
     <Folder Name="/Database/">
-        <Project Path="Database/Database.Migrations/Database.Migrations.csproj" />
-        <Project Path="Database/Database.Seed/Database.Seed.csproj" />
+        <Project Path="Database/Database.Migrations/Database.Migrations.csproj"/>
+        <Project Path="Database/Database.Seed/Database.Seed.csproj"/>
     </Folder>
     <Folder Name="/Domain/">
-        <Project Path="Domain/Domain.Entities/Domain.Entities.csproj" />
-        <Project Path="Domain/Domain.Exceptions/Domain.Exceptions.csproj" />
+        <Project Path="Domain/Domain.Entities/Domain.Entities.csproj"/>
+        <Project Path="Domain/Domain.Exceptions/Domain.Exceptions.csproj"/>
     </Folder>
     <Folder Name="/Infrastructure/">
-        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
+        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj"/>
         <Project
-            Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
+                Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj"/>
         <Project
-            Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj" />
+                Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj"/>
+        <Project Path="Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj"/>
     </Folder>
     <Folder Name="/Features/">
-        <Project Path="Features/Features.Breweries/Features.Breweries.csproj" />
-        <Project Path="Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj" />
-        <Project Path="Features/Features.UserManagement/Features.UserManagement.csproj" />
-        <Project Path="Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj" />
-        <Project Path="Features/Features.Auth/Features.Auth.csproj" />
-        <Project Path="Features/Features.Auth.Tests/Features.Auth.Tests.csproj" />
-        <Project Path="Features/Features.Emails/Features.Emails.csproj" />
-        <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj" />
+        <Project Path="Features/Features.Breweries/Features.Breweries.csproj"/>
+        <Project Path="Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj"/>
+        <Project Path="Features/Features.UserManagement/Features.UserManagement.csproj"/>
+        <Project Path="Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj"/>
+        <Project Path="Features/Features.Auth/Features.Auth.csproj"/>
+        <Project Path="Features/Features.Auth.Tests/Features.Auth.Tests.csproj"/>
+        <Project Path="Features/Features.Emails/Features.Emails.csproj"/>
+        <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj"/>
     </Folder>
     <Folder Name="/Shared/">
-        <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
-        <Project Path="Shared/Shared.Application/Shared.Application.csproj" />
+        <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj"/>
+        <Project Path="Shared/Shared.Application/Shared.Application.csproj"/>
     </Folder>
 </Solution>

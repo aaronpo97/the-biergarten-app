@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Features.Breweries.Dtos;
 using Features.Breweries.Repository;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace Features.Breweries.Queries.GetBreweryById;
 
 /// <summary>
-/// Handles <see cref="GetBreweryByIdQuery"/> by looking up the matching brewery post.
+///     Handles <see cref="GetBreweryByIdQuery" /> by looking up the matching brewery post.
 /// </summary>
 /// <param name="repository">Repository used to query brewery post data.</param>
 public class GetBreweryByIdHandler(IBreweryRepository repository)
@@ -13,7 +14,7 @@ public class GetBreweryByIdHandler(IBreweryRepository repository)
 {
     public async Task<BreweryDto?> Handle(GetBreweryByIdQuery request, CancellationToken cancellationToken)
     {
-        var brewery = await repository.GetByIdAsync(request.BreweryPostId);
+        BreweryPost? brewery = await repository.GetByIdAsync(request.BreweryPostId);
         return brewery?.ToDto();
     }
 }

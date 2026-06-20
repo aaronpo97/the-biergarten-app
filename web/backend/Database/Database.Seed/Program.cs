@@ -1,7 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using DbUp;
-using System.Reflection;
-using Database.Seed;
+﻿using Database.Seed;
+using Microsoft.Data.SqlClient;
 
 // Entry point for the database seeding utility. Connects to the target database
 // (retrying on transient failures), then runs each registered ISeeder in order to
@@ -19,22 +17,22 @@ using Database.Seed;
 /// </exception>
 string BuildConnectionString()
 {
-    var server = Environment.GetEnvironmentVariable("DB_SERVER")
-                 ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+    string server = Environment.GetEnvironmentVariable("DB_SERVER")
+                    ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
-    var dbName = Environment.GetEnvironmentVariable("DB_NAME")
-                 ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+    string dbName = Environment.GetEnvironmentVariable("DB_NAME")
+                    ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
-    var user = Environment.GetEnvironmentVariable("DB_USER")
-               ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+    string user = Environment.GetEnvironmentVariable("DB_USER")
+                  ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
-    var password = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                   ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+    string password = Environment.GetEnvironmentVariable("DB_PASSWORD")
+                      ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
-    var trustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE")
-                                 ?? "True";
+    string trustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE")
+                                    ?? "True";
 
-    var builder = new SqlConnectionStringBuilder
+    SqlConnectionStringBuilder builder = new()
     {
         DataSource = server,
         InitialCatalog = dbName,
@@ -50,7 +48,7 @@ string BuildConnectionString()
 
 try
 {
-    var connectionString = BuildConnectionString();
+    string connectionString = BuildConnectionString();
 
     Console.WriteLine("Attempting to connect to database...");
 
@@ -60,7 +58,6 @@ try
     int retryDelayMs = 2000;
 
     for (int attempt = 1; attempt <= maxRetries; attempt++)
-    {
         try
         {
             connection = new SqlConnection(connectionString);
@@ -76,12 +73,8 @@ try
             connection?.Dispose();
             connection = null;
         }
-    }
 
-    if (connection == null)
-    {
-        throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
-    }
+    if (connection == null) throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
 
     Console.WriteLine("Starting seeding...");
 
@@ -90,10 +83,10 @@ try
         ISeeder[] seeders =
         [
             new LocationSeeder(),
-            new UserSeeder(),
+            new UserSeeder()
         ];
 
-        foreach (var seeder in seeders)
+        foreach (ISeeder seeder in seeders)
         {
             Console.WriteLine($"Seeding {seeder.GetType().Name}...");
             await seeder.SeedAsync(connection);

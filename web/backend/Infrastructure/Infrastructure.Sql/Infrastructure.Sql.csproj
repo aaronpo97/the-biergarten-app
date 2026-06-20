@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Infrastructure.Sql</RootNamespace>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
-    <PackageReference
-      Include="Microsoft.SqlServer.Types"
-      Version="160.1000.6"
-    />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference
-      Include="Microsoft.Extensions.Configuration.Abstractions"
-      Version="9.0.0"
-    />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Infrastructure.Sql</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4"/>
+        <PackageReference
+                Include="Microsoft.SqlServer.Types"
+                Version="160.1000.6"
+        />
+        <PackageReference Include="System.Data.SqlClient" Version="4.9.0"/>
+        <PackageReference
+                Include="Microsoft.Extensions.Configuration.Abstractions"
+                Version="9.0.0"
+        />
+    </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
+using System.Text;
 using System.Text.Json;
-using API.Specs;
 using FluentAssertions;
 using Reqnroll;
 
@@ -15,14 +15,11 @@ public class ApiGeneralSteps(ScenarioContext scenario)
 
     private HttpClient GetClient()
     {
-        if (scenario.TryGetValue<HttpClient>(ClientKey, out var client))
-        {
-            return client;
-        }
+        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client)) return client;
 
-        var factory = scenario.TryGetValue<TestApiFactory>(
+        TestApiFactory? factory = scenario.TryGetValue<TestApiFactory>(
             FactoryKey,
-            out var f
+            out TestApiFactory? f
         )
             ? f
             : new TestApiFactory();
@@ -46,19 +43,19 @@ public class ApiGeneralSteps(ScenarioContext scenario)
         string jsonBody
     )
     {
-        var client = GetClient();
+        HttpClient client = GetClient();
 
-        var requestMessage = new HttpRequestMessage(new HttpMethod(method), url)
+        HttpRequestMessage requestMessage = new(new HttpMethod(method), url)
         {
             Content = new StringContent(
                 jsonBody,
-                System.Text.Encoding.UTF8,
+                Encoding.UTF8,
                 "application/json"
-            ),
+            )
         };
 
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -70,13 +67,13 @@ public class ApiGeneralSteps(ScenarioContext scenario)
         string url
     )
     {
-        var client = GetClient();
-        var requestMessage = new HttpRequestMessage(
+        HttpClient client = GetClient();
+        HttpRequestMessage requestMessage = new(
             new HttpMethod(method),
             url
         );
-        var response = await client.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(requestMessage);
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         scenario[ResponseKey] = response;
         scenario[ResponseBodyKey] = responseBody;
@@ -86,7 +83,7 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     public void ThenTheResponseStatusCodeShouldBeInt(int expected)
     {
         scenario
-            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
         ((int)response!.StatusCode).Should().Be(expected);
@@ -96,7 +93,7 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     public void ThenTheResponseHasHttpStatusInt(int expectedCode)
     {
         scenario
-            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue("No response was received from the API");
         ((int)response!.StatusCode).Should().Be(expectedCode);
@@ -109,20 +106,20 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     )
     {
         scenario
-            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
         scenario
-            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
             .Should()
             .BeTrue();
 
-        using var doc = JsonDocument.Parse(responseBody!);
-        var root = doc.RootElement;
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
 
-        if (!root.TryGetProperty(field, out var value))
+        if (!root.TryGetProperty(field, out JsonElement value))
         {
-            root.TryGetProperty("payload", out var payloadElem)
+            root.TryGetProperty("payload", out JsonElement payloadElem)
                 .Should()
                 .BeTrue(
                     "Expected field '{0}' to be present either at the root or inside 'payload'",
@@ -157,20 +154,20 @@ public class ApiGeneralSteps(ScenarioContext scenario)
     )
     {
         scenario
-            .TryGetValue<HttpResponseMessage>(ResponseKey, out var response)
+            .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
         scenario
-            .TryGetValue<string>(ResponseBodyKey, out var responseBody)
+            .TryGetValue<string>(ResponseBodyKey, out string? responseBody)
             .Should()
             .BeTrue();
 
-        using var doc = JsonDocument.Parse(responseBody!);
-        var root = doc.RootElement;
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
 
-        if (!root.TryGetProperty(field, out var value))
+        if (!root.TryGetProperty(field, out JsonElement value))
         {
-            root.TryGetProperty("payload", out var payloadElem)
+            root.TryGetProperty("payload", out JsonElement payloadElem)
                 .Should()
                 .BeTrue(
                     "Expected field '{0}' to be present either at the root or inside 'payload'",
@@ -195,7 +192,7 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                 "Expected field '{0}' to be a string",
                 field
             );
-        var actualValue = value.GetString();
+        string? actualValue = value.GetString();
         actualValue
             .Should()
             .Contain(
