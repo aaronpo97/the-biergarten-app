@@ -7,16 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj"/>
-        <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj"/>
-        <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj"/>
-        <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj"/>
+        <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
+        <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
+        <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
+        <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
 </Project>

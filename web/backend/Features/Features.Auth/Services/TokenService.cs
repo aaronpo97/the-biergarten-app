@@ -29,25 +29,28 @@ public class TokenService : ITokenService
     ///     Thrown when any of the <c>ACCESS_TOKEN_SECRET</c>, <c>REFRESH_TOKEN_SECRET</c>, or
     ///     <c>CONFIRMATION_TOKEN_SECRET</c> environment variables are not set.
     /// </exception>
-    public TokenService(
-        ITokenInfrastructure tokenInfrastructure,
-        IAuthRepository authRepository
-    )
+    public TokenService(ITokenInfrastructure tokenInfrastructure, IAuthRepository authRepository)
     {
         _tokenInfrastructure = tokenInfrastructure;
         _authRepository = authRepository;
 
-        _accessTokenSecret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")
-                             ?? throw new InvalidOperationException(
-                                 "ACCESS_TOKEN_SECRET environment variable is not set");
+        _accessTokenSecret =
+            Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")
+            ?? throw new InvalidOperationException(
+                "ACCESS_TOKEN_SECRET environment variable is not set"
+            );
 
-        _refreshTokenSecret = Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")
-                              ?? throw new InvalidOperationException(
-                                  "REFRESH_TOKEN_SECRET environment variable is not set");
+        _refreshTokenSecret =
+            Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")
+            ?? throw new InvalidOperationException(
+                "REFRESH_TOKEN_SECRET environment variable is not set"
+            );
 
-        _confirmationTokenSecret = Environment.GetEnvironmentVariable("CONFIRMATION_TOKEN_SECRET")
-                                   ?? throw new InvalidOperationException(
-                                       "CONFIRMATION_TOKEN_SECRET environment variable is not set");
+        _confirmationTokenSecret =
+            Environment.GetEnvironmentVariable("CONFIRMATION_TOKEN_SECRET")
+            ?? throw new InvalidOperationException(
+                "CONFIRMATION_TOKEN_SECRET environment variable is not set"
+            );
     }
 
     /// <summary>
@@ -59,7 +62,12 @@ public class TokenService : ITokenService
     public string GenerateAccessToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.AccessTokenHours);
-        return _tokenInfrastructure.GenerateJwt(user.UserAccountId, user.Username, expiresAt, _accessTokenSecret);
+        return _tokenInfrastructure.GenerateJwt(
+            user.UserAccountId,
+            user.Username,
+            expiresAt,
+            _accessTokenSecret
+        );
     }
 
     /// <summary>
@@ -70,8 +78,15 @@ public class TokenService : ITokenService
     /// <returns>The signed refresh token string.</returns>
     public string GenerateRefreshToken(UserAccount user)
     {
-        DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.RefreshTokenHours);
-        return _tokenInfrastructure.GenerateJwt(user.UserAccountId, user.Username, expiresAt, _refreshTokenSecret);
+        DateTime expiresAt = DateTime.UtcNow.AddHours(
+            TokenServiceExpirationHours.RefreshTokenHours
+        );
+        return _tokenInfrastructure.GenerateJwt(
+            user.UserAccountId,
+            user.Username,
+            expiresAt,
+            _refreshTokenSecret
+        );
     }
 
     /// <summary>
@@ -82,8 +97,15 @@ public class TokenService : ITokenService
     /// <returns>The signed confirmation token string.</returns>
     public string GenerateConfirmationToken(UserAccount user)
     {
-        DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.ConfirmationTokenHours);
-        return _tokenInfrastructure.GenerateJwt(user.UserAccountId, user.Username, expiresAt, _confirmationTokenSecret);
+        DateTime expiresAt = DateTime.UtcNow.AddHours(
+            TokenServiceExpirationHours.ConfirmationTokenHours
+        );
+        return _tokenInfrastructure.GenerateJwt(
+            user.UserAccountId,
+            user.Username,
+            expiresAt,
+            _confirmationTokenSecret
+        );
     }
 
     /// <summary>
@@ -97,7 +119,8 @@ public class TokenService : ITokenService
     /// <exception cref="InvalidOperationException">
     ///     Thrown when <typeparamref name="T" /> is not <see cref="TokenType" /> or does not resolve to a known token type.
     /// </exception>
-    public string GenerateToken<T>(UserAccount user) where T : struct, Enum
+    public string GenerateToken<T>(UserAccount user)
+        where T : struct, Enum
     {
         if (typeof(T) != typeof(TokenType))
             throw new InvalidOperationException("Invalid token type");
@@ -112,7 +135,7 @@ public class TokenService : ITokenService
             TokenType.AccessToken => GenerateAccessToken(user),
             TokenType.RefreshToken => GenerateRefreshToken(user),
             TokenType.ConfirmationToken => GenerateConfirmationToken(user),
-            _ => throw new InvalidOperationException("Invalid token type")
+            _ => throw new InvalidOperationException("Invalid token type"),
         };
     }
 
@@ -189,7 +212,11 @@ public class TokenService : ITokenService
     ///     Thrown when required claims are missing, the user ID claim is not a valid <see cref="Guid" />,
     ///     or the underlying token validation fails for any other reason (e.g. expired or invalid signature).
     /// </exception>
-    private async Task<ValidatedToken> ValidateTokenInternalAsync(string token, string secret, string tokenType)
+    private async Task<ValidatedToken> ValidateTokenInternalAsync(
+        string token,
+        string secret,
+        string tokenType
+    )
     {
         try
         {
@@ -199,7 +226,9 @@ public class TokenService : ITokenService
             string? usernameClaim = principal.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || string.IsNullOrEmpty(usernameClaim))
-                throw new UnauthorizedException($"Invalid {tokenType} token: missing required claims");
+                throw new UnauthorizedException(
+                    $"Invalid {tokenType} token: missing required claims"
+                );
 
             if (!Guid.TryParse(userIdClaim, out Guid userId))
                 throw new UnauthorizedException($"Invalid {tokenType} token: malformed user ID");
