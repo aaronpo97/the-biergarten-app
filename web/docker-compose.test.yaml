@@ -99,36 +99,16 @@ services:
     networks:
       - testnet
 
-  repository.tests:
+  unit.tests:
     env_file: ".env.test"
-    image: repository.tests
-    container_name: test-env-repository-tests
+    image: unit.tests
+    container_name: test-env-unit-tests
     depends_on:
       database.seed:
         condition: service_completed_successfully
     build:
       context: ./backend
-      dockerfile: Infrastructure/Infrastructure.Repository.Tests/Dockerfile
-      args:
-        BUILD_CONFIGURATION: Release
-    environment:
-      DOTNET_RUNNING_IN_CONTAINER: "true"
-    volumes:
-      - ./test-results:/app/test-results
-    restart: "no"
-    networks:
-      - testnet
-
-  service.auth.tests:
-    env_file: ".env.test"
-    image: service.auth.tests
-    container_name: test-env-service-auth-tests
-    depends_on:
-      database.seed:
-        condition: service_completed_successfully
-    build:
-      context: ./backend
-      dockerfile: Service/Service.Auth.Tests/Dockerfile
+      dockerfile: Dockerfile.tests
       args:
         BUILD_CONFIGURATION: Release
     environment:

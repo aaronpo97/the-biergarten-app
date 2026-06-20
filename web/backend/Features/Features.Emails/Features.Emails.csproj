@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <TargetFramework>net10.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+      <RootNamespace>Features.Emails</RootNamespace>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+      <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
+   </ItemGroup>
+</Project>

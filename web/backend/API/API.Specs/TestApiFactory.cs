@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using API.Specs.Mocks;
+using Features.Emails.Services;
 using Infrastructure.Email;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Service.Emails;
 
 namespace API.Specs
 {
@@ -29,17 +29,17 @@ namespace API.Specs
 
                 services.AddScoped<IEmailProvider, MockEmailProvider>();
 
-                // Replace the real email service with mock for testing
-                var emailServiceDescriptor = services.SingleOrDefault(d =>
-                    d.ServiceType == typeof(IEmailService)
+                // Replace the real email dispatcher with mock for testing
+                var emailDispatcherDescriptor = services.SingleOrDefault(d =>
+                    d.ServiceType == typeof(IEmailDispatcher)
                 );
 
-                if (emailServiceDescriptor != null)
+                if (emailDispatcherDescriptor != null)
                 {
-                    services.Remove(emailServiceDescriptor);
+                    services.Remove(emailDispatcherDescriptor);
                 }
 
-                services.AddScoped<IEmailService, MockEmailService>();
+                services.AddScoped<IEmailDispatcher, MockEmailDispatcher>();
             });
         }
     }

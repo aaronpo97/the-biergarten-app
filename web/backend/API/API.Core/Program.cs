@@ -1,19 +1,17 @@
 using API.Core;
 using API.Core.Authentication;
+using Features.Auth.Controllers;
+using Features.Auth.DependencyInjection;
 using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
+using Features.Emails.DependencyInjection;
+using Features.Emails.Services;
 using Features.UserManagement.Controllers;
 using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Infrastructure.Email;
-using Infrastructure.Email.Templates.Rendering;
 using Infrastructure.Jwt;
-using Infrastructure.PasswordHashing;
-using Infrastructure.Repository.Auth;
 using Infrastructure.Sql;
-using Service.Auth;
-using Service.Emails;
 using Shared.Application.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +22,8 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<GlobalExceptionFilter>();
 })
     .AddApplicationPart(typeof(BreweryController).Assembly)
-    .AddApplicationPart(typeof(UserController).Assembly);
+    .AddApplicationPart(typeof(UserController).Assembly)
+    .AddApplicationPart(typeof(AuthController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,6 +33,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
 // Add MediatR. Each Features.* slice's assembly is registered here as it's introduced;
@@ -43,6 +43,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<Program>();
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
@@ -64,20 +66,14 @@ builder.Services.AddSingleton<
     DefaultSqlConnectionFactory
 >();
 
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();
+builder.Services.AddFeaturesAuth();
+builder.Services.AddFeaturesEmails();
 
-builder.Services.AddScoped<ILoginService, LoginService>();
-builder.Services.AddScoped<IRegisterService, RegisterService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
+// ITokenInfrastructure is registered here (not inside Features.Auth's own DI extension) because
+// JwtAuthenticationHandler, a host-level auth middleware concern, also depends on it directly.
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
-builder.Services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
-builder.Services.AddScoped<IEmailProvider, SmtpEmailProvider>();
-builder.Services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IConfirmationService, ConfirmationService>();
 
 // Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();

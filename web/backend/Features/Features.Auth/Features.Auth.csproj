@@ -3,7 +3,7 @@
       <TargetFramework>net10.0</TargetFramework>
       <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
-      <RootNamespace>Features.Breweries</RootNamespace>
+      <RootNamespace>Features.Auth</RootNamespace>
    </PropertyGroup>
 
    <ItemGroup>
@@ -12,6 +12,9 @@
 
    <ItemGroup>
       <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
+      <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.PasswordHashing\Infrastructure.PasswordHashing.csproj" />
       <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
       <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />

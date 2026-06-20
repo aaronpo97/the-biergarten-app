@@ -27,14 +27,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
         <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
-        <ProjectReference Include="..\..\Service\Service.Auth\Service.Auth.csproj" />
         <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
         <ProjectReference Include="..\..\Features\Features.UserManagement\Features.UserManagement.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Emails\Features.Emails.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>

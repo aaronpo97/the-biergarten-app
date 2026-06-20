@@ -18,9 +18,6 @@
         <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
         <Project
             Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Repository/Infrastructure.Repository.csproj" />
-        <Project
-            Path="Infrastructure\Infrastructure.Repository.Tests\Infrastructure.Repository.Tests.csproj" />
         <Project Path="Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj" />
     </Folder>
     <Folder Name="/Features/">
@@ -28,11 +25,10 @@
         <Project Path="Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj" />
         <Project Path="Features/Features.UserManagement/Features.UserManagement.csproj" />
         <Project Path="Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj" />
-    </Folder>
-    <Folder Name="/Service/">
-        <Project Path="Service/Service.Auth.Tests/Service.Auth.Tests.csproj" />
-        <Project Path="Service/Service.Emails/Service.Emails.csproj" />
-        <Project Path="Service/Service.Auth/Service.Auth.csproj" />
+        <Project Path="Features/Features.Auth/Features.Auth.csproj" />
+        <Project Path="Features/Features.Auth.Tests/Features.Auth.Tests.csproj" />
+        <Project Path="Features/Features.Emails/Features.Emails.csproj" />
+        <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj" />
     </Folder>
     <Folder Name="/Shared/">
         <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
