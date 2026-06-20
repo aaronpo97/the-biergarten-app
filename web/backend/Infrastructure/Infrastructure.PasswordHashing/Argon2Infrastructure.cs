@@ -32,7 +32,7 @@ public class Argon2Infrastructure : IPasswordInfrastructure
             Salt = salt,
             DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
             MemorySize = ArgonMemoryKb,
-            Iterations = ArgonIterations
+            Iterations = ArgonIterations,
         };
 
         byte[] hash = argon2.GetBytes(HashSize);
@@ -57,10 +57,7 @@ public class Argon2Infrastructure : IPasswordInfrastructure
     {
         try
         {
-            string[] parts = stored.Split(
-                ':',
-                StringSplitOptions.RemoveEmptyEntries
-            );
+            string[] parts = stored.Split(':', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
                 return false;
 
@@ -72,7 +69,7 @@ public class Argon2Infrastructure : IPasswordInfrastructure
                 Salt = salt,
                 DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
                 MemorySize = ArgonMemoryKb,
-                Iterations = ArgonIterations
+                Iterations = ArgonIterations,
             };
 
             byte[] actual = argon2.GetBytes(expected.Length);
