@@ -18,23 +18,40 @@ skinparam ActivityBarColor #628A5B
 skinparam SwimlaneBorderColor #547461
 skinparam SwimlaneBorderThickness 0.3
 
-title The Biergarten Data Pipeline (Streaming Architecture)
+title The Biergarten Data Pipeline (Current — Synchronous Data Path)
 
 |#F2F6F0|main.cc|
 start
+:Create BoundedChannel<LogEntry> log_channel;
+:Spawn log dispatcher thread\n(LogDispatcher::Run());
+note right
+  The only concurrency in the current pipeline:
+  a dedicated thread drains log_channel and
+  forwards entries to spdlog for the entire run.
+  Joined during shutdown after log_channel closes.
+end note
 :ParseArguments(argc, argv);
 if (Are arguments valid?) then (no)
-  :spdlog::error usage info;
+  :Log error / usage info;
   stop
 else (yes)
 endif
 
 :Init OpenSSL global state & LlamaBackendState;
 :di::make_injector(...);
-:injector.create<std::unique_ptr<BiergartenDataGenerator>>();
-:BiergartenDataGenerator::Run();
+note right
+  Binds ILogger, IEnrichmentService, DataGenerator,
+  IExportService, IPromptFormatter, WebClient based
+  on --mocked vs. model-backed mode.
+end note
+:injector.create<std::unique_ptr<BiergartenPipelineOrchestrator>>();
+:BiergartenPipelineOrchestrator::Run();
+note right
+  Run() itself is synchronous — sampling, enrichment,
+  generation, and export all happen on this thread.
+end note
 
-|#EAF0E8|BiergartenDataGenerator|
+|#EAF0E8|BiergartenPipelineOrchestrator|
 :Initialize SQLite export;
 
 |#E0EAE0|SqliteExportService|
@@ -48,23 +65,35 @@ note right
   Begins Transaction
 end note
 
-|#EAF0E8|BiergartenDataGenerator|
+|#EAF0E8|BiergartenPipelineOrchestrator|
 :QueryCitiesWithCountries();
 
 |#E2EBDC|JsonLoader|
 :JsonLoader::LoadLocations("locations.json");
-:std::ranges::sample(all_locations, 50);
+:std::ranges::sample(all_locations, --location-count);
+note right
+  --location-count defaults to 10.
+end note
 
-|#EAF0E8|BiergartenDataGenerator|
+|#EAF0E8|BiergartenPipelineOrchestrator|
 while (For each sampled Location?) is (Remaining cities)
-  |#DCE8D8|WikipediaService|
+  |#DCE8D8|IEnrichmentService|
   :GetLocationContext(loc);
-  :FetchExtracts(City, Country, Beer);
-  |#EAF0E8|BiergartenDataGenerator|
-  :Store EnrichedCity{Location, region_context};
+  note right
+    WikipediaEnrichmentService fetches a generic
+    "brewing" extract and a "beer in {country}" extract
+    (not a city/region-specific page). MockEnrichmentService
+    (--mocked) returns an empty string instead.
+  end note
+  |#EAF0E8|BiergartenPipelineOrchestrator|
+  if (Lookup failed?) then (yes)
+    :Log warning, skip city;
+  else (no)
+    :Store EnrichedCity{Location, region_context};
+  endif
 endwhile (Done)
 
-|#EAF0E8|BiergartenDataGenerator|
+|#EAF0E8|BiergartenPipelineOrchestrator|
 :GenerateBreweries(enriched_cities);
 
 |#E5EDE1|DataGenerator|
@@ -73,7 +102,10 @@ while (For each EnrichedCity?) is (Remaining cities)
     :DeterministicHash & Format;
   else (LlamaGenerator)
     :PrepareRegionContext;
-    :LoadBrewerySystemPrompt("prompts/system.md");
+    :prompt_directory_->Load("BREWERY_GENERATION");
+    note right
+      Resolves to BREWERY_GENERATION.md inside --prompt-dir.
+    end note
     repeat
       :Infer(system_prompt, user_prompt, max_tokens, kBreweryJsonGrammar);
       :ValidateBreweryJson(raw, brewery);
@@ -81,11 +113,16 @@ while (For each EnrichedCity?) is (Remaining cities)
         break
       else (no)
         :Attempt++;
+        :Append validation error to retry prompt;
       endif
     repeat while (Attempt < 3?) is (yes)
+    note right
+      max_tokens is fixed across retries —
+      it is not raised on truncation.
+    end note
   endif
 
-  |#EAF0E8|BiergartenDataGenerator|
+  |#EAF0E8|BiergartenPipelineOrchestrator|
   if (Generation successful?) then (yes)
     |#E0EAE0|SqliteExportService|
     :ProcessRecord(GeneratedBrewery);
@@ -97,8 +134,8 @@ while (For each EnrichedCity?) is (Remaining cities)
     :Insert Brewery (FK: location_id);
 
     if (Exception caught during insert?) then (yes)
-      |#EAF0E8|BiergartenDataGenerator|
-      :spdlog::warn "Failed to stream record to SQLite export";
+      |#EAF0E8|BiergartenPipelineOrchestrator|
+      :Log warning "SQLite export failed";
       note right
         Data loss is prevented per-record.
         The pipeline continues running.
@@ -106,7 +143,7 @@ while (For each EnrichedCity?) is (Remaining cities)
     else (no)
     endif
   else (no)
-    :spdlog::warn "Generation failed, skipping...";
+    :Log warning "Generation failed, skipping...";
   endif
   |#E5EDE1|DataGenerator|
 endwhile (Done)
@@ -119,6 +156,8 @@ note right
 end note
 
 |#F2F6F0|main.cc|
+:Close log_channel;
+:Join log dispatcher thread;
 :Return 0;
 stop
 

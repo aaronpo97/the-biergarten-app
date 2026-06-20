@@ -25,11 +25,12 @@ skinparam note {
 
 title The Biergarten Data Pipeline - Class Diagram
 
-class BiergartenDataGenerator {
+class BiergartenPipelineOrchestrator {
   - logger_ : std::shared_ptr<ILogger>
   - context_service_ : std::unique_ptr<IEnrichmentService>
   - generator_ : std::unique_ptr<DataGenerator>
   - exporter_ : std::unique_ptr<IExportService>
+  - application_options_ : ApplicationOptions
   - generated_breweries_ : std::vector<GeneratedBrewery>
   + Run() : bool
   - QueryCitiesWithCountries() : std::vector<Location>
@@ -54,21 +55,29 @@ class PipelinePhase <<enumeration>> {
   Teardown
 }
 
-struct LogEntry {
-  + timestamp : std::chrono::system_clock::time_point
+struct LogDTO {
   + level : LogLevel
   + phase : PipelinePhase
   + message : std::string
-  + worker : std::optional<std::string>
+}
+
+struct LogEntry {
+  + timestamp : std::chrono::system_clock::time_point
+  + origin : std::source_location
+  + thread_id : std::thread::id
+  + level : LogLevel
+  + phase : PipelinePhase
+  + message : std::string
 }
 
 interface ILogger <<interface>> {
-  + Log(entry : const LogEntry&) : void
+  + Log(payload : LogDTO) : void
+  - {abstract} DoLog(entry : LogEntry) : void
 }
 
 class LogProducer {
   - channel_ : BoundedChannel<LogEntry>&
-  + Log(entry : const LogEntry&) : void
+  - DoLog(entry : LogEntry) : void
 }
 
 class LogDispatcher {
@@ -81,7 +90,11 @@ interface IEnrichmentService <<interface>> {
   + GetLocationContext(loc : const Location&) : std::string
 }
 
-class WikipediaService {
+class MockEnrichmentService {
+  + GetLocationContext(loc : const Location&) : std::string
+}
+
+class WikipediaEnrichmentService {
   - client_ : std::unique_ptr<WebClient>
   - extract_cache_ : std::unordered_map<std::string, std::string>
   + GetLocationContext(loc : const Location&) : std::string
@@ -113,13 +126,13 @@ class LlamaGenerator {
   - model_ : ModelHandle
   - context_ : ContextHandle
   - prompt_formatter_ : std::unique_ptr<IPromptFormatter>
+  - prompt_directory_ : std::unique_ptr<IPromptDirectory>
   - rng_ : std::mt19937
   + GenerateBrewery(...) : BreweryResult
   + GenerateUser(...) : UserResult
   - Load(model_path : const std::string&) : void
   - Infer(...) : std::string
   - InferFormatted(...) : std::string
-  - LoadBrewerySystemPrompt(...) : std::string
 }
 
 interface IPromptFormatter <<interface>> {
@@ -128,6 +141,16 @@ interface IPromptFormatter <<interface>> {
 
 class Gemma4JinjaPromptFormatter {
   + Format(system_prompt : std::string_view, user_prompt : std::string_view) : std::string
+}
+
+interface IPromptDirectory <<interface>> {
+  + Load(key : std::string_view) : std::string
+}
+
+class PromptDirectory {
+  - prompt_dir_ : std::filesystem::path
+  - cache_ : std::unordered_map<std::string, std::string>
+  + Load(key : std::string_view) : std::string
 }
 
 class JsonLoader {
@@ -164,19 +187,22 @@ class SystemDateTimeProvider {
 }
 
 ' Structural Relationships / Dependency Injection
-BiergartenDataGenerator *-- ILogger : owns
-BiergartenDataGenerator *-- IEnrichmentService : owns
-BiergartenDataGenerator *-- DataGenerator : owns
-BiergartenDataGenerator *-- IExportService : owns
+BiergartenPipelineOrchestrator *-- ILogger : owns
+BiergartenPipelineOrchestrator *-- IEnrichmentService : owns
+BiergartenPipelineOrchestrator *-- DataGenerator : owns
+BiergartenPipelineOrchestrator *-- IExportService : owns
 
 LogEntry *-- LogLevel
 LogEntry *-- PipelinePhase
+LogDTO *-- LogLevel
+LogDTO *-- PipelinePhase
 ILogger <|.. LogProducer : implements
 LogProducer ..> LogEntry : emits
 LogDispatcher ..> LogEntry : consumes
 
-IEnrichmentService <|.. WikipediaService : implements
-WikipediaService *-- WebClient : owns
+IEnrichmentService <|.. WikipediaEnrichmentService : implements
+IEnrichmentService <|.. MockEnrichmentService : implements
+WikipediaEnrichmentService *-- WebClient : owns
 
 WebClient <|.. HttpWebClient : implements
 
@@ -184,10 +210,12 @@ DataGenerator <|.. MockGenerator : implements
 DataGenerator <|.. LlamaGenerator : implements
 
 LlamaGenerator *-- IPromptFormatter : uses
+LlamaGenerator *-- IPromptDirectory : uses
 
 IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
+IPromptDirectory <|.. PromptDirectory : implements
 
-BiergartenDataGenerator ..> JsonLoader : uses
+BiergartenPipelineOrchestrator ..> JsonLoader : uses
 
 IExportService <|.. SqliteExportService : implements
 SqliteExportService *-- IDateTimeProvider : owns
