@@ -11,7 +11,8 @@ namespace Features.Breweries.Repository;
 /// </summary>
 /// <param name="connectionFactory">The factory used to create database connections.</param>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
-    : Repository<BreweryPost>(connectionFactory), IBreweryRepository
+    : Repository<BreweryPost>(connectionFactory),
+        IBreweryRepository
 {
     /// <summary>
     ///     Retrieves a brewery post by ID using the <c>USP_GetBreweryById</c> stored procedure.
@@ -29,7 +30,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         AddParameter(command, "@BreweryPostID", id);
 
         await using DbDataReader reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync()) return MapToEntity(reader);
+        if (await reader.ReadAsync())
+            return MapToEntity(reader);
         return null;
     }
 
@@ -58,7 +60,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         await using DbDataReader reader = await command.ExecuteReaderAsync();
         List<BreweryPost> breweries = new();
 
-        while (await reader.ReadAsync()) breweries.Add(MapToEntity(reader));
+        while (await reader.ReadAsync())
+            breweries.Add(MapToEntity(reader));
 
         return breweries;
     }
@@ -121,7 +124,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         command.CommandText = "USP_CreateBrewery";
         command.CommandType = CommandType.StoredProcedure;
 
-        if (brewery.Location is null) throw new ArgumentException("Location must be provided when creating a brewery.");
+        if (brewery.Location is null)
+            throw new ArgumentException("Location must be provided when creating a brewery.");
 
         AddParameter(command, "@BreweryName", brewery.BreweryName);
         AddParameter(command, "@Description", brewery.Description);
@@ -195,7 +199,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     PostalCode = reader.GetString(reader.GetOrdinal("PostalCode")),
                     Coordinates = reader.IsDBNull(reader.GetOrdinal("Coordinates"))
                         ? null
-                        : reader.GetFieldValue<byte[]>(reader.GetOrdinal("Coordinates"))
+                        : reader.GetFieldValue<byte[]>(reader.GetOrdinal("Coordinates")),
                 };
                 brewery.Location = location;
             }
@@ -215,11 +219,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     /// <param name="command">The command to add the parameter to.</param>
     /// <param name="name">The parameter name (including any prefix, e.g. "@BreweryName").</param>
     /// <param name="value">The parameter value, or <c>null</c> to bind <see cref="DBNull.Value" />.</param>
-    private static void AddParameter(
-        DbCommand command,
-        string name,
-        object? value
-    )
+    private static void AddParameter(DbCommand command, string name, object? value)
     {
         DbParameter p = command.CreateParameter();
         p.ParameterName = name;

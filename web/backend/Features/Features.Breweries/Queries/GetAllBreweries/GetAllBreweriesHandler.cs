@@ -12,9 +12,15 @@ namespace Features.Breweries.Queries.GetAllBreweries;
 public class GetAllBreweriesHandler(IBreweryRepository repository)
     : IRequestHandler<GetAllBreweriesQuery, IEnumerable<BreweryDto>>
 {
-    public async Task<IEnumerable<BreweryDto>> Handle(GetAllBreweriesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<BreweryDto>> Handle(
+        GetAllBreweriesQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        IEnumerable<BreweryPost> breweries = await repository.GetAllAsync(request.Limit, request.Offset);
+        IEnumerable<BreweryPost> breweries = await repository.GetAllAsync(
+            request.Limit,
+            request.Offset
+        );
         return breweries.Select(b => b.ToDto());
     }
 }

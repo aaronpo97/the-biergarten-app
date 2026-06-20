@@ -18,7 +18,10 @@ public class CreateBreweryHandler(IBreweryRepository repository)
     /// <param name="request">The details of the brewery post to create.</param>
     /// <param name="cancellationToken">A token to observe for cancellation requests.</param>
     /// <returns>The newly created brewery post.</returns>
-    public async Task<BreweryDto> Handle(CreateBreweryCommand request, CancellationToken cancellationToken)
+    public async Task<BreweryDto> Handle(
+        CreateBreweryCommand request,
+        CancellationToken cancellationToken
+    )
     {
         BreweryPost entity = new()
         {
@@ -34,8 +37,8 @@ public class CreateBreweryHandler(IBreweryRepository repository)
                 AddressLine1 = request.Location.AddressLine1,
                 AddressLine2 = request.Location.AddressLine2,
                 PostalCode = request.Location.PostalCode,
-                Coordinates = request.Location.Coordinates
-            }
+                Coordinates = request.Location.Coordinates,
+            },
         };
 
         await repository.CreateAsync(entity);
