@@ -13,7 +13,10 @@ public class GetUserByIdHandler(IUserAccountRepository repository)
     : IRequestHandler<GetUserByIdQuery, UserAccount>
 {
     /// <exception cref="NotFoundException">Thrown when no user account exists with the given ID.</exception>
-    public async Task<UserAccount> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+    public async Task<UserAccount> Handle(
+        GetUserByIdQuery request,
+        CancellationToken cancellationToken
+    )
     {
         UserAccount? user = await repository.GetByIdAsync(request.UserAccountId);
         if (user is null)
