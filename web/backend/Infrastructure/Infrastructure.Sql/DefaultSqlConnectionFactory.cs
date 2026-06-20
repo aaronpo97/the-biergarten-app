@@ -9,12 +9,9 @@ namespace Infrastructure.Sql;
 ///     resolving the connection string from environment variables or application configuration.
 /// </summary>
 /// <param name="configuration">The application configuration, used as a fallback source for the connection string.</param>
-public class DefaultSqlConnectionFactory(IConfiguration configuration)
-    : ISqlConnectionFactory
+public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlConnectionFactory
 {
-    private readonly string _connectionString = GetConnectionString(
-        configuration
-    );
+    private readonly string _connectionString = GetConnectionString(configuration);
 
     /// <summary>
     ///     Creates a new, unopened <see cref="SqlConnection" /> using the resolved connection string.
@@ -39,10 +36,9 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration)
     private static string GetConnectionString(IConfiguration configuration)
     {
         // Check for full connection string first
-        string? fullConnectionString = Environment.GetEnvironmentVariable(
-            "DB_CONNECTION_STRING"
-        );
-        if (!string.IsNullOrEmpty(fullConnectionString)) return fullConnectionString;
+        string? fullConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+        if (!string.IsNullOrEmpty(fullConnectionString))
+            return fullConnectionString;
 
         // Try to build from individual environment variables (preferred method for Docker)
         try
@@ -53,7 +49,8 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration)
         {
             // Fall back to configuration-based connection string if env vars are not set
             string? connString = configuration.GetConnectionString("Default");
-            if (!string.IsNullOrEmpty(connString)) return connString;
+            if (!string.IsNullOrEmpty(connString))
+                return connString;
 
             throw new InvalidOperationException(
                 "Database connection string not configured. Set DB_CONNECTION_STRING or DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD env vars or ConnectionStrings:Default."
