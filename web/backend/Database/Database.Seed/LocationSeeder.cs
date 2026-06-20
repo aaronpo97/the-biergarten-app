@@ -15,24 +15,22 @@ namespace Database.Seed;
 internal class LocationSeeder : ISeeder
 {
     /// <summary>The set of countries to seed, identified by name and ISO 3166-1 code.</summary>
-    private static readonly IReadOnlyList<(
-        string CountryName,
-        string CountryCode
-        )> Countries =
+    private static readonly IReadOnlyList<(string CountryName, string CountryCode)> Countries =
     [
         ("Canada", "CA"),
         ("Mexico", "MX"),
-        ("United States", "US")
+        ("United States", "US"),
     ];
 
     /// <summary>
     ///     The set of states/provinces to seed, each identified by name, ISO 3166-2 code,
     ///     and the ISO 3166-1 code of its parent country.
     /// </summary>
-    private static IReadOnlyList<(string StateProvinceName, string StateProvinceCode, string CountryCode)> States
-    {
-        get;
-    } =
+    private static IReadOnlyList<(
+        string StateProvinceName,
+        string StateProvinceCode,
+        string CountryCode
+    )> States { get; } =
     [
         ("Alabama", "US-AL", "US"),
         ("Alaska", "US-AK", "US"),
@@ -134,7 +132,7 @@ internal class LocationSeeder : ISeeder
         ("Veracruz de Ignacio de la Llave", "MX-VER", "MX"),
         ("Yucatán", "MX-YUC", "MX"),
         ("Zacatecas", "MX-ZAC", "MX"),
-        ("Ciudad de México", "MX-CMX", "MX")
+        ("Ciudad de México", "MX-CMX", "MX"),
     ];
 
     /// <summary>
@@ -255,7 +253,7 @@ internal class LocationSeeder : ISeeder
         ("MX-COA", "Saltillo"),
         ("MX-BCS", "La Paz"),
         ("MX-NAY", "Tepic"),
-        ("MX-ZAC", "Zacatecas")
+        ("MX-ZAC", "Zacatecas"),
     ];
 
     /// <summary>
@@ -269,9 +267,7 @@ internal class LocationSeeder : ISeeder
         foreach ((string countryName, string countryCode) in Countries)
             await CreateCountryAsync(connection, countryName, countryCode);
 
-        foreach (
-            (string stateProvinceName, string stateProvinceCode, string countryCode) in States
-        )
+        foreach ((string stateProvinceName, string stateProvinceCode, string countryCode) in States)
             await CreateStateProvinceAsync(
                 connection,
                 stateProvinceName,
@@ -294,10 +290,7 @@ internal class LocationSeeder : ISeeder
         string countryCode
     )
     {
-        await using SqlCommand command = new(
-            "dbo.USP_CreateCountry",
-            connection
-        );
+        await using SqlCommand command = new("dbo.USP_CreateCountry", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@CountryName", countryName);
         command.Parameters.AddWithValue("@ISO3166_1", countryCode);
@@ -318,15 +311,9 @@ internal class LocationSeeder : ISeeder
         string countryCode
     )
     {
-        await using SqlCommand command = new(
-            "dbo.USP_CreateStateProvince",
-            connection
-        );
+        await using SqlCommand command = new("dbo.USP_CreateStateProvince", connection);
         command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddWithValue(
-            "@StateProvinceName",
-            stateProvinceName
-        );
+        command.Parameters.AddWithValue("@StateProvinceName", stateProvinceName);
         command.Parameters.AddWithValue("@ISO3166_2", stateProvinceCode);
         command.Parameters.AddWithValue("@CountryCode", countryCode);
 
@@ -344,16 +331,10 @@ internal class LocationSeeder : ISeeder
         string stateProvinceCode
     )
     {
-        await using SqlCommand command = new(
-            "dbo.USP_CreateCity",
-            connection
-        );
+        await using SqlCommand command = new("dbo.USP_CreateCity", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@CityName", cityName);
-        command.Parameters.AddWithValue(
-            "@StateProvinceCode",
-            stateProvinceCode
-        );
+        command.Parameters.AddWithValue("@StateProvinceCode", stateProvinceCode);
 
         await command.ExecuteNonQueryAsync();
     }

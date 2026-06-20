@@ -17,20 +17,24 @@ using Microsoft.Data.SqlClient;
 /// </exception>
 string BuildConnectionString()
 {
-    string server = Environment.GetEnvironmentVariable("DB_SERVER")
-                    ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+    string server =
+        Environment.GetEnvironmentVariable("DB_SERVER")
+        ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
-    string dbName = Environment.GetEnvironmentVariable("DB_NAME")
-                    ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+    string dbName =
+        Environment.GetEnvironmentVariable("DB_NAME")
+        ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
-    string user = Environment.GetEnvironmentVariable("DB_USER")
-                  ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+    string user =
+        Environment.GetEnvironmentVariable("DB_USER")
+        ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
-    string password = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                      ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+    string password =
+        Environment.GetEnvironmentVariable("DB_PASSWORD")
+        ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
-    string trustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE")
-                                    ?? "True";
+    string trustServerCertificate =
+        Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE") ?? "True";
 
     SqlConnectionStringBuilder builder = new()
     {
@@ -39,12 +43,11 @@ string BuildConnectionString()
         UserID = user,
         Password = password,
         TrustServerCertificate = bool.Parse(trustServerCertificate),
-        Encrypt = true
+        Encrypt = true,
     };
 
     return builder.ConnectionString;
 }
-
 
 try
 {
@@ -74,17 +77,14 @@ try
             connection = null;
         }
 
-    if (connection == null) throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
+    if (connection == null)
+        throw new Exception($"Failed to connect to database after {maxRetries} attempts.");
 
     Console.WriteLine("Starting seeding...");
 
     using (connection)
     {
-        ISeeder[] seeders =
-        [
-            new LocationSeeder(),
-            new UserSeeder()
-        ];
+        ISeeder[] seeders = [new LocationSeeder(), new UserSeeder()];
 
         foreach (ISeeder seeder in seeders)
         {

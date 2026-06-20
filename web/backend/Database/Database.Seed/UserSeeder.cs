@@ -19,10 +19,7 @@ namespace Database.Seed;
 internal class UserSeeder : ISeeder
 {
     /// <summary>The first/last name pairs used to generate seed user accounts.</summary>
-    private static readonly IReadOnlyList<(
-        string FirstName,
-        string LastName
-        )> SeedNames =
+    private static readonly IReadOnlyList<(string FirstName, string LastName)> SeedNames =
     [
         ("Aarya", "Mathews"),
         ("Aiden", "Wells"),
@@ -123,7 +120,7 @@ internal class UserSeeder : ISeeder
         ("Zara", "Wilkinson"),
         ("Zaria", "Gibson"),
         ("Zion", "Watkins"),
-        ("Zoie", "Armstrong")
+        ("Zoie", "Armstrong"),
     ];
 
     /// <summary>
@@ -168,13 +165,8 @@ internal class UserSeeder : ISeeder
             DateTime dob = GenerateDateOfBirth(rng);
 
             // generate a password and hash it
-            string pwd = generator.Generate(
-                64,
-                10,
-                10
-            );
+            string pwd = generator.Generate(64, 10, 10);
             string hash = GeneratePasswordHash(pwd);
-
 
             // register the user (creates account + credential)
             Guid id = await RegisterUserAsync(
@@ -189,9 +181,9 @@ internal class UserSeeder : ISeeder
             createdUsers++;
             createdCredentials++;
 
-
             // add user verification
-            if (await HasUserVerificationAsync(connection, id)) continue;
+            if (await HasUserVerificationAsync(connection, id))
+                continue;
 
             await AddUserVerificationAsync(connection, id);
             createdVerifications++;
@@ -227,7 +219,6 @@ internal class UserSeeder : ISeeder
         await using SqlCommand command = new("dbo.USP_RegisterUser", connection);
         command.CommandType = CommandType.StoredProcedure;
 
-
         command.Parameters.Add("@Username", SqlDbType.VarChar, 64).Value = username;
         command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 128).Value = firstName;
         command.Parameters.Add("@LastName", SqlDbType.NVarChar, 128).Value = lastName;
@@ -236,7 +227,6 @@ internal class UserSeeder : ISeeder
         command.Parameters.Add("@Hash", SqlDbType.NVarChar, -1).Value = hash;
 
         object? result = await command.ExecuteScalarAsync();
-
 
         return (Guid)result!;
     }
@@ -257,7 +247,7 @@ internal class UserSeeder : ISeeder
             Salt = salt,
             DegreeOfParallelism = Math.Max(Environment.ProcessorCount, 1),
             MemorySize = 65536,
-            Iterations = 4
+            Iterations = 4,
         };
 
         byte[] hash = argon2.GetBytes(32);
@@ -274,10 +264,10 @@ internal class UserSeeder : ISeeder
     )
     {
         const string sql = """
-                           SELECT 1
-                           FROM dbo.UserVerification
-                           WHERE UserAccountId = @UserAccountId;
-                           """;
+            SELECT 1
+            FROM dbo.UserVerification
+            WHERE UserAccountId = @UserAccountId;
+            """;
         await using SqlCommand command = new(sql, connection);
         command.Parameters.AddWithValue("@UserAccountId", userAccountId);
         object? result = await command.ExecuteScalarAsync();
@@ -288,15 +278,9 @@ internal class UserSeeder : ISeeder
     /// <param name="connection">An open connection to the target database.</param>
     /// <param name="userAccountId">The identifier of the user account to verify.</param>
     /// <returns>A task that completes when the verification record has been created.</returns>
-    private static async Task AddUserVerificationAsync(
-        SqlConnection connection,
-        Guid userAccountId
-    )
+    private static async Task AddUserVerificationAsync(SqlConnection connection, Guid userAccountId)
     {
-        await using SqlCommand command = new(
-            "dbo.USP_CreateUserVerification",
-            connection
-        );
+        await using SqlCommand command = new("dbo.USP_CreateUserVerification", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@UserAccountID_", userAccountId);
 
