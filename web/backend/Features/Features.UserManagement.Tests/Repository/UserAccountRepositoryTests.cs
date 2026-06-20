@@ -1,11 +1,10 @@
 using Apps72.Dev.Data.DbMocker;
 using FluentAssertions;
-using Infrastructure.Repository.Tests.Database;
-using Infrastructure.Repository.UserAccount;
+using Features.UserManagement.Repository;
 
-namespace Infrastructure.Repository.Tests.UserAccount;
+namespace Features.UserManagement.Tests.Repository;
 
-public class UserAccountRepositoryTest
+public class UserAccountRepositoryTests
 {
     private static UserAccountRepository CreateRepo(MockDbConnection conn) =>
         new(new TestConnectionFactory(conn));

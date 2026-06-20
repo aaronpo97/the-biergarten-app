@@ -1,4 +1,4 @@
-namespace Infrastructure.Repository.UserAccount;
+namespace Features.UserManagement.Repository;
 
 /// <summary>
 /// Repository for CRUD operations on user account records.
