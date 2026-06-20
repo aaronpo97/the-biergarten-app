@@ -1,4 +1,4 @@
-using API.Core.Contracts.Common;
+using Shared.Contracts;
 using FluentValidation;
 
 namespace API.Core.Contracts.Auth;

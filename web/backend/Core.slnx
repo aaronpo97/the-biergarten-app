@@ -29,4 +29,8 @@
         <Project Path="Service/Service.Auth/Service.Auth.csproj" />
         <Project Path="Service/Service.Breweries/Service.Breweries.csproj" />
     </Folder>
+    <Folder Name="/Shared/">
+        <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
+        <Project Path="Shared/Shared.Application/Shared.Application.csproj" />
+    </Folder>
 </Solution>

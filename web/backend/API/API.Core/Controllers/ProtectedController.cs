@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using API.Core.Contracts.Common;
+using Shared.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
