@@ -96,7 +96,9 @@ public class UpdateBreweryHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         persisted!.Location.Should().NotBeNull();
-        persisted.Location!.BreweryPostLocationId.Should().Be(locationCommand.BreweryPostLocationId);
+        persisted
+            .Location!.BreweryPostLocationId.Should()
+            .Be(locationCommand.BreweryPostLocationId);
         persisted.Location.BreweryPostId.Should().Be(command.BreweryPostId);
         persisted.Location.CityId.Should().Be(locationCommand.CityId);
         persisted.Location.AddressLine1.Should().Be(locationCommand.AddressLine1);

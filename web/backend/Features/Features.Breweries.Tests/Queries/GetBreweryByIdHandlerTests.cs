@@ -21,10 +21,12 @@ public class GetBreweryByIdHandlerTests
     public async Task Handle_ReturnsBrewery_WhenFound()
     {
         BreweryPost brewery = new() { BreweryPostId = Guid.NewGuid(), BreweryName = "Test" };
-        _repoMock.Setup(r => r.GetByIdAsync(brewery.BreweryPostId))
-            .ReturnsAsync(brewery);
+        _repoMock.Setup(r => r.GetByIdAsync(brewery.BreweryPostId)).ReturnsAsync(brewery);
 
-        BreweryDto? result = await _handler.Handle(new GetBreweryByIdQuery(brewery.BreweryPostId), CancellationToken.None);
+        BreweryDto? result = await _handler.Handle(
+            new GetBreweryByIdQuery(brewery.BreweryPostId),
+            CancellationToken.None
+        );
 
         result.Should().NotBeNull();
         result!.BreweryPostId.Should().Be(brewery.BreweryPostId);
@@ -34,10 +36,12 @@ public class GetBreweryByIdHandlerTests
     public async Task Handle_ReturnsNull_WhenNotFound()
     {
         Guid id = Guid.NewGuid();
-        _repoMock.Setup(r => r.GetByIdAsync(id))
-            .ReturnsAsync((BreweryPost?)null);
+        _repoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((BreweryPost?)null);
 
-        BreweryDto? result = await _handler.Handle(new GetBreweryByIdQuery(id), CancellationToken.None);
+        BreweryDto? result = await _handler.Handle(
+            new GetBreweryByIdQuery(id),
+            CancellationToken.None
+        );
 
         result.Should().BeNull();
     }

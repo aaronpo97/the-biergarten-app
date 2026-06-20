@@ -20,10 +20,12 @@ public class GetAllBreweriesHandlerTests
     [Fact]
     public async Task Handle_PassesLimitAndOffset_ToRepository()
     {
-        _repoMock.Setup(r => r.GetAllAsync(10, 5))
-            .ReturnsAsync(Array.Empty<BreweryPost>());
+        _repoMock.Setup(r => r.GetAllAsync(10, 5)).ReturnsAsync(Array.Empty<BreweryPost>());
 
-        IEnumerable<BreweryDto> result = await _handler.Handle(new GetAllBreweriesQuery(10, 5), CancellationToken.None);
+        IEnumerable<BreweryDto> result = await _handler.Handle(
+            new GetAllBreweriesQuery(10, 5),
+            CancellationToken.None
+        );
 
         result.Should().BeEmpty();
         _repoMock.Verify(r => r.GetAllAsync(10, 5), Times.Once);
@@ -35,13 +37,18 @@ public class GetAllBreweriesHandlerTests
         BreweryPost[] breweries = new[]
         {
             new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "A" },
-            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "B" }
+            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "B" },
         };
-        _repoMock.Setup(r => r.GetAllAsync(null, null))
-            .ReturnsAsync(breweries);
+        _repoMock.Setup(r => r.GetAllAsync(null, null)).ReturnsAsync(breweries);
 
-        IEnumerable<BreweryDto> result = await _handler.Handle(new GetAllBreweriesQuery(null, null), CancellationToken.None);
+        IEnumerable<BreweryDto> result = await _handler.Handle(
+            new GetAllBreweriesQuery(null, null),
+            CancellationToken.None
+        );
 
-        result.Select(b => b.BreweryPostId).Should().BeEquivalentTo(breweries.Select(b => b.BreweryPostId));
+        result
+            .Select(b => b.BreweryPostId)
+            .Should()
+            .BeEquivalentTo(breweries.Select(b => b.BreweryPostId));
     }
 }
