@@ -9,6 +9,7 @@
 #include <boost/json.hpp>
 #include <cctype>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -76,23 +77,7 @@ bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
   return !out.empty();
 }
 
-bool HasSchemaPlaceholder(const std::array<std::string*, 4>& values) {
-  for (const std::string* value : values) {
-    std::string lowered = *value;
-    std::ranges::transform(lowered, lowered.begin(),
-                           [](const unsigned char character) {
-                             return static_cast<char>(std::tolower(character));
-                           });
-
-    if (lowered == "string") {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool HasSchemaPlaceholder(const std::array<std::string*, 2>& values) {
+bool HasSchemaPlaceholder(std::span<std::string* const> values) {
   for (const std::string* value : values) {
     std::string lowered = *value;
     std::ranges::transform(lowered, lowered.begin(),

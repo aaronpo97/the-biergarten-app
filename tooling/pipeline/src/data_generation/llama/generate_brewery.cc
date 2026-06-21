@@ -91,7 +91,6 @@ BreweryResult LlamaGenerator::GenerateBrewery(
   std::string last_error;
 
   // Token budget: too small risks truncating valid JSON mid-string.
-  // Start conservatively but allow adaptive increases on truncation.
   int max_tokens = kBreweryInitialMaxTokens;
 
   // Limit output length to keep it concise and focused

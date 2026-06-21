@@ -16,20 +16,13 @@ std::string WikipediaEnrichmentService::GetLocationContext(
   if (!this->client_) {
     if (logger_) {
       logger_->Log({.level = LogLevel::Warn,
-                    .phase = PipelinePhase::UserGeneration,
+                    .phase = PipelinePhase::Enrichment,
                     .message = "Wikipedia client is nullptr."});
     }
     return {};
   }
 
   std::string result;
-
-  // std::string region_query(loc.city);
-  // if (!loc.country.empty()) {
-  //   region_query += loc.state_province,
-  //   region_query += ", ";
-  //   region_query += loc.country;
-  // }
 
   constexpr std::string_view brewing_query = "brewing";
   const std::string location_query =
@@ -51,7 +44,7 @@ std::string WikipediaEnrichmentService::GetLocationContext(
     append_extract(FetchExtract(beer_query));
     if (logger_) {
       logger_->Log({.level = LogLevel::Info,
-                    .phase = PipelinePhase::UserGeneration,
+                    .phase = PipelinePhase::Enrichment,
                     .message = std::format("Done fetching for {}. Sleeping for 10 seconds.",
                                location_query)});
     }
@@ -61,7 +54,7 @@ std::string WikipediaEnrichmentService::GetLocationContext(
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Debug,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message = std::format("WikipediaService lookup failed for '{}': {}",
                       location_query, e.what())});
     }

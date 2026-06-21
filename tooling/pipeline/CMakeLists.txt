@@ -210,6 +210,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 # --- services: sqlite ---
 target_sources(${PROJECT_NAME} PRIVATE
 	src/services/sqlite/process_record.cc
+	src/services/sqlite/process_user_record.cc
 	src/services/sqlite/sqlite_export_service.cc
 	src/services/sqlite/finalize.cc
 	src/services/sqlite/initialize.cc

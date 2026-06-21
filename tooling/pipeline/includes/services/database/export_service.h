@@ -35,6 +35,13 @@ class IExportService {
    */
   virtual uint64_t ProcessRecord(const GeneratedBrewery& brewery) = 0;
 
+  /**
+   * @brief Persists one generated user record.
+   *
+   * @param user Generated user payload to store.
+   */
+  virtual uint64_t ProcessRecord(const GeneratedUser& user) = 0;
+
   /// @brief Finalizes the export destination.
   virtual void Finalize() = 0;
 };

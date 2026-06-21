@@ -15,8 +15,6 @@ std::optional<ApplicationOptions> ParseArguments(
 
   opt("help,h", "Produce help message");
 
-  // Defaults sourced from SamplingOptions{} so the CLI and LlamaGenerator
-  // share a single source of truth — changing the struct updates both.
   auto add_sampling_options = [&]() -> void {
     const SamplingOptions sampling_defaults{};
     opt("temperature",
@@ -152,7 +150,6 @@ std::optional<ApplicationOptions> ParseArguments(
 
     options.generator.use_mocked = use_mocked;
     options.generator.model_path = model_path;
-    // options.generator.n_gpu_layers = n_gpu_layers;
 
     // Only populate sampling config when the user explicitly overrides at
     // least one value. Leaving it as std::nullopt lets LlamaGenerator fall

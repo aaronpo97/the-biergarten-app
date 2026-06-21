@@ -21,7 +21,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
       cache_it != this->extract_cache_.end()) {
     if (logger_) {
       logger_->Log({.level = LogLevel::Debug,
-                    .phase = PipelinePhase::UserGeneration,
+                    .phase = PipelinePhase::Enrichment,
                     .message = std::format("Wikipedia: Cache hit for {}!", cache_key)});
     }
     return cache_it->second;
@@ -47,7 +47,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message = std::format("WikipediaService: JSON parse error for '{}': {}",
                       std::string(query), ec.message())});
     }
@@ -60,7 +60,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message =
                std::format("WikipediaService: Expected root object for '{}'",
                std::string(query))});
@@ -78,7 +78,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message =
                std::format("WikipediaService: Missing query.pages for '{}'",
                std::string(query))});
@@ -92,7 +92,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message = std::format("WikipediaService: No pages returned for '{}'",
                       std::string(query))});
     }
@@ -108,7 +108,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message =
                std::format("WikipediaService: Unexpected page format for '{}'",
                std::string(query))});
@@ -122,7 +122,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
   if (page.contains("missing")) {
     if (logger_) {
       logger_->Log({.level = LogLevel::Warn,
-                    .phase = PipelinePhase::UserGeneration,
+                    .phase = PipelinePhase::Enrichment,
                     .message = std::format("WikipediaService: Page '{}' does not exist",
                                std::string(query))});
     }
@@ -136,7 +136,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
            .message =
                std::format("WikipediaService: No extract string found for '{}'",
                std::string(query))});
@@ -149,7 +149,7 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
   std::string extract(extract_ptr->as_string());
   if (logger_) {
     logger_->Log({.level = LogLevel::Info,
-                  .phase = PipelinePhase::UserGeneration,
+                  .phase = PipelinePhase::Enrichment,
                   .message = std::format("WikipediaService: Fetched {} chars for '{}'",
                              extract.size(), std::string(query))});
   }

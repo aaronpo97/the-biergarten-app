@@ -35,6 +35,7 @@ enum class LogLevel {
  */
 enum class PipelinePhase {
   Startup,                   ///< Initialization and validation.
+  Enrichment,                ///< Location/context enrichment (e.g. Wikipedia lookups).
   UserGeneration,            ///< User profile generation.
   BreweryAndBeerGeneration,  ///< Brewery and beer data generation.
   CheckinGeneration,         ///< Checkin (visit) record generation.

@@ -57,7 +57,7 @@ std::string HttpWebClient::Get(const std::string& url) {
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Error,
-           .phase = PipelinePhase::UserGeneration,
+           .phase = PipelinePhase::Enrichment,
          .message =
            std::format("[HttpWebClient] Request failed for URL: {}", url)});
     }

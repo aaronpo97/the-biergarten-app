@@ -107,6 +107,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   generated_users_.clear();
   std::unordered_set<std::string> used_email_local_parts;
   size_t skipped_count = 0;
+  size_t export_failed_count = 0;
 
   for (const auto& city : cities) {
     const std::optional<Name> sampled_name =
@@ -131,13 +132,29 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
       const UserResult user =
           generator_->GenerateUser(city, persona, *sampled_name);
 
-      generated_users_.push_back(GeneratedUser{
+      const GeneratedUser generated_user{
           .location = city.location,
           .user = user,
           .email = BuildEmail(*sampled_name, used_email_local_parts),
           .date_of_birth = GenerateDateOfBirth(rng),
           .password = GenerateRandomPassword(rng),
-      });
+      };
+
+      generated_users_.push_back(generated_user);
+
+      try {
+        exporter_->ProcessRecord(generated_user);
+      } catch (const std::exception& export_exception) {
+        ++export_failed_count;
+
+        logger_->Log(
+            {.level = LogLevel::Warn,
+             .phase = PipelinePhase::UserGeneration,
+             .message = std::format(
+                 "[Pipeline] Generated user for '{}' ({}) but SQLite export failed: {}",
+                 city.location.city, city.location.country,
+                 export_exception.what())});
+      }
     } catch (const std::exception& e) {
       ++skipped_count;
       logger_->Log(
@@ -156,5 +173,14 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
          .message = std::format(
              "[Pipeline] Skipped {} city/cities during user generation",
              skipped_count)});
+  }
+
+  if (export_failed_count > 0) {
+    logger_->Log(
+        {.level = LogLevel::Warn,
+         .phase = PipelinePhase::Teardown,
+         .message = std::format(
+             "[Pipeline] Failed to export {} generated user/users to SQLite",
+             export_failed_count)});
   }
 }

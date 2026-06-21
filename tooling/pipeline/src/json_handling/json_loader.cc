@@ -107,22 +107,7 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
 
 std::vector<Location> JsonLoader::LoadLocations(
     const std::filesystem::path& filepath, std::shared_ptr<ILogger> logger) {
-  std::ifstream input(filepath);
-  if (!input.is_open()) {
-    throw std::runtime_error("Failed to open locations file: " +
-                             filepath.string());
-  }
-
-  std::stringstream buffer;
-  buffer << input.rdbuf();
-  const std::string content = buffer.str();
-
-  boost::system::error_code error;
-  boost::json::value root = boost::json::parse(content, error);
-  if (error) {
-    throw std::runtime_error("Failed to parse locations JSON: " +
-                             error.message());
-  }
+  const boost::json::value root = ParseJsonFile(filepath, "locations");
 
   if (!root.is_array()) {
     throw std::runtime_error(

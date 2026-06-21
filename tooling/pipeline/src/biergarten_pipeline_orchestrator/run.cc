@@ -22,9 +22,6 @@ bool BiergartenPipelineOrchestrator::Run() {
     for (auto& city : cities) {
       try {
         std::string region_context = context_service_->GetLocationContext(city);
-        // logger_->Log(LogLevel::Debug, PipelinePhase::UserGeneration,
-        //              "[Pipeline] Context for '" + city.city + "' (" +
-        //              city.iso3166_2 + ") gathered:\n" + region_context);
 
         enriched.push_back(
             EnrichedCity{.location = std::move(city),
@@ -33,7 +30,7 @@ bool BiergartenPipelineOrchestrator::Run() {
         ++skipped_count;
         logger_->Log(
             {.level = LogLevel::Warn,
-             .phase = PipelinePhase::UserGeneration,
+             .phase = PipelinePhase::Enrichment,
              .message = std::format(
                  "[Pipeline] Skipping city '{}' ({}): context lookup failed: {}",
                  city.city, city.country, exception.what())});
@@ -42,7 +39,7 @@ bool BiergartenPipelineOrchestrator::Run() {
 
     if (skipped_count > 0) {
       logger_->Log({.level = LogLevel::Warn,
-                    .phase = PipelinePhase::UserGeneration,
+                    .phase = PipelinePhase::Enrichment,
                     .message = std::format(
                         "[Pipeline] Skipped {} city/cities due to context lookup errors",
                         skipped_count)});

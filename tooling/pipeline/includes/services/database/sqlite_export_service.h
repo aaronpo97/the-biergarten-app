@@ -31,6 +31,7 @@ class SqliteExportService final : public IExportService {
 
   void Initialize() override;
   uint64_t ProcessRecord(const GeneratedBrewery& brewery) override;
+  uint64_t ProcessRecord(const GeneratedUser& user) override;
   void Finalize() override;
 
  private:
@@ -46,6 +47,15 @@ class SqliteExportService final : public IExportService {
   [[nodiscard]] std::filesystem::path BuildDatabasePath() const;
   [[nodiscard]] static std::string BuildLocationKey(const Location& location);
 
+  /**
+   * @brief Returns the row id for @p location, inserting it first if it has
+   * not already been seen during this run.
+   *
+   * Shared by both ProcessRecord() overloads so breweries and users
+   * referencing the same location resolve to the same row.
+   */
+  [[nodiscard]] sqlite3_int64 ResolveLocationId(const Location& location);
+
   std::unique_ptr<IDateTimeProvider> date_time_provider_;
   std::filesystem::path output_path_;
   std::string run_timestamp_utc_;
@@ -53,6 +63,7 @@ class SqliteExportService final : public IExportService {
   SqliteDatabaseHandle db_handle_;
   SqliteStatementHandle insert_location_stmt_;
   SqliteStatementHandle insert_brewery_stmt_;
+  SqliteStatementHandle insert_user_stmt_;
   bool transaction_open_ = false;
   std::unordered_map<std::string, sqlite3_int64> location_cache_;
 };

@@ -119,7 +119,7 @@ struct UserPersona {
  * @brief LLM sampling parameters.
  */
 struct SamplingOptions {
-  /// @brief LLM sampling temperature (0.0 to 1.0, higher = more random).
+  /// @brief LLM sampling temperature (higher = more random).
   float temperature = 1.0F;
 
   /// @brief LLM nucleus sampling top-p parameter.

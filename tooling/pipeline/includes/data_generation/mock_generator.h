@@ -33,7 +33,7 @@ class MockGenerator final : public DataGenerator {
    *
    * @param city Enriched city the user is associated with.
    * @param persona Persona archetype.
-   * @param name Sampled first/last name. Unused for mock generation.
+   * @param name Sampled first/last name, copied directly into the result.
    * @return Generated user result.
    */
   UserResult GenerateUser(const EnrichedCity& city, const UserPersona& persona,
