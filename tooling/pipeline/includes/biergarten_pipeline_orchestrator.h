@@ -92,11 +92,26 @@ class BiergartenPipelineOrchestrator {
   void GenerateBreweries(std::span<const EnrichedCity> cities);
 
   /**
+   * @brief Generate users grounded in sampled names and personas for
+   * enriched cities.
+   *
+   * Loads personas.json / forenames-by-country.json / surnames-by-country.json
+   * itself, mirroring how QueryCitiesWithCountries() owns its own
+   * locations.json load.
+   *
+   * @param cities Span of enriched city data.
+   */
+  void GenerateUsers(std::span<const EnrichedCity> cities);
+
+  /**
    * @brief Log the generated brewery results.
    */
   void LogResults() const;
 
   /// @brief Stores generated brewery data.
   std::vector<GeneratedBrewery> generated_breweries_;
+
+  /// @brief Stores generated user data.
+  std::vector<GeneratedUser> generated_users_;
 };
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_

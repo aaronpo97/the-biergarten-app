@@ -13,6 +13,7 @@ low-resource language failures.
 - [Model Bias and Language Quality](#model-bias-and-language-quality)
 - [Western and Eurocentric Lens](#western-and-eurocentric-lens)
 - [Wikipedia Enrichment](#wikipedia-enrichment)
+- [Names-by-Country Dataset](#names-by-country-dataset)
 - [The "Avoid AI Phrases" Prompt Instruction](#the-avoid-ai-phrases-prompt-instruction)
 - [Known Issues](#known-issues)
   - [Hallucinated Brewing Techniques](#hallucinated-brewing-techniques)
@@ -88,6 +89,33 @@ International License (CC BY-SA 4.0)** and the **GNU Free Documentation License
 
 Wikipedia's own accuracy limitations and editorial biases can propagate into
 generated descriptions.
+
+---
+
+## Names-by-Country Dataset
+
+`tooling/pipeline/forenames-by-country.json` and `surnames-by-country.json`
+(used to sample a `Name` per ISO 3166-1 country code for user generation) are
+vendored verbatim, unmodified, from
+[sigpwned/popular-names-by-country-dataset](https://github.com/sigpwned/popular-names-by-country-dataset)
+(the `common-forenames-by-country.json` / `common-surnames-by-country.json`
+release assets), released under **CC0** (public domain). That dataset's own
+forename/surname lists are pulled from Wikipedia's "Lists of most common
+surnames" and "List of most popular given names" as of the week of
+2023-07-08 — see that project's README for full provenance. Names are not
+LLM-generated; this is curated fixture data per ROADMAP.md §2. Per-forename
+gender from the source data is preserved through to the sampled `Name`
+(rather than discarded during loading) so it's available for gender-aware
+persona/bio generation later.
+
+The full multinational dataset is kept as-is (106 countries for forenames,
+75 for surnames) rather than trimmed to `locations.json`'s current country
+list, so it doesn't need re-sourcing if more countries are added later.
+`NamesByCountry::SampleName()` returns no result for a country present in
+neither file; of the countries in `locations.json`, that's currently `KE`,
+`SE`, `SG`, `TH`, `VN`, and `ZA` — `GenerateUsers` skips cities in those
+countries the same way brewery generation skips cities whose enrichment
+lookup fails.
 
 ---
 

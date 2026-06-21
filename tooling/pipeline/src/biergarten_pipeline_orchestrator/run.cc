@@ -48,6 +48,7 @@ bool BiergartenPipelineOrchestrator::Run() {
                         skipped_count)});
     }
 
+    this->GenerateUsers(enriched);
     this->GenerateBreweries(enriched);
     exporter_->Finalize();
     this->LogResults();

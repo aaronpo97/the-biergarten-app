@@ -65,12 +65,15 @@ class LlamaGenerator final : public DataGenerator {
                                 const std::string& region_context) override;
 
   /**
-   * @brief Generates a user profile for the provided locale.
+   * @brief Generates a user profile grounded in a sampled name and persona.
    *
-   * @param locale Locale hint.
+   * @param city Enriched city the user is associated with.
+   * @param persona Persona archetype grounding the generated bio.
+   * @param name Sampled first/last name -- not LLM-invented.
    * @return Generated user profile.
    */
-  UserResult GenerateUser(const std::string& locale) override;
+  UserResult GenerateUser(const EnrichedCity& city, const UserPersona& persona,
+                          const Name& name) override;
 
  private:
   static constexpr int32_t kDefaultMaxTokens = 10000;

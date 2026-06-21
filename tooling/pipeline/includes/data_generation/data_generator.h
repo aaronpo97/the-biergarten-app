@@ -28,12 +28,16 @@ class DataGenerator {
                                         const std::string& region_context) = 0;
 
   /**
-   * @brief Generates a user profile for a locale.
+   * @brief Generates a user profile grounded in a sampled name and persona.
    *
-   * @param locale Locale hint used by generator.
+   * @param city Enriched city the user is associated with.
+   * @param persona Persona archetype grounding the generated bio.
+   * @param name Sampled first/last name (and gender) -- not LLM-invented.
    * @return User generation result.
    */
-  virtual UserResult GenerateUser(const std::string& locale) = 0;
+  virtual UserResult GenerateUser(const EnrichedCity& city,
+                                  const UserPersona& persona,
+                                  const Name& name) = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_DATA_GENERATOR_H_

@@ -43,7 +43,7 @@ fork again
   :EnrichmentService::PreWarmLocationCache(sampled_locations);
 end fork
 fork
-  :JsonLoader::LoadNamesByCountry("names-by-country.json");
+  :JsonLoader::LoadNamesByCountry(\n  "forenames-by-country.json",\n  "surnames-by-country.json");
 fork again
   :JsonLoader::LoadPersonas("personas.json");
 end fork

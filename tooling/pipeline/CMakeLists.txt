@@ -151,6 +151,11 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/json_handling/json_loader.cc
 )
 
+# --- data_model ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/data_model/names_by_country.cc
+)
+
 # --- application_options ---
 target_sources(${PROJECT_NAME} PRIVATE
         src/application_options/parse_arguments.cc
@@ -161,6 +166,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/biergarten_pipeline_orchestrator/log_results.cc
         src/biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
         src/biergarten_pipeline_orchestrator/generate_breweries.cc
+        src/biergarten_pipeline_orchestrator/generate_users.cc
         src/biergarten_pipeline_orchestrator/run.cc
         src/biergarten_pipeline_orchestrator/query_cities_with_countries.cc
 )
@@ -258,6 +264,21 @@ target_compile_options(biergarten-pipeline PRIVATE
 configure_file(
         ${CMAKE_SOURCE_DIR}/locations.json
         ${CMAKE_BINARY_DIR}/locations.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/personas.json
+        ${CMAKE_BINARY_DIR}/personas.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/forenames-by-country.json
+        ${CMAKE_BINARY_DIR}/forenames-by-country.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/surnames-by-country.json
+        ${CMAKE_BINARY_DIR}/surnames-by-country.json
         COPYONLY
 )
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

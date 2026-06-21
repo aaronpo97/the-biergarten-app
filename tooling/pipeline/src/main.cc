@@ -53,6 +53,7 @@ int main(const int argc, char** argv) {
       std::make_shared<LogProducer>(log_channel);
 
   std::thread log_thread([&log_dispatcher] { log_dispatcher->Run(); });
+
   auto shutdown = [&](const int exit_code) {
     log_channel.Close();
     log_thread.join();

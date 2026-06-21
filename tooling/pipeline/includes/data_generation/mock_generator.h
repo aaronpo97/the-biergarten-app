@@ -28,12 +28,16 @@ class MockGenerator final : public DataGenerator {
                                 const std::string& region_context) override;
 
   /**
-   * @brief Generates deterministic user data for a locale.
+   * @brief Generates deterministic user data grounded in a sampled name and
+   * persona.
    *
-   * @param locale Locale hint.
+   * @param city Enriched city the user is associated with.
+   * @param persona Persona archetype.
+   * @param name Sampled first/last name. Unused for mock generation.
    * @return Generated user result.
    */
-  UserResult GenerateUser(const std::string& locale) override;
+  UserResult GenerateUser(const EnrichedCity& city, const UserPersona& persona,
+                          const Name& name) override;
 
  private:
   /**
@@ -44,12 +48,26 @@ class MockGenerator final : public DataGenerator {
    */
   static size_t DeterministicHash(const Location& location);
 
+  /**
+   * @brief Combines city, persona, and name into a stable hash value.
+   *
+   * @param location City and country names.
+   * @param persona Persona archetype.
+   * @param name Sampled first/last name.
+   * @return Deterministic hash value.
+   */
+  static size_t DeterministicHash(const Location& location,
+                                  const UserPersona& persona,
+                                  const Name& name);
+
   // Hash stride constants for deterministic distribution across fixed-size
   // arrays. These coprime strides spread hash values uniformly without
   // clustering, ensuring diverse output across different hash inputs.
   static constexpr size_t kNounHashStride = 7;
   static constexpr size_t kDescriptionHashStride = 13;
   static constexpr size_t kBioHashStride = 11;
+  static constexpr size_t kActivityWeightHashStride = 17;
+  static constexpr size_t kActivityWeightHashRange = 1000;
 
   static constexpr std::array<std::string_view, 18> kBreweryAdjectives = {
       "Craft",      "Heritage", "Local",  "Artisan",  "Pioneer",    "Golden",

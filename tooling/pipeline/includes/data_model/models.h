@@ -65,6 +65,53 @@ struct BreweryLocation {
 };
 
 // ============================================================================
+// Name / Persona Models
+// ============================================================================
+
+/**
+ * @brief A sampled first/last name pair, with the source forename's gender.
+ *
+ * Produced by NamesByCountry::SampleName();
+ */
+struct Name {
+  /// @brief First (given) name.
+  std::string first_name{};
+
+  /// @brief Last (family) name.
+  std::string last_name{};
+
+  /// @brief Gender associated with the sampled forename (e.g. "M", "F"), as
+  /// reported by the source dataset.
+  std::string gender{};
+};
+
+/**
+ * @brief A single forename entry from the names-by-country fixture data.
+ */
+struct ForenameEntry {
+  /// @brief Romanized forename.
+  std::string name{};
+
+  /// @brief Gender associated with this forename, as reported by the source
+  /// dataset (e.g. "M", "F").
+  std::string gender{};
+};
+
+/**
+ * @brief A persona archetype used to ground LLM-generated user bios.
+ */
+struct UserPersona {
+  /// @brief Persona display name (e.g. "Hophead Explorer").
+  std::string name{};
+
+  /// @brief Short description of the persona's interests and voice.
+  std::string description{};
+
+  /// @brief Beer styles this persona gravitates toward.
+  std::vector<std::string> style_affinities{};
+};
+
+// ============================================================================
 // Configuration Models
 // ============================================================================
 

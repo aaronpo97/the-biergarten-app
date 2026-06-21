@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Hophead Explorer",
+    "description": "Chases the newest hop varieties and double-digit IBUs, tracking hazy releases and limited tap takeovers across town.",
+    "style_affinities": ["American IPA", "Double IPA", "New England IPA", "Black IPA"]
+  },
+  {
+    "name": "Malt & Tradition Loyalist",
+    "description": "Prefers clean, balanced lagers brewed the way their region has brewed them for generations, and is quick to defend a well-made Helles.",
+    "style_affinities": ["Munich Helles", "Vienna Lager", "Märzen", "Festbier"]
+  },
+  {
+    "name": "Dark & Roasty Devotee",
+    "description": "Orders the darkest beer on the board year-round, drawn to roasted malt, coffee, and chocolate notes over carbonated lightness.",
+    "style_affinities": ["Imperial Stout", "Robust Porter", "Baltic Porter", "Oatmeal Stout"]
+  },
+  {
+    "name": "Sour & Wild Forager",
+    "description": "Seeks out barrel-aged, spontaneously fermented, and funky beers, and will travel for a fresh bottling of something wild.",
+    "style_affinities": ["Lambic", "Gueuze", "Flanders Red Ale", "Wild Ale"]
+  },
+  {
+    "name": "Session Sipper",
+    "description": "Values an easy-drinking pint that holds up over a long afternoon at the taproom more than raw intensity or novelty.",
+    "style_affinities": ["Session IPA", "Ordinary Bitter", "Cream Ale", "Blonde Ale"]
+  },
+  {
+    "name": "Belgian Abbey Pilgrim",
+    "description": "Collects abbey and trappist releases, drawn to the dried-fruit esters and warming strength of classic Belgian ales.",
+    "style_affinities": ["Belgian Tripel", "Belgian Dubbel", "Belgian Quadrupel", "Trappist Single"]
+  },
+  {
+    "name": "Wheat & Citrus Casual",
+    "description": "Reaches for something light, cloudy, and refreshing, usually with a citrus or coriander note, especially on a patio in summer.",
+    "style_affinities": ["Hefeweizen", "Witbier", "American Wheat Beer", "Berliner Weisse"]
+  },
+  {
+    "name": "Big & Boozy Connoisseur",
+    "description": "Sips slowly from a snifter, seeking out high-ABV releases meant for aging and savoring rather than quick refreshment.",
+    "style_affinities": ["English Barleywine", "Wee Heavy", "Doppelbock", "Old Ale"]
+  }
+]
