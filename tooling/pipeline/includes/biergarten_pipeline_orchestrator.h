@@ -17,7 +17,6 @@
 #include "data_model/generated_models.h"
 #include "services/database/export_service.h"
 #include "services/enrichment/enrichment_service.h"
-
 #include "services/logging/logger.h"
 
 /**
@@ -28,14 +27,15 @@
  */
 class BiergartenPipelineOrchestrator {
  public:
-/**
- * @brief Constructs the orchestrator with injected pipeline dependencies.
- *
- * @param context_service Provides regional context for locations.
- * @param generator Implementation (Llama or Mock) for brewery/user generation.
- * @param exporter Database backend for persisting generated records.
- * @param application_options CLI configuration and paths.
- */
+  /**
+   * @brief Constructs the orchestrator with injected pipeline dependencies.
+   *
+   * @param context_service Provides regional context for locations.
+   * @param generator Implementation (Llama or Mock) for brewery/user
+   * generation.
+   * @param exporter Database backend for persisting generated records.
+   * @param application_options CLI configuration and paths.
+   */
   BiergartenPipelineOrchestrator(
       std::shared_ptr<ILogger> logger,
       std::unique_ptr<IEnrichmentService> context_service,
@@ -52,10 +52,11 @@ class BiergartenPipelineOrchestrator {
    * 3. Generate brewery data for sampled cities
    *
    * @note STRUCTURAL CONCURRENCY REQUIREMENT:
-   * When transitioned to a multithreaded design, this method MUST structurally
-   * enforce that all deployed worker threads are joined before returning (e.g.
-   * by using std::jthread or a structured concurrency primitive). This ensures
-   * workers do not attempt to log to a closed channel during application teardown.
+   * When transitioned to a multithreaded design, this method MUST
+   * structurally enforce that all deployed worker threads are joined before
+   * returning (e.g. by using std::jthread or a structured concurrency
+   * primitive). This ensures workers do not attempt to log to a closed
+   * channel during application teardown.
    *
    * @return true if successful, false if not
    */
@@ -71,11 +72,11 @@ class BiergartenPipelineOrchestrator {
   /// @brief Generator dependency selected in the composition root.
   std::unique_ptr<DataGenerator> generator_;
 
-   /// @brief Storage backend for generated brewery records.
-   std::unique_ptr<IExportService> exporter_;
+  /// @brief Storage backend for generated brewery records.
+  std::unique_ptr<IExportService> exporter_;
 
-   /// @brief CLI configuration: paths, model settings, generation parameters.
-   ApplicationOptions application_options_;
+  /// @brief CLI configuration: paths, model settings, generation parameters.
+  ApplicationOptions application_options_;
 
   /**
    * @brief Load locations from JSON and sample cities.
@@ -95,9 +96,9 @@ class BiergartenPipelineOrchestrator {
    * @brief Generate users grounded in sampled names and personas for
    * enriched cities.
    *
-   * Loads personas.json / forenames-by-country.json / surnames-by-country.json
-   * itself, mirroring how QueryCitiesWithCountries() owns its own
-   * locations.json load.
+   * Loads personas.json / forenames-by-country.json /
+   * surnames-by-country.json itself, mirroring how QueryCitiesWithCountries()
+   * owns its own locations.json load.
    *
    * @param cities Span of enriched city data.
    */

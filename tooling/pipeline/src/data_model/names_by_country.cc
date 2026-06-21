@@ -29,8 +29,7 @@ std::optional<Name> NamesByCountry::SampleName(const std::string& iso3166_1,
   const std::vector<ForenameEntry>& forenames = forenames_it->second;
   const std::vector<std::string>& surnames = surnames_it->second;
 
-  std::uniform_int_distribution<size_t> forename_dist(0,
-                                                       forenames.size() - 1);
+  std::uniform_int_distribution<size_t> forename_dist(0, forenames.size() - 1);
   std::uniform_int_distribution<size_t> surname_dist(0, surnames.size() - 1);
 
   const ForenameEntry& forename = forenames[forename_dist(rng)];

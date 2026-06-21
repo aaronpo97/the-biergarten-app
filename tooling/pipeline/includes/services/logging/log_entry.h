@@ -34,9 +34,9 @@ enum class LogLevel {
  * pipeline that emitted it.
  */
 enum class PipelinePhase {
-  Startup,                   ///< Initialization and validation.
-  Enrichment,                ///< Location/context enrichment (e.g. Wikipedia lookups).
-  UserGeneration,            ///< User profile generation.
+  Startup,         ///< Initialization and validation.
+  Enrichment,      ///< Location/context enrichment (e.g. Wikipedia lookups).
+  UserGeneration,  ///< User profile generation.
   BreweryAndBeerGeneration,  ///< Brewery and beer data generation.
   CheckinGeneration,         ///< Checkin (visit) record generation.
   RatingGeneration,          ///< Rating and review generation.
@@ -46,7 +46,8 @@ enum class PipelinePhase {
 
 /**
  * @struct LogDTO
- * @brief User-provided subset of log fields. Used to capture call-site info transparently.
+ * @brief User-provided subset of log fields. Used to capture call-site info
+ * transparently.
  */
 struct LogDTO {
   LogLevel level;
@@ -74,7 +75,6 @@ struct LogEntry {
   /// @brief Thread responsible for emitting the log.
   std::thread::id thread_id{};
 
-
   /// @brief Severity level of this entry.
   LogLevel level;
 
@@ -83,7 +83,6 @@ struct LogEntry {
 
   /// @brief Log message text.
   std::string message;
-
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOG_ENTRY_H_

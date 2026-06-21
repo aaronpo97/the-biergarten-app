@@ -3,8 +3,8 @@
 
 /**
  * @file data_model/generated_models.h
- * @brief Generated output models from the pipeline: brewery/user results, enriched data,
- * and complete generation results.
+ * @brief Generated output models from the pipeline: brewery/user results,
+ * enriched data, and complete generation results.
  */
 
 #include <string>

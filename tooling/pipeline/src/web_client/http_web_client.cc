@@ -48,21 +48,20 @@ std::string HttpWebClient::Get(const std::string& url) {
   const httplib::Result result = client.Get(path);
 
   if (!result) {
-    throw std::runtime_error(std::format(
-        "[HttpWebClient] Request failed for URL: {} — {}", url,
-        httplib::to_string(result.error())));
+    throw std::runtime_error(
+        std::format("[HttpWebClient] Request failed for URL: {} — {}", url,
+                    httplib::to_string(result.error())));
   }
 
   if (result->status < kSuccessMin || result->status >= kSuccessMax) {
     if (logger_) {
-      logger_->Log(
-          {.level = LogLevel::Error,
-           .phase = PipelinePhase::Enrichment,
-         .message =
-           std::format("[HttpWebClient] Request failed for URL: {}", url)});
+      logger_->Log({.level = LogLevel::Error,
+                    .phase = PipelinePhase::Enrichment,
+                    .message = std::format(
+                        "[HttpWebClient] Request failed for URL: {}", url)});
     }
     throw std::runtime_error(std::format("[HttpWebClient] HTTP {} for URL: {}",
-                       result->status, url));
+                                         result->status, url));
   }
 
   return result->body;

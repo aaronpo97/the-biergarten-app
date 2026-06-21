@@ -9,10 +9,12 @@
 
 /**
  * @file bounded_channel.h
- * @brief Thread-safe, bounded multi-producer/multi-consumer synchronous channel.
+ * @brief Thread-safe, bounded multi-producer/multi-consumer synchronous
+ * channel.
  *
  * Intent: Enables asynchronous inter-thread communication with backpressure.
- * Models a synchronous channel where producers/consumers block on capacity limits.
+ * Models a synchronous channel where producers/consumers block on capacity
+ * limits.
  */
 
 /**

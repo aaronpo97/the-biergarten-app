@@ -148,8 +148,6 @@ struct GeneratorOptions {
   /// @brief Use mocked generator instead of actual LLM inference.
   bool use_mocked = false;
 
-
-
   /// @brief Specific sampling parameters for this generator.
   /// If nullopt, the application should use global defaults.
   std::optional<SamplingOptions> sampling;
@@ -186,7 +184,7 @@ struct ApplicationOptions {
 // Function Declarations
 // ============================================================================
 
-std::optional<ApplicationOptions> ParseArguments(const int argc, char** argv,
-                                                std::shared_ptr<ILogger> logger = nullptr);
+std::optional<ApplicationOptions> ParseArguments(
+    const int argc, char** argv, std::shared_ptr<ILogger> logger = nullptr);
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_MODELS_H_

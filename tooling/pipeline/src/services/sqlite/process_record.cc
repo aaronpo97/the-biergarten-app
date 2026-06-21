@@ -38,8 +38,7 @@ sqlite3_int64 SqliteExportService::ResolveLocationId(const Location& location) {
   }
 
   const std::string local_languages_json =
-      sqlite_export_service_internal::SerializeVector(
-          location.local_languages);
+      sqlite_export_service_internal::SerializeVector(location.local_languages);
 
   sqlite_export_service_internal::Bind(
       insert_location_stmt_,
@@ -92,7 +91,8 @@ sqlite3_int64 SqliteExportService::ResolveLocationId(const Location& location) {
           .action = "Failed to bind SQLite location longitude"});
 
   sqlite_export_service_internal::StepStatement(
-      db_handle_, insert_location_stmt_, "Failed to insert SQLite location row");
+      db_handle_, insert_location_stmt_,
+      "Failed to insert SQLite location row");
 
   const sqlite3_int64 location_id =
       sqlite_export_service_internal::LastInsertRowId(db_handle_);

@@ -57,8 +57,7 @@ class MockGenerator final : public DataGenerator {
    * @return Deterministic hash value.
    */
   static size_t DeterministicHash(const Location& location,
-                                  const UserPersona& persona,
-                                  const Name& name);
+                                  const UserPersona& persona, const Name& name);
 
   // Hash stride constants for deterministic distribution across fixed-size
   // arrays. These coprime strides spread hash values uniformly without
@@ -142,7 +141,8 @@ class MockGenerator final : public DataGenerator {
       "Visits breweries for the stories, stays for the flagship pours.",
       "Craft beer fan mapping tasting notes and favorite brew routes.",
       "Always ready to trade recommendations for underrated local breweries.",
-      "Keeping a running list of must-try collab releases and tap takeovers."};
+      "Keeping a running list of must-try collab releases and tap "
+      "takeovers."};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_MOCK_GENERATOR_H_

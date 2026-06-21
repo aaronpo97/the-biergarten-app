@@ -45,8 +45,9 @@ std::string WikipediaEnrichmentService::GetLocationContext(
     if (logger_) {
       logger_->Log({.level = LogLevel::Info,
                     .phase = PipelinePhase::Enrichment,
-                    .message = std::format("Done fetching for {}. Sleeping for 10 seconds.",
-                               location_query)});
+                    .message = std::format(
+                        "Done fetching for {}. Sleeping for 10 seconds.",
+                        location_query)});
     }
     std::this_thread::sleep_for(10s);
 
@@ -56,7 +57,7 @@ std::string WikipediaEnrichmentService::GetLocationContext(
           {.level = LogLevel::Debug,
            .phase = PipelinePhase::Enrichment,
            .message = std::format("WikipediaService lookup failed for '{}': {}",
-                      location_query, e.what())});
+                                  location_query, e.what())});
     }
   }
   return result;

@@ -44,8 +44,8 @@ PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir,
   // Scenario 4: directory must be readable (probe with directory_iterator).
   std::filesystem::directory_iterator probe(prompt_dir_, ec);
   if (ec) {
-    throw std::runtime_error(
-        std::format("PromptDirectory: prompt directory is not readable: {} ({})",
+    throw std::runtime_error(std::format(
+        "PromptDirectory: prompt directory is not readable: {} ({})",
         prompt_dir_.string(), ec.message()));
   }
 
@@ -76,7 +76,7 @@ std::string PromptDirectory::Load(std::string_view key) {
   if (!file.is_open()) {
     throw std::runtime_error(
         std::format("PromptDirectory: prompt file not found for key '{}': {}",
-        key_str, file_path.string()));
+                    key_str, file_path.string()));
   }
 
   std::string content((std::istreambuf_iterator<char>(file)),
@@ -84,15 +84,18 @@ std::string PromptDirectory::Load(std::string_view key) {
   file.close();
 
   if (content.empty()) {
-    throw std::runtime_error(std::format("PromptDirectory: prompt file for key '{}' is empty: {}",
-                             key_str, file_path.string()));
+    throw std::runtime_error(
+        std::format("PromptDirectory: prompt file for key '{}' is empty: {}",
+                    key_str, file_path.string()));
   }
 
   if (logger_) {
-    logger_->Log({.level = LogLevel::Info,
-                  .phase = PipelinePhase::Startup,
-                  .message = std::format("[PromptDirectory] Loaded prompt '{}' from '{}' ({} chars)",
-                             key_str, file_path.string(), content.size())});
+    logger_->Log(
+        {.level = LogLevel::Info,
+         .phase = PipelinePhase::Startup,
+         .message = std::format(
+             "[PromptDirectory] Loaded prompt '{}' from '{}' ({} chars)",
+             key_str, file_path.string(), content.size())});
   }
 
   cache_.emplace(key_str, content);

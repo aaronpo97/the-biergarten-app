@@ -25,11 +25,10 @@
  */
 class NamesByCountry {
  public:
-  NamesByCountry(
-      std::unordered_map<std::string, std::vector<ForenameEntry>>
-          forenames_by_country,
-      std::unordered_map<std::string, std::vector<std::string>>
-          surnames_by_country);
+  NamesByCountry(std::unordered_map<std::string, std::vector<ForenameEntry>>
+                     forenames_by_country,
+                 std::unordered_map<std::string, std::vector<std::string>>
+                     surnames_by_country);
 
   /**
    * @brief Samples a first/last name pair for the given country.

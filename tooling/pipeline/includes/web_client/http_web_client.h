@@ -1,18 +1,17 @@
 /**
-* @file web_client/http_web_client.h
-* @brief cpp-httplib implementation of the WebClient interface.
-*/
+ * @file web_client/http_web_client.h
+ * @brief cpp-httplib implementation of the WebClient interface.
+ */
 
 #ifndef BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_HTTP_WEB_CLIENT_H_
 #define BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_HTTP_WEB_CLIENT_H_
 
-
-#include "web_client/web_client.h"
-#include "services/logging/logger.h"
-
 #include <memory>
 #include <string>
 #include <utility>
+
+#include "services/logging/logger.h"
+#include "web_client/web_client.h"
 
 /**
  * @brief WebClient implementation backed by cpp-httplib.
@@ -26,7 +25,7 @@
  * bound to a single origin at construction time.
  */
 class HttpWebClient final : public WebClient {
-public:
+ public:
   explicit HttpWebClient(std::shared_ptr<ILogger> logger)
       : logger_(std::move(logger)) {}
   ~HttpWebClient() override = default;
@@ -34,7 +33,8 @@ public:
   /**
    * @brief Executes a blocking HTTP/HTTPS GET request against a full URL.
    *
-   * @param url Fully-qualified URL, e.g. "https://en.wikipedia.org/api/rest_v1/page/summary/Berlin"
+   * @param url Fully-qualified URL, e.g.
+   * "https://en.wikipedia.org/api/rest_v1/page/summary/Berlin"
    * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
    */
   std::string Get(const std::string& url) override;
@@ -51,6 +51,5 @@ public:
  private:
   std::shared_ptr<ILogger> logger_;
 };
-
 
 #endif

@@ -12,7 +12,7 @@ BiergartenPipelineOrchestrator::BiergartenPipelineOrchestrator(
     std::unique_ptr<IEnrichmentService> context_service,
     std::unique_ptr<DataGenerator> generator,
     std::unique_ptr<IExportService> exporter,
-    const ApplicationOptions &app_options)
+    const ApplicationOptions& app_options)
     : logger_(std::move(logger)),
       context_service_(std::move(context_service)),
       generator_(std::move(generator)),

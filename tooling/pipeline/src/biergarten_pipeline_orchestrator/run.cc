@@ -28,21 +28,22 @@ bool BiergartenPipelineOrchestrator::Run() {
                          .region_context = std::move(region_context)});
       } catch (const std::exception& exception) {
         ++skipped_count;
-        logger_->Log(
-            {.level = LogLevel::Warn,
-             .phase = PipelinePhase::Enrichment,
-             .message = std::format(
-                 "[Pipeline] Skipping city '{}' ({}): context lookup failed: {}",
-                 city.city, city.country, exception.what())});
+        logger_->Log({.level = LogLevel::Warn,
+                      .phase = PipelinePhase::Enrichment,
+                      .message = std::format(
+                          "[Pipeline] Skipping city '{}' ({}): context "
+                          "lookup failed: {}",
+                          city.city, city.country, exception.what())});
       }
     }
 
     if (skipped_count > 0) {
-      logger_->Log({.level = LogLevel::Warn,
-                    .phase = PipelinePhase::Enrichment,
-                    .message = std::format(
-                        "[Pipeline] Skipped {} city/cities due to context lookup errors",
-                        skipped_count)});
+      logger_->Log(
+          {.level = LogLevel::Warn,
+           .phase = PipelinePhase::Enrichment,
+           .message = std::format("[Pipeline] Skipped {} city/cities due "
+                                  "to context lookup errors",
+                                  skipped_count)});
     }
 
     this->GenerateUsers(enriched);
@@ -51,11 +52,10 @@ bool BiergartenPipelineOrchestrator::Run() {
     this->LogResults();
     return true;
   } catch (const std::exception& e) {
-    logger_->Log(
-        {.level = LogLevel::Error,
-         .phase = PipelinePhase::Teardown,
-         .message =
-             std::format("Pipeline execution failed with error: {}", e.what())});
+    logger_->Log({.level = LogLevel::Error,
+                  .phase = PipelinePhase::Teardown,
+                  .message = std::format(
+                      "Pipeline execution failed with error: {}", e.what())});
     return false;
   }
 }

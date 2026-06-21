@@ -41,17 +41,17 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
   const std::string system_prompt = prompt_directory_->Load("USER_GENERATION");
 
   std::string user_prompt = std::format(
-      "## NAME:\n{} {}\n\n## GENDER:\n{}\n\n## CITY:\n{}\n\n## COUNTRY:\n{}\n\n"
+      "## NAME:\n{} {}\n\n## GENDER:\n{}\n\n## CITY:\n{}\n\n## "
+      "COUNTRY:\n{}\n\n"
       "## PERSONA:\n{}\n\n## PERSONA DESCRIPTION:\n{}\n\n## STYLE "
       "AFFINITIES:\n{}",
       name.first_name, name.last_name, name.gender, city.location.city,
       city.location.country, persona.name, persona.description,
       style_affinities);
 
-  const std::string retry_context =
-      std::format("Name: {} {}\nCity: {}, {}\nPersona: {}", name.first_name,
-                 name.last_name, city.location.city, city.location.country,
-                 persona.name);
+  const std::string retry_context = std::format(
+      "Name: {} {}\nCity: {}, {}\nPersona: {}", name.first_name, name.last_name,
+      city.location.city, city.location.country, persona.name);
 
   constexpr int max_attempts = 3;
   std::string raw;
@@ -59,14 +59,13 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
   int max_tokens = kUserInitialMaxTokens;
 
   for (int attempt = 0; attempt < max_attempts; ++attempt) {
-    raw = this->Infer(system_prompt, user_prompt, max_tokens,
-                      kUserJsonGrammar);
+    raw = this->Infer(system_prompt, user_prompt, max_tokens, kUserJsonGrammar);
     if (logger_) {
       logger_->Log(
           {.level = LogLevel::Debug,
            .phase = PipelinePhase::UserGeneration,
            .message = std::format("LlamaGenerator: raw output (attempt {}): {}",
-                      attempt + 1, raw)});
+                                  attempt + 1, raw)});
     }
 
     UserResult user;
@@ -78,8 +77,9 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
         logger_->Log(
             {.level = LogLevel::Info,
              .phase = PipelinePhase::UserGeneration,
-             .message = std::format("LlamaGenerator: successfully generated user data on attempt {}",
-                        attempt + 1)});
+             .message = std::format("LlamaGenerator: successfully "
+                                    "generated user data on attempt {}",
+                                    attempt + 1)});
       }
 
       user.first_name = name.first_name;
@@ -90,32 +90,34 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
 
     last_error = *validation_error;
     if (logger_) {
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
-           .message =
-               std::format("LlamaGenerator: malformed user JSON (attempt {}): {}",
-               attempt + 1, *validation_error)});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "LlamaGenerator: malformed user JSON (attempt {}): {}",
+                        attempt + 1, *validation_error)});
     }
 
     user_prompt = std::format(
         "Your previous response was invalid. Error: {}\nReturn the thought "
-        "process before the JSON if needed, then return ONLY valid JSON with "
-        "exactly these keys, in this exact order: {{\"username\": \"<handle "
+        "process before the JSON if needed, then return ONLY valid JSON "
+        "with "
+        "exactly these keys, in this exact order: {{\"username\": "
+        "\"<handle "
         "derived from the given name>\", \"bio\": \"<first-person bio "
-        "grounded in the persona>\", \"activity_weight\": <number between 0 "
+        "grounded in the persona>\", \"activity_weight\": <number between "
+        "0 "
         "and 1>}}.\nDo not include markdown, comments, extra keys, or "
         "literal placeholder values.\n\n{}",
         *validation_error, retry_context);
   }
 
   if (logger_) {
-    logger_->Log(
-        {.level = LogLevel::Error,
-         .phase = PipelinePhase::UserGeneration,
-       .message = std::format(
-         "LlamaGenerator: malformed user response after {} attempts: {}",
-         max_attempts, last_error.empty() ? raw : last_error)});
+    logger_->Log({.level = LogLevel::Error,
+                  .phase = PipelinePhase::UserGeneration,
+                  .message = std::format(
+                      "LlamaGenerator: malformed user response "
+                      "after {} attempts: {}",
+                      max_attempts, last_error.empty() ? raw : last_error)});
   }
   throw std::runtime_error("LlamaGenerator: malformed user response");
 }

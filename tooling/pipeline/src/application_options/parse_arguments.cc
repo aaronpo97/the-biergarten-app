@@ -51,7 +51,8 @@ std::optional<ApplicationOptions> ParseArguments(
         prog_opts::value<std::string>()->default_value("pipeline.log"),
         "Path for application logs");
     opt("prompt-dir", prog_opts::value<std::string>()->default_value(""),
-        "Directory containing named prompt files (e.g. BREWERY_GENERATION.md)."
+        "Directory containing named prompt files (e.g. "
+        "BREWERY_GENERATION.md)."
         " Required when not using --mocked.");
     opt("location-count", prog_opts::value<uint32_t>()->default_value(10));
   };
@@ -70,11 +71,11 @@ std::optional<ApplicationOptions> ParseArguments(
     })();
     if (logger) {
       logger->Log(LogDTO{.level = LogLevel::Info,
-                   .phase = PipelinePhase::Startup,
-                   .message = title});
+                         .phase = PipelinePhase::Startup,
+                         .message = title});
       logger->Log(LogDTO{.level = LogLevel::Info,
-                   .phase = PipelinePhase::Startup,
-                   .message = usage});
+                         .phase = PipelinePhase::Startup,
+                         .message = usage});
     }
     return std::nullopt;
   }
@@ -89,8 +90,8 @@ std::optional<ApplicationOptions> ParseArguments(
       help_stream << "\n" << desc;
       if (logger) {
         logger->Log(LogDTO{.level = LogLevel::Info,
-                     .phase = PipelinePhase::Startup,
-                     .message = help_stream.str()});
+                           .phase = PipelinePhase::Startup,
+                           .message = help_stream.str()});
       }
       return std::nullopt;
     }
@@ -106,14 +107,16 @@ std::optional<ApplicationOptions> ParseArguments(
     const std::string model_path = var_map["model"].as<std::string>();
     const int n_gpu_layers = var_map["n-gpu-layers"].as<int>();
 
-    // Enforce mutual exclusivity before any further configuration is applied.
+    // Enforce mutual exclusivity before any further configuration is
+    // applied.
     if (use_mocked && !model_path.empty()) {
       const std::string msg =
-          "Invalid arguments: --mocked and --model are mutually exclusive";
+          "Invalid arguments: --mocked and --model are mutually "
+          "exclusive";
       if (logger) {
         logger->Log(LogDTO{.level = LogLevel::Error,
-                     .phase = PipelinePhase::Startup,
-                     .message = msg});
+                           .phase = PipelinePhase::Startup,
+                           .message = msg});
       } else {
         std::cerr << msg << std::endl;
       }
@@ -122,11 +125,12 @@ std::optional<ApplicationOptions> ParseArguments(
 
     if (!use_mocked && model_path.empty()) {
       const std::string msg =
-          "Invalid arguments: either --mocked or --model must be specified";
+          "Invalid arguments: either --mocked or --model must be "
+          "specified";
       if (logger) {
         logger->Log(LogDTO{.level = LogLevel::Error,
-                     .phase = PipelinePhase::Startup,
-                     .message = msg});
+                           .phase = PipelinePhase::Startup,
+                           .message = msg});
       } else {
         std::cerr << msg << std::endl;
       }
@@ -137,7 +141,8 @@ std::optional<ApplicationOptions> ParseArguments(
     // generator has no use for it and should not require it to be present.
     if (!use_mocked && options.pipeline.prompt_dir.empty()) {
       const std::string msg =
-          "Invalid arguments: --prompt-dir is required when not using --mocked";
+          "Invalid arguments: --prompt-dir is required when not using "
+          "--mocked";
       if (logger) {
         logger->Log({.level = LogLevel::Error,
                      .phase = PipelinePhase::Startup,
@@ -168,8 +173,8 @@ std::optional<ApplicationOptions> ParseArguments(
             "Sampling parameters are ignored when using --mocked";
         if (logger) {
           logger->Log(LogDTO{.level = LogLevel::Warn,
-                       .phase = PipelinePhase::Startup,
-                       .message = msg});
+                             .phase = PipelinePhase::Startup,
+                             .message = msg});
         } else {
           std::cerr << msg << std::endl;
         }
@@ -194,8 +199,8 @@ std::optional<ApplicationOptions> ParseArguments(
         exception.what();
     if (logger) {
       logger->Log(LogDTO{.level = LogLevel::Error,
-                   .phase = PipelinePhase::Startup,
-                   .message = msg});
+                         .phase = PipelinePhase::Startup,
+                         .message = msg});
     }
     return std::nullopt;
   } catch (...) {
@@ -203,8 +208,8 @@ std::optional<ApplicationOptions> ParseArguments(
         "Failed to parse command-line arguments: unknown error";
     if (logger) {
       logger->Log(LogDTO{.level = LogLevel::Error,
-                   .phase = PipelinePhase::Startup,
-                   .message = msg});
+                         .phase = PipelinePhase::Startup,
+                         .message = msg});
     }
     return std::nullopt;
   }

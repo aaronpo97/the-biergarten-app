@@ -6,18 +6,18 @@
 
 #include "json_handling/json_loader.h"
 
-#include <format>
-#include "services/logging/logger.h"
-#include <iostream>
-
 #include <boost/json.hpp>
+#include <format>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
+
+#include "services/logging/logger.h"
 
 static std::string ReadRequiredString(const boost::json::object& object,
                                       const char* key) {
@@ -45,7 +45,7 @@ static std::vector<std::string> ReadRequiredStringArray(
   const boost::json::value* value = object.if_contains(key);
   if (value == nullptr || !value->is_array()) {
     throw std::runtime_error(
-      std::format("Missing or invalid string array field: {}", key));
+        std::format("Missing or invalid string array field: {}", key));
   }
 
   const auto& array = value->as_array();
@@ -67,8 +67,8 @@ boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
                                  const char* what) {
   std::ifstream input(filepath);
   if (!input.is_open()) {
-    throw std::runtime_error(std::format("Failed to open {} file: {}", what,
-                                         filepath.string()));
+    throw std::runtime_error(
+        std::format("Failed to open {} file: {}", what, filepath.string()));
   }
 
   std::stringstream buffer;
@@ -87,8 +87,7 @@ boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
 /// `fallback_key` if `key` is missing/empty (some source entries only have a
 /// "localized" form and no "romanized" form).
 std::string ReadFirstOfStringArray(const boost::json::object& object,
-                                   const char* key,
-                                   const char* fallback_key) {
+                                   const char* key, const char* fallback_key) {
   for (const char* candidate_key : {key, fallback_key}) {
     const boost::json::value* value = object.if_contains(candidate_key);
     if (value == nullptr || !value->is_array()) {
@@ -163,8 +162,7 @@ std::vector<UserPersona> JsonLoader::LoadPersonas(
     personas.push_back(UserPersona{
         .name = ReadRequiredString(object, "name"),
         .description = ReadRequiredString(object, "description"),
-        .style_affinities =
-            ReadRequiredStringArray(object, "style_affinities"),
+        .style_affinities = ReadRequiredStringArray(object, "style_affinities"),
     });
   }
 
@@ -207,8 +205,8 @@ NamesByCountry JsonLoader::LoadNamesByCountry(
         }
         const auto& name_object = name_value.as_object();
         entries.push_back(ForenameEntry{
-            .name = ReadFirstOfStringArray(name_object, "romanized",
-                                           "localized"),
+            .name =
+                ReadFirstOfStringArray(name_object, "romanized", "localized"),
             .gender = ReadRequiredString(name_object, "gender"),
         });
       }
@@ -216,8 +214,7 @@ NamesByCountry JsonLoader::LoadNamesByCountry(
     forenames_by_country.emplace(country_code, std::move(entries));
   }
 
-  std::unordered_map<std::string, std::vector<std::string>>
-      surnames_by_country;
+  std::unordered_map<std::string, std::vector<std::string>> surnames_by_country;
   for (const auto& [country_code, name_entries] : surnames_root.as_object()) {
     if (!name_entries.is_array()) {
       continue;

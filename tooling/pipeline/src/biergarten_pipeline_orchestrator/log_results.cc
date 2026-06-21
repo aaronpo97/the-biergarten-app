@@ -38,7 +38,6 @@ void BiergartenPipelineOrchestrator::LogResults() const {
 
   boost::json::array user_output;
 
-
   for (const auto& generated_user : generated_users_) {
     user_output.push_back(boost::json::object{
         {"first_name", generated_user.user.first_name},

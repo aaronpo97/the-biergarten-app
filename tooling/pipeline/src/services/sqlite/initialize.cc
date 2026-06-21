@@ -18,9 +18,9 @@ std::filesystem::path SqliteExportService::BuildDatabasePath() const {
   std::filesystem::path candidate = output_path_ / base_filename;
 
   for (int suffix = 1; std::filesystem::exists(candidate); ++suffix) {
-    candidate = output_path_ /
-                std::filesystem::path(std::format("biergarten_seed_{}-{}.sqlite",
-                                      run_timestamp_utc_, suffix));
+    candidate = output_path_ / std::filesystem::path(
+                                   std::format("biergarten_seed_{}-{}.sqlite",
+                                               run_timestamp_utc_, suffix));
   }
 
   return candidate;

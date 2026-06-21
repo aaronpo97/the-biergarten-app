@@ -24,8 +24,8 @@ std::string Sanitize(std::string_view value) {
   out.reserve(value.size());
   for (const char character : value) {
     if (std::isalnum(static_cast<unsigned char>(character)) != 0) {
-      out.push_back(
-          static_cast<char>(std::tolower(static_cast<unsigned char>(character))));
+      out.push_back(static_cast<char>(
+          std::tolower(static_cast<unsigned char>(character))));
     }
   }
   return out;
@@ -62,8 +62,7 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
       sys_days{birth_year_anchor} - days{day_offset_dist(rng)};
   const year_month_day birth_ymd{birth_date};
 
-  return std::format("{:04}-{:02}-{:02}",
-                     static_cast<int>(birth_ymd.year()),
+  return std::format("{:04}-{:02}-{:02}", static_cast<int>(birth_ymd.year()),
                      static_cast<unsigned>(birth_ymd.month()),
                      static_cast<unsigned>(birth_ymd.day()));
 }
@@ -71,7 +70,8 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
 std::string GenerateRandomPassword(std::mt19937& rng) {
   constexpr size_t kPasswordLength = 32;
   constexpr std::string_view kCharset =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&"
+      "*";
 
   std::uniform_int_distribution<size_t> char_dist(0, kCharset.size() - 1);
 
@@ -115,14 +115,14 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
 
     if (!sampled_name.has_value()) {
       ++skipped_count;
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
-           .message = std::format(
-               "[Pipeline] Skipping city '{}' ({}): no names available for "
-               "country '{}'",
-               city.location.city, city.location.country,
-               city.location.iso3166_1)});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "[Pipeline] Skipping city '{}' ({}): no names "
+                        "available for "
+                        "country '{}'",
+                        city.location.city, city.location.country,
+                        city.location.iso3166_1)});
       continue;
     }
 
@@ -147,22 +147,22 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
       } catch (const std::exception& export_exception) {
         ++export_failed_count;
 
-        logger_->Log(
-            {.level = LogLevel::Warn,
-             .phase = PipelinePhase::UserGeneration,
-             .message = std::format(
-                 "[Pipeline] Generated user for '{}' ({}) but SQLite export failed: {}",
-                 city.location.city, city.location.country,
-                 export_exception.what())});
+        logger_->Log({.level = LogLevel::Warn,
+                      .phase = PipelinePhase::UserGeneration,
+                      .message = std::format(
+                          "[Pipeline] Generated user for '{}' ({}) but "
+                          "SQLite export failed: {}",
+                          city.location.city, city.location.country,
+                          export_exception.what())});
       }
     } catch (const std::exception& e) {
       ++skipped_count;
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
-           .message = std::format(
-               "[Pipeline] Skipping city '{}' ({}): user generation failed: {}",
-               city.location.city, city.location.country, e.what())});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "[Pipeline] Skipping city '{}' ({}): "
+                        "user generation failed: {}",
+                        city.location.city, city.location.country, e.what())});
     }
   }
 
@@ -176,11 +176,10 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   }
 
   if (export_failed_count > 0) {
-    logger_->Log(
-        {.level = LogLevel::Warn,
-         .phase = PipelinePhase::Teardown,
-         .message = std::format(
-             "[Pipeline] Failed to export {} generated user/users to SQLite",
-             export_failed_count)});
+    logger_->Log({.level = LogLevel::Warn,
+                  .phase = PipelinePhase::Teardown,
+                  .message = std::format("[Pipeline] Failed to export {} "
+                                         "generated user/users to SQLite",
+                                         export_failed_count)});
   }
 }
