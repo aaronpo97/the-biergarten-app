@@ -53,17 +53,6 @@ struct Location {
   double longitude{};
 };
 
-/**
- * @brief Non-owning brewery location input.
- */
-struct BreweryLocation {
-  /// @brief City name.
-  std::string_view city_name;
-
-  /// @brief Country name.
-  std::string_view country_name;
-};
-
 // ============================================================================
 // Name / Persona Models
 // ============================================================================

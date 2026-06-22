@@ -74,7 +74,7 @@ struct EnrichedCity {
 /**
  * @brief Helper struct to store generated brewery data.
  */
-struct GeneratedBrewery {
+struct BreweryRecord {
   Location location;
   BreweryResult brewery;
 };
@@ -86,7 +86,7 @@ struct GeneratedBrewery {
  * the orchestrator (never LLM-authored) so a downstream auth-account seeding
  * consumer can register real accounts from the pipeline's SQLite export.
  */
-struct GeneratedUser {
+struct UserRecord {
   Location location;
   UserResult user;
   std::string email{};

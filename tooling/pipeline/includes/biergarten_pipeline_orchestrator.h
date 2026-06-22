@@ -110,9 +110,9 @@ class BiergartenPipelineOrchestrator {
   void LogResults() const;
 
   /// @brief Stores generated brewery data.
-  std::vector<GeneratedBrewery> generated_breweries_;
+  std::vector<BreweryRecord> generated_breweries_;
 
   /// @brief Stores generated user data.
-  std::vector<GeneratedUser> generated_users_;
+  std::vector<UserRecord> generated_users_;
 };
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_

@@ -1,6 +1,6 @@
 /**
  * @file services/sqlite/process_user_record.cc
- * @brief SqliteExportService::ProcessRecord(GeneratedUser) implementation.
+ * @brief SqliteExportService::ProcessRecord(UserRecord) implementation.
  */
 
 #include <stdexcept>
@@ -8,7 +8,7 @@
 #include "services/database/sqlite_export_service.h"
 #include "services/database/sqlite_export_service_helpers.h"
 
-uint64_t SqliteExportService::ProcessRecord(const GeneratedUser& user) {
+uint64_t SqliteExportService::ProcessRecord(const UserRecord& user) {
   if (db_handle_ == nullptr || !transaction_open_) {
     throw std::runtime_error("SQLite export service is not initialized");
   }

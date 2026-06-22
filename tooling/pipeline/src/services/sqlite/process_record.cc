@@ -1,6 +1,6 @@
 /**
  * @file services/sqlite/process_record.cc
- * @brief SqliteExportService::ProcessRecord(GeneratedBrewery) implementation
+ * @brief SqliteExportService::ProcessRecord() implementation
  * and the shared location-resolution helper.
  */
 
@@ -102,7 +102,7 @@ sqlite3_int64 SqliteExportService::ResolveLocationId(const Location& location) {
   return location_id;
 }
 
-uint64_t SqliteExportService::ProcessRecord(const GeneratedBrewery& brewery) {
+uint64_t SqliteExportService::ProcessRecord(const BreweryRecord& brewery) {
   if (db_handle_ == nullptr || !transaction_open_) {
     throw std::runtime_error("SQLite export service is not initialized");
   }
@@ -115,12 +115,14 @@ uint64_t SqliteExportService::ProcessRecord(const GeneratedBrewery& brewery) {
           .index = sqlite_export_service_internal::kBreweryLocationIdBindIndex,
           .value = location_id,
           .action = "Failed to bind SQLite brewery location id"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
       sqlite_export_service_internal::BindParam<std::string_view>{
           .index = sqlite_export_service_internal::kBreweryEnglishNameBindIndex,
           .value = brewery.brewery.name_en,
           .action = "Failed to bind SQLite brewery English name"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
       sqlite_export_service_internal::BindParam<std::string_view>{
@@ -128,12 +130,14 @@ uint64_t SqliteExportService::ProcessRecord(const GeneratedBrewery& brewery) {
               kBreweryEnglishDescriptionBindIndex,
           .value = brewery.brewery.description_en,
           .action = "Failed to bind SQLite brewery English description"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
       sqlite_export_service_internal::BindParam<std::string_view>{
           .index = sqlite_export_service_internal::kBreweryLocalNameBindIndex,
           .value = brewery.brewery.name_local,
           .action = "Failed to bind SQLite brewery local name"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
       sqlite_export_service_internal::BindParam<std::string_view>{

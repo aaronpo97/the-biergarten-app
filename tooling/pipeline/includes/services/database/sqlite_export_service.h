@@ -30,8 +30,8 @@ class SqliteExportService final : public IExportService {
   SqliteExportService& operator=(SqliteExportService&&) = delete;
 
   void Initialize() override;
-  uint64_t ProcessRecord(const GeneratedBrewery& brewery) override;
-  uint64_t ProcessRecord(const GeneratedUser& user) override;
+  uint64_t ProcessRecord(const BreweryRecord& brewery) override;
+  uint64_t ProcessRecord(const UserRecord& user) override;
   void Finalize() override;
 
  private:

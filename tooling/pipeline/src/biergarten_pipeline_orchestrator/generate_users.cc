@@ -37,9 +37,13 @@ std::string BuildEmail(const Name& name,
       std::format("{}.{}", Sanitize(name.first_name), Sanitize(name.last_name));
 
   std::string local_part = base;
-  for (int suffix = 1; used_local_parts.contains(local_part); ++suffix) {
+  uint32_t suffix = 1;
+
+  while (used_local_parts.contains(local_part)) {
     local_part = std::format("{}{}", base, suffix);
+    ++suffix;
   }
+
   used_local_parts.insert(local_part);
 
   return std::format("{}@thebiergarten.app", local_part);
@@ -68,17 +72,17 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
 }
 
 std::string GenerateRandomPassword(std::mt19937& rng) {
-  constexpr size_t kPasswordLength = 32;
-  constexpr std::string_view kCharset =
+  constexpr size_t k_password_length = 32;
+  constexpr std::string_view k_charset =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&"
       "*";
 
-  std::uniform_int_distribution<size_t> char_dist(0, kCharset.size() - 1);
+  std::uniform_int_distribution<size_t> char_dist(0, k_charset.size() - 1);
 
   std::string password;
-  password.reserve(kPasswordLength);
-  for (size_t i = 0; i < kPasswordLength; ++i) {
-    password.push_back(kCharset[char_dist(rng)]);
+  password.reserve(k_password_length);
+  for (size_t i = 0; i < k_password_length; ++i) {
+    password.push_back(k_charset[char_dist(rng)]);
   }
   return password;
 }
@@ -93,6 +97,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
 
   const std::vector<UserPersona> personas =
       JsonLoader::LoadPersonas("personas.json", logger_);
+
   if (personas.empty()) {
     throw std::runtime_error(
         "No personas available in personas.json for user generation");
@@ -109,6 +114,50 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   size_t skipped_count = 0;
   size_t export_failed_count = 0;
 
+  const auto generate_record =
+      [this, &rng, &used_email_local_parts, &skipped_count](
+          const EnrichedCity& city, const UserPersona& persona,
+          const Name& sampled_name) -> std::optional<UserRecord> {
+    try {
+      const UserResult user =
+          generator_->GenerateUser(city, persona, sampled_name);
+
+      return UserRecord{
+          .location = city.location,
+          .user = user,
+          .email = BuildEmail(sampled_name, used_email_local_parts),
+          .date_of_birth = GenerateDateOfBirth(rng),
+          .password = GenerateRandomPassword(rng),
+      };
+    } catch (const std::exception& e) {
+      ++skipped_count;
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "[Pipeline] Skipping city '{}' ({}): "
+                        "user generation failed: {}",
+                        city.location.city, city.location.country, e.what())});
+      return std::nullopt;
+    }
+  };
+
+  const auto export_record = [this,
+                              &export_failed_count](const UserRecord& record) {
+    try {
+      exporter_->ProcessRecord(record);
+    } catch (const std::exception& export_exception) {
+      ++export_failed_count;
+
+      logger_->Log(
+          {.level = LogLevel::Warn,
+           .phase = PipelinePhase::UserGeneration,
+           .message = std::format("[Pipeline] Generated user for '{}' ({}) but "
+                                  "SQLite export failed: {}",
+                                  record.location.city, record.location.country,
+                                  export_exception.what())});
+    }
+  };
+
   for (const auto& city : cities) {
     const std::optional<Name> sampled_name =
         names_by_country.SampleName(city.location.iso3166_1, rng);
@@ -119,8 +168,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                     .phase = PipelinePhase::UserGeneration,
                     .message = std::format(
                         "[Pipeline] Skipping city '{}' ({}): no names "
-                        "available for "
-                        "country '{}'",
+                        "available for country '{}'",
                         city.location.city, city.location.country,
                         city.location.iso3166_1)});
       continue;
@@ -128,42 +176,14 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
 
     const UserPersona& persona = personas[persona_dist(rng)];
 
-    try {
-      const UserResult user =
-          generator_->GenerateUser(city, persona, *sampled_name);
-
-      const GeneratedUser generated_user{
-          .location = city.location,
-          .user = user,
-          .email = BuildEmail(*sampled_name, used_email_local_parts),
-          .date_of_birth = GenerateDateOfBirth(rng),
-          .password = GenerateRandomPassword(rng),
-      };
-
-      generated_users_.push_back(generated_user);
-
-      try {
-        exporter_->ProcessRecord(generated_user);
-      } catch (const std::exception& export_exception) {
-        ++export_failed_count;
-
-        logger_->Log({.level = LogLevel::Warn,
-                      .phase = PipelinePhase::UserGeneration,
-                      .message = std::format(
-                          "[Pipeline] Generated user for '{}' ({}) but "
-                          "SQLite export failed: {}",
-                          city.location.city, city.location.country,
-                          export_exception.what())});
-      }
-    } catch (const std::exception& e) {
-      ++skipped_count;
-      logger_->Log({.level = LogLevel::Warn,
-                    .phase = PipelinePhase::UserGeneration,
-                    .message = std::format(
-                        "[Pipeline] Skipping city '{}' ({}): "
-                        "user generation failed: {}",
-                        city.location.city, city.location.country, e.what())});
+    const std::optional<UserRecord> record =
+        generate_record(city, persona, *sampled_name);
+    if (!record.has_value()) {
+      continue;
     }
+
+    generated_users_.push_back(*record);
+    export_record(*record);
   }
 
   if (skipped_count > 0) {
