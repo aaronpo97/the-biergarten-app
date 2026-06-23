@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pipeline Results Viewer</title>
+  </head>
+  <body>
+    <div class="dialog" id="window">
+      <div class="dialog-header">
+        <p>Pipeline Results Viewer</p>
+      </div>
+      <div class="dialog-body">
+        <div class="field-group">
+          <label for="table-select">Table</label>
+          <select id="table-select"></select>
+        </div>
+        <p id="status"></p>
+        <div id="table-container"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
