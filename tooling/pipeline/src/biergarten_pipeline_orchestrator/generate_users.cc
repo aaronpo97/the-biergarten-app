@@ -71,22 +71,6 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
                      static_cast<unsigned>(birth_ymd.day()));
 }
 
-std::string GenerateRandomPassword(std::mt19937& rng) {
-  constexpr size_t k_password_length = 32;
-  constexpr std::string_view k_charset =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&"
-      "*";
-
-  std::uniform_int_distribution<size_t> char_dist(0, k_charset.size() - 1);
-
-  std::string password;
-  password.reserve(k_password_length);
-  for (size_t i = 0; i < k_password_length; ++i) {
-    password.push_back(k_charset[char_dist(rng)]);
-  }
-  return password;
-}
-
 }  // namespace
 
 void BiergartenPipelineOrchestrator::GenerateUsers(
@@ -128,7 +112,6 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
           .user = user,
           .email = BuildEmail(sampled_name, used_email_local_parts),
           .date_of_birth = GenerateDateOfBirth(rng),
-          .password = GenerateRandomPassword(rng),
       };
     } catch (const std::exception& e) {
       ++skipped_count;

@@ -69,12 +69,6 @@ uint64_t SqliteExportService::ProcessRecord(const UserRecord& user) {
           .index = sqlite_export_service_internal::kUserDateOfBirthBindIndex,
           .value = user.date_of_birth,
           .action = "Failed to bind SQLite user date of birth"});
-  sqlite_export_service_internal::Bind(
-      insert_user_stmt_,
-      sqlite_export_service_internal::BindParam<std::string_view>{
-          .index = sqlite_export_service_internal::kUserPasswordBindIndex,
-          .value = user.password,
-          .action = "Failed to bind SQLite user password"});
 
   sqlite_export_service_internal::StepStatement(
       db_handle_, insert_user_stmt_, "Failed to insert SQLite user row");

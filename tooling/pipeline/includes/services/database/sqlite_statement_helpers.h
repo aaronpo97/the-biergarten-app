@@ -63,7 +63,6 @@ CREATE TABLE IF NOT EXISTS users (
   activity_weight REAL NOT NULL,
   email TEXT NOT NULL UNIQUE,
   date_of_birth TEXT NOT NULL,
-  password TEXT NOT NULL,
   FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
 
@@ -104,9 +103,8 @@ INSERT INTO users (
   bio,
   activity_weight,
   email,
-  date_of_birth,
-  password
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  date_of_birth
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 )sql";
 
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
@@ -135,7 +133,6 @@ inline constexpr int kUserBioBindIndex = 6;
 inline constexpr int kUserActivityWeightBindIndex = 7;
 inline constexpr int kUserEmailBindIndex = 8;
 inline constexpr int kUserDateOfBirthBindIndex = 9;
-inline constexpr int kUserPasswordBindIndex = 10;
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
                                        std::string_view sql,
