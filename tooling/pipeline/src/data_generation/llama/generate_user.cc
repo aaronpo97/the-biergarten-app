@@ -10,20 +10,9 @@
 #include <string>
 #include <string_view>
 
+#include "data_generation/json_grammars.h"
 #include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"
-
-// GBNF grammar for structured user JSON output.
-static constexpr std::string_view kUserJsonGrammar = R"json_user(
-root ::= thought-block "{" ws "\"username\"" ws ":" ws string ws "," ws "\"bio\"" ws ":" ws string ws "," ws "\"activity_weight\"" ws ":" ws number ws "}" ws
-thought-block ::= [^{]*
-ws ::= [ \t\n\r]*
-string ::= "\"" char+ "\""
-char ::= [^"\\\x7F\x00-\x1F] | [\\] escape
-escape ::= ["\\/bfnrt] | "u" hex hex hex hex
-hex ::= [0-9a-fA-F]
-number ::= "-"? ("0" | [1-9] [0-9]*) ("." [0-9]+)?
-)json_user";
 
 static constexpr int kUserInitialMaxTokens = 1200;
 

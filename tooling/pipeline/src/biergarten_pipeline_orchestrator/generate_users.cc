@@ -110,15 +110,16 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   std::uniform_int_distribution<size_t> persona_dist(0, personas.size() - 1);
 
   generated_users_.clear();
-  std::unordered_set<std::string> used_email_local_parts;
   size_t skipped_count = 0;
   size_t export_failed_count = 0;
 
   const auto generate_record =
-      [this, &rng, &used_email_local_parts, &skipped_count](
+      [this, &rng, &skipped_count](
           const EnrichedCity& city, const UserPersona& persona,
           const Name& sampled_name) -> std::optional<UserRecord> {
     try {
+      std::unordered_set<std::string> used_email_local_parts;
+
       const UserResult user =
           generator_->GenerateUser(city, persona, sampled_name);
 
