@@ -14,11 +14,13 @@
 // JSON object (the prompts explicitly invite this); only the "{...}" tail is
 // constrained to the expected shape.
 inline constexpr std::string_view kUserJsonGrammar = R"json_user(
-root ::= thought-block "{" ws
+root ::= thought-block (
+    "{" ws
     "\"username\"" ws ":" ws string ws "," ws
     "\"bio\"" ws ":" ws string ws "," ws
     "\"activity_weight\"" ws ":" ws number ws
   "}" ws
+)
 thought-block ::= [^{]*
 ws            ::= [ \t\n\r]*
 string        ::= "\"" char+ "\""
@@ -31,12 +33,14 @@ number        ::= "-"? ("0" | [1-9] [0-9]*) ("." [0-9]+)?
 // GBNF grammar for structured brewery JSON output (see thought-block note
 // above).
 inline constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
-root ::= thought-block "{" ws
+root ::= thought-block (
+    "{" ws
     "\"name_en\"" ws ":" ws string ws "," ws
     "\"description_en\"" ws ":" ws string ws "," ws
     "\"name_local\"" ws ":" ws string ws "," ws
     "\"description_local\"" ws ":" ws string ws
   "}" ws
+)
 thought-block ::= [^{]*
 ws            ::= [ \t\n\r]*
 string        ::= "\"" char+ "\""
