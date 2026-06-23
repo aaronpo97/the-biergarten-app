@@ -19,16 +19,24 @@
  * @brief Generated brewery payload.
  */
 struct BreweryResult {
-  /// @brief Brewery display name in English.
+  /**
+   * @brief Brewery display name in English.
+   */
   std::string name_en;
 
-  /// @brief Brewery description text in English.
+  /**
+   * @brief Brewery description text in English.
+   */
   std::string description_en;
 
-  /// @brief Brewery display name in the local language.
+  /**
+   * @brief Brewery display name in the local language.
+   */
   std::string name_local;
 
-  /// @brief Brewery description text in the local language.
+  /**
+   * @brief Brewery description text in the local language.
+   */
   std::string description_local;
 };
 
@@ -36,26 +44,38 @@ struct BreweryResult {
  * @brief Generated user profile payload.
  */
 struct UserResult {
-  /// @brief First (given) name, copied from the sampled Name -- not
-  /// LLM-invented.
+  /**
+   * @brief First (given) name, copied from the sampled Name -- not
+   * LLM-invented.
+   */
   std::string first_name{};
 
-  /// @brief Last (family) name, copied from the sampled Name -- not
-  /// LLM-invented.
+  /**
+   * @brief Last (family) name, copied from the sampled Name -- not
+   * LLM-invented.
+   */
   std::string last_name{};
 
-  /// @brief Gender associated with the sampled first name, copied from the
-  /// sampled Name -- not LLM-invented.
+  /**
+   * @brief Gender associated with the sampled first name, copied from the
+   * sampled Name -- not LLM-invented.
+   */
   std::string gender{};
 
-  /// @brief Username handle.
+  /**
+   * @brief Username handle.
+   */
   std::string username{};
 
-  /// @brief Short user biography.
+  /**
+   * @brief Short user biography.
+   */
   std::string bio{};
 
-  /// @brief Relative check-in/activity weight for this user, used to drive
-  /// a J-curve activity profile in later pipeline phases.
+  /**
+   * @brief Relative check-in/activity weight for this user, used to drive
+   * a J-curve activity profile in later pipeline phases.
+   */
   float activity_weight{};
 };
 

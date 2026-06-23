@@ -18,7 +18,9 @@
  */
 class IDateTimeProvider {
  public:
-  /// @brief Virtual destructor for polymorphic cleanup.
+  /**
+   * @brief Virtual destructor for polymorphic cleanup.
+   */
   virtual ~IDateTimeProvider() = default;
 
   IDateTimeProvider() = default;

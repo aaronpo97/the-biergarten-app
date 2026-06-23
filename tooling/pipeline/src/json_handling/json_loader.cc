@@ -83,9 +83,11 @@ boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
   return root;
 }
 
-/// @brief Returns the first element of a string array field, falling back to
-/// `fallback_key` if `key` is missing/empty (some source entries only have a
-/// "localized" form and no "romanized" form).
+/**
+ * @brief Returns the first element of a string array field, falling back to
+ * `fallback_key` if `key` is missing/empty (some source entries only have a
+ * "localized" form and no "romanized" form).
+ */
 std::string ReadFirstOfStringArray(const boost::json::object& object,
                                    const char* key, const char* fallback_key) {
   for (const char* candidate_key : {key, fallback_key}) {

@@ -63,19 +63,29 @@ class BiergartenPipelineOrchestrator {
   bool Run();
 
  private:
-  /// @brief Logger instance for emitting pipeline messages.
+  /**
+   * @brief Logger instance for emitting pipeline messages.
+   */
   std::shared_ptr<ILogger> logger_;
 
-  /// @brief Owning context provider dependency.
+  /**
+   * @brief Owning context provider dependency.
+   */
   std::unique_ptr<IEnrichmentService> context_service_;
 
-  /// @brief Generator dependency selected in the composition root.
+  /**
+   * @brief Generator dependency selected in the composition root.
+   */
   std::unique_ptr<DataGenerator> generator_;
 
-  /// @brief Storage backend for generated brewery records.
+  /**
+   * @brief Storage backend for generated brewery records.
+   */
   std::unique_ptr<IExportService> exporter_;
 
-  /// @brief CLI configuration: paths, model settings, generation parameters.
+  /**
+   * @brief CLI configuration: paths, model settings, generation parameters.
+   */
   ApplicationOptions application_options_;
 
   /**
@@ -109,10 +119,14 @@ class BiergartenPipelineOrchestrator {
    */
   void LogResults() const;
 
-  /// @brief Stores generated brewery data.
+  /**
+   * @brief Stores generated brewery data.
+   */
   std::vector<BreweryRecord> generated_breweries_;
 
-  /// @brief Stores generated user data.
+  /**
+   * @brief Stores generated user data.
+   */
   std::vector<UserRecord> generated_users_;
 };
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_

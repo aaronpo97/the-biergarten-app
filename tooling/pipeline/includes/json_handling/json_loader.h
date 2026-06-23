@@ -14,14 +14,20 @@
 #include "data_model/names_by_country.h"
 #include "services/logging/logger.h"
 
-/// @brief Loads curated world locations from a JSON file into memory.
+/**
+ * @brief Loads curated world locations from a JSON file into memory.
+ */
 class JsonLoader {
  public:
-  /// @brief Parses a JSON array file and returns all location records.
+  /**
+   * @brief Parses a JSON array file and returns all location records.
+   */
   static std::vector<Location> LoadLocations(
       const std::filesystem::path& filepath);
 
-  /// @brief Parses a JSON array file and returns all persona records.
+  /**
+   * @brief Parses a JSON array file and returns all persona records.
+   */
   static std::vector<UserPersona> LoadPersonas(
       const std::filesystem::path& filepath);
 

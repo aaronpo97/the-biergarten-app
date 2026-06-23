@@ -17,7 +17,9 @@ class IExportService {
  public:
   IExportService() = default;
 
-  /// @brief Virtual destructor for polymorphic cleanup.
+  /**
+   * @brief Virtual destructor for polymorphic cleanup.
+   */
   virtual ~IExportService() = default;
 
   IExportService(const IExportService&) = delete;
@@ -25,7 +27,9 @@ class IExportService {
   IExportService(IExportService&&) = delete;
   IExportService& operator=(IExportService&&) = delete;
 
-  /// @brief Prepares the export destination for a new run.
+  /**
+   * @brief Prepares the export destination for a new run.
+   */
   virtual void Initialize() = 0;
 
   /**
@@ -42,7 +46,9 @@ class IExportService {
    */
   virtual uint64_t ProcessRecord(const UserRecord& user) = 0;
 
-  /// @brief Finalizes the export destination.
+  /**
+   * @brief Finalizes the export destination.
+   */
   virtual void Finalize() = 0;
 };
 
