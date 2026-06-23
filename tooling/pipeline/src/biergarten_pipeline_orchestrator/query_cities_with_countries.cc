@@ -22,7 +22,7 @@ BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
 
   const std::filesystem::path locations_path = "locations.json";
 
-  auto all_locations = JsonLoader::LoadLocations(locations_path, logger_);
+  auto all_locations = JsonLoader::LoadLocations(locations_path);
 
   const size_t sample_count = std::min(
       static_cast<size_t>(application_options_.pipeline.location_count),

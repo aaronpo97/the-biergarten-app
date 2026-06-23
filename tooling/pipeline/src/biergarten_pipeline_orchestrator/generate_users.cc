@@ -96,7 +96,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                 .message = "=== SAMPLE USER GENERATION ==="});
 
   const std::vector<UserPersona> personas =
-      JsonLoader::LoadPersonas("personas.json", logger_);
+      JsonLoader::LoadPersonas("personas.json");
 
   if (personas.empty()) {
     throw std::runtime_error(
@@ -104,7 +104,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   }
 
   const NamesByCountry names_by_country = JsonLoader::LoadNamesByCountry(
-      "forenames-by-country.json", "surnames-by-country.json", logger_);
+      "forenames-by-country.json", "surnames-by-country.json");
 
   std::mt19937 rng(std::random_device{}());
   std::uniform_int_distribution<size_t> persona_dist(0, personas.size() - 1);

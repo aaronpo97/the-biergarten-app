@@ -19,13 +19,11 @@ class JsonLoader {
  public:
   /// @brief Parses a JSON array file and returns all location records.
   static std::vector<Location> LoadLocations(
-      const std::filesystem::path& filepath,
-      std::shared_ptr<ILogger> logger = nullptr);
+      const std::filesystem::path& filepath);
 
   /// @brief Parses a JSON array file and returns all persona records.
   static std::vector<UserPersona> LoadPersonas(
-      const std::filesystem::path& filepath,
-      std::shared_ptr<ILogger> logger = nullptr);
+      const std::filesystem::path& filepath);
 
   /**
    * @brief Parses the names-by-country fixture pair into a sampling-capable
@@ -36,8 +34,7 @@ class JsonLoader {
    */
   static NamesByCountry LoadNamesByCountry(
       const std::filesystem::path& forenames_filepath,
-      const std::filesystem::path& surnames_filepath,
-      std::shared_ptr<ILogger> logger = nullptr);
+      const std::filesystem::path& surnames_filepath);
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_

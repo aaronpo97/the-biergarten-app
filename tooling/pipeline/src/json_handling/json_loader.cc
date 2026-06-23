@@ -105,7 +105,7 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
 }  // namespace
 
 std::vector<Location> JsonLoader::LoadLocations(
-    const std::filesystem::path& filepath, std::shared_ptr<ILogger> logger) {
+    const std::filesystem::path& filepath) {
   const boost::json::value root = ParseJsonFile(filepath, "locations");
 
   if (!root.is_array()) {
@@ -140,7 +140,7 @@ std::vector<Location> JsonLoader::LoadLocations(
 }
 
 std::vector<UserPersona> JsonLoader::LoadPersonas(
-    const std::filesystem::path& filepath, std::shared_ptr<ILogger> logger) {
+    const std::filesystem::path& filepath) {
   const boost::json::value root = ParseJsonFile(filepath, "personas");
 
   if (!root.is_array()) {
@@ -171,8 +171,7 @@ std::vector<UserPersona> JsonLoader::LoadPersonas(
 
 NamesByCountry JsonLoader::LoadNamesByCountry(
     const std::filesystem::path& forenames_filepath,
-    const std::filesystem::path& surnames_filepath,
-    std::shared_ptr<ILogger> logger) {
+    const std::filesystem::path& surnames_filepath) {
   const boost::json::value forenames_root =
       ParseJsonFile(forenames_filepath, "forenames-by-country");
   const boost::json::value surnames_root =
