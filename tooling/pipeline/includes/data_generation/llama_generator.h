@@ -44,14 +44,9 @@ class LlamaGenerator final : public DataGenerator {
 
   ~LlamaGenerator() override;
 
-  // disable copy constructor
   LlamaGenerator(const LlamaGenerator&) = delete;
-
-  // disable copy assignment operator
   LlamaGenerator& operator=(const LlamaGenerator&) = delete;
-  // disable move constructor
   LlamaGenerator(LlamaGenerator&&) = delete;
-  // disable move assignment operator
   LlamaGenerator& operator=(LlamaGenerator&&) = delete;
 
   /**

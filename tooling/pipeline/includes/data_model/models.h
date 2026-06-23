@@ -28,14 +28,7 @@ namespace prog_opts = boost::program_options;
  * @brief Canonical location record for city-level generation.
  */
 struct Location {
-  /**
-   * @brief City name.
-   */
   std::string city{};
-
-  /**
-   * @brief State or province name.
-   */
   std::string state_province{};
 
   /**
@@ -43,9 +36,6 @@ struct Location {
    */
   std::string iso3166_2{};
 
-  /**
-   * @brief Country name.
-   */
   std::string country{};
 
   /**
@@ -79,14 +69,7 @@ struct Location {
  * Produced by NamesByCountry::SampleName();
  */
 struct Name {
-  /**
-   * @brief First (given) name.
-   */
   std::string first_name{};
-
-  /**
-   * @brief Last (family) name.
-   */
   std::string last_name{};
 
   /**
@@ -207,9 +190,6 @@ struct PipelineOptions {
    */
   std::filesystem::path prompt_dir;
 
-  /**
-   * @brief Path for application logs.
-   */
   std::filesystem::path log_path;
 
   /**

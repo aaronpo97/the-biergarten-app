@@ -16,10 +16,6 @@
 class IExportService {
  public:
   IExportService() = default;
-
-  /**
-   * @brief Virtual destructor for polymorphic cleanup.
-   */
   virtual ~IExportService() = default;
 
   IExportService(const IExportService&) = delete;

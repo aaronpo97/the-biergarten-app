@@ -10,6 +10,9 @@
 #include <string_view>
 
 // GBNF grammar for structured user JSON output.
+// thought-block permits the model to emit free-form reasoning before the
+// JSON object (the prompts explicitly invite this); only the "{...}" tail is
+// constrained to the expected shape.
 inline constexpr std::string_view kUserJsonGrammar = R"json_user(
 root ::= thought-block "{" ws
     "\"username\"" ws ":" ws string ws "," ws
@@ -25,7 +28,8 @@ hex           ::= [0-9a-fA-F]
 number        ::= "-"? ("0" | [1-9] [0-9]*) ("." [0-9]+)?
 )json_user";
 
-// GBNF grammar for structured brewery JSON output.
+// GBNF grammar for structured brewery JSON output (see thought-block note
+// above).
 inline constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
 root ::= thought-block "{" ws
     "\"name_en\"" ws ":" ws string ws "," ws

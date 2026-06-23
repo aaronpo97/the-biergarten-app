@@ -109,6 +109,8 @@ INSERT INTO users (
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 )sql";
 
+// sqlite3_bind_*() parameter indices are 1-based, matching the "?"
+// placeholder order in the SQL above.
 inline constexpr int kLocationCityBindIndex = 1;
 inline constexpr int kLocationStateProvinceBindIndex = 2;
 inline constexpr int kLocationIso31662BindIndex = 3;

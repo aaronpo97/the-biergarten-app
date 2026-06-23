@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/query_cities_with_countries.cc
- * @brief BiergartenDataGenerator::QueryCitiesWithCountries() implementation.
+ * @brief BiergartenPipelineOrchestrator::QueryCitiesWithCountries() implementation.
  */
 
 #include <algorithm>

@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/generate_users.cc
- * @brief BiergartenDataGenerator::GenerateUsers() implementation.
+ * @brief BiergartenPipelineOrchestrator::GenerateUsers() implementation.
  */
 
 #include <cctype>

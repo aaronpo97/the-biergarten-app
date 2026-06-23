@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/run.cc
- * @brief BiergartenDataGenerator::Run() implementation.
+ * @brief BiergartenPipelineOrchestrator::Run() implementation.
  */
 
 #include <chrono>

@@ -36,7 +36,11 @@ class WikipediaEnrichmentService final : public IEnrichmentService {
   std::unique_ptr<WebClient> client_;
   std::shared_ptr<ILogger> logger_;
   /**
-   * @brief Canonical cache for raw Wikipedia query extracts.
+   * @brief Cache for raw Wikipedia query extracts, keyed by query string.
+   *
+   * GetLocationContext() always queries "brewing" and reuses "beer in
+   * {country}" for every city in that country, so caching avoids refetching
+   * the same extract across locations in a run.
    */
   std::unordered_map<std::string, std::string> extract_cache_;
 };

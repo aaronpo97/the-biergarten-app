@@ -15,9 +15,6 @@
  */
 class IEnrichmentService {
  public:
-  /**
-   * @brief Virtual destructor for polymorphic cleanup.
-   */
   virtual ~IEnrichmentService() = default;
 
   /**

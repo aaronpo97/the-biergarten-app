@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/log_results.cc
- * @brief BiergartenDataGenerator::LogResults() implementation.
+ * @brief BiergartenPipelineOrchestrator::LogResults() implementation.
  */
 
 #include <boost/json/array.hpp>

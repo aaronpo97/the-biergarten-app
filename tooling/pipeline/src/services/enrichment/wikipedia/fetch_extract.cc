@@ -1,5 +1,6 @@
 /**
  * @file wikipedia/fetch_extract.cc
+ * @brief WikipediaEnrichmentService::FetchExtract() implementation.
  */
 
 #include <boost/json.hpp>

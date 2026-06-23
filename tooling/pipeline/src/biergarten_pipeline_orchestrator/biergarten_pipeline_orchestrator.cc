@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
- * @brief BiergartenDataGenerator constructor implementation.
+ * @brief BiergartenPipelineOrchestrator constructor implementation.
  */
 
 #include "biergarten_pipeline_orchestrator.h"

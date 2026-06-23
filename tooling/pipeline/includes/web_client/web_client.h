@@ -13,9 +13,6 @@
  */
 class WebClient {
  public:
-  /**
-   * @brief Virtual destructor for polymorphic cleanup.
-   */
   virtual ~WebClient() = default;
 
   /**

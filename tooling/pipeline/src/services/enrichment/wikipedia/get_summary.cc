@@ -1,6 +1,6 @@
 /**
  * @file wikipedia/get_summary.cc
- * @brief WikipediaService::GetLocationContext() implementation.
+ * @brief WikipediaEnrichmentService::GetLocationContext() implementation.
  */
 
 #include <chrono>

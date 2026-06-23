@@ -1,6 +1,6 @@
 /**
  * @file biergarten_pipeline_orchestrator/generate_breweries.cc
- * @brief BiergartenDataGenerator::GenerateBreweries() implementation.
+ * @brief BiergartenPipelineOrchestrator::GenerateBreweries() implementation.
  */
 
 #include <chrono>
