@@ -24,7 +24,9 @@
 #include "data_generation/mock_generator.h"
 #include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
 #include "data_model/models.h"
+#include "json_handling/json_loader.h"
 #include "llama_backend_state.h"
+#include "services/curated_data/curated_data_service.h"
 #include "services/database/export_service.h"
 #include "services/database/sqlite_export_service.h"
 #include "services/datetime/timer.h"
@@ -47,7 +49,7 @@ int main(const int argc, char** argv) {
   spdlog::set_pattern("│ %Y-%m-%d %H:%M:%S.%e │ %^%-7l%$ │ %v");
   BoundedChannel<LogEntry> log_channel(kLogMaxCount);
 
-  auto log_dispatcher =  //
+  auto log_dispatcher = //
       std::make_unique<LogDispatcher>(log_channel);
   std::shared_ptr<ILogger> log_producer =
       std::make_shared<LogProducer>(log_channel);
@@ -104,21 +106,22 @@ int main(const int argc, char** argv) {
         di::bind<ApplicationOptions>().to(options),
         di::bind<std::string>().to(model_path),
         di::bind<IExportService>().to<SqliteExportService>(),
+        di::bind<ICuratedDataService>().to<JsonLoader>(),
         di::bind<IPromptFormatter>().to([options, log_producer] {
           if (options.generator.use_mocked) {
             {
               log_producer->Log(
-                  {.level = LogLevel::Info,
-                   .phase = PipelinePhase::Startup,
-                   .message = "Prompt formatter: none (mock mode)"});
+              {.level = LogLevel::Info,
+               .phase = PipelinePhase::Startup,
+               .message = "Prompt formatter: none (mock mode)"});
             }
             return std::unique_ptr<IPromptFormatter>(nullptr);
           }
           {
             log_producer->Log(
-                {.level = LogLevel::Info,
-                 .phase = PipelinePhase::Startup,
-                 .message = "Prompt formatter: Gemma4JinjaPromptFormatter"});
+            {.level = LogLevel::Info,
+             .phase = PipelinePhase::Startup,
+             .message = "Prompt formatter: Gemma4JinjaPromptFormatter"});
           }
           return std::unique_ptr<IPromptFormatter>(
               std::make_unique<Gemma4JinjaPromptFormatter>());
@@ -142,7 +145,7 @@ int main(const int argc, char** argv) {
         }),
         di::bind<IEnrichmentService>().to(
             [options, &log_producer](
-                const auto& inj) -> std::unique_ptr<IEnrichmentService> {
+            const auto& inj) -> std::unique_ptr<IEnrichmentService> {
               if (options.generator.use_mocked) {
                 {
                   log_producer->Log({.level = LogLevel::Info,
@@ -162,7 +165,8 @@ int main(const int argc, char** argv) {
             }),
         di::bind<DataGenerator>().to(
             [&options, &model_path, &sampling, &prompt_directory,
-             &log_producer](const auto& inj) -> std::unique_ptr<DataGenerator> {
+              &log_producer
+            ](const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
                 {
                   log_producer->Log({.level = LogLevel::Info,
@@ -173,14 +177,14 @@ int main(const int argc, char** argv) {
               }
               {
                 log_producer->Log(
-                    {.level = LogLevel::Info,
-                     .phase = PipelinePhase::Startup,
-                     .message = std::format(
-                         "Generator: LlamaGenerator | model={} | "
-                         "temp={:.2f} "
-                         "top_p={:.2f} top_k={} n_ctx={} seed={}",
-                         model_path, sampling.temperature, sampling.top_p,
-                         sampling.top_k, sampling.n_ctx, sampling.seed)});
+                {.level = LogLevel::Info,
+                 .phase = PipelinePhase::Startup,
+                 .message = std::format(
+                     "Generator: LlamaGenerator | model={} | "
+                     "temp={:.2f} "
+                     "top_p={:.2f} top_k={} n_ctx={} seed={}",
+                     model_path, sampling.temperature, sampling.top_p,
+                     sampling.top_k, sampling.n_ctx, sampling.seed)});
               }
               return std::make_unique<LlamaGenerator>(
                   options, model_path, log_producer,
@@ -204,7 +208,6 @@ int main(const int argc, char** argv) {
                                               timer.Elapsed())});
 
     return shutdown(EXIT_SUCCESS);
-
   } catch (const std::exception& exception) {
     const LogDTO log_entry{.level = LogLevel::Error,
                            .phase = PipelinePhase::Teardown,

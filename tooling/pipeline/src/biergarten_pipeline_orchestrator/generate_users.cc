@@ -18,14 +18,13 @@
 #include "services/logging/logger.h"
 
 namespace {
-
 std::string Sanitize(std::string_view value) {
   std::string out;
   out.reserve(value.size());
   for (const char character : value) {
     if (std::isalnum(static_cast<unsigned char>(character)) != 0) {
       out.push_back(static_cast<char>(
-          std::tolower(static_cast<unsigned char>(character))));
+        std::tolower(static_cast<unsigned char>(character))));
     }
   }
   return out;
@@ -70,8 +69,7 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
                      static_cast<unsigned>(birth_ymd.month()),
                      static_cast<unsigned>(birth_ymd.day()));
 }
-
-}  // namespace
+} // namespace
 
 void BiergartenPipelineOrchestrator::GenerateUsers(
     std::span<const EnrichedCity> cities) {
@@ -80,15 +78,16 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                 .message = "=== SAMPLE USER GENERATION ==="});
 
   const std::vector<UserPersona> personas =
-      JsonLoader::LoadPersonas("personas.json");
+      curated_data_service_->LoadPersonas("personas.json");
 
   if (personas.empty()) {
     throw std::runtime_error(
         "No personas available in personas.json for user generation");
   }
 
-  const NamesByCountry names_by_country = JsonLoader::LoadNamesByCountry(
-      "forenames-by-country.json", "surnames-by-country.json");
+  const NamesByCountry names_by_country =
+      curated_data_service_->LoadNamesByCountry(
+          "forenames-by-country.json", "surnames-by-country.json");
 
   std::mt19937 rng(std::random_device{}());
   std::uniform_int_distribution<size_t> persona_dist(0, personas.size() - 1);
@@ -99,8 +98,8 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
 
   const auto generate_record =
       [this, &rng, &skipped_count](
-          const EnrichedCity& city, const UserPersona& persona,
-          const Name& sampled_name) -> std::optional<UserRecord> {
+      const EnrichedCity& city, const UserPersona& persona,
+      const Name& sampled_name) -> std::optional<UserRecord> {
     try {
       std::unordered_set<std::string> used_email_local_parts;
 
@@ -126,19 +125,19 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   };
 
   const auto export_record = [this,
-                              &export_failed_count](const UserRecord& record) {
+        &export_failed_count](const UserRecord& record) {
     try {
       exporter_->ProcessRecord(record);
     } catch (const std::exception& export_exception) {
       ++export_failed_count;
 
       logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
-           .message = std::format("[Pipeline] Generated user for '{}' ({}) but "
-                                  "SQLite export failed: {}",
-                                  record.location.city, record.location.country,
-                                  export_exception.what())});
+      {.level = LogLevel::Warn,
+       .phase = PipelinePhase::UserGeneration,
+       .message = std::format("[Pipeline] Generated user for '{}' ({}) but "
+                              "SQLite export failed: {}",
+                              record.location.city, record.location.country,
+                              export_exception.what())});
     }
   };
 
@@ -172,11 +171,11 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
 
   if (skipped_count > 0) {
     logger_->Log(
-        {.level = LogLevel::Warn,
-         .phase = PipelinePhase::UserGeneration,
-         .message = std::format(
-             "[Pipeline] Skipped {} city/cities during user generation",
-             skipped_count)});
+    {.level = LogLevel::Warn,
+     .phase = PipelinePhase::UserGeneration,
+     .message = std::format(
+         "[Pipeline] Skipped {} city/cities during user generation",
+         skipped_count)});
   }
 
   if (export_failed_count > 0) {

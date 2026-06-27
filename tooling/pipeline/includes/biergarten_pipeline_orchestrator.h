@@ -15,6 +15,7 @@
 
 #include "data_generation/data_generator.h"
 #include "data_model/generated_models.h"
+#include "services/curated_data/curated_data_service.h"
 #include "services/database/export_service.h"
 #include "services/enrichment/enrichment_service.h"
 #include "services/logging/logger.h"
@@ -34,6 +35,8 @@ class BiergartenPipelineOrchestrator {
    * @param generator Implementation (Llama or Mock) for brewery/user
    * generation.
    * @param exporter Database backend for persisting generated records.
+   * @param curated_data_service Loads curated location, persona, and name
+   * data used to seed generation.
    * @param application_options CLI configuration and paths.
    */
   BiergartenPipelineOrchestrator(
@@ -41,6 +44,7 @@ class BiergartenPipelineOrchestrator {
       std::unique_ptr<IEnrichmentService> context_service,
       std::unique_ptr<DataGenerator> generator,
       std::unique_ptr<IExportService> exporter,
+      std::unique_ptr<ICuratedDataService> curated_data_service,
       const ApplicationOptions& application_options);
 
   /**
@@ -76,6 +80,7 @@ class BiergartenPipelineOrchestrator {
    * @brief Storage backend for generated brewery and user records.
    */
   std::unique_ptr<IExportService> exporter_;
+  std::unique_ptr<ICuratedDataService> curated_data_service_;
 
   ApplicationOptions application_options_;
 
@@ -114,4 +119,5 @@ class BiergartenPipelineOrchestrator {
   std::vector<BreweryRecord> generated_breweries_;
   std::vector<UserRecord> generated_users_;
 };
+
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_

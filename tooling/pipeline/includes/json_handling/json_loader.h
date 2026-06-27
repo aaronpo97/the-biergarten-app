@@ -3,33 +3,34 @@
 
 /**
  * @file json_handling/json_loader.h
- * @brief Loader API for curated location data.
+ * @brief JSON-backed implementation of ICuratedDataService.
  */
 
 #include <filesystem>
-#include <memory>
 #include <vector>
 
 #include "data_model/models.h"
 #include "data_model/names_by_country.h"
-#include "services/logging/logger.h"
+#include "services/curated_data/curated_data_service.h"
 
 /**
- * @brief Loads curated world locations from a JSON file into memory.
+ * @brief Loads curated location, persona, and name data from JSON files.
  */
-class JsonLoader {
+class JsonLoader final : public ICuratedDataService {
  public:
+  JsonLoader() = default;
+
   /**
    * @brief Parses a JSON array file and returns all location records.
    */
-  static std::vector<Location> LoadLocations(
-      const std::filesystem::path& filepath);
+  std::vector<Location> LoadLocations(
+      const std::filesystem::path& filepath) override;
 
   /**
    * @brief Parses a JSON array file and returns all persona records.
    */
-  static std::vector<UserPersona> LoadPersonas(
-      const std::filesystem::path& filepath);
+  std::vector<UserPersona> LoadPersonas(
+      const std::filesystem::path& filepath) override;
 
   /**
    * @brief Parses the names-by-country fixture pair into a sampling-capable
@@ -38,9 +39,9 @@ class JsonLoader {
    * @param forenames_filepath Path to forenames-by-country.json.
    * @param surnames_filepath Path to surnames-by-country.json.
    */
-  static NamesByCountry LoadNamesByCountry(
+  NamesByCountry LoadNamesByCountry(
       const std::filesystem::path& forenames_filepath,
-      const std::filesystem::path& surnames_filepath);
+      const std::filesystem::path& surnames_filepath) override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_
