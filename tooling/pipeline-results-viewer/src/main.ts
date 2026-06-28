@@ -1,27 +1,41 @@
-import "95css/css/95css.css";
-import initSqlJs, { type Database } from "sql.js";
+import initSqlJs, { type Database, type SqlValue } from "sql.js";
 import sqlWasmUrl from "sql.js/dist/sql-wasm.wasm?url";
-import "./style.css";
+import "./style.scss";
 
 const DB_URL = "/biergarten.sqlite";
+
+const tabs = document.querySelectorAll<HTMLButtonElement>("[role='tab']");
+const panels = document.querySelectorAll<HTMLDivElement>("[role='tabpanel']");
 
 const tableSelect = document.querySelector<HTMLSelectElement>("#table-select")!;
 const tableContainer =
   document.querySelector<HTMLDivElement>("#table-container")!;
 const status = document.querySelector<HTMLParagraphElement>("#status")!;
 
-const renderTable = (db: Database, name: string) => {
-  const result = db.exec(`SELECT * FROM "${name}"`);
-  tableContainer.replaceChildren();
+const queryInput = document.querySelector<HTMLTextAreaElement>("#query-input")!;
+const queryRun = document.querySelector<HTMLButtonElement>("#query-run")!;
+const queryStatus = document.querySelector<HTMLParagraphElement>("#query-status")!;
+const queryContainer =
+  document.querySelector<HTMLDivElement>("#query-container")!;
 
-  if (result.length === 0) {
-    tableContainer.append(
-      Object.assign(document.createElement("p"), { textContent: "No rows." }),
-    );
-    return;
-  }
+for (const tab of tabs) {
+  tab.addEventListener("click", () => {
+    for (const otherTab of tabs) {
+      const isActive = otherTab === tab;
+      otherTab.classList.toggle("is-active", isActive);
+      otherTab.setAttribute("aria-selected", String(isActive));
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.id !== tab.getAttribute("aria-controls");
+    }
+  });
+}
 
-  const { columns, values } = result[0];
+const renderResultTable = (
+  container: HTMLDivElement,
+  columns: string[],
+  values: SqlValue[][],
+) => {
   const table = document.createElement("table");
 
   const head = table.createTHead().insertRow();
@@ -41,7 +55,47 @@ const renderTable = (db: Database, name: string) => {
     }
   }
 
-  tableContainer.append(table);
+  container.append(table);
+};
+
+const renderTable = (db: Database, name: string) => {
+  const result = db.exec(`SELECT * FROM "${name}"`);
+  tableContainer.replaceChildren();
+
+  if (result.length === 0) {
+    tableContainer.append(
+      Object.assign(document.createElement("p"), { textContent: "No rows." }),
+    );
+    return;
+  }
+
+  const { columns, values } = result[0];
+  renderResultTable(tableContainer, columns, values);
+};
+
+const runQuery = (db: Database) => {
+  const sql = queryInput.value.trim();
+  queryContainer.replaceChildren();
+
+  if (!sql) {
+    queryStatus.textContent = "Enter a query to run.";
+    return;
+  }
+
+  try {
+    const results = db.exec(sql);
+
+    if (results.length === 0) {
+      queryStatus.textContent = "Query executed. No rows returned.";
+      return;
+    }
+
+    const { columns, values } = results[results.length - 1];
+    renderResultTable(queryContainer, columns, values);
+    queryStatus.textContent = `${values.length} row${values.length === 1 ? "" : "s"} returned.`;
+  } catch (error) {
+    queryStatus.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
 };
 
 async function main(): Promise<void> {
@@ -78,6 +132,14 @@ async function main(): Promise<void> {
   }
 
   status.textContent = "";
+
+  queryRun.addEventListener("click", () => runQuery(db));
+  queryInput.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      runQuery(db);
+    }
+  });
 }
 
 main().catch((error: unknown) => {
