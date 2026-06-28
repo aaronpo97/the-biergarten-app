@@ -32,7 +32,7 @@ class DataGenerator {
    *
    * @param city Enriched city the user is associated with.
    * @param persona Persona archetype grounding the generated bio.
-   * @param name Sampled first/last name (and gender) -- not LLM-invented.
+   * @param name Sampled first/last name (and gender)
    * @return User generation result.
    */
   virtual UserResult GenerateUser(const EnrichedCity& city,

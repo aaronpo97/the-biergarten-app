@@ -135,11 +135,11 @@ int main(const int argc, char** argv) {
             }
             return std::unique_ptr<WebClient>(nullptr);
           }
-          {
-            log_producer->Log({.level = LogLevel::Info,
-                               .phase = PipelinePhase::Startup,
-                               .message = "Web client: HttpWebClient"});
-          }
+
+          log_producer->Log({.level = LogLevel::Info,
+                             .phase = PipelinePhase::Startup,
+                             .message = "Web client: HttpWebClient"});
+
           return std::unique_ptr<WebClient>(
               std::make_unique<HttpWebClient>(log_producer));
         }),
@@ -147,18 +147,17 @@ int main(const int argc, char** argv) {
             [options, &log_producer](
             const auto& inj) -> std::unique_ptr<IEnrichmentService> {
               if (options.generator.use_mocked) {
-                {
-                  log_producer->Log({.level = LogLevel::Info,
-                                     .phase = PipelinePhase::Startup,
-                                     .message = "Enrichment: mock"});
-                }
-                return std::make_unique<MockEnrichmentService>();
-              }
-              {
                 log_producer->Log({.level = LogLevel::Info,
                                    .phase = PipelinePhase::Startup,
-                                   .message = "Enrichment: Wikipedia"});
+                                   .message = "Enrichment: mock"});
+
+                return std::make_unique<MockEnrichmentService>();
               }
+
+              log_producer->Log({.level = LogLevel::Info,
+                                 .phase = PipelinePhase::Startup,
+                                 .message = "Enrichment: Wikipedia"});
+
               return std::make_unique<WikipediaEnrichmentService>(
                   inj.template create<std::unique_ptr<WebClient>>(),
                   log_producer);
@@ -168,24 +167,22 @@ int main(const int argc, char** argv) {
               &log_producer
             ](const auto& inj) -> std::unique_ptr<DataGenerator> {
               if (options.generator.use_mocked) {
-                {
-                  log_producer->Log({.level = LogLevel::Info,
-                                     .phase = PipelinePhase::Startup,
-                                     .message = "Generator: mock"});
-                }
+                log_producer->Log({.level = LogLevel::Info,
+                                   .phase = PipelinePhase::Startup,
+                                   .message = "Generator: mock"});
+
                 return std::make_unique<MockGenerator>();
               }
-              {
-                log_producer->Log(
-                {.level = LogLevel::Info,
-                 .phase = PipelinePhase::Startup,
-                 .message = std::format(
-                     "Generator: LlamaGenerator | model={} | "
-                     "temp={:.2f} "
-                     "top_p={:.2f} top_k={} n_ctx={} seed={}",
-                     model_path, sampling.temperature, sampling.top_p,
-                     sampling.top_k, sampling.n_ctx, sampling.seed)});
-              }
+
+              log_producer->Log(
+              {.level = LogLevel::Info,
+               .phase = PipelinePhase::Startup,
+               .message = std::format(
+                   "Generator: LlamaGenerator | model={} | "
+                   "temp={:.2f} top_p={:.2f} top_k={} n_ctx={} seed={}",
+                   model_path, sampling.temperature, sampling.top_p,
+                   sampling.top_k, sampling.n_ctx, sampling.seed)});
+
               return std::make_unique<LlamaGenerator>(
                   options, model_path, log_producer,
                   inj.template create<std::unique_ptr<IPromptFormatter>>(),
