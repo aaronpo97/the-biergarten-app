@@ -10,6 +10,7 @@
 #include <boost/program_options.hpp>
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -93,7 +94,22 @@ struct ForenameEntry {
    * dataset (e.g. "M", "F").
    */
   std::string gender{};
+
+  bool operator==(const ForenameEntry& other) const {
+    return name == other.name && gender == other.gender;
+  }
 };
+
+namespace std {
+template <>
+struct hash<ForenameEntry> {
+  size_t operator()(const ForenameEntry& entry) const noexcept {
+    const size_t name_hash = std::hash<std::string>{}(entry.name);
+    const size_t gender_hash = std::hash<std::string>{}(entry.gender);
+    return name_hash ^ (gender_hash << 1);
+  }
+};
+}  // namespace std
 
 /**
  * @brief A persona archetype used to ground LLM-generated user bios.

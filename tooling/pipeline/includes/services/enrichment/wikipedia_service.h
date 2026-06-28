@@ -11,7 +11,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "enrichment_service.h"
+#include "services/enrichment/enrichment_service.h"
 #include "services/logging/logger.h"
 #include "web_client/web_client.h"
 

@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "enrichment_service.h"
+#include "services/enrichment/enrichment_service.h"
 
 /**
  * @brief Enrichment service that returns no context for any location.

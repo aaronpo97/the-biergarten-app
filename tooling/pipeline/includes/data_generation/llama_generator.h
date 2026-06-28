@@ -1,24 +1,23 @@
 #ifndef BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 #define BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 
-#include <filesystem>
-
 /**
  * @file data_generation/llama_generator.h
  * @brief llama.cpp-backed implementation of DataGenerator.
  */
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <random>
 #include <string>
 #include <string_view>
 
-#include "../services/prompting/prompt_directory.h"
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/models.h"
 #include "services/logging/logger.h"
+#include "services/prompting/prompt_directory.h"
 
 struct llama_model;
 struct llama_context;

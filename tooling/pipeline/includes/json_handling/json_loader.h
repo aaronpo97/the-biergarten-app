@@ -7,41 +7,49 @@
  */
 
 #include <filesystem>
+#include <unordered_set>
 #include <vector>
 
 #include "data_model/models.h"
-#include "data_model/names_by_country.h"
 #include "services/curated_data/curated_data_service.h"
 
 /**
  * @brief Loads curated location, persona, and name data from JSON files.
  */
 class JsonLoader final : public ICuratedDataService {
+  struct cache {
+    std::vector<Location> locations;
+    std::vector<UserPersona> personas;
+    std::unordered_map<std::string, forename_list> forenames_by_country;
+    std::unordered_map<std::string, surname_list> surnames_by_country;
+
+    cache() = default;
+    ~cache() = default;
+  };
+
+  cache cache_;
+
  public:
   JsonLoader() = default;
 
   /**
    * @brief Parses a JSON array file and returns all location records.
    */
-  std::vector<Location> LoadLocations(
-      const std::filesystem::path& filepath) override;
+  std::vector<Location> LoadLocations(const std::filesystem::path&) override;
 
   /**
    * @brief Parses a JSON array file and returns all persona records.
    */
-  std::vector<UserPersona> LoadPersonas(
-      const std::filesystem::path& filepath) override;
+  std::vector<UserPersona> LoadPersonas(const std::filesystem::path&) override;
+
+  std::unordered_map<std::string, forename_list> LoadForenamesByCountry(
+      const std::filesystem::path&) override;
 
   /**
-   * @brief Parses the names-by-country fixture pair into a sampling-capable
-   * NamesByCountry.
-   *
-   * @param forenames_filepath Path to forenames-by-country.json.
-   * @param surnames_filepath Path to surnames-by-country.json.
+   * @brief Parses a JSON file and returns all the forenames per country.
    */
-  NamesByCountry LoadNamesByCountry(
-      const std::filesystem::path& forenames_filepath,
-      const std::filesystem::path& surnames_filepath) override;
+  std::unordered_map<std::string, surname_list> LoadSurnamesByCountry(
+      const std::filesystem::path&) override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_

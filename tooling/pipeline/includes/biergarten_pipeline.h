@@ -1,0 +1,69 @@
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_H_
+
+/**
+ * @file biergarten_pipeline.h
+ * @brief Master umbrella header — includes every public header in the
+ * Biergarten pipeline.
+ */
+
+// --- orchestrator ---
+#include "biergarten_pipeline_orchestrator.h"
+
+// --- concurrency ---
+#include "concurrency/bounded_channel.h"
+
+// --- data_generation ---
+#include "data_generation/data_generator.h"
+#include "data_generation/json_grammars.h"
+#include "data_generation/llama_generator.h"
+#include "data_generation/llama_generator_helpers.h"
+#include "data_generation/mock_generator.h"
+#include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
+#include "data_generation/prompt_formatting/prompt_formatter.h"
+
+// --- data_model ---
+#include "data_model/generated_models.h"
+#include "data_model/models.h"
+
+// --- json_handling ---
+#include "json_handling/json_loader.h"
+#include "json_handling/pretty_print.h"
+
+// --- llama backend ---
+#include "llama_backend_state.h"
+
+// --- services: curated_data ---
+#include "services/curated_data/curated_data_service.h"
+
+// --- services: database ---
+#include "services/database/export_service.h"
+#include "services/database/sqlite_connection_helpers.h"
+#include "services/database/sqlite_export_service.h"
+#include "services/database/sqlite_export_service_helpers.h"
+#include "services/database/sqlite_handle_types.h"
+#include "services/database/sqlite_statement_helpers.h"
+
+// --- services: datetime ---
+#include "services/datetime/date_time_provider.h"
+#include "services/datetime/timer.h"
+
+// --- services: enrichment ---
+#include "services/enrichment/enrichment_service.h"
+#include "services/enrichment/mock_enrichment.h"
+#include "services/enrichment/wikipedia_service.h"
+
+// --- services: logging ---
+#include "services/logging/log_dispatcher.h"
+#include "services/logging/log_entry.h"
+#include "services/logging/log_producer.h"
+#include "services/logging/logger.h"
+
+// --- services: prompting ---
+#include "services/prompting/prompt_directory.h"
+
+// --- web_client ---
+#include "web_client/http_web_client.h"
+#include "web_client/web_client.h"
+
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_H_

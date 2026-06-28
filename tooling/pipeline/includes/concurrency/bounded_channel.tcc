@@ -1,4 +1,4 @@
-#include "bounded_channel.h"
+#include "concurrency/bounded_channel.h"
 
 template <typename T>
 void BoundedChannel<T>::Send(T item) {

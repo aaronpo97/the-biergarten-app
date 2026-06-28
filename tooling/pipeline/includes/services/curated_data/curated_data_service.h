@@ -7,11 +7,13 @@
  */
 
 #include <filesystem>
+#include <unordered_set>
 #include <vector>
 
 #include "data_model/models.h"
-#include "data_model/names_by_country.h"
 
+using forename_list = std::unordered_set<ForenameEntry>;
+using surname_list = std::unordered_set<std::string>;
 /**
  * @brief Interface for services that load curated data used to seed
  * brewery/user generation.
@@ -38,15 +40,9 @@ class ICuratedDataService {
   virtual std::vector<UserPersona> LoadPersonas(
       const std::filesystem::path& filepath) = 0;
 
-  /**
-   * @brief Loads the names-by-country fixture pair into a sampling-capable
-   * NamesByCountry.
-   *
-   * @param forenames_filepath Path to forenames-by-country.json.
-   * @param surnames_filepath Path to surnames-by-country.json.
-   */
-  virtual NamesByCountry LoadNamesByCountry(
-      const std::filesystem::path& forenames_filepath,
+  virtual std::unordered_map<std::string, forename_list> LoadForenamesByCountry(
+      const std::filesystem::path& forenames_filepath) = 0;
+  virtual std::unordered_map<std::string, surname_list> LoadSurnamesByCountry(
       const std::filesystem::path& surnames_filepath) = 0;
 };
 

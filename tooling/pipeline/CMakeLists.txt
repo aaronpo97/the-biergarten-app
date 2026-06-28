@@ -151,11 +151,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/json_handling/json_loader.cc
 )
 
-# --- data_model ---
-target_sources(${PROJECT_NAME} PRIVATE
-        src/data_model/names_by_country.cc
-)
-
 # --- application_options ---
 target_sources(${PROJECT_NAME} PRIVATE
         src/application_options/parse_arguments.cc

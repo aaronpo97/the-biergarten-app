@@ -137,7 +137,6 @@ std::vector<Location> JsonLoader::LoadLocations(
         .longitude = ReadRequiredNumber(object, "longitude"),
     });
   }
-
   return locations;
 }
 

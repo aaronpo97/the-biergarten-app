@@ -5,6 +5,8 @@
 
 #include "data_generation/llama_generator.h"
 
+#include <llama.h>
+
 #include <filesystem>
 #include <memory>
 #include <random>
@@ -12,7 +14,6 @@
 #include <string>
 
 #include "data_model/models.h"
-#include "llama.h"
 
 static constexpr uint32_t kMaxContextSize = 32768U;
 

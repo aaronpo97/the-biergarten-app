@@ -4,6 +4,9 @@
  * context, and resets prior resources during model initialization.
  */
 
+#include <ggml-backend.h>
+#include <llama.h>
+
 #include <algorithm>
 #include <chrono>
 #include <stdexcept>
@@ -11,8 +14,6 @@
 #include <utility>
 
 #include "data_generation/llama_generator.h"
-#include "ggml-backend.h"
-#include "llama.h"
 
 // Maximum batch size for decode operations. Capping the batch prevents
 // excessive memory allocation while maintaining inference performance.

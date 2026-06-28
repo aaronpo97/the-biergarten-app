@@ -7,8 +7,8 @@
 #include <chrono>
 #include <format>
 
-#include "../../includes/json_handling/pretty_print.h"
 #include "biergarten_pipeline_orchestrator.h"
+#include "json_handling/pretty_print.h"
 #include "services/logging/logger.h"
 
 void BiergartenPipelineOrchestrator::LogResults() const {

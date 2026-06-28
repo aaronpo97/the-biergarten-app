@@ -11,10 +11,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "../datetime/date_time_provider.h"
 #include "data_model/models.h"
-#include "export_service.h"
-#include "sqlite_export_service_helpers.h"
+#include "services/database/export_service.h"
+#include "services/database/sqlite_export_service_helpers.h"
+#include "services/datetime/date_time_provider.h"
 
 /**
  * @brief Persists generated brewery records into a fresh SQLite database.

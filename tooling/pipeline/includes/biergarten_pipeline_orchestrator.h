@@ -1,12 +1,9 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_ORCHESTRATOR_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_ORCHESTRATOR_H_
 
 /**
  * @file biergarten_pipeline_orchestrator.h
  * @brief Orchestration for end-to-end brewery and user data generation.
- *
- * Coordinates location loading, enrichment, and generation phases to produce
- * a complete dataset, wiring dependencies selected at the composition root.
  */
 
 #include <memory>
@@ -103,10 +100,6 @@ class BiergartenPipelineOrchestrator {
    * @brief Generate users grounded in sampled names and personas for
    * enriched cities.
    *
-   * Loads personas.json / forenames-by-country.json /
-   * surnames-by-country.json itself, mirroring how QueryCitiesWithCountries()
-   * owns its own locations.json load.
-   *
    * @param cities Span of enriched city data.
    */
   void GenerateUsers(std::span<const EnrichedCity> cities);
@@ -120,4 +113,4 @@ class BiergartenPipelineOrchestrator {
   std::vector<UserRecord> generated_users_;
 };
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_DATA_GENERATOR_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_BIERGARTEN_PIPELINE_ORCHESTRATOR_H_

@@ -52,4 +52,4 @@ class HttpWebClient final : public WebClient {
   std::shared_ptr<ILogger> logger_;
 };
 
-#endif
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_HTTP_WEB_CLIENT_H_

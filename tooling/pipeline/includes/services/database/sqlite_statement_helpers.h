@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-#include "sqlite_handle_types.h"
+#include "services/database/sqlite_handle_types.h"
 
 namespace sqlite_export_service_internal {
 
@@ -109,30 +109,36 @@ INSERT INTO users (
 
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
 // placeholder order in the SQL above.
-inline constexpr int kLocationCityBindIndex = 1;
-inline constexpr int kLocationStateProvinceBindIndex = 2;
-inline constexpr int kLocationIso31662BindIndex = 3;
-inline constexpr int kLocationCountryBindIndex = 4;
-inline constexpr int kLocationIso31661BindIndex = 5;
-inline constexpr int kLocationLanguagesBindIndex = 6;
-inline constexpr int kLocationLatitudeBindIndex = 7;
-inline constexpr int kLocationLongitudeBindIndex = 8;
+enum eLocationBindIndex {
+  kLocationCityBindIndex = 1,
+  kLocationStateProvinceBindIndex,
+  kLocationIso31662BindIndex,
+  kLocationCountryBindIndex,
+  kLocationIso31661BindIndex,
+  kLocationLanguagesBindIndex,
+  kLocationLatitudeBindIndex,
+  kLocationLongitudeBindIndex,
+};
 
-inline constexpr int kBreweryLocationIdBindIndex = 1;
-inline constexpr int kBreweryEnglishNameBindIndex = 2;
-inline constexpr int kBreweryEnglishDescriptionBindIndex = 3;
-inline constexpr int kBreweryLocalNameBindIndex = 4;
-inline constexpr int kBreweryLocalDescriptionBindIndex = 5;
+enum BreweryBindIndex {
+  kBreweryLocationIdBindIndex = 1,
+  kBreweryEnglishNameBindIndex,
+  kBreweryEnglishDescriptionBindIndex,
+  kBreweryLocalNameBindIndex,
+  kBreweryLocalDescriptionBindIndex,
+};
 
-inline constexpr int kUserLocationIdBindIndex = 1;
-inline constexpr int kUserFirstNameBindIndex = 2;
-inline constexpr int kUserLastNameBindIndex = 3;
-inline constexpr int kUserGenderBindIndex = 4;
-inline constexpr int kUserUsernameBindIndex = 5;
-inline constexpr int kUserBioBindIndex = 6;
-inline constexpr int kUserActivityWeightBindIndex = 7;
-inline constexpr int kUserEmailBindIndex = 8;
-inline constexpr int kUserDateOfBirthBindIndex = 9;
+enum UserBindIndex {
+  kUserLocationIdBindIndex = 1,
+  kUserFirstNameBindIndex,
+  kUserLastNameBindIndex,
+  kUserGenderBindIndex,
+  kUserUsernameBindIndex,
+  kUserBioBindIndex,
+  kUserActivityWeightBindIndex,
+  kUserEmailBindIndex,
+  kUserDateOfBirthBindIndex,
+};
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
                                        std::string_view sql,
