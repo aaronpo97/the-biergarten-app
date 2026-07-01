@@ -14,3 +14,13 @@ size_t MockGenerator::DeterministicHash(const Location& location) {
   boost::hash_combine(seed, location.country);
   return seed;
 }
+
+size_t MockGenerator::DeterministicHash(const Location& location,
+                                        const UserPersona& persona,
+                                        const Name& name) {
+  size_t seed = DeterministicHash(location);
+  boost::hash_combine(seed, persona.name);
+  boost::hash_combine(seed, name.first_name);
+  boost::hash_combine(seed, name.last_name);
+  return seed;
+}

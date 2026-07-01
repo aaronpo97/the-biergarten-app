@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pipeline Results Viewer</title>
+  </head>
+  <body>
+    <div class="dialog" id="window">
+      <div class="dialog-header">
+        <p>Pipeline Results Viewer</p>
+      </div>
+      <div class="tab-strip" role="tablist">
+        <button
+          type="button"
+          class="tab is-active"
+          id="tab-tables"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-tables"
+        >
+          Tables
+        </button>
+        <button
+          type="button"
+          class="tab"
+          id="tab-query"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-query"
+        >
+          Query
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div
+          class="tab-panel"
+          id="panel-tables"
+          role="tabpanel"
+          aria-labelledby="tab-tables"
+        >
+          <div class="field-group">
+            <label for="table-select">Table</label>
+            <select id="table-select"></select>
+          </div>
+          <p id="status"></p>
+          <div id="table-container"></div>
+        </div>
+        <div
+          class="tab-panel"
+          id="panel-query"
+          role="tabpanel"
+          aria-labelledby="tab-query"
+          hidden
+        >
+          <div class="field-group field-group--stacked">
+            <label for="query-input">SQL Query</label>
+            <textarea
+              id="query-input"
+              rows="4"
+              spellcheck="false"
+              placeholder="SELECT * FROM ..."
+            ></textarea>
+          </div>
+          <button type="button" id="query-run" class="btn">Run Query</button>
+          <p id="query-status"></p>
+          <div id="query-container"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

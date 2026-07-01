@@ -1,24 +1,23 @@
 #ifndef BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 #define BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_H_
 
-#include <filesystem>
-
 /**
  * @file data_generation/llama_generator.h
  * @brief llama.cpp-backed implementation of DataGenerator.
  */
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <random>
 #include <string>
 #include <string_view>
 
-#include "../services/prompting/prompt_directory.h"
 #include "data_generation/data_generator.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 #include "data_model/models.h"
 #include "services/logging/logger.h"
+#include "services/prompting/prompt_directory.h"
 
 struct llama_model;
 struct llama_context;
@@ -44,14 +43,9 @@ class LlamaGenerator final : public DataGenerator {
 
   ~LlamaGenerator() override;
 
-  // disable copy constructor
   LlamaGenerator(const LlamaGenerator&) = delete;
-
-  // disable copy assignment operator
   LlamaGenerator& operator=(const LlamaGenerator&) = delete;
-  // disable move constructor
   LlamaGenerator(LlamaGenerator&&) = delete;
-  // disable move assignment operator
   LlamaGenerator& operator=(LlamaGenerator&&) = delete;
 
   /**
@@ -65,12 +59,15 @@ class LlamaGenerator final : public DataGenerator {
                                 const std::string& region_context) override;
 
   /**
-   * @brief Generates a user profile for the provided locale.
+   * @brief Generates a user profile grounded in a sampled name and persona.
    *
-   * @param locale Locale hint.
+   * @param city Enriched city the user is associated with.
+   * @param persona Persona archetype grounding the generated bio.
+   * @param name Sampled first/last name -- not LLM-invented.
    * @return Generated user profile.
    */
-  UserResult GenerateUser(const std::string& locale) override;
+  UserResult GenerateUser(const EnrichedCity& city, const UserPersona& persona,
+                          const Name& name) override;
 
  private:
   static constexpr int32_t kDefaultMaxTokens = 10000;

@@ -106,4 +106,4 @@ inline void PrettyPrint(std::ostream& outstream,
   }
 }
 
-#endif
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_PRETTY_PRINT_H_

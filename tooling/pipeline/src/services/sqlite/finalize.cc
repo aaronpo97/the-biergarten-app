@@ -14,6 +14,7 @@ void SqliteExportService::Finalize() {
   }
 
   try {
+    insert_user_stmt_.reset();
     insert_brewery_stmt_.reset();
     insert_location_stmt_.reset();
     if (transaction_open_) {

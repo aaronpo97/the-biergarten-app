@@ -20,10 +20,22 @@
  * @brief Severity levels supported by the logging infra.
  */
 enum class LogLevel {
-  Debug,  ///< Development/debugging information.
-  Info,   ///< General informational messages.
-  Warn,   ///< Warning conditions.
-  Error,  ///< Error conditions.
+  /**
+   * @brief Development/debugging information.
+   */
+  Debug,
+  /**
+   * @brief General informational messages.
+   */
+  Info,
+  /**
+   * @brief Warning conditions.
+   */
+  Warn,
+  /**
+   * @brief Error conditions.
+   */
+  Error,
 };
 
 /**
@@ -34,18 +46,44 @@ enum class LogLevel {
  * pipeline that emitted it.
  */
 enum class PipelinePhase {
-  Startup,                   ///< Initialization and validation.
-  UserGeneration,            ///< User profile generation.
-  BreweryAndBeerGeneration,  ///< Brewery and beer data generation.
-  CheckinGeneration,         ///< Checkin (visit) record generation.
-  RatingGeneration,          ///< Rating and review generation.
-  FollowGeneration,          ///< Follow relationship generation.
-  Teardown,                  ///< Finalization and cleanup.
+  /**
+   * @brief Initialization and validation.
+   */
+  Startup,
+  /**
+   * @brief Location/context enrichment (e.g. Wikipedia lookups).
+   */
+  Enrichment,
+  /**
+   * @brief User profile generation.
+   */
+  UserGeneration,
+  /**
+   * @brief Brewery and beer data generation.
+   */
+  BreweryAndBeerGeneration,
+  /**
+   * @brief Checkin (visit) record generation.
+   */
+  CheckinGeneration,
+  /**
+   * @brief Rating and review generation.
+   */
+  RatingGeneration,
+  /**
+   * @brief Follow relationship generation.
+   */
+  FollowGeneration,
+  /**
+   * @brief Finalization and cleanup.
+   */
+  Teardown,
 };
 
 /**
  * @struct LogDTO
- * @brief User-provided subset of log fields. Used to capture call-site info transparently.
+ * @brief User-provided subset of log fields. Used to capture call-site info
+ * transparently.
  */
 struct LogDTO {
   LogLevel level;
@@ -64,25 +102,35 @@ struct LogDTO {
  * before the entry is dispatched.
  */
 struct LogEntry {
-  /// @brief Timestamp when the entry was created.
+  /**
+   * @brief Timestamp when the entry was created.
+   */
   std::chrono::system_clock::time_point timestamp{};
 
-  /// @brief Source location where the log call was made.
+  /**
+   * @brief Source location where the log call was made.
+   */
   std::source_location origin{};
 
-  /// @brief Thread responsible for emitting the log.
+  /**
+   * @brief Thread responsible for emitting the log.
+   */
   std::thread::id thread_id{};
 
-
-  /// @brief Severity level of this entry.
+  /**
+   * @brief Severity level of this entry.
+   */
   LogLevel level;
 
-  /// @brief Pipeline phase associated with the entry.
+  /**
+   * @brief Pipeline phase associated with the entry.
+   */
   PipelinePhase phase;
 
-  /// @brief Log message text.
+  /**
+   * @brief Log message text.
+   */
   std::string message;
-
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOG_ENTRY_H_

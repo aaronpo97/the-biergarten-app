@@ -47,4 +47,18 @@ void AppendTokenPiece(const llama_vocab* vocab, llama_token token,
 std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                BreweryResult& brewery_out);
 
+/**
+ * @brief Validates and parses user JSON output.
+ *
+ * Only populates `username`, `bio`, and `activity_weight` -- `first_name`
+ * and `last_name` are not LLM-authored and are set separately from the
+ * sampled Name.
+ *
+ * @param raw Raw model output.
+ * @param user_out Parsed user payload.
+ * @return Validation error message if invalid, or std::nullopt on success.
+ */
+std::optional<std::string> ValidateUserJson(const std::string& raw,
+                                            UserResult& user_out);
+
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_GENERATION_LLAMA_GENERATOR_HELPERS_H_

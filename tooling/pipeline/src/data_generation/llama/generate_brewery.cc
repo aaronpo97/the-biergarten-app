@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include "data_generation/json_grammars.h"
 #include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"
 
@@ -31,19 +32,6 @@ static std::string FormatLocalLanguageCodes(
 
   return formatted;
 }
-
-// GBNF grammar for structured brewery JSON output.
-// @TODO move to a separate gbnf file if it grows in complexity or is shared
-// across modules.
-static constexpr std::string_view kBreweryJsonGrammar = R"json_brewery(
-root ::= thought-block "{" ws "\"name_en\"" ws ":" ws string ws "," ws "\"description_en\"" ws ":" ws string ws "," ws "\"name_local\"" ws ":" ws string ws "," ws "\"description_local\"" ws ":" ws string ws "}" ws
-thought-block ::= [^{]*
-ws ::= [ \t\n\r]*
-string ::= "\"" char+ "\""
-char ::= [^"\\\x7F\x00-\x1F] | [\\] escape
-escape ::= ["\\/bfnrt] | "u" hex hex hex hex
-hex ::= [0-9a-fA-F]
-)json_brewery";
 
 static constexpr int kBreweryInitialMaxTokens = 2800;
 
@@ -83,15 +71,14 @@ BreweryResult LlamaGenerator::GenerateBrewery(
 
   /**
    * RETRY LOOP with validation and error correction
-   * Attempts to generate valid brewery data up to 3 times, with feedback-based
-   * refinement
+   * Attempts to generate valid brewery data up to 3 times, with
+   * feedback-based refinement
    */
   constexpr int max_attempts = 3;
   std::string raw;
   std::string last_error;
 
   // Token budget: too small risks truncating valid JSON mid-string.
-  // Start conservatively but allow adaptive increases on truncation.
   int max_tokens = kBreweryInitialMaxTokens;
 
   // Limit output length to keep it concise and focused
@@ -104,7 +91,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
           {.level = LogLevel::Debug,
            .phase = PipelinePhase::BreweryAndBeerGeneration,
            .message = std::format("LlamaGenerator: raw output (attempt {}): {}",
-                      attempt + 1, raw)});
+                                  attempt + 1, raw)});
     }
 
     // Validate output: parse JSON and check required fields
@@ -120,8 +107,9 @@ BreweryResult LlamaGenerator::GenerateBrewery(
         logger_->Log(
             {.level = LogLevel::Info,
              .phase = PipelinePhase::BreweryAndBeerGeneration,
-             .message = std::format("LlamaGenerator: successfully generated brewery data on attempt {}",
-                        attempt + 1)});
+             .message = std::format("LlamaGenerator: successfully generated "
+                                    "brewery data on attempt {}",
+                                    attempt + 1)});
       }
 
       return brewery;
@@ -134,33 +122,38 @@ BreweryResult LlamaGenerator::GenerateBrewery(
       logger_->Log(
           {.level = LogLevel::Warn,
            .phase = PipelinePhase::BreweryAndBeerGeneration,
-           .message =
-               std::format("LlamaGenerator: malformed brewery JSON (attempt {}): {}",
+           .message = std::format(
+               "LlamaGenerator: malformed brewery JSON (attempt {}): {}",
                attempt + 1, *validation_error)});
     }
 
     // Update prompt with error details to guide LLM toward correct output.
     user_prompt = std::format(
         "Your previous response was invalid. Error: {}\nReturn the thought "
-        "process before the JSON if needed, then return ONLY valid JSON with "
-        "exactly these keys, in this exact order: {{\"name_en\": \"<English "
+        "process before the JSON if needed, then return ONLY valid JSON "
+        "with "
+        "exactly these keys, in this exact order: {{\"name_en\": "
+        "\"<English "
         "brewery name>\", \"description_en\": \"<English single-paragraph "
-        "description>\", \"name_local\": \"<local-language brewery name>\", "
+        "description>\", \"name_local\": \"<local-language brewery "
+        "name>\", "
         "\"description_local\": \"<local-language single-paragraph "
-        "description>\"}}.\nDo not include markdown, comments, extra keys, or "
-        "literal placeholder values.\n\nKeep the JSON strings concise enough "
+        "description>\"}}.\nDo not include markdown, comments, extra keys, "
+        "or "
+        "literal placeholder values.\n\nKeep the JSON strings concise "
+        "enough "
         "to fit within the token budget.\n\n{}",
         *validation_error, retry_location);
   }
 
   // All retry attempts exhausted: log failure and throw exception
   if (logger_) {
-    logger_->Log(
-        {.level = LogLevel::Error,
-         .phase = PipelinePhase::BreweryAndBeerGeneration,
-       .message = std::format(
-         "LlamaGenerator: malformed brewery response after {} attempts: {}",
-         max_attempts, last_error.empty() ? raw : last_error)});
+    logger_->Log({.level = LogLevel::Error,
+                  .phase = PipelinePhase::BreweryAndBeerGeneration,
+                  .message = std::format(
+                      "LlamaGenerator: malformed brewery "
+                      "response after {} attempts: {}",
+                      max_attempts, last_error.empty() ? raw : last_error)});
   }
   throw std::runtime_error("LlamaGenerator: malformed brewery response");
 }

@@ -33,7 +33,7 @@ void ResetStatement(SqliteStatementHandle& statement) {
 }
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<std::string_view>& param) {
+          const BoundParam<std::string_view>& param) {
   const auto byte_count = param.value.size();
   if (byte_count > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
     ThrowSqliteError(sqlite3_db_handle(statement.get()), param.action);
@@ -60,7 +60,7 @@ void Bind(const SqliteStatementHandle& statement,
 }
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<double>& param) {
+          const BoundParam<double>& param) {
   if (sqlite3_bind_double(statement.get(), param.index, param.value) !=
       SQLITE_OK) {
     ThrowSqliteError(sqlite3_db_handle(statement.get()), param.action);
@@ -68,7 +68,7 @@ void Bind(const SqliteStatementHandle& statement,
 }
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<sqlite3_int64>& param) {
+          const BoundParam<sqlite3_int64>& param) {
   if (sqlite3_bind_int64(statement.get(), param.index, param.value) !=
       SQLITE_OK) {
     ThrowSqliteError(sqlite3_db_handle(statement.get()), param.action);

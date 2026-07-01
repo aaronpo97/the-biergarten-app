@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include "sqlite_handle_types.h"
+#include "services/database/sqlite_handle_types.h"
 
 namespace sqlite_export_service_internal {
 

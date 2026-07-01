@@ -1,17 +1,17 @@
 /**
  * @file biergarten_pipeline_orchestrator/query_cities_with_countries.cc
- * @brief BiergartenDataGenerator::QueryCitiesWithCountries() implementation.
+ * @brief BiergartenPipelineOrchestrator::QueryCitiesWithCountries()
+ * implementation.
  */
 
 #include <algorithm>
 #include <chrono>
-#include <filesystem>
 #include <format>
 #include <iterator>
 #include <random>
 
 #include "biergarten_pipeline_orchestrator.h"
-#include "json_handling/json_loader.h"
+#include "services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
 
 std::vector<Location>
@@ -20,9 +20,8 @@ BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
                 .phase = PipelinePhase::Startup,
                 .message = "=== GEOGRAPHIC DATA OVERVIEW ==="});
 
-  const std::filesystem::path locations_path = "locations.json";
-
-  auto all_locations = JsonLoader::LoadLocations(locations_path, logger_);
+  const std::vector<Location>& all_locations =
+      curated_data_service_->LoadLocations();
 
   const size_t sample_count = std::min(
       static_cast<size_t>(application_options_.pipeline.location_count),
