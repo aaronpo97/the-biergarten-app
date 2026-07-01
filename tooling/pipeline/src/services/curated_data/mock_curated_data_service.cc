@@ -56,47 +56,45 @@ MockCuratedDataService::MockCuratedDataService()
       },
       forenames_by_country_{
           {"US",
-           forename_list{
+           ForenameList{
                ForenameEntry{.name = "James", .gender = "M"},
                ForenameEntry{.name = "Mary", .gender = "F"},
            }},
           {"DE",
-           forename_list{
+           ForenameList{
                ForenameEntry{.name = "Lukas", .gender = "M"},
                ForenameEntry{.name = "Anna", .gender = "F"},
            }},
           {"FR",
-           forename_list{
+           ForenameList{
                ForenameEntry{.name = "Lucas", .gender = "M"},
                ForenameEntry{.name = "Camille", .gender = "F"},
            }},
           {"BE",
-           forename_list{
+           ForenameList{
                ForenameEntry{.name = "Noah", .gender = "M"},
                ForenameEntry{.name = "Emma", .gender = "F"},
            }},
       },
       surnames_by_country_{
-          {"US", surname_list{"Smith", "Johnson"}},
-          {"DE", surname_list{"Muller", "Schmidt"}},
-          {"FR", surname_list{"Martin", "Bernard"}},
-          {"BE", surname_list{"Peeters", "Janssens"}},
+          {"US", SurnameList{"Smith", "Johnson"}},
+          {"DE", SurnameList{"Muller", "Schmidt"}},
+          {"FR", SurnameList{"Martin", "Bernard"}},
+          {"BE", SurnameList{"Peeters", "Janssens"}},
       } {}
 
-const std::vector<Location>& MockCuratedDataService::LoadLocations() {
+const LocationsList& MockCuratedDataService::LoadLocations() {
   return locations_;
 }
 
-const std::vector<UserPersona>& MockCuratedDataService::LoadPersonas() {
+const PersonasList& MockCuratedDataService::LoadPersonas() {
   return personas_;
 }
 
-const std::unordered_map<std::string, forename_list>&
-MockCuratedDataService::LoadForenamesByCountry() {
+const ForenamesByCountryMap& MockCuratedDataService::LoadForenamesByCountry() {
   return forenames_by_country_;
 }
 
-const std::unordered_map<std::string, surname_list>&
-MockCuratedDataService::LoadSurnamesByCountry() {
+const SurnamesByCountryMap& MockCuratedDataService::LoadSurnamesByCountry() {
   return surnames_by_country_;
 }

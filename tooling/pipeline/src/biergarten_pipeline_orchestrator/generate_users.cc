@@ -12,7 +12,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <unordered_set>
 
 #include "biergarten_pipeline_orchestrator.h"
@@ -72,10 +71,10 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
                      static_cast<unsigned>(birth_ymd.day()));
 }
 
-std::optional<Name> SampleName(
-    const std::unordered_map<std::string, forename_list>& forenames_by_country,
-    const std::unordered_map<std::string, surname_list>& surnames_by_country,
-    const std::string& iso3166_1, std::mt19937& rng) {
+std::optional<Name> SampleName(const ForenamesByCountryMap& forenames_by_country,
+                               const SurnamesByCountryMap& surnames_by_country,
+                               const std::string& iso3166_1,
+                               std::mt19937& rng) {
   const auto forenames_it = forenames_by_country.find(iso3166_1);
   const auto surnames_it = surnames_by_country.find(iso3166_1);
 
@@ -85,8 +84,8 @@ std::optional<Name> SampleName(
     return std::nullopt;
   }
 
-  const forename_list& forenames = forenames_it->second;
-  const surname_list& surnames = surnames_it->second;
+  const ForenameList& forenames = forenames_it->second;
+  const SurnameList& surnames = surnames_it->second;
 
   std::uniform_int_distribution<size_t> forename_dist(0, forenames.size() - 1);
   std::uniform_int_distribution<size_t> surname_dist(0, surnames.size() - 1);
@@ -109,17 +108,16 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                 .phase = PipelinePhase::UserGeneration,
                 .message = "=== SAMPLE USER GENERATION ==="});
 
-  const std::vector<UserPersona>& personas =
-      curated_data_service_->LoadPersonas();
+  const PersonasList& personas = curated_data_service_->LoadPersonas();
 
   if (personas.empty()) {
     throw std::runtime_error(
         "No personas available in personas.json for user generation");
   }
 
-  const std::unordered_map<std::string, forename_list>& forenames_by_country =
+  const ForenamesByCountryMap& forenames_by_country =
       curated_data_service_->LoadForenamesByCountry();
-  const std::unordered_map<std::string, surname_list>& surnames_by_country =
+  const SurnamesByCountryMap& surnames_by_country =
       curated_data_service_->LoadSurnamesByCountry();
 
   std::mt19937 rng(std::random_device{}());

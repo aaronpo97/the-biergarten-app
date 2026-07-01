@@ -41,11 +41,12 @@ architecture needs.
       handed to `DataGenerator::GenerateUser`. Add `ForenameEntry` (`name`,
       `gender`). Landed as a flatter shape than originally planned here: no
       `NamesByCountry` wrapper class. `curated_data_service.h` instead
-      declares `forename_list = std::unordered_set<ForenameEntry>` and
-      `surname_list = std::unordered_set<std::string>`, and
+      declares `ForenameList = std::vector<ForenameEntry>` and
+      `SurnameList = std::vector<std::string>`, and
       `ICuratedDataService` exposes two maps keyed by ISO 3166-1 code —
-      `unordered_map<string, forename_list>` and
-      `unordered_map<string, surname_list>` — directly (see §2). Sampling is
+      `ForenamesByCountryMap = unordered_map<string, ForenameList>` and
+      `SurnamesByCountryMap = unordered_map<string, SurnameList>` —
+      directly (see §2). Sampling is
       a free function, `SampleName(forenames_by_country,
       surnames_by_country, iso3166_1, rng)`, in
       `generate_users.cc`'s anonymous namespace, not a method on a class.
@@ -106,8 +107,9 @@ architecture needs.
       `tooling/pipeline/forenames-by-country.json` and
       `surnames-by-country.json`. Landed as two separate methods —
       `LoadForenamesByCountry()` and `LoadSurnamesByCountry()` — each
-      returning a flat `unordered_map<string, forename_list>` /
-      `unordered_map<string, surname_list>` keyed by ISO 3166-1 code, rather
+      returning a flat `ForenamesByCountryMap` / `SurnamesByCountryMap`
+      (aliases for `unordered_map<string, ForenameList>` /
+      `unordered_map<string, SurnameList>`) keyed by ISO 3166-1 code, rather
       than one combined `LoadNamesByCountry() : NamesByCountry` call. Both
       files are vendored verbatim (unmodified,
       full multinational coverage) from

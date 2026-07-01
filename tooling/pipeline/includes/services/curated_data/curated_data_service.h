@@ -7,13 +7,19 @@
  */
 
 #include <filesystem>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "data_model/models.h"
 
-using forename_list = std::unordered_set<ForenameEntry>;
-using surname_list = std::unordered_set<std::string>;
+using ForenameList = std::vector<ForenameEntry>;
+using SurnameList = std::vector<std::string>;
+using LocationsList = std::vector<Location>;
+using PersonasList = std::vector<UserPersona>;
+using ForenamesByCountryMap = std::unordered_map<std::string, ForenameList>;
+using SurnamesByCountryMap = std::unordered_map<std::string, SurnameList>;
+
 /**
  * @brief Interface for services that load curated data used to seed
  * brewery/user generation.
@@ -31,17 +37,14 @@ class ICuratedDataService {
   /**
    * @brief Loads all curated location records.
    */
-  virtual const std::vector<Location>& LoadLocations() = 0;
+  virtual const LocationsList& LoadLocations() = 0;
 
   /**
    * @brief Loads all curated persona records.
    */
-  virtual const std::vector<UserPersona>& LoadPersonas() = 0;
-
-  virtual const std::unordered_map<std::string, forename_list>&
-  LoadForenamesByCountry() = 0;
-  virtual const std::unordered_map<std::string, surname_list>&
-  LoadSurnamesByCountry() = 0;
+  virtual const PersonasList& LoadPersonas() = 0;
+  virtual const ForenamesByCountryMap& LoadForenamesByCountry() = 0;
+  virtual const SurnamesByCountryMap& LoadSurnamesByCountry() = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_CURATED_DATA_CURATED_DATA_SERVICE_H_

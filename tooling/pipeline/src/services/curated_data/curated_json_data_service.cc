@@ -14,8 +14,8 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "services/logging/logger.h"
 
@@ -109,7 +109,7 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
 CuratedJsonDataService::CuratedJsonDataService(CuratedDataFilePaths filepaths)
     : filepaths_(std::move(filepaths)) {}
 
-const std::vector<Location>& CuratedJsonDataService::LoadLocations() {
+const LocationsList& CuratedJsonDataService::LoadLocations() {
   if (!cache_.locations.empty()) {
     return cache_.locations;
   }
@@ -122,7 +122,7 @@ const std::vector<Location>& CuratedJsonDataService::LoadLocations() {
         "Invalid locations JSON: root element must be an array");
   }
 
-  std::vector<Location> locations;
+  LocationsList locations;
   const auto& items = root.as_array();
   locations.reserve(items.size());
 
@@ -148,7 +148,7 @@ const std::vector<Location>& CuratedJsonDataService::LoadLocations() {
   return cache_.locations;
 }
 
-const std::vector<UserPersona>& CuratedJsonDataService::LoadPersonas() {
+const PersonasList& CuratedJsonDataService::LoadPersonas() {
   if (!cache_.personas.empty()) {
     return cache_.personas;
   }
@@ -161,7 +161,7 @@ const std::vector<UserPersona>& CuratedJsonDataService::LoadPersonas() {
         "Invalid personas JSON: root element must be an array");
   }
 
-  std::vector<UserPersona> personas;
+  PersonasList personas;
   const auto& items = root.as_array();
   personas.reserve(items.size());
 
@@ -183,8 +183,7 @@ const std::vector<UserPersona>& CuratedJsonDataService::LoadPersonas() {
   return cache_.personas;
 }
 
-const std::unordered_map<std::string, forename_list>&
-CuratedJsonDataService::LoadForenamesByCountry() {
+const ForenamesByCountryMap& CuratedJsonDataService::LoadForenamesByCountry() {
   if (!cache_.forenames_by_country.empty()) {
     return cache_.forenames_by_country;
   }
@@ -198,12 +197,12 @@ CuratedJsonDataService::LoadForenamesByCountry() {
         "keyed by ISO 3166-1 country code");
   }
 
-  std::unordered_map<std::string, forename_list> forenames_by_country;
+  ForenamesByCountryMap forenames_by_country;
   for (const auto& [country_code, regions] : root.as_object()) {
     if (!regions.is_array()) {
       continue;
     }
-    forename_list entries;
+    ForenameList entries;
     for (const auto& region : regions.as_array()) {
       if (!region.is_object()) {
         continue;
@@ -217,7 +216,7 @@ CuratedJsonDataService::LoadForenamesByCountry() {
           continue;
         }
         const auto& name_object = name_value.as_object();
-        entries.insert(ForenameEntry{
+        entries.emplace_back(ForenameEntry{
             .name =
                 ReadFirstOfStringArray(name_object, "romanized", "localized"),
             .gender = ReadRequiredString(name_object, "gender"),
@@ -231,8 +230,7 @@ CuratedJsonDataService::LoadForenamesByCountry() {
   return cache_.forenames_by_country;
 }
 
-const std::unordered_map<std::string, surname_list>&
-CuratedJsonDataService::LoadSurnamesByCountry() {
+const SurnamesByCountryMap& CuratedJsonDataService::LoadSurnamesByCountry() {
   if (!cache_.surnames_by_country.empty()) {
     return cache_.surnames_by_country;
   }
@@ -246,17 +244,17 @@ CuratedJsonDataService::LoadSurnamesByCountry() {
         "keyed by ISO 3166-1 country code");
   }
 
-  std::unordered_map<std::string, surname_list> surnames_by_country;
+  SurnamesByCountryMap surnames_by_country;
   for (const auto& [country_code, name_entries] : root.as_object()) {
-    if (!name_entries.is_array()) {
+    if (!name_entries.is_array())
       continue;
-    }
-    surname_list surnames;
+
+    SurnameList surnames;
     for (const auto& name_value : name_entries.as_array()) {
       if (!name_value.is_object()) {
         continue;
       }
-      surnames.insert(ReadFirstOfStringArray(name_value.as_object(),
+      surnames.emplace_back(ReadFirstOfStringArray(name_value.as_object(),
                                              "romanized", "localized"));
     }
     surnames_by_country.emplace(country_code, std::move(surnames));

@@ -7,8 +7,6 @@
  */
 
 #include <filesystem>
-#include <unordered_set>
-#include <vector>
 
 #include "data_model/models.h"
 #include "services/curated_data/curated_data_service.h"
@@ -29,10 +27,10 @@ struct CuratedDataFilePaths {
  */
 class CuratedJsonDataService final : public ICuratedDataService {
   struct cache {
-    std::vector<Location> locations;
-    std::vector<UserPersona> personas;
-    std::unordered_map<std::string, forename_list> forenames_by_country;
-    std::unordered_map<std::string, surname_list> surnames_by_country;
+    LocationsList locations;
+    PersonasList personas;
+    ForenamesByCountryMap forenames_by_country;
+    SurnamesByCountryMap surnames_by_country;
 
     cache() = default;
     ~cache() = default;
@@ -47,21 +45,19 @@ class CuratedJsonDataService final : public ICuratedDataService {
   /**
    * @brief Parses a JSON array file and returns all location records.
    */
-  const std::vector<Location>& LoadLocations() override;
+  const LocationsList& LoadLocations() override;
 
   /**
    * @brief Parses a JSON array file and returns all persona records.
    */
-  const std::vector<UserPersona>& LoadPersonas() override;
+  const PersonasList& LoadPersonas() override;
 
-  const std::unordered_map<std::string, forename_list>&
-  LoadForenamesByCountry() override;
+  const ForenamesByCountryMap& LoadForenamesByCountry() override;
 
   /**
    * @brief Parses a JSON file and returns all the forenames per country.
    */
-  const std::unordered_map<std::string, surname_list>&
-  LoadSurnamesByCountry() override;
+  const SurnamesByCountryMap& LoadSurnamesByCountry() override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_

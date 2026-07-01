@@ -283,9 +283,7 @@ runs.
 `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
 first time each is called, since `BiergartenPipelineOrchestrator` owns a
 single `ICuratedDataService` instance for the whole run — later calls return
-the cached result instead of re-parsing. None of these methods take a path
-argument; the fixture paths are fixed for the instance's lifetime via the
-`CuratedDataFilePaths` passed to `CuratedJsonDataService`'s constructor.
+the cached result instead of re-parsing. 
 
 `GenerateUsers()` samples a forename/surname pair per city via `SampleName()`,
 keyed by the city's ISO 3166-1 code. Countries present in `locations.json`

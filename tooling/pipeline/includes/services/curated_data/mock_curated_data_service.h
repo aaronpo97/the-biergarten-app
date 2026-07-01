@@ -8,8 +8,6 @@
  */
 
 #include <filesystem>
-#include <unordered_map>
-#include <vector>
 
 #include "data_model/models.h"
 #include "services/curated_data/curated_data_service.h"
@@ -22,21 +20,19 @@ class MockCuratedDataService final : public ICuratedDataService {
  public:
   MockCuratedDataService();
 
-  const std::vector<Location>& LoadLocations() override;
+  const LocationsList& LoadLocations() override;
 
-  const std::vector<UserPersona>& LoadPersonas() override;
+  const PersonasList& LoadPersonas() override;
 
-  const std::unordered_map<std::string, forename_list>&
-  LoadForenamesByCountry() override;
+  const ForenamesByCountryMap& LoadForenamesByCountry() override;
 
-  const std::unordered_map<std::string, surname_list>&
-  LoadSurnamesByCountry() override;
+  const SurnamesByCountryMap& LoadSurnamesByCountry() override;
 
  private:
-  std::vector<Location> locations_;
-  std::vector<UserPersona> personas_;
-  std::unordered_map<std::string, forename_list> forenames_by_country_;
-  std::unordered_map<std::string, surname_list> surnames_by_country_;
+  LocationsList locations_;
+  PersonasList personas_;
+  ForenamesByCountryMap forenames_by_country_;
+  SurnamesByCountryMap surnames_by_country_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_CURATED_DATA_MOCK_CURATED_DATA_SERVICE_H_
