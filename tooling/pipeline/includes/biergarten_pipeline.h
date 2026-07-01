@@ -27,7 +27,7 @@
 #include "data_model/models.h"
 
 // --- json_handling ---
-#include "json_handling/json_loader.h"
+#include "services/curated_data/curated_json_data_service.h"
 #include "json_handling/pretty_print.h"
 
 // --- llama backend ---

@@ -83,24 +83,20 @@ MockCuratedDataService::MockCuratedDataService()
           {"BE", surname_list{"Peeters", "Janssens"}},
       } {}
 
-const std::vector<Location>& MockCuratedDataService::LoadLocations(
-    const std::filesystem::path& /*filepath*/) {
+const std::vector<Location>& MockCuratedDataService::LoadLocations() {
   return locations_;
 }
 
-const std::vector<UserPersona>& MockCuratedDataService::LoadPersonas(
-    const std::filesystem::path& /*filepath*/) {
+const std::vector<UserPersona>& MockCuratedDataService::LoadPersonas() {
   return personas_;
 }
 
 const std::unordered_map<std::string, forename_list>&
-MockCuratedDataService::LoadForenamesByCountry(
-    const std::filesystem::path& /*forenames_filepath*/) {
+MockCuratedDataService::LoadForenamesByCountry() {
   return forenames_by_country_;
 }
 
 const std::unordered_map<std::string, surname_list>&
-MockCuratedDataService::LoadSurnamesByCountry(
-    const std::filesystem::path& /*surnames_filepath*/) {
+MockCuratedDataService::LoadSurnamesByCountry() {
   return surnames_by_country_;
 }

@@ -31,19 +31,17 @@ class ICuratedDataService {
   /**
    * @brief Loads all curated location records.
    */
-  virtual const std::vector<Location>& LoadLocations(
-      const std::filesystem::path& filepath) = 0;
+  virtual const std::vector<Location>& LoadLocations() = 0;
 
   /**
    * @brief Loads all curated persona records.
    */
-  virtual const std::vector<UserPersona>& LoadPersonas(
-      const std::filesystem::path& filepath) = 0;
+  virtual const std::vector<UserPersona>& LoadPersonas() = 0;
 
   virtual const std::unordered_map<std::string, forename_list>&
-  LoadForenamesByCountry(const std::filesystem::path& forenames_filepath) = 0;
+  LoadForenamesByCountry() = 0;
   virtual const std::unordered_map<std::string, surname_list>&
-  LoadSurnamesByCountry(const std::filesystem::path& surnames_filepath) = 0;
+  LoadSurnamesByCountry() = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_CURATED_DATA_CURATED_DATA_SERVICE_H_

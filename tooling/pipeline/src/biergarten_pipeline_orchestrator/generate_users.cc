@@ -16,7 +16,7 @@
 #include <unordered_set>
 
 #include "biergarten_pipeline_orchestrator.h"
-#include "json_handling/json_loader.h"
+#include "../../includes/services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
 
 namespace {
@@ -110,7 +110,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                 .message = "=== SAMPLE USER GENERATION ==="});
 
   const std::vector<UserPersona>& personas =
-      curated_data_service_->LoadPersonas("personas.json");
+      curated_data_service_->LoadPersonas();
 
   if (personas.empty()) {
     throw std::runtime_error(
@@ -118,9 +118,9 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   }
 
   const std::unordered_map<std::string, forename_list>& forenames_by_country =
-      curated_data_service_->LoadForenamesByCountry("forenames-by-country.json");
+      curated_data_service_->LoadForenamesByCountry();
   const std::unordered_map<std::string, surname_list>& surnames_by_country =
-      curated_data_service_->LoadSurnamesByCountry("surnames-by-country.json");
+      curated_data_service_->LoadSurnamesByCountry();
 
   std::mt19937 rng(std::random_device{}());
   std::uniform_int_distribution<size_t> persona_dist(0, personas.size() - 1);

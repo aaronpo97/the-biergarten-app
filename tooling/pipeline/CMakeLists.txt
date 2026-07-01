@@ -149,7 +149,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- json_handling ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/json_handling/json_loader.cc
+        src/services/curated_data/curated_json_data_service.cc
 )
 
 # --- services: curated_data ---

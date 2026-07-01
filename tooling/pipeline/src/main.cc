@@ -100,7 +100,13 @@ int main(const int argc, char** argv) {
                                  .phase = PipelinePhase::Startup,
                                  .message = "Curated data: JsonLoader"});
 
-              return std::make_unique<JsonLoader>();
+              return std::make_unique<CuratedJsonDataService>(
+                  CuratedDataFilePaths{
+                      .locations_path = "locations.json",
+                      .personas_path = "personas.json",
+                      .forenames_path = "forenames-by-country.json",
+                      .surnames_path = "surnames-by-country.json",
+                  });
             }),
         di::bind<IPromptFormatter>().to([options, log_producer] {
           if (options.generator.use_mocked) {

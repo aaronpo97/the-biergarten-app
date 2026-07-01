@@ -14,9 +14,20 @@
 #include "services/curated_data/curated_data_service.h"
 
 /**
+ * @brief File locations for the curated JSON fixtures consumed by
+ * CuratedJsonDataService.
+ */
+struct CuratedDataFilePaths {
+  std::filesystem::path locations_path;
+  std::filesystem::path personas_path;
+  std::filesystem::path forenames_path;
+  std::filesystem::path surnames_path;
+};
+
+/**
  * @brief Loads curated location, persona, and name data from JSON files.
  */
-class JsonLoader final : public ICuratedDataService {
+class CuratedJsonDataService final : public ICuratedDataService {
   struct cache {
     std::vector<Location> locations;
     std::vector<UserPersona> personas;
@@ -27,31 +38,30 @@ class JsonLoader final : public ICuratedDataService {
     ~cache() = default;
   };
 
+  CuratedDataFilePaths filepaths_;
   cache cache_;
 
  public:
-  JsonLoader() = default;
+  explicit CuratedJsonDataService(CuratedDataFilePaths filepaths);
 
   /**
    * @brief Parses a JSON array file and returns all location records.
    */
-  const std::vector<Location>& LoadLocations(
-      const std::filesystem::path&) override;
+  const std::vector<Location>& LoadLocations() override;
 
   /**
    * @brief Parses a JSON array file and returns all persona records.
    */
-  const std::vector<UserPersona>& LoadPersonas(
-      const std::filesystem::path&) override;
+  const std::vector<UserPersona>& LoadPersonas() override;
 
   const std::unordered_map<std::string, forename_list>&
-  LoadForenamesByCountry(const std::filesystem::path&) override;
+  LoadForenamesByCountry() override;
 
   /**
    * @brief Parses a JSON file and returns all the forenames per country.
    */
   const std::unordered_map<std::string, surname_list>&
-  LoadSurnamesByCountry(const std::filesystem::path&) override;
+  LoadSurnamesByCountry() override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_

@@ -4,7 +4,7 @@
  * records with strict field validation and descriptive error reporting.
  */
 
-#include "json_handling/json_loader.h"
+#include "../../../includes/services/curated_data/curated_json_data_service.h"
 
 #include <boost/json.hpp>
 #include <format>
@@ -106,13 +106,16 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
 
 }  // namespace
 
-const std::vector<Location>& JsonLoader::LoadLocations(
-    const std::filesystem::path& filepath) {
+CuratedJsonDataService::CuratedJsonDataService(CuratedDataFilePaths filepaths)
+    : filepaths_(std::move(filepaths)) {}
+
+const std::vector<Location>& CuratedJsonDataService::LoadLocations() {
   if (!cache_.locations.empty()) {
     return cache_.locations;
   }
 
-  const boost::json::value root = ParseJsonFile(filepath, "locations");
+  const boost::json::value root =
+      ParseJsonFile(filepaths_.locations_path, "locations");
 
   if (!root.is_array()) {
     throw std::runtime_error(
@@ -145,13 +148,13 @@ const std::vector<Location>& JsonLoader::LoadLocations(
   return cache_.locations;
 }
 
-const std::vector<UserPersona>& JsonLoader::LoadPersonas(
-    const std::filesystem::path& filepath) {
+const std::vector<UserPersona>& CuratedJsonDataService::LoadPersonas() {
   if (!cache_.personas.empty()) {
     return cache_.personas;
   }
 
-  const boost::json::value root = ParseJsonFile(filepath, "personas");
+  const boost::json::value root =
+      ParseJsonFile(filepaths_.personas_path, "personas");
 
   if (!root.is_array()) {
     throw std::runtime_error(
@@ -180,13 +183,14 @@ const std::vector<UserPersona>& JsonLoader::LoadPersonas(
   return cache_.personas;
 }
 
-const std::unordered_map<std::string, forename_list>& JsonLoader::
-LoadForenamesByCountry(const std::filesystem::path& filepath) {
+const std::unordered_map<std::string, forename_list>&
+CuratedJsonDataService::LoadForenamesByCountry() {
   if (!cache_.forenames_by_country.empty()) {
     return cache_.forenames_by_country;
   }
 
-  const boost::json::value root = ParseJsonFile(filepath, "forenames-by-country");
+  const boost::json::value root =
+      ParseJsonFile(filepaths_.forenames_path, "forenames-by-country");
 
   if (!root.is_object()) {
     throw std::runtime_error(
@@ -228,12 +232,13 @@ LoadForenamesByCountry(const std::filesystem::path& filepath) {
 }
 
 const std::unordered_map<std::string, surname_list>&
-JsonLoader::LoadSurnamesByCountry(const std::filesystem::path& filepath) {
+CuratedJsonDataService::LoadSurnamesByCountry() {
   if (!cache_.surnames_by_country.empty()) {
     return cache_.surnames_by_country;
   }
 
-  const boost::json::value root = ParseJsonFile(filepath, "surnames-by-country");
+  const boost::json::value root =
+      ParseJsonFile(filepaths_.surnames_path, "surnames-by-country");
 
   if (!root.is_object()) {
     throw std::runtime_error(

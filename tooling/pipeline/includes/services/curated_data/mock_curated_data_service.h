@@ -22,17 +22,15 @@ class MockCuratedDataService final : public ICuratedDataService {
  public:
   MockCuratedDataService();
 
-  const std::vector<Location>& LoadLocations(
-      const std::filesystem::path& /*filepath*/) override;
+  const std::vector<Location>& LoadLocations() override;
 
-  const std::vector<UserPersona>& LoadPersonas(
-      const std::filesystem::path& /*filepath*/) override;
+  const std::vector<UserPersona>& LoadPersonas() override;
 
-  const std::unordered_map<std::string, forename_list>& LoadForenamesByCountry(
-      const std::filesystem::path& /*forenames_filepath*/) override;
+  const std::unordered_map<std::string, forename_list>&
+  LoadForenamesByCountry() override;
 
-  const std::unordered_map<std::string, surname_list>& LoadSurnamesByCountry(
-      const std::filesystem::path& /*surnames_filepath*/) override;
+  const std::unordered_map<std::string, surname_list>&
+  LoadSurnamesByCountry() override;
 
  private:
   std::vector<Location> locations_;

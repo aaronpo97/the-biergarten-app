@@ -72,26 +72,30 @@ architecture needs.
 
 ## 2. Data Preloading
 
-`tooling/pipeline/includes/services/curated_data/`,
-`tooling/pipeline/includes/json_handling/`, fixture files.
+`tooling/pipeline/includes/services/curated_data/`, fixture files.
 
-- [x] Extract an interface; have `JsonLoader` implement it. Landed as
-      `ICuratedDataService` (`services/curated_data/curated_data_service.h`),
-      not `DataPreloader` — `LoadLocations()`, `LoadPersonas()`,
-      `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` are all
-      virtual methods returning `const&`. `JsonLoader` also memoizes each
-      one in a private `cache` struct (`locations_`, `personas_`,
-      `forenames_by_country_`, `surnames_by_country_`), so a second call
-      with the same or a different path on the same instance returns the
-      cached result instead of re-parsing — safe because `JsonLoader`
-      outlives every call site (owned by
-      `BiergartenPipelineOrchestrator` via
+- [x] Extract an interface; have `CuratedJsonDataService` implement it.
+      Landed as `ICuratedDataService`
+      (`services/curated_data/curated_data_service.h`), not `DataPreloader`
+      — `LoadLocations()`, `LoadPersonas()`, `LoadForenamesByCountry()`, and
+      `LoadSurnamesByCountry()` are all virtual methods returning `const&`
+      and take no arguments. `CuratedJsonDataService`
+      (`services/curated_data/curated_json_data_service.h`, originally
+      landed as `JsonLoader` under `json_handling/` before being renamed and
+      moved) takes a `CuratedDataFilePaths` DTO (`locations_path`,
+      `personas_path`, `forenames_path`, `surnames_path`) in its
+      constructor rather than a path per `Load*()` call, and memoizes each
+      result in a private `cache` struct (`locations`, `personas`,
+      `forenames_by_country`, `surnames_by_country`), so a second call on
+      the same instance returns the cached result instead of re-parsing —
+      safe because `CuratedJsonDataService` outlives every call site (owned
+      by `BiergartenPipelineOrchestrator` via
       `unique_ptr<ICuratedDataService>` for the whole run). `main.cc`'s DI
       injector also gained a `MockCuratedDataService` (fixed in-memory
       data: 4 locations across `US`/`DE`/`FR`/`BE`, 3 personas, and
       matching forename/surname sets for those four countries), bound in
-      place of `JsonLoader` under `--mocked`, mirroring the existing
-      `MockEnrichmentService`/`MockGenerator` pattern.
+      place of `CuratedJsonDataService` under `--mocked`, mirroring the
+      existing `MockEnrichmentService`/`MockGenerator` pattern.
 - [ ] Add `LoadBeerStyles()`. `beer-styles.json` already exists in the repo
       and is already copied into the Docker image
       (`runpod/Dockerfile`), but no loader reads it yet, and the native
@@ -101,12 +105,11 @@ architecture needs.
 - [x] Add name-by-country loading, parsing
       `tooling/pipeline/forenames-by-country.json` and
       `surnames-by-country.json`. Landed as two separate methods —
-      `LoadForenamesByCountry(forenames_filepath)` and
-      `LoadSurnamesByCountry(surnames_filepath)` — each returning a flat
-      `unordered_map<string, forename_list>` / `unordered_map<string,
-      surname_list>` keyed by ISO 3166-1 code, rather than one combined
-      `LoadNamesByCountry(forenames_filepath, surnames_filepath) :
-      NamesByCountry` call. Both files are vendored verbatim (unmodified,
+      `LoadForenamesByCountry()` and `LoadSurnamesByCountry()` — each
+      returning a flat `unordered_map<string, forename_list>` /
+      `unordered_map<string, surname_list>` keyed by ISO 3166-1 code, rather
+      than one combined `LoadNamesByCountry() : NamesByCountry` call. Both
+      files are vendored verbatim (unmodified,
       full multinational coverage) from
       `sigpwned/popular-names-by-country-dataset` (CC0) — see
       ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section for

@@ -222,7 +222,7 @@ environment variables listed above to match your run.
 
 | Stage           | Implementation                                                                                                                          |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Load            | `ICuratedDataService` (`JsonLoader`) reads `locations.json`, `personas.json`, `forenames-by-country.json`, and `surnames-by-country.json` into typed records, caching each after its first load. `--mocked` runs use `MockCuratedDataService`'s fixed in-memory dataset instead. |
+| Load            | `ICuratedDataService` (`CuratedJsonDataService`) reads `locations.json`, `personas.json`, `forenames-by-country.json`, and `surnames-by-country.json` (paths supplied via a `CuratedDataFilePaths` DTO at construction) into typed records, caching each after its first load. `--mocked` runs use `MockCuratedDataService`'s fixed in-memory dataset instead. |
 | Sample          | `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()` samples `--location-count` locations per run (default `10`).               |
 | Enrich          | `WikipediaEnrichmentService` fetches brewing and beer-related context. Keeps going when a lookup fails. `--mocked` runs use `MockEnrichmentService` instead and skip Wikipedia entirely. |
 | Generate Users  | `GenerateUsers()` samples a persona and a forename/surname pair per enriched city (skipping countries with no name data), then `MockGenerator` or `LlamaGenerator` produces a username, bio, and activity weight around the sampled name. |
@@ -237,11 +237,13 @@ skipped and the pipeline continues. `GenerateUsers()` runs before
 ### Key Components
 
 - `src/main.cc` — argument parsing and Boost.DI composition root.
-- `JsonLoader` — implements `ICuratedDataService`; parses and validates
-  curated location, persona, and forename/surname JSON, memoizing each
-  result after its first load on a given instance. `MockCuratedDataService`
-  is the in-memory substitute (4 fixed locations, 3 personas, and name data
-  for `US`/`DE`/`FR`/`BE`) used in `--mocked` runs.
+- `CuratedJsonDataService` — implements `ICuratedDataService`; takes a
+  `CuratedDataFilePaths` DTO (locations/personas/forenames/surnames paths) in
+  its constructor, then parses and validates curated location, persona, and
+  forename/surname JSON, memoizing each result after its first load on a
+  given instance. `MockCuratedDataService` is the in-memory substitute (4
+  fixed locations, 3 personas, and name data for `US`/`DE`/`FR`/`BE`) used in
+  `--mocked` runs.
 - `WikipediaEnrichmentService` — queries Wikipedia extracts, caches results,
   returns empty context on failure. `MockEnrichmentService` is the no-op
   substitute used in `--mocked` runs.
@@ -277,12 +279,13 @@ valid output on the first pass; the retry path is kept for resilience.
 `MockGenerator` uses stable hashes for repeatable output in demos and Storybook
 runs.
 
-`JsonLoader` memoizes each of `LoadLocations()`, `LoadPersonas()`,
+`CuratedJsonDataService` memoizes each of `LoadLocations()`, `LoadPersonas()`,
 `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
 first time each is called, since `BiergartenPipelineOrchestrator` owns a
-single `ICuratedDataService` instance for the whole run — later calls (even
-with a different path argument) return the cached result instead of
-re-parsing.
+single `ICuratedDataService` instance for the whole run — later calls return
+the cached result instead of re-parsing. None of these methods take a path
+argument; the fixture paths are fixed for the instance's lifetime via the
+`CuratedDataFilePaths` passed to `CuratedJsonDataService`'s constructor.
 
 `GenerateUsers()` samples a forename/surname pair per city via `SampleName()`,
 keyed by the city's ISO 3166-1 code. Countries present in `locations.json`
@@ -403,8 +406,8 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 ## Fixture Strategy
 
 - `--mocked` for stable fixtures, repeatable screenshots, and Storybook runs.
-  `MockCuratedDataService` swaps in for `JsonLoader`, so no fixture files
-  need to be present on disk.
+  `MockCuratedDataService` swaps in for `CuratedJsonDataService`, so no
+  fixture files need to be present on disk.
 - `--model` when geographically grounded content matters for demos.
 - Keep `locations.json` structured enough to support discovery and future
   filtering.
@@ -441,8 +444,8 @@ Paths below are relative to `tooling/pipeline/`.
 - `src/main.cc` — argument parsing and DI composition root.
 - `src/biergarten_pipeline_orchestrator/` — orchestration, sampling, logging,
   and export.
-- `src/json_handling/` — `JsonLoader`, the file-backed `ICuratedDataService`.
-- `src/services/curated_data/` — `MockCuratedDataService`, the in-memory
+- `src/services/curated_data/` — `CuratedJsonDataService`, the file-backed
+  `ICuratedDataService`, and `MockCuratedDataService`, the in-memory
   `ICuratedDataService` used in `--mocked` runs.
 - `src/services/enrichment/wikipedia/` — enrichment service and cache.
 - `src/services/sqlite/` — SQLite export implementation.
