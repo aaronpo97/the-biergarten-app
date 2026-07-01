@@ -86,27 +86,30 @@ package "Domain: Models" {
     + gender : std::string
   }
 
-  class NamesByCountry {
-    - forenames_by_country_ : std::unordered_map<std::string, std::vector<ForenameEntry>>
-    - surnames_by_country_ : std::unordered_map<std::string, std::vector<std::string>>
-    + SampleName(iso3166_1 : const std::string&,\n  rng : std::mt19937&) : std::optional<Name>
-  }
-
-  note right of NamesByCountry
-    Backed by two source-shaped maps,
-    keyed by ISO 3166-1 country code,
-    sourced from popular-names-by-country-dataset
-    (CC0) -- see ETHICS-AND-KNOWN-ISSUES.md.
-    Gender is preserved per forename so it can
-    be threaded through to persona/bio generation
-    later; surnames carry no gender in the source
-    data. Pairing happens at sample time, not at
-    fixture-authoring time, so no information from
-    the source dataset is discarded up front.
+  note right of ForenameEntry
+    forename_list = std::unordered_set<ForenameEntry>
+    surname_list = std::unordered_set<std::string>
+    (aliases declared in curated_data_service.h).
+    ICuratedDataService::LoadForenamesByCountry() /
+    LoadSurnamesByCountry() each return a flat
+    std::unordered_map<std::string, forename_list>
+    or <std::string, surname_list> keyed by ISO
+    3166-1 country code -- no NamesByCountry
+    wrapper class. SampleName(forenames_by_country,
+    surnames_by_country, iso3166_1, rng) is a free
+    function, not a method, so it can be called by
+    any per-city worker without owning the maps.
+    Sourced from popular-names-by-country-dataset
+    (CC0) -- see ETHICS-AND-KNOWN-ISSUES.md. Gender
+    is preserved per forename so it can be threaded
+    through to persona/bio generation later; surnames
+    carry no gender in the source data. Pairing
+    happens at sample time, not at fixture-authoring
+    time, so no information from the source dataset
+    is discarded up front.
   end note
 
-  NamesByCountry *-- "0..*" ForenameEntry
-  NamesByCountry ..> Name : produces
+  ForenameEntry ..> Name : SampleName() produces
 
   class CheckinResult {
     + checked_in_at : std::string
@@ -365,19 +368,42 @@ package "Infrastructure: Pipeline Channel" {
 
 package "Infrastructure: Data Preloading" {
 
-  interface DataPreloader <<interface>> {
-    + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
-    + LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
-    + LoadPersonas(filepath : const std::filesystem::path&) : std::vector<UserPersona>
-    + LoadNamesByCountry(forenames_filepath : const std::filesystem::path&,\n  surnames_filepath : const std::filesystem::path&) : NamesByCountry
+  interface ICuratedDataService <<interface>> {
+    + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+    + LoadBeerStyles(filepath : const std::filesystem::path&) : const std::vector<BeerStyle>&
+    + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+    + LoadForenamesByCountry(forenames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+    + LoadSurnamesByCountry(surnames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
   }
 
   class JsonLoader {
-    + LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
-    + LoadBeerStyles(filepath : const std::filesystem::path&) : std::vector<BeerStyle>
-    + LoadPersonas(filepath : const std::filesystem::path&) : std::vector<UserPersona>
-    + LoadNamesByCountry(forenames_filepath : const std::filesystem::path&,\n  surnames_filepath : const std::filesystem::path&) : NamesByCountry
+    + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+    + LoadBeerStyles(filepath : const std::filesystem::path&) : const std::vector<BeerStyle>&
+    + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+    + LoadForenamesByCountry(forenames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+    + LoadSurnamesByCountry(surnames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
   }
+
+  note right of JsonLoader
+    Each Load* call is memoized after its first
+    parse -- implemented today, ahead of the rest
+    of this package (LoadBeerStyles is still planned).
+  end note
+
+  class MockCuratedDataService {
+    + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+    + LoadBeerStyles(filepath : const std::filesystem::path&) : const std::vector<BeerStyle>&
+    + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+    + LoadForenamesByCountry(forenames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+    + LoadSurnamesByCountry(surnames_filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
+  }
+
+  note right of MockCuratedDataService
+    Fixed in-memory dataset used in --mocked mode,
+    implemented today for Locations/Personas/
+    Forenames/Surnames; would need a LoadBeerStyles
+    fixture too once that method is implemented.
+  end note
 
 }
 
@@ -520,7 +546,7 @@ package "Infrastructure: Data Export" {
 }
 
 class BiergartenPipelineOrchestrator {
-  - preloader_ : std::unique_ptr<DataPreloader>
+  - curated_data_service_ : std::unique_ptr<ICuratedDataService>
   - enrichment_service_ : std::unique_ptr<EnrichmentService>
   - generator_ : std::unique_ptr<DataGenerator>
   - logger_ : std::unique_ptr<Logger>
@@ -548,7 +574,7 @@ class BiergartenPipelineOrchestrator {
 }
 
 ' --- Orchestration Aggregations (Services & Strategies) ---
-BiergartenPipelineOrchestrator *--  DataPreloader
+BiergartenPipelineOrchestrator *--  ICuratedDataService
 BiergartenPipelineOrchestrator *--  EnrichmentService
 BiergartenPipelineOrchestrator *--  DataGenerator
 BiergartenPipelineOrchestrator *--  ExportService
@@ -567,7 +593,8 @@ BiergartenPipelineOrchestrator *-- "0..*" GeneratedCheckin : checkin_pool_
 BiergartenPipelineOrchestrator *-- "0..*" GeneratedFollow  : follow_pool_
 
 ' --- Interfaces & Implementations ---
-DataPreloader                  <|.. JsonLoader
+ICuratedDataService            <|.. JsonLoader
+ICuratedDataService            <|.. MockCuratedDataService
 Logger                         <|.. PipelineLogger
 ContextStrategy                <|.. BreweryContextStrategy
 ContextStrategy                <|.. BeerContextStrategy

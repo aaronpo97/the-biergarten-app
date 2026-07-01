@@ -30,11 +30,14 @@ class BiergartenPipelineOrchestrator {
   - context_service_ : std::unique_ptr<IEnrichmentService>
   - generator_ : std::unique_ptr<DataGenerator>
   - exporter_ : std::unique_ptr<IExportService>
+  - curated_data_service_ : std::unique_ptr<ICuratedDataService>
   - application_options_ : ApplicationOptions
-  - generated_breweries_ : std::vector<GeneratedBrewery>
+  - generated_breweries_ : std::vector<BreweryRecord>
+  - generated_users_ : std::vector<UserRecord>
   + Run() : bool
   - QueryCitiesWithCountries() : std::vector<Location>
   - GenerateBreweries(cities : std::span<const EnrichedCity>) : void
+  - GenerateUsers(cities : std::span<const EnrichedCity>) : void
   - LogResults() : void
 }
 
@@ -113,13 +116,14 @@ class HttpWebClient {
 
 interface DataGenerator <<interface>> {
   + GenerateBrewery(location : const Location&, region_context : const std::string&) : BreweryResult
-  + GenerateUser(locale : const std::string&) : UserResult
+  + GenerateUser(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult
 }
 
 class MockGenerator {
-  + GenerateBrewery(...) : BreweryResult
-  + GenerateUser(...) : UserResult
+  + GenerateBrewery(location : const Location&, region_context : const std::string&) : BreweryResult
+  + GenerateUser(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult
   - DeterministicHash(location : const Location&) : size_t
+  - DeterministicHash(location : const Location&, persona : const UserPersona&, name : const Name&) : size_t
 }
 
 class LlamaGenerator {
@@ -153,13 +157,49 @@ class PromptDirectory {
   + Load(key : std::string_view) : std::string
 }
 
-class JsonLoader {
-  + {static} LoadLocations(filepath : const std::filesystem::path&) : std::vector<Location>
+interface ICuratedDataService <<interface>> {
+  + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+  + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+  + LoadForenamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+  + LoadSurnamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
 }
+
+class JsonLoader {
+  - cache_ : cache
+  + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+  + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+  + LoadForenamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+  + LoadSurnamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
+}
+
+note right of JsonLoader
+  Each Load* method memoizes its result in
+  cache_ on first call; later calls on the
+  same instance return the cached value
+  without re-parsing.
+end note
+
+class MockCuratedDataService {
+  - locations_ : std::vector<Location>
+  - personas_ : std::vector<UserPersona>
+  - forenames_by_country_ : std::unordered_map<std::string, forename_list>
+  - surnames_by_country_ : std::unordered_map<std::string, surname_list>
+  + LoadLocations(filepath : const std::filesystem::path&) : const std::vector<Location>&
+  + LoadPersonas(filepath : const std::filesystem::path&) : const std::vector<UserPersona>&
+  + LoadForenamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, forename_list>&
+  + LoadSurnamesByCountry(filepath : const std::filesystem::path&) : const std::unordered_map<std::string, surname_list>&
+}
+
+note right of MockCuratedDataService
+  Fixed 4-location / 3-persona dataset
+  (US, DE, FR, BE) used in --mocked runs;
+  filepath arguments are ignored.
+end note
 
 interface IExportService <<interface>> {
   + Initialize() : void
-  + ProcessRecord(brewery : const GeneratedBrewery&) : void
+  + ProcessRecord(brewery : const BreweryRecord&) : uint64_t
+  + ProcessRecord(user : const UserRecord&) : uint64_t
   + Finalize() : void
 }
 
@@ -167,15 +207,18 @@ class SqliteExportService {
   - date_time_provider_ : std::unique_ptr<IDateTimeProvider>
   - run_timestamp_utc_ : std::string
   - database_path_ : std::filesystem::path
-  - db_handle_ : sqlite3*
-  - insert_location_stmt_ : sqlite3_stmt*
-  - insert_brewery_stmt_ : sqlite3_stmt*
+  - db_handle_ : SqliteDatabaseHandle
+  - insert_location_stmt_ : SqliteStatementHandle
+  - insert_brewery_stmt_ : SqliteStatementHandle
+  - insert_user_stmt_ : SqliteStatementHandle
   - transaction_open_ : bool
   - location_cache_ : std::unordered_map<std::string, sqlite3_int64>
   + Initialize() : void
-  + ProcessRecord(brewery : const GeneratedBrewery&) : void
+  + ProcessRecord(brewery : const BreweryRecord&) : uint64_t
+  + ProcessRecord(user : const UserRecord&) : uint64_t
   + Finalize() : void
   - InitializeSchema() : void
+  - ResolveLocationId(location : const Location&) : sqlite3_int64
 }
 
 interface IDateTimeProvider <<interface>> {
@@ -191,6 +234,7 @@ BiergartenPipelineOrchestrator *-- ILogger : owns
 BiergartenPipelineOrchestrator *-- IEnrichmentService : owns
 BiergartenPipelineOrchestrator *-- DataGenerator : owns
 BiergartenPipelineOrchestrator *-- IExportService : owns
+BiergartenPipelineOrchestrator *-- ICuratedDataService : owns
 
 LogEntry *-- LogLevel
 LogEntry *-- PipelinePhase
@@ -215,7 +259,8 @@ LlamaGenerator *-- IPromptDirectory : uses
 IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
 IPromptDirectory <|.. PromptDirectory : implements
 
-BiergartenPipelineOrchestrator ..> JsonLoader : uses
+ICuratedDataService <|.. JsonLoader : implements
+ICuratedDataService <|.. MockCuratedDataService : implements
 
 IExportService <|.. SqliteExportService : implements
 SqliteExportService *-- IDateTimeProvider : owns

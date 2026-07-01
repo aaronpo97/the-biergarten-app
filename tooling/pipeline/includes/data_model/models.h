@@ -67,7 +67,7 @@ struct Location {
 /**
  * @brief A sampled first/last name pair, with the source forename's gender.
  *
- * Produced by NamesByCountry::SampleName();
+ * Produced by the SampleName() helper in generate_users.cc.
  */
 struct Name {
   std::string first_name{};

@@ -111,11 +111,11 @@ persona/bio generation later.
 The full multinational dataset is kept as-is (106 countries for forenames,
 75 for surnames) rather than trimmed to `locations.json`'s current country
 list, so it doesn't need re-sourcing if more countries are added later.
-`NamesByCountry::SampleName()` returns no result for a country present in
-neither file; of the countries in `locations.json`, that's currently `KE`,
-`SE`, `SG`, `TH`, `VN`, and `ZA` — `GenerateUsers` skips cities in those
-countries the same way brewery generation skips cities whose enrichment
-lookup fails.
+`SampleName()` (a free helper in `generate_users.cc`) returns no result for
+a country present in neither file; of the countries in `locations.json`,
+that's currently `KE`, `SE`, `SG`, `TH`, `VN`, and `ZA` — `GenerateUsers`
+skips cities in those countries the same way brewery generation skips
+cities whose enrichment lookup fails.
 
 ---
 

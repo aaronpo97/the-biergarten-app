@@ -43,10 +43,18 @@ fork again
   :EnrichmentService::PreWarmLocationCache(sampled_locations);
 end fork
 fork
-  :JsonLoader::LoadNamesByCountry(\n  "forenames-by-country.json",\n  "surnames-by-country.json");
+  :JsonLoader::LoadForenamesByCountry(\n  "forenames-by-country.json");
+fork again
+  :JsonLoader::LoadSurnamesByCountry(\n  "surnames-by-country.json");
 fork again
   :JsonLoader::LoadPersonas("personas.json");
 end fork
+note right
+  Each call is memoized after its first parse
+  (implemented today). MockCuratedDataService
+  returns a fixed in-memory dataset instead
+  under --mocked, skipping these JSON files.
+end note
 
 ' ═══════════════════════════════════════════
 ' PHASE 0 — USER GENERATION
@@ -82,11 +90,15 @@ fork again
       ibu_preference, checkin_weight.
     end note
 
-    :NamesByCountry::SampleName(\n  location.iso3166_1);
+    :SampleName(forenames_by_country,\n  surnames_by_country, location.iso3166_1, rng);
     note right
       Deterministic lookup -- no LLM involved.
-      Name selected from pre-keyed table
+      Free function (implemented today in
+      generate_users.cc), not a class method.
+      Name selected from pre-keyed maps
       and passed into the generation prompt.
+      Skips the city if either map has no
+      entry for iso3166_1.
     end note
 
     :GenerateUser(enriched_city, persona, sampled_name)\nvia DataGenerator;
