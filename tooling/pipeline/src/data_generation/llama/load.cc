@@ -4,14 +4,14 @@
  * context, and resets prior resources during model initialization.
  */
 
-#include <ggml-backend.h>
-#include <llama.h>
-
 #include <algorithm>
 #include <chrono>
 #include <stdexcept>
 #include <string>
 #include <utility>
+
+#include <ggml-backend.h>
+#include <llama.h>
 
 #include "data_generation/llama_generator.h"
 

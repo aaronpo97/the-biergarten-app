@@ -14,8 +14,8 @@
 #include <string_view>
 #include <unordered_set>
 
-#include "../../includes/services/curated_data/curated_json_data_service.h"
 #include "biergarten_pipeline_orchestrator.h"
+#include "services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
 
 namespace {
@@ -126,14 +126,13 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
   generated_users_.clear();
   size_t skipped_count = 0;
   size_t export_failed_count = 0;
+  std::unordered_set<std::string> used_email_local_parts;
 
   const auto generate_record =
-      [this, &rng, &skipped_count](
+      [this, &rng, &skipped_count, &used_email_local_parts](
           const EnrichedCity& city, const UserPersona& persona,
           const Name& sampled_name) -> std::optional<UserRecord> {
     try {
-      std::unordered_set<std::string> used_email_local_parts;
-
       const UserResult user =
           generator_->GenerateUser(city, persona, sampled_name);
 

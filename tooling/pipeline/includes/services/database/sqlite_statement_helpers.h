@@ -109,7 +109,7 @@ INSERT INTO users (
 
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
 // placeholder order in the SQL above.
-enum eLocationBindIndex {
+enum LocationBindIndex {
   kLocationCityBindIndex = 1,
   kLocationStateProvinceBindIndex,
   kLocationIso31662BindIndex,

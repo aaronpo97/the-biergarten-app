@@ -4,8 +4,6 @@
  * parsing, token decoding, and JSON validation helpers for Llama modules.
  */
 
-#include <llama.h>
-
 #include <algorithm>
 #include <array>
 #include <boost/json.hpp>
@@ -16,6 +14,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <llama.h>
 
 #include "data_generation/llama_generator_helpers.h"
 

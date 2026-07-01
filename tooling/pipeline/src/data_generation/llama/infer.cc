@@ -5,8 +5,6 @@
  * output tokens back to text for system+user chat prompts.
  */
 
-#include <llama.h>
-
 #include <algorithm>
 #include <chrono>
 #include <format>
@@ -15,6 +13,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <llama.h>
 
 #include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"

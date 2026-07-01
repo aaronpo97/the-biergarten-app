@@ -4,7 +4,7 @@
  * records with strict field validation and descriptive error reporting.
  */
 
-#include "../../../includes/services/curated_data/curated_json_data_service.h"
+#include "services/curated_data/curated_json_data_service.h"
 
 #include <boost/json.hpp>
 #include <format>

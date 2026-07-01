@@ -10,8 +10,8 @@
 #include <iterator>
 #include <random>
 
-#include "../../includes/services/curated_data/curated_json_data_service.h"
 #include "biergarten_pipeline_orchestrator.h"
+#include "services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
 
 std::vector<Location>

@@ -5,13 +5,13 @@
 
 #include "data_generation/llama_generator.h"
 
-#include <llama.h>
-
 #include <filesystem>
 #include <memory>
 #include <random>
 #include <stdexcept>
 #include <string>
+
+#include <llama.h>
 
 #include "data_model/models.h"
 
