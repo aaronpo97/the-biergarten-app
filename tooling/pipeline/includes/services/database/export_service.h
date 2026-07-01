@@ -16,8 +16,6 @@
 class IExportService {
  public:
   IExportService() = default;
-
-  /// @brief Virtual destructor for polymorphic cleanup.
   virtual ~IExportService() = default;
 
   IExportService(const IExportService&) = delete;
@@ -25,7 +23,9 @@ class IExportService {
   IExportService(IExportService&&) = delete;
   IExportService& operator=(IExportService&&) = delete;
 
-  /// @brief Prepares the export destination for a new run.
+  /**
+   * @brief Prepares the export destination for a new run.
+   */
   virtual void Initialize() = 0;
 
   /**
@@ -33,9 +33,18 @@ class IExportService {
    *
    * @param brewery Generated brewery payload to store.
    */
-  virtual uint64_t ProcessRecord(const GeneratedBrewery& brewery) = 0;
+  virtual uint64_t ProcessRecord(const BreweryRecord& brewery) = 0;
 
-  /// @brief Finalizes the export destination.
+  /**
+   * @brief Persists one generated user record.
+   *
+   * @param user Generated user payload to store.
+   */
+  virtual uint64_t ProcessRecord(const UserRecord& user) = 0;
+
+  /**
+   * @brief Finalizes the export destination.
+   */
   virtual void Finalize() = 0;
 };
 

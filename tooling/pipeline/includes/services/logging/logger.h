@@ -39,7 +39,8 @@ class ILogger {
    */
   void Log(LogDTO payload,
            std::source_location origin = std::source_location::current(),
-           std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
+           std::chrono::system_clock::time_point timestamp =
+               std::chrono::system_clock::now(),
            std::thread::id thread_id = std::this_thread::get_id()) {
     LogEntry entry;
     entry.timestamp = timestamp;

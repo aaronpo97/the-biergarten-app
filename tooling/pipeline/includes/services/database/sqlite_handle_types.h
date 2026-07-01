@@ -24,8 +24,10 @@ using SqliteDatabaseHandle = std::unique_ptr<sqlite3, SqliteDatabaseDeleter>;
 using SqliteStatementHandle =
     std::unique_ptr<sqlite3_stmt, SqliteStatementDeleter>;
 
+// Represents a parameter that is bound to a prepared SQLite statement.
+// N.B. indices are 1 based.
 template <typename T>
-struct BindParam {
+struct BoundParam {
   int index;
   T value;
   std::string_view action;

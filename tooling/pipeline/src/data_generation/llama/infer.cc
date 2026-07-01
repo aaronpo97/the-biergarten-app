@@ -14,9 +14,10 @@
 #include <string_view>
 #include <vector>
 
+#include <llama.h>
+
 #include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"
-#include "llama.h"
 
 static constexpr size_t kPromptTokenSlack = 8;
 // Minimum tokens to keep when using top-p sampling. Ensures at least one

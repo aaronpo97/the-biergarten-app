@@ -1,6 +1,7 @@
 /**
  * @file services/sqlite/process_record.cc
- * @brief SqliteExportService::ProcessRecord() implementation.
+ * @brief SqliteExportService::ProcessRecord() implementation
+ * and the shared location-resolution helper.
  */
 
 #include <iomanip>
@@ -29,111 +30,117 @@ std::string SqliteExportService::BuildLocationKey(const Location& location) {
   return key_stream.str();
 }
 
-uint64_t SqliteExportService::ProcessRecord(const GeneratedBrewery& brewery) {
+sqlite3_int64 SqliteExportService::ResolveLocationId(const Location& location) {
+  const std::string location_key = BuildLocationKey(location);
+  const auto cached_location = location_cache_.find(location_key);
+  if (cached_location != location_cache_.end()) {
+    return cached_location->second;
+  }
+
+  const std::string local_languages_json =
+      sqlite_export_service_internal::SerializeVector(location.local_languages);
+
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index = sqlite_export_service_internal::kLocationCityBindIndex,
+          .value = location.city,
+          .action = "Failed to bind SQLite location city"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index =
+              sqlite_export_service_internal::kLocationStateProvinceBindIndex,
+          .value = location.state_province,
+          .action = "Failed to bind SQLite location state/province"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index = sqlite_export_service_internal::kLocationIso31662BindIndex,
+          .value = location.iso3166_2,
+          .action = "Failed to bind SQLite location ISO 3166-2 code"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index = sqlite_export_service_internal::kLocationCountryBindIndex,
+          .value = location.country,
+          .action = "Failed to bind SQLite location country"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index = sqlite_export_service_internal::kLocationIso31661BindIndex,
+          .value = location.iso3166_1,
+          .action = "Failed to bind SQLite location ISO 3166-1 code"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam<std::string_view>{
+          .index = sqlite_export_service_internal::kLocationLanguagesBindIndex,
+          .value = local_languages_json,
+          .action = "Failed to bind SQLite location languages"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam{
+          .index = sqlite_export_service_internal::kLocationLatitudeBindIndex,
+          .value = location.latitude,
+          .action = "Failed to bind SQLite location latitude"});
+  sqlite_export_service_internal::Bind(
+      insert_location_stmt_,
+      sqlite_export_service_internal::BoundParam{
+          .index = sqlite_export_service_internal::kLocationLongitudeBindIndex,
+          .value = location.longitude,
+          .action = "Failed to bind SQLite location longitude"});
+
+  sqlite_export_service_internal::StepStatement(
+      db_handle_, insert_location_stmt_,
+      "Failed to insert SQLite location row");
+
+  const sqlite3_int64 location_id =
+      sqlite_export_service_internal::LastInsertRowId(db_handle_);
+  location_cache_.emplace(location_key, location_id);
+  sqlite_export_service_internal::ResetStatement(insert_location_stmt_);
+
+  return location_id;
+}
+
+uint64_t SqliteExportService::ProcessRecord(const BreweryRecord& brewery) {
   if (db_handle_ == nullptr || !transaction_open_) {
     throw std::runtime_error("SQLite export service is not initialized");
   }
 
-  const std::string location_key = BuildLocationKey(brewery.location);
-  const auto cached_location = location_cache_.find(location_key);
-  sqlite3_int64 location_id = 0;
-
-  if (cached_location != location_cache_.end()) {
-    location_id = cached_location->second;
-  } else {
-    const std::string local_languages_json =
-        sqlite_export_service_internal::SerializeVector(
-            brewery.location.local_languages);
-
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index = sqlite_export_service_internal::kLocationCityBindIndex,
-            .value = brewery.location.city,
-            .action = "Failed to bind SQLite location city"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index =
-                sqlite_export_service_internal::kLocationStateProvinceBindIndex,
-            .value = brewery.location.state_province,
-            .action = "Failed to bind SQLite location state/province"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index = sqlite_export_service_internal::kLocationIso31662BindIndex,
-            .value = brewery.location.iso3166_2,
-            .action = "Failed to bind SQLite location ISO 3166-2 code"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index = sqlite_export_service_internal::kLocationCountryBindIndex,
-            .value = brewery.location.country,
-            .action = "Failed to bind SQLite location country"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index = sqlite_export_service_internal::kLocationIso31661BindIndex,
-            .value = brewery.location.iso3166_1,
-            .action = "Failed to bind SQLite location ISO 3166-1 code"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam<std::string_view>{
-            .index =
-                sqlite_export_service_internal::kLocationLanguagesBindIndex,
-            .value = local_languages_json,
-            .action = "Failed to bind SQLite location languages"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam{
-            .index = sqlite_export_service_internal::kLocationLatitudeBindIndex,
-            .value = brewery.location.latitude,
-            .action = "Failed to bind SQLite location latitude"});
-    sqlite_export_service_internal::Bind(
-        insert_location_stmt_,
-        sqlite_export_service_internal::BindParam{
-            .index =
-                sqlite_export_service_internal::kLocationLongitudeBindIndex,
-            .value = brewery.location.longitude,
-            .action = "Failed to bind SQLite location longitude"});
-
-    sqlite_export_service_internal::StepStatement(
-        db_handle_, insert_location_stmt_,
-        "Failed to insert SQLite location row");
-
-    location_id = sqlite_export_service_internal::LastInsertRowId(db_handle_);
-    location_cache_.emplace(location_key, location_id);
-    sqlite_export_service_internal::ResetStatement(insert_location_stmt_);
-  }
+  const sqlite3_int64 location_id = ResolveLocationId(brewery.location);
 
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
-      sqlite_export_service_internal::BindParam<sqlite3_int64>{
+      sqlite_export_service_internal::BoundParam<sqlite3_int64>{
           .index = sqlite_export_service_internal::kBreweryLocationIdBindIndex,
           .value = location_id,
           .action = "Failed to bind SQLite brewery location id"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
-      sqlite_export_service_internal::BindParam<std::string_view>{
+      sqlite_export_service_internal::BoundParam<std::string_view>{
           .index = sqlite_export_service_internal::kBreweryEnglishNameBindIndex,
           .value = brewery.brewery.name_en,
           .action = "Failed to bind SQLite brewery English name"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
-      sqlite_export_service_internal::BindParam<std::string_view>{
+      sqlite_export_service_internal::BoundParam<std::string_view>{
           .index = sqlite_export_service_internal::
               kBreweryEnglishDescriptionBindIndex,
           .value = brewery.brewery.description_en,
           .action = "Failed to bind SQLite brewery English description"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
-      sqlite_export_service_internal::BindParam<std::string_view>{
+      sqlite_export_service_internal::BoundParam<std::string_view>{
           .index = sqlite_export_service_internal::kBreweryLocalNameBindIndex,
           .value = brewery.brewery.name_local,
           .action = "Failed to bind SQLite brewery local name"});
+
   sqlite_export_service_internal::Bind(
       insert_brewery_stmt_,
-      sqlite_export_service_internal::BindParam<std::string_view>{
+      sqlite_export_service_internal::BoundParam<std::string_view>{
           .index =
               sqlite_export_service_internal::kBreweryLocalDescriptionBindIndex,
           .value = brewery.brewery.description_local,

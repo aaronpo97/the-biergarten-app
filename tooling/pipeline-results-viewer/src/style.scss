@@ -1,0 +1,267 @@
+$gray-100: #dedede;
+$gray-300: #c3c3c3;
+$gray-500: #808080;
+$white: #ffffff;
+$black: #000000;
+$navy: #000080;
+$blue: #1084d0;
+$teal: #008080;
+
+$color-surface: $gray-300;
+$color-surface-alt: $gray-100;
+$color-surface-sunken: $white;
+$color-border-highlight: $gray-100;
+$color-border-lowlight: $gray-500;
+$color-border-light: $white;
+$color-border-dark: $black;
+$color-text: $black;
+$color-text-on-accent: $white;
+$color-text-status: $navy;
+$color-accent-start: $navy;
+$color-accent-end: $blue;
+$color-desktop-bg: $teal;
+$color-row-stripe: $gray-100;
+$color-shadow: rgba($black, 0.4);
+$color-focus-ring: $black;
+
+$bevel-size: 2px;
+$font-stack: Tahoma, "MS Sans Serif", Verdana, sans-serif;
+
+@mixin bevel-raised($size: $bevel-size) {
+  border-style: solid;
+  border-width: $size;
+  border-top-color: $color-border-highlight;
+  border-left-color: $color-border-highlight;
+  border-right-color: $color-border-dark;
+  border-bottom-color: $color-border-dark;
+  box-shadow:
+    inset $size $size 0 0 $color-border-light,
+    inset (-$size) (-$size) 0 0 $color-border-lowlight;
+}
+
+@mixin bevel-sunken($size: $bevel-size) {
+  border-style: solid;
+  border-width: $size;
+  border-top-color: $color-border-lowlight;
+  border-left-color: $color-border-lowlight;
+  border-right-color: $color-border-light;
+  border-bottom-color: $color-border-light;
+  box-shadow:
+    inset $size $size 0 0 $color-border-dark,
+    inset (-$size) (-$size) 0 0 $color-surface-alt;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: $color-desktop-bg;
+  font-family: $font-stack;
+  color: $color-text;
+  min-height: 100vh;
+}
+
+#window {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  background: $color-surface;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  @include bevel-raised(3px);
+  box-shadow: 8px 8px 0 0 $color-shadow;
+}
+
+.dialog-header {
+  background: linear-gradient(90deg, $color-accent-start, $color-accent-end);
+  color: $color-text-on-accent;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+}
+
+.tab-strip {
+  display: flex;
+  gap: 4px;
+  padding: 8px 8px 0;
+}
+
+.tab {
+  position: relative;
+  top: 3px;
+  margin-bottom: -2px;
+  font-family: $font-stack;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: $color-surface;
+  color: $color-text;
+  border-style: solid;
+  border-width: 2px;
+  border-top-color: $color-border-light;
+  border-left-color: $color-border-light;
+  border-right-color: $color-border-dark;
+  border-bottom-color: $color-border-dark;
+  border-radius: 0;
+  cursor: pointer;
+
+  &.is-active {
+    top: 0;
+    z-index: 1;
+    border-bottom-color: $color-surface;
+  }
+
+  &:focus {
+    outline: 1px dotted $color-focus-ring;
+    outline-offset: -4px;
+  }
+}
+
+.dialog-body {
+  border-top: 2px solid $color-border-dark;
+  padding: 12px;
+}
+
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.field-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  label {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  &.field-group--stacked {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+select#table-select {
+  font-family: $font-stack;
+  font-size: 13px;
+  padding: 3px 6px;
+  background: $color-surface-sunken;
+  color: $color-text;
+  border-radius: 0;
+  @include bevel-sunken();
+
+  &:focus {
+    outline: 1px dotted $color-focus-ring;
+    outline-offset: 2px;
+  }
+}
+
+textarea#query-input {
+  font-family: $font-stack;
+  font-size: 13px;
+  padding: 6px;
+  background: $color-surface-sunken;
+  color: $color-text;
+  border-radius: 0;
+  resize: vertical;
+  @include bevel-sunken();
+
+  &:focus {
+    outline: 1px dotted $color-focus-ring;
+    outline-offset: 2px;
+  }
+}
+
+.btn {
+  align-self: flex-start;
+  font-family: $font-stack;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  background: $color-surface;
+  color: $color-text;
+  cursor: pointer;
+  @include bevel-raised();
+
+  &:active {
+    @include bevel-sunken();
+  }
+
+  &:focus {
+    outline: 1px dotted $color-focus-ring;
+    outline-offset: -4px;
+  }
+}
+
+#status,
+#query-status {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: $color-text-status;
+}
+
+#table-container,
+#query-container {
+  background: $color-surface-sunken;
+  padding: 4px;
+  overflow-x: auto;
+  @include bevel-sunken();
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-family: $font-stack;
+}
+
+th,
+td {
+  border: 1px solid $color-border-lowlight;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  background: $color-surface;
+  white-space: nowrap;
+  font-weight: bold;
+  text-transform: uppercase;
+  @include bevel-raised(1px);
+}
+
+td {
+  min-width: 120px;
+  max-width: 800px;
+  white-space: normal;
+  word-break: break-word;
+  background: $color-surface-sunken;
+}
+
+tbody tr:nth-child(even) td {
+  background: $color-row-stripe;
+}

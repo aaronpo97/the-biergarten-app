@@ -10,9 +10,10 @@
 #include <string>
 #include <utility>
 
+#include <ggml-backend.h>
+#include <llama.h>
+
 #include "data_generation/llama_generator.h"
-#include "ggml-backend.h"
-#include "llama.h"
 
 // Maximum batch size for decode operations. Capping the batch prevents
 // excessive memory allocation while maintaining inference performance.

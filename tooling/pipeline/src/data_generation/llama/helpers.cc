@@ -9,13 +9,16 @@
 #include <boost/json.hpp>
 #include <cctype>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include <llama.h>
+
 #include "data_generation/llama_generator_helpers.h"
-#include "llama.h"
+
 namespace {
 /**
  * String trimming: removes leading and trailing whitespace
@@ -76,7 +79,7 @@ bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
   return !out.empty();
 }
 
-bool HasSchemaPlaceholder(const std::array<std::string*, 4>& values) {
+bool HasSchemaPlaceholder(std::span<std::string* const> values) {
   for (const std::string* value : values) {
     std::string lowered = *value;
     std::ranges::transform(lowered, lowered.begin(),
@@ -201,6 +204,61 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
   const std::array schema_placeholders = {
       &brewery_out.name_en, &brewery_out.description_en,
       &brewery_out.name_local, &brewery_out.description_local};
+  if (HasSchemaPlaceholder(schema_placeholders)) {
+    return "JSON appears to be a schema placeholder, not content";
+  }
+
+  return std::nullopt;
+}
+
+std::optional<std::string> ValidateUserJson(const std::string& raw,
+                                            UserResult& user_out) {
+  boost::system::error_code error_code;
+  const std::string_view raw_view(raw);
+  const size_t opening_brace = raw_view.find('{');
+  if (opening_brace == std::string_view::npos) {
+    return "JSON parse error: missing opening brace '{'";
+  }
+
+  const std::string_view json_payload = raw_view.substr(opening_brace);
+  boost::json::value json_value = boost::json::parse(json_payload, error_code);
+  if (error_code) {
+    return "JSON parse error: " + error_code.message();
+  }
+
+  if (!json_value.is_object()) {
+    return "JSON root must be an object";
+  }
+
+  const auto& obj = json_value.get_object();
+  if (obj.size() != 3) {
+    return "JSON object must contain exactly three keys";
+  }
+
+  std::string validation_error;
+  if (!ReadRequiredTrimmedStringField(obj, "username", user_out.username,
+                                      &validation_error)) {
+    return validation_error;
+  }
+
+  if (!ReadRequiredTrimmedStringField(obj, "bio", user_out.bio,
+                                      &validation_error)) {
+    return validation_error;
+  }
+
+  const boost::json::value* activity_weight_field =
+      obj.if_contains("activity_weight");
+  if (activity_weight_field == nullptr || !activity_weight_field->is_number()) {
+    return "Missing or invalid numeric field: activity_weight";
+  }
+
+  const double activity_weight = activity_weight_field->to_number<double>();
+  if (activity_weight < 0.0 || activity_weight > 1.0) {
+    return "activity_weight must be between 0 and 1";
+  }
+  user_out.activity_weight = static_cast<float>(activity_weight);
+
+  const std::array schema_placeholders = {&user_out.username, &user_out.bio};
   if (HasSchemaPlaceholder(schema_placeholders)) {
     return "JSON appears to be a schema placeholder, not content";
   }

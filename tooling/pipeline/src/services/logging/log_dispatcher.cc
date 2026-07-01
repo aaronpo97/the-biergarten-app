@@ -19,6 +19,8 @@ namespace {
   switch (phase) {
     case PipelinePhase::Startup:
       return "Startup";
+    case PipelinePhase::Enrichment:
+      return "Enrichment";
     case PipelinePhase::UserGeneration:
       return "User Generation";
     case PipelinePhase::BreweryAndBeerGeneration:

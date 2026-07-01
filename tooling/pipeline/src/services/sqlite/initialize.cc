@@ -18,9 +18,9 @@ std::filesystem::path SqliteExportService::BuildDatabasePath() const {
   std::filesystem::path candidate = output_path_ / base_filename;
 
   for (int suffix = 1; std::filesystem::exists(candidate); ++suffix) {
-    candidate = output_path_ /
-                std::filesystem::path(std::format("biergarten_seed_{}-{}.sqlite",
-                                      run_timestamp_utc_, suffix));
+    candidate = output_path_ / std::filesystem::path(
+                                   std::format("biergarten_seed_{}-{}.sqlite",
+                                               run_timestamp_utc_, suffix));
   }
 
   return candidate;
@@ -33,6 +33,9 @@ void SqliteExportService::InitializeSchema() const {
   sqlite_export_service_internal::ExecSql(
       db_handle_, sqlite_export_service_internal::kCreateBreweriesTableSql,
       "Failed to create SQLite breweries table");
+  sqlite_export_service_internal::ExecSql(
+      db_handle_, sqlite_export_service_internal::kCreateUsersTableSql,
+      "Failed to create SQLite users table");
 }
 
 void SqliteExportService::PrepareStatements() {
@@ -42,6 +45,9 @@ void SqliteExportService::PrepareStatements() {
   insert_brewery_stmt_ = sqlite_export_service_internal::PrepareStatement(
       db_handle_, sqlite_export_service_internal::kInsertBrewerySql,
       "Failed to prepare SQLite brewery insert statement");
+  insert_user_stmt_ = sqlite_export_service_internal::PrepareStatement(
+      db_handle_, sqlite_export_service_internal::kInsertUserSql,
+      "Failed to prepare SQLite user insert statement");
 }
 
 void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
@@ -54,6 +60,7 @@ void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
     transaction_open_ = false;
   }
 
+  insert_user_stmt_.reset();
   insert_brewery_stmt_.reset();
   insert_location_stmt_.reset();
   db_handle_.reset();

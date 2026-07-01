@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-#include "sqlite_handle_types.h"
+#include "services/database/sqlite_handle_types.h"
 
 namespace sqlite_export_service_internal {
 
@@ -50,6 +50,26 @@ CREATE INDEX IF NOT EXISTS idx_breweries_location_id ON breweries(location_id);
 
 )sql";
 
+inline constexpr std::string_view kCreateUsersTableSql = R"sql(
+
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  location_id INTEGER NOT NULL,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  gender TEXT NOT NULL,
+  username TEXT NOT NULL,
+  bio TEXT NOT NULL,
+  activity_weight REAL NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  date_of_birth TEXT NOT NULL,
+  FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_location_id ON users(location_id);
+
+)sql";
+
 inline constexpr std::string_view kInsertLocationSql = R"sql(
 INSERT INTO locations (
   city,
@@ -73,20 +93,52 @@ INSERT INTO breweries (
 ) VALUES (?, ?, ?, ?, ?);
 )sql";
 
-inline constexpr int kLocationCityBindIndex = 1;
-inline constexpr int kLocationStateProvinceBindIndex = 2;
-inline constexpr int kLocationIso31662BindIndex = 3;
-inline constexpr int kLocationCountryBindIndex = 4;
-inline constexpr int kLocationIso31661BindIndex = 5;
-inline constexpr int kLocationLanguagesBindIndex = 6;
-inline constexpr int kLocationLatitudeBindIndex = 7;
-inline constexpr int kLocationLongitudeBindIndex = 8;
+inline constexpr std::string_view kInsertUserSql = R"sql(
+INSERT INTO users (
+  location_id,
+  first_name,
+  last_name,
+  gender,
+  username,
+  bio,
+  activity_weight,
+  email,
+  date_of_birth
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+)sql";
 
-inline constexpr int kBreweryLocationIdBindIndex = 1;
-inline constexpr int kBreweryEnglishNameBindIndex = 2;
-inline constexpr int kBreweryEnglishDescriptionBindIndex = 3;
-inline constexpr int kBreweryLocalNameBindIndex = 4;
-inline constexpr int kBreweryLocalDescriptionBindIndex = 5;
+// sqlite3_bind_*() parameter indices are 1-based, matching the "?"
+// placeholder order in the SQL above.
+enum LocationBindIndex {
+  kLocationCityBindIndex = 1,
+  kLocationStateProvinceBindIndex,
+  kLocationIso31662BindIndex,
+  kLocationCountryBindIndex,
+  kLocationIso31661BindIndex,
+  kLocationLanguagesBindIndex,
+  kLocationLatitudeBindIndex,
+  kLocationLongitudeBindIndex,
+};
+
+enum BreweryBindIndex {
+  kBreweryLocationIdBindIndex = 1,
+  kBreweryEnglishNameBindIndex,
+  kBreweryEnglishDescriptionBindIndex,
+  kBreweryLocalNameBindIndex,
+  kBreweryLocalDescriptionBindIndex,
+};
+
+enum UserBindIndex {
+  kUserLocationIdBindIndex = 1,
+  kUserFirstNameBindIndex,
+  kUserLastNameBindIndex,
+  kUserGenderBindIndex,
+  kUserUsernameBindIndex,
+  kUserBioBindIndex,
+  kUserActivityWeightBindIndex,
+  kUserEmailBindIndex,
+  kUserDateOfBirthBindIndex,
+};
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
                                        std::string_view sql,
@@ -95,13 +147,13 @@ SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
 void ResetStatement(SqliteStatementHandle& statement);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<std::string_view>& param);
+          const BoundParam<std::string_view>& param);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<double>& param);
+          const BoundParam<double>& param);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<sqlite3_int64>& param);
+          const BoundParam<sqlite3_int64>& param);
 
 void StepStatement(const SqliteDatabaseHandle& db_handle,
                    const SqliteStatementHandle& statement,

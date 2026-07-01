@@ -139,6 +139,7 @@ FetchContent_MakeAvailable(cpp-httplib)
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME}
         includes/services/enrichment/mock_enrichment.h
+        includes/services/curated_data/mock_curated_data_service.h
         includes/json_handling/pretty_print.h)
 
 # --- Entry point ---
@@ -148,7 +149,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- json_handling ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/json_handling/json_loader.cc
+        src/services/curated_data/curated_json_data_service.cc
+)
+
+# --- services: curated_data ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/curated_data/mock_curated_data_service.cc
 )
 
 # --- application_options ---
@@ -161,6 +167,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/biergarten_pipeline_orchestrator/log_results.cc
         src/biergarten_pipeline_orchestrator/biergarten_pipeline_orchestrator.cc
         src/biergarten_pipeline_orchestrator/generate_breweries.cc
+        src/biergarten_pipeline_orchestrator/generate_users.cc
         src/biergarten_pipeline_orchestrator/run.cc
         src/biergarten_pipeline_orchestrator/query_cities_with_countries.cc
 )
@@ -204,6 +211,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 # --- services: sqlite ---
 target_sources(${PROJECT_NAME} PRIVATE
 	src/services/sqlite/process_record.cc
+	src/services/sqlite/process_user_record.cc
 	src/services/sqlite/sqlite_export_service.cc
 	src/services/sqlite/finalize.cc
 	src/services/sqlite/initialize.cc
@@ -258,6 +266,21 @@ target_compile_options(biergarten-pipeline PRIVATE
 configure_file(
         ${CMAKE_SOURCE_DIR}/locations.json
         ${CMAKE_BINARY_DIR}/locations.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/personas.json
+        ${CMAKE_BINARY_DIR}/personas.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/forenames-by-country.json
+        ${CMAKE_BINARY_DIR}/forenames-by-country.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/surnames-by-country.json
+        ${CMAKE_BINARY_DIR}/surnames-by-country.json
         COPYONLY
 )
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

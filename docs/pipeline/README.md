@@ -1,8 +1,9 @@
 # Biergarten Pipeline
 
 A C++20 command-line pipeline that samples city records from local JSON,
-enriches each with Wikipedia context, and generates bilingual brewery names and
-descriptions via a local GGUF model or a deterministic mock.
+enriches each with Wikipedia context, and generates bilingual brewery names
+and descriptions plus locale-grounded user profiles via a local GGUF model or
+a deterministic mock.
 
 > **This pipeline produces AI-generated data.** It is not a source of truth for
 > brewing techniques, cultural representation, or local-language accuracy. See
@@ -45,6 +46,7 @@ step.
 | Beer reviews and ratings         | Stable brewery fixtures with enough context to anchor review pages |
 | Social follow relationships      | Repeatable brewery entities for feeds, follows, and saved lists    |
 | Geospatial brewery experiences   | Latitude, longitude, and country-level metadata                    |
+| User accounts and profiles       | Locale-grounded names, bios, and an auth-ready email/date-of-birth pair for seeding real accounts |
 
 ---
 
@@ -218,35 +220,46 @@ environment variables listed above to match your run.
 
 ### Pipeline Stages
 
-| Stage    | Implementation                                                                                                                          |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Load     | `JsonLoader::LoadLocations()` reads `locations.json` into typed `Location` records.                                                     |
-| Sample   | `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()` samples `--location-count` locations per run (default `10`).               |
-| Enrich   | `WikipediaEnrichmentService` fetches brewing and beer-related context. Keeps going when a lookup fails. `--mocked` runs use `MockEnrichmentService` instead and skip Wikipedia entirely. |
-| Generate | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language.                          |
-| Store    | `SqliteExportService` writes each successful brewery into a fresh dated `.sqlite` database with normalized location and brewery tables. |
-| Log      | `spdlog` writes results and warnings to the console.                                                                                    |
+| Stage           | Implementation                                                                                                                          |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Load            | `ICuratedDataService` (`CuratedJsonDataService`) reads `locations.json`, `personas.json`, `forenames-by-country.json`, and `surnames-by-country.json` (paths supplied via a `CuratedDataFilePaths` DTO at construction) into typed records, caching each after its first load. `--mocked` runs use `MockCuratedDataService`'s fixed in-memory dataset instead. |
+| Sample          | `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()` samples `--location-count` locations per run (default `10`).               |
+| Enrich          | `WikipediaEnrichmentService` fetches brewing and beer-related context. Keeps going when a lookup fails. `--mocked` runs use `MockEnrichmentService` instead and skip Wikipedia entirely. |
+| Generate Users  | `GenerateUsers()` samples a persona and a forename/surname pair per enriched city (skipping countries with no name data), then `MockGenerator` or `LlamaGenerator` produces a username, bio, and activity weight around the sampled name. |
+| Generate Breweries | `MockGenerator` or `LlamaGenerator` produces brewery names and descriptions in English and the local language.                       |
+| Store           | `SqliteExportService` writes each successful user and brewery into a fresh dated `.sqlite` database with normalized `locations`, `users`, and `breweries` tables. |
+| Log             | `spdlog` writes results and warnings to the console.                                                                                    |
 
-If enrichment or generation fails for a city, that city is skipped and the
-pipeline continues.
+If name sampling, enrichment, or generation fails for a city, that city is
+skipped and the pipeline continues. `GenerateUsers()` runs before
+`GenerateBreweries()` in `BiergartenPipelineOrchestrator::Run()`.
 
 ### Key Components
 
 - `src/main.cc` — argument parsing and Boost.DI composition root.
-- `JsonLoader` — validates curated location input.
+- `CuratedJsonDataService` — implements `ICuratedDataService`; takes a
+  `CuratedDataFilePaths` DTO (locations/personas/forenames/surnames paths) in
+  its constructor, then parses and validates curated location, persona, and
+  forename/surname JSON, memoizing each result after its first load on a
+  given instance. `MockCuratedDataService` is the in-memory substitute (4
+  fixed locations, 3 personas, and name data for `US`/`DE`/`FR`/`BE`) used in
+  `--mocked` runs.
 - `WikipediaEnrichmentService` — queries Wikipedia extracts, caches results,
   returns empty context on failure. `MockEnrichmentService` is the no-op
   substitute used in `--mocked` runs.
-- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output, retries
-  malformed responses up to three times with corrective feedback in the
-  retry prompt. The token budget is fixed across attempts; it is not raised
-  automatically on truncation.
-- `MockGenerator` — stable hash-based output so the same city input always
-  produces the same brewery.
-- `SqliteExportService` — creates a dated SQLite file per run and persists each
-  successful brewery into normalized tables.
+- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output for
+  both `GenerateBrewery` and `GenerateUser`, retries malformed responses up
+  to three times with corrective feedback in the retry prompt. The token
+  budget is fixed across attempts; it is not raised automatically on
+  truncation.
+- `MockGenerator` — stable hash-based output so the same city/persona/name
+  input always produces the same brewery or user.
+- `SqliteExportService` — creates a dated SQLite file per run and persists
+  each successful user and brewery into normalized tables.
 - Brewery payloads include English and local-language name and description
-  fields.
+  fields. User payloads carry a sampled first/last name and gender, an
+  LLM-generated username/bio/activity weight, and a programmatically
+  generated (not LLM-authored) unique email and date of birth.
 
 ### Runtime Behaviour
 
@@ -266,6 +279,18 @@ valid output on the first pass; the retry path is kept for resilience.
 `MockGenerator` uses stable hashes for repeatable output in demos and Storybook
 runs.
 
+`CuratedJsonDataService` memoizes each of `LoadLocations()`, `LoadPersonas()`,
+`LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
+first time each is called, since `BiergartenPipelineOrchestrator` owns a
+single `ICuratedDataService` instance for the whole run — later calls return
+the cached result instead of re-parsing. 
+
+`GenerateUsers()` samples a forename/surname pair per city via `SampleName()`,
+keyed by the city's ISO 3166-1 code. Countries present in `locations.json`
+but absent from either name fixture (currently `KE`, `SE`, `SG`, `TH`, `VN`,
+`ZA`) are skipped, the same way a failed enrichment or generation call skips
+a city — see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section.
+
 ### Process Flow - Activity Diagram
 
 ![An activity diagram](./diagrams/current/output/activity.svg)
@@ -278,9 +303,10 @@ runs.
 
 ## Generated Output
 
-Each successful run stores a `GeneratedBrewery` pair with the source location
-and a `BreweryResult` payload. The same generated records are also written to a
-fresh SQLite export file named with the current UTC timestamp.
+Each successful run stores a `BreweryRecord` pair with the source location
+and a `BreweryResult` payload, and a `UserRecord` pair with the source
+location and a `UserResult` payload. The same generated records are also
+written to a fresh SQLite export file named with the current UTC timestamp.
 
 | Field               | Meaning                                    |
 | ------------------- | ------------------------------------------ |
@@ -288,6 +314,17 @@ fresh SQLite export file named with the current UTC timestamp.
 | `description_en`    | Brewery description in English.            |
 | `name_local`        | Brewery name in the local language.        |
 | `description_local` | Brewery description in the local language. |
+
+| Field             | Meaning                                                          |
+| ----------------- | ----------------------------------------------------------------- |
+| `first_name`      | Sampled forename, copied from the curated name data (not LLM-invented). |
+| `last_name`       | Sampled surname, copied from the curated name data (not LLM-invented).  |
+| `gender`          | Gender associated with the sampled forename in the source dataset. |
+| `username`        | LLM-generated handle.                                            |
+| `bio`             | LLM-generated short biography.                                   |
+| `activity_weight` | Relative check-in/activity weight, reserved for a future J-curve activity profile. |
+| `email`           | Unique `@thebiergarten.app` address, generated programmatically from the sampled name. |
+| `date_of_birth`   | Randomized date of birth (age 19-48), generated programmatically. |
 
 The log dump also includes city, country, state or province, ISO subdivision
 code, latitude, and longitude for each entry.
@@ -367,11 +404,17 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 ## Fixture Strategy
 
 - `--mocked` for stable fixtures, repeatable screenshots, and Storybook runs.
+  `MockCuratedDataService` swaps in for `CuratedJsonDataService`, so no
+  fixture files need to be present on disk.
 - `--model` when geographically grounded content matters for demos.
 - Keep `locations.json` structured enough to support discovery and future
   filtering.
-- Treat SQLite output as seed material for the app's brewery domain, not
-  production data.
+- `personas.json`, `forenames-by-country.json`, and
+  `surnames-by-country.json` are curated/vendored fixture data, not
+  LLM-generated — see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset
+  section for provenance.
+- Treat SQLite output as seed material for the app's brewery and user
+  domains, not production data.
 
 ---
 
@@ -382,6 +425,9 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 | `tooling/pipeline/includes/`           | Public headers and shared models.                  |
 | `tooling/pipeline/src/`                | Implementation files.                              |
 | `tooling/pipeline/locations.json`      | Curated city input copied into the build tree.     |
+| `tooling/pipeline/personas.json`       | Curated user persona archetypes copied into the build tree. |
+| `tooling/pipeline/forenames-by-country.json` | Vendored (CC0) forename data by ISO 3166-1 country code. |
+| `tooling/pipeline/surnames-by-country.json`  | Vendored (CC0) surname data by ISO 3166-1 country code. |
 | `tooling/pipeline/prompts/`            | System prompts used by the model-backed path.      |
 | `tooling/pipeline/runpod/`             | Dockerfile, launcher, and RunPod pod template.      |
 | `docs/pipeline/diagrams/`              | Architecture and pipeline diagrams.                |
@@ -396,6 +442,9 @@ Paths below are relative to `tooling/pipeline/`.
 - `src/main.cc` — argument parsing and DI composition root.
 - `src/biergarten_pipeline_orchestrator/` — orchestration, sampling, logging,
   and export.
+- `src/services/curated_data/` — `CuratedJsonDataService`, the file-backed
+  `ICuratedDataService`, and `MockCuratedDataService`, the in-memory
+  `ICuratedDataService` used in `--mocked` runs.
 - `src/services/enrichment/wikipedia/` — enrichment service and cache.
 - `src/services/sqlite/` — SQLite export implementation.
 - `src/data_generation/llama/` — local inference, prompt loading, output
@@ -407,11 +456,12 @@ Paths below are relative to `tooling/pipeline/`.
 
 ## Next Steps
 
-The pipeline currently produces city-aware brewery records and dated SQLite
-exports. The next passes add additional fixture types so the app can exercise
-the full brewery domain without live data. For the detailed engineering
-breakdown of what's needed to reach the architecture in
-[`diagrams/planned/`](./diagrams/planned/), see [ROADMAP.md](./ROADMAP.md).
+The pipeline currently produces city-aware brewery and user records and
+dated SQLite exports. The next passes add additional fixture types so the
+app can exercise the full brewery and social domains without live data. For
+the detailed engineering breakdown of what's needed to reach the
+architecture in [`diagrams/planned/`](./diagrams/planned/), see
+[ROADMAP.md](./ROADMAP.md).
 
 ### Testing — Very High Priority
 
@@ -432,12 +482,6 @@ breakdown of what's needed to reach the architecture in
 Generate catalog entries with style, ABV, IBU, color, aroma notes, and food
 pairing hints. Link beers back to breweries and cities. Keep style coverage wide
 enough to exercise search, sort, and category filters.
-
-### User Generation
-
-Generate user profiles with stable names, bios, locale hints, and preference
-signals. Include stable IDs for downstream fixture joins. Keep output
-deterministic for screenshots while allowing larger randomized batches.
 
 ### Check-In System
 

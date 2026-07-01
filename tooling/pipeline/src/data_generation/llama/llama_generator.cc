@@ -11,8 +11,9 @@
 #include <stdexcept>
 #include <string>
 
+#include <llama.h>
+
 #include "data_model/models.h"
-#include "llama.h"
 
 static constexpr uint32_t kMaxContextSize = 32768U;
 
