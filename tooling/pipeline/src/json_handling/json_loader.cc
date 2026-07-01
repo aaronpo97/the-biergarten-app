@@ -106,8 +106,12 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
 
 }  // namespace
 
-std::vector<Location> JsonLoader::LoadLocations(
+const std::vector<Location>& JsonLoader::LoadLocations(
     const std::filesystem::path& filepath) {
+  if (!cache_.locations.empty()) {
+    return cache_.locations;
+  }
+
   const boost::json::value root = ParseJsonFile(filepath, "locations");
 
   if (!root.is_array()) {
@@ -137,11 +141,16 @@ std::vector<Location> JsonLoader::LoadLocations(
         .longitude = ReadRequiredNumber(object, "longitude"),
     });
   }
-  return locations;
+  cache_.locations = std::move(locations);
+  return cache_.locations;
 }
 
-std::vector<UserPersona> JsonLoader::LoadPersonas(
+const std::vector<UserPersona>& JsonLoader::LoadPersonas(
     const std::filesystem::path& filepath) {
+  if (!cache_.personas.empty()) {
+    return cache_.personas;
+  }
+
   const boost::json::value root = ParseJsonFile(filepath, "personas");
 
   if (!root.is_array()) {
@@ -167,30 +176,30 @@ std::vector<UserPersona> JsonLoader::LoadPersonas(
     });
   }
 
-  return personas;
+  cache_.personas = std::move(personas);
+  return cache_.personas;
 }
 
-NamesByCountry JsonLoader::LoadNamesByCountry(
-    const std::filesystem::path& forenames_filepath,
-    const std::filesystem::path& surnames_filepath) {
-  const boost::json::value forenames_root =
-      ParseJsonFile(forenames_filepath, "forenames-by-country");
-  const boost::json::value surnames_root =
-      ParseJsonFile(surnames_filepath, "surnames-by-country");
+const std::unordered_map<std::string, forename_list>& JsonLoader::
+LoadForenamesByCountry(const std::filesystem::path& filepath) {
+  if (!cache_.forenames_by_country.empty()) {
+    return cache_.forenames_by_country;
+  }
 
-  if (!forenames_root.is_object() || !surnames_root.is_object()) {
+  const boost::json::value root = ParseJsonFile(filepath, "forenames-by-country");
+
+  if (!root.is_object()) {
     throw std::runtime_error(
-        "Invalid names-by-country JSON: root element must be an object "
+        "Invalid forenames-by-country JSON: root element must be an object "
         "keyed by ISO 3166-1 country code");
   }
 
-  std::unordered_map<std::string, std::vector<ForenameEntry>>
-      forenames_by_country;
-  for (const auto& [country_code, regions] : forenames_root.as_object()) {
+  std::unordered_map<std::string, forename_list> forenames_by_country;
+  for (const auto& [country_code, regions] : root.as_object()) {
     if (!regions.is_array()) {
       continue;
     }
-    std::vector<ForenameEntry> entries;
+    forename_list entries;
     for (const auto& region : regions.as_array()) {
       if (!region.is_object()) {
         continue;
@@ -204,7 +213,7 @@ NamesByCountry JsonLoader::LoadNamesByCountry(
           continue;
         }
         const auto& name_object = name_value.as_object();
-        entries.push_back(ForenameEntry{
+        entries.insert(ForenameEntry{
             .name =
                 ReadFirstOfStringArray(name_object, "romanized", "localized"),
             .gender = ReadRequiredString(name_object, "gender"),
@@ -214,22 +223,40 @@ NamesByCountry JsonLoader::LoadNamesByCountry(
     forenames_by_country.emplace(country_code, std::move(entries));
   }
 
-  std::unordered_map<std::string, std::vector<std::string>> surnames_by_country;
-  for (const auto& [country_code, name_entries] : surnames_root.as_object()) {
+  cache_.forenames_by_country = std::move(forenames_by_country);
+  return cache_.forenames_by_country;
+}
+
+const std::unordered_map<std::string, surname_list>&
+JsonLoader::LoadSurnamesByCountry(const std::filesystem::path& filepath) {
+  if (!cache_.surnames_by_country.empty()) {
+    return cache_.surnames_by_country;
+  }
+
+  const boost::json::value root = ParseJsonFile(filepath, "surnames-by-country");
+
+  if (!root.is_object()) {
+    throw std::runtime_error(
+        "Invalid surnames-by-country JSON: root element must be an object "
+        "keyed by ISO 3166-1 country code");
+  }
+
+  std::unordered_map<std::string, surname_list> surnames_by_country;
+  for (const auto& [country_code, name_entries] : root.as_object()) {
     if (!name_entries.is_array()) {
       continue;
     }
-    std::vector<std::string> surnames;
+    surname_list surnames;
     for (const auto& name_value : name_entries.as_array()) {
       if (!name_value.is_object()) {
         continue;
       }
-      surnames.push_back(ReadFirstOfStringArray(name_value.as_object(),
-                                                "romanized", "localized"));
+      surnames.insert(ReadFirstOfStringArray(name_value.as_object(),
+                                             "romanized", "localized"));
     }
     surnames_by_country.emplace(country_code, std::move(surnames));
   }
 
-  return NamesByCountry(std::move(forenames_by_country),
-                        std::move(surnames_by_country));
+  cache_.surnames_by_country = std::move(surnames_by_country);
+  return cache_.surnames_by_country;
 }

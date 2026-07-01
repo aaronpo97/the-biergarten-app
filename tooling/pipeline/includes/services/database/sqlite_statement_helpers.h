@@ -147,13 +147,13 @@ SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
 void ResetStatement(SqliteStatementHandle& statement);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<std::string_view>& param);
+          const BoundParam<std::string_view>& param);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<double>& param);
+          const BoundParam<double>& param);
 
 void Bind(const SqliteStatementHandle& statement,
-          const BindParam<sqlite3_int64>& param);
+          const BoundParam<sqlite3_int64>& param);
 
 void StepStatement(const SqliteDatabaseHandle& db_handle,
                    const SqliteStatementHandle& statement,

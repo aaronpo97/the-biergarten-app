@@ -35,21 +35,23 @@ class JsonLoader final : public ICuratedDataService {
   /**
    * @brief Parses a JSON array file and returns all location records.
    */
-  std::vector<Location> LoadLocations(const std::filesystem::path&) override;
+  const std::vector<Location>& LoadLocations(
+      const std::filesystem::path&) override;
 
   /**
    * @brief Parses a JSON array file and returns all persona records.
    */
-  std::vector<UserPersona> LoadPersonas(const std::filesystem::path&) override;
-
-  std::unordered_map<std::string, forename_list> LoadForenamesByCountry(
+  const std::vector<UserPersona>& LoadPersonas(
       const std::filesystem::path&) override;
+
+  const std::unordered_map<std::string, forename_list>&
+  LoadForenamesByCountry(const std::filesystem::path&) override;
 
   /**
    * @brief Parses a JSON file and returns all the forenames per country.
    */
-  std::unordered_map<std::string, surname_list> LoadSurnamesByCountry(
-      const std::filesystem::path&) override;
+  const std::unordered_map<std::string, surname_list>&
+  LoadSurnamesByCountry(const std::filesystem::path&) override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_

@@ -109,7 +109,7 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
                 .phase = PipelinePhase::UserGeneration,
                 .message = "=== SAMPLE USER GENERATION ==="});
 
-  const std::vector<UserPersona> personas =
+  const std::vector<UserPersona>& personas =
       curated_data_service_->LoadPersonas("personas.json");
 
   if (personas.empty()) {
@@ -117,10 +117,9 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
         "No personas available in personas.json for user generation");
   }
 
-  const std::unordered_map<std::string, forename_list> forenames_by_country =
-      curated_data_service_->LoadForenamesByCountry(
-          "forenames-by-country.json");
-  const std::unordered_map<std::string, surname_list> surnames_by_country =
+  const std::unordered_map<std::string, forename_list>& forenames_by_country =
+      curated_data_service_->LoadForenamesByCountry("forenames-by-country.json");
+  const std::unordered_map<std::string, surname_list>& surnames_by_country =
       curated_data_service_->LoadSurnamesByCountry("surnames-by-country.json");
 
   std::mt19937 rng(std::random_device{}());

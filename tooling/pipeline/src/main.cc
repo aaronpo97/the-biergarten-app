@@ -86,7 +86,22 @@ int main(const int argc, char** argv) {
         di::bind<ApplicationOptions>().to(options),
         di::bind<std::string>().to(model_path),
         di::bind<IExportService>().to<SqliteExportService>(),
-        di::bind<ICuratedDataService>().to<JsonLoader>(),
+        di::bind<ICuratedDataService>().to(
+            [options, &log_producer]() -> std::unique_ptr<ICuratedDataService> {
+              if (options.generator.use_mocked) {
+                log_producer->Log({.level = LogLevel::Info,
+                                   .phase = PipelinePhase::Startup,
+                                   .message = "Curated data: mock"});
+
+                return std::make_unique<MockCuratedDataService>();
+              }
+
+              log_producer->Log({.level = LogLevel::Info,
+                                 .phase = PipelinePhase::Startup,
+                                 .message = "Curated data: JsonLoader"});
+
+              return std::make_unique<JsonLoader>();
+            }),
         di::bind<IPromptFormatter>().to([options, log_producer] {
           if (options.generator.use_mocked) {
             {

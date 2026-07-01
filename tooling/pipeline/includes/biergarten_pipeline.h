@@ -35,6 +35,7 @@
 
 // --- services: curated_data ---
 #include "services/curated_data/curated_data_service.h"
+#include "services/curated_data/mock_curated_data_service.h"
 
 // --- services: database ---
 #include "services/database/export_service.h"

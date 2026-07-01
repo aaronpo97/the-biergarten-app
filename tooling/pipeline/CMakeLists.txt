@@ -139,6 +139,7 @@ FetchContent_MakeAvailable(cpp-httplib)
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME}
         includes/services/enrichment/mock_enrichment.h
+        includes/services/curated_data/mock_curated_data_service.h
         includes/json_handling/pretty_print.h)
 
 # --- Entry point ---
@@ -149,6 +150,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 # --- json_handling ---
 target_sources(${PROJECT_NAME} PRIVATE
         src/json_handling/json_loader.cc
+)
+
+# --- services: curated_data ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/curated_data/mock_curated_data_service.cc
 )
 
 # --- application_options ---
