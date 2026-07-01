@@ -14,8 +14,8 @@
 #include <string_view>
 #include <unordered_set>
 
-#include "biergarten_pipeline_orchestrator.h"
 #include "../../includes/services/curated_data/curated_json_data_service.h"
+#include "biergarten_pipeline_orchestrator.h"
 #include "services/logging/logger.h"
 
 namespace {
@@ -71,10 +71,10 @@ std::string GenerateDateOfBirth(std::mt19937& rng) {
                      static_cast<unsigned>(birth_ymd.day()));
 }
 
-std::optional<Name> SampleName(const ForenamesByCountryMap& forenames_by_country,
-                               const SurnamesByCountryMap& surnames_by_country,
-                               const std::string& iso3166_1,
-                               std::mt19937& rng) {
+std::optional<Name> SampleName(
+    const ForenamesByCountryMap& forenames_by_country,
+    const SurnamesByCountryMap& surnames_by_country,
+    const std::string& iso3166_1, std::mt19937& rng) {
   const auto forenames_it = forenames_by_country.find(iso3166_1);
   const auto surnames_it = surnames_by_country.find(iso3166_1);
 

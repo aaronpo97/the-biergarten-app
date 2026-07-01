@@ -30,17 +30,16 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
   const std::string system_prompt = prompt_directory_->Load("USER_GENERATION");
 
   std::string user_prompt = std::format(
-    "## NAME:\n\n{} {}\n\n"
-    "## GENDER:\n\n{}\n\n"
-    "## CITY:\n\n{}\n\n"
-    "## COUNTRY:\n\n{}\n\n"
-    "## PERSONA:\n\n{}\n\n"
-    "## PERSONA DESCRIPTION:\n\n{}\n\n"
-    "## STYLE AFFINITIES:\n\n{}",
-    name.first_name, name.last_name, name.gender,
-    city.location.city, city.location.country,
-    persona.name, persona.description,
-    style_affinities);
+      "## NAME:\n\n{} {}\n\n"
+      "## GENDER:\n\n{}\n\n"
+      "## CITY:\n\n{}\n\n"
+      "## COUNTRY:\n\n{}\n\n"
+      "## PERSONA:\n\n{}\n\n"
+      "## PERSONA DESCRIPTION:\n\n{}\n\n"
+      "## STYLE AFFINITIES:\n\n{}",
+      name.first_name, name.last_name, name.gender, city.location.city,
+      city.location.country, persona.name, persona.description,
+      style_affinities);
 
   const std::string retry_context = std::format(
       "Name: {} {}\nCity: {}, {}\nPersona: {}", name.first_name, name.last_name,

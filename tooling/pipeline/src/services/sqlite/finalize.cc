@@ -3,10 +3,9 @@
  * @brief SqliteExportService::Finalize() implementation.
  */
 
-#include "stdexcept"
-
 #include "services/database/sqlite_export_service.h"
 #include "services/database/sqlite_export_service_helpers.h"
+#include "stdexcept"
 
 void SqliteExportService::Finalize() {
   if (db_handle_ == nullptr) {

@@ -87,9 +87,7 @@ const LocationsList& MockCuratedDataService::LoadLocations() {
   return locations_;
 }
 
-const PersonasList& MockCuratedDataService::LoadPersonas() {
-  return personas_;
-}
+const PersonasList& MockCuratedDataService::LoadPersonas() { return personas_; }
 
 const ForenamesByCountryMap& MockCuratedDataService::LoadForenamesByCountry() {
   return forenames_by_country_;

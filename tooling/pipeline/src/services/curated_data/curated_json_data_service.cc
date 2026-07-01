@@ -246,8 +246,7 @@ const SurnamesByCountryMap& CuratedJsonDataService::LoadSurnamesByCountry() {
 
   SurnamesByCountryMap surnames_by_country;
   for (const auto& [country_code, name_entries] : root.as_object()) {
-    if (!name_entries.is_array())
-      continue;
+    if (!name_entries.is_array()) continue;
 
     SurnameList surnames;
     for (const auto& name_value : name_entries.as_array()) {
@@ -255,7 +254,7 @@ const SurnamesByCountryMap& CuratedJsonDataService::LoadSurnamesByCountry() {
         continue;
       }
       surnames.emplace_back(ReadFirstOfStringArray(name_value.as_object(),
-                                             "romanized", "localized"));
+                                                   "romanized", "localized"));
     }
     surnames_by_country.emplace(country_code, std::move(surnames));
   }
