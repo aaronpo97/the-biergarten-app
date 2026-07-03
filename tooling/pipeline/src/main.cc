@@ -174,6 +174,14 @@ int main(const int argc, char** argv) {
                 return std::make_unique<MockGenerator>();
               }
 
+#ifdef BIERGARTEN_MOCK_ONLY
+              // Unreachable: ParseArguments requires --mocked when
+              // BIERGARTEN_MOCK_ONLY is compiled in, so LlamaGenerator is
+              // never constructed and is not linked into this binary.
+              throw std::runtime_error(
+                  "LlamaGenerator is unavailable in a BIERGARTEN_MOCK_ONLY "
+                  "build");
+#else
               log_producer->Log(
                   {.level = LogLevel::Info,
                    .phase = PipelinePhase::Startup,
@@ -187,6 +195,7 @@ int main(const int argc, char** argv) {
                   options, model_path, log_producer,
                   inj.template create<std::unique_ptr<IPromptFormatter>>(),
                   std::move(prompt_directory));
+#endif
             }));
 
     const auto orchestrator =
