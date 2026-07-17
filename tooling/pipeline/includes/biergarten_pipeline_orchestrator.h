@@ -87,7 +87,7 @@ class BiergartenPipelineOrchestrator {
    * @return Vector of locations randomly sampled per
    * PipelineOptions::location_count.
    */
-  std::vector<Location> QueryCitiesWithCountries();
+  std::vector<Location> QueryLocations();
 
   /**
    * @brief Generate breweries for enriched cities.

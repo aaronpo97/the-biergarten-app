@@ -15,7 +15,7 @@
 #include "services/logging/logger.h"
 
 std::vector<Location>
-BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
+BiergartenPipelineOrchestrator::QueryLocations() {
   logger_->Log({.level = LogLevel::Info,
                 .phase = PipelinePhase::Startup,
                 .message = "=== GEOGRAPHIC DATA OVERVIEW ==="});

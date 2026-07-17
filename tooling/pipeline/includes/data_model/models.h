@@ -31,6 +31,7 @@ namespace prog_opts = boost::program_options;
 struct Location {
   std::string city{};
   std::string state_province{};
+  std::string postal_code{};
 
   /**
    * @brief ISO 3166-2 subdivision code.

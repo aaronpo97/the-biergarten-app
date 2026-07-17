@@ -14,7 +14,7 @@ bool BiergartenPipelineOrchestrator::Run() {
   try {
     exporter_->Initialize();
 
-    std::vector<Location> cities = QueryCitiesWithCountries();
+    std::vector<Location> cities = QueryLocations();
     std::vector<EnrichedCity> enriched;
     enriched.reserve(cities.size());
 
