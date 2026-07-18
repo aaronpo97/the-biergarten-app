@@ -11,7 +11,8 @@
 #include "data_generation/mock_generator.h"
 
 BreweryResult MockGenerator::GenerateBrewery(
-    const Location& location, const std::string& /*region_context*/) {
+    const EnrichedCity& enriched_city) {
+  const City& location = enriched_city.location;
   const size_t hash = DeterministicHash(location);
 
   const std::string_view adjective =

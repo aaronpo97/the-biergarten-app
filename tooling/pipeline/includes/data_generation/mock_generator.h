@@ -20,20 +20,15 @@ class MockGenerator final : public DataGenerator {
   /**
    * @brief Generates deterministic brewery data for a location.
    *
-   * @param location City and country names.
-   * @param region_context Unused for mock generation.
+   * @param enriched_city
    * @return Generated brewery result.
    */
-  BreweryResult GenerateBrewery(const Location& location,
-                                const std::string& region_context) override;
 
+  BreweryResult GenerateBrewery(const EnrichedCity& enriched_city) override;
   /**
    * @brief Generates deterministic user data grounded in a sampled name and
    * persona.
-   *
-   * @param city Enriched city the user is associated with.
-   * @param persona Persona archetype.
-   * @param name Sampled first/last name, copied directly into the result.
+
    * @return Generated user result.
    */
   UserResult GenerateUser(const EnrichedCity& city, const UserPersona& persona,

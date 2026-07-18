@@ -36,7 +36,9 @@ static std::string FormatLocalLanguageCodes(
 static constexpr int kBreweryInitialMaxTokens = 2800;
 
 BreweryResult LlamaGenerator::GenerateBrewery(
-    const Location& location, const std::string& region_context) {
+    const EnrichedCity& enriched_city) {
+  const City& location = enriched_city.location;
+  const std::string& region_context = enriched_city.region_context;
   /**
    * Preprocess and truncate region context to manageable size
    */

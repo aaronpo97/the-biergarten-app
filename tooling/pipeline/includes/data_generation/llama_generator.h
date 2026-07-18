@@ -55,8 +55,7 @@ class LlamaGenerator final : public DataGenerator {
    * @param region_context Additional regional context.
    * @return Generated brewery result.
    */
-  BreweryResult GenerateBrewery(const Location& location,
-                                const std::string& region_context) override;
+  BreweryResult GenerateBrewery(const EnrichedCity&) override;
 
   /**
    * @brief Generates a user profile grounded in a sampled name and persona.
