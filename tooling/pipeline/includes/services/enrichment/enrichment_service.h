@@ -20,10 +20,10 @@ class IEnrichmentService {
   /**
    * @brief Resolves contextual enrichment for a location.
    *
-   * @param loc Location to enrich.
+   * @param loc City to enrich.
    * @return Context text, or an empty string if unavailable.
    */
-  virtual std::string GetLocationContext(const Location& loc) = 0;
+  virtual std::string GetLocationContext(const City& loc) = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_ENRICHMENT_SERVICE_H_

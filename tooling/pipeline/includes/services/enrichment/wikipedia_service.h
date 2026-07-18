@@ -29,7 +29,7 @@ class WikipediaEnrichmentService final : public IEnrichmentService {
   /**
    * @brief Returns the Wikipedia-derived context for a location.
    */
-  [[nodiscard]] std::string GetLocationContext(const Location& loc) override;
+  [[nodiscard]] std::string GetLocationContext(const City& loc) override;
 
  private:
   std::string FetchExtract(std::string_view query);

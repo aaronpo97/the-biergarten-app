@@ -51,7 +51,7 @@ class LlamaGenerator final : public DataGenerator {
   /**
    * @brief Generates brewery data for a specific location.
    *
-   * @param location Location object.
+   * @param location City object.
    * @param region_context Additional regional context.
    * @return Generated brewery result.
    */

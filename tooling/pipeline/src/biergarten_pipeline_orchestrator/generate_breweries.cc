@@ -51,13 +51,13 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
       exporter_->ProcessRecord(record);
     } catch (const std::exception& export_exception) {
       ++export_failed_count;
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::BreweryAndBeerGeneration,
-           .message = std::format("[Pipeline] Generated brewery for '{}' ({}) "
-                                  "but SQLite export failed: {}",
-                                  record.location.city, record.location.country,
-                                  export_exception.what())});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::BreweryAndBeerGeneration,
+                    .message = std::format(
+                        "[Pipeline] Generated brewery for '{}' ({}) "
+                        "but SQLite export failed: {}",
+                        record.address.city.city, record.address.city.country,
+                        export_exception.what())});
     }
   };
 

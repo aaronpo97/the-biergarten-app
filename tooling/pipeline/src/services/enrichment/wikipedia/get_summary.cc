@@ -11,7 +11,7 @@
 #include "services/enrichment/wikipedia_service.h"
 
 std::string WikipediaEnrichmentService::GetLocationContext(
-    const Location& loc) {
+    const City& loc) {
   using namespace std::literals::chrono_literals;
   if (!this->client_) {
     if (logger_) {

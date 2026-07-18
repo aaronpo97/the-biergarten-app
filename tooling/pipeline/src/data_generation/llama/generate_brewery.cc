@@ -68,7 +68,7 @@ BreweryResult LlamaGenerator::GenerateBrewery(
    * Store location context for retry prompts (without repeating full context)
    */
   const std::string retry_location =
-      std::format("Location: {}{}\nLocal language codes: {}", location.city,
+      std::format("City: {}{}\nLocal language codes: {}", location.city,
                   country_suffix, local_language_codes);
 
   /**

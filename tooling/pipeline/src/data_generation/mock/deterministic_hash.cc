@@ -8,14 +8,14 @@
 
 #include "data_generation/mock_generator.h"
 
-size_t MockGenerator::DeterministicHash(const Location& location) {
+size_t MockGenerator::DeterministicHash(const City& location) {
   size_t seed = 0;
   boost::hash_combine(seed, location.city);
   boost::hash_combine(seed, location.country);
   return seed;
 }
 
-size_t MockGenerator::DeterministicHash(const Location& location,
+size_t MockGenerator::DeterministicHash(const City& location,
                                         const UserPersona& persona,
                                         const Name& name) {
   size_t seed = DeterministicHash(location);

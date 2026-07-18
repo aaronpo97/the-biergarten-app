@@ -15,7 +15,7 @@
 
 using ForenameList = std::vector<ForenameEntry>;
 using SurnameList = std::vector<std::string>;
-using LocationsList = std::vector<Location>;
+using LocationsList = std::vector<City>;
 using PersonasList = std::vector<UserPersona>;
 using ForenamesByCountryMap = std::unordered_map<std::string, ForenameList>;
 using SurnamesByCountryMap = std::unordered_map<std::string, SurnameList>;

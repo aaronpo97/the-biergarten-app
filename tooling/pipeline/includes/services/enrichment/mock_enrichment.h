@@ -15,7 +15,7 @@
  */
 class MockEnrichmentService final : public IEnrichmentService {
  public:
-  std::string GetLocationContext(const Location& /*loc*/) override {
+  std::string GetLocationContext(const City& /*loc*/) override {
     return {};
   }
 };

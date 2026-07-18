@@ -17,9 +17,9 @@
 
 namespace sqlite_export_service_internal {
 
-inline constexpr std::string_view kCreateLocationsTableSql = R"sql(
+inline constexpr std::string_view kCreateCitiesTableSql = R"sql(
 
-CREATE TABLE IF NOT EXISTS locations (
+CREATE TABLE IF NOT EXISTS cities (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   city TEXT NOT NULL,
   state_province TEXT NOT NULL,
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS locations (
   country TEXT NOT NULL,
   iso3166_1 TEXT NOT NULL,
   local_languages_json TEXT NOT NULL,
-  latitude REAL NOT NULL,
-  longitude REAL NOT NULL,
-  UNIQUE(city, state_province, iso3166_2, country, latitude, longitude)
+  postal_code_country_format_regex TEXT NOT NULL,
+  postal_code_city_regex_json TEXT NOT NULL,
+  UNIQUE(city, state_province, iso3166_2, country)
 );
 
 )sql";
@@ -38,15 +38,29 @@ inline constexpr std::string_view kCreateBreweriesTableSql = R"sql(
 
 CREATE TABLE IF NOT EXISTS breweries (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  location_id INTEGER NOT NULL,
   name_en TEXT NOT NULL,
   description_en TEXT NOT NULL,
   name_local TEXT NOT NULL,
-  description_local TEXT NOT NULL,
-  FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE CASCADE
+  description_local TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_breweries_location_id ON breweries(location_id);
+)sql";
+
+inline constexpr std::string_view kCreateBreweryAddressesTableSql = R"sql(
+
+CREATE TABLE IF NOT EXISTS brewery_addresses (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  brewery_id INTEGER NOT NULL,
+  city_id INTEGER NOT NULL,
+  postal_code TEXT NOT NULL,
+  FOREIGN KEY(brewery_id) REFERENCES breweries(id) ON DELETE CASCADE,
+  FOREIGN KEY(city_id) REFERENCES cities(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_brewery_addresses_brewery_id
+  ON brewery_addresses(brewery_id);
+CREATE INDEX IF NOT EXISTS idx_brewery_addresses_city_id
+  ON brewery_addresses(city_id);
 
 )sql";
 
@@ -54,7 +68,6 @@ inline constexpr std::string_view kCreateUsersTableSql = R"sql(
 
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  location_id INTEGER NOT NULL,
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   gender TEXT NOT NULL,
@@ -62,40 +75,61 @@ CREATE TABLE IF NOT EXISTS users (
   bio TEXT NOT NULL,
   activity_weight REAL NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  date_of_birth TEXT NOT NULL,
-  FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE CASCADE
+  date_of_birth TEXT NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS idx_users_location_id ON users(location_id);
 
 )sql";
 
-inline constexpr std::string_view kInsertLocationSql = R"sql(
-INSERT INTO locations (
+inline constexpr std::string_view kCreateUserAddressesTableSql = R"sql(
+
+CREATE TABLE IF NOT EXISTS user_addresses (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  city_id INTEGER NOT NULL,
+  postal_code TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(city_id) REFERENCES cities(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_addresses_user_id
+  ON user_addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_city_id
+  ON user_addresses(city_id);
+
+)sql";
+
+inline constexpr std::string_view kInsertCitySql = R"sql(
+INSERT INTO cities (
   city,
   state_province,
   iso3166_2,
   country,
   iso3166_1,
   local_languages_json,
-  latitude,
-  longitude
+  postal_code_country_format_regex,
+  postal_code_city_regex_json
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 )sql";
 
 inline constexpr std::string_view kInsertBrewerySql = R"sql(
 INSERT INTO breweries (
-  location_id,
   name_en,
   description_en,
   name_local,
   description_local
-) VALUES (?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?);
+)sql";
+
+inline constexpr std::string_view kInsertBreweryAddressSql = R"sql(
+INSERT INTO brewery_addresses (
+  brewery_id,
+  city_id,
+  postal_code
+) VALUES (?, ?, ?);
 )sql";
 
 inline constexpr std::string_view kInsertUserSql = R"sql(
 INSERT INTO users (
-  location_id,
   first_name,
   last_name,
   gender,
@@ -104,33 +138,45 @@ INSERT INTO users (
   activity_weight,
   email,
   date_of_birth
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+)sql";
+
+inline constexpr std::string_view kInsertUserAddressSql = R"sql(
+INSERT INTO user_addresses (
+  user_id,
+  city_id,
+  postal_code
+) VALUES (?, ?, ?);
 )sql";
 
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
 // placeholder order in the SQL above.
-enum LocationBindIndex {
-  kLocationCityBindIndex = 1,
-  kLocationStateProvinceBindIndex,
-  kLocationIso31662BindIndex,
-  kLocationCountryBindIndex,
-  kLocationIso31661BindIndex,
-  kLocationLanguagesBindIndex,
-  kLocationLatitudeBindIndex,
-  kLocationLongitudeBindIndex,
+enum CityBindIndex {
+  kCityCityBindIndex = 1,
+  kCityStateProvinceBindIndex,
+  kCityIso31662BindIndex,
+  kCityCountryBindIndex,
+  kCityIso31661BindIndex,
+  kCityLanguagesBindIndex,
+  kCityPostalCodeCountryFormatRegexBindIndex,
+  kCityPostalCodeCityRegexJsonBindIndex,
 };
 
 enum BreweryBindIndex {
-  kBreweryLocationIdBindIndex = 1,
-  kBreweryEnglishNameBindIndex,
+  kBreweryEnglishNameBindIndex = 1,
   kBreweryEnglishDescriptionBindIndex,
   kBreweryLocalNameBindIndex,
   kBreweryLocalDescriptionBindIndex,
 };
 
+enum BreweryAddressBindIndex {
+  kBreweryAddressBreweryIdBindIndex = 1,
+  kBreweryAddressCityIdBindIndex,
+  kBreweryAddressPostalCodeBindIndex,
+};
+
 enum UserBindIndex {
-  kUserLocationIdBindIndex = 1,
-  kUserFirstNameBindIndex,
+  kUserFirstNameBindIndex = 1,
   kUserLastNameBindIndex,
   kUserGenderBindIndex,
   kUserUsernameBindIndex,
@@ -138,6 +184,12 @@ enum UserBindIndex {
   kUserActivityWeightBindIndex,
   kUserEmailBindIndex,
   kUserDateOfBirthBindIndex,
+};
+
+enum UserAddressBindIndex {
+  kUserAddressUserIdBindIndex = 1,
+  kUserAddressCityIdBindIndex,
+  kUserAddressPostalCodeBindIndex,
 };
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,

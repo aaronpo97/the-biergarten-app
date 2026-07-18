@@ -28,26 +28,40 @@ std::filesystem::path SqliteExportService::BuildDatabasePath() const {
 
 void SqliteExportService::InitializeSchema() const {
   sqlite_export_service_internal::ExecSql(
-      db_handle_, sqlite_export_service_internal::kCreateLocationsTableSql,
-      "Failed to create SQLite locations table");
+      db_handle_, sqlite_export_service_internal::kCreateCitiesTableSql,
+      "Failed to create SQLite cities table");
   sqlite_export_service_internal::ExecSql(
       db_handle_, sqlite_export_service_internal::kCreateBreweriesTableSql,
       "Failed to create SQLite breweries table");
   sqlite_export_service_internal::ExecSql(
+      db_handle_,
+      sqlite_export_service_internal::kCreateBreweryAddressesTableSql,
+      "Failed to create SQLite brewery_addresses table");
+  sqlite_export_service_internal::ExecSql(
       db_handle_, sqlite_export_service_internal::kCreateUsersTableSql,
       "Failed to create SQLite users table");
+  sqlite_export_service_internal::ExecSql(
+      db_handle_, sqlite_export_service_internal::kCreateUserAddressesTableSql,
+      "Failed to create SQLite user_addresses table");
 }
 
 void SqliteExportService::PrepareStatements() {
-  insert_location_stmt_ = sqlite_export_service_internal::PrepareStatement(
-      db_handle_, sqlite_export_service_internal::kInsertLocationSql,
-      "Failed to prepare SQLite location insert statement");
+  insert_city_stmt_ = sqlite_export_service_internal::PrepareStatement(
+      db_handle_, sqlite_export_service_internal::kInsertCitySql,
+      "Failed to prepare SQLite city insert statement");
   insert_brewery_stmt_ = sqlite_export_service_internal::PrepareStatement(
       db_handle_, sqlite_export_service_internal::kInsertBrewerySql,
       "Failed to prepare SQLite brewery insert statement");
+  insert_brewery_address_stmt_ =
+      sqlite_export_service_internal::PrepareStatement(
+          db_handle_, sqlite_export_service_internal::kInsertBreweryAddressSql,
+          "Failed to prepare SQLite brewery address insert statement");
   insert_user_stmt_ = sqlite_export_service_internal::PrepareStatement(
       db_handle_, sqlite_export_service_internal::kInsertUserSql,
       "Failed to prepare SQLite user insert statement");
+  insert_user_address_stmt_ = sqlite_export_service_internal::PrepareStatement(
+      db_handle_, sqlite_export_service_internal::kInsertUserAddressSql,
+      "Failed to prepare SQLite user address insert statement");
 }
 
 void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
@@ -60,11 +74,13 @@ void SqliteExportService::RollbackAndCloseNoThrow() noexcept {
     transaction_open_ = false;
   }
 
+  insert_user_address_stmt_.reset();
   insert_user_stmt_.reset();
+  insert_brewery_address_stmt_.reset();
   insert_brewery_stmt_.reset();
-  insert_location_stmt_.reset();
+  insert_city_stmt_.reset();
   db_handle_.reset();
-  location_cache_.clear();
+  city_cache_.clear();
 }
 
 void SqliteExportService::Initialize() {

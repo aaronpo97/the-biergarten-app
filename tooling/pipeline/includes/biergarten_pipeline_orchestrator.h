@@ -16,6 +16,7 @@
 #include "services/database/export_service.h"
 #include "services/enrichment/enrichment_service.h"
 #include "services/logging/logger.h"
+#include "services/postal_code/postal_code_service.h"
 
 /**
  * @brief Main orchestrator for the Biergarten data generation pipeline.
@@ -34,6 +35,8 @@ class BiergartenPipelineOrchestrator {
    * @param exporter Database backend for persisting generated records.
    * @param curated_data_service Loads curated location, persona, and name
    * data used to seed generation.
+   * @param postal_code_service Resolves a postal code for a city from its
+   * curated postal-code data.
    * @param application_options CLI configuration and paths.
    */
   BiergartenPipelineOrchestrator(
@@ -42,6 +45,7 @@ class BiergartenPipelineOrchestrator {
       std::unique_ptr<DataGenerator> generator,
       std::unique_ptr<IExportService> exporter,
       std::unique_ptr<ICuratedDataService> curated_data_service,
+      std::unique_ptr<IPostalCodeService> postal_code_service,
       const ApplicationOptions& application_options);
 
   /**
@@ -78,6 +82,7 @@ class BiergartenPipelineOrchestrator {
    */
   std::unique_ptr<IExportService> exporter_;
   std::unique_ptr<ICuratedDataService> curated_data_service_;
+  std::unique_ptr<IPostalCodeService> postal_code_service_;
 
   ApplicationOptions application_options_;
 
@@ -87,7 +92,7 @@ class BiergartenPipelineOrchestrator {
    * @return Vector of locations randomly sampled per
    * PipelineOptions::location_count.
    */
-  std::vector<Location> QueryLocations();
+  std::vector<City> QueryLocations();
 
   /**
    * @brief Generate breweries for enriched cities.

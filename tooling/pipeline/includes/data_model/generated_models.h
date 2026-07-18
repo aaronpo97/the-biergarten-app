@@ -87,15 +87,33 @@ struct UserResult {
  * @brief Enriched city data with Wikipedia context.
  */
 struct EnrichedCity {
-  Location location;
+  City location;
   std::string region_context{};
+};
+
+/**
+ * @brief A physical address: the city plus a concrete postal code selected
+ * from that city's curated postal-code examples.
+ */
+struct BreweryAddress {
+  City city;
+  std::string postal_code{};
+};
+
+/**
+ * @brief A physical address for a generated user: the city plus a concrete
+ * postal code selected from that city's curated postal-code examples.
+ */
+struct UserAddress {
+  City city;
+  std::string postal_code{};
 };
 
 /**
  * @brief Helper struct to store generated brewery data.
  */
 struct BreweryRecord {
-  Location location;
+  BreweryAddress address;
   BreweryResult brewery;
 };
 
@@ -107,7 +125,7 @@ struct BreweryRecord {
  * consumer can register real accounts from the pipeline's SQLite export.
  */
 struct UserRecord {
-  Location location;
+  UserAddress address;
   UserResult user;
   std::string email{};
   std::string date_of_birth{};

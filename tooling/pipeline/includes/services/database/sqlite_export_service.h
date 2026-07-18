@@ -45,27 +45,29 @@ class SqliteExportService final : public IExportService {
   void RollbackAndCloseNoThrow() noexcept;
 
   [[nodiscard]] std::filesystem::path BuildDatabasePath() const;
-  [[nodiscard]] static std::string BuildLocationKey(const Location& location);
+  [[nodiscard]] static std::string BuildCityKey(const City& city);
 
   /**
-   * @brief Returns the row id for @p location, inserting it first if it has
+   * @brief Returns the row id for @p city, inserting it first if it has
    * not already been seen during this run.
    *
-   * Shared by both ProcessRecord() overloads so breweries and users
-   * referencing the same location resolve to the same row.
+   * Shared by both ProcessRecord() overloads so brewery and user addresses
+   * referencing the same city resolve to the same row.
    */
-  [[nodiscard]] sqlite3_int64 ResolveLocationId(const Location& location);
+  [[nodiscard]] sqlite3_int64 ResolveCityId(const City& city);
 
   std::unique_ptr<IDateTimeProvider> date_time_provider_;
   std::filesystem::path output_path_;
   std::string run_timestamp_utc_;
   std::filesystem::path database_path_;
   SqliteDatabaseHandle db_handle_;
-  SqliteStatementHandle insert_location_stmt_;
+  SqliteStatementHandle insert_city_stmt_;
   SqliteStatementHandle insert_brewery_stmt_;
+  SqliteStatementHandle insert_brewery_address_stmt_;
   SqliteStatementHandle insert_user_stmt_;
+  SqliteStatementHandle insert_user_address_stmt_;
   bool transaction_open_ = false;
-  std::unordered_map<std::string, sqlite3_int64> location_cache_;
+  std::unordered_map<std::string, sqlite3_int64> city_cache_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_SQLITE_EXPORT_SERVICE_H_

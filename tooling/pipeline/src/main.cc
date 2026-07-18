@@ -86,6 +86,7 @@ int main(const int argc, char** argv) {
         di::bind<ApplicationOptions>().to(options),
         di::bind<std::string>().to(model_path),
         di::bind<IExportService>().to<SqliteExportService>(),
+        di::bind<IPostalCodeService>().to<MockPostalCodeService>(),
         di::bind<ICuratedDataService>().to(
             [options, &log_producer]() -> std::unique_ptr<ICuratedDataService> {
               if (options.generator.use_mocked) {

@@ -135,9 +135,12 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
     try {
       const UserResult user =
           generator_->GenerateUser(city, persona, sampled_name);
+      const std::string postal_code =
+          postal_code_service_->GeneratePostalCode(city.location);
 
       return UserRecord{
-          .location = city.location,
+          .address =
+              UserAddress{.city = city.location, .postal_code = postal_code},
           .user = user,
           .email = BuildEmail(sampled_name, used_email_local_parts),
           .date_of_birth = GenerateDateOfBirth(rng),
@@ -161,13 +164,13 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
     } catch (const std::exception& export_exception) {
       ++export_failed_count;
 
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::UserGeneration,
-           .message = std::format("[Pipeline] Generated user for '{}' ({}) but "
-                                  "SQLite export failed: {}",
-                                  record.location.city, record.location.country,
-                                  export_exception.what())});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::UserGeneration,
+                    .message = std::format(
+                        "[Pipeline] Generated user for '{}' ({}) but "
+                        "SQLite export failed: {}",
+                        record.address.city.city, record.address.city.country,
+                        export_exception.what())});
     }
   };
 
