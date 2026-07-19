@@ -1,5 +1,10 @@
-#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_POSTAL_CODE_XEGER_H_
-#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_POSTAL_CODE_XEGER_H_
+#ifndef BIERGARTEN_PIPELINE_INCLUDES_SERVICES_XEGER_XEGER_H_
+#define BIERGARTEN_PIPELINE_INCLUDES_SERVICES_XEGER_XEGER_H_
+
+#include <random>
+#include <string>
+#include <string_view>
+
 /**
  * @brief Generates a random string matching @p pattern.
  *
@@ -30,4 +35,4 @@
 std::string GenerateStringFromRegex(std::string_view pattern, std::mt19937& rng,
                                     int unbounded_repeat_cap = 8);
 
-#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_POSTAL_CODE_XEGER_H_
+#endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_XEGER_XEGER_H_

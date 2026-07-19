@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include "services/postal_code/xeger.h"
+#include "services/xeger/xeger.h"
 
 XegerPostalCodeService::XegerPostalCodeService()
     : rng_(std::random_device{}()) {}

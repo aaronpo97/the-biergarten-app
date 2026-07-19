@@ -212,8 +212,14 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # --- services: postal_code ---
 target_sources(${PROJECT_NAME} PRIVATE
-        src/services/postal_code/xeger.cc
         src/services/postal_code/xeger_postal_code_service.cc
+)
+
+# --- services: xeger ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/xeger/xeger.cc
+        src/services/xeger/xeger_parser.cc
+        src/services/xeger/xeger_generator.cc
 )
 
 # --- services: sqlite ---
