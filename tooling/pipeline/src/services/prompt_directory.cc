@@ -15,9 +15,7 @@
 #include <string_view>
 #include <utility>
 
-// ---------------------------------------------------------------------------
 // PromptDirectory
-// ---------------------------------------------------------------------------
 
 PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir)
     : PromptDirectory(prompt_dir, nullptr) {}
@@ -27,21 +25,21 @@ PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir,
     : prompt_dir_(prompt_dir), logger_(std::move(logger)) {
   std::error_code ec;
 
-  // Scenario 4: directory must exist.
+  // Directory must exist.
   if (!std::filesystem::exists(prompt_dir_, ec) || ec) {
     throw std::runtime_error(
         "PromptDirectory: prompt directory does not exist: " +
         prompt_dir_.string());
   }
 
-  // Scenario 4: path must be a directory, not a file.
+  // Path must be a directory, not a file.
   if (!std::filesystem::is_directory(prompt_dir_, ec) || ec) {
     throw std::runtime_error(
         "PromptDirectory: prompt directory path is not a directory: " +
         prompt_dir_.string());
   }
 
-  // Scenario 4: directory must be readable (probe with directory_iterator).
+  // Directory must be readable (probe with directory_iterator).
   std::filesystem::directory_iterator probe(prompt_dir_, ec);
   if (ec) {
     throw std::runtime_error(std::format(
@@ -68,7 +66,7 @@ std::string PromptDirectory::Load(std::string_view key) {
     return cache_it->second;
   }
 
-  // Scenario 3: resolve <prompt_dir>/<key>.md and require it to exist.
+  // Resolve <prompt_dir>/<key>.md and require it to exist.
   const std::filesystem::path file_path =
       prompt_dir_ / std::filesystem::path(std::format("{}.md", key_str));
 
@@ -98,6 +96,7 @@ std::string PromptDirectory::Load(std::string_view key) {
              key_str, file_path.string(), content.size())});
   }
 
+  // Cache the loaded content for future calls.
   cache_.emplace(key_str, content);
   return content;
 }

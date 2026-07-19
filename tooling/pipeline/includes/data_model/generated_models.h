@@ -11,9 +11,7 @@
 
 #include "data_model/models.h"
 
-// ============================================================================
 // Generation Output Models
-// ============================================================================
 
 /**
  * @brief Generated brewery payload.
@@ -79,9 +77,7 @@ struct UserResult {
   float activity_weight{};
 };
 
-// ============================================================================
 // Pipeline Data Models
-// ============================================================================
 
 /**
  * @brief Enriched city data with Wikipedia context.

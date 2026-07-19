@@ -26,9 +26,7 @@
  */
 template <typename T>
 class BoundedChannel {
-  // -------------------------------------------------------------------------
   // Internal state — all access must be guarded by mutex_.
-  // -------------------------------------------------------------------------
 
   std::queue<T> queue_;
 

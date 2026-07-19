@@ -21,9 +21,7 @@ class ILogger;
 
 namespace prog_opts = boost::program_options;
 
-// ============================================================================
 // City Models
-// ============================================================================
 
 /**
  * @brief Curated postal-code metadata for a city, mirroring the
@@ -80,9 +78,7 @@ struct City {
   PostalCodeSpec postal_code{};
 };
 
-// ============================================================================
 // Name / Persona Models
-// ============================================================================
 
 /**
  * @brief A sampled first/last name pair, with the source forename's gender.
@@ -151,9 +147,7 @@ struct UserPersona {
   std::vector<std::string> style_affinities{};
 };
 
-// ============================================================================
 // Configuration Models
-// ============================================================================
 
 /**
  * @brief LLM sampling parameters.
@@ -243,9 +237,7 @@ struct ApplicationOptions {
   PipelineOptions pipeline;
 };
 
-// ============================================================================
 // Function Declarations
-// ============================================================================
 
 std::optional<ApplicationOptions> ParseArguments(
     const int argc, char** argv, std::shared_ptr<ILogger> logger = nullptr);

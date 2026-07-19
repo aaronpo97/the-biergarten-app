@@ -26,9 +26,7 @@
 
 namespace {
 
-// ---------------------------------------------------------------------------
 // Regex syntax characters
-// ---------------------------------------------------------------------------
 
 constexpr char kAnchorStart = '^';
 constexpr char kAnchorEnd = '$';
@@ -50,9 +48,7 @@ constexpr char kBraceOpen = '{';
 constexpr char kBraceClose = '}';
 constexpr char kBraceComma = ',';
 
-// ---------------------------------------------------------------------------
 // AST
-// ---------------------------------------------------------------------------
 
 struct Literal;
 struct AnyChar;
@@ -123,7 +119,6 @@ struct Repeat : Visitable<Repeat> {
   std::optional<unsigned int> max;  // std::nullopt means "no upper bound"
 };
 
-// ---------------------------------------------------------------------------
 // Parser (recursive descent)
 //
 // Precedence, loosest to tightest binding:
@@ -131,7 +126,6 @@ struct Repeat : Visitable<Repeat> {
 //     ParseConcat     ::=  abc
 //       ParseRepeat   ::=  a*  a{2,5}
 //         ParseAtom   ::=  a  .  [..]  (..)  \d
-// ---------------------------------------------------------------------------
 
 class Parser {
  public:
@@ -435,9 +429,7 @@ class Parser {
   }
 };
 
-// ---------------------------------------------------------------------------
 // Generator -- a Visitor that emits a random matching string
-// ---------------------------------------------------------------------------
 
 class XegerGenerator final : public Visitor {
  public:

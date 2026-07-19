@@ -10,7 +10,6 @@
 #include <string>
 
 #include "services/database/sqlite_export_service.h"
-#include "services/database/sqlite_export_service_helpers.h"
 
 std::filesystem::path SqliteExportService::BuildDatabasePath() const {
   std::filesystem::path base_filename("biergarten_seed_" + run_timestamp_utc_ +
