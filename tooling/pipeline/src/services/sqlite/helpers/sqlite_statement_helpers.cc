@@ -88,7 +88,8 @@ sqlite3_int64 LastInsertRowId(const SqliteDatabaseHandle& db_handle) {
 }
 
 std::string SerializeVector(const std::vector<std::string>& str_vec) {
-  boost::json::array array(str_vec.size());
+  boost::json::array array;
+  array.reserve(str_vec.size());
   for (const auto& s : str_vec) {
     array.emplace_back(s);
   }

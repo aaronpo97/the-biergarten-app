@@ -14,20 +14,20 @@
 void BiergartenPipelineOrchestrator::LogResults() const {
   boost::json::array brewery_output;
 
-  for (const auto& [location, brewery] : generated_breweries_) {
+  for (const auto& [address, brewery] : generated_breweries_) {
+    const City& city = address.city;
     brewery_output.push_back(boost::json::object{
         {"name_en", brewery.name_en},
         {"description_en", brewery.description_en},
         {"name_local", brewery.name_local},
         {"description_local", brewery.description_local},
-        {"location", boost::json::object{
-                         {"city", location.city},
-                         {"country", location.country},
-                         {"state_province", location.state_province},
-                         {"iso3166_2", location.iso3166_2},
-                         {"latitude", location.latitude},
-                         {"longitude", location.longitude},
-                     }}});
+        {"address", boost::json::object{
+                        {"city", city.city},
+                        {"country", city.country},
+                        {"state_province", city.state_province},
+                        {"iso3166_2", city.iso3166_2},
+                        {"postal_code", address.postal_code},
+                    }}});
   }
 
   std::ostringstream brewery_oss;

@@ -1,6 +1,6 @@
 /**
  * @file json_handling/json_loader.cc
- * @brief Parses curated location JSON input into strongly typed Location
+ * @brief Parses curated location JSON input into strongly typed City
  * records with strict field validation and descriptive error reporting.
  */
 
@@ -30,16 +30,6 @@ static std::string ReadRequiredString(const boost::json::object& object,
   return std::string(text);
 }
 
-static double ReadRequiredNumber(const boost::json::object& object,
-                                 const char* key) {
-  const boost::json::value* value = object.if_contains(key);
-  if (value == nullptr || !value->is_number()) {
-    throw std::runtime_error(
-        std::format("Missing or invalid numeric field: {}", key));
-  }
-  return value->to_number<double>();
-}
-
 static std::vector<std::string> ReadRequiredStringArray(
     const boost::json::object& object, const char* key) {
   const boost::json::value* value = object.if_contains(key);
@@ -59,6 +49,21 @@ static std::vector<std::string> ReadRequiredStringArray(
     items.emplace_back(item.as_string());
   }
   return items;
+}
+
+static PostalCodeSpec ReadPostalCodeSpec(const boost::json::object& object) {
+  const boost::json::value* value = object.if_contains("postal_code");
+  if (value == nullptr || !value->is_object()) {
+    throw std::runtime_error("Missing or invalid object field: postal_code");
+  }
+
+  const auto& postal_code = value->as_object();
+  return PostalCodeSpec{
+      .country_format_regex =
+          ReadRequiredString(postal_code, "country_format_regex"),
+      .city_regexes = ReadRequiredStringArray(postal_code, "city_regex"),
+      .examples = ReadRequiredStringArray(postal_code, "examples"),
+  };
 }
 
 namespace {
@@ -133,15 +138,14 @@ const LocationsList& CuratedJsonDataService::LoadLocations() {
     }
 
     const auto& object = item.as_object();
-    locations.push_back(Location{
+    locations.push_back(City{
         .city = ReadRequiredString(object, "city"),
         .state_province = ReadRequiredString(object, "state_province"),
         .iso3166_2 = ReadRequiredString(object, "iso3166_2"),
         .country = ReadRequiredString(object, "country"),
         .iso3166_1 = ReadRequiredString(object, "iso3166_1"),
         .local_languages = ReadRequiredStringArray(object, "local_languages"),
-        .latitude = ReadRequiredNumber(object, "latitude"),
-        .longitude = ReadRequiredNumber(object, "longitude"),
+        .postal_code = ReadPostalCodeSpec(object),
     });
   }
   cache_.locations = std::move(locations);

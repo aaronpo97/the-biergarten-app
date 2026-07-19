@@ -21,14 +21,36 @@ class ILogger;
 
 namespace prog_opts = boost::program_options;
 
-// ============================================================================
-// Location Models
-// ============================================================================
+// City Models
 
 /**
- * @brief Canonical location record for city-level generation.
+ * @brief Curated postal-code metadata for a city, mirroring the
+ * `postal_code` object in the locations dataset.
  */
-struct Location {
+struct PostalCodeSpec {
+  /**
+   * @brief Permissive country-wide postal-code format regex, used as the
+   * validation fallback for a selected example.
+   */
+  std::string country_format_regex{};
+
+  /**
+   * @brief City-specific postal-code regexes (more precise than the country
+   * format).
+   */
+  std::vector<std::string> city_regexes{};
+
+  /**
+   * @brief Concrete example postal codes for this city. The postal code
+   * service selects from these rather than synthesizing codes.
+   */
+  std::vector<std::string> examples{};
+};
+
+/**
+ * @brief Canonical city record for city-level generation.
+ */
+struct City {
   std::string city{};
   std::string state_province{};
 
@@ -50,19 +72,13 @@ struct Location {
   std::vector<std::string> local_languages{};
 
   /**
-   * @brief Latitude in decimal degrees.
+   * @brief Postal-code metadata (format regex, city regexes, and concrete
+   * examples) sourced directly from the curated locations dataset.
    */
-  double latitude{};
-
-  /**
-   * @brief Longitude in decimal degrees.
-   */
-  double longitude{};
+  PostalCodeSpec postal_code{};
 };
 
-// ============================================================================
 // Name / Persona Models
-// ============================================================================
 
 /**
  * @brief A sampled first/last name pair, with the source forename's gender.
@@ -131,9 +147,7 @@ struct UserPersona {
   std::vector<std::string> style_affinities{};
 };
 
-// ============================================================================
 // Configuration Models
-// ============================================================================
 
 /**
  * @brief LLM sampling parameters.
@@ -223,9 +237,7 @@ struct ApplicationOptions {
   PipelineOptions pipeline;
 };
 
-// ============================================================================
 // Function Declarations
-// ============================================================================
 
 std::optional<ApplicationOptions> ParseArguments(
     const int argc, char** argv, std::shared_ptr<ILogger> logger = nullptr);

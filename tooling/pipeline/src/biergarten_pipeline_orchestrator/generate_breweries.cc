@@ -22,12 +22,15 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
 
   const auto generate_record =
       [this, &skipped_count](
-          const Location& location,
-          const std::string& region_context) -> std::optional<BreweryRecord> {
+          const EnrichedCity& enriched_city) -> std::optional<BreweryRecord> {
     try {
-      const BreweryResult brewery =
-          generator_->GenerateBrewery(location, region_context);
-      return BreweryRecord{.location = location, .brewery = brewery};
+      const BreweryResult brewery = generator_->GenerateBrewery(enriched_city);
+      const std::string postal_code =
+          postal_code_service_->GeneratePostalCode(enriched_city.location);
+      return BreweryRecord{
+          .address = BreweryAddress{.city = enriched_city.location,
+                                    .postal_code = postal_code},
+          .brewery = brewery};
     } catch (const std::exception& e) {
       ++skipped_count;
 
@@ -36,7 +39,8 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
            .phase = PipelinePhase::BreweryAndBeerGeneration,
            .message = std::format("[Pipeline] Skipping city '{}' ({}): brewery "
                                   "generation failed: {}",
-                                  location.city, location.country, e.what())});
+                                  enriched_city.location.city,
+                                  enriched_city.location.country, e.what())});
       return std::nullopt;
     }
   };
@@ -47,19 +51,18 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
       exporter_->ProcessRecord(record);
     } catch (const std::exception& export_exception) {
       ++export_failed_count;
-      logger_->Log(
-          {.level = LogLevel::Warn,
-           .phase = PipelinePhase::BreweryAndBeerGeneration,
-           .message = std::format("[Pipeline] Generated brewery for '{}' ({}) "
-                                  "but SQLite export failed: {}",
-                                  record.location.city, record.location.country,
-                                  export_exception.what())});
+      logger_->Log({.level = LogLevel::Warn,
+                    .phase = PipelinePhase::BreweryAndBeerGeneration,
+                    .message = std::format(
+                        "[Pipeline] Generated brewery for '{}' ({}) "
+                        "but SQLite export failed: {}",
+                        record.address.city.city, record.address.city.country,
+                        export_exception.what())});
     }
   };
 
-  for (const auto& [location, region_context] : cities) {
-    const std::optional<BreweryRecord> record =
-        generate_record(location, region_context);
+  for (const EnrichedCity& enriched_city : cities) {
+    const std::optional<BreweryRecord> record = generate_record(enriched_city);
     if (!record.has_value()) {
       continue;
     }
