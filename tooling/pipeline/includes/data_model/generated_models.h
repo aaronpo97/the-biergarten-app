@@ -17,64 +17,64 @@
  * @brief Generated brewery payload.
  */
 struct BreweryResult {
-  /**
-   * @brief Brewery display name in English.
-   */
-  std::string name_en;
+   /**
+    * @brief Brewery display name in English.
+    */
+   std::string name_en;
 
-  /**
-   * @brief Brewery description text in English.
-   */
-  std::string description_en;
+   /**
+    * @brief Brewery description text in English.
+    */
+   std::string description_en;
 
-  /**
-   * @brief Brewery display name in the local language.
-   */
-  std::string name_local;
+   /**
+    * @brief Brewery display name in the local language.
+    */
+   std::string name_local;
 
-  /**
-   * @brief Brewery description text in the local language.
-   */
-  std::string description_local;
+   /**
+    * @brief Brewery description text in the local language.
+    */
+   std::string description_local;
 };
 
 /**
  * @brief Generated user profile payload.
  */
 struct UserResult {
-  /**
-   * @brief First (given) name, copied from the sampled Name -- not
-   * LLM-invented.
-   */
-  std::string first_name{};
+   /**
+    * @brief First (given) name, copied from the sampled Name -- not
+    * LLM-invented.
+    */
+   std::string first_name{};
 
-  /**
-   * @brief Last (family) name, copied from the sampled Name -- not
-   * LLM-invented.
-   */
-  std::string last_name{};
+   /**
+    * @brief Last (family) name, copied from the sampled Name -- not
+    * LLM-invented.
+    */
+   std::string last_name{};
 
-  /**
-   * @brief Gender associated with the sampled first name, copied from the
-   * sampled Name -- not LLM-invented.
-   */
-  std::string gender{};
+   /**
+    * @brief Gender associated with the sampled first name, copied from the
+    * sampled Name -- not LLM-invented.
+    */
+   std::string gender{};
 
-  /**
-   * @brief Username handle.
-   */
-  std::string username{};
+   /**
+    * @brief Username handle.
+    */
+   std::string username{};
 
-  /**
-   * @brief Short user biography.
-   */
-  std::string bio{};
+   /**
+    * @brief Short user biography.
+    */
+   std::string bio{};
 
-  /**
-   * @brief Relative check-in/activity weight for this user, used to drive
-   * a J-curve activity profile in later pipeline phases.
-   */
-  float activity_weight{};
+   /**
+    * @brief Relative check-in/activity weight for this user, used to drive
+    * a J-curve activity profile in later pipeline phases.
+    */
+   float activity_weight{};
 };
 
 // Pipeline Data Models
@@ -83,8 +83,8 @@ struct UserResult {
  * @brief Enriched city data with Wikipedia context.
  */
 struct EnrichedCity {
-  City location;
-  std::string region_context{};
+   City location;
+   std::string region_context{};
 };
 
 /**
@@ -92,8 +92,8 @@ struct EnrichedCity {
  * from that city's curated postal-code examples.
  */
 struct BreweryAddress {
-  City city;
-  std::string postal_code{};
+   City city;
+   std::string postal_code{};
 };
 
 /**
@@ -101,16 +101,16 @@ struct BreweryAddress {
  * postal code selected from that city's curated postal-code examples.
  */
 struct UserAddress {
-  City city;
-  std::string postal_code{};
+   City city;
+   std::string postal_code{};
 };
 
 /**
  * @brief Helper struct to store generated brewery data.
  */
 struct BreweryRecord {
-  BreweryAddress address;
-  BreweryResult brewery;
+   BreweryAddress address;
+   BreweryResult brewery;
 };
 
 /**
@@ -121,10 +121,10 @@ struct BreweryRecord {
  * consumer can register real accounts from the pipeline's SQLite export.
  */
 struct UserRecord {
-  UserAddress address;
-  UserResult user;
-  std::string email{};
-  std::string date_of_birth{};
+   UserAddress address;
+   UserResult user;
+   std::string email{};
+   std::string date_of_birth{};
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_DATA_MODEL_GENERATED_MODELS_H_
