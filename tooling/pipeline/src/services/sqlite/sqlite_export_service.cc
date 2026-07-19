@@ -12,7 +12,7 @@ SqliteExportService::SqliteExportService(const ApplicationOptions& options)
       output_path_(options.pipeline.output_path) {}
 
 SqliteExportService::~SqliteExportService() {
-  if (db_handle_ != nullptr) {
-    RollbackAndCloseNoThrow();
-  }
+   if (db_handle_ != nullptr) {
+      RollbackAndCloseNoThrow();
+   }
 }

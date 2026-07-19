@@ -9,26 +9,26 @@
 #include "services/database/sqlite_export_service_helpers.h"
 
 void SqliteExportService::Finalize() {
-  if (db_handle_ == nullptr) {
-    return;
-  }
+   if (db_handle_ == nullptr) {
+      return;
+   }
 
-  try {
-    insert_user_address_stmt_.reset();
-    insert_user_stmt_.reset();
-    insert_brewery_address_stmt_.reset();
-    insert_brewery_stmt_.reset();
-    insert_city_stmt_.reset();
-    if (transaction_open_) {
-      sqlite_export_service_internal::ExecSql(
-          db_handle_, "COMMIT;", "Failed to commit SQLite transaction");
-      transaction_open_ = false;
-    }
+   try {
+      insert_user_address_stmt_.reset();
+      insert_user_stmt_.reset();
+      insert_brewery_address_stmt_.reset();
+      insert_brewery_stmt_.reset();
+      insert_city_stmt_.reset();
+      if (transaction_open_) {
+         sqlite_export_service_internal::ExecSql(
+             db_handle_, "COMMIT;", "Failed to commit SQLite transaction");
+         transaction_open_ = false;
+      }
 
-    db_handle_.reset();
-    city_cache_.clear();
-  } catch (...) {
-    RollbackAndCloseNoThrow();
-    throw;
-  }
+      db_handle_.reset();
+      city_cache_.clear();
+   } catch (...) {
+      RollbackAndCloseNoThrow();
+      throw;
+   }
 }
