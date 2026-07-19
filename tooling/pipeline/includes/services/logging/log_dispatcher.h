@@ -22,32 +22,32 @@
  * and exit once the channel has been closed and drained.
  */
 class LogDispatcher {
- public:
-  /**
-   * @brief Construct a log dispatcher.
-   *
-   * @param channel Reference to the bounded channel used for log retrieval.
-   */
-  explicit LogDispatcher(BoundedChannel<LogEntry>& channel);
+  public:
+   /**
+    * @brief Construct a log dispatcher.
+    *
+    * @param channel Reference to the bounded channel used for log retrieval.
+    */
+   explicit LogDispatcher(BoundedChannel<LogEntry>& channel);
 
-  LogDispatcher(const LogDispatcher&) = delete;
-  LogDispatcher& operator=(const LogDispatcher&) = delete;
-  LogDispatcher(LogDispatcher&&) = delete;
-  LogDispatcher& operator=(LogDispatcher&&) = delete;
-  ~LogDispatcher() = default;
+   LogDispatcher(const LogDispatcher&) = delete;
+   LogDispatcher& operator=(const LogDispatcher&) = delete;
+   LogDispatcher(LogDispatcher&&) = delete;
+   LogDispatcher& operator=(LogDispatcher&&) = delete;
+   ~LogDispatcher() = default;
 
-  /**
-   * @brief Drain the channel and forward entries to spdlog.
-   *
-   * Intended to be called once on a dedicated thread. The loop returns after
-   * the channel has been closed and all queued entries have been processed.
-   */
-  void Run();
+   /**
+    * @brief Drain the channel and forward entries to spdlog.
+    *
+    * Intended to be called once on a dedicated thread. The loop returns after
+    * the channel has been closed and all queued entries have been processed.
+    */
+   void Run();
 
- private:
-  BoundedChannel<LogEntry>& channel_;
+  private:
+   BoundedChannel<LogEntry>& channel_;
 
-  static spdlog::level::level_enum ToSpdlogLevel(LogLevel level);
+   static spdlog::level::level_enum ToSpdlogLevel(LogLevel level);
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_LOGGING_LOG_DISPATCHER_H_
