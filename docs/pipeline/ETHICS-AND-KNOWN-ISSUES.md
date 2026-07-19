@@ -102,21 +102,19 @@ vendored verbatim, unmodified, from
 (the `common-forenames-by-country.json` / `common-surnames-by-country.json`
 release assets), released under **CC0** (public domain). That dataset's own
 forename/surname lists are pulled from Wikipedia's "Lists of most common
-surnames" and "List of most popular given names" as of the week of
-2023-07-08 — see that project's README for full provenance. Names are not
-LLM-generated; this is curated fixture data per ROADMAP.md §2. Per-forename
-gender from the source data is preserved through to the sampled `Name`
-(rather than discarded during loading) so it's available for gender-aware
-persona/bio generation later.
+surnames" and "List of most popular given names" as of the week of 2023-07-08 —
+see that project's README for full provenance. Names are not LLM-generated; this
+is curated fixture data per ROADMAP.md §2. Per-forename gender from the source
+data is preserved through to the sampled `Name` (rather than discarded during
+loading) so it's available for gender-aware persona/bio generation later.
 
-The full multinational dataset is kept as-is (106 countries for forenames,
-75 for surnames) rather than trimmed to `locations.json`'s current country
-list, so it doesn't need re-sourcing if more countries are added later.
-`SampleName()` (a free helper in `generate_users.cc`) returns no result for
-a country present in neither file; of the countries in `locations.json`,
-that's currently `KE`, `SE`, `SG`, `TH`, `VN`, and `ZA` — `GenerateUsers`
-skips cities in those countries the same way brewery generation skips
-cities whose enrichment lookup fails.
+The full multinational dataset is kept as-is (106 countries for forenames, 75
+for surnames) rather than trimmed to `locations.json`'s current country list, so
+it doesn't need re-sourcing if more countries are added later. `SampleName()` (a
+free helper in `generate_users.cc`) returns no result for a country present in
+neither file; of the countries in `locations.json`, that's currently `KE`, `SE`,
+`SG`, `TH`, `VN`, and `ZA` — `GenerateUsers` skips cities in those countries the
+same way brewery generation skips cities whose enrichment lookup fails.
 
 ---
 
@@ -273,8 +271,7 @@ For languages such as Welsh (Wales), Māori (Aotearoa/New Zealand), or Sicilian
 but is semantically incoherent. This comes from limited training-data coverage
 rather than prompt engineering.
 
-Output sample:
-[./french-cities.example](french-cities.example)
+Output sample: [./french-cities.example](french-cities.example)
 
 #### Proposed Mitigations
 
@@ -298,9 +295,9 @@ curated real-world examples.
 The generated code is **format-conformant by construction** — it always
 satisfies the regex it was generated from — but it is not looked up from any
 real postal registry. It does not correspond to a real address, business, or
-resident, and should not be treated as accurate geocoding or delivery data.
-This is consistent with the rest of the dataset: fixture data for a
-proof-of-concept, not a source of truth.
+resident, and should not be treated as accurate geocoding or delivery data. This
+is consistent with the rest of the dataset: fixture data for a proof-of-concept,
+not a source of truth.
 
 ---
 
