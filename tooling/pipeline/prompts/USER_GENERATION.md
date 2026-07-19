@@ -41,11 +41,11 @@ You will receive the inputs like this:
 ABSOLUTELY NO MARKDOWN FORMATTING. Do NOT wrap your response in json or ```
 blocks.
 
-Do not add markdown, code fences, or postscript around the final JSON object.
-Do not say "Here is the JSON" or "Enjoy!".
+Do not add markdown, code fences, or postscript around the final JSON object. Do
+not say "Here is the JSON" or "Enjoy!".
 
-The JSON must contain exactly three keys ("username", "bio",
-"activity_weight") in that order. Do not rename or add any other keys.
+The JSON must contain exactly three keys ("username", "bio", "activity_weight")
+in that order. Do not rename or add any other keys.
 
 ESCAPE ALL QUOTES inside the bio field using \", or use single quotes (' ')
 instead.
@@ -53,15 +53,15 @@ instead.
 DO NOT use actual line breaks (\n) inside any string. Keep the bio as one
 continuous string.
 
-The bio must be between 25 and 60 words, written in first person, and must
-read as something this specific person would write about themselves -- not a
-generic profile blurb.
+The bio must be between 25 and 60 words, written in first person, and must read
+as something this specific person would write about themselves -- not a generic
+profile blurb.
 
-`activity_weight` is a number between 0 and 1 (inclusive) representing how
-often this persona checks in at breweries relative to other users. Persona
-archetypes implying frequent, habitual brewery visits should skew higher;
-casual or occasional-visitor personas should skew lower. Do not default to
-0.5 -- vary it meaningfully based on the persona description.
+`activity_weight` is a number between 0 and 1 (inclusive) representing how often
+this persona checks in at breweries relative to other users. Persona archetypes
+implying frequent, habitual brewery visits should skew higher; casual or
+occasional-visitor personas should skew lower. Do not default to 0.5 -- vary it
+meaningfully based on the persona description.
 
 Expected JSON format:
 
@@ -78,8 +78,8 @@ Expected JSON format:
 ### THE USERNAME:
 
 Derive the username from the given first and/or last name (e.g. lowercase,
-abbreviated, or combined with a short word or number tied to the persona's
-style affinities). Do not invent an unrelated handle. Do not include spaces.
+abbreviated, or combined with a short word or number tied to the persona's style
+affinities). Do not invent an unrelated handle. Do not include spaces.
 
 ### THE BIO:
 
@@ -90,14 +90,14 @@ city or country naturally if it fits, but do not force it.
 
 ### VOICE & PERSPECTIVE:
 
-Write in the first person ("I"/"my"). The tone should match the persona:
-an enthusiastic explorer sounds different from a relaxed, easy-drinking
-regular. Do not write in second or third person.
+Write in the first person ("I"/"my"). The tone should match the persona: an
+enthusiastic explorer sounds different from a relaxed, easy-drinking regular. Do
+not write in second or third person.
 
 ### THE BLOCKLIST (FORBIDDEN CONCEPTS):
 
-You absolutely cannot use the following words and phrases. Make sure your
-final output doesn't have any of these:
+You absolutely cannot use the following words and phrases. Make sure your final
+output doesn't have any of these:
 
 - "hidden gem"
 - "passion"
@@ -108,14 +108,14 @@ final output doesn't have any of these:
 
 #### FORBIDDEN WRITING PATTERNS
 
-The following patterns are common AI writing pitfalls and must not appear in
-the bio:
+The following patterns are common AI writing pitfalls and must not appear in the
+bio:
 
 - Negative parallelism constructions: "It's not X, it's Y"
-- Inflated significance phrases: "stands as a testament," "plays a vital
-  role," "deeply rooted"
-- Superficial trailing analyses: sentences ending in -ing words that add
-  opinion without content
+- Inflated significance phrases: "stands as a testament," "plays a vital role,"
+  "deeply rooted"
+- Superficial trailing analyses: sentences ending in -ing words that add opinion
+  without content
 - Promotional travel-copy tone: "breathtaking," "must-visit," "vibrant"
 - Overused conjunctive transitions used as sentence openers: "Moreover,"
   "Furthermore," "In addition"
