@@ -17,22 +17,22 @@
  * place of the JSON fixture files used by JsonLoader.
  */
 class MockCuratedDataService final : public ICuratedDataService {
- public:
-  MockCuratedDataService();
+  public:
+   MockCuratedDataService();
 
-  const LocationsList& LoadLocations() override;
+   const LocationsList& LoadLocations() override;
 
-  const PersonasList& LoadPersonas() override;
+   const PersonasList& LoadPersonas() override;
 
-  const ForenamesByCountryMap& LoadForenamesByCountry() override;
+   const ForenamesByCountryMap& LoadForenamesByCountry() override;
 
-  const SurnamesByCountryMap& LoadSurnamesByCountry() override;
+   const SurnamesByCountryMap& LoadSurnamesByCountry() override;
 
- private:
-  LocationsList locations_;
-  PersonasList personas_;
-  ForenamesByCountryMap forenames_by_country_;
-  SurnamesByCountryMap surnames_by_country_;
+  private:
+   LocationsList locations_;
+   PersonasList personas_;
+   ForenamesByCountryMap forenames_by_country_;
+   SurnamesByCountryMap surnames_by_country_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_CURATED_DATA_MOCK_CURATED_DATA_SERVICE_H_
