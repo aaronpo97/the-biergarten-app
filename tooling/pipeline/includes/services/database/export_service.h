@@ -14,38 +14,38 @@
  * @brief Interface for services that persist generated brewery records.
  */
 class IExportService {
- public:
-  IExportService() = default;
-  virtual ~IExportService() = default;
+  public:
+   IExportService() = default;
+   virtual ~IExportService() = default;
 
-  IExportService(const IExportService&) = delete;
-  IExportService& operator=(const IExportService&) = delete;
-  IExportService(IExportService&&) = delete;
-  IExportService& operator=(IExportService&&) = delete;
+   IExportService(const IExportService&) = delete;
+   IExportService& operator=(const IExportService&) = delete;
+   IExportService(IExportService&&) = delete;
+   IExportService& operator=(IExportService&&) = delete;
 
-  /**
-   * @brief Prepares the export destination for a new run.
-   */
-  virtual void Initialize() = 0;
+   /**
+    * @brief Prepares the export destination for a new run.
+    */
+   virtual void Initialize() = 0;
 
-  /**
-   * @brief Persists one generated brewery record.
-   *
-   * @param brewery Generated brewery payload to store.
-   */
-  virtual uint64_t ProcessRecord(const BreweryRecord& brewery) = 0;
+   /**
+    * @brief Persists one generated brewery record.
+    *
+    * @param brewery Generated brewery payload to store.
+    */
+   virtual uint64_t ProcessRecord(const BreweryRecord& brewery) = 0;
 
-  /**
-   * @brief Persists one generated user record.
-   *
-   * @param user Generated user payload to store.
-   */
-  virtual uint64_t ProcessRecord(const UserRecord& user) = 0;
+   /**
+    * @brief Persists one generated user record.
+    *
+    * @param user Generated user payload to store.
+    */
+   virtual uint64_t ProcessRecord(const UserRecord& user) = 0;
 
-  /**
-   * @brief Finalizes the export destination.
-   */
-  virtual void Finalize() = 0;
+   /**
+    * @brief Finalizes the export destination.
+    */
+   virtual void Finalize() = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_DATABASE_EXPORT_SERVICE_H_

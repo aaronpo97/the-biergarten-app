@@ -152,44 +152,44 @@ INSERT INTO user_addresses (
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
 // placeholder order in the SQL above.
 enum CityBindIndex {
-  kCityCityBindIndex = 1,
-  kCityStateProvinceBindIndex,
-  kCityIso31662BindIndex,
-  kCityCountryBindIndex,
-  kCityIso31661BindIndex,
-  kCityLanguagesBindIndex,
-  kCityPostalCodeCountryFormatRegexBindIndex,
-  kCityPostalCodeCityRegexJsonBindIndex,
+   kCityCityBindIndex = 1,
+   kCityStateProvinceBindIndex,
+   kCityIso31662BindIndex,
+   kCityCountryBindIndex,
+   kCityIso31661BindIndex,
+   kCityLanguagesBindIndex,
+   kCityPostalCodeCountryFormatRegexBindIndex,
+   kCityPostalCodeCityRegexJsonBindIndex,
 };
 
 enum BreweryBindIndex {
-  kBreweryEnglishNameBindIndex = 1,
-  kBreweryEnglishDescriptionBindIndex,
-  kBreweryLocalNameBindIndex,
-  kBreweryLocalDescriptionBindIndex,
+   kBreweryEnglishNameBindIndex = 1,
+   kBreweryEnglishDescriptionBindIndex,
+   kBreweryLocalNameBindIndex,
+   kBreweryLocalDescriptionBindIndex,
 };
 
 enum BreweryAddressBindIndex {
-  kBreweryAddressBreweryIdBindIndex = 1,
-  kBreweryAddressCityIdBindIndex,
-  kBreweryAddressPostalCodeBindIndex,
+   kBreweryAddressBreweryIdBindIndex = 1,
+   kBreweryAddressCityIdBindIndex,
+   kBreweryAddressPostalCodeBindIndex,
 };
 
 enum UserBindIndex {
-  kUserFirstNameBindIndex = 1,
-  kUserLastNameBindIndex,
-  kUserGenderBindIndex,
-  kUserUsernameBindIndex,
-  kUserBioBindIndex,
-  kUserActivityWeightBindIndex,
-  kUserEmailBindIndex,
-  kUserDateOfBirthBindIndex,
+   kUserFirstNameBindIndex = 1,
+   kUserLastNameBindIndex,
+   kUserGenderBindIndex,
+   kUserUsernameBindIndex,
+   kUserBioBindIndex,
+   kUserActivityWeightBindIndex,
+   kUserEmailBindIndex,
+   kUserDateOfBirthBindIndex,
 };
 
 enum UserAddressBindIndex {
-  kUserAddressUserIdBindIndex = 1,
-  kUserAddressCityIdBindIndex,
-  kUserAddressPostalCodeBindIndex,
+   kUserAddressUserIdBindIndex = 1,
+   kUserAddressCityIdBindIndex,
+   kUserAddressPostalCodeBindIndex,
 };
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,
