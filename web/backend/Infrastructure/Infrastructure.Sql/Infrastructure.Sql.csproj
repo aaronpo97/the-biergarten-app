@@ -6,7 +6,7 @@
         <RootNamespace>Infrastructure.Sql</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
         <PackageReference Include="Microsoft.SqlServer.Types" Version="160.1000.6" />
         <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
         <PackageReference

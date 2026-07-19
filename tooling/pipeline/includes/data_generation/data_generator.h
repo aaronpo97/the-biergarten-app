@@ -20,12 +20,10 @@ class DataGenerator {
   /**
    * @brief Generates brewery data for a location.
    *
-   * @param location Location data
-   * @param region_context Additional regional context text.
+   * @param city Enriched city the brewery is associated with.
    * @return Brewery generation result.
    */
-  virtual BreweryResult GenerateBrewery(const Location& location,
-                                        const std::string& region_context) = 0;
+  virtual BreweryResult GenerateBrewery(const EnrichedCity& city) = 0;
 
   /**
    * @brief Generates a user profile grounded in a sampled name and persona.

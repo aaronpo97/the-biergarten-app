@@ -18,6 +18,7 @@ low-resource language failures.
 - [Known Issues](#known-issues)
   - [Hallucinated Brewing Techniques](#hallucinated-brewing-techniques)
   - [Low-Resource Language Hallucination](#low-resource-language-hallucination)
+  - [Synthetic Postal Codes](#synthetic-postal-codes)
 
 ---
 
@@ -285,6 +286,21 @@ Output sample:
 - **Downstream flagging:** add a `description_local_confidence` column to the
   SQLite schema so downstream applications can filter or flag potentially
   hallucinated text by language tier.
+
+### Synthetic Postal Codes
+
+When the pipeline is run without `--mocked`, `XegerPostalCodeService` generates
+a fresh postal code per brewery/user address by reverse-matching one of the
+city's curated postal-code regexes from `locations.json` (falling back to the
+country format regex), rather than returning one of `MockPostalCodeService`'s
+curated real-world examples.
+
+The generated code is **format-conformant by construction** — it always
+satisfies the regex it was generated from — but it is not looked up from any
+real postal registry. It does not correspond to a real address, business, or
+resident, and should not be treated as accurate geocoding or delivery data.
+This is consistent with the rest of the dataset: fixture data for a
+proof-of-concept, not a source of truth.
 
 ---
 

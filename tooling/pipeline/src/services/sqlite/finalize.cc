@@ -14,9 +14,11 @@ void SqliteExportService::Finalize() {
   }
 
   try {
+    insert_user_address_stmt_.reset();
     insert_user_stmt_.reset();
+    insert_brewery_address_stmt_.reset();
     insert_brewery_stmt_.reset();
-    insert_location_stmt_.reset();
+    insert_city_stmt_.reset();
     if (transaction_open_) {
       sqlite_export_service_internal::ExecSql(
           db_handle_, "COMMIT;", "Failed to commit SQLite transaction");
@@ -24,7 +26,7 @@ void SqliteExportService::Finalize() {
     }
 
     db_handle_.reset();
-    location_cache_.clear();
+    city_cache_.clear();
   } catch (...) {
     RollbackAndCloseNoThrow();
     throw;

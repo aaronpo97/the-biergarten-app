@@ -111,6 +111,8 @@ if(NOT BIERGARTEN_MOCK_ONLY)
                 )
                 FetchContent_MakeAvailable(llama-cpp)
         endif()
+
+        find_package(OpenMP REQUIRED)
 endif()
 
 # spdlog
@@ -208,6 +210,18 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/services/enrichment/wikipedia/get_summary.cc
 )
 
+# --- services: postal_code ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/postal_code/xeger_postal_code_service.cc
+)
+
+# --- services: xeger ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/xeger/xeger.cc
+        src/services/xeger/xeger_parser.cc
+        src/services/xeger/xeger_generator.cc
+)
+
 # --- services: sqlite ---
 target_sources(${PROJECT_NAME} PRIVATE
 	src/services/sqlite/process_record.cc
@@ -237,6 +251,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:llama>
+        $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:OpenMP::OpenMP_CXX>
         boost::di
         Boost::json
         Boost::program_options

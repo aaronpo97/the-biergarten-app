@@ -14,13 +14,13 @@
 #include "services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
 
-std::vector<Location>
-BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
+std::vector<City>
+BiergartenPipelineOrchestrator::QueryLocations() {
   logger_->Log({.level = LogLevel::Info,
                 .phase = PipelinePhase::Startup,
                 .message = "=== GEOGRAPHIC DATA OVERVIEW ==="});
 
-  const std::vector<Location>& all_locations =
+  const std::vector<City>& all_locations =
       curated_data_service_->LoadLocations();
 
   const size_t sample_count = std::min(
@@ -31,7 +31,7 @@ BiergartenPipelineOrchestrator::QueryCitiesWithCountries() {
       static_cast<std::iter_difference_t<decltype(all_locations.cbegin())>>(
           sample_count);
 
-  std::vector<Location> sampled_locations;
+  std::vector<City> sampled_locations;
   sampled_locations.reserve(sample_count);
 
   std::random_device random_generator;

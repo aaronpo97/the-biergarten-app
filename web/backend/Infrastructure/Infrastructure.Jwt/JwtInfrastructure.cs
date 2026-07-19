@@ -88,7 +88,7 @@ public class JwtInfrastructure : ITokenInfrastructure
 
             return new ClaimsPrincipal(result.ClaimsIdentity);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw new UnauthorizedException("Invalid token");
         }

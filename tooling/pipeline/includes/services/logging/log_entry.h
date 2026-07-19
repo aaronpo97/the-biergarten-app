@@ -51,7 +51,7 @@ enum class PipelinePhase {
    */
   Startup,
   /**
-   * @brief Location/context enrichment (e.g. Wikipedia lookups).
+   * @brief City/context enrichment (e.g. Wikipedia lookups).
    */
   Enrichment,
   /**
