@@ -15,12 +15,12 @@
  * it alive for application lifetime.
  */
 class LlamaBackendState {
- public:
-  LlamaBackendState() { llama_backend_init(); }
-  ~LlamaBackendState() { llama_backend_free(); }
+  public:
+   LlamaBackendState() { llama_backend_init(); }
+   ~LlamaBackendState() { llama_backend_free(); }
 
-  LlamaBackendState(const LlamaBackendState&) = delete;
-  LlamaBackendState& operator=(const LlamaBackendState&) = delete;
+   LlamaBackendState(const LlamaBackendState&) = delete;
+   LlamaBackendState& operator=(const LlamaBackendState&) = delete;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_LLAMA_BACKEND_STATE_H_
