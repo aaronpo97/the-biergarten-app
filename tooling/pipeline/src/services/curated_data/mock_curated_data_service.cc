@@ -92,15 +92,15 @@ MockCuratedDataService::MockCuratedDataService()
       } {}
 
 const LocationsList& MockCuratedDataService::LoadLocations() {
-  return locations_;
+   return locations_;
 }
 
 const PersonasList& MockCuratedDataService::LoadPersonas() { return personas_; }
 
 const ForenamesByCountryMap& MockCuratedDataService::LoadForenamesByCountry() {
-  return forenames_by_country_;
+   return forenames_by_country_;
 }
 
 const SurnamesByCountryMap& MockCuratedDataService::LoadSurnamesByCountry() {
-  return surnames_by_country_;
+   return surnames_by_country_;
 }
