@@ -24,56 +24,57 @@
  * example that fails validation, throws so the caller can skip the city.
  */
 class MockPostalCodeService final : public IPostalCodeService {
- public:
-  std::string GeneratePostalCode(const City& city) override {
-    const PostalCodeSpec& spec = city.postal_code;
+  public:
+   std::string GeneratePostalCode(const City& city) override {
+      const PostalCodeSpec& spec = city.postal_code;
 
-    if (spec.examples.empty()) {
-      throw std::runtime_error(std::format(
-          "No postal-code examples available for city '{}'", city.city));
-    }
-
-    const std::string& candidate = spec.examples.front();
-
-    if (!MatchesAnyPattern(candidate, spec)) {
-      throw std::runtime_error(
-          std::format("Postal code '{}' for city '{}' does not match the "
-                      "curated postal-code regex",
-                      candidate, city.city));
-    }
-
-    return candidate;
-  }
-
- private:
-  /**
-   * @brief Returns true if @p candidate matches any city regex, or the
-   * country format regex when no city regex matches. When the spec carries no
-   * usable regex at all, validation is skipped (returns true).
-   */
-  static bool MatchesAnyPattern(const std::string& candidate,
-                                const PostalCodeSpec& spec) {
-    bool has_pattern = false;
-
-    for (const std::string& pattern : spec.city_regexes) {
-      if (pattern.empty()) {
-        continue;
+      if (spec.examples.empty()) {
+         throw std::runtime_error(std::format(
+             "No postal-code examples available for city '{}'", city.city));
       }
-      has_pattern = true;
-      if (std::regex_match(candidate, std::regex(pattern))) {
-        return true;
-      }
-    }
 
-    if (!spec.country_format_regex.empty()) {
-      has_pattern = true;
-      if (std::regex_match(candidate, std::regex(spec.country_format_regex))) {
-        return true;
-      }
-    }
+      const std::string& candidate = spec.examples.front();
 
-    return !has_pattern;
-  }
+      if (!MatchesAnyPattern(candidate, spec)) {
+         throw std::runtime_error(
+             std::format("Postal code '{}' for city '{}' does not match the "
+                         "curated postal-code regex",
+                         candidate, city.city));
+      }
+
+      return candidate;
+   }
+
+  private:
+   /**
+    * @brief Returns true if @p candidate matches any city regex, or the
+    * country format regex when no city regex matches. When the spec carries no
+    * usable regex at all, validation is skipped (returns true).
+    */
+   static bool MatchesAnyPattern(const std::string& candidate,
+                                 const PostalCodeSpec& spec) {
+      bool has_pattern = false;
+
+      for (const std::string& pattern : spec.city_regexes) {
+         if (pattern.empty()) {
+            continue;
+         }
+         has_pattern = true;
+         if (std::regex_match(candidate, std::regex(pattern))) {
+            return true;
+         }
+      }
+
+      if (!spec.country_format_regex.empty()) {
+         has_pattern = true;
+         if (std::regex_match(candidate,
+                              std::regex(spec.country_format_regex))) {
+            return true;
+         }
+      }
+
+      return !has_pattern;
+   }
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_POSTAL_CODE_MOCK_POSTAL_CODE_SERVICE_H_
