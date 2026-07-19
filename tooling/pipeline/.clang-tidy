@@ -1,12 +1,6 @@
 Checks: >
-  -*,
-  bugprone-*,
-  google-*,
-  modernize-*,
-  readability-*,
-  cppcoreguidelines-*,
-  -modernize-use-trailing-return-type,
-  -google-runtime-references
+  -*, bugprone-*, google-*, modernize-*, readability-*, cppcoreguidelines-*,
+  -modernize-use-trailing-return-type, -google-runtime-references
 
 CheckOptions:
   # Enforce Google Naming Conventions with valid clang-tidy strings

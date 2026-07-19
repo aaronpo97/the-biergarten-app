@@ -26,45 +26,45 @@
  */
 template <typename T>
 class BoundedChannel {
-  // Internal state — all access must be guarded by mutex_.
+   // Internal state — all access must be guarded by mutex_.
 
-  std::queue<T> queue_;
+   std::queue<T> queue_;
 
-  std::mutex mutex_;
+   std::mutex mutex_;
 
-  std::condition_variable not_full_;
+   std::condition_variable not_full_;
 
-  std::condition_variable not_empty_;
+   std::condition_variable not_empty_;
 
-  std::size_t capacity_;
+   std::size_t capacity_;
 
-  bool closed_ = false;
+   bool closed_ = false;
 
- public:
-  /**
-   * @brief Construct a bounded channel with the given capacity.
-   * @param capacity Maximum number of items the channel may hold.
-   */
-  explicit BoundedChannel(std::size_t capacity) : capacity_(capacity) {}
+  public:
+   /**
+    * @brief Construct a bounded channel with the given capacity.
+    * @param capacity Maximum number of items the channel may hold.
+    */
+   explicit BoundedChannel(std::size_t capacity) : capacity_(capacity) {}
 
-  /**
-   * @brief Send an item into the channel. Blocks when the channel is full.
-   * @param item Move-only item to enqueue.
-   */
-  void Send(T item);
+   /**
+    * @brief Send an item into the channel. Blocks when the channel is full.
+    * @param item Move-only item to enqueue.
+    */
+   void Send(T item);
 
-  /**
-   * @brief Receive an item from the channel. Blocks when the channel is
-   * empty.
-   * @return std::optional<T> containing the item, or std::nullopt when the
-   * channel is closed and drained.
-   */
-  std::optional<T> Receive();
+   /**
+    * @brief Receive an item from the channel. Blocks when the channel is
+    * empty.
+    * @return std::optional<T> containing the item, or std::nullopt when the
+    * channel is closed and drained.
+    */
+   std::optional<T> Receive();
 
-  /**
-   * @brief Close the channel and unblock all waiting threads. Idempotent.
-   */
-  void Close();
+   /**
+    * @brief Close the channel and unblock all waiting threads. Idempotent.
+    */
+   void Close();
 };
 
 // Include the template implementation

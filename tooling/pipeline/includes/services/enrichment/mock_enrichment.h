@@ -14,9 +14,7 @@
  * @brief Enrichment service that returns no context for any location.
  */
 class MockEnrichmentService final : public IEnrichmentService {
- public:
-  std::string GetLocationContext(const City& /*loc*/) override {
-    return {};
-  }
+  public:
+   std::string GetLocationContext(const City& /*loc*/) override { return {}; }
 };
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_ENRICHMENT_MOCK_ENRICHMENT_H_

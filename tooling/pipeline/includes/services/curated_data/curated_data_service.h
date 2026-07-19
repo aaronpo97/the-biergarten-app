@@ -25,26 +25,26 @@ using SurnamesByCountryMap = std::unordered_map<std::string, SurnameList>;
  * brewery/user generation.
  */
 class ICuratedDataService {
- public:
-  ICuratedDataService() = default;
-  virtual ~ICuratedDataService() = default;
+  public:
+   ICuratedDataService() = default;
+   virtual ~ICuratedDataService() = default;
 
-  ICuratedDataService(const ICuratedDataService&) = delete;
-  ICuratedDataService& operator=(const ICuratedDataService&) = delete;
-  ICuratedDataService(ICuratedDataService&&) = delete;
-  ICuratedDataService& operator=(ICuratedDataService&&) = delete;
+   ICuratedDataService(const ICuratedDataService&) = delete;
+   ICuratedDataService& operator=(const ICuratedDataService&) = delete;
+   ICuratedDataService(ICuratedDataService&&) = delete;
+   ICuratedDataService& operator=(ICuratedDataService&&) = delete;
 
-  /**
-   * @brief Loads all curated location records.
-   */
-  virtual const LocationsList& LoadLocations() = 0;
+   /**
+    * @brief Loads all curated location records.
+    */
+   virtual const LocationsList& LoadLocations() = 0;
 
-  /**
-   * @brief Loads all curated persona records.
-   */
-  virtual const PersonasList& LoadPersonas() = 0;
-  virtual const ForenamesByCountryMap& LoadForenamesByCountry() = 0;
-  virtual const SurnamesByCountryMap& LoadSurnamesByCountry() = 0;
+   /**
+    * @brief Loads all curated persona records.
+    */
+   virtual const PersonasList& LoadPersonas() = 0;
+   virtual const ForenamesByCountryMap& LoadForenamesByCountry() = 0;
+   virtual const SurnamesByCountryMap& LoadSurnamesByCountry() = 0;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_CURATED_DATA_CURATED_DATA_SERVICE_H_

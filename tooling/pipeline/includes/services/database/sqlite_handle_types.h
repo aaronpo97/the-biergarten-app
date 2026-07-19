@@ -13,11 +13,11 @@
 namespace sqlite_export_service_internal {
 
 struct SqliteDatabaseDeleter {
-  void operator()(sqlite3* handle) const noexcept;
+   void operator()(sqlite3* handle) const noexcept;
 };
 
 struct SqliteStatementDeleter {
-  void operator()(sqlite3_stmt* statement) const noexcept;
+   void operator()(sqlite3_stmt* statement) const noexcept;
 };
 
 using SqliteDatabaseHandle = std::unique_ptr<sqlite3, SqliteDatabaseDeleter>;
@@ -28,9 +28,9 @@ using SqliteStatementHandle =
 // N.B. indices are 1 based.
 template <typename T>
 struct BoundParam {
-  int index;
-  T value;
-  std::string_view action;
+   int index;
+   T value;
+   std::string_view action;
 };
 
 }  // namespace sqlite_export_service_internal

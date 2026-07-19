@@ -25,31 +25,31 @@
  * bound to a single origin at construction time.
  */
 class HttpWebClient final : public WebClient {
- public:
-  explicit HttpWebClient(std::shared_ptr<ILogger> logger)
-      : logger_(std::move(logger)) {}
-  ~HttpWebClient() override = default;
+  public:
+   explicit HttpWebClient(std::shared_ptr<ILogger> logger)
+       : logger_(std::move(logger)) {}
+   ~HttpWebClient() override = default;
 
-  /**
-   * @brief Executes a blocking HTTP/HTTPS GET request against a full URL.
-   *
-   * @param url Fully-qualified URL, e.g.
-   * "https://en.wikipedia.org/api/rest_v1/page/summary/Berlin"
-   * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
-   */
-  std::string Get(const std::string& url) override;
+   /**
+    * @brief Executes a blocking HTTP/HTTPS GET request against a full URL.
+    *
+    * @param url Fully-qualified URL, e.g.
+    * "https://en.wikipedia.org/api/rest_v1/page/summary/Berlin"
+    * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
+    */
+   std::string Get(const std::string& url) override;
 
-  /**
-   * @brief Percent-encodes a single URI component (query parameter value or
-   *        path segment). Delegates to httplib::encode_uri_component().
-   *
-   * @param value Raw string to encode.
-   * @return Percent-encoded string safe for use in a URL.
-   */
-  std::string EncodeURL(const std::string& value) override;
+   /**
+    * @brief Percent-encodes a single URI component (query parameter value or
+    *        path segment). Delegates to httplib::encode_uri_component().
+    *
+    * @param value Raw string to encode.
+    * @return Percent-encoded string safe for use in a URL.
+    */
+   std::string EncodeURL(const std::string& value) override;
 
- private:
-  std::shared_ptr<ILogger> logger_;
+  private:
+   std::shared_ptr<ILogger> logger_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_WEB_CLIENT_HTTP_WEB_CLIENT_H_

@@ -20,13 +20,13 @@
  * via GenerateStringFromRegex().
  */
 class XegerPostalCodeService final : public IPostalCodeService {
- public:
-  XegerPostalCodeService();
+  public:
+   XegerPostalCodeService();
 
-  std::string GeneratePostalCode(const City& city) override;
+   std::string GeneratePostalCode(const City& city) override;
 
- private:
-  std::mt19937 rng_;
+  private:
+   std::mt19937 rng_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_POSTAL_CODE_XEGER_POSTAL_CODE_SERVICE_H_
