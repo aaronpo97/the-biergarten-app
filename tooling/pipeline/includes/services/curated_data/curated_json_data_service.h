@@ -16,48 +16,48 @@
  * CuratedJsonDataService.
  */
 struct CuratedDataFilePaths {
-  std::filesystem::path locations_path;
-  std::filesystem::path personas_path;
-  std::filesystem::path forenames_path;
-  std::filesystem::path surnames_path;
+   std::filesystem::path locations_path;
+   std::filesystem::path personas_path;
+   std::filesystem::path forenames_path;
+   std::filesystem::path surnames_path;
 };
 
 /**
  * @brief Loads curated location, persona, and name data from JSON files.
  */
 class CuratedJsonDataService final : public ICuratedDataService {
-  struct cache {
-    LocationsList locations;
-    PersonasList personas;
-    ForenamesByCountryMap forenames_by_country;
-    SurnamesByCountryMap surnames_by_country;
+   struct cache {
+      LocationsList locations;
+      PersonasList personas;
+      ForenamesByCountryMap forenames_by_country;
+      SurnamesByCountryMap surnames_by_country;
 
-    cache() = default;
-    ~cache() = default;
-  };
+      cache() = default;
+      ~cache() = default;
+   };
 
-  CuratedDataFilePaths filepaths_;
-  cache cache_;
+   CuratedDataFilePaths filepaths_;
+   cache cache_;
 
- public:
-  explicit CuratedJsonDataService(CuratedDataFilePaths filepaths);
+  public:
+   explicit CuratedJsonDataService(CuratedDataFilePaths filepaths);
 
-  /**
-   * @brief Parses a JSON array file and returns all location records.
-   */
-  const LocationsList& LoadLocations() override;
+   /**
+    * @brief Parses a JSON array file and returns all location records.
+    */
+   const LocationsList& LoadLocations() override;
 
-  /**
-   * @brief Parses a JSON array file and returns all persona records.
-   */
-  const PersonasList& LoadPersonas() override;
+   /**
+    * @brief Parses a JSON array file and returns all persona records.
+    */
+   const PersonasList& LoadPersonas() override;
 
-  const ForenamesByCountryMap& LoadForenamesByCountry() override;
+   const ForenamesByCountryMap& LoadForenamesByCountry() override;
 
-  /**
-   * @brief Parses a JSON file and returns all the forenames per country.
-   */
-  const SurnamesByCountryMap& LoadSurnamesByCountry() override;
+   /**
+    * @brief Parses a JSON file and returns all the forenames per country.
+    */
+   const SurnamesByCountryMap& LoadSurnamesByCountry() override;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_JSON_HANDLING_JSON_LOADER_H_
