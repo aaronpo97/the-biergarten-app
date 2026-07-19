@@ -86,7 +86,24 @@ int main(const int argc, char** argv) {
         di::bind<ApplicationOptions>().to(options),
         di::bind<std::string>().to(model_path),
         di::bind<IExportService>().to<SqliteExportService>(),
-        di::bind<IPostalCodeService>().to<MockPostalCodeService>(),
+        di::bind<IPostalCodeService>().to(
+            [options, &log_producer]() -> std::unique_ptr<IPostalCodeService> {
+              if (options.generator.use_mocked) {
+                log_producer->Log(
+                    {.level = LogLevel::Info,
+                     .phase = PipelinePhase::Startup,
+                     .message = "Postal code: mock (curated examples)"});
+
+                return std::make_unique<MockPostalCodeService>();
+              }
+
+              log_producer->Log(
+                  {.level = LogLevel::Info,
+                   .phase = PipelinePhase::Startup,
+                   .message = "Postal code: Xeger (regex-based generation)"});
+
+              return std::make_unique<XegerPostalCodeService>();
+            }),
         di::bind<ICuratedDataService>().to(
             [options, &log_producer]() -> std::unique_ptr<ICuratedDataService> {
               if (options.generator.use_mocked) {
