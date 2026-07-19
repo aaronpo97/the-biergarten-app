@@ -12,34 +12,34 @@
 
 BreweryResult MockGenerator::GenerateBrewery(
     const EnrichedCity& enriched_city) {
-  const City& location = enriched_city.location;
-  const size_t hash = DeterministicHash(location);
+   const City& location = enriched_city.location;
+   const size_t hash = DeterministicHash(location);
 
-  const std::string_view adjective =
-      kBreweryAdjectives.at(hash % kBreweryAdjectives.size());
-  const std::string_view noun =
-      kBreweryNouns.at(hash / kNounHashStride % kBreweryNouns.size());
-  const std::string_view base_description = kBreweryDescriptions.at(
-      (hash / kDescriptionHashStride) % kBreweryDescriptions.size());
+   const std::string_view adjective =
+       kBreweryAdjectives.at(hash % kBreweryAdjectives.size());
+   const std::string_view noun =
+       kBreweryNouns.at(hash / kNounHashStride % kBreweryNouns.size());
+   const std::string_view base_description = kBreweryDescriptions.at(
+       (hash / kDescriptionHashStride) % kBreweryDescriptions.size());
 
-  const std::string name =
-      std::format("{} {} {}", location.city, adjective, noun);
+   const std::string name =
+       std::format("{} {} {}", location.city, adjective, noun);
 
-  const std::string state_suffix =
-      location.state_province.empty()
-          ? std::string{}
-          : std::format(", {}", location.state_province);
-  const std::string country_suffix =
-      location.country.empty() ? std::string{}
-                               : std::format(", {}", location.country);
-  const std::string description =
-      std::format("{} Located in {}{}{}.", base_description, location.city,
-                  state_suffix, country_suffix);
+   const std::string state_suffix =
+       location.state_province.empty()
+           ? std::string{}
+           : std::format(", {}", location.state_province);
+   const std::string country_suffix =
+       location.country.empty() ? std::string{}
+                                : std::format(", {}", location.country);
+   const std::string description =
+       std::format("{} Located in {}{}{}.", base_description, location.city,
+                   state_suffix, country_suffix);
 
-  return {
-      .name_en = name,
-      .description_en = description,
-      .name_local = name,
-      .description_local = description,
-  };
+   return {
+       .name_en = name,
+       .description_en = description,
+       .name_local = name,
+       .description_local = description,
+   };
 }
