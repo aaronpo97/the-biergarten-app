@@ -24,22 +24,22 @@
  * @brief Interface for loading named prompt files.
  */
 class IPromptDirectory {
- public:
-  IPromptDirectory() = default;
-  IPromptDirectory(const IPromptDirectory&) = delete;
-  IPromptDirectory& operator=(const IPromptDirectory&) = delete;
-  IPromptDirectory(IPromptDirectory&&) = delete;
-  IPromptDirectory& operator=(IPromptDirectory&&) = delete;
-  virtual ~IPromptDirectory() = default;
+  public:
+   IPromptDirectory() = default;
+   IPromptDirectory(const IPromptDirectory&) = delete;
+   IPromptDirectory& operator=(const IPromptDirectory&) = delete;
+   IPromptDirectory(IPromptDirectory&&) = delete;
+   IPromptDirectory& operator=(IPromptDirectory&&) = delete;
+   virtual ~IPromptDirectory() = default;
 
-  /**
-   * @brief Loads the prompt associated with @p key.
-   *
-   * @param key Logical prompt key, e.g. "BREWERY_GENERATION".
-   * @return Prompt text.
-   * @throws std::runtime_error if the prompt file cannot be found or read.
-   */
-  [[nodiscard]] virtual std::string Load(std::string_view key) = 0;
+   /**
+    * @brief Loads the prompt associated with @p key.
+    *
+    * @param key Logical prompt key, e.g. "BREWERY_GENERATION".
+    * @return Prompt text.
+    * @throws std::runtime_error if the prompt file cannot be found or read.
+    */
+   [[nodiscard]] virtual std::string Load(std::string_view key) = 0;
 };
 
 /**
@@ -50,33 +50,33 @@ class IPromptDirectory {
  * at construction time; individual file absence is reported lazily at Load().
  */
 class PromptDirectory final : public IPromptDirectory {
- public:
-  /**
-   * @brief Constructs a PromptDirectory rooted at @p prompt_dir.
-   *
-   * @param prompt_dir Absolute or relative path to the prompt directory.
-   * @throws std::runtime_error if @p prompt_dir does not exist or is not a
-   *         directory.
-   */
-  explicit PromptDirectory(const std::filesystem::path& prompt_dir);
-  PromptDirectory(const std::filesystem::path& prompt_dir,
-                  std::shared_ptr<ILogger> logger);
+  public:
+   /**
+    * @brief Constructs a PromptDirectory rooted at @p prompt_dir.
+    *
+    * @param prompt_dir Absolute or relative path to the prompt directory.
+    * @throws std::runtime_error if @p prompt_dir does not exist or is not a
+    *         directory.
+    */
+   explicit PromptDirectory(const std::filesystem::path& prompt_dir);
+   PromptDirectory(const std::filesystem::path& prompt_dir,
+                   std::shared_ptr<ILogger> logger);
 
-  /**
-   * @brief Loads the prompt for @p key, caching the result.
-   *
-   * Maps @p key → <prompt_dir>/<key>.md.
-   *
-   * @param key Logical prompt key.
-   * @return Prompt text.
-   * @throws std::runtime_error if the file does not exist or is empty.
-   */
-  [[nodiscard]] std::string Load(std::string_view key) override;
+   /**
+    * @brief Loads the prompt for @p key, caching the result.
+    *
+    * Maps @p key → <prompt_dir>/<key>.md.
+    *
+    * @param key Logical prompt key.
+    * @return Prompt text.
+    * @throws std::runtime_error if the file does not exist or is empty.
+    */
+   [[nodiscard]] std::string Load(std::string_view key) override;
 
- private:
-  std::filesystem::path prompt_dir_;
-  std::shared_ptr<ILogger> logger_;
-  std::unordered_map<std::string, std::string> cache_;
+  private:
+   std::filesystem::path prompt_dir_;
+   std::shared_ptr<ILogger> logger_;
+   std::unordered_map<std::string, std::string> cache_;
 };
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_SERVICES_PROMPTING_PROMPT_DIRECTORY_H_
