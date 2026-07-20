@@ -54,11 +54,11 @@ void XegerGenerator::Visit(const Alternation& node) {
 }
 
 void XegerGenerator::Visit(const Repeat& node) {
-   const int lo = node.min;
-   const int hi = (node.max < 0) ? node.min + unbounded_cap_ : node.max;
-   std::uniform_int_distribution<int> dist(lo, hi);
-   const int count = dist(rng_);
-   for (int i = 0; i < count; ++i) {
+   const unsigned int low = node.min;
+   const unsigned int high = node.max.value_or(node.min + unbounded_cap_);
+   std::uniform_int_distribution<unsigned int> dist(low, high);
+   const unsigned int count = dist(rng_);
+   for (unsigned int i = 0; i < count; ++i) {
       node.child->Accept(*this);
    }
 }
