@@ -111,8 +111,9 @@ if(NOT BIERGARTEN_MOCK_ONLY)
                 )
                 FetchContent_MakeAvailable(llama-cpp)
         endif()
-
+        if (NOT APPLE)
         find_package(OpenMP REQUIRED)
+        endif()
 endif()
 
 # spdlog
@@ -249,9 +250,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         includes
 )
 
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
         $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:llama>
-        $<$<NOT:$<BOOL:${BIERGARTEN_MOCK_ONLY}>>:OpenMP::OpenMP_CXX>
+        $<TARGET_NAME_IF_EXISTS:OpenMP::OpenMP_CXX>
         boost::di
         Boost::json
         Boost::program_options
