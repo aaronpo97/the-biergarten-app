@@ -16,12 +16,18 @@
 
         <!--
         remove this override once microsoft ships official fix to vulnerability
-        https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+        https:
         -->
         <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.50.3" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Pipeline-generated seed data, copied to the output directory so it can be opened via
+             ConnectionStrings.SqliteConnectionString at runtime. -->
+        <None Include="SeedData\seed.sqlite" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

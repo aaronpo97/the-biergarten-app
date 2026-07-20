@@ -1,19 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace Database.Seed;
+namespace Database.Seed.DatabaseHelpers;
 
 public class ConnectionStrings
 {
-    /// <summary>
-    /// Builds a SQL Server connection string from the <c>DB_SERVER</c>, <c>DB_NAME</c>,
-    /// <c>DB_USER</c>, <c>DB_PASSWORD</c>, and <c>DB_TRUST_SERVER_CERTIFICATE</c>
-    /// environment variables.
-    /// </summary>
-    /// <returns>A fully built SQL Server connection string.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown when <c>DB_SERVER</c>, <c>DB_NAME</c>, <c>DB_USER</c>, or <c>DB_PASSWORD</c>
-    /// is not set.
-    /// </exception>
     private static string GetSqlServerConnectionString()
     {
         string server =
@@ -48,7 +38,6 @@ public class ConnectionStrings
         return builder.ConnectionString;
     }
 
-
     public static string SqlServerConnectionString => GetSqlServerConnectionString();
-    public static string SqliteConnectionString => "Data Source=seed.sqlite";
+    public static string SqliteConnectionString => "Data Source=SeedData/seed.sqlite";
 }
