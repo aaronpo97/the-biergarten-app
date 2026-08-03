@@ -4,25 +4,28 @@ namespace Database.Seed.DatabaseHelpers;
 
 public class ConnectionStrings
 {
+    public static string SqlServerConnectionString => GetSqlServerConnectionString();
+    public static string SqliteConnectionString => "Data Source=SeedData/seed.sqlite";
+
     private static string GetSqlServerConnectionString()
     {
-        string server =
+        var server =
             Environment.GetEnvironmentVariable("DB_SERVER")
             ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
-        string dbName =
+        var dbName =
             Environment.GetEnvironmentVariable("DB_NAME")
             ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
-        string user =
+        var user =
             Environment.GetEnvironmentVariable("DB_USER")
             ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
-        string password =
+        var password =
             Environment.GetEnvironmentVariable("DB_PASSWORD")
             ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
-        string trustServerCertificate =
+        var trustServerCertificate =
             Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE") ?? "True";
 
         SqlConnectionStringBuilder builder = new()
@@ -32,12 +35,9 @@ public class ConnectionStrings
             UserID = user,
             Password = password,
             TrustServerCertificate = bool.Parse(trustServerCertificate),
-            Encrypt = true,
+            Encrypt = true
         };
 
         return builder.ConnectionString;
     }
-
-    public static string SqlServerConnectionString => GetSqlServerConnectionString();
-    public static string SqliteConnectionString => "Data Source=SeedData/seed.sqlite";
 }
