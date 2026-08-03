@@ -21,11 +21,11 @@ public sealed class PipelineSeedDataReader
         IReadOnlyDictionary<long, City> cities = ReadCities(connection);
 
         const string sql = """
-            SELECT b.name_en, b.description_en, b.name_local, b.description_local,
-                   ba.city_id, ba.postal_code
-            FROM breweries b
-            JOIN brewery_addresses ba ON ba.brewery_id = b.id;
-            """;
+                           SELECT b.name_en, b.description_en, b.name_local, b.description_local,
+                                  ba.city_id, ba.postal_code
+                           FROM breweries b
+                           JOIN brewery_addresses ba ON ba.brewery_id = b.id;
+                           """;
 
         using SqliteCommand command = new(sql, connection);
         using SqliteDataReader reader = command.ExecuteReader();
@@ -40,13 +40,13 @@ public sealed class PipelineSeedDataReader
                         NameEn = reader.GetString(0),
                         DescriptionEn = reader.GetString(1),
                         NameLocal = reader.GetString(2),
-                        DescriptionLocal = reader.GetString(3),
+                        DescriptionLocal = reader.GetString(3)
                     },
                     Address = new BreweryAddress
                     {
                         City = cities[reader.GetInt64(4)],
-                        PostalCode = reader.GetString(5),
-                    },
+                        PostalCode = reader.GetString(5)
+                    }
                 }
             );
 
@@ -61,12 +61,12 @@ public sealed class PipelineSeedDataReader
         IReadOnlyDictionary<long, City> cities = ReadCities(connection);
 
         const string sql = """
-            SELECT u.first_name, u.last_name, u.gender, u.username, u.bio,
-                   u.activity_weight, u.email, u.date_of_birth,
-                   ua.city_id, ua.postal_code
-            FROM users u
-            JOIN user_addresses ua ON ua.user_id = u.id;
-            """;
+                           SELECT u.first_name, u.last_name, u.gender, u.username, u.bio,
+                                  u.activity_weight, u.email, u.date_of_birth,
+                                  ua.city_id, ua.postal_code
+                           FROM users u
+                           JOIN user_addresses ua ON ua.user_id = u.id;
+                           """;
 
         using SqliteCommand command = new(sql, connection);
         using SqliteDataReader reader = command.ExecuteReader();
@@ -83,15 +83,15 @@ public sealed class PipelineSeedDataReader
                         Gender = reader.GetString(2),
                         Username = reader.GetString(3),
                         Bio = reader.GetString(4),
-                        ActivityWeight = (float)reader.GetDouble(5),
+                        ActivityWeight = (float)reader.GetDouble(5)
                     },
                     Email = reader.GetString(6),
                     DateOfBirth = reader.GetString(7),
                     Address = new UserAddress
                     {
                         City = cities[reader.GetInt64(8)],
-                        PostalCode = reader.GetString(9),
-                    },
+                        PostalCode = reader.GetString(9)
+                    }
                 }
             );
 
@@ -101,11 +101,11 @@ public sealed class PipelineSeedDataReader
     private static IReadOnlyDictionary<long, City> ReadCities(SqliteConnection connection)
     {
         const string sql = """
-            SELECT id, city, state_province, iso3166_2, country, iso3166_1,
-                   local_languages_json, postal_code_country_format_regex,
-                   postal_code_city_regex_json
-            FROM cities;
-            """;
+                           SELECT id, city, state_province, iso3166_2, country, iso3166_1,
+                                  local_languages_json, postal_code_country_format_regex,
+                                  postal_code_city_regex_json
+                           FROM cities;
+                           """;
 
         using SqliteCommand command = new(sql, connection);
         using SqliteDataReader reader = command.ExecuteReader();
@@ -123,13 +123,15 @@ public sealed class PipelineSeedDataReader
                 PostalCode = new PostalCodeSpec
                 {
                     CountryFormatRegex = reader.GetString(7),
-                    CityRegexes = DeserializeStringArray(reader.GetString(8)),
-                },
+                    CityRegexes = DeserializeStringArray(reader.GetString(8))
+                }
             };
 
         return cities;
     }
 
-    private static IReadOnlyList<string> DeserializeStringArray(string json) =>
-        JsonSerializer.Deserialize<List<string>>(json) ?? [];
+    private static IReadOnlyList<string> DeserializeStringArray(string json)
+    {
+        return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+    }
 }
