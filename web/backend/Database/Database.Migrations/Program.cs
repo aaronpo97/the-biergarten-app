@@ -7,215 +7,211 @@ using Microsoft.Data.SqlClient;
 namespace Database.Migrations;
 
 /// <summary>
-///     Entry point for the database migration runner. Reads connection details from
-///     environment variables, optionally clears and recreates the target database, and
-///     applies all SQL migration scripts embedded in this assembly using DbUp.
+///     Entry point for the database migration runner. Reads connection details from environment
+///     variables, optionally drops and recreates the target database, and applies all SQL
+///     migration scripts embedded in this assembly using DbUp.
 /// </summary>
 public static class Program
 {
-    /// <summary>The connection string for the target application database (<c>DB_NAME</c>).</summary>
-    private static readonly string connectionString = BuildConnectionString();
+    /// <summary>
+    ///     Migration runner entry point. Drops the target database when <c>CLEAR_DATABASE</c> is
+    ///     set to <c>true</c>, ensures the database exists, then deploys all pending migrations.
+    /// </summary>
+    /// <returns>
+    ///     <c>0</c> if migrations completed successfully; <c>1</c> if they failed or an error occurred.
+    /// </returns>
+    public static async Task<int> Main()
+    {
+        Console.WriteLine("Starting database migrations...");
 
-    /// <summary>The connection string for the <c>master</c> database, used for create/drop operations.</summary>
-    private static readonly string masterConnectionString = BuildConnectionString("master");
+        try
+        {
+            DatabaseSettings settings = DatabaseSettings.FromEnvironment();
+
+            if (settings.ClearDatabase)
+            {
+                Console.WriteLine(
+                    $"CLEAR_DATABASE is enabled. Dropping database '{settings.DatabaseName}'..."
+                );
+                await DropDatabaseIfExistsAsync(settings);
+            }
+
+            await CreateDatabaseIfNotExistsAsync(settings);
+
+            return DeployMigrations(settings.ConnectionString) ? 0 : 1;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or SqlException)
+        {
+            Console.Error.WriteLine("An error occurred during database migrations:");
+            Console.Error.WriteLine(ex.Message);
+            return 1;
+        }
+    }
 
     /// <summary>
-    ///     Builds a SQL Server connection string from the <c>DB_SERVER</c>, <c>DB_NAME</c>,
-    ///     <c>DB_USER</c>, <c>DB_PASSWORD</c>, and <c>DB_TRUST_SERVER_CERTIFICATE</c>
-    ///     environment variables.
+    ///     Drops the target database if it exists, first forcing it into single-user mode with
+    ///     rollback immediate so that any existing connections are terminated.
     /// </summary>
-    /// <param name="databaseName">
-    ///     The database (initial catalog) to connect to. When <c>null</c>, falls back to the
-    ///     <c>DB_NAME</c> environment variable.
-    /// </param>
-    /// <returns>A fully built SQL Server connection string.</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when <c>DB_SERVER</c>, <c>DB_USER</c>, <c>DB_PASSWORD</c>, or (when
-    ///     <paramref name="databaseName" /> is <c>null</c>) <c>DB_NAME</c> is not set.
-    /// </exception>
-    private static string BuildConnectionString(string? databaseName = null)
+    /// <param name="settings">The resolved database settings.</param>
+    /// <exception cref="SqlException">Thrown if the connection or the drop operation fails.</exception>
+    private static async Task DropDatabaseIfExistsAsync(DatabaseSettings settings)
     {
-        string server =
-            Environment.GetEnvironmentVariable("DB_SERVER")
-            ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
+        const string sql = """
+            DECLARE @statement nvarchar(max);
 
-        string dbName =
-            databaseName
-            ?? Environment.GetEnvironmentVariable("DB_NAME")
-            ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
+            IF EXISTS (SELECT 1 FROM sys.databases WHERE name = @databaseName)
+            BEGIN
+                SET @statement =
+                    N'ALTER DATABASE ' + QUOTENAME(@databaseName)
+                    + N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE;';
+                EXEC sys.sp_executesql @statement;
 
-        string user =
-            Environment.GetEnvironmentVariable("DB_USER")
-            ?? throw new InvalidOperationException("DB_USER environment variable is not set");
+                SET @statement = N'DROP DATABASE ' + QUOTENAME(@databaseName) + N';';
+                EXEC sys.sp_executesql @statement;
+            END
+            """;
 
-        string password =
-            Environment.GetEnvironmentVariable("DB_PASSWORD")
-            ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+        await ExecuteNonQueryAsync(settings.MasterConnectionString, sql, settings.DatabaseName);
+        Console.WriteLine($"Database '{settings.DatabaseName}' dropped, or did not exist.");
+    }
 
-        string trustServerCertificate =
-            Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE") ?? "True";
+    /// <summary>
+    ///     Creates the target database on the <c>master</c> connection if it does not already exist.
+    /// </summary>
+    /// <param name="settings">The resolved database settings.</param>
+    /// <exception cref="SqlException">Thrown if the connection or the create operation fails.</exception>
+    private static async Task CreateDatabaseIfNotExistsAsync(DatabaseSettings settings)
+    {
+        const string sql = """
+            DECLARE @statement nvarchar(max);
 
-        SqlConnectionStringBuilder builder = new()
-        {
-            DataSource = server,
-            InitialCatalog = dbName,
-            UserID = user,
-            Password = password,
-            TrustServerCertificate = bool.Parse(trustServerCertificate),
-            Encrypt = true,
-        };
+            IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = @databaseName)
+            BEGIN
+                SET @statement = N'CREATE DATABASE ' + QUOTENAME(@databaseName) + N';';
+                EXEC sys.sp_executesql @statement;
+            END
+            """;
 
-        return builder.ConnectionString;
+        await ExecuteNonQueryAsync(settings.MasterConnectionString, sql, settings.DatabaseName);
+        Console.WriteLine($"Database '{settings.DatabaseName}' is present.");
+    }
+
+    /// <summary>
+    ///     Opens a connection, executes a non-query batch parameterised by database name, and
+    ///     disposes both the command and the connection.
+    /// </summary>
+    /// <param name="connectionString">The connection string to open.</param>
+    /// <param name="sql">The Transact-SQL batch to execute.</param>
+    /// <param name="databaseName">The value bound to the <c>@databaseName</c> parameter.</param>
+    private static async Task ExecuteNonQueryAsync(
+        string connectionString,
+        string sql,
+        string databaseName
+    )
+    {
+        await using SqlConnection connection = new(connectionString);
+        await connection.OpenAsync();
+
+        await using SqlCommand command = new(sql, connection);
+        command.Parameters.Add("@databaseName", SqlDbType.NVarChar, 128).Value = databaseName;
+
+        await command.ExecuteNonQueryAsync();
     }
 
     /// <summary>
     ///     Applies all pending SQL migration scripts embedded in this assembly to the target
     ///     database using DbUp, logging progress to the console.
     /// </summary>
+    /// <param name="connectionString">The connection string for the target application database.</param>
     /// <returns><c>true</c> if the upgrade completed successfully; otherwise <c>false</c>.</returns>
-    private static bool DeployMigrations()
+    private static bool DeployMigrations(string connectionString)
     {
-        UpgradeEngine? upgrader = DeployChanges
+        UpgradeEngine upgrader = DeployChanges
             .To.SqlDatabase(connectionString)
             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+            .WithTransactionPerScript()
             .LogToConsole()
             .Build();
 
-        DatabaseUpgradeResult? result = upgrader.PerformUpgrade();
-        return result.Successful;
+        DatabaseUpgradeResult result = upgrader.PerformUpgrade();
+
+        if (result.Successful)
+        {
+            Console.WriteLine("Database migrations completed successfully.");
+            return true;
+        }
+
+        Console.Error.WriteLine($"Database migrations failed: {result.Error}");
+        return false;
     }
 
     /// <summary>
-    ///     Drops the <c>Biergarten</c> database if it exists, first forcing it into single-user
-    ///     mode with rollback to terminate any existing connections.
+    ///     Connection details and runtime options resolved from environment variables.
     /// </summary>
-    /// <returns>
-    ///     <c>true</c> if the database was dropped (or did not exist) without error; <c>false</c>
-    ///     if an error occurred while connecting or dropping the database.
-    /// </returns>
-    private static bool ClearDatabase()
+    /// <param name="ConnectionString">The connection string for the target application database.</param>
+    /// <param name="MasterConnectionString">
+    ///     The connection string for the <c>master</c> database, used for create and drop operations.
+    /// </param>
+    /// <param name="DatabaseName">The name of the target application database.</param>
+    /// <param name="ClearDatabase">Whether the target database should be dropped before migrating.</param>
+    private sealed record DatabaseSettings(
+        string ConnectionString,
+        string MasterConnectionString,
+        string DatabaseName,
+        bool ClearDatabase
+    )
     {
-        SqlConnection myConn = new(masterConnectionString);
-
-        try
+        /// <summary>
+        ///     Builds the settings from the <c>DB_SERVER</c>, <c>DB_NAME</c>, <c>DB_USER</c>,
+        ///     <c>DB_PASSWORD</c>, <c>DB_TRUST_SERVER_CERTIFICATE</c>, and <c>CLEAR_DATABASE</c>
+        ///     environment variables.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when a required environment variable is not set.
+        /// </exception>
+        public static DatabaseSettings FromEnvironment()
         {
-            myConn.Open();
+            string server = Required("DB_SERVER");
+            string databaseName = Required("DB_NAME");
+            string user = Required("DB_USER");
+            string password = Required("DB_PASSWORD");
 
-            // First, set the database to single user mode to close all connections
-            SqlCommand setModeCommand = new(
-                "IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten') "
-                    + "ALTER DATABASE [Biergarten] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;",
-                myConn
+            bool trustServerCertificate =
+                !bool.TryParse(
+                    Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE"),
+                    out bool parsedTrust
+                )
+                || parsedTrust;
+
+            bool clearDatabase = string.Equals(
+                Environment.GetEnvironmentVariable("CLEAR_DATABASE"),
+                "true",
+                StringComparison.OrdinalIgnoreCase
             );
-            try
-            {
-                setModeCommand.ExecuteNonQuery();
-                Console.WriteLine("Database set to single user mode.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Could not set single user mode: {ex.Message}");
-            }
 
-            // Then drop the database
-            SqlCommand dropCommand = new("DROP DATABASE IF EXISTS [Biergarten];", myConn);
-            try
-            {
-                dropCommand.ExecuteNonQuery();
-                Console.WriteLine("Database cleared successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error dropping database: {ex}");
-                return false;
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error clearing database: {ex}");
-            return false;
-        }
-        finally
-        {
-            if (myConn.State == ConnectionState.Open)
-                myConn.Close();
+            return new DatabaseSettings(
+                Build(databaseName),
+                Build("master"),
+                databaseName,
+                clearDatabase
+            );
+
+            string Build(string initialCatalog) =>
+                new SqlConnectionStringBuilder
+                {
+                    DataSource = server,
+                    InitialCatalog = initialCatalog,
+                    UserID = user,
+                    Password = password,
+                    Encrypt = true,
+                    TrustServerCertificate = trustServerCertificate
+                }.ConnectionString;
         }
 
-        return true;
-    }
-
-    /// <summary>
-    ///     Creates the <c>Biergarten</c> database on the master connection if it does not
-    ///     already exist. Errors encountered while creating the database are logged but do
-    ///     not stop execution.
-    /// </summary>
-    /// <returns><c>true</c> always; this method does not propagate database errors as a failure result.</returns>
-    private static bool CreateDatabaseIfNotExists()
-    {
-        SqlConnection myConn = new(masterConnectionString);
-
-        const string str = """
-            IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'Biergarten')
-            CREATE DATABASE [Biergarten]
-            """;
-
-        SqlCommand myCommand = new(str, myConn);
-        try
-        {
-            myConn.Open();
-            myCommand.ExecuteNonQuery();
-            Console.WriteLine("Database creation command executed successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating database: {ex}");
-        }
-        finally
-        {
-            if (myConn.State == ConnectionState.Open)
-                myConn.Close();
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Migration runner entry point. Optionally clears the existing database when the
-    ///     <c>CLEAR_DATABASE</c> environment variable is set to <c>"true"</c>, ensures the
-    ///     database exists, then deploys all pending migrations.
-    /// </summary>
-    /// <param name="args">Command-line arguments (unused).</param>
-    /// <returns><c>0</c> if migrations completed successfully; <c>1</c> if they failed or an error occurred.</returns>
-    public static int Main(string[] args)
-    {
-        Console.WriteLine("Starting database migrations...");
-
-        try
-        {
-            string? clearDatabase = Environment.GetEnvironmentVariable("CLEAR_DATABASE");
-            if (clearDatabase == "true")
-            {
-                Console.WriteLine("CLEAR_DATABASE is enabled. Clearing existing database...");
-                ClearDatabase();
-            }
-
-            CreateDatabaseIfNotExists();
-            bool success = DeployMigrations();
-
-            if (success)
-            {
-                Console.WriteLine("Database migrations completed successfully.");
-                return 0;
-            }
-
-            Console.WriteLine("Database migrations failed.");
-            return 1;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("An error occurred during database migrations:");
-            Console.WriteLine(ex.Message);
-            return 1;
-        }
+        private static string Required(string variableName) =>
+            Environment.GetEnvironmentVariable(variableName)
+            ?? throw new InvalidOperationException(
+                $"The {variableName} environment variable is not set."
+            );
     }
 }

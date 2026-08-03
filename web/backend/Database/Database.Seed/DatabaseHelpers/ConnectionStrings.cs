@@ -1,4 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿#region
+
+using Microsoft.Data.SqlClient;
+
+#endregion
 
 namespace Database.Seed.DatabaseHelpers;
 
@@ -9,23 +13,23 @@ public class ConnectionStrings
 
     private static string GetSqlServerConnectionString()
     {
-        var server =
+        string server =
             Environment.GetEnvironmentVariable("DB_SERVER")
             ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
 
-        var dbName =
+        string dbName =
             Environment.GetEnvironmentVariable("DB_NAME")
             ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
 
-        var user =
+        string user =
             Environment.GetEnvironmentVariable("DB_USER")
             ?? throw new InvalidOperationException("DB_USER environment variable is not set");
 
-        var password =
+        string password =
             Environment.GetEnvironmentVariable("DB_PASSWORD")
             ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
 
-        var trustServerCertificate =
+        string trustServerCertificate =
             Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE") ?? "True";
 
         SqlConnectionStringBuilder builder = new()
