@@ -2,14 +2,13 @@ using Domain.Entities;
 using Features.Auth.Dtos;
 
 namespace Features.Auth.Repository;
+
 /// <summary>
 ///     Repository for authentication-related database operations including user registration and credential management.
 /// </summary>
 public interface IAuthRepository
 {
-    Task<UserAccount> RegisterUserAsync(
-        UserRegistrationDto userRegistrationDto
-    );
+    Task<UserAccount> RegisterUserAsync(UserRegistrationDto userRegistrationDto);
 
     Task<UserAccount?> GetUserByEmailAsync(string email);
 

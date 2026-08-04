@@ -180,8 +180,7 @@ public static class Program
                 !bool.TryParse(
                     Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE"),
                     out bool parsedTrust
-                )
-                || parsedTrust;
+                ) || parsedTrust;
 
             bool clearDatabase = string.Equals(
                 Environment.GetEnvironmentVariable("CLEAR_DATABASE"),
@@ -204,7 +203,7 @@ public static class Program
                     UserID = user,
                     Password = password,
                     Encrypt = true,
-                    TrustServerCertificate = trustServerCertificate
+                    TrustServerCertificate = trustServerCertificate,
                 }.ConnectionString;
         }
 

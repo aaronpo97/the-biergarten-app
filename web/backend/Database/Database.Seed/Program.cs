@@ -1,23 +1,20 @@
-
-
 using Database.Seed.DatabaseHelpers;
 using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
+using Domain.Entities;
 using Features.Auth.DependencyInjection;
 using Features.Auth.Dtos;
 using Features.Auth.Repository;
 using Features.Breweries.DependencyInjection;
 using Features.Breweries.Repository;
+using idunno.Password;
+using Infrastructure.PasswordHashing;
 using Infrastructure.Sql;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using idunno.Password;
-using Infrastructure.PasswordHashing;
-using Domain.Entities;
 
-
-async static Task<int> main()
+static async Task<int> main()
 {
     IReadOnlyList<BreweryRecord> breweries;
     IReadOnlyList<UserRecord> users;
@@ -61,16 +58,15 @@ async static Task<int> main()
     }
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine(
-        $"Loaded {breweries.Count} breweries."
-    );
+    Console.WriteLine($"Loaded {breweries.Count} breweries.");
     Console.ResetColor();
 
     for (int i = 0; i < breweries.Count; i++)
     {
         BreweryRecord brewery = breweries[i];
         Console.WriteLine(
-            $"{i + 1}:\t{brewery.Brewery.NameEn}\t({brewery.Address.City.CityName}, {brewery.Address.City.Country})");
+            $"{i + 1}:\t{brewery.Brewery.NameEn}\t({brewery.Address.City.CityName}, {brewery.Address.City.Country})"
+        );
     }
 
     Console.ForegroundColor = ConsoleColor.Green;
@@ -87,7 +83,11 @@ async static Task<int> main()
 
         // Generate a password that is 64 characters long with 10 digits, 10 symbols,
         // allowing upper and lower case letters, disallowing repeat characters.
-        string generatedPassword = PasswordGenerator.Generate(length: 64, numberOfDigits: 10, numberOfSymbols: 10);
+        string generatedPassword = PasswordGenerator.Generate(
+            length: 64,
+            numberOfDigits: 10,
+            numberOfSymbols: 10
+        );
         string hashedPassword = passwordInfrastructure.Hash(generatedPassword);
 
         UserRegistrationDto registrationDto = new(
@@ -102,7 +102,9 @@ async static Task<int> main()
         try
         {
             UserAccount createdUser = await authRepository.RegisterUserAsync(registrationDto);
-            Console.WriteLine($"Created user: {createdUser.Username} ({createdUser.UserAccountId})");
+            Console.WriteLine(
+                $"Created user: {createdUser.Username} ({createdUser.UserAccountId})"
+            );
         }
         catch (Exception ex)
         {
@@ -110,11 +112,9 @@ async static Task<int> main()
             Console.WriteLine($"Error creating user {username}: {ex.Message}");
             Console.ResetColor();
         }
-
     }
 
     return 0;
 }
-
 
 return await main();
