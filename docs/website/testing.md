@@ -19,7 +19,7 @@ The project uses a multi-layered testing approach across backend and frontend:
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
   components
 
-## Running Tests with Docker (Recommended)
+## Running tests with Docker (recommended)
 
 The easiest way to run all tests is using Docker Compose, which sets up an
 isolated test environment:
@@ -37,7 +37,7 @@ This command:
 5. Exports results to `./test-results/`
 6. Exits when tests complete
 
-### View Test Results
+### View test results
 
 ```bash
 # List test result files
@@ -51,18 +51,18 @@ cat test-results/Features.UserManagement.Tests.trx
 cat test-results/Features.Emails.Tests.trx
 ```
 
-### Clean Up
+### Clean up
 
 ```bash
 # Remove test containers and volumes
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
-## Running Tests Locally
+## Running tests locally
 
 You can run individual test projects locally without Docker:
 
-### Integration Tests (API.Specs)
+### Integration tests (API.Specs)
 
 ```bash
 cd web/backend
@@ -75,7 +75,7 @@ dotnet test API/API.Specs/API.Specs.csproj
 - Database migrated and seeded
 - Environment variables set (DB connection, JWT secret)
 
-### Feature Slice Unit Tests
+### Feature slice unit tests
 
 Each feature slice has its own test project, covering its command/query
 handlers and repository:
@@ -96,7 +96,7 @@ for proj in Features/*.Tests; do dotnet test "$proj"; done
 - No database required (handlers use Moq; repository tests use DbMocker to
   simulate SQL Server responses)
 
-### Frontend Storybook Tests
+### Frontend Storybook tests
 
 ```bash
 cd web/frontend
@@ -110,7 +110,7 @@ npm run test:storybook
   toasts, and the theme gallery
 - Runs in browser mode via Vitest and Storybook integration
 
-### Frontend Playwright Storybook Tests
+### Frontend Playwright Storybook tests
 
 ```bash
 cd web/frontend
@@ -125,9 +125,9 @@ npm run test:storybook:playwright
 - The command will start or reuse the Storybook server defined in
   `playwright.storybook.config.ts`
 
-## Test Coverage
+## Test coverage
 
-### Current Coverage
+### Current coverage
 
 **Features.Auth.Tests**:
 
@@ -160,7 +160,7 @@ npm run test:storybook:playwright
 - Theme gallery rendering across Biergarten themes
 - Toast interactions and themed notification display
 
-### Planned Coverage
+### Planned coverage
 
 - [ ] Password reset functionality
 - [ ] Beer post operations
@@ -168,7 +168,7 @@ npm run test:storybook:playwright
 - [ ] Image upload service
 - [ ] Frontend route integration coverage beyond Storybook stories
 
-## Testing Frameworks & Tools
+## Testing frameworks and tools
 
 ### xUnit
 
@@ -200,9 +200,9 @@ npm run test:storybook:playwright
 - Simulates SQL Server responses
 - No real database required for unit tests
 
-## Test Structure
+## Test structure
 
-### API.Specs (Integration Tests)
+### API.Specs (integration tests)
 
 ```
 API.Specs/
@@ -260,9 +260,9 @@ Each of the other three slices (`Features.Breweries.Tests`,
 `Features.UserManagement.Tests`, `Features.Emails.Tests`) follows the same
 shape: a `Commands/`/`Queries/` folder with one test file per handler.
 
-## Writing Tests
+## Writing tests
 
-### Unit Test Example (xUnit)
+### Unit test example (xUnit)
 
 ```csharp
 public class LoginHandlerTests
@@ -287,7 +287,7 @@ public class LoginHandlerTests
 }
 ```
 
-### Integration Test Example (Reqnroll)
+### Integration test example (Reqnroll)
 
 ```gherkin
 Scenario: User login with valid credentials
@@ -297,7 +297,7 @@ Scenario: User login with valid credentials
   And the response should contain a JWT token
 ```
 
-## Continuous Integration
+## Continuous integration
 
 Tests run automatically in CI/CD pipelines using the test Docker Compose
 configuration:
@@ -326,7 +326,7 @@ npm run test:storybook:playwright
 
 ## Troubleshooting
 
-### Tests Failing Due to Database Connection
+### Tests failing due to database connection
 
 Ensure SQL Server is running and environment variables are set:
 
@@ -334,12 +334,12 @@ Ensure SQL Server is running and environment variables are set:
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml ps
 ```
 
-### Port Conflicts
+### Port conflicts
 
 If port 1433 is in use, stop other SQL Server instances or modify the port in
 `docker-compose.test.yaml`.
 
-### Stale Test Data
+### Stale test data
 
 Clean up test database:
 
@@ -347,13 +347,13 @@ Clean up test database:
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
-### View Container Logs
+### View container logs
 
 ```bash
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml logs <service-name>
 ```
 
-## Best Practices
+## Best practices
 
 1. **Isolation**: Each test should be independent and not rely on other tests
 2. **Cleanup**: Use fixtures and dispose patterns for resource cleanup

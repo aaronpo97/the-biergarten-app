@@ -1,4 +1,4 @@
-# Docker Guide
+# Docker guide
 
 This document covers Docker deployment, configuration, and troubleshooting for
 The Biergarten App.
@@ -16,7 +16,7 @@ The project uses Docker Compose to orchestrate multiple services:
 See the [deployment diagram](diagrams-out/deployment.svg) for visual
 representation.
 
-## Docker Compose Environments
+## Docker Compose environments
 
 ### 1. Development (`docker-compose.dev.yaml`)
 
@@ -66,7 +66,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml down -v
 
 ### 2. Testing (`docker-compose.test.yaml`)
 
-**Purpose**: Automated CI/CD testing in isolated environment
+**Purpose**: Automated CI/CD testing in an isolated environment
 
 **Features**:
 
@@ -128,18 +128,15 @@ api.core          # Production API
 docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d
 ```
 
-## Service Dependencies
+## Service dependencies
 
 Docker Compose manages startup order using health checks:
 
 ```mermaid
-sqlserver (health check)
-    ↓
-database.migrations (completes successfully)
-    ↓
-database.seed (completes successfully)
-    ↓
-api.core / tests (start when ready)
+graph TD
+    A[sqlserver: health check passes] --> B[database.migrations: completes successfully]
+    B --> C[database.seed: completes successfully]
+    C --> D[api.core / tests: start when ready]
 ```
 
 **Health Check Example** (SQL Server):
@@ -168,7 +165,7 @@ api.core:
 
 ## Volumes
 
-### Persistent Volumes
+### Persistent volumes
 
 **Development**:
 
@@ -184,7 +181,7 @@ api.core:
 - `sqlserverdata-prod` - Production database files
 - `nuget-cache-prod` - Production NuGet cache
 
-### Mounted Volumes
+### Mounted volumes
 
 **Test Results**:
 
@@ -203,7 +200,7 @@ Each environment uses isolated bridge networks:
 - `testnet` - Testing network (fully isolated)
 - `prodnet` - Production network
 
-## Environment Variables
+## Environment variables
 
 All containers are configured via environment variables from `.env` files:
 
@@ -224,9 +221,9 @@ environment:
 
 For complete list, see [Environment Variables](environment-variables.md).
 
-## Common Commands
+## Common commands
 
-### View Services
+### View services
 
 ```bash
 # Running services
@@ -236,7 +233,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml ps
 docker ps -a
 ```
 
-### View Logs
+### View logs
 
 ```bash
 # All services
@@ -249,17 +246,17 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml logs -f ap
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml logs --tail=100 api.core
 ```
 
-### Execute Commands in Container
+### Execute commands in container
 
 ```bash
 # Interactive shell
 docker exec -it dev-env-api-core bash
 
-# Run command
-docker exec dev-env-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'password' -C
+# Run command (replace <db-password> with the value of DB_PASSWORD from .env.dev)
+docker exec dev-env-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '<db-password>' -C
 ```
 
-### Restart Services
+### Restart services
 
 ```bash
 # Restart all services
@@ -272,7 +269,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml restart ap
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d --build api.core
 ```
 
-### Build Images
+### Build images
 
 ```bash
 # Build all images
@@ -285,7 +282,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml build api.
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml build --no-cache
 ```
 
-### Clean Up
+### Clean up
 
 ```bash
 # Stop and remove containers
@@ -301,9 +298,9 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml down -v --
 docker system prune -af --volumes
 ```
 
-## Dockerfile Structure
+## Dockerfile structure
 
-### Multi-Stage Build
+### Multi-stage build
 
 ```dockerfile
 # Stage 1: Build
@@ -321,7 +318,7 @@ COPY --from=build /app/build .
 ENTRYPOINT ["dotnet", "Project.dll"]
 ```
 
-## Additional Resources
+## Additional resources
 
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [.NET Docker Images](https://hub.docker.com/_/microsoft-dotnet)
