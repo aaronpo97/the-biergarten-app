@@ -12,11 +12,6 @@ namespace API.Core.Authentication;
 ///     Custom ASP.NET Core authentication handler that validates bearer JWT access tokens
 ///     supplied in the <c>Authorization</c> header against the <c>JWT</c> authentication scheme.
 /// </summary>
-/// <param name="options">The monitored options for the <c>JWT</c> authentication scheme.</param>
-/// <param name="logger">The logger factory used by the base <see cref="AuthenticationHandler{TOptions}" />.</param>
-/// <param name="encoder">The URL encoder used by the base <see cref="AuthenticationHandler{TOptions}" />.</param>
-/// <param name="tokenInfrastructure">The infrastructure service used to validate JWT access tokens.</param>
-/// <param name="configuration">The application configuration, used as a fallback source for the JWT secret key.</param>
 public class JwtAuthenticationHandler(
     IOptionsMonitor<JwtAuthenticationOptions> options,
     ILoggerFactory logger,
@@ -31,15 +26,9 @@ public class JwtAuthenticationHandler(
     /// <remarks>
     ///     The signing secret is resolved first from the <c>ACCESS_TOKEN_SECRET</c> environment variable, falling
     ///     back to the <c>Jwt:SecretKey</c> configuration value, to stay consistent with the secret source used
-    ///     when tokens are issued. Authentication fails if the secret is not configured, the
-    ///     <c>Authorization</c> header is missing, the header does not use the <c>Bearer</c> scheme, or the
-    ///     token fails validation.
+    ///     when tokens are issued. Fails if the secret is not configured, the <c>Authorization</c> header is
+    ///     missing or not <c>Bearer</c>-scheme, or the token fails validation.
     /// </remarks>
-    /// <returns>
-    ///     A successful <see cref="AuthenticateResult" /> containing the validated
-    ///     <see cref="System.Security.Claims.ClaimsPrincipal" />
-    ///     on success, or a failure result describing why authentication could not be completed.
-    /// </returns>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // Use the same access-token secret source as TokenService to avoid mismatched validation.
@@ -78,8 +67,6 @@ public class JwtAuthenticationHandler(
     /// <summary>
     ///     Writes a JSON 401 Unauthorized response when authentication fails or is required but not supplied.
     /// </summary>
-    /// <param name="properties">The authentication properties associated with the challenge.</param>
-    /// <returns>A task that completes once the response body has been written.</returns>
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
         Response.ContentType = "application/json";
@@ -96,5 +83,4 @@ public class JwtAuthenticationHandler(
 /// <summary>
 ///     Options for the <c>JWT</c> authentication scheme handled by <see cref="JwtAuthenticationHandler" />.
 /// </summary>
-/// <remarks>No additional options are defined beyond those provided by <see cref="AuthenticationSchemeOptions" />.</remarks>
 public class JwtAuthenticationOptions : AuthenticationSchemeOptions { }

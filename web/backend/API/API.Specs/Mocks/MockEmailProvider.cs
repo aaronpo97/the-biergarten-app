@@ -3,8 +3,7 @@ using Infrastructure.Email;
 namespace API.Specs.Mocks;
 
 /// <summary>
-///     Mock email provider for testing that doesn't actually send emails.
-///     Tracks sent emails for verification in tests if needed.
+///     Test double for <see cref="IEmailProvider" /> that records sent emails instead of delivering them.
 /// </summary>
 public class MockEmailProvider : IEmailProvider
 {
