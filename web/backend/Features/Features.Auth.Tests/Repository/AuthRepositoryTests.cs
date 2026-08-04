@@ -1,5 +1,6 @@
 using Apps72.Dev.Data.DbMocker;
 using Domain.Entities;
+using Features.Auth.Dtos;
 using Features.Auth.Repository;
 using FluentAssertions;
 
@@ -50,12 +51,14 @@ public class AuthRepositoryTests
 
         AuthRepository repo = CreateRepo(conn);
         UserAccount result = await repo.RegisterUserAsync(
-            "testuser",
-            "Test",
-            "User",
-            "test@example.com",
-            new DateTime(1990, 1, 1),
-            "hashedpassword123"
+            new UserRegistrationDto(
+                "testuser",
+                "Test",
+                "User",
+                "test@example.com",
+                new DateTime(1990, 1, 1),
+                "hashedpassword123"
+            )
         );
 
         result.Should().NotBeNull();

@@ -9,7 +9,7 @@ namespace Database.Seed.DatabaseHelpers;
 public class ConnectionStrings
 {
     public static string SqlServerConnectionString => GetSqlServerConnectionString();
-    public static string SqliteConnectionString => "Data Source=SeedData/seed.sqlite";
+    public static string SqliteConnectionString => "Data Source=SeedData/biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite";
 
     private static string GetSqlServerConnectionString()
     {
