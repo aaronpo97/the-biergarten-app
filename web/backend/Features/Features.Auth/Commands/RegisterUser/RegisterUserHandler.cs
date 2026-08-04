@@ -34,12 +34,14 @@ public class RegisterUserHandler(
         string hashed = passwordInfrastructure.Hash(request.Password);
 
         UserAccount createdUser = await authRepo.RegisterUserAsync(
-           new UserRegistrationDto(request.Username,
-            request.FirstName,
-            request.LastName,
-            request.Email,
-            request.DateOfBirth,
-            hashed)
+            new UserRegistrationDto(
+                request.Username,
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.DateOfBirth,
+                hashed
+            )
         );
 
         string accessToken = tokenService.GenerateAccessToken(createdUser);

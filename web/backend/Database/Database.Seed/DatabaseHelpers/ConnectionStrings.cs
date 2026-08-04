@@ -9,7 +9,8 @@ namespace Database.Seed.DatabaseHelpers;
 public class ConnectionStrings
 {
     public static string SqlServerConnectionString => GetSqlServerConnectionString();
-    public static string SqliteConnectionString => "Data Source=SeedData/biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite";
+    public static string SqliteConnectionString =>
+        "Data Source=SeedData/biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite";
 
     private static string GetSqlServerConnectionString()
     {
@@ -39,7 +40,7 @@ public class ConnectionStrings
             UserID = user,
             Password = password,
             TrustServerCertificate = bool.Parse(trustServerCertificate),
-            Encrypt = true
+            Encrypt = true,
         };
 
         return builder.ConnectionString;

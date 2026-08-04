@@ -26,9 +26,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     subsequent lookup to fail.
     /// </remarks>
     /// <exception cref="Exception">Thrown when the newly registered user cannot be retrieved after registration.</exception>
-    public async Task<UserAccount> RegisterUserAsync(
-        UserRegistrationDto userRegistrationDto
-    )
+    public async Task<UserAccount> RegisterUserAsync(UserRegistrationDto userRegistrationDto)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
@@ -36,8 +34,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         command.CommandText = "USP_RegisterUser";
         command.CommandType = CommandType.StoredProcedure;
 
-        var (username, firstName, lastName, email, dateOfBirth, passwordHash) =
-            userRegistrationDto;
+        var (username, firstName, lastName, email, dateOfBirth, passwordHash) = userRegistrationDto;
 
         AddParameter(command, "@Username", username);
         AddParameter(command, "@FirstName", firstName);
