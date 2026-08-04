@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using Domain.Entities;
+using Features.Auth.Dtos;
 using Infrastructure.Sql;
 using Microsoft.Data.SqlClient;
 
@@ -35,12 +36,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     /// <exception cref="Exception">Thrown when the newly registered user cannot be retrieved after registration.</exception>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task<UserAccount> RegisterUserAsync(
-        string username,
-        string firstName,
-        string lastName,
-        string email,
-        DateTime dateOfBirth,
-        string passwordHash
+        UserRegistrationDto userRegistrationDto
     )
     {
         await using DbConnection connection = await CreateConnection();
@@ -48,6 +44,9 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
 
         command.CommandText = "USP_RegisterUser";
         command.CommandType = CommandType.StoredProcedure;
+
+        var (username, firstName, lastName, email, dateOfBirth, passwordHash) =
+            userRegistrationDto;
 
         AddParameter(command, "@Username", username);
         AddParameter(command, "@FirstName", firstName);
