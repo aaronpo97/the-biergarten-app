@@ -14,13 +14,9 @@ namespace API.Core.Controllers;
 public class ProtectedController : ControllerBase
 {
     /// <summary>
-    ///     Returns the authenticated caller's user ID and username, extracted from the JWT claims.
+    ///     Returns the authenticated caller's user ID and username extracted from the JWT claims.
     /// </summary>
-    /// <returns>
-    ///     A <c>200 OK</c> result wrapping a <see cref="ResponseBody{T}" /> whose payload contains the
-    ///     caller's <c>userId</c> (from <see cref="ClaimTypes.NameIdentifier" />) and <c>username</c>
-    ///     (from <see cref="ClaimTypes.Name" />), either of which may be <c>null</c> if not present in the token.
-    /// </returns>
+    /// <returns><c>userId</c> and <c>username</c> may be <c>null</c> if not present in the token.</returns>
     [HttpGet]
     public ActionResult<ResponseBody<object>> Get()
     {
