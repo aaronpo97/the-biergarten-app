@@ -81,8 +81,6 @@ static async Task<int> main()
         string email = user.Email;
         DateTime dateOfBirth = DateTime.Parse(user.DateOfBirth);
 
-        // Generate a password that is 64 characters long with 10 digits, 10 symbols,
-        // allowing upper and lower case letters, disallowing repeat characters.
         string generatedPassword = PasswordGenerator.Generate(
             length: 64,
             numberOfDigits: 10,
