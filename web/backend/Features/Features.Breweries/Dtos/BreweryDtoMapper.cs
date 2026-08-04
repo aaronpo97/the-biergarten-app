@@ -2,17 +2,8 @@ using Domain.Entities;
 
 namespace Features.Breweries.Dtos;
 
-/// <summary>
-///     Maps <see cref="BreweryPost" /> domain entities to their <see cref="BreweryDto" /> wire representation.
-/// </summary>
 public static class BreweryDtoMapper
 {
-    /// <summary>
-    ///     Maps a <see cref="BreweryPost" /> domain entity to its <see cref="BreweryDto" /> representation,
-    ///     including its location, if present.
-    /// </summary>
-    /// <param name="brewery">The brewery post entity to map.</param>
-    /// <returns>The mapped <see cref="BreweryDto" />.</returns>
     public static BreweryDto ToDto(this BreweryPost brewery)
     {
         return new BreweryDto

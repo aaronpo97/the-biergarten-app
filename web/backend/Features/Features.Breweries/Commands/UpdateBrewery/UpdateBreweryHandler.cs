@@ -5,10 +5,6 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
-/// <summary>
-///     Handles <see cref="UpdateBreweryCommand" /> by persisting changes to an existing brewery post.
-/// </summary>
-/// <param name="repository">Repository used to persist the updated brewery post.</param>
 public class UpdateBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<UpdateBreweryCommand, BreweryDto>
 {
@@ -16,9 +12,6 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
     ///     Updates an existing brewery post. If <paramref name="request" /> has no <c>Location</c>,
     ///     the brewery's location is cleared.
     /// </summary>
-    /// <param name="request">The updated details of the brewery post.</param>
-    /// <param name="cancellationToken">A token to observe for cancellation requests.</param>
-    /// <returns>The updated brewery post.</returns>
     public async Task<BreweryDto> Handle(
         UpdateBreweryCommand request,
         CancellationToken cancellationToken

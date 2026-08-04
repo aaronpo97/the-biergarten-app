@@ -11,12 +11,6 @@ namespace Features.Auth.Queries.Login;
 /// <summary>
 ///     Handles <see cref="LoginQuery" /> by verifying credentials and issuing access/refresh tokens.
 /// </summary>
-/// <param name="authRepo">Repository used to look up the user account and its active credential.</param>
-/// <param name="passwordInfrastructure">
-///     Infrastructure component used to verify a plain-text password against a stored
-///     hash.
-/// </param>
-/// <param name="tokenService">Service used to generate access and refresh tokens for the authenticated user.</param>
 public class LoginHandler(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,

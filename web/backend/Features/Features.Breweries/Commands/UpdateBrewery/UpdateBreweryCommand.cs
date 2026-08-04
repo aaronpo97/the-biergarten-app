@@ -3,9 +3,6 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
-/// <summary>
-///     Location data for an existing brewery post, supplied as part of <see cref="UpdateBreweryCommand" />.
-/// </summary>
 public record UpdateBreweryLocation(
     Guid BreweryPostLocationId,
     Guid CityId,

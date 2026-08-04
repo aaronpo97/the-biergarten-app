@@ -10,9 +10,6 @@ namespace Features.Auth.Commands.ResendConfirmationEmail;
 ///     Handles <see cref="ResendConfirmationEmailCommand" /> by generating a fresh confirmation token and
 ///     sending it via Features.Emails.
 /// </summary>
-/// <param name="authRepository">Repository used to look up the user and check verification status.</param>
-/// <param name="tokenService">Service used to generate the confirmation token.</param>
-/// <param name="mediator">Used to send the cross-slice command that triggers the email.</param>
 /// <remarks>
 ///     Returns silently without sending an email if the user does not exist (to prevent user enumeration)
 ///     or if the user's account is already verified.

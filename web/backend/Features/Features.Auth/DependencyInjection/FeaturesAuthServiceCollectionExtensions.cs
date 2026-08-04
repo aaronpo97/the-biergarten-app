@@ -5,9 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Features.Auth.DependencyInjection;
 
-/// <summary>
-///     Registers the services owned by the Auth feature slice.
-/// </summary>
 public static class FeaturesAuthServiceCollectionExtensions
 {
     public static IServiceCollection AddFeaturesAuth(this IServiceCollection services)
