@@ -1,22 +1,20 @@
-CREATE
-OR
-ALTER PROCEDURE USP_GetUserAccountById(
+CREATE OR ALTER PROCEDURE USP_GetUserAccountById(
     @UserAccountId UNIQUEIDENTIFIER
-    )
-    AS
+)
+AS
 BEGIN
     SET
-NOCOUNT ON;
+        NOCOUNT ON;
 
-SELECT UserAccountID,
-       Username,
-       FirstName,
-       LastName,
-       Email,
-       CreatedAt,
-       UpdatedAt,
-       DateOfBirth,
-       Timer
-FROM dbo.UserAccount
-WHERE UserAccountID = @UserAccountId;
+    SELECT UserAccountID,
+           Username,
+           FirstName,
+           LastName,
+           Email,
+           CreatedAt,
+           UpdatedAt,
+           DateOfBirth,
+           Timer
+    FROM dbo.UserAccount
+    WHERE UserAccountID = @UserAccountId;
 END
