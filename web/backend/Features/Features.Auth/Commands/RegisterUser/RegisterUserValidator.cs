@@ -2,15 +2,8 @@ using FluentValidation;
 
 namespace Features.Auth.Commands.RegisterUser;
 
-/// <summary>
-///     Validates <see cref="RegisterUserCommand" /> instances before they are processed.
-/// </summary>
 public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
 {
-    /// <summary>
-    ///     Configures validation rules for username format and length, first/last name length, email format and
-    ///     length, minimum age based on date of birth, and password strength requirements.
-    /// </summary>
     public RegisterUserValidator()
     {
         RuleFor(x => x.Username)

@@ -9,17 +9,11 @@ namespace Features.Breweries.Repository;
 ///     ADO.NET-based implementation of <see cref="IBreweryRepository" /> backed by SQL Server stored
 ///     procedures.
 /// </summary>
-/// <param name="connectionFactory">The factory used to create database connections.</param>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : Repository<BreweryPost>(connectionFactory),
         IBreweryRepository
 {
-    /// <summary>
-    ///     Retrieves a brewery post by ID using the <c>USP_GetBreweryById</c> stored procedure.
-    /// </summary>
-    /// <param name="id">The unique identifier of the brewery post.</param>
-    /// <returns>The matching <see cref="BreweryPost" />, or <c>null</c> if not found.</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
+    /// <summary>Retrieves a brewery post by ID using the <c>USP_GetBreweryById</c> stored procedure.</summary>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -40,10 +34,6 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     stored procedure. The <c>@Limit</c> and <c>@Offset</c> parameters are only added when their
     ///     corresponding argument has a value.
     /// </summary>
-    /// <param name="limit">The maximum number of records to return, or <c>null</c> for no limit.</param>
-    /// <param name="offset">The number of records to skip, or <c>null</c> for no offset.</param>
-    /// <returns>The collection of matching <see cref="BreweryPost" /> records.</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
@@ -71,8 +61,6 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     <c>USP_UpdateBrewery</c> stored procedure. When <paramref name="brewery" />.<c>Location</c> is
     ///     <c>null</c>, any existing location for the brewery is removed.
     /// </summary>
-    /// <param name="brewery">The brewery post containing updated values.</param>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task UpdateAsync(BreweryPost brewery)
     {
         await using DbConnection connection = await CreateConnection();
@@ -97,8 +85,6 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     Deletes a brewery post by ID using the <c>USP_DeleteBrewery</c> stored procedure. Its location
     ///     and photos are removed via cascading foreign keys.
     /// </summary>
-    /// <param name="id">The unique identifier of the brewery post to delete.</param>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task DeleteAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -110,12 +96,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         await command.ExecuteNonQueryAsync();
     }
 
-    /// <summary>
-    ///     Creates a new brewery post and its location using the <c>USP_CreateBrewery</c> stored procedure.
-    /// </summary>
-    /// <param name="brewery">The brewery post to create. Must have a non-null <c>Location</c>.</param>
+    /// <summary>Creates a new brewery post and its location using the <c>USP_CreateBrewery</c> stored procedure.</summary>
     /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" />.<c>Location</c> is <c>null</c>.</exception>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task CreateAsync(BreweryPost brewery)
     {
         await using DbConnection connection = await CreateConnection();
@@ -139,12 +121,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <summary>
-    ///     Maps the current row of a data reader to a <see cref="BreweryPost" /> entity, including its
-    ///     rowversion <c>Timer</c> field and, if location columns are present in the result set, its
-    ///     associated <see cref="BreweryPostLocation" />.
+    ///     Maps the current row of <paramref name="reader" /> to a <see cref="BreweryPost" />, including its
+    ///     associated <see cref="BreweryPostLocation" /> if location columns are present in the result set.
     /// </summary>
-    /// <param name="reader">The data reader positioned on the row to map.</param>
-    /// <returns>The mapped <see cref="BreweryPost" /> instance.</returns>
     protected override BreweryPost MapToEntity(DbDataReader reader)
     {
         BreweryPost brewery = new();
@@ -212,13 +191,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return brewery;
     }
 
-    /// <summary>
-    ///     Helper method to add a parameter to a database command, converting <c>null</c> values to
-    ///     <see cref="DBNull.Value" />.
-    /// </summary>
-    /// <param name="command">The command to add the parameter to.</param>
-    /// <param name="name">The parameter name (including any prefix, e.g. "@BreweryName").</param>
-    /// <param name="value">The parameter value, or <c>null</c> to bind <see cref="DBNull.Value" />.</param>
+    /// <summary>Adds a parameter to <paramref name="command" />, converting <c>null</c> to <see cref="DBNull.Value" />.</summary>
     private static void AddParameter(DbCommand command, string name, object? value)
     {
         DbParameter p = command.CreateParameter();

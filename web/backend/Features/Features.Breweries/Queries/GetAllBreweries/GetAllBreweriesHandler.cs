@@ -5,10 +5,6 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetAllBreweries;
 
-/// <summary>
-///     Handles <see cref="GetAllBreweriesQuery" /> by retrieving a paginated list of brewery posts.
-/// </summary>
-/// <param name="repository">Repository used to query brewery post data.</param>
 public class GetAllBreweriesHandler(IBreweryRepository repository)
     : IRequestHandler<GetAllBreweriesQuery, IEnumerable<BreweryDto>>
 {
