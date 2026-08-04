@@ -105,9 +105,16 @@ public sealed class PipelineSeedDataReader
     private static IReadOnlyDictionary<long, City> ReadCities(SqliteConnection connection)
     {
         const string sql = """
-                           SELECT id, city, state_province, iso3166_2, country, iso3166_1,
-                                  local_languages_json, postal_code_country_format_regex,
-                                  postal_code_city_regex_json
+                           SELECT
+                                id,
+                                city,
+                                state_province,
+                                iso3166_2,
+                                country,
+                                iso3166_1,
+                                local_languages_json,
+                                postal_code_country_format_regex,
+                                postal_code_city_regex_json
                            FROM cities;
                            """;
 
@@ -115,24 +122,35 @@ public sealed class PipelineSeedDataReader
         using SqliteDataReader reader = command.ExecuteReader();
 
         Dictionary<long, City> cities = [];
+
+        const int cityNameBindIndex = 1;
+        const int stateProvinceBindIndex = 2;
+        const int iso31662BindIndex = 3;
+        const int countryBindIndex = 4;
+        const int iso31661BindIndex = 5;
+        const int localLanguagesBindIndex = 6;
+        const int countryFormatRegexBindIndex = 7;
+        const int cityRegexesBindIndex = 8;
+
         while (reader.Read())
             cities[reader.GetInt64(0)] = new City
             {
-                CityName = reader.GetString(1),
-                StateProvince = reader.GetString(2),
-                Iso31662 = reader.GetString(3),
-                Country = reader.GetString(4),
-                Iso31661 = reader.GetString(5),
-                LocalLanguages = DeserializeStringArray(reader.GetString(6)),
+                CityName = reader.GetString(cityNameBindIndex),
+                StateProvince = reader.GetString(stateProvinceBindIndex),
+                Iso31662 = reader.GetString(iso31662BindIndex),
+                Country = reader.GetString(countryBindIndex),
+                Iso31661 = reader.GetString(iso31661BindIndex),
+                LocalLanguages = DeserializeStringArray(reader.GetString(localLanguagesBindIndex)),
                 PostalCode = new PostalCodeSpec
                 {
-                    CountryFormatRegex = reader.GetString(7),
-                    CityRegexes = DeserializeStringArray(reader.GetString(8))
+                    CountryFormatRegex = reader.GetString(countryFormatRegexBindIndex),
+                    CityRegexes = DeserializeStringArray(reader.GetString(cityRegexesBindIndex))
                 }
             };
 
         return cities;
     }
+
 
     private static IReadOnlyList<string> DeserializeStringArray(string json)
     {

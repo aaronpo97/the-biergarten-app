@@ -1,7 +1,7 @@
 using Domain.Entities;
+using Features.Auth.Dtos;
 
 namespace Features.Auth.Repository;
-
 /// <summary>
 ///     Repository for authentication-related database operations including user registration and credential management.
 /// </summary>
@@ -11,20 +11,8 @@ public interface IAuthRepository
     ///     Registers a new user with account details and initial credential.
     ///     Uses stored procedure: USP_RegisterUser
     /// </summary>
-    /// <param name="username">Unique username for the user</param>
-    /// <param name="firstName">User's first name</param>
-    /// <param name="lastName">User's last name</param>
-    /// <param name="email">User's email address</param>
-    /// <param name="dateOfBirth">User's date of birth</param>
-    /// <param name="passwordHash">Hashed password</param>
-    /// <returns>The newly created UserAccount with generated ID</returns>
     Task<UserAccount> RegisterUserAsync(
-        string username,
-        string firstName,
-        string lastName,
-        string email,
-        DateTime dateOfBirth,
-        string passwordHash
+        UserRegistrationDto userRegistrationDto
     );
 
     /// <summary>
