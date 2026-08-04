@@ -1,8 +1,7 @@
-```bash
-touch runpod/start.sh
-docker build \
- --progress=plain \
- -t biergarten-pipeline:latest \
- -f runpod/Dockerfile \
- . 2>&1 | tee build.log
-```
+# RunPod container
+
+Dockerfile, launcher (`start.sh`), and pod template for running the
+Biergarten pipeline on a GPU host. See
+[Docker / RunPod](../../../docs/pipeline/README.md#docker--runpod) in the
+pipeline README for the full build and run instructions, environment
+variable reference, and RunPod deployment notes.

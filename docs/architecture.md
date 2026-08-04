@@ -2,7 +2,7 @@
 
 This document describes the active architecture of The Biergarten App.
 
-## High-Level Overview
+## High-level overview
 
 The Biergarten App is a monorepo with a clear split between the backend and the
 active website:
@@ -29,9 +29,9 @@ For visual representations, see:
 - [database-schema.svg](website/diagrams-out/database-schema.svg) - Database
   relationships
 
-## Backend Architecture
+## Backend architecture
 
-### Vertical Slice Architecture Pattern
+### Vertical-slice architecture pattern
 
 The backend organizes business capabilities as feature slices instead of
 technical layers. Each feature (`Features.Auth`, `Features.Breweries`,
@@ -80,9 +80,9 @@ interaction (`Features.Auth` triggering a confirmation email handled by
 whose contract lives in `Shared.Application`, so neither slice takes a
 project reference on the other.
 
-### Layer Responsibilities
+### Layer responsibilities
 
-#### API Layer (`API.Core`)
+#### API layer (`API.Core`)
 
 **Purpose**: Thin ASP.NET Core host: no business logic, no controllers of
 its own
@@ -108,7 +108,7 @@ its own
 - No controllers, no business logic, no feature-specific contracts
 - Exists purely to host and wire up the feature slices
 
-#### Feature Slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`)
+#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`)
 
 **Purpose**: Each slice is the complete vertical for one business capability
 
@@ -146,7 +146,7 @@ MediatR commands sent from other slices, never over HTTP.
   MediatR
 - Read endpoints return a dedicated `Dto`, never the domain entity directly
 
-#### Shared Projects (`Shared.Contracts`, `Shared.Application`)
+#### Shared projects (`Shared.Contracts`, `Shared.Application`)
 
 **Purpose**: The minimum cross-slice surface area required because every
 slice needs it, or because duplicating it four times would be worse than
@@ -166,7 +166,7 @@ sharing it
 - Kept deliberately small: this is the exception to "no slice depends on
   another slice," not a general-purpose dumping ground
 
-#### Infrastructure Layer
+#### Infrastructure layer
 
 **Purpose**: Technical capabilities and external integrations, shared by
 whichever slices need them
@@ -185,14 +185,14 @@ whichever slices need them
 **Dependencies**:
 
 - Domain entities
-- External libraries (ADO.NET, JWT, Argon2, MailKit, etc.)
+- External libraries (ADO.NET, JWT, Argon2, MailKit, and so on)
 
 **Rules**:
 
 - Implements technical concerns only, no business logic
 - Reusable across slices
 
-#### Domain Layer (`Domain.Entities`)
+#### Domain layer (`Domain.Entities`)
 
 **Purpose**: Core business entities and models
 
@@ -213,9 +213,9 @@ whichever slices need them
 - No infrastructure references
 - Represents business concepts
 
-### Design Patterns
+### Design patterns
 
-#### Vertical Slice + MediatR
+#### Vertical slice + MediatR
 
 **Purpose**: Organize code by feature instead of by technical layer, so
 everything needed to understand or change one capability lives in one
@@ -223,9 +223,9 @@ project
 
 **Implementation**:
 
-- Each HTTP write operation is a `Command` (e.g. `CreateBreweryCommand` in
-  `Features.Breweries/Commands/CreateBrewery/`); each read operation is a
-  `Query` (e.g. `GetBreweryByIdQuery`)
+- Each HTTP write operation is a `Command` (for example, `CreateBreweryCommand`
+  in `Features.Breweries/Commands/CreateBrewery/`); each read operation is a
+  `Query` (for example, `GetBreweryByIdQuery`)
 - Controllers bind directly to the Command/Query as the request body;
   there is no separate request DTO + mapping step for writes
 - A single shared `ValidationBehavior<TRequest,TResponse>`
@@ -246,7 +246,7 @@ public class CreateBreweryHandler(IBreweryRepository repository) : IRequestHandl
 }
 ```
 
-#### Repository Pattern
+#### Repository pattern
 
 **Purpose**: Abstract database access behind interfaces
 
@@ -275,7 +275,7 @@ public interface IAuthRepository
 }
 ```
 
-#### Dependency Injection
+#### Dependency injection
 
 **Purpose**: Loose coupling and testability
 
@@ -289,7 +289,7 @@ extension method that registers its repository and slice-internal services
 - Singleton: `ISqlConnectionFactory`
 - Transient: Utilities, helpers
 
-#### SQL-First Approach
+#### SQL-first approach
 
 **Purpose**: Push complex logic into the database
 
@@ -306,9 +306,9 @@ extension method that registers its repository and slice-internal services
 - `USP_GetUserAccountByUsername` - User lookup
 - `USP_RotateUserCredential` - Password update
 
-## Frontend Architecture
+## Frontend architecture
 
-### Active Website (`web/frontend`)
+### Active website (`web/frontend`)
 
 The current website is a React Router 7 application with server-side rendering
 enabled.
@@ -327,7 +327,7 @@ web/frontend/
 └── package.json         Frontend scripts and dependencies
 ```
 
-### Frontend Responsibilities
+### Frontend responsibilities
 
 - Render the auth demo and theme guide routes
 - Manage cookie-backed website session state
@@ -335,7 +335,7 @@ web/frontend/
 - Provide shared UI building blocks for forms, navigation, themes, and toasts
 - Supply Storybook documentation and browser-based component verification
 
-### Theme System
+### Theme system
 
 The active website uses semantic DaisyUI theme tokens backed by four Biergarten
 themes:
@@ -348,15 +348,15 @@ themes:
 All component styling should prefer semantic tokens such as `primary`,
 `success`, `surface`, and `highlight` instead of hard-coded color values.
 
-### Legacy Frontend
+### Legacy frontend
 
 The previous Next.js frontend has been archived at `archive/next-js-web-app/`
 for reference only. Active product and engineering documentation should point
 to `web/frontend`.
 
-## Security Architecture
+## Security architecture
 
-### Authentication Flow
+### Authentication flow
 
 1. **Registration**:
    - User submits credentials
@@ -375,7 +375,7 @@ to `web/frontend`.
    - Middleware validates token
    - Request proceeds if valid
 
-### Password Security
+### Password security
 
 **Algorithm**: Argon2id
 
@@ -385,7 +385,7 @@ to `web/frontend`.
 - Salt: 128-bit (16 bytes)
 - Hash: 256-bit (32 bytes)
 
-### JWT Tokens
+### JWT tokens
 
 **Algorithm**: HS256 (HMAC-SHA256)
 
@@ -409,9 +409,9 @@ to `web/frontend`.
 }
 ```
 
-## Database Architecture
+## Database architecture
 
-### SQL-First Philosophy
+### SQL-first philosophy
 
 **Principles**:
 
@@ -427,7 +427,7 @@ to `web/frontend`.
 - Version-controlled schema (migrations)
 - Easier query profiling and tuning
 
-### Migration Strategy
+### Migration strategy
 
 **Tool**: DbUp
 
@@ -448,7 +448,7 @@ scripts/
 └── ...
 ```
 
-### Data Seeding
+### Data seeding
 
 **Purpose**: Populate development/test databases
 
@@ -460,9 +460,9 @@ scripts/
 - Test user accounts
 - Sample breweries (future)
 
-## Deployment Architecture
+## Deployment architecture
 
-### Docker Containerization
+### Docker containerization
 
 **Container Structure**:
 
@@ -479,10 +479,10 @@ scripts/
 
 For details, see [Docker Guide](website/docker.md).
 
-### Health Checks
+### Health checks
 
-**SQL Server**: Validates database connectivity **API**: Checks service health
-and dependencies
+- **SQL Server**: Validates database connectivity
+- **API**: Checks service health and dependencies
 
 **Configuration**:
 
@@ -494,9 +494,9 @@ healthcheck:
   start_period: 30s
 ```
 
-## Testing Architecture
+## Testing architecture
 
-### Test Pyramid
+### Test pyramid
 
 ```
     ┌──────────────┐

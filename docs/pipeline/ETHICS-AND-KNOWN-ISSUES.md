@@ -1,28 +1,28 @@
-# Ethics, Bias, and Known Issues
+# Ethics, bias, and known issues
 
 This document covers the ethical context of the Biergarten Pipeline's output,
 the model's biases, and known issues including hallucinated brewing science and
 low-resource language failures.
 
-> Note that all testing was used using `google_gemma-4-E4B-it-Q6_K.gguf`.
+> All testing described below used `google_gemma-4-E4B-it-Q6_K.gguf`.
 
-## Table of Contents
+## Table of contents
 
-- [What This Dataset Is](#what-this-dataset-is)
-- [What This Dataset Is Not](#what-this-dataset-is-not)
-- [Model Bias and Language Quality](#model-bias-and-language-quality)
-- [Western and Eurocentric Lens](#western-and-eurocentric-lens)
-- [Wikipedia Enrichment](#wikipedia-enrichment)
-- [Names-by-Country Dataset](#names-by-country-dataset)
-- [The "Avoid AI Phrases" Prompt Instruction](#the-avoid-ai-phrases-prompt-instruction)
-- [Known Issues](#known-issues)
-  - [Hallucinated Brewing Techniques](#hallucinated-brewing-techniques)
-  - [Low-Resource Language Hallucination](#low-resource-language-hallucination)
-  - [Synthetic Postal Codes](#synthetic-postal-codes)
+- [What this dataset is](#what-this-dataset-is)
+- [What this dataset is not](#what-this-dataset-is-not)
+- [Model bias and language quality](#model-bias-and-language-quality)
+- [Western and Eurocentric lens](#western-and-eurocentric-lens)
+- [Wikipedia enrichment](#wikipedia-enrichment)
+- [Names-by-country dataset](#names-by-country-dataset)
+- [The "avoid AI phrases" prompt instruction](#the-avoid-ai-phrases-prompt-instruction)
+- [Known issues](#known-issues)
+  - [Hallucinated brewing techniques](#hallucinated-brewing-techniques)
+  - [Low-resource language hallucination](#low-resource-language-hallucination)
+  - [Synthetic postal codes](#synthetic-postal-codes)
 
 ---
 
-## What This Dataset Is
+## What this dataset is
 
 This is AI-generated fixture data for a proof-of-concept version of The
 Biergarten App. Anyone who interacts with an application seeded from this
@@ -30,29 +30,29 @@ pipeline must be told upfront that the content is AI-generated.
 
 ---
 
-## What This Dataset Is Not
+## What this dataset is not
 
 The pipeline is not intended to produce accurate brewing science, faithful
 cultural representation, or reliable local-language text. Hallucinations such as
 invented fermentation techniques, or incoherent local-language prose, are
-expected, observed, and partially documented in [Known Issues](#known-issues)
+expected, observed, and partially documented in [Known issues](#known-issues)
 below.
 
-Human control sits at the context layer (i.e. prompt design, Wikipedia
+Human control sits at the context layer (that is, prompt design, Wikipedia
 enrichment). Statistical output shapes in future pipeline stages (check-in
 distributions, rating skews, activity profiles) will be handled the same way.
 
 **Treat this data as an exercise in prompt engineering and model behaviour, not
 as a source of truth for brewing techniques or cultural representation.**
 
-**Natural language processing, although a powerful tool for data analysis and
-generation is to be taken with scrutiny. Human language is not simply just data
-points to be analyzed, but it also carries deep cultural and human meaning that
-artificial intelligence is incapable of.**
+**Natural language processing is a powerful tool for data analysis and
+generation, but its output should be treated with scrutiny. Human language is
+not simply data points to be analyzed — it carries cultural and human meaning
+that artificial intelligence cannot capture.**
 
 ---
 
-## Model Bias and Language Quality
+## Model bias and language quality
 
 The underlying model's training biases surface within this pipeline. Output
 quality tracks with how well a language is represented in the training corpus:
@@ -67,9 +67,9 @@ large language models trained predominantly on English-language
 material.[^llm-bias]
 
 Mitigations are documented in
-[Known Issues: Low-Resource Language Hallucination](#low-resource-language-hallucination).
+[Known issues: Low-resource language hallucination](#low-resource-language-hallucination).
 
-### Western and Eurocentric Lens
+### Western and Eurocentric lens
 
 The model's training data skews heavily Western and North American. When
 generating brewery descriptions for Kinshasa, Abidjan, or Osaka, for example, it
@@ -81,19 +81,19 @@ some generation in city-specific material, but it does not eliminate the skew.
 
 ---
 
-## Wikipedia Enrichment
+## Wikipedia enrichment
 
 City and beer context is fetched from the Wikipedia API. Wikipedia text is
 co-licensed under the **Creative Commons Attribution-ShareAlike 4.0
-International License (CC BY-SA 4.0)** and the **GNU Free Documentation License
-(GFDL)**.[^wp-license]
+International License (CC BY-SA 4.0)**[^cc-sa] and the **GNU Free Documentation
+License (GFDL)**.[^wp-license]
 
 Wikipedia's own accuracy limitations and editorial biases can propagate into
 generated descriptions.
 
 ---
 
-## Names-by-Country Dataset
+## Names-by-country dataset
 
 `tooling/pipeline/forenames-by-country.json` and `surnames-by-country.json`
 (used to sample a `Name` per ISO 3166-1 country code for user generation) are
@@ -118,7 +118,7 @@ same way brewery generation skips cities whose enrichment lookup fails.
 
 ---
 
-## The "Avoid AI Phrases" Prompt Instruction
+## The "avoid AI phrases" prompt instruction
 
 The system prompt instructs the model to avoid common AI-generated phrasing
 patterns. This is a prompt engineering experiment:
@@ -130,14 +130,14 @@ consumers are informed of the AI-generated origin before engagement.
 
 ---
 
-## Known Issues
+## Known issues
 
-### Hallucinated Brewing Techniques
+### Hallucinated brewing techniques
 
 When forced by the system prompt to generate a "highly specialized technical
 brewing detail," the model frequently hallucinates fermentation science and
-brewing chemistry. While the resulting sounds confident, it will be nonsensical
-to reader with brewing and/or scientific expertise.
+brewing chemistry. While the resulting text sounds confident, it is
+nonsensical to a reader with brewing or scientific expertise.
 
 Small-parameter models such as Gemma 4 E4B cannot reliably satisfy prompts
 calling for specialist brewing detail. This is consistent with the **CHOKE**
@@ -155,9 +155,9 @@ and factually wrong output.
 [2026-04-21 15:04:40.258] [info]    brewery_description_local="早朝の、たこ焼きや香ばしいイカ焼きの湿った匂いは、いつも乾燥小屋の外にある使用済み麦芽の金属的な匂いと奇妙に混ざり合って近隣に漂います。私たちはこの場所に店を構えることを決めたのです。なぜなら、大阪は決して止まることのない都市であり、商品と味が絶え間なく交換されることで築かれた場所だからです。地元の多くの方々は、信頼できる大規模な淡麗ラガーの味が習慣になっていますが、私たちは発酵の、より深く、より複雑な表現を探求することに関心があります。私たちのベースモルトは、山田錦のような地元の米の品種を意図的に組み込んで作られています。この米を酒ではなく、麦芽として、仕込みの最中にその複雑でバターのような風味を引き出すために使用しています。この組み合わせを、ゆっくりとした嫌気的な熟成プロセスに続けることで、私たちのビールは、慌ただしい市場のスタイルとは一線を画す、深みのある、満足感のある複雑さを持っています。オリジナルの倉庫の重く深紅のレンガ壁は、関西特有の湿気と季節の雨を何十年も吸収し、この地区の絶え間ない動きの正確な物語を語るような古色を帯びています。私たちはこの構造物を、その魅力のためではなく、その回復力とモルタルに込められた地域の歴史の密度ゆえに選びました。私たちの目標は、ただこの力強い交易都市に値する飲み物を提供することだけです。もしメインの通りから離れた静かな場所をお探しなら、新世界近くの脇道にある私たちを探してください。"
 ```
 
-A review of the following text for brewing techniques reveals several
-inaccuracies, and no comments could be made on the local-language version due to
-my own lack of proficiency in Japanese:
+A review of the following text for brewing techniques reveals three
+inaccuracies. No comments are made on the local-language version, since its
+reviewer does not read Japanese:
 
 #### 1. "Buttery flavours" framed as a desirable malt-derived flavour
 
@@ -191,7 +191,7 @@ fermentable sugars.[^yn-sakeonline]
 
 **Misleading**
 
-Anaerobic conditions during packaging and aging are not differentiating
+Anaerobic conditions during packaging and aging are not a differentiating
 technique. Anaerobic conditions are the standard baseline for all commercial
 beer production. Breweries exclude oxygen as a top priority for packaging and
 shelf stability; published research in _Microbiology Spectrum_ confirms that
@@ -200,7 +200,7 @@ Professional packaging lines use CO_2 purges and closed transfers specifically
 to maintain this state.[^packaging] Framing anaerobic aging as a distinctive
 practice is misleading and suggests hallucinated output.
 
-### Low-Resource Language Hallucination
+### Low-resource language hallucination
 
 The generation pipeline passes local language codes to the model to retrieve a
 translated `description_local`. Output quality is reliable for high-resource
@@ -262,9 +262,9 @@ idiomatic phrasing.
 ]
 ```
 
-This dataset, when fed into the pipeline will often times reason that a local
-variant of French is needed, but will often times just default to a standardized
-dialect of French, devoid of any cultural or linguistic nuance.
+When fed into the pipeline, this dataset often causes the model to reason that
+a local variant of French is needed, but it often defaults to a standardized
+dialect of French, without cultural or linguistic nuance.
 
 For languages such as Welsh (Wales), Māori (Aotearoa/New Zealand), or Sicilian
 (Sicily, Italy), the model can generate text that looks syntactically plausible
@@ -273,7 +273,7 @@ rather than prompt engineering.
 
 Output sample: [./french-cities.example](french-cities.example)
 
-#### Proposed Mitigations
+#### Proposed mitigations
 
 - **Prevention via allowlist:** introduce a high-resource language allowlist. If
   a location's code is unlisted, skip `description_local` generation and fall
@@ -284,7 +284,7 @@ Output sample: [./french-cities.example](french-cities.example)
   SQLite schema so downstream applications can filter or flag potentially
   hallucinated text by language tier.
 
-### Synthetic Postal Codes
+### Synthetic postal codes
 
 When the pipeline is run without `--mocked`, `XegerPostalCodeService` generates
 a fresh postal code per brewery/user address by reverse-matching one of the
@@ -312,7 +312,7 @@ not a source of truth.
     Simhi, Itay Itzhak, Fazl Barez, Gabriel Stanovsky, Yonatan Belinkov.
 
 [^llm-bias]:
-    e.g., Blasi et al. (2022), "Systematic Inequalities in Language Technology
+    For example, Blasi et al. (2022), "Systematic Inequalities in Language Technology
     Performance across the World's Languages," _ACL Anthology_. The pattern is
     consistent with models trained predominantly on English-language web
     corpora.

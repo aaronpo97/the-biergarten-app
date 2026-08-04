@@ -1,20 +1,24 @@
 # The Biergarten App
 
 The Biergarten App is a full-stack directory and discovery platform for
-breweries. It features a robust user authentication system, a searchable
-database of brewery locations, and a custom offline data-generation pipeline
-that uses LLMs (Llama.cpp) and Wikipedia to synthesize realistic seed data.
+breweries. It provides:
 
-It features:
+- JWT-based user authentication, with email confirmation and refresh-token
+  rotation
+- A searchable database of brewery locations
+- An offline data-generation pipeline that uses large language models (LLMs)
+  via Llama.cpp and Wikipedia to synthesize realistic seed data
+
+The repository is organized into:
 
 - A .NET backend (Web API + database migrations/seed) under `web/backend/`
 - A server-rendered React website (React Router + Vite) under `web/frontend/`
-- A C++20 “pipeline” CLI for generating seed data under `tooling/pipeline/`
+- A C++20 data-generation CLI under `tooling/pipeline/`
 
 Specialized documentation (setup, architecture, docker, testing, diagrams, and
 pipeline notes) lives under `docs/`.
 
-## Documentation (Start Here)
+## Documentation
 
 Website + backend (active stack):
 
@@ -37,7 +41,7 @@ Data generation pipeline (C++):
 - [Authentication Flow](docs/website/diagrams-out/authentication-flow.svg)
 - [Database Schema](docs/website/diagrams-out/database-schema.svg)
 
-## Current Status
+## Current status
 
 Active areas in the repository:
 
@@ -52,18 +56,27 @@ Archived/reference areas:
 - `archive/next-js-web-app/` contains an older Next.js frontend retained for
   reference
 
-## Tech Stack
+## Tech stack
 
 - **Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp
 - **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5
 - **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
 - **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
 - **Infrastructure**: Docker, Docker Compose
-- **Security**: Argon2id password hashing, JWT access/refresh/confirmation
-  tokens
+- **Security**: Argon2id password hashing, JSON Web Tokens (JWT) for
+  access/refresh/confirmation
 - **Data Pipeline**: C++20, CMake, Boost, libcurl, SQLite, llama.cpp
 
-## Quick Start
+## Requirements
+
+- .NET SDK 10 or later
+- Node.js 18 or later
+- Docker Desktop, or an equivalent Docker Engine setup
+
+See [Getting Started](docs/website/getting-started.md) for the full
+prerequisite list, including the pipeline's C++ toolchain.
+
+## Quick start
 
 For full setup details, use [Getting Started](docs/website/getting-started.md).
 This section is the shortest path to a working dev environment.
@@ -101,7 +114,7 @@ npm run test:storybook
 npm run test:storybook:playwright
 ```
 
-## Repository Structure
+## Repository structure
 
 ```text
 web/
@@ -123,9 +136,10 @@ archive/
 
 ## Testing
 
-Run the backend test stack with Docker:
+Create a test environment file, then run the backend test stack with Docker:
 
 ```bash
+cp web/.env.example web/.env.test
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
@@ -147,5 +161,16 @@ See [Environment Variables](docs/website/environment-variables.md) for details.
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+4. Run the checks in [Testing](docs/website/testing.md) (backend tests,
+   `npm run lint`, `npm run typecheck`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+## Support
+
+Report bugs and request features via
+[GitHub Issues](https://github.com/aaronpo97/the-biergarten-app/issues).
+
+## License
+
+GPL-3.0. See [LICENSE.md](LICENSE.md).

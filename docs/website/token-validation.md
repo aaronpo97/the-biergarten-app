@@ -1,8 +1,8 @@
-# Token Validation Architecture
+# Token validation architecture
 
 ## Overview
 
-The Core project validates JWTs across three token types:
+The Core project validates JSON Web Tokens (JWTs) across three token types:
 
 - **Access Tokens**: Short-lived (1 hour) tokens for API authentication
 - **Refresh Tokens**: Long-lived (21 days) tokens for obtaining new access
@@ -12,7 +12,7 @@ The Core project validates JWTs across three token types:
 
 ## Components
 
-### Infrastructure Layer
+### Infrastructure layer
 
 #### [ITokenInfrastructure](../../web/backend/Infrastructure/Infrastructure.Jwt/ITokenInfrastructure.cs)
 
@@ -30,7 +30,7 @@ Low-level JWT operations.
 - Algorithm: HS256 (HMAC-SHA256)
 - Validates token lifetime, signature, and well-formedness
 
-### Features.Auth Slice
+### Features.Auth slice
 
 #### [ITokenService](../../web/backend/Features/Features.Auth/Services/ITokenService.cs)
 
@@ -69,7 +69,7 @@ registered by the host (`API.Core/Program.cs`) since
 `JwtAuthenticationHandler` (host-level auth middleware) also depends on
 it directly.
 
-### Integration Points
+### Integration points
 
 #### [ConfirmUserHandler](../../web/backend/Features/Features.Auth/Commands/ConfirmUser/ConfirmUserHandler.cs)
 
@@ -112,9 +112,9 @@ it directly.
 - `POST /api/auth/confirm/resend?userId=...` - Resend the confirmation email
 - `POST /api/auth/refresh` - Refresh access token
 
-## Validation Security
+## Validation security
 
-### Token Secrets
+### Token secrets
 
 Three independent secrets enable:
 
@@ -130,7 +130,7 @@ REFRESH_TOKEN_SECRET=...          # Signs 21-day refresh tokens
 CONFIRMATION_TOKEN_SECRET=...     # Signs 30-minute confirmation tokens
 ```
 
-### Validation Checks
+### Validation checks
 
 Each token is validated for:
 
@@ -139,7 +139,7 @@ Each token is validated for:
 3. **Claims Presence** - Required claims (Sub, UniqueName) must be present
 4. **Claims Format** - UserId claim must be a valid GUID
 
-### Error Handling
+### Error handling
 
 Validation failures return HTTP 401 Unauthorized:
 
@@ -148,9 +148,9 @@ Validation failures return HTTP 401 Unauthorized:
 - Missing claims → "Invalid token"
 - Malformed claims → "Invalid token"
 
-## Token Lifecycle
+## Token lifecycle
 
-### Access Token Lifecycle
+### Access token lifecycle
 
 1. **Generation**: During login (1-hour validity)
 2. **Usage**: Included in Authorization header on API requests
@@ -158,16 +158,16 @@ Validation failures return HTTP 401 Unauthorized:
 4. **Expiration**: Token becomes invalid after 1 hour
 5. **Refresh**: Use refresh token to obtain new access token
 
-### Refresh Token Lifecycle
+### Refresh token lifecycle
 
 1. **Generation**: During login (21-day validity)
 2. **Storage**: Client-side (secure storage)
 3. **Usage**: Posted to `/api/auth/refresh` endpoint
-4. **Validation**: Validated by RefreshTokenService
+4. **Validation**: Validated by `ITokenService.RefreshTokenAsync()`
 5. **Rotation**: New refresh token issued on successful refresh
 6. **Expiration**: Token becomes invalid after 21 days
 
-### Confirmation Token Lifecycle
+### Confirmation token lifecycle
 
 1. **Generation**: During user registration (30-minute validity)
 2. **Delivery**: Emailed to user in confirmation link
@@ -180,7 +180,7 @@ Validation failures return HTTP 401 Unauthorized:
 
 All of the following live in `Features.Auth.Tests`.
 
-### Unit Tests
+### Unit tests
 
 **Services/TokenServiceValidationTests.cs**
 
@@ -210,7 +210,7 @@ All of the following live in `Features.Auth.Tests`.
 - Sends a fresh confirmation email when the user exists and is unverified
 - No-ops when the user doesn't exist or is already verified
 
-### BDD Tests (Reqnroll)
+### BDD tests (Reqnroll)
 
 **TokenRefresh.feature**
 
@@ -230,19 +230,19 @@ All of the following live in `Features.Auth.Tests`.
 - Invalid/expired access token rejection
 - Token type mismatch (refresh used as access token)
 
-## Future Enhancements
+## Future enhancements
 
-### Stretch Goals
+### Stretch goals
 
 1. **Middleware for Access Token Validation**
    - Automatically validate access tokens on protected routes
    - Populate HttpContext.User from token claims
    - Return 401 for invalid/missing tokens
 
-2. **Token Blacklisting**
-   - Implement token revocation (e.g., on logout)
-   - Store blacklisted tokens in cache/database
-   - Check blacklist during validation
+2. **Token Denylisting**
+   - Implement token revocation (for example, on logout)
+   - Store denylisted tokens in cache/database
+   - Check the denylist during validation
 
 3. **Refresh Token Rotation Strategy**
    - Detect token reuse (replay attacks)

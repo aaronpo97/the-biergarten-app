@@ -1,4 +1,4 @@
-# Environment Variables
+# Environment variables
 
 This document covers the active environment variables used by the current
 Biergarten stack.
@@ -11,7 +11,7 @@ The application uses environment variables for:
 - **React Router website** - API base URL and session signing
 - **Docker containers** - environment-specific orchestration
 
-## Configuration Patterns
+## Configuration patterns
 
 ### Backend (.NET API)
 
@@ -30,9 +30,9 @@ Environment-specific `.env` files loaded via `env_file:` in docker-compose.yaml:
 - `.env.test` - Testing
 - `.env.prod` - Production
 
-## Backend Variables (.NET API)
+## Backend variables (.NET API)
 
-### Database Connection
+### Database connection
 
 **Option 1: Component-Based (Recommended for Docker)**
 
@@ -59,7 +59,7 @@ string is built from components.
 
 **Implementation**: See `DefaultSqlConnectionFactory.cs`
 
-### JWT Authentication Secrets (Backend)
+### JSON Web Token (JWT) authentication secrets (backend)
 
 The backend uses separate secrets for different token types to enable
 independent key rotation and validation isolation.
@@ -80,9 +80,9 @@ WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 
 **Security Requirements**:
 
-- Each secret should be minimum 32 characters
-- Recommend 127+ characters for production
-- Generate using cryptographically secure random functions
+- Use at least 32 characters per secret
+- Use 127 or more characters in production
+- Generate secrets with a cryptographically secure random function
 - Never reuse secrets across token types or environments
 - Rotate secrets periodically in production
 
@@ -110,19 +110,20 @@ openssl rand -base64 127
 - **Handler**: Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler
 - **Validation**: Token signature, expiration, and malformed token checks
 
-### Migration Control
+### Migration control
 
 ```bash
 CLEAR_DATABASE=true
 ```
 
 - **Required**: No
-- **Default**: false
-- **Effect**: If "true", drops and recreates database during migrations
-- **Usage**: Development and testing environments ONLY
-- **Warning**: NEVER use in production
+- **Default**: `false`
+- **Effect**: If set to `true`, drops and recreates the database during
+  migrations
+- **Usage**: Development and testing environments only
+- **Warning**: Never use in production
 
-### ASP.NET Core Configuration
+### ASP.NET Core configuration
 
 ```bash
 ASPNETCORE_ENVIRONMENT=Development    # Development, Production, Staging
@@ -130,7 +131,7 @@ ASPNETCORE_URLS=http://0.0.0.0:8080  # Binding address and port
 DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 ```
 
-## Frontend Variables (`web/frontend`)
+## Frontend variables (`web/frontend`)
 
 The active website does not use the old Next.js/Prisma environment model. Its
 core runtime variables are:
@@ -141,7 +142,7 @@ SESSION_SECRET=<generated-secret>        # Cookie session signing secret
 NODE_ENV=development                     # Standard Node runtime mode
 ```
 
-### Frontend Variable Details
+### Frontend variable details
 
 #### `API_BASE_URL`
 
@@ -163,7 +164,7 @@ NODE_ENV=development                     # Standard Node runtime mode
 - **Typical values**: `development`, `production`, `test`
 - **Purpose**: Controls secure cookie behavior and runtime mode
 
-### SMTP Configuration (Backend)
+### SMTP configuration (backend)
 
 Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation
 and account emails.
@@ -183,11 +184,11 @@ SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten
 - **Local dev**: point at the `mailpit` Docker service (SMTP on port 1025, web
   UI on http://localhost:8025)
 - **Production**: point at a real provider (SendGrid, Mailgun, Amazon SES,
-  etc.)
+  and so on)
 
-## Docker-Specific Variables
+## Docker-specific variables
 
-### SQL Server Container
+### SQL Server container
 
 ```bash
 SA_PASSWORD=YourStrong!Passw0rd   # SQL Server SA password
@@ -201,9 +202,9 @@ MSSQL_PID=Express                 # SQL Server edition (Express, Developer, Ente
 - Uppercase, lowercase, digits, and special characters
 - Maps to `DB_PASSWORD` for application containers
 
-## Environment File Structure
+## Environment file structure
 
-### Backend/Docker (`web/` Directory)
+### Backend/Docker (`web/` directory)
 
 ```
 web/.env.example          # Template (tracked in Git)
@@ -219,7 +220,7 @@ cp web/.env.example web/.env.dev
 # Edit web/.env.dev with your values
 ```
 
-## Legacy Frontend Variables
+## Legacy frontend variables
 
 Variables for the archived Next.js frontend (`archive/next-js-web-app/`) have
 been removed from this active reference, since that app is retained for
@@ -231,7 +232,7 @@ reference only and is not run as part of the active stack.
 - `web/docker-compose.test.yaml` → `web/.env.test`
 - `web/docker-compose.prod.yaml` → `web/.env.prod`
 
-## Variable Reference Table
+## Variable reference table
 
 | Variable                      | Backend | Frontend | Docker | Required | Notes                      |
 | ----------------------------- | :-----: | :------: | :----: | :------: | -------------------------- |
@@ -268,7 +269,7 @@ reference only and is not run as part of the active stack.
 
 ## Validation
 
-### Backend Validation
+### Backend validation
 
 Variables are validated at startup:
 
@@ -279,7 +280,7 @@ Variables are validated at startup:
   "minimum 32 characters" guidance above is a recommendation, not an
   enforced check
 
-### Frontend Validation
+### Frontend validation
 
 The active website relies on runtime defaults for local development and the
 surrounding server environment in deployed environments.
@@ -288,9 +289,9 @@ surrounding server environment in deployed environments.
 - `SESSION_SECRET` falls back to a development-only local secret
 - `NODE_ENV` controls secure cookie behavior
 
-## Example Configuration Files
+## Example configuration files
 
-### `.env.dev` (Backend/Docker)
+### `.env.dev` (backend/Docker)
 
 ```bash
 # Database

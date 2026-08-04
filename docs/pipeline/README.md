@@ -14,8 +14,8 @@ deterministic mock.
 
 ## Table of Contents
 
-- [How It Fits The Main App](#how-it-fits-the-main-app)
-- [Quick Start](#quick-start)
+- [How it fits the main app](#how-it-fits-the-main-app)
+- [Quick start](#quick-start)
   - [Build](#build)
   - [Model](#model)
   - [Run](#run)
@@ -24,17 +24,17 @@ deterministic mock.
   - [Pipeline Stages](#pipeline-stages)
   - [Key Components](#key-components)
   - [Runtime Behaviour](#runtime-behaviour)
-- [Generated Output](#generated-output)
-- [Tech Stack](#tech-stack)
-- [Tested Hardware](#tested-hardware)
-- [Fixture Strategy](#fixture-strategy)
-- [Repo Layout](#repo-layout)
-- [Code Tour](#code-tour)
-- [Next Steps](#next-steps)
+- [Generated output](#generated-output)
+- [Tech stack](#tech-stack)
+- [Tested hardware](#tested-hardware)
+- [Fixture strategy](#fixture-strategy)
+- [Repo layout](#repo-layout)
+- [Code tour](#code-tour)
+- [Next steps](#next-steps)
 
 ---
 
-## How It Fits The Main App
+## How it fits the main app
 
 The pipeline is a data ingestion layer. It sits outside the web app runtime and
 produces seed records the app imports at startup or during a dedicated seed
@@ -50,7 +50,7 @@ step.
 
 ---
 
-## Quick Start
+## Quick start
 
 ### Build
 
@@ -99,13 +99,13 @@ Each run writes a fresh dated SQLite file such as
   --temperature 1.0 --top-p 0.95 --top-k 64 --n-ctx 8192 --seed -1
 ```
 
-#### CLI Flags
+#### CLI flags
 
 | Flag               | Purpose                                                                                              |
 | ------------------ | ---------------------------------------------------------------------------------------------------- |
 | `--mocked`         | Deterministic mock generator, no model required.                                                     |
 | `--model, -m`      | Path to a GGUF file. Required unless `--mocked` is set.                                              |
-| `--prompt-dir`     | Directory containing prompt files (e.g. `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
+| `--prompt-dir`     | Directory containing prompt files (for example, `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
 | `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                         |
 | `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                  |
 | `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                             |
@@ -176,7 +176,7 @@ output to confirm the fast path was taken.
 ### Run the container
 
 The container always runs the model-backed path; there is no `--mocked`
-container mode (use a native build for that — see [Quick Start](#quick-start)).
+container mode (use a native build for that — see [Quick start](#quick-start)).
 The entrypoint, `runpod/start.sh`, downloads the GGUF model automatically if it
 is not already present at the configured path.
 
@@ -218,7 +218,7 @@ environment variables listed above to match your run.
 
 ## Architecture
 
-### Pipeline Stages
+### Pipeline stages
 
 | Stage              | Implementation                                                                                                                                                                                                                                                                                                                                                 |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -234,7 +234,7 @@ If name sampling, enrichment, or generation fails for a city, that city is
 skipped and the pipeline continues. `GenerateUsers()` runs before
 `GenerateBreweries()` in `BiergartenPipelineOrchestrator::Run()`.
 
-### Key Components
+### Key components
 
 - `src/main.cc` — argument parsing and Boost.DI composition root.
 - `CuratedJsonDataService` — implements `ICuratedDataService`; takes a
@@ -260,7 +260,7 @@ skipped and the pipeline continues. `GenerateUsers()` runs before
   LLM-generated username/bio/activity weight, and a programmatically generated
   (not LLM-authored) unique email and date of birth.
 
-### Runtime Behaviour
+### Runtime behaviour
 
 `WikipediaEnrichmentService` fetches two Wikipedia extracts per city: a generic
 "brewing" extract and a "beer in `{country}`" extract. It does not currently
@@ -290,17 +290,17 @@ absent from either name fixture (currently `KE`, `SE`, `SG`, `TH`, `VN`, `ZA`)
 are skipped, the same way a failed enrichment or generation call skips a city —
 see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section.
 
-### Process Flow - Activity Diagram
+### Process flow - activity diagram
 
 ![An activity diagram](./diagrams/current/output/activity.svg)
 
-### Architectural Overview - Class Diagram
+### Architectural overview - class diagram
 
 ![A class diagram](./diagrams/current/output/class.svg)
 
 ---
 
-## Generated Output
+## Generated output
 
 Each successful run stores a `BreweryRecord` pair with the source location and a
 `BreweryResult` payload, and a `UserRecord` pair with the source location and a
@@ -328,7 +328,7 @@ SQLite export file named with the current UTC timestamp.
 The log dump also includes city, country, state or province, ISO subdivision
 code, latitude, and longitude for each entry.
 
-### Consumer Data Shape
+### Consumer data shape
 
 | Field                               | Why it matters                                   |
 | ----------------------------------- | ------------------------------------------------ |
@@ -341,7 +341,7 @@ code, latitude, and longitude for each entry.
 
 ---
 
-## Tech Stack
+## Tech stack
 
 - C++20
 - CMake 3.31+
@@ -363,7 +363,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 ---
 
-## Tested Hardware
+## Tested hardware
 
 ### ARM macOS — M1 Pro
 
@@ -398,7 +398,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 ---
 
-## Fixture Strategy
+## Fixture strategy
 
 - `--mocked` for stable fixtures, repeatable screenshots, and Storybook runs.
   `MockCuratedDataService` swaps in for `CuratedJsonDataService`, so no fixture
@@ -414,7 +414,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 ---
 
-## Repo Layout
+## Repo layout
 
 | Path                                         | Purpose                                                     |
 | -------------------------------------------- | ----------------------------------------------------------- |
@@ -431,7 +431,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 ---
 
-## Code Tour
+## Code tour
 
 Paths below are relative to `tooling/pipeline/`.
 
@@ -450,7 +450,7 @@ Paths below are relative to `tooling/pipeline/`.
 
 ---
 
-## Next Steps
+## Next steps
 
 The pipeline currently produces city-aware brewery and user records and dated
 SQLite exports. The next passes add additional fixture types so the app can
@@ -458,7 +458,7 @@ exercise the full brewery and social domains without live data. For the detailed
 engineering breakdown of what's needed to reach the architecture in
 [`diagrams/planned/`](./diagrams/planned/), see [ROADMAP.md](./ROADMAP.md).
 
-### Testing — Very High Priority
+### Testing — very high priority
 
 - Unit test JSON validation and retry logic against malformed, truncated, and
   empty model outputs.
@@ -472,19 +472,19 @@ engineering breakdown of what's needed to reach the architecture in
 - Confirm the retry path is reachable when the reasoning block consumes
   available token budget.
 
-### Beer Generation
+### Beer generation
 
 Generate catalog entries with style, ABV, IBU, color, aroma notes, and food
 pairing hints. Link beers back to breweries and cities. Keep style coverage wide
 enough to exercise search, sort, and category filters.
 
-### Check-In System
+### Check-in system
 
 Produce timestamped check-in events between users and breweries. Use a J-curve
 activity profile — a small set of users accounts for most check-ins, the rest
 appear occasionally. Add bursty behaviour around weekends and travel periods.
 
-### Beer Ratings
+### Beer ratings
 
 Generate rating events with a strong positive skew and a long tail of lower
 scores. Avoid uniform distributions. Attach timestamps and user IDs so the app
