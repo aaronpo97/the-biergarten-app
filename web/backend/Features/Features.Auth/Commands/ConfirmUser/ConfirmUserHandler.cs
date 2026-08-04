@@ -11,8 +11,6 @@ namespace Features.Auth.Commands.ConfirmUser;
 ///     Handles <see cref="ConfirmUserCommand" /> by validating the confirmation token and marking the
 ///     corresponding user account as confirmed.
 /// </summary>
-/// <param name="authRepository">Repository used to look up and confirm user accounts.</param>
-/// <param name="tokenService">Service used to validate the confirmation token.</param>
 public class ConfirmUserHandler(IAuthRepository authRepository, ITokenService tokenService)
     : IRequestHandler<ConfirmUserCommand, ConfirmationPayload>
 {

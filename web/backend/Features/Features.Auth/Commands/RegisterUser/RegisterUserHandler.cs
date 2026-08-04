@@ -14,10 +14,6 @@ namespace Features.Auth.Commands.RegisterUser;
 ///     account, issues access/refresh/confirmation tokens, and attempts to send the registration
 ///     confirmation email via Features.Emails.
 /// </summary>
-/// <param name="authRepo">Repository used to check for existing users and persist the new account.</param>
-/// <param name="passwordInfrastructure">Infrastructure component used to hash the user's plain-text password.</param>
-/// <param name="tokenService">Service used to generate access, refresh, and confirmation tokens.</param>
-/// <param name="mediator">Used to send the cross-slice command that triggers the confirmation email.</param>
 public class RegisterUserHandler(
     IAuthRepository authRepo,
     IPasswordInfrastructure passwordInfrastructure,

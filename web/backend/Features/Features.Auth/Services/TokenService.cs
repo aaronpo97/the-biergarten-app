@@ -19,12 +19,7 @@ public class TokenService : ITokenService
     private readonly string _refreshTokenSecret;
     private readonly ITokenInfrastructure _tokenInfrastructure;
 
-    /// <summary>
-    ///     Initializes a new instance of <see cref="TokenService" />, loading the access, refresh, and
-    ///     confirmation token signing secrets from environment variables.
-    /// </summary>
-    /// <param name="tokenInfrastructure">The infrastructure component used to generate and validate JWTs.</param>
-    /// <param name="authRepository">Repository used to look up user accounts during token refresh.</param>
+    /// <summary>Initializes a new instance of the <see cref="TokenService" /> class.</summary>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when any of the <c>ACCESS_TOKEN_SECRET</c>, <c>REFRESH_TOKEN_SECRET</c>, or
     ///     <c>CONFIRMATION_TOKEN_SECRET</c> environment variables are not set.
@@ -53,12 +48,6 @@ public class TokenService : ITokenService
             );
     }
 
-    /// <summary>
-    ///     Generates an access token for the given user, signed with the access token secret and
-    ///     expiring after <see cref="TokenServiceExpirationHours.AccessTokenHours" /> hours.
-    /// </summary>
-    /// <param name="user">The user account to generate the token for.</param>
-    /// <returns>The signed access token string.</returns>
     public string GenerateAccessToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.AccessTokenHours);
@@ -70,12 +59,6 @@ public class TokenService : ITokenService
         );
     }
 
-    /// <summary>
-    ///     Generates a refresh token for the given user, signed with the refresh token secret and
-    ///     expiring after <see cref="TokenServiceExpirationHours.RefreshTokenHours" /> hours.
-    /// </summary>
-    /// <param name="user">The user account to generate the token for.</param>
-    /// <returns>The signed refresh token string.</returns>
     public string GenerateRefreshToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
@@ -89,12 +72,6 @@ public class TokenService : ITokenService
         );
     }
 
-    /// <summary>
-    ///     Generates a confirmation token for the given user, signed with the confirmation token secret and
-    ///     expiring after <see cref="TokenServiceExpirationHours.ConfirmationTokenHours" /> hours.
-    /// </summary>
-    /// <param name="user">The user account to generate the token for.</param>
-    /// <returns>The signed confirmation token string.</returns>
     public string GenerateConfirmationToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
@@ -111,11 +88,9 @@ public class TokenService : ITokenService
     /// <summary>
     ///     Generates a token of the kind specified by <typeparamref name="T" />, dispatching to
     ///     <see cref="GenerateAccessToken" />, <see cref="GenerateRefreshToken" />, or
-    ///     <see cref="GenerateConfirmationToken" /> based on the corresponding <see cref="TokenType" /> value.
+    ///     <see cref="GenerateConfirmationToken" />.
     /// </summary>
-    /// <typeparam name="T">The enum type identifying which kind of token to generate. Must be <see cref="TokenType" />.</typeparam>
-    /// <param name="user">The user account to generate the token for.</param>
-    /// <returns>The signed token string corresponding to the requested token type.</returns>
+    /// <typeparam name="T">Must be <see cref="TokenType" />.</typeparam>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when <typeparamref name="T" /> is not <see cref="TokenType" /> or does not resolve to a known token type.
     /// </exception>
@@ -139,11 +114,6 @@ public class TokenService : ITokenService
         };
     }
 
-    /// <summary>
-    ///     Validates an access token against the access token secret.
-    /// </summary>
-    /// <param name="token">The access token string to validate.</param>
-    /// <returns>A <see cref="ValidatedToken" /> describing the token's claims.</returns>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
     /// </exception>
@@ -152,11 +122,6 @@ public class TokenService : ITokenService
         return await ValidateTokenInternalAsync(token, _accessTokenSecret, "access");
     }
 
-    /// <summary>
-    ///     Validates a refresh token against the refresh token secret.
-    /// </summary>
-    /// <param name="token">The refresh token string to validate.</param>
-    /// <returns>A <see cref="ValidatedToken" /> describing the token's claims.</returns>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
     /// </exception>
@@ -165,11 +130,6 @@ public class TokenService : ITokenService
         return await ValidateTokenInternalAsync(token, _refreshTokenSecret, "refresh");
     }
 
-    /// <summary>
-    ///     Validates a confirmation token against the confirmation token secret.
-    /// </summary>
-    /// <param name="token">The confirmation token string to validate.</param>
-    /// <returns>A <see cref="ValidatedToken" /> describing the token's claims.</returns>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
     /// </exception>
@@ -178,12 +138,6 @@ public class TokenService : ITokenService
         return await ValidateTokenInternalAsync(token, _confirmationTokenSecret, "confirmation");
     }
 
-    /// <summary>
-    ///     Validates the given refresh token, looks up the associated user, and issues a fresh
-    ///     access/refresh token pair.
-    /// </summary>
-    /// <param name="refreshTokenString">The refresh token string to validate and exchange.</param>
-    /// <returns>A <see cref="RefreshTokenResult" /> containing the user and newly issued tokens.</returns>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when the refresh token is invalid, or when the user account it refers to no longer exists.
     /// </exception>
@@ -204,10 +158,7 @@ public class TokenService : ITokenService
     ///     Performs the shared validation logic for access, refresh, and confirmation tokens:
     ///     validates the JWT signature/expiration, then extracts and parses the user ID and username claims.
     /// </summary>
-    /// <param name="token">The token string to validate.</param>
-    /// <param name="secret">The secret key to validate the token's signature against.</param>
     /// <param name="tokenType">A human-readable label (e.g. "access", "refresh", "confirmation") used in error messages.</param>
-    /// <returns>A <see cref="ValidatedToken" /> describing the token's claims.</returns>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when required claims are missing, the user ID claim is not a valid <see cref="Guid" />,
     ///     or the underlying token validation fails for any other reason (e.g. expired or invalid signature).

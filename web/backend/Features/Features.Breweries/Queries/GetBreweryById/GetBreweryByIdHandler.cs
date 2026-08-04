@@ -5,10 +5,6 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetBreweryById;
 
-/// <summary>
-///     Handles <see cref="GetBreweryByIdQuery" /> by looking up the matching brewery post.
-/// </summary>
-/// <param name="repository">Repository used to query brewery post data.</param>
 public class GetBreweryByIdHandler(IBreweryRepository repository)
     : IRequestHandler<GetBreweryByIdQuery, BreweryDto?>
 {

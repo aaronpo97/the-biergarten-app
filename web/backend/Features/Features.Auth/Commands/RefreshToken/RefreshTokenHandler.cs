@@ -8,7 +8,6 @@ namespace Features.Auth.Commands.RefreshToken;
 ///     Handles <see cref="RefreshTokenCommand" /> by validating the refresh token and issuing a new
 ///     access/refresh token pair.
 /// </summary>
-/// <param name="tokenService">Service used to validate and exchange the refresh token.</param>
 public class RefreshTokenHandler(ITokenService tokenService)
     : IRequestHandler<RefreshTokenCommand, LoginPayload>
 {

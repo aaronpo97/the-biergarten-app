@@ -11,28 +11,17 @@ using Shared.Contracts;
 
 namespace Features.Breweries.Controllers;
 
-/// <summary>
-///     Provides CRUD endpoints for managing brewery posts.
-/// </summary>
 /// <remarks>
-///     The controller is decorated with <c>[Authorize(AuthenticationSchemes = "JWT")]</c> by default; read endpoints
-///     (<see cref="GetById" /> and <see cref="GetAll" />) opt out via <c>[AllowAnonymous]</c>.
+///     Requires JWT authentication by default; <see cref="GetById" /> and <see cref="GetAll" /> opt out via
+///     <c>[AllowAnonymous]</c>.
 /// </remarks>
-/// <param name="mediator">Used to dispatch brewery commands and queries to their handlers.</param>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = "JWT")]
 public class BreweryController(IMediator mediator) : ControllerBase
 {
-    /// <summary>
-    ///     Retrieves a single brewery post by its unique identifier.
-    /// </summary>
     /// <remarks>Allows anonymous access.</remarks>
-    /// <param name="id">The unique identifier of the brewery post to retrieve.</param>
-    /// <returns>
-    ///     A <c>200 OK</c> result wrapping a <see cref="ResponseBody{T}" /> of <see cref="BreweryDto" /> if found;
-    ///     otherwise a <c>404 Not Found</c> result wrapping a <see cref="ResponseBody" /> error message.
-    /// </returns>
+    /// <returns><c>200 OK</c> with the brewery if found; otherwise <c>404 Not Found</c>.</returns>
     [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> GetById(Guid id)
@@ -50,13 +39,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>
-    ///     Retrieves a paginated list of brewery posts.
-    /// </summary>
     /// <remarks>Allows anonymous access.</remarks>
-    /// <param name="limit">The maximum number of brewery posts to return, or <c>null</c> for no limit.</param>
-    /// <param name="offset">The number of brewery posts to skip before returning results, or <c>null</c> for no offset.</param>
-    /// <returns>A <c>200 OK</c> result wrapping a <see cref="ResponseBody{T}" /> of a collection of <see cref="BreweryDto" />.</returns>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<ResponseBody<IEnumerable<BreweryDto>>>> GetAll(
@@ -76,14 +59,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>
-    ///     Creates a new brewery post.
-    /// </summary>
-    /// <param name="command">The brewery details to create, including the posting user, name, description, and location.</param>
-    /// <returns>
-    ///     A <c>201 Created</c> result wrapping a <see cref="ResponseBody{T}" /> of the newly created
-    ///     <see cref="BreweryDto" />.
-    /// </returns>
+    /// <returns><c>201 Created</c> with the newly created brewery.</returns>
     [HttpPost]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Create(
         [FromBody] CreateBreweryCommand command
@@ -100,22 +76,8 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>
-    ///     Updates an existing brewery post.
-    /// </summary>
-    /// <param name="id">
-    ///     The unique identifier of the brewery post from the route, which must match <paramref name="command" />
-    ///     's ID.
-    /// </param>
-    /// <param name="command">
-    ///     The updated brewery details, including the posting user, name, description, and optional
-    ///     location.
-    /// </param>
-    /// <returns>
-    ///     A <c>200 OK</c> result wrapping a <see cref="ResponseBody{T}" /> of the updated <see cref="BreweryDto" /> if the
-    ///     update succeeds; otherwise a <c>400 Bad Request</c> result wrapping a <see cref="ResponseBody" /> error message
-    ///     when the route ID does not match the payload ID.
-    /// </returns>
+    /// <param name="id">Must match <paramref name="command" />'s <c>BreweryPostId</c>.</param>
+    /// <returns><c>200 OK</c> with the updated brewery; or <c>400 Bad Request</c> if the route ID does not match the payload ID.</returns>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(
         Guid id,
@@ -135,11 +97,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>
-    ///     Deletes a brewery post.
-    /// </summary>
-    /// <param name="id">The unique identifier of the brewery post to delete.</param>
-    /// <returns>A <c>200 OK</c> result wrapping a <see cref="ResponseBody" /> confirming the deletion.</returns>
+    /// <returns><c>200 OK</c> confirming the deletion.</returns>
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ResponseBody>> Delete(Guid id)
     {

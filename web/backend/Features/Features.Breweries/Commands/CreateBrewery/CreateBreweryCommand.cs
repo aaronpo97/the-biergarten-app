@@ -3,9 +3,6 @@ using MediatR;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
-/// <summary>
-///     Location data required to create a new brewery post, supplied as part of <see cref="CreateBreweryCommand" />.
-/// </summary>
 public record CreateBreweryLocation(
     Guid CityId,
     string AddressLine1,

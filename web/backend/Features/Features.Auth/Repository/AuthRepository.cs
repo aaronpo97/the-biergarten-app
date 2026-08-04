@@ -11,7 +11,6 @@ namespace Features.Auth.Repository;
 ///     ADO.NET-based implementation of <see cref="IAuthRepository" /> backed by SQL Server stored procedures,
 ///     handling user registration, credential lookup/rotation, and account verification.
 /// </summary>
-/// <param name="connectionFactory">The factory used to create database connections.</param>
 public class AuthRepository(ISqlConnectionFactory connectionFactory)
     : Repository<UserAccount>(connectionFactory),
         IAuthRepository
@@ -26,15 +25,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     If the result cannot be interpreted, <see cref="Guid.Empty" /> is used, which will cause the
     ///     subsequent lookup to fail.
     /// </remarks>
-    /// <param name="username">Unique username for the user</param>
-    /// <param name="firstName">User's first name</param>
-    /// <param name="lastName">User's last name</param>
-    /// <param name="email">User's email address</param>
-    /// <param name="dateOfBirth">User's date of birth</param>
-    /// <param name="passwordHash">Hashed password</param>
-    /// <returns>The newly created UserAccount with generated ID</returns>
     /// <exception cref="Exception">Thrown when the newly registered user cannot be retrieved after registration.</exception>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task<UserAccount> RegisterUserAsync(
         UserRegistrationDto userRegistrationDto
     )
@@ -84,13 +75,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             ?? throw new Exception("Failed to retrieve newly registered user.");
     }
 
-    /// <summary>
-    ///     Retrieves a user account by email address (typically used for login) using the
-    ///     <c>usp_GetUserAccountByEmail</c> stored procedure.
-    /// </summary>
-    /// <param name="email">Email address to search for</param>
-    /// <returns>UserAccount if found, null otherwise</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
+    /// <summary>Retrieves a user account by email using the <c>usp_GetUserAccountByEmail</c> stored procedure.</summary>
     public async Task<UserAccount?> GetUserByEmailAsync(string email)
     {
         await using DbConnection connection = await CreateConnection();
@@ -104,13 +89,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return await reader.ReadAsync() ? MapToEntity(reader) : null;
     }
 
-    /// <summary>
-    ///     Retrieves a user account by username (typically used for login) using the
-    ///     <c>usp_GetUserAccountByUsername</c> stored procedure.
-    /// </summary>
-    /// <param name="username">Username to search for</param>
-    /// <returns>UserAccount if found, null otherwise</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
+    /// <summary>Retrieves a user account by username using the <c>usp_GetUserAccountByUsername</c> stored procedure.</summary>
     public async Task<UserAccount?> GetUserByUsernameAsync(string username)
     {
         await using DbConnection connection = await CreateConnection();
@@ -128,9 +107,6 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     Retrieves the active (non-revoked) credential for a user account using the
     ///     <c>USP_GetActiveUserCredentialByUserAccountId</c> stored procedure.
     /// </summary>
-    /// <param name="userAccountId">ID of the user account</param>
-    /// <returns>Active UserCredential if found, null otherwise</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
@@ -148,9 +124,6 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     Rotates a user's credential by invalidating all existing credentials and creating a new one,
     ///     using the <c>USP_RotateUserCredential</c> stored procedure.
     /// </summary>
-    /// <param name="userAccountId">ID of the user account</param>
-    /// <param name="newPasswordHash">New hashed password</param>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
     public async Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash)
     {
         await using DbConnection connection = await CreateConnection();
@@ -164,12 +137,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         await command.ExecuteNonQueryAsync();
     }
 
-    /// <summary>
-    ///     Retrieves a user account by ID using the <c>usp_GetUserAccountById</c> stored procedure.
-    /// </summary>
-    /// <param name="userAccountId">ID of the user account</param>
-    /// <returns>UserAccount if found, null otherwise</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
+    /// <summary>Retrieves a user account by ID using the <c>usp_GetUserAccountById</c> stored procedure.</summary>
     public async Task<UserAccount?> GetUserByIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
@@ -189,8 +157,6 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     no-op and the existing user is returned (idempotent). If a concurrent request verifies the user
     ///     first, the resulting duplicate-key SQL exception (error 2601/2627) is swallowed.
     /// </summary>
-    /// <param name="userAccountId">ID of the user account to confirm</param>
-    /// <returns>The confirmed <see cref="Domain.Entities.UserAccount" />, or <c>null</c> if the user account does not exist.</returns>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">
     ///     Thrown when the database command fails for a reason other than
     ///     a duplicate verification record.
@@ -225,13 +191,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return await GetUserByIdAsync(userAccountId);
     }
 
-    /// <summary>
-    ///     Checks whether a user account has been verified by querying the
-    ///     <c>dbo.UserVerification</c> table for a matching record.
-    /// </summary>
-    /// <param name="userAccountId">ID of the user account</param>
-    /// <returns>True if the user has a verification record, false otherwise</returns>
-    /// <exception cref="Microsoft.Data.SqlClient.SqlException">Thrown when the database command fails.</exception>
+    /// <summary>Checks whether a user account has been verified by querying the <c>dbo.UserVerification</c> table.</summary>
     public async Task<bool> IsUserVerifiedAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
@@ -246,23 +206,13 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return result != null && result != DBNull.Value;
     }
 
-    /// <summary>
-    ///     Determines whether a <see cref="SqlException" /> represents a duplicate key violation
-    ///     (SQL Server error 2601 or 2627), used to detect a concurrent duplicate verification insert.
-    /// </summary>
-    /// <param name="ex">The SQL exception to inspect.</param>
-    /// <returns>True if the exception represents a duplicate key violation, false otherwise.</returns>
+    /// <summary>Determines whether a <see cref="SqlException" /> is a duplicate key violation (SQL Server error 2601 or 2627).</summary>
     private static bool IsDuplicateVerificationViolation(SqlException ex)
     {
         // 2601/2627 are duplicate key violations in SQL Server.
         return ex.Number == 2601 || ex.Number == 2627;
     }
 
-    /// <summary>
-    ///     Maps a data reader row to a UserAccount entity.
-    /// </summary>
-    /// <param name="reader">The data reader positioned on the row to map.</param>
-    /// <returns>The mapped <see cref="Domain.Entities.UserAccount" /> instance.</returns>
     protected override UserAccount MapToEntity(DbDataReader reader)
     {
         return new UserAccount
@@ -285,8 +235,6 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     ///     Maps a data reader row to a UserCredential entity. The <c>Timer</c> column is mapped only if
     ///     present in the reader's schema, allowing this method to support result sets that omit it.
     /// </summary>
-    /// <param name="reader">The data reader positioned on the row to map.</param>
-    /// <returns>The mapped <see cref="UserCredential" /> instance.</returns>
     private static UserCredential MapToCredentialEntity(DbDataReader reader)
     {
         UserCredential entity = new()
@@ -319,13 +267,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return entity;
     }
 
-    /// <summary>
-    ///     Helper method to add a parameter to a database command, converting <c>null</c> values to
-    ///     <see cref="DBNull.Value" />.
-    /// </summary>
-    /// <param name="command">The command to add the parameter to.</param>
-    /// <param name="name">The parameter name (including any prefix, e.g. "@Username").</param>
-    /// <param name="value">The parameter value, or <c>null</c> to bind <see cref="DBNull.Value" />.</param>
+    /// <summary>Adds a parameter to a database command, converting <c>null</c> values to <see cref="DBNull.Value" />.</summary>
     private static void AddParameter(DbCommand command, string name, object? value)
     {
         DbParameter p = command.CreateParameter();
