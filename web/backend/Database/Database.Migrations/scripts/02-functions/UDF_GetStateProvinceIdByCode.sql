@@ -1,16 +1,13 @@
-CREATE
-OR
-ALTER FUNCTION dbo.UDF_GetStateProvinceIdByCode
-    (
+CREATE OR ALTER FUNCTION dbo.UDF_GetStateProvinceIdByCode(
     @StateProvinceCode NVARCHAR(6)
-    )
+)
     RETURNS UNIQUEIDENTIFIER
-    AS
+AS
 BEGIN
     DECLARE
-@StateProvinceId UNIQUEIDENTIFIER;
-SELECT @StateProvinceId = StateProvinceID
-FROM dbo.StateProvince
-WHERE ISO3166_2 = @StateProvinceCode;
-RETURN @StateProvinceId;
+        @StateProvinceId UNIQUEIDENTIFIER;
+    SELECT @StateProvinceId = StateProvinceID
+    FROM dbo.StateProvince
+    WHERE ISO3166_2 = @StateProvinceCode;
+    RETURN @StateProvinceId;
 END;
