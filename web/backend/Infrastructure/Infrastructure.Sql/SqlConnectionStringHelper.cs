@@ -9,10 +9,9 @@ public static class SqlConnectionStringHelper
 {
     /// <summary>
     ///     Builds a SQL Server connection string from environment variables.
-    ///     Expects DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD, and DB_TRUST_SERVER_CERTIFICATE.
     /// </summary>
-    /// <param name="databaseName">Optional override for the database name. If null, uses DB_NAME env var.</param>
-    /// <returns>A properly formatted SQL Server connection string.</returns>
+    /// <remarks>Throws <see cref="InvalidOperationException" /> if DB_SERVER, DB_NAME, DB_USER, or DB_PASSWORD is unset.</remarks>
+    /// <param name="databaseName">If null, falls back to the DB_NAME environment variable.</param>
     public static string BuildConnectionString(string? databaseName = null)
     {
         string server =
@@ -48,7 +47,6 @@ public static class SqlConnectionStringHelper
     /// <summary>
     ///     Builds a connection string to the master database using environment variables.
     /// </summary>
-    /// <returns>A connection string for the master database.</returns>
     public static string BuildMasterConnectionString()
     {
         return BuildConnectionString("master");

@@ -8,15 +8,11 @@ namespace Infrastructure.Sql;
 ///     Default <see cref="ISqlConnectionFactory" /> implementation that creates SQL Server connections,
 ///     resolving the connection string from environment variables or application configuration.
 /// </summary>
-/// <param name="configuration">The application configuration, used as a fallback source for the connection string.</param>
 public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlConnectionFactory
 {
     private readonly string _connectionString = GetConnectionString(configuration);
 
-    /// <summary>
-    ///     Creates a new, unopened <see cref="SqlConnection" /> using the resolved connection string.
-    /// </summary>
-    /// <returns>A new <see cref="SqlConnection" /> instance.</returns>
+    /// <inheritdoc />
     public DbConnection CreateConnection()
     {
         return new SqlConnection(_connectionString);
@@ -24,15 +20,10 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlCon
 
     /// <summary>
     ///     Resolves the SQL Server connection string, preferring (in order): the <c>DB_CONNECTION_STRING</c>
-    ///     environment variable, a connection string built from individual <c>DB_*</c> environment variables
-    ///     via <see cref="SqlConnectionStringHelper.BuildConnectionString" />, and finally the <c>"Default"</c>
-    ///     connection string from <paramref name="configuration" />.
+    ///     environment variable, a connection string built from individual <c>DB_*</c> environment variables,
+    ///     and finally the <c>"Default"</c> connection string from configuration.
     /// </summary>
-    /// <param name="configuration">The application configuration to fall back to.</param>
-    /// <returns>The resolved SQL Server connection string.</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when no connection string can be resolved from any of the supported sources.
-    /// </exception>
+    /// <exception cref="InvalidOperationException">Thrown when no connection string can be resolved from any source.</exception>
     private static string GetConnectionString(IConfiguration configuration)
     {
         // Check for full connection string first
