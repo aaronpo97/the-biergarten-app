@@ -5,9 +5,8 @@ using MediatR;
 namespace Shared.Application.Behaviors;
 
 /// <summary>
-///     MediatR pipeline behavior that runs all registered FluentValidation validators for a
-///     request before invoking its handler, short-circuiting with a <see cref="ValidationException" />
-///     when any validator reports failures.
+///     MediatR pipeline behavior that runs registered FluentValidation validators before the handler,
+///     throwing <see cref="ValidationException" /> if any report failures.
 /// </summary>
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
