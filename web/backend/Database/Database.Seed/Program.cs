@@ -7,112 +7,243 @@ using Features.Auth.Dtos;
 using Features.Auth.Repository;
 using Features.Breweries.DependencyInjection;
 using Features.Breweries.Repository;
+using Features.Locations.DependencyInjection;
+using Features.Locations.Dtos;
+using Features.Locations.Repository;
 using idunno.Password;
 using Infrastructure.PasswordHashing;
 using Infrastructure.Sql;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 
-static async Task<int> main()
+return await RunAsync();
+
+static async Task<int> RunAsync()
 {
-    IReadOnlyList<BreweryRecord> breweries;
-    IReadOnlyList<UserRecord> users;
     try
     {
+        ServiceCollection services = [];
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+        services.AddFeaturesBreweries();
+        services.AddFeaturesLocations();
+        services.AddFeaturesAuth();
+
+        await using ServiceProvider provider = services.BuildServiceProvider();
+
+        IBreweryRepository breweryRepository = provider.GetRequiredService<IBreweryRepository>();
+        ILocationRepository locationRepository = provider.GetRequiredService<ILocationRepository>();
+        IAuthRepository authRepository = provider.GetRequiredService<IAuthRepository>();
+        IPasswordInfrastructure passwordInfrastructure =
+            provider.GetRequiredService<IPasswordInfrastructure>();
+
+        AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]").LeftJustified());
+        AnsiConsole.MarkupLine("[grey]Connecting to SQLite source and loading seed data...[/]");
+        AnsiConsole.WriteLine();
+
         PipelineSeedDataReader reader = new(ConnectionStrings.SqliteConnectionString);
-        breweries = reader.ReadBreweryRecords();
-        users = reader.ReadUserRecords();
+
+        SeedData seedData = null!;
+        IReadOnlyList<Guid> postedByIds = [];
+
+        await AnsiConsole
+            .Status()
+            .Spinner(Spinner.Known.Dots)
+            .SpinnerStyle(Style.Parse("green"))
+            .StartAsync(
+                "Loading seed data...",
+                async ctx =>
+                {
+                    seedData = await reader.ReadSeedDataAsync();
+                    ctx.Status(
+                        $"Loaded {seedData.Breweries.Count} breweries and {seedData.Users.Count} users."
+                    );
+                }
+            );
+
+        AnsiConsole.MarkupLine(
+            $"[green]✓[/] Loaded [bold]{seedData.Breweries.Count}[/] breweries."
+        );
+        AnsiConsole.Write(BuildBreweryTable(seedData.Breweries));
+        AnsiConsole.WriteLine();
+
+        AnsiConsole.MarkupLine($"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
+        AnsiConsole.Write(BuildUserTable(seedData.Users));
+        AnsiConsole.WriteLine();
+
+        AnsiConsole.WriteLine("Seed data loaded successfully.");
+
+        AnsiConsole.Write(
+            new Rule("[bold green]Loading seed data into target database.[/]").LeftJustified()
+        );
+
+        await AnsiConsole
+            .Status()
+            .Spinner(Spinner.Known.Dots)
+            .SpinnerStyle(Style.Parse("green"))
+            .StartAsync(
+                "Loading user data into target database...",
+                async ctx =>
+                {
+                    Thread.Sleep(3000); // Simulate some work being done
+                    postedByIds = await LoadUsersIntoDatabaseAsync(
+                        authRepository,
+                        passwordInfrastructure,
+                        seedData.Users
+                    );
+                    ctx.Status("User data loaded into target database.");
+                }
+            );
+
+        await AnsiConsole
+            .Status()
+            .Spinner(Spinner.Known.Dots)
+            .SpinnerStyle(Style.Parse("green"))
+            .StartAsync(
+                "Loading brewery data into target database...",
+                async ctx =>
+                {
+                    await LoadBreweriesIntoDatabaseAsync(
+                        breweryRepository,
+                        locationRepository,
+                        seedData.Breweries,
+                        postedByIds
+                    );
+                    ctx.Status("Brewery data loaded into target database.");
+                }
+            );
+
+        return 0;
     }
-    catch (SqliteException ex)
+    catch (Exception ex)
     {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"Error opening database connection: {ex.Message}");
-        Console.ResetColor();
+        AnsiConsole.MarkupLine("[red]Seeding failed.[/]");
+        AnsiConsole.WriteException(ex);
         return 1;
     }
+}
 
-    ServiceCollection services = [];
-    services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
-    services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
-    services.AddFeaturesBreweries();
-    services.AddFeaturesAuth();
+static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
+    IAuthRepository authRepository,
+    IPasswordInfrastructure passwordInfrastructure,
+    IReadOnlyList<UserRecord> users
+)
+{
+    List<Guid> userAccountIds = [];
 
-    using ServiceProvider provider = services.BuildServiceProvider();
-
-    IBreweryRepository breweryRepository;
-    IAuthRepository authRepository;
-    IPasswordInfrastructure passwordInfrastructure;
-    try
+    foreach (UserRecord userRecord in users)
     {
-        breweryRepository = provider.GetRequiredService<IBreweryRepository>();
-        authRepository = provider.GetRequiredService<IAuthRepository>();
-        passwordInfrastructure = provider.GetRequiredService<IPasswordInfrastructure>();
-    }
-    catch (InvalidOperationException ex)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"Error configuring database connection: {ex.Message}");
-        Console.ResetColor();
-        return 1;
+        UserAccount userAccount = await authRepository.RegisterUserAsync(
+            new UserRegistrationDto(
+                userRecord.User.Username,
+                userRecord.User.FirstName,
+                userRecord.User.LastName,
+                userRecord.Email,
+                DateTime.Parse(userRecord.DateOfBirth),
+                passwordInfrastructure.Hash(
+                    PasswordGenerator.Generate(length: 64, numberOfDigits: 10, numberOfSymbols: 10)
+                )
+            )
+        );
+        userAccountIds.Add(userAccount.UserAccountId);
     }
 
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"Loaded {breweries.Count} breweries.");
-    Console.ResetColor();
+    return userAccountIds;
+}
+
+/// <summary>
+///     Persists each <paramref name="breweries" /> record, resolving (and creating, if needed) its
+///     Country/StateProvince/City chain via <paramref name="locationRepository" />. The pipeline
+///     data has no street-level address or a specific user tied to each brewery, so a placeholder
+///     address is used and <c>PostedById</c> is assigned round-robin from <paramref name="posterUserIds" />
+///     to keep seeding deterministic across runs.
+/// </summary>
+static async Task LoadBreweriesIntoDatabaseAsync(
+    IBreweryRepository breweryRepository,
+    ILocationRepository locationRepository,
+    IReadOnlyList<BreweryRecord> breweries,
+    IReadOnlyList<Guid> posterUserIds
+)
+{
+    if (posterUserIds.Count == 0)
+        throw new InvalidOperationException("Cannot load breweries without any registered users.");
 
     for (int i = 0; i < breweries.Count; i++)
     {
-        BreweryRecord brewery = breweries[i];
-        Console.WriteLine(
-            $"{i + 1}:\t{brewery.Brewery.NameEn}\t({brewery.Address.City.CityName}, {brewery.Address.City.Country})"
+        BreweryRecord breweryRecord = breweries[i];
+
+        Guid cityId = await locationRepository.GetOrCreateCityIdAsync(
+            new CityLocation(
+                breweryRecord.Address.City.CityName,
+                breweryRecord.Address.City.StateProvince,
+                breweryRecord.Address.City.Iso31662,
+                breweryRecord.Address.City.Country,
+                breweryRecord.Address.City.Iso31661
+            )
+        );
+
+        await breweryRepository.CreateAsync(
+            new BreweryPost
+            {
+                BreweryName = breweryRecord.Brewery.NameEn,
+                Description = breweryRecord.Brewery.DescriptionEn,
+                PostedById = posterUserIds[i % posterUserIds.Count],
+                Location = new BreweryPostLocation
+                {
+                    CityId = cityId,
+                    AddressLine1 = "Address unavailable",
+                    PostalCode = breweryRecord.Address.PostalCode,
+                },
+            }
+        );
+    }
+}
+
+static Table BuildBreweryTable(IReadOnlyList<BreweryRecord> breweries)
+{
+    Table table = new Table()
+        .AddColumn("Brewery Name (EN)")
+        .AddColumn("Brewery Name (Local)")
+        .AddColumn("City")
+        .AddColumn("State/Province")
+        .AddColumn("Country")
+        .AddColumn("Postal Code");
+
+    foreach (BreweryRecord brewery in breweries)
+    {
+        table.AddRow(
+            brewery.Brewery.NameEn,
+            brewery.Brewery.NameLocal,
+            brewery.Address.City.CityName,
+            brewery.Address.City.StateProvince,
+            brewery.Address.City.Country,
+            brewery.Address.PostalCode
         );
     }
 
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"Loaded {users.Count} users.");
-    Console.ResetColor();
+    return table;
+}
+
+static Table BuildUserTable(IReadOnlyList<UserRecord> users)
+{
+    Table table = new Table()
+        .AddColumn("Username")
+        .AddColumn("First Name")
+        .AddColumn("Last Name")
+        .AddColumn("Email")
+        .AddColumn("Date of Birth");
 
     foreach (UserRecord user in users)
     {
-        string username = user.User.Username;
-        string firstName = user.User.FirstName;
-        string lastName = user.User.LastName;
-        string email = user.Email;
-        DateTime dateOfBirth = DateTime.Parse(user.DateOfBirth);
-
-        string generatedPassword = PasswordGenerator.Generate(
-            length: 64,
-            numberOfDigits: 10,
-            numberOfSymbols: 10
+        table.AddRow(
+            user.User.Username,
+            user.User.FirstName,
+            user.User.LastName,
+            user.Email,
+            user.DateOfBirth.ToString()
         );
-        string hashedPassword = passwordInfrastructure.Hash(generatedPassword);
-
-        UserRegistrationDto registrationDto = new(
-            username,
-            firstName,
-            lastName,
-            email,
-            dateOfBirth,
-            hashedPassword
-        );
-
-        try
-        {
-            UserAccount createdUser = await authRepository.RegisterUserAsync(registrationDto);
-            Console.WriteLine(
-                $"Created user: {createdUser.Username} ({createdUser.UserAccountId})"
-            );
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error creating user {username}: {ex.Message}");
-            Console.ResetColor();
-        }
     }
 
-    return 0;
+    return table;
 }
-
-return await main();

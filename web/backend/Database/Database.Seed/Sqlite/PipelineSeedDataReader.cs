@@ -1,12 +1,13 @@
-#region
-
 using System.Text.Json;
 using Database.Seed.PipelineData;
 using Microsoft.Data.Sqlite;
 
-#endregion
-
 namespace Database.Seed.Sqlite;
+
+public sealed record SeedData(
+    IReadOnlyList<BreweryRecord> Breweries,
+    IReadOnlyList<UserRecord> Users
+);
 
 public sealed class PipelineSeedDataReader
 {
@@ -17,13 +18,40 @@ public sealed class PipelineSeedDataReader
         _connectionString = connectionString;
     }
 
-    public IReadOnlyList<BreweryRecord> ReadBreweryRecords()
+    /// <summary>
+    /// Reads breweries and users in a single connection, loading the cities
+    /// lookup only once and sharing it between both reads.
+    /// </summary>
+    public async Task<SeedData> ReadSeedDataAsync(CancellationToken cancellationToken = default)
     {
-        using SqliteConnection connection = new(_connectionString);
-        connection.Open();
+        await using SqliteConnection connection = new(_connectionString);
+        await connection.OpenAsync(cancellationToken);
 
-        IReadOnlyDictionary<long, City> cities = ReadCities(connection);
+        IReadOnlyDictionary<long, City> cities = await ReadCitiesAsync(
+            connection,
+            cancellationToken
+        );
 
+        IReadOnlyList<BreweryRecord> breweries = await ReadBreweryRecordsAsync(
+            connection,
+            cities,
+            cancellationToken
+        );
+        IReadOnlyList<UserRecord> users = await ReadUserRecordsAsync(
+            connection,
+            cities,
+            cancellationToken
+        );
+
+        return new SeedData(breweries, users);
+    }
+
+    private static async Task<IReadOnlyList<BreweryRecord>> ReadBreweryRecordsAsync(
+        SqliteConnection connection,
+        IReadOnlyDictionary<long, City> cities,
+        CancellationToken cancellationToken
+    )
+    {
         const string sql = """
             SELECT b.name_en, b.description_en, b.name_local, b.description_local,
                    ba.city_id, ba.postal_code
@@ -31,25 +59,32 @@ public sealed class PipelineSeedDataReader
             JOIN brewery_addresses ba ON ba.brewery_id = b.id;
             """;
 
-        using SqliteCommand command = new(sql, connection);
-        using SqliteDataReader reader = command.ExecuteReader();
+        await using SqliteCommand command = new(sql, connection);
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        const int nameEnIndex = 0;
+        const int descriptionEnIndex = 1;
+        const int nameLocalIndex = 2;
+        const int descriptionLocalIndex = 3;
+        const int cityIdIndex = 4;
+        const int postalCodeIndex = 5;
 
         List<BreweryRecord> records = [];
-        while (reader.Read())
+        while (await reader.ReadAsync(cancellationToken))
             records.Add(
                 new BreweryRecord
                 {
                     Brewery = new BreweryResult
                     {
-                        NameEn = reader.GetString(0),
-                        DescriptionEn = reader.GetString(1),
-                        NameLocal = reader.GetString(2),
-                        DescriptionLocal = reader.GetString(3),
+                        NameEn = reader.GetString(nameEnIndex),
+                        DescriptionEn = reader.GetString(descriptionEnIndex),
+                        NameLocal = reader.GetString(nameLocalIndex),
+                        DescriptionLocal = reader.GetString(descriptionLocalIndex),
                     },
                     Address = new BreweryAddress
                     {
-                        City = cities[reader.GetInt64(4)],
-                        PostalCode = reader.GetString(5),
+                        City = cities[reader.GetInt64(cityIdIndex)],
+                        PostalCode = reader.GetString(postalCodeIndex),
                     },
                 }
             );
@@ -57,13 +92,12 @@ public sealed class PipelineSeedDataReader
         return records;
     }
 
-    public IReadOnlyList<UserRecord> ReadUserRecords()
+    private static async Task<IReadOnlyList<UserRecord>> ReadUserRecordsAsync(
+        SqliteConnection connection,
+        IReadOnlyDictionary<long, City> cities,
+        CancellationToken cancellationToken
+    )
     {
-        using SqliteConnection connection = new(_connectionString);
-        connection.Open();
-
-        IReadOnlyDictionary<long, City> cities = ReadCities(connection);
-
         const string sql = """
             SELECT u.first_name, u.last_name, u.gender, u.username, u.bio,
                    u.activity_weight, u.email, u.date_of_birth,
@@ -72,29 +106,40 @@ public sealed class PipelineSeedDataReader
             JOIN user_addresses ua ON ua.user_id = u.id;
             """;
 
-        using SqliteCommand command = new(sql, connection);
-        using SqliteDataReader reader = command.ExecuteReader();
+        await using SqliteCommand command = new(sql, connection);
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        const int firstNameIndex = 0;
+        const int lastNameIndex = 1;
+        const int genderIndex = 2;
+        const int usernameIndex = 3;
+        const int bioIndex = 4;
+        const int activityWeightIndex = 5;
+        const int emailIndex = 6;
+        const int dateOfBirthIndex = 7;
+        const int cityIdIndex = 8;
+        const int postalCodeIndex = 9;
 
         List<UserRecord> records = [];
-        while (reader.Read())
+        while (await reader.ReadAsync(cancellationToken))
             records.Add(
                 new UserRecord
                 {
                     User = new UserResult
                     {
-                        FirstName = reader.GetString(0),
-                        LastName = reader.GetString(1),
-                        Gender = reader.GetString(2),
-                        Username = reader.GetString(3),
-                        Bio = reader.GetString(4),
-                        ActivityWeight = (float)reader.GetDouble(5),
+                        FirstName = reader.GetString(firstNameIndex),
+                        LastName = reader.GetString(lastNameIndex),
+                        Gender = reader.GetString(genderIndex),
+                        Username = reader.GetString(usernameIndex),
+                        Bio = reader.GetString(bioIndex),
+                        ActivityWeight = (float)reader.GetDouble(activityWeightIndex),
                     },
-                    Email = reader.GetString(6),
-                    DateOfBirth = reader.GetString(7),
+                    Email = reader.GetString(emailIndex),
+                    DateOfBirth = reader.GetString(dateOfBirthIndex),
                     Address = new UserAddress
                     {
-                        City = cities[reader.GetInt64(8)],
-                        PostalCode = reader.GetString(9),
+                        City = cities[reader.GetInt64(cityIdIndex)],
+                        PostalCode = reader.GetString(postalCodeIndex),
                     },
                 }
             );
@@ -102,7 +147,10 @@ public sealed class PipelineSeedDataReader
         return records;
     }
 
-    private static IReadOnlyDictionary<long, City> ReadCities(SqliteConnection connection)
+    private static async Task<IReadOnlyDictionary<long, City>> ReadCitiesAsync(
+        SqliteConnection connection,
+        CancellationToken cancellationToken
+    )
     {
         const string sql = """
             SELECT
@@ -118,33 +166,34 @@ public sealed class PipelineSeedDataReader
             FROM cities;
             """;
 
-        using SqliteCommand command = new(sql, connection);
-        using SqliteDataReader reader = command.ExecuteReader();
+        await using SqliteCommand command = new(sql, connection);
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
 
         Dictionary<long, City> cities = [];
 
-        const int cityNameBindIndex = 1;
-        const int stateProvinceBindIndex = 2;
-        const int iso31662BindIndex = 3;
-        const int countryBindIndex = 4;
-        const int iso31661BindIndex = 5;
-        const int localLanguagesBindIndex = 6;
-        const int countryFormatRegexBindIndex = 7;
-        const int cityRegexesBindIndex = 8;
+        const int idIndex = 0;
+        const int cityNameIndex = 1;
+        const int stateProvinceIndex = 2;
+        const int iso31662Index = 3;
+        const int countryIndex = 4;
+        const int iso31661Index = 5;
+        const int localLanguagesIndex = 6;
+        const int countryFormatRegexIndex = 7;
+        const int cityRegexesIndex = 8;
 
-        while (reader.Read())
-            cities[reader.GetInt64(0)] = new City
+        while (await reader.ReadAsync(cancellationToken))
+            cities[reader.GetInt64(idIndex)] = new City
             {
-                CityName = reader.GetString(cityNameBindIndex),
-                StateProvince = reader.GetString(stateProvinceBindIndex),
-                Iso31662 = reader.GetString(iso31662BindIndex),
-                Country = reader.GetString(countryBindIndex),
-                Iso31661 = reader.GetString(iso31661BindIndex),
-                LocalLanguages = DeserializeStringArray(reader.GetString(localLanguagesBindIndex)),
+                CityName = reader.GetString(cityNameIndex),
+                StateProvince = reader.GetString(stateProvinceIndex),
+                Iso31662 = reader.GetString(iso31662Index),
+                Country = reader.GetString(countryIndex),
+                Iso31661 = reader.GetString(iso31661Index),
+                LocalLanguages = DeserializeStringArray(reader.GetString(localLanguagesIndex)),
                 PostalCode = new PostalCodeSpec
                 {
-                    CountryFormatRegex = reader.GetString(countryFormatRegexBindIndex),
-                    CityRegexes = DeserializeStringArray(reader.GetString(cityRegexesBindIndex)),
+                    CountryFormatRegex = reader.GetString(countryFormatRegexIndex),
+                    CityRegexes = DeserializeStringArray(reader.GetString(cityRegexesIndex)),
                 },
             };
 

@@ -11,6 +11,8 @@
         <PackageReference Include="idunno.Password.Generator" Version="2.0.0" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+        <PackageReference Include="Spectre.Console" Version="0.57.2" />
+
 
         <!--
         remove this override once microsoft ships official fix to vulnerability
@@ -24,14 +26,12 @@
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
         <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
         <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <!-- Pipeline-generated seed data, copied to the output directory so it can be opened via
              ConnectionStrings.SqliteConnectionString at runtime. -->
-        <None
-            CopyToOutputDirectory="PreserveNewest"
-            Include="SeedData\biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite"
-        />
+        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite" />
     </ItemGroup>
 </Project>
