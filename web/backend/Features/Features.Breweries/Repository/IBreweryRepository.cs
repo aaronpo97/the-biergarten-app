@@ -7,14 +7,25 @@ namespace Features.Breweries.Repository;
 /// </summary>
 public interface IBreweryRepository
 {
-    /// <summary>Returns <c>null</c> if no brewery post exists with the given ID.</summary>
+    /// <summary>
+    ///     Retrieves a brewery post by ID, joined to its location. Returns <c>null</c> if no brewery post
+    ///     exists with the given ID, or if it has no associated location.
+    /// </summary>
     Task<BreweryPost?> GetByIdAsync(Guid id);
 
+    /// <summary>
+    ///     Retrieves all brewery posts, optionally paginated, ordered by creation date descending. Posts
+    ///     without a location are included, with <see cref="BreweryPost.Location" /> left <c>null</c>.
+    /// </summary>
+    /// <param name="limit">Maximum number of rows to return. Unbounded if <see langword="null" />.</param>
+    /// <param name="offset">Number of rows to skip. Treated as zero if <see langword="null" />.</param>
     Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset);
 
     /// <summary>
-    ///     Updates a brewery post, enforcing optimistic concurrency via <paramref name="brewery" />'s
-    ///     <c>Timer</c>: the update is rejected if the row was modified since <c>Timer</c> was read.
+    ///     Updates a brewery post's name and description, and upserts or clears its location, enforcing
+    ///     optimistic concurrency via <paramref name="brewery" />'s <c>Timer</c>: the update is rejected
+    ///     if the row was modified since <c>Timer</c> was read. When <paramref name="brewery" />'s
+    ///     <c>Location</c> is <c>null</c>, any existing location for the brewery is removed.
     ///     Returns the freshly persisted brewery, including its new <c>Timer</c>.
     /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
@@ -27,9 +38,14 @@ public interface IBreweryRepository
     /// </exception>
     Task<BreweryPost> UpdateAsync(BreweryPost brewery);
 
+    /// <summary>Deletes a brewery post by ID. Its location and photos are removed via cascading foreign keys.</summary>
+    /// <exception cref="Domain.Exceptions.NotFoundException">Thrown when no brewery exists with the given <paramref name="id" />.</exception>
     Task DeleteAsync(Guid id);
 
     /// <summary>Creates a new brewery post, including its location details.</summary>
     /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" /> has no <c>Location</c>.</exception>
+    /// <exception cref="Domain.Exceptions.NotFoundException">
+    ///     Thrown when <paramref name="brewery" />'s <c>PostedById</c> or <c>Location.CityId</c> does not exist.
+    /// </exception>
     Task CreateAsync(BreweryPost brewery);
 }

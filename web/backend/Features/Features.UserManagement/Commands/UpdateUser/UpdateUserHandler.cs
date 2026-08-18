@@ -3,6 +3,9 @@ using MediatR;
 
 namespace Features.UserManagement.Commands.UpdateUser;
 
+/// <summary>
+///     Handles <see cref="UpdateUserCommand" />.
+/// </summary>
 public class UpdateUserHandler(IUserAccountRepository repository)
     : IRequestHandler<UpdateUserCommand>
 {

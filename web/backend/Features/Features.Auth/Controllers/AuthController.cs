@@ -23,6 +23,11 @@ namespace Features.Auth.Controllers;
 [Authorize(AuthenticationSchemes = "JWT")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
+    /// <summary>Registers a new user account.</summary>
+    /// <remarks>
+    ///     Anonymous access. Returns 201 Created with the new account's ID, username, and issued tokens.
+    ///     Returns 409 Conflict if the username or email is already taken.
+    /// </remarks>
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<ResponseBody<RegistrationPayload>>> Register(
@@ -40,6 +45,10 @@ public class AuthController(IMediator mediator) : ControllerBase
         );
     }
 
+    /// <summary>Authenticates a user by username and password and issues a new access/refresh token pair.</summary>
+    /// <remarks>
+    ///     Anonymous access. Returns 200 OK with the tokens, or 401 Unauthorized if the credentials are invalid.
+    /// </remarks>
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<ResponseBody<LoginPayload>>> Login([FromBody] LoginQuery query)
@@ -54,6 +63,11 @@ public class AuthController(IMediator mediator) : ControllerBase
         );
     }
 
+    /// <summary>Confirms a user account using a confirmation token.</summary>
+    /// <remarks>
+    ///     Requires a valid JWT bearer token (no <c>[AllowAnonymous]</c> override). Returns 200 OK on success,
+    ///     or 401 Unauthorized if <paramref name="token" /> is invalid or expired.
+    /// </remarks>
     [HttpPost("confirm")]
     public async Task<ActionResult<ResponseBody<ConfirmationPayload>>> Confirm(
         [FromQuery] string token
@@ -69,6 +83,12 @@ public class AuthController(IMediator mediator) : ControllerBase
         );
     }
 
+    /// <summary>Resends the account confirmation email for the given user, generating a fresh confirmation token.</summary>
+    /// <remarks>
+    ///     Requires a valid JWT bearer token (no <c>[AllowAnonymous]</c> override). Always returns 200 OK, even
+    ///     if <paramref name="userId" /> does not exist or the account is already confirmed, to avoid user
+    ///     enumeration.
+    /// </remarks>
     [HttpPost("confirm/resend")]
     public async Task<ActionResult<ResponseBody>> ResendConfirmation([FromQuery] Guid userId)
     {
@@ -76,6 +96,11 @@ public class AuthController(IMediator mediator) : ControllerBase
         return Ok(new ResponseBody { Message = "confirmation email has been resent" });
     }
 
+    /// <summary>Exchanges a valid refresh token for a new access/refresh token pair.</summary>
+    /// <remarks>
+    ///     Anonymous access. Returns 200 OK with the new tokens, or 401 Unauthorized if the refresh token is
+    ///     invalid or expired.
+    /// </remarks>
     [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<ActionResult<ResponseBody<LoginPayload>>> Refresh(

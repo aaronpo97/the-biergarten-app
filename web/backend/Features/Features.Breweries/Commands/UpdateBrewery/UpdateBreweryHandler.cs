@@ -5,6 +5,7 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
+/// <summary>Handles <see cref="UpdateBreweryCommand" /> by persisting changes to an existing brewery post.</summary>
 public class UpdateBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<UpdateBreweryCommand, BreweryDto>
 {

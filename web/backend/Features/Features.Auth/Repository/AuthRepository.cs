@@ -19,11 +19,8 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     private const string SelectColumns =
         "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, Timer";
 
-    /// <summary>
-    ///     Registers a new user account and its initial credential in a single transaction, then fetches
-    ///     and returns the newly created user.
-    /// </summary>
-    /// <exception cref="Exception">Thrown when the newly registered user cannot be retrieved after registration.</exception>
+    /// <inheritdoc />
+    /// <remarks>The account and credential are inserted within a single database transaction.</remarks>
     public async Task<UserAccount> RegisterUserAsync(UserRegistrationDto userRegistrationDto)
     {
         await using DbConnection connection = await CreateConnection();
@@ -69,7 +66,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             ?? throw new Exception("Failed to retrieve newly registered user.");
     }
 
-    /// <summary>Retrieves a user account by email.</summary>
+    /// <inheritdoc />
     public async Task<UserAccount?> GetUserByEmailAsync(string email)
     {
         await using DbConnection connection = await CreateConnection();
@@ -79,7 +76,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <summary>Retrieves a user account by username.</summary>
+    /// <inheritdoc />
     public async Task<UserAccount?> GetUserByUsernameAsync(string username)
     {
         await using DbConnection connection = await CreateConnection();
@@ -89,7 +86,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <summary>Retrieves the active (non-revoked) credential for a user account.</summary>
+    /// <inheritdoc />
     public async Task<UserCredential?> GetActiveCredentialByUserAccountIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
@@ -103,10 +100,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <summary>
-    ///     Rotates a user's credential by revoking all existing credentials and creating a new one.
-    /// </summary>
-    /// <exception cref="NotFoundException">Thrown when no account with <paramref name="userAccountId" /> exists.</exception>
+    /// <inheritdoc />
     public async Task RotateCredentialAsync(Guid userAccountId, string newPasswordHash)
     {
         await using DbConnection connection = await CreateConnection();
@@ -151,7 +145,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         }
     }
 
-    /// <summary>Retrieves a user account by ID.</summary>
+    /// <inheritdoc />
     public async Task<UserAccount?> GetUserByIdAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();
@@ -161,11 +155,12 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <summary>
-    ///     Marks a user account as confirmed by inserting a verification record. If the user is already
-    ///     verified, this is a no-op and the existing user is returned (idempotent). If a concurrent request
-    ///     verifies the user first, the resulting duplicate-key SQL exception (error 2601/2627) is swallowed.
-    /// </summary>
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Confirmation is recorded by inserting a row into <c>dbo.UserVerification</c>. If a concurrent
+    ///     request verifies the same user first, the resulting duplicate-key SQL exception (error 2601/2627)
+    ///     is swallowed to keep the operation idempotent.
+    /// </remarks>
     /// <exception cref="Microsoft.Data.SqlClient.SqlException">
     ///     Thrown when the database command fails for a reason other than a duplicate verification record.
     /// </exception>
@@ -197,7 +192,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         return await GetUserByIdAsync(userAccountId);
     }
 
-    /// <summary>Checks whether a user account has been verified by querying the <c>dbo.UserVerification</c> table.</summary>
+    /// <inheritdoc />
     public async Task<bool> IsUserVerifiedAsync(Guid userAccountId)
     {
         await using DbConnection connection = await CreateConnection();

@@ -1,15 +1,18 @@
 namespace Infrastructure.Sql;
 
 /// <summary>
-///     Custom SQL Server error numbers (50000+) that this application's stored procedures use to
-///     signal domain-level failures via <c>THROW</c>. Repositories catch
-///     <see cref="Microsoft.Data.SqlClient.SqlException" /> and switch on <c>ex.Number</c> against
-///     these constants to translate the failure into the corresponding <c>Domain.Exceptions</c> type.
+///     Custom SQL Server error numbers (50000+) that a stored procedure could use to signal
+///     domain-level failures via <c>THROW</c>, for a repository to catch as
+///     <see cref="Microsoft.Data.SqlClient.SqlException" /> and translate via <c>ex.Number</c> into
+///     the corresponding <c>Domain.Exceptions</c> type.
 /// </summary>
 /// <remarks>
-///     Each number is shared by every procedure that raises that category of error — it identifies
-///     the category, not a single call site. The procedure's own error message (<c>ex.Message</c>)
-///     already says which entity or rule was involved, so it is safe to surface directly to callers.
+///     Currently unused: the schema has no stored procedures, and no repository throws or catches on
+///     these numbers. Repositories instead run their own existence/concurrency checks and throw
+///     <c>Domain.Exceptions</c> directly (see <c>docs/website/database.md</c> for the current
+///     approach). This type is kept in case a future stored procedure reintroduces the pattern; each
+///     number would
+///     identify a category of error shared by every procedure that raises it, not a single call site.
 /// </remarks>
 public static class SqlErrorCodes
 {

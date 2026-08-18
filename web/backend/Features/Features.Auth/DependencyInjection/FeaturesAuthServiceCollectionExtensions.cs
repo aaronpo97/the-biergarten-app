@@ -5,8 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Features.Auth.DependencyInjection;
 
+/// <summary>Registers the services required by Features.Auth with the dependency injection container.</summary>
 public static class FeaturesAuthServiceCollectionExtensions
 {
+    /// <summary>
+    ///     Adds <see cref="IAuthRepository" />, <see cref="ITokenService" />, and the Argon2 password hashing
+    ///     infrastructure as scoped services.
+    /// </summary>
     public static IServiceCollection AddFeaturesAuth(this IServiceCollection services)
     {
         services.AddScoped<IAuthRepository, AuthRepository>();

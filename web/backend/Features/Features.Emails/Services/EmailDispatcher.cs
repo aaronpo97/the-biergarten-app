@@ -22,6 +22,7 @@ public class EmailDispatcher(
         Environment.GetEnvironmentVariable("WEBSITE_BASE_URL")
         ?? throw new InvalidOperationException("WEBSITE_BASE_URL environment variable is not set");
 
+    /// <inheritdoc />
     public async Task SendRegistrationEmailAsync(
         string firstName,
         string email,
@@ -38,6 +39,7 @@ public class EmailDispatcher(
         await emailProvider.SendAsync(email, "Welcome to The Biergarten App!", emailHtml, true);
     }
 
+    /// <inheritdoc />
     public async Task SendResendConfirmationEmailAsync(
         string firstName,
         string email,

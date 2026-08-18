@@ -1,5 +1,6 @@
 namespace Features.Breweries.Dtos;
 
+/// <summary>Location details of a brewery, as returned by the API.</summary>
 public class BreweryLocationDto
 {
     public Guid BreweryPostLocationId { get; set; }
@@ -18,6 +19,7 @@ public class BreweryLocationDto
     public byte[]? Coordinates { get; set; }
 }
 
+/// <summary>A brewery post, as returned by the API.</summary>
 public class BreweryDto
 {
     public Guid BreweryPostId { get; set; }
@@ -30,10 +32,12 @@ public class BreweryDto
 
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Gets or sets the date and time of the last edit, or <see langword="null"/> if never edited.</summary>
     public DateTime? UpdatedAt { get; set; }
 
     /// <summary>Gets or sets the row-version/concurrency token used to detect conflicting concurrent updates.</summary>
     public byte[]? Timer { get; set; }
 
+    /// <summary>Gets or sets the brewery's location, or <see langword="null"/> if none has been set.</summary>
     public BreweryLocationDto? Location { get; set; }
 }

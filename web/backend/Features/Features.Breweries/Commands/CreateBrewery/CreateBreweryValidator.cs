@@ -2,6 +2,7 @@ using FluentValidation;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
+/// <summary>Validates <see cref="CreateBreweryCommand" />.</summary>
 public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 {
     public CreateBreweryValidator()

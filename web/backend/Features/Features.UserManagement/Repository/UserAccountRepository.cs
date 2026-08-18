@@ -46,7 +46,6 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc />
-    /// <exception cref="NotFoundException">Thrown when no user account exists with the given ID.</exception>
     public async Task UpdateAsync(UserAccount userAccount)
     {
         await using DbConnection connection = await CreateConnection();
@@ -73,7 +72,6 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc />
-    /// <exception cref="NotFoundException">Thrown when no user account exists with the given <paramref name="id" />.</exception>
     public async Task DeleteAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();

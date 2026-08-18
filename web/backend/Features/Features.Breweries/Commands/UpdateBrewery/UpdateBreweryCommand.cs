@@ -3,6 +3,11 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
+/// <summary>Location details for a brewery being updated.</summary>
+/// <param name="BreweryPostLocationId">
+///     Identifier of the existing location row, if any; a new row is created if none exists yet.
+/// </param>
+/// <param name="Coordinates">Raw binary representation of the brewery's geographic coordinates.</param>
 public record UpdateBreweryLocation(
     Guid BreweryPostLocationId,
     Guid CityId,

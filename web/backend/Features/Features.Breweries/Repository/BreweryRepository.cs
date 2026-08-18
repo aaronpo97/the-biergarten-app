@@ -26,10 +26,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         "bp.BreweryPostID, bp.PostedByID, bp.BreweryName, bp.Description, bp.CreatedAt, bp.UpdatedAt, bp.Timer, "
         + "bpl.BreweryPostLocationID, bpl.CityID, bpl.AddressLine1, bpl.AddressLine2, bpl.PostalCode, bpl.Coordinates";
 
-    /// <summary>
-    ///     Retrieves a brewery post by ID, joined to its location. A brewery with no location row
-    ///     returns <c>null</c> (matches the previous stored procedure's <c>INNER JOIN</c> behavior).
-    /// </summary>
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Joins to the location table with an <c>INNER JOIN</c> (matching the previous stored procedure's
+    ///     behavior), which is why a brewery with no location row is treated as not found.
+    /// </remarks>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -47,10 +48,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return await reader.ReadAsync() ? MapToEntity(reader) : null;
     }
 
-    /// <summary>
-    ///     Retrieves all brewery posts, optionally paginated, ordered by creation date descending. Posts
-    ///     without a location are included, with <see cref="BreweryPost.Location" /> left <c>null</c>.
-    /// </summary>
+    /// <inheritdoc/>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
@@ -75,15 +73,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return breweries;
     }
 
-    /// <summary>
-    ///     Updates a brewery post's name and description, and upserts or clears its location. When
-    ///     <paramref name="brewery" />.<c>Location</c> is <c>null</c>, any existing location for the
-    ///     brewery is removed.
-    /// </summary>
-    /// <exception cref="NotFoundException">Thrown when the brewery, or the given city, does not exist.</exception>
-    /// <exception cref="ConflictException">
-    ///     Thrown when <paramref name="brewery" />'s <c>Timer</c> no longer matches the stored row.
-    /// </exception>
+    /// <inheritdoc/>
     public async Task<BreweryPost> UpdateAsync(BreweryPost brewery)
     {
         await using DbConnection connection = await CreateConnection();
@@ -221,10 +211,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             );
     }
 
-    /// <summary>
-    ///     Deletes a brewery post by ID. Its location and photos are removed via cascading foreign keys.
-    /// </summary>
-    /// <exception cref="NotFoundException">Thrown when no brewery exists with the given <paramref name="id" />.</exception>
+    /// <inheritdoc/>
     public async Task DeleteAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -237,11 +224,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             throw new NotFoundException("Brewery not found.");
     }
 
-    /// <summary>Creates a new brewery post, including its location details.</summary>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" /> has no <c>Location</c>.</exception>
-    /// <exception cref="NotFoundException">
-    ///     Thrown when <paramref name="brewery" />.<c>PostedById</c> or <c>Location.CityId</c> does not exist.
-    /// </exception>
+    /// <inheritdoc/>
     public async Task CreateAsync(BreweryPost brewery)
     {
         if (brewery.Location is null)

@@ -48,6 +48,7 @@ public class TokenService : ITokenService
             );
     }
 
+    /// <inheritdoc />
     public string GenerateAccessToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.AccessTokenHours);
@@ -59,6 +60,7 @@ public class TokenService : ITokenService
         );
     }
 
+    /// <inheritdoc />
     public string GenerateRefreshToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
@@ -72,6 +74,7 @@ public class TokenService : ITokenService
         );
     }
 
+    /// <inheritdoc />
     public string GenerateConfirmationToken(UserAccount user)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
@@ -109,33 +112,25 @@ public class TokenService : ITokenService
         };
     }
 
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
-    /// </exception>
+    /// <inheritdoc />
     public async Task<ValidatedToken> ValidateAccessTokenAsync(string token)
     {
         return await ValidateTokenInternalAsync(token, _accessTokenSecret, "access");
     }
 
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
-    /// </exception>
+    /// <inheritdoc />
     public async Task<ValidatedToken> ValidateRefreshTokenAsync(string token)
     {
         return await ValidateTokenInternalAsync(token, _refreshTokenSecret, "refresh");
     }
 
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
-    /// </exception>
+    /// <inheritdoc />
     public async Task<ValidatedToken> ValidateConfirmationTokenAsync(string token)
     {
         return await ValidateTokenInternalAsync(token, _confirmationTokenSecret, "confirmation");
     }
 
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when the refresh token is invalid, or when the user account it refers to no longer exists.
-    /// </exception>
+    /// <inheritdoc />
     public async Task<RefreshTokenResult> RefreshTokenAsync(string refreshTokenString)
     {
         ValidatedToken validated = await ValidateRefreshTokenAsync(refreshTokenString);

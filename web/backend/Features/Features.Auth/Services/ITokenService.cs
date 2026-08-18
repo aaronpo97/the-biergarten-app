@@ -29,6 +29,7 @@ public record RefreshTokenResult(UserAccount UserAccount, string RefreshToken, s
 /// </summary>
 public static class TokenServiceExpirationHours
 {
+    /// <summary>1 hour.</summary>
     public const double AccessTokenHours = 1;
 
     /// <summary>21 days.</summary>
@@ -43,10 +44,22 @@ public static class TokenServiceExpirationHours
 /// </summary>
 public interface ITokenService
 {
+    /// <summary>
+    ///     Generates a signed access token for the given user, expiring after
+    ///     <see cref="TokenServiceExpirationHours.AccessTokenHours" /> hours.
+    /// </summary>
     string GenerateAccessToken(UserAccount user);
 
+    /// <summary>
+    ///     Generates a signed refresh token for the given user, expiring after
+    ///     <see cref="TokenServiceExpirationHours.RefreshTokenHours" /> hours.
+    /// </summary>
     string GenerateRefreshToken(UserAccount user);
 
+    /// <summary>
+    ///     Generates a signed confirmation token for the given user, expiring after
+    ///     <see cref="TokenServiceExpirationHours.ConfirmationTokenHours" /> hours.
+    /// </summary>
     string GenerateConfirmationToken(UserAccount user);
 
     /// <summary>Generates a token of the type specified by <typeparamref name="T" />.</summary>
@@ -54,12 +67,28 @@ public interface ITokenService
     string GenerateToken<T>(UserAccount user)
         where T : struct, Enum;
 
+    /// <summary>Validates an access token's signature and expiration and extracts the caller's identity.</summary>
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
+    /// </exception>
     Task<ValidatedToken> ValidateAccessTokenAsync(string token);
 
+    /// <summary>Validates a refresh token's signature and expiration and extracts the caller's identity.</summary>
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
+    /// </exception>
     Task<ValidatedToken> ValidateRefreshTokenAsync(string token);
 
+    /// <summary>Validates a confirmation token's signature and expiration and extracts the caller's identity.</summary>
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
+    /// </exception>
     Task<ValidatedToken> ValidateConfirmationTokenAsync(string token);
 
     /// <summary>Validates a refresh token and issues a new access/refresh token pair for the associated user.</summary>
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the refresh token is invalid or expired, or when the user account it refers to no
+    ///     longer exists.
+    /// </exception>
     Task<RefreshTokenResult> RefreshTokenAsync(string refreshTokenString);
 }

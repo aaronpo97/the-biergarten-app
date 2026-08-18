@@ -51,15 +51,17 @@ public class SmtpEmailProvider : IEmailProvider
         _fromName = Environment.GetEnvironmentVariable("SMTP_FROM_NAME") ?? "The Biergarten";
     }
 
+    /// <inheritdoc/>
     public async Task SendAsync(string to, string subject, string body, bool isHtml = true)
     {
         await SendAsync([to], subject, body, isHtml);
     }
 
-    /// <summary>
+    /// <inheritdoc/>
+    /// <remarks>
     ///     Connects using StartTls when SSL is enabled (or no encryption otherwise), authenticates
     ///     if credentials were configured, sends the message, and disconnects.
-    /// </summary>
+    /// </remarks>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when connecting, authenticating, or sending via SMTP fails, wrapping the original exception.
     /// </exception>
