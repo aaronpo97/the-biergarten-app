@@ -4,7 +4,7 @@ The Biergarten App is a full-stack directory and discovery platform for
 breweries. It provides:
 
 - JWT-based user authentication, with email confirmation and refresh-token
-  rotation
+  reissue
 - A searchable database of brewery locations
 - An offline data-generation pipeline that uses large language models (LLMs)
   via Llama.cpp and Wikipedia to synthesize realistic seed data

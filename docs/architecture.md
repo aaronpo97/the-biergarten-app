@@ -35,9 +35,11 @@ For visual representations, see:
 
 The backend organizes business capabilities as feature slices instead of
 technical layers. Each feature (`Features.Auth`, `Features.Breweries`,
-`Features.UserManagement`, `Features.Emails`) is a single project that owns its
-own controller, MediatR commands/queries/handlers, validators, and repository,
-end to end:
+`Features.UserManagement`, `Features.Emails`, `Features.Locations`) is a single
+project that owns its own MediatR commands/queries/handlers, validators, and
+repository end to end. `Features.Emails` and `Features.Locations` have no
+`Controllers/` folder — both are invoked internally by other slices via
+MediatR/DI, never over HTTP:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
@@ -46,15 +48,15 @@ end to end:
 │   - Swagger/OpenAPI, JWT auth middleware, global exception filter     │
 └───────────────────────────────────────────────────────────────────────┘
                   ↓ discovers controllers via AddApplicationPart
-┌───────────────┬───────────────┬───────────────────┬───────────────────┐
-│ Features.Auth │Features.      │ Features.          │ Features.Emails  │
-│               │Breweries      │ UserManagement      │ (no controller,  │
-│ Controller    │ Controller    │ Controller          │  internal only)  │
-│ Commands/     │ Commands/     │ Commands/           │ Commands/        │
-│  Queries +    │  Queries +    │  Queries +          │  Handlers        │
-│  Handlers     │  Handlers     │  Handlers           │                  │
-│ Repository    │ Repository    │ Repository          │ EmailDispatcher  │
-└───────────────┴───────────────┴───────────────────┴───────────────────┘
+┌───────────────┬───────────────┬───────────────────┬──────────────────┬──────────────────┐
+│ Features.Auth │Features.      │ Features.          │ Features.Emails  │ Features.        │
+│               │Breweries      │ UserManagement      │ (no controller,  │ Locations        │
+│ Controller    │ Controller    │ Controller          │  internal only)  │ (no controller,  │
+│ Commands/     │ Commands/     │ Commands/           │ Commands/        │  internal only)  │
+│  Queries +    │  Queries +    │  Queries +          │  Handlers        │ Repository       │
+│  Handlers     │  Handlers     │  Handlers           │                  │                  │
+│ Repository    │ Repository    │ Repository          │ EmailDispatcher  │                  │
+└───────────────┴───────────────┴───────────────────┴──────────────────┴──────────────────┘
        ↓ each slice depends only on shared/domain/infra, never on another slice
 ┌─────────────────────────┬─────────────────────────┬────────────────────┐
 │ Shared.Contracts        │ Shared.Application        │ Domain.Entities /  │
@@ -108,7 +110,7 @@ own
 - No controllers, no business logic, no feature-specific contracts
 - Exists purely to host and wire up the feature slices
 
-#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`)
+#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`, `Features.Locations`)
 
 **Purpose**: Each slice is the complete vertical for one business capability
 
@@ -126,7 +128,12 @@ own
   slice's repository/services
 
 `Features.Emails` has no `Controllers/` folder. It's invoked only via MediatR
-commands sent from other slices, never over HTTP.
+commands sent from other slices, never over HTTP. `Features.Locations` also has
+no `Controllers/` folder and no MediatR handlers — it exposes
+`ILocationRepository` directly as a plain service, currently consumed only by
+`Database.Seed` to look up cities while seeding brewery locations. Other slices
+(for example, `Features.Breweries`) do not yet depend on it; they run their own
+`CityID` existence checks inline.
 
 **Dependencies**:
 
@@ -198,6 +205,9 @@ whichever slices need them
 - `UserAccount` - User profile data
 - `UserCredential` - Authentication credentials
 - `UserVerification` - Account verification state
+- `BreweryPost` - A user-submitted brewery listing
+- `BreweryPostLocation` - A brewery's address and coordinates
+- `City` - A city referenced by a brewery location
 
 **Dependencies**:
 
@@ -258,7 +268,6 @@ only:
 **Benefits**:
 
 - Testable (easy to mock)
-- SQL-first approach (stored procedures)
 - Each slice's data access logic is self-contained
 
 **Example**:
@@ -285,22 +294,31 @@ method that registers its repository and slice-internal services
 - Singleton: `ISqlConnectionFactory`
 - Transient: Utilities, helpers
 
-#### SQL-first approach
+#### Direct SQL via Dapper/ADO.NET
 
-**Purpose**: Push complex logic into the database
+**Purpose**: Keep data access explicit and colocated with the slice that owns
+it, without an ORM's change-tracking or mapping magic
 
 **Strategy**:
 
-- All queries via stored procedures
-- No ORM (Entity Framework not used)
-- Database handles complex logic
-- Application focuses on orchestration
+- No ORM (Entity Framework not used); each
+  repository issues inline SQL (a mix of Dapper and raw
+  `DbCommand`/`DbDataReader` for the few reads that need manual column mapping,
+  such as the `GEOGRAPHY` column on `BreweryPostLocation`)
+- Referential checks that a stored procedure used to perform (e.g. "does this
+  `CityId` exist?") are now explicit `SELECT 1 ...` existence checks in the
+  repository method, run inside the same transaction as the write
+- Optimistic concurrency uses each table's `Timer` (`ROWVERSION`) column,
+  checked in the `UPDATE ... WHERE ... AND Timer = @Timer` clause
+- Repositories throw `Domain.Exceptions` types (`NotFoundException`,
+  `ConflictException`, ...) directly when a check fails, rather than relying on
+  a database-side `THROW`; `API.Core`'s `GlobalExceptionFilter` maps those
+  exception types to HTTP status codes
+- Application focuses on orchestration; the database enforces integrity via
+  keys, `CHECK` constraints, and cascades
 
-**Stored Procedure Examples**:
-
-- `USP_RegisterUser` - User registration
-- `USP_GetUserAccountByUsername` - User lookup
-- `USP_RotateUserCredential` - Password update
+See [Database](website/database.md) for the schema and the app's current SQL
+error-handling approach in more detail.
 
 ## Frontend architecture
 
@@ -357,18 +375,29 @@ for reference only. Active product and engineering documentation should point to
 1. **Registration**:
    - User submits credentials
    - Password hashed with Argon2id
-   - User account created
-   - JWT token issued
+   - User account created (unverified) and a confirmation email is dispatched
+     via `Features.Emails`
 
-2. **Login**:
+2. **Email confirmation**:
+   - User follows the confirmation link/token from the email
+   - `Features.Auth`'s `ConfirmUser` command marks the account verified
+
+3. **Login**:
    - User submits credentials
    - Password verified against hash
-   - JWT token issued
-   - Token stored client-side
+   - Access and refresh JWTs are issued; the refresh token is stored server-side
+     against the user's credential row
 
-3. **API Requests**:
-   - Client sends JWT in Authorization header
-   - Middleware validates token
+4. **Token refresh**:
+   - Client exchanges a valid, unexpired refresh token for a new access/refresh
+     pair via `Features.Auth`'s `RefreshToken` command
+   - Refresh tokens are stateless JWTs, not tracked server-side: the previous
+     refresh token is not invalidated and remains usable until its own
+     expiration
+
+5. **API Requests**:
+   - Client sends the access JWT in the `Authorization` header
+   - `JwtAuthenticationHandler` validates the token
    - Request proceeds if valid
 
 ### Password security
@@ -433,32 +462,40 @@ scheme, see [Database](website/database.md).
 
 **Process**:
 
-1. Write SQL migration script
-2. Embed in `Database.Migrations` project
-3. Run migrations on startup
-4. Idempotent and versioned
+1. Write a SQL script under `Database.Migrations/scripts/`
+2. Embed it in the `Database.Migrations` project
+3. `Database.Migrations` runs each script against the target database on
+   startup, tracked so a script never re-runs once applied
 
 **Migration Files**:
 
 ```
 scripts/
-├── 001-CreateUserTables.sql
-├── 002-CreateLocationTables.sql
-├── 003-CreateBreweryTables.sql
-└── ...
+└── 01-schema/
+    └── schema.sql   # full table/index/constraint definitions
 ```
+
+Currently the whole schema is a single versioned script. As the schema evolves,
+new numbered scripts get added alongside it rather than editing `schema.sql` in
+place, so DbUp's already-applied tracking stays valid.
 
 ### Data seeding
 
-**Purpose**: Populate development/test databases
+**Purpose**: Populate development/test databases with realistic data
 
-**Implementation**: `Database.Seed` project
+**Implementation**: `Database.Seed` project, using data produced by the C++
+pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
 
 **Seed Data**:
 
-- Countries, states/provinces, cities
-- Test user accounts
-- Sample breweries (future)
+- Cities (via `Features.Locations`' `ILocationRepository`)
+- User accounts (via `Features.Auth`'s repository)
+- Brewery posts with locations (via `Features.Breweries`' repository)
+
+Tables that exist in the schema but have no corresponding `Domain.Entities` type
+or feature slice yet (`Photo`, `UserAvatar`, `UserFollow`, `Country`,
+`StateProvince`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`,
+`BreweryPostPhoto`) are not seeded.
 
 ## Deployment architecture
 
@@ -470,6 +507,7 @@ scripts/
 - `database.migrations` - Schema migration runner
 - `database.seed` - Data seeder
 - `api.core` - ASP.NET Core Web API
+- `mailpit` - Local dev/test SMTP server + web UI (not used in production)
 
 **Environments**:
 
