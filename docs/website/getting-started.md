@@ -46,7 +46,8 @@ See [Environment Variables](environment-variables.md) for the full list.
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 ```
 
-This starts SQL Server, migrations, seeding, the API, and Mailpit (local dev SMTP).
+This starts SQL Server, migrations, seeding, the API, and Mailpit (local dev
+SMTP).
 
 Available endpoints:
 

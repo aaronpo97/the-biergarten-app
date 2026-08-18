@@ -34,8 +34,8 @@ Low-level JWT operations.
 
 #### [ITokenService](../../web/backend/Features/Features.Auth/Services/ITokenService.cs)
 
-Both token generation and validation live on the same slice-internal
-service (there is no separate validation service/class).
+Both token generation and validation live on the same slice-internal service
+(there is no separate validation service/class).
 
 **Generation methods:**
 
@@ -56,18 +56,18 @@ service (there is no separate validation service/class).
 - `Username` (string)
 - `Principal` (ClaimsPrincipal) - Full JWT claims
 
-**Implementation:** [TokenService.cs](../../web/backend/Features/Features.Auth/Services/TokenService.cs)
+**Implementation:**
+[TokenService.cs](../../web/backend/Features/Features.Auth/Services/TokenService.cs)
 
 - Reads token secrets from environment variables
 - Extracts and validates claims (Sub, UniqueName)
 - Throws `UnauthorizedException` on validation failure
 
-`TokenService` is registered by `Features.Auth`'s own
-`AddFeaturesAuth()` extension method, except for the lower-level
-`ITokenInfrastructure` (JWT signing/verification) it depends on, which is
-registered by the host (`API.Core/Program.cs`) since
-`JwtAuthenticationHandler` (host-level auth middleware) also depends on
-it directly.
+`TokenService` is registered by `Features.Auth`'s own `AddFeaturesAuth()`
+extension method, except for the lower-level `ITokenInfrastructure` (JWT
+signing/verification) it depends on, which is registered by the host
+(`API.Core/Program.cs`) since `JwtAuthenticationHandler` (host-level auth
+middleware) also depends on it directly.
 
 ### Integration points
 
@@ -97,9 +97,9 @@ it directly.
 **Flow:**
 
 1. Receives a refresh token via `RefreshTokenCommand`
-2. Delegates to `ITokenService.RefreshTokenAsync()`, which validates the
-   token, retrieves the user account via `IAuthRepository.GetUserByIdAsync()`,
-   and issues a new access/refresh token pair
+2. Delegates to `ITokenService.RefreshTokenAsync()`, which validates the token,
+   retrieves the user account via `IAuthRepository.GetUserByIdAsync()`, and
+   issues a new access/refresh token pair
 3. Maps the result onto `LoginPayload`
 
 #### [AuthController](../../web/backend/Features/Features.Auth/Controllers/AuthController.cs)

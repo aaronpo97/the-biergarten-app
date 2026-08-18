@@ -85,12 +85,7 @@ public class TokenService : ITokenService
         );
     }
 
-    /// <summary>
-    ///     Generates a token of the kind specified by <typeparamref name="T" />, dispatching to
-    ///     <see cref="GenerateAccessToken" />, <see cref="GenerateRefreshToken" />, or
-    ///     <see cref="GenerateConfirmationToken" />.
-    /// </summary>
-    /// <typeparam name="T">Must be <see cref="TokenType" />.</typeparam>
+    /// <inheritdoc />
     /// <exception cref="InvalidOperationException">
     ///     Thrown when <typeparamref name="T" /> is not <see cref="TokenType" /> or does not resolve to a known token type.
     /// </exception>

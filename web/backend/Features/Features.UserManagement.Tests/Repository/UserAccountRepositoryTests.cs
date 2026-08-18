@@ -1,5 +1,6 @@
 using Apps72.Dev.Data.DbMocker;
 using Domain.Entities;
+using Domain.Exceptions;
 using Features.UserManagement.Repository;
 using FluentAssertions;
 
@@ -16,7 +17,7 @@ public class UserAccountRepositoryTests
     public async Task GetByIdAsync_ReturnsRow_Mapped()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountById")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE UserAccountID = @UserAccountId"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -57,7 +58,7 @@ public class UserAccountRepositoryTests
     public async Task GetAllAsync_ReturnsMultipleRows()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetAllUserAccounts")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -105,7 +106,7 @@ public class UserAccountRepositoryTests
     public async Task GetByUsername_ReturnsRow()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Username = @Username"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -142,7 +143,7 @@ public class UserAccountRepositoryTests
     public async Task GetByEmail_ReturnsRow()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Email = @Email"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -173,5 +174,47 @@ public class UserAccountRepositoryTests
         UserAccount? result = await repo.GetByEmailAsync("byemail@example.com");
         result.Should().NotBeNull();
         result!.Username.Should().Be("byemail");
+    }
+
+    [Fact]
+    public async Task GetAllAsync_AppliesLimitAndOffset()
+    {
+        MockDbConnection conn = new();
+        conn.Mocks.When(cmd =>
+                cmd.CommandText.Contains("OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY")
+            )
+            .ReturnsTable(MockTable.Empty());
+
+        UserAccountRepository repo = CreateRepo(conn);
+
+        // Fails with a MockException if the repository doesn't emit OFFSET/FETCH pagination SQL.
+        await repo.GetAllAsync(10, 20);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ThrowsNotFound_WhenAccountMissing()
+    {
+        MockDbConnection conn = new();
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("UPDATE dbo.UserAccount"))
+            .ReturnsTable(MockTable.Empty());
+
+        UserAccountRepository repo = CreateRepo(conn);
+        UserAccount account = new() { UserAccountId = Guid.NewGuid(), Username = "ghost" };
+
+        Func<Task> act = async () => await repo.UpdateAsync(account);
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ThrowsNotFound_WhenAccountMissing()
+    {
+        MockDbConnection conn = new();
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("DELETE FROM dbo.UserAccount"))
+            .ReturnsTable(MockTable.Empty());
+
+        UserAccountRepository repo = CreateRepo(conn);
+
+        Func<Task> act = async () => await repo.DeleteAsync(Guid.NewGuid());
+        await act.Should().ThrowAsync<NotFoundException>();
     }
 }

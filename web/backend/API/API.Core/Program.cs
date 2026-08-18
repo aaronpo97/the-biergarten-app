@@ -11,7 +11,7 @@ using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Jwt;
-using Infrastructure.Sql;
+using Infrastructure.Sql.DependencyInjection;
 using Shared.Application.Behaviors;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -60,7 +60,7 @@ if (!builder.Environment.IsProduction())
 
 // Configure Dependency Injection -------------------------------------------------------------------------------------
 
-builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+builder.Services.AddInfrastructureSql();
 
 builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();

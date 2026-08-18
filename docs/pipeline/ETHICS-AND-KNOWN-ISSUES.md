@@ -136,8 +136,8 @@ consumers are informed of the AI-generated origin before engagement.
 
 When forced by the system prompt to generate a "highly specialized technical
 brewing detail," the model frequently hallucinates fermentation science and
-brewing chemistry. While the resulting text sounds confident, it is
-nonsensical to a reader with brewing or scientific expertise.
+brewing chemistry. While the resulting text sounds confident, it is nonsensical
+to a reader with brewing or scientific expertise.
 
 Small-parameter models such as Gemma 4 E4B cannot reliably satisfy prompts
 calling for specialist brewing detail. This is consistent with the **CHOKE**
@@ -262,8 +262,8 @@ idiomatic phrasing.
 ]
 ```
 
-When fed into the pipeline, this dataset often causes the model to reason that
-a local variant of French is needed, but it often defaults to a standardized
+When fed into the pipeline, this dataset often causes the model to reason that a
+local variant of French is needed, but it often defaults to a standardized
 dialect of French, without cultural or linguistic nuance.
 
 For languages such as Welsh (Wales), Māori (Aotearoa/New Zealand), or Sicilian
@@ -312,10 +312,10 @@ not a source of truth.
     Simhi, Itay Itzhak, Fazl Barez, Gabriel Stanovsky, Yonatan Belinkov.
 
 [^llm-bias]:
-    For example, Blasi et al. (2022), "Systematic Inequalities in Language Technology
-    Performance across the World's Languages," _ACL Anthology_. The pattern is
-    consistent with models trained predominantly on English-language web
-    corpora.
+    For example, Blasi et al. (2022), "Systematic Inequalities in Language
+    Technology Performance across the World's Languages," _ACL Anthology_. The
+    pattern is consistent with models trained predominantly on English-language
+    web corpora.
 
 [^wp-license]:
     Source:

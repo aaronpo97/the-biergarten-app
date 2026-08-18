@@ -9,6 +9,5 @@ public class BreweryPost
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public byte[]? Timer { get; set; }
-    public UserAccount PostedBy { get; set; } = null!;
     public BreweryPostLocation? Location { get; set; }
 }

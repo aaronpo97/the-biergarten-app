@@ -10,5 +10,4 @@ public class BreweryPostLocation
     public Guid CityId { get; set; }
     public byte[]? Coordinates { get; set; }
     public byte[]? Timer { get; set; }
-    public BreweryPost BreweryPost { get; set; } = null!;
 }

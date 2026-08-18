@@ -77,7 +77,11 @@ public class BreweryController(IMediator mediator) : ControllerBase
     }
 
     /// <param name="id">Must match <paramref name="command" />'s <c>BreweryPostId</c>.</param>
-    /// <returns><c>200 OK</c> with the updated brewery; or <c>400 Bad Request</c> if the route ID does not match the payload ID.</returns>
+    /// <returns>
+    ///     <c>200 OK</c> with the updated brewery; <c>400 Bad Request</c> if the route ID does not match the
+    ///     payload ID; <c>404 Not Found</c> if the brewery or its <c>CityId</c> does not exist; or
+    ///     <c>409 Conflict</c> if the brewery was modified since <c>command.Timer</c> was read.
+    /// </returns>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(
         Guid id,

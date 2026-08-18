@@ -19,10 +19,21 @@ public class AuthRepositoryTests
         Guid expectedUserId = Guid.NewGuid();
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "USP_RegisterUser").ReturnsScalar(expectedUserId);
+        // DbMocker's ReturnsScalar(Guid) doesn't round-trip correctly, so a single-row/single-column
+        // ReturnsTable is used to fake the scalar OUTPUT INSERTED.UserAccountID read instead.
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("INSERT INTO dbo.UserAccount"))
+            .ReturnsTable(
+                MockTable.WithColumns(("UserAccountID", typeof(Guid))).AddRow(expectedUserId)
+            );
+
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("INSERT INTO dbo.UserCredential"))
+            .ReturnsScalar(1);
 
         // Mock the subsequent read for the newly created user by id
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountById")
+        conn.Mocks.When(cmd =>
+                cmd.CommandText.Contains("FROM dbo.UserAccount")
+                && cmd.CommandText.Contains("WHERE UserAccountID")
+            )
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -76,7 +87,7 @@ public class AuthRepositoryTests
         Guid userId = Guid.NewGuid();
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Email = @Email"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -119,7 +130,7 @@ public class AuthRepositoryTests
     {
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByEmail")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Email = @Email"))
             .ReturnsTable(MockTable.Empty());
 
         AuthRepository repo = CreateRepo(conn);
@@ -134,7 +145,7 @@ public class AuthRepositoryTests
         Guid userId = Guid.NewGuid();
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Username = @Username"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -175,7 +186,7 @@ public class AuthRepositoryTests
     {
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "usp_GetUserAccountByUsername")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("WHERE Username = @Username"))
             .ReturnsTable(MockTable.Empty());
 
         AuthRepository repo = CreateRepo(conn);
@@ -191,7 +202,7 @@ public class AuthRepositoryTests
         Guid credentialId = Guid.NewGuid();
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("FROM dbo.UserCredential"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -219,7 +230,7 @@ public class AuthRepositoryTests
         Guid userId = Guid.NewGuid();
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "USP_GetActiveUserCredentialByUserAccountId")
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("FROM dbo.UserCredential"))
             .ReturnsTable(MockTable.Empty());
 
         AuthRepository repo = CreateRepo(conn);
@@ -235,12 +246,30 @@ public class AuthRepositoryTests
         string newPasswordHash = "new_hashed_password";
         MockDbConnection conn = new();
 
-        conn.Mocks.When(cmd => cmd.CommandText == "USP_RotateUserCredential").ReturnsScalar(1);
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("SELECT 1 FROM dbo.UserAccount"))
+            .ReturnsScalar(1);
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("UPDATE dbo.UserCredential")).ReturnsScalar(1);
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("INSERT INTO dbo.UserCredential"))
+            .ReturnsScalar(1);
 
         AuthRepository repo = CreateRepo(conn);
 
         // Should not throw
         Func<Task> act = async () => await repo.RotateCredentialAsync(userId, newPasswordHash);
         await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task RotateCredentialAsync_ThrowsNotFound_WhenUserAccountMissing()
+    {
+        MockDbConnection conn = new();
+
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("SELECT 1 FROM dbo.UserAccount"))
+            .ReturnsTable(MockTable.Empty());
+
+        AuthRepository repo = CreateRepo(conn);
+
+        Func<Task> act = async () => await repo.RotateCredentialAsync(Guid.NewGuid(), "hash");
+        await act.Should().ThrowAsync<Domain.Exceptions.NotFoundException>();
     }
 }

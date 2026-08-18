@@ -27,6 +27,8 @@
         <Project Path="Features/Features.Auth.Tests/Features.Auth.Tests.csproj" />
         <Project Path="Features/Features.Emails/Features.Emails.csproj" />
         <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj" />
+        <Project Path="Features/Features.Locations/Features.Locations.csproj" />
+        <Project Path="Features/Features.Locations.Tests/Features.Locations.Tests.csproj" />
     </Folder>
     <Folder Name="/Shared/">
         <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />

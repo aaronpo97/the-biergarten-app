@@ -14,22 +14,10 @@ public static class SqlConnectionStringHelper
     /// <param name="databaseName">If null, falls back to the DB_NAME environment variable.</param>
     public static string BuildConnectionString(string? databaseName = null)
     {
-        string server =
-            Environment.GetEnvironmentVariable("DB_SERVER")
-            ?? throw new InvalidOperationException("DB_SERVER environment variable is not set");
-
-        string dbName =
-            databaseName
-            ?? Environment.GetEnvironmentVariable("DB_NAME")
-            ?? throw new InvalidOperationException("DB_NAME environment variable is not set");
-
-        string user =
-            Environment.GetEnvironmentVariable("DB_USER")
-            ?? throw new InvalidOperationException("DB_USER environment variable is not set");
-
-        string password =
-            Environment.GetEnvironmentVariable("DB_PASSWORD")
-            ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set");
+        string server = Required("DB_SERVER");
+        string dbName = databaseName ?? Required("DB_NAME");
+        string user = Required("DB_USER");
+        string password = Required("DB_PASSWORD");
 
         SqlConnectionStringBuilder builder = new()
         {
@@ -37,7 +25,7 @@ public static class SqlConnectionStringHelper
             InitialCatalog = dbName,
             UserID = user,
             Password = password,
-            TrustServerCertificate = true,
+            TrustServerCertificate = ResolveTrustServerCertificate(),
             Encrypt = true,
         };
 
@@ -51,4 +39,23 @@ public static class SqlConnectionStringHelper
     {
         return BuildConnectionString("master");
     }
+
+    /// <summary>
+    ///     Resolves the <c>DB_TRUST_SERVER_CERTIFICATE</c> environment variable, defaulting to
+    ///     <c>true</c> when it is unset or not a valid boolean.
+    /// </summary>
+    private static bool ResolveTrustServerCertificate()
+    {
+        return !bool.TryParse(
+                Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE"),
+                out bool trustServerCertificate
+            )
+            || trustServerCertificate;
+    }
+
+    private static string Required(string variableName) =>
+        Environment.GetEnvironmentVariable(variableName)
+        ?? throw new InvalidOperationException(
+            $"The {variableName} environment variable is not set."
+        );
 }

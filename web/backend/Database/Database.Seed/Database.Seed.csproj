@@ -28,6 +28,10 @@
         <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
         <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
     </ItemGroup>
+    
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
 
     <ItemGroup>
         <!-- Pipeline-generated seed data, copied to the output directory so it can be opened via

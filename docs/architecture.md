@@ -13,8 +13,8 @@ active website:
 - **Architecture Style**: Vertical-slice backend plus server-rendered React
   frontend
 
-The legacy Next.js frontend has been retained in `archive/next-js-web-app/`
-for reference only.
+The legacy Next.js frontend has been retained in `archive/next-js-web-app/` for
+reference only.
 
 ## Diagrams
 
@@ -35,9 +35,9 @@ For visual representations, see:
 
 The backend organizes business capabilities as feature slices instead of
 technical layers. Each feature (`Features.Auth`, `Features.Breweries`,
-`Features.UserManagement`, `Features.Emails`) is a single project that owns
-its own controller, MediatR commands/queries/handlers, validators, and
-repository, end to end:
+`Features.UserManagement`, `Features.Emails`) is a single project that owns its
+own controller, MediatR commands/queries/handlers, validators, and repository,
+end to end:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
@@ -74,18 +74,18 @@ repository, end to end:
 └─────────────────────────────────────┘
 ```
 
-Slices never reference each other's project. The one cross-slice
-interaction (`Features.Auth` triggering a confirmation email handled by
-`Features.Emails`) goes through a MediatR command (`SendRegistrationEmailCommand`)
-whose contract lives in `Shared.Application`, so neither slice takes a
-project reference on the other.
+Slices never reference each other's project. The one cross-slice interaction
+(`Features.Auth` triggering a confirmation email handled by `Features.Emails`)
+goes through a MediatR command (`SendRegistrationEmailCommand`) whose contract
+lives in `Shared.Application`, so neither slice takes a project reference on the
+other.
 
 ### Layer responsibilities
 
 #### API layer (`API.Core`)
 
-**Purpose**: Thin ASP.NET Core host: no business logic, no controllers of
-its own
+**Purpose**: Thin ASP.NET Core host: no business logic, no controllers of its
+own
 
 **Components**:
 
@@ -114,26 +114,25 @@ its own
 
 **Components** (per slice):
 
-- `Controllers/`: HTTP endpoints, binding directly to Command/Query types
-  as the request contract
-- `Commands/<Operation>/` and `Queries/<Operation>/`: one folder per
-  operation, each containing the Command/Query record, its
-  `IRequestHandler`, and (for commands) a FluentValidation validator
-- `Repository/`: the slice's own stored-procedure repository
-  implementation
-- `Dtos/`: response shapes returned by query handlers (never the raw
-  domain entity)
-- `DependencyInjection/`: an `AddFeaturesX()` extension method registering
-  the slice's repository/services
+- `Controllers/`: HTTP endpoints, binding directly to Command/Query types as the
+  request contract
+- `Commands/<Operation>/` and `Queries/<Operation>/`: one folder per operation,
+  each containing the Command/Query record, its `IRequestHandler`, and (for
+  commands) a FluentValidation validator
+- `Repository/`: the slice's own stored-procedure repository implementation
+- `Dtos/`: response shapes returned by query handlers (never the raw domain
+  entity)
+- `DependencyInjection/`: an `AddFeaturesX()` extension method registering the
+  slice's repository/services
 
-`Features.Emails` has no `Controllers/` folder. It's invoked only via
-MediatR commands sent from other slices, never over HTTP.
+`Features.Emails` has no `Controllers/` folder. It's invoked only via MediatR
+commands sent from other slices, never over HTTP.
 
 **Dependencies**:
 
 - `Domain.Entities`, `Domain.Exceptions`
-- `Infrastructure.Sql` (generic ADO.NET plumbing) plus whichever
-  infrastructure project the slice needs (`Infrastructure.Jwt`/
+- `Infrastructure.Sql` (generic ADO.NET plumbing) plus whichever infrastructure
+  project the slice needs (`Infrastructure.Jwt`/
   `Infrastructure.PasswordHashing` for Auth, `Infrastructure.Email`/
   `Infrastructure.Email.Templates` for Emails)
 - `Shared.Contracts`, `Shared.Application`
@@ -142,29 +141,27 @@ MediatR commands sent from other slices, never over HTTP.
 **Rules**:
 
 - All business logic for that feature lives in its command/query handlers
-- No direct controller-to-repository calls; everything flows through
-  MediatR
+- No direct controller-to-repository calls; everything flows through MediatR
 - Read endpoints return a dedicated `Dto`, never the domain entity directly
 
 #### Shared projects (`Shared.Contracts`, `Shared.Application`)
 
-**Purpose**: The minimum cross-slice surface area required because every
-slice needs it, or because duplicating it four times would be worse than
-sharing it
+**Purpose**: The minimum cross-slice surface area required because every slice
+needs it, or because duplicating it four times would be worse than sharing it
 
 **Components**:
 
 - `Shared.Contracts`: `ResponseBody<T>`/`ResponseBody`, the API response
   envelope every controller returns
-- `Shared.Application`: `ValidationBehavior<TRequest,TResponse>` (the
-  MediatR pipeline behavior that runs FluentValidation before a handler
-  executes) and the cross-slice email commands
-  (`SendRegistrationEmailCommand`, `SendResendConfirmationEmailCommand`)
+- `Shared.Application`: `ValidationBehavior<TRequest,TResponse>` (the MediatR
+  pipeline behavior that runs FluentValidation before a handler executes) and
+  the cross-slice email commands (`SendRegistrationEmailCommand`,
+  `SendResendConfirmationEmailCommand`)
 
 **Rules**:
 
-- Kept deliberately small: this is the exception to "no slice depends on
-  another slice," not a general-purpose dumping ground
+- Kept deliberately small: this is the exception to "no slice depends on another
+  slice," not a general-purpose dumping ground
 
 #### Infrastructure layer
 
@@ -218,16 +215,15 @@ whichever slices need them
 #### Vertical slice + MediatR
 
 **Purpose**: Organize code by feature instead of by technical layer, so
-everything needed to understand or change one capability lives in one
-project
+everything needed to understand or change one capability lives in one project
 
 **Implementation**:
 
 - Each HTTP write operation is a `Command` (for example, `CreateBreweryCommand`
   in `Features.Breweries/Commands/CreateBrewery/`); each read operation is a
   `Query` (for example, `GetBreweryByIdQuery`)
-- Controllers bind directly to the Command/Query as the request body;
-  there is no separate request DTO + mapping step for writes
+- Controllers bind directly to the Command/Query as the request body; there is
+  no separate request DTO + mapping step for writes
 - A single shared `ValidationBehavior<TRequest,TResponse>`
   (`Shared.Application/Behaviors/`) runs FluentValidation validators in the
   MediatR pipeline before any handler executes
@@ -250,14 +246,14 @@ public class CreateBreweryHandler(IBreweryRepository repository) : IRequestHandl
 
 **Purpose**: Abstract database access behind interfaces
 
-**Implementation**: each slice owns its own repository, scoped to that
-feature only:
+**Implementation**: each slice owns its own repository, scoped to that feature
+only:
 
 - `Features.Auth/Repository/IAuthRepository.cs`
 - `Features.Breweries/Repository/IBreweryRepository.cs`
 - `Features.UserManagement/Repository/IUserAccountRepository.cs`
-- `Infrastructure.Sql/DefaultSqlConnectionFactory.cs`: the generic
-  connection factory every slice's repository builds on
+- `Infrastructure.Sql/DefaultSqlConnectionFactory.cs`: the generic connection
+  factory every slice's repository builds on
 
 **Benefits**:
 
@@ -279,9 +275,9 @@ public interface IAuthRepository
 
 **Purpose**: Loose coupling and testability
 
-**Configuration**: `Program.cs` wires up MediatR/FluentValidation across
-every `Features.*` assembly; each slice exposes its own `AddFeaturesX()`
-extension method that registers its repository and slice-internal services
+**Configuration**: `Program.cs` wires up MediatR/FluentValidation across every
+`Features.*` assembly; each slice exposes its own `AddFeaturesX()` extension
+method that registers its repository and slice-internal services
 
 **Lifetimes**:
 
@@ -351,8 +347,8 @@ All component styling should prefer semantic tokens such as `primary`,
 ### Legacy frontend
 
 The previous Next.js frontend has been archived at `archive/next-js-web-app/`
-for reference only. Active product and engineering documentation should point
-to `web/frontend`.
+for reference only. Active product and engineering documentation should point to
+`web/frontend`.
 
 ## Security architecture
 
@@ -410,6 +406,10 @@ to `web/frontend`.
 ```
 
 ## Database architecture
+
+For the table-by-table schema, the stored procedure reference (parameters,
+behavior, and exactly what each one throws), and the custom SQL error code
+scheme, see [Database](website/database.md).
 
 ### SQL-first philosophy
 

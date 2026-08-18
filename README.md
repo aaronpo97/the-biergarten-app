@@ -24,6 +24,7 @@ Website + backend (active stack):
 
 - [Getting Started](docs/website/getting-started.md)
 - [Architecture](docs/architecture.md)
+- [Database](docs/website/database.md)
 - [Docker Guide](docs/website/docker.md)
 - [Testing](docs/website/testing.md)
 - [Environment Variables](docs/website/environment-variables.md)

@@ -6,18 +6,12 @@ namespace Infrastructure.Email.Templates.Rendering;
 public interface IEmailTemplateProvider
 {
     /// <summary>
-    ///     Renders the UserRegisteredEmail template with the specified parameters.
+    ///     Renders the UserRegisteredEmail template.
     /// </summary>
-    /// <param name="username">The username to include in the email</param>
-    /// <param name="confirmationLink">The email confirmation link</param>
-    /// <returns>The rendered HTML string</returns>
     Task<string> RenderUserRegisteredEmailAsync(string username, string confirmationLink);
 
     /// <summary>
-    ///     Renders the ResendConfirmation template with the specified parameters.
+    ///     Renders the ResendConfirmation template.
     /// </summary>
-    /// <param name="username">The username to include in the email</param>
-    /// <param name="confirmationLink">The new confirmation link</param>
-    /// <returns>The rendered HTML string</returns>
     Task<string> RenderResendConfirmationEmailAsync(string username, string confirmationLink);
 }

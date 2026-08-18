@@ -1,54 +1,73 @@
-using System.Data;
 using System.Data.Common;
+using Dapper;
 using Domain.Entities;
+using Domain.Exceptions;
 using Infrastructure.Sql;
 
 namespace Features.Breweries.Repository;
 
 /// <summary>
-///     ADO.NET-based implementation of <see cref="IBreweryRepository" /> backed by SQL Server stored
-///     procedures.
+///     Dapper-based implementation of <see cref="IBreweryRepository" />.
 /// </summary>
+/// <remarks>
+///     <c>BreweryPostLocation.Coordinates</c> is a SQL Server <c>GEOGRAPHY</c> column. Dapper's generic
+///     <c>Query&lt;T&gt;</c> deserializer reads columns via <c>IDataRecord.GetValue</c>, which for a UDT
+///     column returns a CLR UDT instance rather than raw bytes and cannot be coerced to <c>byte[]</c>.
+///     The two read methods below therefore read rows manually via <see cref="DbDataReader.GetFieldValue{T}" />
+///     (the same approach the previous ADO.NET implementation used, which SqlClient supports specifically
+///     for UDT columns). All write methods use Dapper, since they only bind parameters and never
+///     deserialize <c>Coordinates</c> back out of a result set.
+/// </remarks>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : Repository<BreweryPost>(connectionFactory),
         IBreweryRepository
 {
-    /// <summary>Retrieves a brewery post by ID using the <c>USP_GetBreweryById</c> stored procedure.</summary>
+    private const string SelectColumns =
+        "bp.BreweryPostID, bp.PostedByID, bp.BreweryName, bp.Description, bp.CreatedAt, bp.UpdatedAt, bp.Timer, "
+        + "bpl.BreweryPostLocationID, bpl.CityID, bpl.AddressLine1, bpl.AddressLine2, bpl.PostalCode, bpl.Coordinates";
+
+    /// <summary>
+    ///     Retrieves a brewery post by ID, joined to its location. A brewery with no location row
+    ///     returns <c>null</c> (matches the previous stored procedure's <c>INNER JOIN</c> behavior).
+    /// </summary>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
-        command.CommandType = CommandType.StoredProcedure;
-
-        command.CommandText = "USP_GetBreweryById";
-        AddParameter(command, "@BreweryPostID", id);
+        command.CommandText =
+            $"""
+            SELECT {SelectColumns}
+            FROM dbo.BreweryPost bp
+            INNER JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            WHERE bp.BreweryPostID = @BreweryPostId
+            """;
+        AddParameter(command, "@BreweryPostId", id);
 
         await using DbDataReader reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-            return MapToEntity(reader);
-        return null;
+        return await reader.ReadAsync() ? MapToEntity(reader) : null;
     }
 
     /// <summary>
-    ///     Retrieves all brewery posts, optionally paginated, using the <c>USP_GetAllBreweries</c>
-    ///     stored procedure. The <c>@Limit</c> and <c>@Offset</c> parameters are only added when their
-    ///     corresponding argument has a value.
+    ///     Retrieves all brewery posts, optionally paginated, ordered by creation date descending. Posts
+    ///     without a location are included, with <see cref="BreweryPost.Location" /> left <c>null</c>.
     /// </summary>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
-        command.CommandText = "USP_GetAllBreweries";
-        command.CommandType = CommandType.StoredProcedure;
-
-        if (limit.HasValue)
-            AddParameter(command, "@Limit", limit.Value);
-
-        if (offset.HasValue)
-            AddParameter(command, "@Offset", offset.Value);
+        command.CommandText =
+            $"""
+            SELECT {SelectColumns}
+            FROM dbo.BreweryPost bp
+            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            ORDER BY bp.CreatedAt DESC
+            OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            """;
+        AddParameter(command, "@Offset", offset ?? 0);
+        AddParameter(command, "@Limit", limit ?? int.MaxValue);
 
         await using DbDataReader reader = await command.ExecuteReaderAsync();
-        List<BreweryPost> breweries = new();
+        List<BreweryPost> breweries = [];
 
         while (await reader.ReadAsync())
             breweries.Add(MapToEntity(reader));
@@ -57,77 +76,256 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <summary>
-    ///     Updates a brewery post's name and description, and upserts or clears its location, using the
-    ///     <c>USP_UpdateBrewery</c> stored procedure. When <paramref name="brewery" />.<c>Location</c> is
-    ///     <c>null</c>, any existing location for the brewery is removed.
+    ///     Updates a brewery post's name and description, and upserts or clears its location. When
+    ///     <paramref name="brewery" />.<c>Location</c> is <c>null</c>, any existing location for the
+    ///     brewery is removed.
     /// </summary>
-    public async Task UpdateAsync(BreweryPost brewery)
+    /// <exception cref="NotFoundException">Thrown when the brewery, or the given city, does not exist.</exception>
+    /// <exception cref="ConflictException">
+    ///     Thrown when <paramref name="brewery" />'s <c>Timer</c> no longer matches the stored row.
+    /// </exception>
+    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbCommand command = connection.CreateCommand();
-        command.CommandText = "USP_UpdateBrewery";
-        command.CommandType = CommandType.StoredProcedure;
+        await using DbTransaction transaction = await connection.BeginTransactionAsync();
 
-        AddParameter(command, "@BreweryPostID", brewery.BreweryPostId);
-        AddParameter(command, "@BreweryName", brewery.BreweryName);
-        AddParameter(command, "@Description", brewery.Description);
-        AddParameter(command, "@BreweryPostLocationID", brewery.Location?.BreweryPostLocationId);
-        AddParameter(command, "@CityID", brewery.Location?.CityId);
-        AddParameter(command, "@AddressLine1", brewery.Location?.AddressLine1);
-        AddParameter(command, "@AddressLine2", brewery.Location?.AddressLine2);
-        AddParameter(command, "@PostalCode", brewery.Location?.PostalCode);
-        AddParameter(command, "@Coordinates", brewery.Location?.Coordinates);
+        try
+        {
+            bool breweryExists =
+                await connection.ExecuteScalarAsync<int?>(
+                    new CommandDefinition(
+                        "SELECT 1 FROM dbo.BreweryPost WHERE BreweryPostID = @BreweryPostId",
+                        new { brewery.BreweryPostId },
+                        transaction
+                    )
+                ) is not null;
 
-        await command.ExecuteNonQueryAsync();
+            if (!breweryExists)
+                throw new NotFoundException("Brewery not found.");
+
+            if (brewery.Location is not null)
+            {
+                bool cityExists =
+                    await connection.ExecuteScalarAsync<int?>(
+                        new CommandDefinition(
+                            "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
+                            new { brewery.Location.CityId },
+                            transaction
+                        )
+                    ) is not null;
+
+                if (!cityExists)
+                    throw new NotFoundException("City not found.");
+            }
+
+            int updatedRows = await connection.ExecuteAsync(
+                new CommandDefinition(
+                    """
+                    UPDATE dbo.BreweryPost
+                    SET BreweryName = @BreweryName, Description = @Description, UpdatedAt = GETDATE()
+                    WHERE BreweryPostID = @BreweryPostId AND Timer = @Timer
+                    """,
+                    new
+                    {
+                        brewery.BreweryPostId,
+                        brewery.BreweryName,
+                        brewery.Description,
+                        brewery.Timer,
+                    },
+                    transaction
+                )
+            );
+
+            if (updatedRows == 0)
+                throw new ConflictException(
+                    "Brewery was modified by another request. Reload and try again."
+                );
+
+            if (brewery.Location is null)
+            {
+                // No location supplied: clear any existing location for this brewery.
+                await connection.ExecuteAsync(
+                    new CommandDefinition(
+                        "DELETE FROM dbo.BreweryPostLocation WHERE BreweryPostID = @BreweryPostId",
+                        new { brewery.BreweryPostId },
+                        transaction
+                    )
+                );
+            }
+            else
+            {
+                bool locationExists =
+                    await connection.ExecuteScalarAsync<int?>(
+                        new CommandDefinition(
+                            "SELECT 1 FROM dbo.BreweryPostLocation WHERE BreweryPostID = @BreweryPostId",
+                            new { brewery.BreweryPostId },
+                            transaction
+                        )
+                    ) is not null;
+
+                if (locationExists)
+                    await connection.ExecuteAsync(
+                        new CommandDefinition(
+                            """
+                            UPDATE dbo.BreweryPostLocation
+                            SET CityID = @CityId, AddressLine1 = @AddressLine1, AddressLine2 = @AddressLine2,
+                                PostalCode = @PostalCode, Coordinates = @Coordinates
+                            WHERE BreweryPostID = @BreweryPostId
+                            """,
+                            new
+                            {
+                                brewery.BreweryPostId,
+                                brewery.Location.CityId,
+                                brewery.Location.AddressLine1,
+                                brewery.Location.AddressLine2,
+                                brewery.Location.PostalCode,
+                                brewery.Location.Coordinates,
+                            },
+                            transaction
+                        )
+                    );
+                else
+                    await connection.ExecuteAsync(
+                        new CommandDefinition(
+                            """
+                            INSERT INTO dbo.BreweryPostLocation
+                                (BreweryPostLocationID, BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
+                            VALUES (@BreweryPostLocationId, @BreweryPostId, @CityId, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates)
+                            """,
+                            new
+                            {
+                                brewery.Location.BreweryPostLocationId,
+                                brewery.BreweryPostId,
+                                brewery.Location.CityId,
+                                brewery.Location.AddressLine1,
+                                brewery.Location.AddressLine2,
+                                brewery.Location.PostalCode,
+                                brewery.Location.Coordinates,
+                            },
+                            transaction
+                        )
+                    );
+            }
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        return await GetByIdAsync(brewery.BreweryPostId)
+            ?? throw new InvalidOperationException(
+                $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
+            );
     }
 
     /// <summary>
-    ///     Deletes a brewery post by ID using the <c>USP_DeleteBrewery</c> stored procedure. Its location
-    ///     and photos are removed via cascading foreign keys.
+    ///     Deletes a brewery post by ID. Its location and photos are removed via cascading foreign keys.
     /// </summary>
+    /// <exception cref="NotFoundException">Thrown when no brewery exists with the given <paramref name="id" />.</exception>
     public async Task DeleteAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbCommand command = connection.CreateCommand();
-        command.CommandText = "USP_DeleteBrewery";
-        command.CommandType = CommandType.StoredProcedure;
+        int rows = await connection.ExecuteAsync(
+            "DELETE FROM dbo.BreweryPost WHERE BreweryPostID = @BreweryPostId",
+            new { BreweryPostId = id }
+        );
 
-        AddParameter(command, "@BreweryPostID", id);
-        await command.ExecuteNonQueryAsync();
+        if (rows == 0)
+            throw new NotFoundException("Brewery not found.");
     }
 
-    /// <summary>Creates a new brewery post and its location using the <c>USP_CreateBrewery</c> stored procedure.</summary>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" />.<c>Location</c> is <c>null</c>.</exception>
+    /// <summary>Creates a new brewery post, including its location details.</summary>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" /> has no <c>Location</c>.</exception>
+    /// <exception cref="NotFoundException">
+    ///     Thrown when <paramref name="brewery" />.<c>PostedById</c> or <c>Location.CityId</c> does not exist.
+    /// </exception>
     public async Task CreateAsync(BreweryPost brewery)
     {
-        await using DbConnection connection = await CreateConnection();
-        await using DbCommand command = connection.CreateCommand();
-
-        command.CommandText = "USP_CreateBrewery";
-        command.CommandType = CommandType.StoredProcedure;
-
         if (brewery.Location is null)
             throw new ArgumentException("Location must be provided when creating a brewery.");
 
-        AddParameter(command, "@BreweryName", brewery.BreweryName);
-        AddParameter(command, "@Description", brewery.Description);
-        AddParameter(command, "@PostedByID", brewery.PostedById);
-        AddParameter(command, "@CityID", brewery.Location?.CityId);
-        AddParameter(command, "@AddressLine1", brewery.Location?.AddressLine1);
-        AddParameter(command, "@AddressLine2", brewery.Location?.AddressLine2);
-        AddParameter(command, "@PostalCode", brewery.Location?.PostalCode);
-        AddParameter(command, "@Coordinates", brewery.Location?.Coordinates);
-        await command.ExecuteNonQueryAsync();
+        await using DbConnection connection = await CreateConnection();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync();
+
+        try
+        {
+            bool userExists =
+                await connection.ExecuteScalarAsync<int?>(
+                    new CommandDefinition(
+                        "SELECT 1 FROM dbo.UserAccount WHERE UserAccountID = @PostedById",
+                        new { brewery.PostedById },
+                        transaction
+                    )
+                ) is not null;
+
+            if (!userExists)
+                throw new NotFoundException("User not found.");
+
+            bool cityExists =
+                await connection.ExecuteScalarAsync<int?>(
+                    new CommandDefinition(
+                        "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
+                        new { brewery.Location.CityId },
+                        transaction
+                    )
+                ) is not null;
+
+            if (!cityExists)
+                throw new NotFoundException("City not found.");
+
+            await connection.ExecuteAsync(
+                new CommandDefinition(
+                    "INSERT INTO dbo.BreweryPost (BreweryPostID, BreweryName, Description, PostedByID) VALUES (@BreweryPostId, @BreweryName, @Description, @PostedById)",
+                    new
+                    {
+                        brewery.BreweryPostId,
+                        brewery.BreweryName,
+                        brewery.Description,
+                        brewery.PostedById,
+                    },
+                    transaction
+                )
+            );
+
+            await connection.ExecuteAsync(
+                new CommandDefinition(
+                    """
+                    INSERT INTO dbo.BreweryPostLocation
+                        (BreweryPostLocationID, BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
+                    VALUES (@BreweryPostLocationId, @BreweryPostId, @CityId, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates)
+                    """,
+                    new
+                    {
+                        brewery.Location.BreweryPostLocationId,
+                        brewery.BreweryPostId,
+                        brewery.Location.CityId,
+                        brewery.Location.AddressLine1,
+                        brewery.Location.AddressLine2,
+                        brewery.Location.PostalCode,
+                        brewery.Location.Coordinates,
+                    },
+                    transaction
+                )
+            );
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <summary>
     ///     Maps the current row of <paramref name="reader" /> to a <see cref="BreweryPost" />, including its
-    ///     associated <see cref="BreweryPostLocation" /> if location columns are present in the result set.
+    ///     associated <see cref="BreweryPostLocation" /> if a location row was joined in.
     /// </summary>
-    protected override BreweryPost MapToEntity(DbDataReader reader)
+    private static BreweryPost MapToEntity(DbDataReader reader)
     {
-        BreweryPost brewery = new();
-
         int ordBreweryPostId = reader.GetOrdinal("BreweryPostId");
         int ordPostedById = reader.GetOrdinal("PostedById");
         int ordBreweryName = reader.GetOrdinal("BreweryName");
@@ -136,62 +334,42 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         int ordUpdatedAt = reader.GetOrdinal("UpdatedAt");
         int ordTimer = reader.GetOrdinal("Timer");
 
-        brewery.BreweryPostId = reader.GetGuid(ordBreweryPostId);
-        brewery.PostedById = reader.GetGuid(ordPostedById);
-        brewery.BreweryName = reader.GetString(ordBreweryName);
-        brewery.Description = reader.GetString(ordDescription);
-        brewery.CreatedAt = reader.GetDateTime(ordCreatedAt);
-
-        brewery.UpdatedAt = reader.IsDBNull(ordUpdatedAt) ? null : reader.GetDateTime(ordUpdatedAt);
-
-        // Read timer (varbinary/rowversion) robustly
-        if (reader.IsDBNull(ordTimer))
-            brewery.Timer = null;
-        else
-            try
-            {
-                brewery.Timer = reader.GetFieldValue<byte[]>(ordTimer);
-            }
-            catch
-            {
-                long length = reader.GetBytes(ordTimer, 0, null, 0, 0);
-                byte[] buffer = new byte[length];
-                reader.GetBytes(ordTimer, 0, buffer, 0, (int)length);
-                brewery.Timer = buffer;
-            }
-
-        // Map BreweryPostLocation if columns are present
-        try
+        BreweryPost brewery = new()
         {
-            int ordLocationId = reader.GetOrdinal("BreweryPostLocationId");
-            if (!reader.IsDBNull(ordLocationId))
-            {
-                BreweryPostLocation location = new()
-                {
-                    BreweryPostLocationId = reader.GetGuid(ordLocationId),
-                    BreweryPostId = reader.GetGuid(reader.GetOrdinal("BreweryPostId")),
-                    CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
-                    AddressLine1 = reader.GetString(reader.GetOrdinal("AddressLine1")),
-                    AddressLine2 = reader.IsDBNull(reader.GetOrdinal("AddressLine2"))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal("AddressLine2")),
-                    PostalCode = reader.GetString(reader.GetOrdinal("PostalCode")),
-                    Coordinates = reader.IsDBNull(reader.GetOrdinal("Coordinates"))
-                        ? null
-                        : reader.GetFieldValue<byte[]>(reader.GetOrdinal("Coordinates")),
-                };
-                brewery.Location = location;
-            }
-        }
-        catch (IndexOutOfRangeException)
+            BreweryPostId = reader.GetGuid(ordBreweryPostId),
+            PostedById = reader.GetGuid(ordPostedById),
+            BreweryName = reader.GetString(ordBreweryName),
+            Description = reader.GetString(ordDescription),
+            CreatedAt = reader.GetDateTime(ordCreatedAt),
+            UpdatedAt = reader.IsDBNull(ordUpdatedAt) ? null : reader.GetDateTime(ordUpdatedAt),
+            Timer = reader.IsDBNull(ordTimer) ? null : reader.GetFieldValue<byte[]>(ordTimer),
+        };
+
+        int ordLocationId = reader.GetOrdinal("BreweryPostLocationId");
+        if (!reader.IsDBNull(ordLocationId))
         {
-            // Location columns not present, skip mapping location
+            int ordCoordinates = reader.GetOrdinal("Coordinates");
+            int ordAddressLine2 = reader.GetOrdinal("AddressLine2");
+
+            brewery.Location = new BreweryPostLocation
+            {
+                BreweryPostLocationId = reader.GetGuid(ordLocationId),
+                BreweryPostId = brewery.BreweryPostId,
+                CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
+                AddressLine1 = reader.GetString(reader.GetOrdinal("AddressLine1")),
+                AddressLine2 = reader.IsDBNull(ordAddressLine2)
+                    ? null
+                    : reader.GetString(ordAddressLine2),
+                PostalCode = reader.GetString(reader.GetOrdinal("PostalCode")),
+                Coordinates = reader.IsDBNull(ordCoordinates)
+                    ? null
+                    : reader.GetFieldValue<byte[]>(ordCoordinates),
+            };
         }
 
         return brewery;
     }
 
-    /// <summary>Adds a parameter to <paramref name="command" />, converting <c>null</c> to <see cref="DBNull.Value" />.</summary>
     private static void AddParameter(DbCommand command, string name, object? value)
     {
         DbParameter p = command.CreateParameter();

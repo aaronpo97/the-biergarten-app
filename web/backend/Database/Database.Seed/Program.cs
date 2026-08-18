@@ -12,7 +12,7 @@ using Features.Locations.Dtos;
 using Features.Locations.Repository;
 using idunno.Password;
 using Infrastructure.PasswordHashing;
-using Infrastructure.Sql;
+using Infrastructure.Sql.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -25,7 +25,7 @@ static async Task<int> RunAsync()
     {
         ServiceCollection services = [];
         services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
-        services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+        services.AddInfrastructureSql();
         services.AddFeaturesBreweries();
         services.AddFeaturesLocations();
         services.AddFeaturesAuth();

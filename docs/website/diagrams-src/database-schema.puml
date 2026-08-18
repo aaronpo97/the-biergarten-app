@@ -3,102 +3,207 @@
 skinparam backgroundColor #FFFFFF
 skinparam defaultFontName Arial
 skinparam linetype ortho
+skinparam packageStyle rectangle
 
-title Key Database Schema - User & Authentication
+title Database Schema
+caption Every table also has a Timer ROWVERSION column (optimistic concurrency), omitted below for brevity.\nTables marked (*) have no CRUD stored procedures yet.
 
-entity "UserAccount" as User {
-  * UserAccountId: INT <<PK>>
-  --
-  * Username: NVARCHAR(30) <<UNIQUE>>
-  * Email: NVARCHAR(255) <<UNIQUE>>
-  * FirstName: NVARCHAR(50)
-  * LastName: NVARCHAR(50)
-  Bio: NVARCHAR(500)
-  CreatedAt: DATETIME2
-  UpdatedAt: DATETIME2
-  LastLoginAt: DATETIME2
+package "User & Auth" {
+  entity "UserAccount" as User {
+    * UserAccountID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * Username: VARCHAR(64) <<UNIQUE>>
+    * FirstName: NVARCHAR(128)
+    * LastName: NVARCHAR(128)
+    * Email: VARCHAR(128) <<UNIQUE>>
+    * CreatedAt: DATETIME
+    UpdatedAt: DATETIME
+    * DateOfBirth: DATE
+  }
+
+  entity "UserCredential" as Cred {
+    * UserCredentialID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * UserAccountID: UNIQUEIDENTIFIER <<FK>>
+    * CreatedAt: DATETIME
+    * Expiry: DATETIME
+    * Hash: NVARCHAR(256)
+    * IsRevoked: BIT
+    RevokedAt: DATETIME
+  }
+
+  entity "UserVerification" as Verify {
+    * UserVerificationID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * UserAccountID: UNIQUEIDENTIFIER <<FK, UNIQUE>>
+    * VerificationDateTime: DATETIME
+  }
+
+  entity "UserAvatar (*)" as Avatar {
+    * UserAvatarID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * UserAccountID: UNIQUEIDENTIFIER <<FK, UNIQUE>>
+    * PhotoID: UNIQUEIDENTIFIER <<FK>>
+  }
+
+  entity "UserFollow (*)" as Follow {
+    * UserFollowID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * UserAccountID: UNIQUEIDENTIFIER <<FK>>
+    * FollowingID: UNIQUEIDENTIFIER <<FK>>
+    * CreatedAt: DATETIME
+  }
+
+  entity "Photo (*)" as Photo {
+    * PhotoID: UNIQUEIDENTIFIER <<PK>>
+    --
+    Hyperlink: NVARCHAR(256)
+    * UploadedByID: UNIQUEIDENTIFIER <<FK>>
+    * UploadedAt: DATETIME
+  }
 }
 
-entity "UserCredential" as Cred {
-  * UserCredentialId: INT <<PK>>
-  --
-  * UserAccountId: INT <<FK>>
-  * PasswordHash: VARBINARY(32)
-  * PasswordSalt: VARBINARY(16)
-  CredentialRotatedAt: DATETIME2
-  CredentialExpiresAt: DATETIME2
-  CredentialRevokedAt: DATETIME2
-  * IsActive: BIT
-  CreatedAt: DATETIME2
+package "Location" {
+  entity "Country" as Country {
+    * CountryID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * CountryName: NVARCHAR(100)
+    * ISO3166_1: CHAR(2) <<UNIQUE>>
+  }
+
+  entity "StateProvince" as StateProvince {
+    * StateProvinceID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * StateProvinceName: NVARCHAR(100)
+    * ISO3166_2: CHAR(6) <<UNIQUE>>
+    * CountryID: UNIQUEIDENTIFIER <<FK>>
+  }
+
+  entity "City" as City {
+    * CityID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * CityName: NVARCHAR(100)
+    * StateProvinceID: UNIQUEIDENTIFIER <<FK>>
+  }
 }
 
-entity "UserVerification" as Verify {
-  * UserVerificationId: INT <<PK>>
-  --
-  * UserAccountId: INT <<FK>>
-  * IsVerified: BIT
-  VerifiedAt: DATETIME2
-  VerificationToken: NVARCHAR(255)
-  TokenExpiresAt: DATETIME2
+package "Brewery" {
+  entity "BreweryPost" as Brewery {
+    * BreweryPostID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * BreweryName: NVARCHAR(256)
+    * PostedByID: UNIQUEIDENTIFIER <<FK>>
+    * Description: NVARCHAR(512)
+    * CreatedAt: DATETIME
+    UpdatedAt: DATETIME
+  }
+
+  entity "BreweryPostLocation" as BreweryLoc {
+    * BreweryPostLocationID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * BreweryPostID: UNIQUEIDENTIFIER <<FK, UNIQUE>>
+    * AddressLine1: NVARCHAR(256)
+    AddressLine2: NVARCHAR(256)
+    * PostalCode: NVARCHAR(20)
+    * CityID: UNIQUEIDENTIFIER <<FK>>
+    Coordinates: GEOGRAPHY
+  }
+
+  entity "BreweryPostPhoto (*)" as BreweryPhoto {
+    * BreweryPostPhotoID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * BreweryPostID: UNIQUEIDENTIFIER <<FK>>
+    * PhotoID: UNIQUEIDENTIFIER <<FK>>
+    * LinkedAt: DATETIME
+  }
 }
 
-entity "UserAvatar" as Avatar {
-  * UserAvatarId: INT <<PK>>
-  --
-  * UserAccountId: INT <<FK>>
-  PhotoId: INT <<FK>>
-  * IsActive: BIT
-  CreatedAt: DATETIME2
+package "Beer (*)" {
+  entity "BeerStyle (*)" as BeerStyle {
+    * BeerStyleID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * StyleName: NVARCHAR(100) <<UNIQUE>>
+    Description: NVARCHAR(MAX)
+  }
+
+  entity "BeerPost (*)" as Beer {
+    * BeerPostID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * Name: NVARCHAR(100)
+    * Description: NVARCHAR(MAX)
+    * ABV: DECIMAL(4,2)
+    * IBU: INT
+    * PostedByID: UNIQUEIDENTIFIER <<FK>>
+    * BeerStyleID: UNIQUEIDENTIFIER <<FK>>
+    * BrewedByID: UNIQUEIDENTIFIER <<FK>>
+    * CreatedAt: DATETIME
+    UpdatedAt: DATETIME
+  }
+
+  entity "BeerPostPhoto (*)" as BeerPhoto {
+    * BeerPostPhotoID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * BeerPostID: UNIQUEIDENTIFIER <<FK>>
+    * PhotoID: UNIQUEIDENTIFIER <<FK>>
+    * LinkedAt: DATETIME
+  }
+
+  entity "BeerPostComment (*)" as BeerComment {
+    * BeerPostCommentID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * Comment: NVARCHAR(250)
+    * BeerPostID: UNIQUEIDENTIFIER <<FK>>
+    * CommentedByID: UNIQUEIDENTIFIER <<FK>>
+    * Rating: INT
+    * CreatedAt: DATETIME
+    UpdatedAt: DATETIME
+  }
 }
 
-entity "UserFollow" as Follow {
-  * UserFollowId: INT <<PK>>
-  --
-  * FollowerUserId: INT <<FK>>
-  * FollowedUserId: INT <<FK>>
-  CreatedAt: DATETIME2
-}
-
-entity "Photo" as Photo {
-  * PhotoId: INT <<PK>>
-  --
-  * Url: NVARCHAR(500)
-  * CloudinaryPublicId: NVARCHAR(255)
-  Width: INT
-  Height: INT
-  Format: NVARCHAR(10)
-  CreatedAt: DATETIME2
-}
-
-' Relationships
+' Relationships: User & Auth
 User ||--o{ Cred : "has"
 User ||--o| Verify : "has"
-User ||--o{ Avatar : "has"
-User ||--o{ Follow : "follows"
-User ||--o{ Follow : "followed by"
+User ||--o| Avatar : "has"
 Avatar }o--|| Photo : "refers to"
+User ||--o{ Follow : "follows (UserAccountID)"
+User ||--o{ Follow : "followed by (FollowingID)"
+User ||--o{ Photo : "uploaded"
 
-note right of Cred
-  Password hashing:
-  - Algorithm: Argon2id
-  - Memory: 64MB
-  - Iterations: 4
-  - Salt: 128-bit
-  - Hash: 256-bit
-end note
+' Relationships: Location
+Country ||--o{ StateProvince : "has"
+StateProvince ||--o{ City : "has"
 
-note right of Verify
-  Account verification
-  via email token
-  with expiry
-end note
+' Relationships: Brewery
+User ||--o{ Brewery : "posted"
+Brewery ||--o| BreweryLoc : "has"
+City ||--o{ BreweryLoc : "located in"
+Brewery ||--o{ BreweryPhoto : "has"
+Photo ||--o{ BreweryPhoto : "linked to"
+
+' Relationships: Beer
+User ||--o{ Beer : "posted"
+BeerStyle ||--o{ Beer : "categorizes"
+Brewery ||--o{ Beer : "brewed"
+Beer ||--o{ BeerPhoto : "has"
+Photo ||--o{ BeerPhoto : "linked to"
+Beer ||--o{ BeerComment : "has"
+User ||--o{ BeerComment : "commented"
 
 note bottom of User
   Core stored procedures:
   - USP_RegisterUser
-  - USP_GetUserAccountByUsername
+  - usp_UpdateUserAccount
+  - usp_DeleteUserAccount
   - USP_RotateUserCredential
-  - USP_UpdateUserAccount
+  - USP_CreateUserVerification
+end note
+
+note bottom of Brewery
+  Core stored procedures:
+  - USP_CreateBrewery
+  - USP_UpdateBrewery
+  - USP_DeleteBrewery
+  (optimistic concurrency via Timer)
 end note
 
 @enduml

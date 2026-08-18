@@ -11,7 +11,4 @@ public class UserAccount
     public DateTime? UpdatedAt { get; set; }
     public DateTime DateOfBirth { get; set; }
     public byte[]? Timer { get; set; }
-    public ICollection<BreweryPost> BreweryPosts { get; set; } = [];
-    public ICollection<UserCredential> UserCredentials { get; set; } = [];
-    public UserVerification? Verification { get; set; }
 }

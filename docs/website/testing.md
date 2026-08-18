@@ -7,8 +7,8 @@ Biergarten App.
 
 The project uses a multi-layered testing approach across backend and frontend:
 
-- **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against
-  a live, seeded database
+- **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against a
+  live, seeded database
 - **Features.\*.Tests** - One unit test project per backend feature slice
   (`Features.Auth.Tests`, `Features.Breweries.Tests`,
   `Features.UserManagement.Tests`, `Features.Emails.Tests`), covering that
@@ -77,8 +77,8 @@ dotnet test API/API.Specs/API.Specs.csproj
 
 ### Feature slice unit tests
 
-Each feature slice has its own test project, covering its command/query
-handlers and repository:
+Each feature slice has its own test project, covering its command/query handlers
+and repository:
 
 ```bash
 cd web/backend

@@ -8,5 +8,4 @@ public class UserCredential
     public DateTime Expiry { get; set; }
     public string Hash { get; set; } = string.Empty;
     public byte[]? Timer { get; set; }
-    public UserAccount UserAccount { get; set; } = null!;
 }

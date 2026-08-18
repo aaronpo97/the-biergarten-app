@@ -6,5 +6,4 @@ public class UserVerification
     public Guid UserAccountId { get; set; }
     public DateTime VerificationDateTime { get; set; }
     public byte[]? Timer { get; set; }
-    public UserAccount UserAccount { get; set; } = null!;
 }

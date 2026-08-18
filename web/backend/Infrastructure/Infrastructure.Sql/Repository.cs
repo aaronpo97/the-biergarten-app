@@ -3,8 +3,8 @@ using System.Data.Common;
 namespace Infrastructure.Sql;
 
 /// <summary>
-///     Base class for ADO.NET-based repositories, providing shared connection creation and
-///     entity-mapping infrastructure for derived repository implementations.
+///     Base class for Dapper-based repositories, providing shared connection creation for derived
+///     repository implementations.
 /// </summary>
 public abstract class Repository<T>(ISqlConnectionFactory connectionFactory)
     where T : class
@@ -19,9 +19,4 @@ public abstract class Repository<T>(ISqlConnectionFactory connectionFactory)
         await connection.OpenAsync();
         return connection;
     }
-
-    /// <summary>
-    ///     Maps the current row of a data reader to an instance of <typeparamref name="T" />.
-    /// </summary>
-    protected abstract T MapToEntity(DbDataReader reader);
 }

@@ -1,7 +1,7 @@
 namespace Infrastructure.Email;
 
 /// <summary>
-///     Service for sending emails via SMTP.
+///     Service for sending emails.
 /// </summary>
 public interface IEmailProvider
 {

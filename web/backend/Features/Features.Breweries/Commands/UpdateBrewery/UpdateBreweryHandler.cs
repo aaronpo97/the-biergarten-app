@@ -12,6 +12,14 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
     ///     Updates an existing brewery post. If <paramref name="request" /> has no <c>Location</c>,
     ///     the brewery's location is cleared.
     /// </summary>
+    /// <exception cref="Domain.Exceptions.NotFoundException">
+    ///     Thrown when no brewery exists with <paramref name="request" />'s <c>BreweryPostId</c>, or its
+    ///     location's <c>CityId</c> does not exist.
+    /// </exception>
+    /// <exception cref="Domain.Exceptions.ConflictException">
+    ///     Thrown when the brewery was modified by another request since <paramref name="request" />.
+    ///     <c>Timer</c> was read.
+    /// </exception>
     public async Task<BreweryDto> Handle(
         UpdateBreweryCommand request,
         CancellationToken cancellationToken
@@ -23,6 +31,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
             PostedById = request.PostedById,
             BreweryName = request.BreweryName,
             Description = request.Description,
+            Timer = request.Timer,
             UpdatedAt = DateTime.UtcNow,
             Location = request.Location is null
                 ? null
@@ -38,7 +47,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
                 },
         };
 
-        await repository.UpdateAsync(entity);
-        return entity.ToDto();
+        BreweryPost updated = await repository.UpdateAsync(entity);
+        return updated.ToDto();
     }
 }
