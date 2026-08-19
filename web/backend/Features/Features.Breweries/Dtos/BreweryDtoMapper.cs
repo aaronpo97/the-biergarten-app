@@ -25,8 +25,12 @@ public static class BreweryDtoMapper
                 : new BreweryLocationDto
                 {
                     BreweryPostLocationId = brewery.Location.BreweryPostLocationId,
-                    BreweryPostId = brewery.Location.BreweryPostId,
                     CityId = brewery.Location.CityId,
+                    CityName = brewery.Location.City?.CityName ?? string.Empty,
+                    StateProvinceName = brewery.Location.City?.StateProvince?.StateProvinceName ?? string.Empty,
+                    StateProvinceCode = brewery.Location.City?.StateProvince?.ISO3166_2 ?? string.Empty,
+                    CountryName = brewery.Location.City?.StateProvince?.Country?.CountryName ?? string.Empty,
+                    CountryCode = brewery.Location.City?.StateProvince?.Country?.ISO3166_1 ?? string.Empty,
                     AddressLine1 = brewery.Location.AddressLine1,
                     AddressLine2 = brewery.Location.AddressLine2,
                     PostalCode = brewery.Location.PostalCode,

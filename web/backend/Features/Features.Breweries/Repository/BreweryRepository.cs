@@ -23,14 +23,45 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         IBreweryRepository
 {
     private const string SelectColumns =
-        "bp.BreweryPostID, bp.PostedByID, bp.BreweryName, bp.Description, bp.CreatedAt, bp.UpdatedAt, bp.Timer, "
-        + "bpl.BreweryPostLocationID, bpl.CityID, bpl.AddressLine1, bpl.AddressLine2, bpl.PostalCode, bpl.Coordinates";
+    """
+        bp.BreweryPostID,
+        bp.PostedByID,
+        bp.BreweryName,
+        bp.Description,
+        bp.CreatedAt,
+        bp.UpdatedAt,
+        bp.Timer,
+        bpl.BreweryPostLocationID,
+        bpl.CityID,
+        bpl.AddressLine1,
+        bpl.AddressLine2,
+        bpl.PostalCode,
+        bpl.Coordinates,
+        c.CityName,
+        c.StateProvinceID,
+        sp.StateProvinceName,
+        sp.ISO3166_2,
+        sp.CountryID,
+        co.CountryName,
+        co.ISO3166_1
+    """;
+
+    /// <summary>
+    ///     Joins from <c>dbo.BreweryPost</c> down to <c>dbo.Country</c> so a row carries everything needed
+    ///     to populate <see cref="BreweryPost.Location" />'s full <c>City</c> → <c>StateProvince</c> →
+    ///     <c>Country</c> chain. All joins are <c>LEFT JOIN</c> (matching the previous stored procedure's
+    ///     behavior), since a brewery post may have no location.
+    /// </summary>
+    private const string FromJoins =
+    """
+        dbo.BreweryPost bp
+        LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+        LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+        LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+        LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+    """;
 
     /// <inheritdoc/>
-    /// <remarks>
-    ///     Joins to the location table with an <c>INNER JOIN</c> (matching the previous stored procedure's
-    ///     behavior), which is why a brewery with no location row is treated as not found.
-    /// </remarks>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -38,8 +69,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         command.CommandText =
             $"""
             SELECT {SelectColumns}
-            FROM dbo.BreweryPost bp
-            INNER JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            FROM {FromJoins}
             WHERE bp.BreweryPostID = @BreweryPostId
             """;
         AddParameter(command, "@BreweryPostId", id);
@@ -56,8 +86,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         command.CommandText =
             $"""
             SELECT {SelectColumns}
-            FROM dbo.BreweryPost bp
-            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            FROM {FromJoins}
             ORDER BY bp.CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             """;
@@ -339,6 +368,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 BreweryPostLocationId = reader.GetGuid(ordLocationId),
                 BreweryPostId = brewery.BreweryPostId,
                 CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
+                City = MapCity(reader),
                 AddressLine1 = reader.GetString(reader.GetOrdinal("AddressLine1")),
                 AddressLine2 = reader.IsDBNull(ordAddressLine2)
                     ? null
@@ -351,6 +381,34 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
 
         return brewery;
+    }
+
+    /// <summary>
+    ///     Maps the current row's <c>City</c> → <c>StateProvince</c> → <c>Country</c> columns. The schema
+    ///     enforces <c>NOT NULL</c> foreign keys down this whole chain, so whenever a location row was
+    ///     joined in (the caller only calls this when it was), these columns are always populated too.
+    /// </summary>
+    private static City MapCity(DbDataReader reader)
+    {
+        return new City
+        {
+            CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
+            CityName = reader.GetString(reader.GetOrdinal("CityName")),
+            StateProvinceId = reader.GetGuid(reader.GetOrdinal("StateProvinceId")),
+            StateProvince = new StateProvince
+            {
+                StateProvinceId = reader.GetGuid(reader.GetOrdinal("StateProvinceId")),
+                StateProvinceName = reader.GetString(reader.GetOrdinal("StateProvinceName")),
+                ISO3166_2 = reader.GetString(reader.GetOrdinal("ISO3166_2")),
+                CountryId = reader.GetGuid(reader.GetOrdinal("CountryId")),
+                Country = new Country
+                {
+                    CountryId = reader.GetGuid(reader.GetOrdinal("CountryId")),
+                    CountryName = reader.GetString(reader.GetOrdinal("CountryName")),
+                    ISO3166_1 = reader.GetString(reader.GetOrdinal("ISO3166_1")),
+                },
+            },
+        };
     }
 
     private static void AddParameter(DbCommand command, string name, object? value)

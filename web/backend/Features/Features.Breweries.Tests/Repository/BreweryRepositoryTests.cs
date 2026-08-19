@@ -20,8 +20,11 @@ public class BreweryRepositoryTests
         MockDbConnection conn = new();
 
         Guid locationId = Guid.NewGuid();
+        Guid cityId = Guid.NewGuid();
+        Guid stateProvinceId = Guid.NewGuid();
+        Guid countryId = Guid.NewGuid();
 
-        conn.Mocks.When(cmd => cmd.CommandText.Contains("INNER JOIN dbo.BreweryPostLocation"))
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("LEFT JOIN dbo.BreweryPostLocation"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -37,7 +40,14 @@ public class BreweryRepositoryTests
                         ("AddressLine1", typeof(string)),
                         ("AddressLine2", typeof(string)),
                         ("PostalCode", typeof(string)),
-                        ("Coordinates", typeof(byte[]))
+                        ("Coordinates", typeof(byte[])),
+                        ("CityName", typeof(string)),
+                        ("StateProvinceId", typeof(Guid)),
+                        ("StateProvinceName", typeof(string)),
+                        ("ISO3166_2", typeof(string)),
+                        ("CountryId", typeof(Guid)),
+                        ("CountryName", typeof(string)),
+                        ("ISO3166_1", typeof(string))
                     )
                     .AddRow(
                         breweryId,
@@ -48,11 +58,18 @@ public class BreweryRepositoryTests
                         null,
                         null,
                         locationId,
-                        Guid.NewGuid(),
+                        cityId,
                         "123 Main St",
                         null,
                         "12345",
-                        null
+                        null,
+                        "Portland",
+                        stateProvinceId,
+                        "Oregon",
+                        "US-OR",
+                        countryId,
+                        "United States",
+                        "US"
                     )
             );
 
@@ -62,13 +79,19 @@ public class BreweryRepositoryTests
         result!.BreweryPostId.Should().Be(breweryId);
         result.Location.Should().NotBeNull();
         result.Location!.BreweryPostLocationId.Should().Be(locationId);
+        result.Location.City.Should().NotBeNull();
+        result.Location.City.CityName.Should().Be("Portland");
+        result.Location.City.StateProvince.Should().NotBeNull();
+        result.Location.City.StateProvince.StateProvinceName.Should().Be("Oregon");
+        result.Location.City.StateProvince.Country.Should().NotBeNull();
+        result.Location.City.StateProvince.Country.CountryName.Should().Be("United States");
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenNotExists()
     {
         MockDbConnection conn = new();
-        conn.Mocks.When(cmd => cmd.CommandText.Contains("INNER JOIN dbo.BreweryPostLocation"))
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("LEFT JOIN dbo.BreweryPostLocation"))
             .ReturnsTable(MockTable.Empty());
         BreweryRepository repo = CreateRepo(conn);
         BreweryPost? result = await repo.GetByIdAsync(Guid.NewGuid());
@@ -225,7 +248,7 @@ public class BreweryRepositoryTests
             .ReturnsScalar(1);
 
         // Repository re-fetches the row after a successful update to return the new Timer.
-        conn.Mocks.When(cmd => cmd.CommandText.Contains("INNER JOIN dbo.BreweryPostLocation"))
+        conn.Mocks.When(cmd => cmd.CommandText.Contains("LEFT JOIN dbo.BreweryPostLocation"))
             .ReturnsTable(
                 MockTable
                     .WithColumns(
@@ -241,7 +264,14 @@ public class BreweryRepositoryTests
                         ("AddressLine1", typeof(string)),
                         ("AddressLine2", typeof(string)),
                         ("PostalCode", typeof(string)),
-                        ("Coordinates", typeof(byte[]))
+                        ("Coordinates", typeof(byte[])),
+                        ("CityName", typeof(string)),
+                        ("StateProvinceId", typeof(Guid)),
+                        ("StateProvinceName", typeof(string)),
+                        ("ISO3166_2", typeof(string)),
+                        ("CountryId", typeof(Guid)),
+                        ("CountryName", typeof(string)),
+                        ("ISO3166_1", typeof(string))
                     )
                     .AddRow(
                         breweryId,
@@ -256,7 +286,14 @@ public class BreweryRepositoryTests
                         "123 Main St",
                         null,
                         "12345",
-                        null
+                        null,
+                        "Portland",
+                        Guid.NewGuid(),
+                        "Oregon",
+                        "US-OR",
+                        Guid.NewGuid(),
+                        "United States",
+                        "US"
                     )
             );
 

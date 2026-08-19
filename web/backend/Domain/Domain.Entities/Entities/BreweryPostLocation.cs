@@ -8,6 +8,7 @@ public class BreweryPostLocation
     public string? AddressLine2 { get; set; }
     public string PostalCode { get; set; } = string.Empty;
     public Guid CityId { get; set; }
+    public City? City { get; set; }
     public byte[]? Coordinates { get; set; }
     public byte[]? Timer { get; set; }
 }

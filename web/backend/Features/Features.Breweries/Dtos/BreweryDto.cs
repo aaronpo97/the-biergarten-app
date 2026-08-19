@@ -4,10 +4,16 @@ namespace Features.Breweries.Dtos;
 public class BreweryLocationDto
 {
     public Guid BreweryPostLocationId { get; set; }
-
-    public Guid BreweryPostId { get; set; }
-
     public Guid CityId { get; set; }
+    public string CityName { get; set; } = string.Empty;
+
+    public string StateProvinceName { get; set; } = string.Empty;
+
+    public string StateProvinceCode { get; set; } = string.Empty;
+
+    public string CountryName { get; set; } = string.Empty;
+
+    public string CountryCode { get; set; } = string.Empty;
 
     public string AddressLine1 { get; set; } = string.Empty;
 
@@ -41,3 +47,5 @@ public class BreweryDto
     /// <summary>Gets or sets the brewery's location, or <see langword="null"/> if none has been set.</summary>
     public BreweryLocationDto? Location { get; set; }
 }
+
+

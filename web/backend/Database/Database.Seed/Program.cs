@@ -186,11 +186,13 @@ static async Task LoadBreweriesIntoDatabaseAsync(
         await breweryRepository.CreateAsync(
             new BreweryPost
             {
+                BreweryPostId = Guid.NewGuid(),
                 BreweryName = breweryRecord.Brewery.NameEn,
                 Description = breweryRecord.Brewery.DescriptionEn,
                 PostedById = posterUserIds[i % posterUserIds.Count],
                 Location = new BreweryPostLocation
                 {
+                    BreweryPostLocationId = Guid.NewGuid(),
                     CityId = cityId,
                     AddressLine1 = "Address unavailable",
                     PostalCode = breweryRecord.Address.PostalCode,
