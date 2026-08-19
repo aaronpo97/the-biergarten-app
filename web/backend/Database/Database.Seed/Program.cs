@@ -86,7 +86,6 @@ static async Task<int> RunAsync()
                 "Loading user data into target database...",
                 async ctx =>
                 {
-                    Thread.Sleep(3000); // Simulate some work being done
                     postedByIds = await LoadUsersIntoDatabaseAsync(
                         authRepository,
                         passwordInfrastructure,

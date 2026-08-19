@@ -34,7 +34,7 @@ public class BreweryRepositoryTests
                         ("Description", typeof(string)),
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
-                        ("Timer", typeof(byte[])),
+                        ("RowVersion", typeof(byte[])),
                         ("BreweryPostLocationId", typeof(Guid)),
                         ("CityId", typeof(Guid)),
                         ("AddressLine1", typeof(string)),
@@ -230,7 +230,7 @@ public class BreweryRepositoryTests
     public async Task UpdateAsync_ReturnsFreshlyPersistedBrewery_WhenSuccessful()
     {
         Guid breweryId = Guid.NewGuid();
-        byte[] newTimer = [0x00, 0x02];
+        byte[] newRowVersion = [0x00, 0x02];
         MockDbConnection conn = new();
 
         conn.Mocks.When(cmd =>
@@ -239,7 +239,7 @@ public class BreweryRepositoryTests
             .ReturnsScalar(1);
         conn.Mocks.When(cmd => cmd.CommandText.Contains("SELECT 1 FROM dbo.City")).ReturnsScalar(1);
         conn.Mocks.When(cmd =>
-                cmd.CommandText.Contains("WHERE BreweryPostID = @BreweryPostId AND Timer = @Timer")
+                cmd.CommandText.Contains("WHERE BreweryPostID = @BreweryPostId AND RowVersion = @RowVersion")
             )
             .ReturnsScalar(1);
         conn.Mocks.When(cmd => cmd.CommandText.Contains("SELECT 1 FROM dbo.BreweryPostLocation"))
@@ -247,7 +247,7 @@ public class BreweryRepositoryTests
         conn.Mocks.When(cmd => cmd.CommandText.Contains("UPDATE dbo.BreweryPostLocation"))
             .ReturnsScalar(1);
 
-        // Repository re-fetches the row after a successful update to return the new Timer.
+        // Repository re-fetches the row after a successful update to return the new RowVersion.
         conn.Mocks.When(cmd => cmd.CommandText.Contains("LEFT JOIN dbo.BreweryPostLocation"))
             .ReturnsTable(
                 MockTable
@@ -258,7 +258,7 @@ public class BreweryRepositoryTests
                         ("Description", typeof(string)),
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
-                        ("Timer", typeof(byte[])),
+                        ("RowVersion", typeof(byte[])),
                         ("BreweryPostLocationId", typeof(Guid)),
                         ("CityId", typeof(Guid)),
                         ("AddressLine1", typeof(string)),
@@ -280,7 +280,7 @@ public class BreweryRepositoryTests
                         "Updated description",
                         DateTime.UtcNow,
                         DateTime.UtcNow,
-                        newTimer,
+                        newRowVersion,
                         Guid.NewGuid(),
                         Guid.NewGuid(),
                         "123 Main St",
@@ -304,7 +304,7 @@ public class BreweryRepositoryTests
             PostedById = Guid.NewGuid(),
             BreweryName = "Renamed Brewery",
             Description = "Updated description",
-            Timer = [0x00, 0x01],
+            RowVersion = [0x00, 0x01],
             Location = new BreweryPostLocation
             {
                 CityId = Guid.NewGuid(),
@@ -316,7 +316,7 @@ public class BreweryRepositoryTests
         BreweryPost result = await repo.UpdateAsync(brewery);
 
         result.BreweryPostId.Should().Be(breweryId);
-        result.Timer.Should().Equal(newTimer);
+        result.RowVersion.Should().Equal(newRowVersion);
     }
 
     [Fact]
@@ -329,14 +329,14 @@ public class BreweryRepositoryTests
             .ReturnsScalar((int?)null);
 
         BreweryRepository repo = CreateRepo(conn);
-        BreweryPost brewery = new() { BreweryPostId = Guid.NewGuid(), Timer = [0x00, 0x01] };
+        BreweryPost brewery = new() { BreweryPostId = Guid.NewGuid(), RowVersion = [0x00, 0x01] };
 
         Func<Task> act = async () => await repo.UpdateAsync(brewery);
         await act.Should().ThrowAsync<NotFoundException>();
     }
 
     [Fact]
-    public async Task UpdateAsync_ThrowsConflict_WhenTimerStale()
+    public async Task UpdateAsync_ThrowsConflict_WhenRowVersionStale()
     {
         MockDbConnection conn = new();
         conn.Mocks.When(cmd =>
@@ -344,10 +344,10 @@ public class BreweryRepositoryTests
             )
             .ReturnsScalar(1);
 
-        // Brewery exists but the conditional UPDATE (WHERE ... AND Timer = @Timer) matches no rows,
-        // since the caller's Timer no longer matches the stored row.
+        // Brewery exists but the conditional UPDATE (WHERE ... AND RowVersion = @RowVersion) matches no rows,
+        // since the caller's RowVersion no longer matches the stored row.
         conn.Mocks.When(cmd =>
-                cmd.CommandText.Contains("WHERE BreweryPostID = @BreweryPostId AND Timer = @Timer")
+                cmd.CommandText.Contains("WHERE BreweryPostID = @BreweryPostId AND RowVersion = @RowVersion")
             )
             .ReturnsScalar(0);
 
@@ -357,7 +357,7 @@ public class BreweryRepositoryTests
             BreweryPostId = Guid.NewGuid(),
             BreweryName = "Renamed Brewery",
             Description = "Updated description",
-            Timer = [0x00, 0x01],
+            RowVersion = [0x00, 0x01],
         };
 
         Func<Task> act = async () => await repo.UpdateAsync(brewery);

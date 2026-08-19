@@ -43,7 +43,7 @@ public class UpdateBreweryHandlerTests
         persisted.PostedById.Should().Be(command.PostedById);
         persisted.BreweryName.Should().Be("Renamed");
         persisted.Description.Should().Be("New description");
-        persisted.Timer.Should().Equal(command.Timer);
+        persisted.RowVersion.Should().Equal(command.RowVersion);
         persisted.UpdatedAt.Should().NotBeNull();
         persisted.UpdatedAt!.Value.Should().BeOnOrAfter(before).And.BeOnOrBefore(after);
     }

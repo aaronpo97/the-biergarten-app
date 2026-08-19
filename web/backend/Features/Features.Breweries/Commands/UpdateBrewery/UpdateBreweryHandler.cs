@@ -19,7 +19,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
     /// </exception>
     /// <exception cref="Domain.Exceptions.ConflictException">
     ///     Thrown when the brewery was modified by another request since <paramref name="request" />.
-    ///     <c>Timer</c> was read.
+    ///     <c>RowVersion</c> was read.
     /// </exception>
     public async Task<BreweryDto> Handle(
         UpdateBreweryCommand request,
@@ -32,7 +32,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
             PostedById = request.PostedById,
             BreweryName = request.BreweryName,
             Description = request.Description,
-            Timer = request.Timer,
+            RowVersion = request.RowVersion,
             UpdatedAt = DateTime.UtcNow,
             Location = request.Location is null
                 ? null

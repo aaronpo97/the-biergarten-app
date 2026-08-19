@@ -7,8 +7,8 @@ public class UpdateBreweryValidator : AbstractValidator<UpdateBreweryCommand>
 {
     public UpdateBreweryValidator()
     {
-        RuleFor(x => x.Timer)
+        RuleFor(x => x.RowVersion)
             .NotEmpty()
-            .WithMessage("Timer is required to detect conflicting concurrent updates.");
+            .WithMessage("RowVersion is required to detect conflicting concurrent updates.");
     }
 }

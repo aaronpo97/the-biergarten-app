@@ -23,17 +23,17 @@ public interface IBreweryRepository
 
     /// <summary>
     ///     Updates a brewery post's name and description, and upserts or clears its location, enforcing
-    ///     optimistic concurrency via <paramref name="brewery" />'s <c>Timer</c>: the update is rejected
-    ///     if the row was modified since <c>Timer</c> was read. When <paramref name="brewery" />'s
+    ///     optimistic concurrency via <paramref name="brewery" />'s <c>RowVersion</c>: the update is rejected
+    ///     if the row was modified since <c>RowVersion</c> was read. When <paramref name="brewery" />'s
     ///     <c>Location</c> is <c>null</c>, any existing location for the brewery is removed.
-    ///     Returns the freshly persisted brewery, including its new <c>Timer</c>.
+    ///     Returns the freshly persisted brewery, including its new <c>RowVersion</c>.
     /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
     ///     Thrown when no brewery exists with the given ID, or the given location's <c>CityId</c> does not
     ///     exist.
     /// </exception>
     /// <exception cref="Domain.Exceptions.ConflictException">
-    ///     Thrown when <paramref name="brewery" />'s <c>Timer</c> no longer matches the stored row (it was
+    ///     Thrown when <paramref name="brewery" />'s <c>RowVersion</c> no longer matches the stored row (it was
     ///     modified by another request since it was last read).
     /// </exception>
     Task<BreweryPost> UpdateAsync(BreweryPost brewery);

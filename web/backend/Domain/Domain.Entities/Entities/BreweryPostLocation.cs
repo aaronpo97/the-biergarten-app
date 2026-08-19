@@ -1,14 +1,23 @@
 namespace Domain.Entities;
 
-public class BreweryPostLocation
+public sealed class BreweryPostLocation
 {
+    // PK
     public Guid BreweryPostLocationId { get; set; }
+
+    // FK References
     public Guid BreweryPostId { get; set; }
+    public Guid CityId { get; set; }
+
+    // Attributes
     public string AddressLine1 { get; set; } = string.Empty;
     public string? AddressLine2 { get; set; }
     public string PostalCode { get; set; } = string.Empty;
-    public Guid CityId { get; set; }
-    public City? City { get; set; }
     public byte[]? Coordinates { get; set; }
-    public byte[]? Timer { get; set; }
+
+    // Audit Fields
+    public byte[]? RowVersion { get; set; }
+
+    // Navigation Properties
+    public City? City { get; set; }
 }

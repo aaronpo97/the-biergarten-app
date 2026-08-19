@@ -22,29 +22,28 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : Repository<BreweryPost>(connectionFactory),
         IBreweryRepository
 {
-    private const string SelectColumns =
-    """
-        bp.BreweryPostID,
-        bp.PostedByID,
-        bp.BreweryName,
-        bp.Description,
-        bp.CreatedAt,
-        bp.UpdatedAt,
-        bp.Timer,
-        bpl.BreweryPostLocationID,
-        bpl.CityID,
-        bpl.AddressLine1,
-        bpl.AddressLine2,
-        bpl.PostalCode,
-        bpl.Coordinates,
-        c.CityName,
-        c.StateProvinceID,
-        sp.StateProvinceName,
-        sp.ISO3166_2,
-        sp.CountryID,
-        co.CountryName,
-        co.ISO3166_1
-    """;
+    private const string SelectColumns = """
+            bp.BreweryPostID,
+            bp.PostedByID,
+            bp.BreweryName,
+            bp.Description,
+            bp.CreatedAt,
+            bp.UpdatedAt,
+            bp.RowVersion,
+            bpl.BreweryPostLocationID,
+            bpl.CityID,
+            bpl.AddressLine1,
+            bpl.AddressLine2,
+            bpl.PostalCode,
+            bpl.Coordinates,
+            c.CityName,
+            c.StateProvinceID,
+            sp.StateProvinceName,
+            sp.ISO3166_2,
+            sp.CountryID,
+            co.CountryName,
+            co.ISO3166_1
+        """;
 
     /// <summary>
     ///     Joins from <c>dbo.BreweryPost</c> down to <c>dbo.Country</c> so a row carries everything needed
@@ -52,22 +51,20 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     <c>Country</c> chain. All joins are <c>LEFT JOIN</c> (matching the previous stored procedure's
     ///     behavior), since a brewery post may have no location.
     /// </summary>
-    private const string FromJoins =
-    """
-        dbo.BreweryPost bp
-        LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-        LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-        LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-        LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
-    """;
+    private const string FromJoins = """
+            dbo.BreweryPost bp
+            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+        """;
 
     /// <inheritdoc/>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
-        command.CommandText =
-            $"""
+        command.CommandText = $"""
             SELECT {SelectColumns}
             FROM {FromJoins}
             WHERE bp.BreweryPostID = @BreweryPostId
@@ -83,8 +80,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbCommand command = connection.CreateCommand();
-        command.CommandText =
-            $"""
+        command.CommandText = $"""
             SELECT {SelectColumns}
             FROM {FromJoins}
             ORDER BY bp.CreatedAt DESC
@@ -117,7 +113,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new { brewery.BreweryPostId },
                         transaction
                     )
-                ) is not null;
+                )
+                is not null;
 
             if (!breweryExists)
                 throw new NotFoundException("Brewery not found.");
@@ -131,7 +128,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             new { brewery.Location.CityId },
                             transaction
                         )
-                    ) is not null;
+                    )
+                    is not null;
 
                 if (!cityExists)
                     throw new NotFoundException("City not found.");
@@ -142,14 +140,14 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     """
                     UPDATE dbo.BreweryPost
                     SET BreweryName = @BreweryName, Description = @Description, UpdatedAt = GETDATE()
-                    WHERE BreweryPostID = @BreweryPostId AND Timer = @Timer
+                    WHERE BreweryPostID = @BreweryPostId AND RowVersion = @RowVersion
                     """,
                     new
                     {
                         brewery.BreweryPostId,
                         brewery.BreweryName,
                         brewery.Description,
-                        brewery.Timer,
+                        brewery.RowVersion,
                     },
                     transaction
                 )
@@ -180,7 +178,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             new { brewery.BreweryPostId },
                             transaction
                         )
-                    ) is not null;
+                    )
+                    is not null;
 
                 if (locationExists)
                     await connection.ExecuteAsync(
@@ -208,8 +207,21 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new CommandDefinition(
                             """
                             INSERT INTO dbo.BreweryPostLocation
-                                (BreweryPostLocationID, BreweryPostID, CityID, AddressLine1, AddressLine2, PostalCode, Coordinates)
-                            VALUES (@BreweryPostLocationId, @BreweryPostId, @CityId, @AddressLine1, @AddressLine2, @PostalCode, @Coordinates)
+                                (BreweryPostLocationID,
+                                 BreweryPostID,
+                                 CityID,
+                                 AddressLine1,
+                                 AddressLine2,
+                                 PostalCode,
+                                 Coordinates)
+                            VALUES
+                                   (@BreweryPostLocationId,
+                                    @BreweryPostId,
+                                    @CityId,
+                                    @AddressLine1,
+                                    @AddressLine2,
+                                    @PostalCode,
+                                    @Coordinates)
                             """,
                             new
                             {
@@ -271,7 +283,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new { brewery.PostedById },
                         transaction
                     )
-                ) is not null;
+                )
+                is not null;
 
             if (!userExists)
                 throw new NotFoundException("User not found.");
@@ -283,14 +296,26 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new { brewery.Location.CityId },
                         transaction
                     )
-                ) is not null;
+                )
+                is not null;
 
             if (!cityExists)
                 throw new NotFoundException("City not found.");
 
             await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "INSERT INTO dbo.BreweryPost (BreweryPostID, BreweryName, Description, PostedByID) VALUES (@BreweryPostId, @BreweryName, @Description, @PostedById)",
+                    """
+                    INSERT INTO dbo.BreweryPost
+                    (BreweryPostID,
+                    BreweryName,
+                    Description,
+                    PostedByID)
+                    VALUES
+                     (@BreweryPostId,
+                      @BreweryName,
+                      @Description,
+                      @PostedById)
+                    """,
                     new
                     {
                         brewery.BreweryPostId,
@@ -344,7 +369,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         int ordDescription = reader.GetOrdinal("Description");
         int ordCreatedAt = reader.GetOrdinal("CreatedAt");
         int ordUpdatedAt = reader.GetOrdinal("UpdatedAt");
-        int ordTimer = reader.GetOrdinal("Timer");
+        int ordRowVersion = reader.GetOrdinal("RowVersion");
 
         BreweryPost brewery = new()
         {
@@ -354,7 +379,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             Description = reader.GetString(ordDescription),
             CreatedAt = reader.GetDateTime(ordCreatedAt),
             UpdatedAt = reader.IsDBNull(ordUpdatedAt) ? null : reader.GetDateTime(ordUpdatedAt),
-            Timer = reader.IsDBNull(ordTimer) ? null : reader.GetFieldValue<byte[]>(ordTimer),
+            RowVersion = reader.IsDBNull(ordRowVersion)
+                ? null
+                : reader.GetFieldValue<byte[]>(ordRowVersion),
         };
 
         int ordLocationId = reader.GetOrdinal("BreweryPostLocationId");

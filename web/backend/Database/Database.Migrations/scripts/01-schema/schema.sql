@@ -39,7 +39,7 @@ CREATE TABLE dbo.UserAccount
 
     DateOfBirth DATE NOT NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserAccount
         PRIMARY KEY (UserAccountID),
@@ -67,7 +67,7 @@ CREATE TABLE Photo -- All photos must be linked to a user account, you cannot de
     UploadedAt DATETIME NOT NULL
         CONSTRAINT DF_Photo_UploadedAt DEFAULT GETDATE(),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_Photo
         PRIMARY KEY (PhotoID),
@@ -94,7 +94,7 @@ CREATE TABLE UserAvatar -- delete avatar photo when user account is deleted
 
     PhotoID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserAvatar PRIMARY KEY (UserAvatarID),
 
@@ -128,7 +128,7 @@ CREATE TABLE UserVerification -- delete verification data when user account is d
     VerificationDateTime DATETIME NOT NULL
         CONSTRAINT DF_VerificationDateTime DEFAULT GETDATE(),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserVerification
         PRIMARY KEY (UserVerificationID),
@@ -170,7 +170,7 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
 
     RevokedAt DATETIME NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserCredential
         PRIMARY KEY (UserCredentialID),
@@ -205,7 +205,7 @@ CREATE TABLE UserFollow
     CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_UserFollow_CreatedAt DEFAULT GETDATE(),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserFollow
         PRIMARY KEY (UserFollowID),
@@ -245,7 +245,7 @@ CREATE TABLE Country
 
     ISO3166_1 CHAR(2) NOT NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_Country
         PRIMARY KEY (CountryID),
@@ -269,7 +269,7 @@ CREATE TABLE StateProvince
 
     CountryID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_StateProvince
         PRIMARY KEY (StateProvinceID),
@@ -298,7 +298,7 @@ CREATE TABLE City
 
     StateProvinceID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_City
         PRIMARY KEY (CityID),
@@ -331,7 +331,7 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
 
     UpdatedAt DATETIME NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPost
         PRIMARY KEY (BreweryPostID),
@@ -366,7 +366,7 @@ CREATE TABLE BreweryPostLocation
 
     Coordinates GEOGRAPHY NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPostLocation
         PRIMARY KEY (BreweryPostLocationID),
@@ -419,7 +419,7 @@ CREATE TABLE BreweryPostPhoto -- All photos linked to a post are deleted if the 
     LinkedAt DATETIME NOT NULL
         CONSTRAINT DF_BreweryPostPhoto_LinkedAt DEFAULT GETDATE(),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPostPhoto
         PRIMARY KEY (BreweryPostPhotoID),
@@ -455,7 +455,7 @@ CREATE TABLE BeerStyle
 
     Description NVARCHAR(MAX),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerStyle
         PRIMARY KEY (BeerStyleID),
@@ -493,7 +493,7 @@ CREATE TABLE BeerPost
 
     UpdatedAt DATETIME,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPost
         PRIMARY KEY (BeerPostID),
@@ -545,7 +545,7 @@ CREATE TABLE BeerPostPhoto -- All photos linked to a beer post are deleted if th
     LinkedAt DATETIME NOT NULL
         CONSTRAINT DF_BeerPostPhoto_LinkedAt DEFAULT GETDATE(),
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPostPhoto
         PRIMARY KEY (BeerPostPhotoID),
@@ -590,7 +590,7 @@ CREATE TABLE BeerPostComment
 
     UpdatedAt DATETIME NULL,
 
-    Timer ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPostComment
         PRIMARY KEY (BeerPostCommentID),
