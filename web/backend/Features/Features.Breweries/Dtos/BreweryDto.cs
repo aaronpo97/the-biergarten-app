@@ -16,8 +16,6 @@ public record BreweryLocationDto(
     byte[]? Coordinates
 );
 
-public record BeerPreviewDto(Guid BeerPostId, string Name, decimal ABV, int IBU);
-
 /// <summary>A brewery post, as returned by the API.</summary>
 /// <param name="UpdatedAt">The date and time of the last edit, or <see langword="null"/> if never edited.</param>
 /// <param name="RowVersion">The row-version/concurrency token used to detect conflicting concurrent updates.</param>
@@ -30,6 +28,5 @@ public record BreweryDto(
     DateTime CreatedAt,
     DateTime? UpdatedAt,
     byte[]? RowVersion,
-    BreweryLocationDto? Location,
-    List<BeerPreviewDto> BeerPosts
+    BreweryLocationDto? Location
 );

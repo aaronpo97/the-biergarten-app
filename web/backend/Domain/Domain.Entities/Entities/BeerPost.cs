@@ -24,4 +24,6 @@ public sealed class BeerPost
     // Navigation Properties
     public UserAccount? PostedBy { get; set; }
     public BreweryPost? BrewedBy { get; set; }
+
+    public BeerStyle? BeerStyle { get; set; }
 }
