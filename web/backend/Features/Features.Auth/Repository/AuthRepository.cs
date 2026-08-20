@@ -17,7 +17,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         IAuthRepository
 {
     private const string SelectColumns =
-        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, Timer";
+        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion";
 
     /// <inheritdoc />
     /// <remarks>The account and credential are inserted within a single database transaction.</remarks>
@@ -92,7 +92,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserCredential>(
             """
-            SELECT UserCredentialId, UserAccountId, Hash, CreatedAt, Timer
+            SELECT UserCredentialId, UserAccountId, Hash, CreatedAt, RowVersion
             FROM dbo.UserCredential
             WHERE UserAccountId = @UserAccountId AND IsRevoked = 0
             """,

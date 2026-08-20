@@ -29,7 +29,7 @@ public class UserAccountRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
@@ -70,7 +70,7 @@ public class UserAccountRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         Guid.NewGuid(),
@@ -118,7 +118,7 @@ public class UserAccountRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         Guid.NewGuid(),
@@ -155,7 +155,7 @@ public class UserAccountRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         Guid.NewGuid(),

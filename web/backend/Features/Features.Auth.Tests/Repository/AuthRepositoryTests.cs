@@ -45,7 +45,7 @@ public class AuthRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         expectedUserId,
@@ -99,7 +99,7 @@ public class AuthRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         userId,
@@ -157,7 +157,7 @@ public class AuthRepositoryTests
                         ("CreatedAt", typeof(DateTime)),
                         ("UpdatedAt", typeof(DateTime?)),
                         ("DateOfBirth", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(
                         userId,
@@ -210,7 +210,7 @@ public class AuthRepositoryTests
                         ("UserAccountId", typeof(Guid)),
                         ("Hash", typeof(string)),
                         ("CreatedAt", typeof(DateTime)),
-                        ("Timer", typeof(byte[]))
+                        ("RowVersion", typeof(byte[]))
                     )
                     .AddRow(credentialId, userId, "hashed_password_value", DateTime.UtcNow, null)
             );

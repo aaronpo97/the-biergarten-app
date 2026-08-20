@@ -83,10 +83,59 @@ public class AuthSteps(ScenarioContext scenario)
         );
     }
 
+    private const string FixtureUsername = "test.user";
+    private const string FixturePassword = "Password1!";
+    private const string FixtureEmail = "test.user@thebiergarten.app";
+
+    // Scenarios run in parallel across feature classes, and this fixture is shared by name.
+    // Serializing provisioning avoids two scenarios racing to INSERT the same username/email,
+    // which would otherwise surface as a raw SQL unique-constraint error instead of a clean 409.
+    private static readonly SemaphoreSlim FixtureProvisioningLock = new(1, 1);
+
     [Given("I have an existing account")]
-    public void GivenIHaveAnExistingAccount()
+    public async Task GivenIHaveAnExistingAccount()
     {
-        scenario[TestUserKey] = ("test.user", "password");
+        scenario[TestUserKey] = (FixtureUsername, FixturePassword);
+
+        HttpClient client = GetClient();
+        var registrationData = new
+        {
+            username = FixtureUsername,
+            firstName = "Test",
+            lastName = "User",
+            email = FixtureEmail,
+            dateOfBirth = "1990-01-01",
+            password = FixturePassword,
+        };
+
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/register")
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(registrationData),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+
+        // Registration is used (rather than relying on seeded data) so the fixture account is
+        // guaranteed to exist regardless of run order. A 409 means another scenario in this run
+        // already provisioned it, which is equally fine.
+        await FixtureProvisioningLock.WaitAsync();
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(requestMessage);
+        }
+        finally
+        {
+            FixtureProvisioningLock.Release();
+        }
+
+        if ((int)response.StatusCode is not (201 or 409))
+            throw new InvalidOperationException(
+                $"Failed to provision fixture account '{FixtureUsername}': "
+                    + $"{(int)response.StatusCode} {response.StatusCode}"
+            );
     }
 
     [Given("I do not have an existing account")]
@@ -320,7 +369,7 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task GivenIAmLoggedIn()
     {
         HttpClient client = GetClient();
-        var loginData = new { username = "test.user", password = "password" };
+        var loginData = new { username = FixtureUsername, password = FixturePassword };
         string body = JsonSerializer.Serialize(loginData);
 
         HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/login")

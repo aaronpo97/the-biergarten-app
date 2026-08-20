@@ -14,7 +14,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
         IUserAccountRepository
 {
     private const string SelectColumns =
-        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, Timer";
+        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion";
 
     /// <inheritdoc />
     public async Task<UserAccount?> GetByIdAsync(Guid id)
