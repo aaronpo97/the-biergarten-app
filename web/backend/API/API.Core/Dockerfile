@@ -27,6 +27,8 @@ COPY ["Features/Features.Breweries/Features.Breweries.csproj", "Features/Feature
 COPY ["Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj", "Features/Features.Breweries.Tests/"]
 COPY ["Features/Features.Emails/Features.Emails.csproj", "Features/Features.Emails/"]
 COPY ["Features/Features.Emails.Tests/Features.Emails.Tests.csproj", "Features/Features.Emails.Tests/"]
+COPY ["Features/Features.Locations/Features.Locations.csproj", "Features/Features.Locations/"]
+COPY ["Features/Features.Locations.Tests/Features.Locations.Tests.csproj", "Features/Features.Locations.Tests/"]
 COPY ["Features/Features.UserManagement/Features.UserManagement.csproj", "Features/Features.UserManagement/"]
 COPY ["Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj", "Features/Features.UserManagement.Tests/"]
 COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]

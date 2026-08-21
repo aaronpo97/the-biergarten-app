@@ -101,21 +101,21 @@ Each run writes a fresh dated SQLite file such as
 
 #### CLI flags
 
-| Flag               | Purpose                                                                                              |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| `--mocked`         | Deterministic mock generator, no model required.                                                     |
-| `--model, -m`      | Path to a GGUF file. Required unless `--mocked` is set.                                              |
+| Flag               | Purpose                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `--mocked`         | Deterministic mock generator, no model required.                                                             |
+| `--model, -m`      | Path to a GGUF file. Required unless `--mocked` is set.                                                      |
 | `--prompt-dir`     | Directory containing prompt files (for example, `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
-| `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                         |
-| `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                  |
-| `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                             |
-| `--temperature`    | Sampling temperature. Default: `1.0`.                                                                |
-| `--top-p`          | Nucleus sampling. Default: `0.95`.                                                                   |
-| `--top-k`          | Top-k sampling. Default: `64`.                                                                       |
-| `--n-ctx`          | Context window size. Default: `8192`.                                                                |
-| `--seed`           | Random seed. Default: `-1` (random at runtime).                                                      |
-| `--n-gpu-layers`   | Number of model layers to offload to GPU. Default: `0`.                                              |
-| `--help, -h`       | Print usage and exit.                                                                                |
+| `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                                 |
+| `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                          |
+| `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                                     |
+| `--temperature`    | Sampling temperature. Default: `1.0`.                                                                        |
+| `--top-p`          | Nucleus sampling. Default: `0.95`.                                                                           |
+| `--top-k`          | Top-k sampling. Default: `64`.                                                                               |
+| `--n-ctx`          | Context window size. Default: `8192`.                                                                        |
+| `--seed`           | Random seed. Default: `-1` (random at runtime).                                                              |
+| `--n-gpu-layers`   | Number of model layers to offload to GPU. Default: `0`.                                                      |
+| `--help, -h`       | Print usage and exit.                                                                                        |
 
 `--mocked` and `--model` are mutually exclusive. Omitting both exits with an
 error before the pipeline starts. Sampling flags are ignored when `--mocked` is

@@ -12,14 +12,12 @@ namespace Infrastructure.Jwt;
 /// </summary>
 public class JwtInfrastructure : ITokenInfrastructure
 {
-    /// <summary>
-    ///     Generates a signed JWT, signed using HMAC-SHA256 with the provided secret.
-    /// </summary>
+    /// <inheritdoc />
     /// <remarks>
     ///     Sets registered claims <c>sub</c> (userId), <c>unique_name</c> (username), <c>iat</c> (current UTC time),
     ///     <c>exp</c> (expiry), and <c>jti</c> (a newly generated GUID).
     /// </remarks>
-    /// <param name="secret">The symmetric secret used to sign the token (encoded as UTF-8 bytes).</param>
+    /// <param name="secret">The symmetric secret used to sign the token, encoded as UTF-8 bytes.</param>
     public string GenerateJwt(Guid userId, string username, DateTime expiry, string secret)
     {
         JsonWebTokenHandler handler = new();
@@ -52,11 +50,9 @@ public class JwtInfrastructure : ITokenInfrastructure
         return handler.CreateToken(tokenDescriptor);
     }
 
-    /// <summary>
-    ///     Validates a JWT's signature and lifetime (issuer and audience validation are disabled),
-    ///     using the provided secret as the HMAC-SHA256 symmetric signing key.
-    /// </summary>
-    /// <param name="secret">The symmetric secret used to verify the token's signature (encoded as UTF-8 bytes).</param>
+    /// <inheritdoc />
+    /// <remarks>Issuer and audience validation are disabled; only the signature and lifetime are validated.</remarks>
+    /// <param name="secret">The symmetric secret used to verify the token's signature, encoded as UTF-8 bytes.</param>
     /// <exception cref="UnauthorizedException">
     ///     Thrown when the token is invalid, has no claims identity, is expired, or otherwise fails validation.
     /// </exception>

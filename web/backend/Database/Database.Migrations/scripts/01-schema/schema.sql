@@ -24,22 +24,22 @@ CREATE TABLE dbo.UserAccount
     UserAccountID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserAccountID DEFAULT NEWID(),
 
-    Username      VARCHAR(64)  NOT NULL,
+    Username VARCHAR(64) NOT NULL,
 
-    FirstName     NVARCHAR(128) NOT NULL,
+    FirstName NVARCHAR(128) NOT NULL,
 
-    LastName      NVARCHAR(128) NOT NULL,
+    LastName NVARCHAR(128) NOT NULL,
 
-    Email         VARCHAR(128) NOT NULL,
+    Email VARCHAR(128) NOT NULL,
 
-    CreatedAt     DATETIME     NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_UserAccount_CreatedAt DEFAULT GETDATE(),
 
-    UpdatedAt     DATETIME,
+    UpdatedAt DATETIME,
 
-    DateOfBirth   DATE         NOT NULL,
+    DateOfBirth DATE NOT NULL,
 
-    Timer         ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserAccount
         PRIMARY KEY (UserAccountID),
@@ -56,18 +56,18 @@ CREATE TABLE dbo.UserAccount
 
 CREATE TABLE Photo -- All photos must be linked to a user account, you cannot delete a user account if they have uploaded photos
 (
-    PhotoID      UNIQUEIDENTIFIER
+    PhotoID UNIQUEIDENTIFIER
         CONSTRAINT DF_PhotoID DEFAULT NEWID(),
 
-    Hyperlink    NVARCHAR(256),
+    Hyperlink NVARCHAR(256),
     -- storage is handled via filesystem or cloud service
 
     UploadedByID UNIQUEIDENTIFIER NOT NULL,
 
-    UploadedAt   DATETIME         NOT NULL
+    UploadedAt DATETIME NOT NULL
         CONSTRAINT DF_Photo_UploadedAt DEFAULT GETDATE(),
 
-    Timer        ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_Photo
         PRIMARY KEY (PhotoID),
@@ -87,14 +87,14 @@ NONCLUSTERED INDEX IX_Photo_UploadedByID
 
 CREATE TABLE UserAvatar -- delete avatar photo when user account is deleted
 (
-    UserAvatarID  UNIQUEIDENTIFIER
+    UserAvatarID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserAvatarID DEFAULT NEWID(),
 
     UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
-    PhotoID       UNIQUEIDENTIFIER NOT NULL,
+    PhotoID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer         ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserAvatar PRIMARY KEY (UserAvatarID),
 
@@ -120,15 +120,15 @@ NONCLUSTERED INDEX IX_UserAvatar_UserAccount
 
 CREATE TABLE UserVerification -- delete verification data when user account is deleted
 (
-    UserVerificationID   UNIQUEIDENTIFIER
+    UserVerificationID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserVerificationID DEFAULT NEWID(),
 
-    UserAccountID        UNIQUEIDENTIFIER NOT NULL,
+    UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
-    VerificationDateTime DATETIME         NOT NULL
+    VerificationDateTime DATETIME NOT NULL
         CONSTRAINT DF_VerificationDateTime DEFAULT GETDATE(),
 
-    Timer                ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserVerification
         PRIMARY KEY (UserVerificationID),
@@ -154,23 +154,23 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
     UserCredentialID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserCredentialID DEFAULT NEWID(),
 
-    UserAccountID    UNIQUEIDENTIFIER NOT NULL,
+    UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
-    CreatedAt        DATETIME         NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_UserCredential_CreatedAt DEFAULT GETDATE(),
 
-    Expiry           DATETIME         NOT NULL
+    Expiry DATETIME NOT NULL
         CONSTRAINT DF_UserCredential_Expiry DEFAULT DATEADD(DAY, 90, GETDATE()),
 
-    Hash             NVARCHAR(256) NOT NULL,
+    Hash NVARCHAR(256) NOT NULL,
     -- uses argon2
 
-    IsRevoked        BIT              NOT NULL
+    IsRevoked BIT NOT NULL
         CONSTRAINT DF_UserCredential_IsRevoked DEFAULT 0,
 
-    RevokedAt        DATETIME NULL,
+    RevokedAt DATETIME NULL,
 
-    Timer            ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserCredential
         PRIMARY KEY (UserCredentialID),
@@ -195,17 +195,17 @@ NONCLUSTERED INDEX IX_UserCredential_Account_Active
 
 CREATE TABLE UserFollow
 (
-    UserFollowID  UNIQUEIDENTIFIER
+    UserFollowID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserFollowID DEFAULT NEWID(),
 
     UserAccountID UNIQUEIDENTIFIER NOT NULL,
 
-    FollowingID   UNIQUEIDENTIFIER NOT NULL,
+    FollowingID UNIQUEIDENTIFIER NOT NULL,
 
-    CreatedAt     DATETIME         NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_UserFollow_CreatedAt DEFAULT GETDATE(),
 
-    Timer         ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_UserFollow
         PRIMARY KEY (UserFollowID),
@@ -223,7 +223,7 @@ CREATE TABLE UserFollow
     CONSTRAINT CK_CannotFollowOwnAccount
         CHECK (UserAccountID != FollowingID
 )
-    );
+);
 
 CREATE
 NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
@@ -238,14 +238,14 @@ NONCLUSTERED INDEX IX_UserFollow_FollowingID_UserAccount
 
 CREATE TABLE Country
 (
-    CountryID   UNIQUEIDENTIFIER
+    CountryID UNIQUEIDENTIFIER
         CONSTRAINT DF_CountryID DEFAULT NEWID(),
 
     CountryName NVARCHAR(100) NOT NULL,
 
-    ISO3166_1   CHAR(2) NOT NULL,
+    ISO3166_1 CHAR(2) NOT NULL,
 
-    Timer       ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_Country
         PRIMARY KEY (CountryID),
@@ -259,17 +259,17 @@ CREATE TABLE Country
 
 CREATE TABLE StateProvince
 (
-    StateProvinceID   UNIQUEIDENTIFIER
+    StateProvinceID UNIQUEIDENTIFIER
         CONSTRAINT DF_StateProvinceID DEFAULT NEWID(),
 
     StateProvinceName NVARCHAR(100) NOT NULL,
 
-    ISO3166_2         CHAR(6)          NOT NULL,
+    ISO3166_2 CHAR(6) NOT NULL,
     -- eg 'US-CA' for California, 'CA-ON' for Ontario
 
-    CountryID         UNIQUEIDENTIFIER NOT NULL,
+    CountryID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer             ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_StateProvince
         PRIMARY KEY (StateProvinceID),
@@ -291,14 +291,14 @@ NONCLUSTERED INDEX IX_StateProvince_Country
 
 CREATE TABLE City
 (
-    CityID          UNIQUEIDENTIFIER
+    CityID UNIQUEIDENTIFIER
         CONSTRAINT DF_CityID DEFAULT NEWID(),
 
-    CityName        NVARCHAR(100) NOT NULL,
+    CityName NVARCHAR(100) NOT NULL,
 
     StateProvinceID UNIQUEIDENTIFIER NOT NULL,
 
-    Timer           ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_City
         PRIMARY KEY (CityID),
@@ -320,18 +320,18 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
     BreweryPostID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostID DEFAULT NEWID(),
 
-    BreweryName   NVARCHAR(256) NOT NULL,
+    BreweryName NVARCHAR(256) NOT NULL,
 
-    PostedByID    UNIQUEIDENTIFIER NOT NULL,
+    PostedByID UNIQUEIDENTIFIER NOT NULL,
 
-    Description   NVARCHAR(512) NOT NULL,
+    Description NVARCHAR(MAX) NOT NULL,
 
-    CreatedAt     DATETIME         NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_BreweryPost_CreatedAt DEFAULT GETDATE(),
 
-    UpdatedAt     DATETIME NULL,
+    UpdatedAt DATETIME NULL,
 
-    Timer         ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPost
         PRIMARY KEY (BreweryPostID),
@@ -354,19 +354,19 @@ CREATE TABLE BreweryPostLocation
     BreweryPostLocationID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostLocationID DEFAULT NEWID(),
 
-    BreweryPostID         UNIQUEIDENTIFIER NOT NULL,
+    BreweryPostID UNIQUEIDENTIFIER NOT NULL,
 
-    AddressLine1          NVARCHAR(256) NOT NULL,
+    AddressLine1 NVARCHAR(256) NOT NULL,
 
-    AddressLine2          NVARCHAR(256),
+    AddressLine2 NVARCHAR(256),
 
-    PostalCode            NVARCHAR(20) NOT NULL,
+    PostalCode NVARCHAR(20) NOT NULL,
 
-    CityID                UNIQUEIDENTIFIER NOT NULL,
+    CityID UNIQUEIDENTIFIER NOT NULL,
 
-    Coordinates           GEOGRAPHY NULL,
+    Coordinates GEOGRAPHY NULL,
 
-    Timer                 ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPostLocation
         PRIMARY KEY (BreweryPostLocationID),
@@ -412,14 +412,14 @@ CREATE TABLE BreweryPostPhoto -- All photos linked to a post are deleted if the 
     BreweryPostPhotoID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostPhotoID DEFAULT NEWID(),
 
-    BreweryPostID      UNIQUEIDENTIFIER NOT NULL,
+    BreweryPostID UNIQUEIDENTIFIER NOT NULL,
 
-    PhotoID            UNIQUEIDENTIFIER NOT NULL,
+    PhotoID UNIQUEIDENTIFIER NOT NULL,
 
-    LinkedAt           DATETIME         NOT NULL
+    LinkedAt DATETIME NOT NULL
         CONSTRAINT DF_BreweryPostPhoto_LinkedAt DEFAULT GETDATE(),
 
-    Timer              ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BreweryPostPhoto
         PRIMARY KEY (BreweryPostPhotoID),
@@ -451,11 +451,11 @@ CREATE TABLE BeerStyle
     BeerStyleID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerStyleID DEFAULT NEWID(),
 
-    StyleName   NVARCHAR(100) NOT NULL,
+    StyleName NVARCHAR(100) NOT NULL,
 
     Description NVARCHAR(MAX),
 
-    Timer       ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerStyle
         PRIMARY KEY (BeerStyleID),
@@ -469,31 +469,31 @@ CREATE TABLE BeerStyle
 
 CREATE TABLE BeerPost
 (
-    BeerPostID  UNIQUEIDENTIFIER
+    BeerPostID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerPostID DEFAULT NEWID(),
 
-    Name        NVARCHAR(100) NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
 
     Description NVARCHAR(MAX) NOT NULL,
 
-    ABV         DECIMAL(4, 2)    NOT NULL,
+    ABV DECIMAL(4, 2) NOT NULL,
     -- Alcohol By Volume (typically 0-67%)
 
-    IBU         INT              NOT NULL,
+    IBU INT NOT NULL,
     -- International Bitterness Units (typically 0-120)
 
-    PostedByID  UNIQUEIDENTIFIER NOT NULL,
+    PostedByID UNIQUEIDENTIFIER NOT NULL,
 
     BeerStyleID UNIQUEIDENTIFIER NOT NULL,
 
-    BrewedByID  UNIQUEIDENTIFIER NOT NULL,
+    BrewedByID UNIQUEIDENTIFIER NOT NULL,
 
-    CreatedAt   DATETIME         NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_BeerPost_CreatedAt DEFAULT GETDATE(),
 
-    UpdatedAt   DATETIME,
+    UpdatedAt DATETIME,
 
-    Timer       ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPost
         PRIMARY KEY (BeerPostID),
@@ -538,14 +538,14 @@ CREATE TABLE BeerPostPhoto -- All photos linked to a beer post are deleted if th
     BeerPostPhotoID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerPostPhotoID DEFAULT NEWID(),
 
-    BeerPostID      UNIQUEIDENTIFIER NOT NULL,
+    BeerPostID UNIQUEIDENTIFIER NOT NULL,
 
-    PhotoID         UNIQUEIDENTIFIER NOT NULL,
+    PhotoID UNIQUEIDENTIFIER NOT NULL,
 
-    LinkedAt        DATETIME         NOT NULL
+    LinkedAt DATETIME NOT NULL
         CONSTRAINT DF_BeerPostPhoto_LinkedAt DEFAULT GETDATE(),
 
-    Timer           ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPostPhoto
         PRIMARY KEY (BeerPostPhotoID),
@@ -577,20 +577,20 @@ CREATE TABLE BeerPostComment
     BeerPostCommentID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerPostComment DEFAULT NEWID(),
 
-    Comment           NVARCHAR(250) NOT NULL,
+    Comment NVARCHAR(250) NOT NULL,
 
-    BeerPostID        UNIQUEIDENTIFIER NOT NULL,
+    BeerPostID UNIQUEIDENTIFIER NOT NULL,
 
-    CommentedByID     UNIQUEIDENTIFIER NOT NULL,
+    CommentedByID UNIQUEIDENTIFIER NOT NULL,
 
-    Rating            INT              NOT NULL,
+    Rating INT NOT NULL,
 
-    CreatedAt         DATETIME         NOT NULL
+    CreatedAt DATETIME NOT NULL
         CONSTRAINT DF_BeerPostComment_CreatedAt DEFAULT GETDATE(),
 
-    UpdatedAt         DATETIME NULL,
+    UpdatedAt DATETIME NULL,
 
-    Timer             ROWVERSION,
+    RowVersion ROWVERSION,
 
     CONSTRAINT PK_BeerPostComment
         PRIMARY KEY (BeerPostCommentID),

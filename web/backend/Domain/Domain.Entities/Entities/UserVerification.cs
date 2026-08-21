@@ -1,10 +1,16 @@
 namespace Domain.Entities;
 
-public class UserVerification
+public sealed class UserVerification
 {
+    // PK
     public Guid UserVerificationId { get; set; }
+
+    // FK References
     public Guid UserAccountId { get; set; }
+
+    // Attributes
     public DateTime VerificationDateTime { get; set; }
-    public byte[]? Timer { get; set; }
-    public UserAccount UserAccount { get; set; } = null!;
+
+    // Audit Fields
+    public byte[]? RowVersion { get; set; }
 }

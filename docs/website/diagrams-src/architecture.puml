@@ -23,17 +23,25 @@ package "Feature Slices" #F3E5F5 {
   [Features.Breweries] as BrewerySlice
   [Features.UserManagement] as UserSlice
   [Features.Emails] as EmailsSlice
+  [Features.Locations] as LocationsSlice
   note right of AuthSlice
     Each slice owns its own:
     - Controller (HTTP endpoints)
     - Commands/Queries + Handlers
     - Validators
-    - Repository
+    - Repository (Dapper)
   end note
   note right of EmailsSlice
     No controller - invoked only
     via MediatR commands sent
     from other slices
+  end note
+  note right of LocationsSlice
+    No controller and no MediatR
+    handlers - exposes ILocationRepository
+    directly as a plain DI service.
+    Not registered by API.Core at all;
+    only Database.Seed depends on it today
   end note
 }
 
@@ -61,23 +69,29 @@ package "Domain Layer" #E8F5E9 {
   [Domain.Entities] as Domain
   [Domain.Exceptions] as DomainExceptions
   note right of Domain
-    - UserAccount
-    - UserCredential
-    - UserVerification
-    - BreweryPost
+    - UserAccount, UserCredential, UserVerification
+    - BreweryPost, BreweryPostLocation
+    - City, StateProvince, Country
+    - BeerPost, BeerStyle
+      (schema tables exist; no repository yet)
   end note
 }
 
 database "SQL Server" {
-  [Stored Procedures] as SP
   [Tables] as Tables
 }
+
+node "Database.Seed\n(separate console app)" as Seed
 
 ' Relationships
 API ..> AuthSlice : AddApplicationPart\n+ MediatR scan
 API ..> BrewerySlice : AddApplicationPart\n+ MediatR scan
 API ..> UserSlice : AddApplicationPart\n+ MediatR scan
 API ..> EmailsSlice : MediatR scan only\n(no controller)
+
+Seed ..> AuthSlice : AddFeaturesAuth()\n(DI only, no API/MediatR)
+Seed ..> BrewerySlice : AddFeaturesBreweries()
+Seed ..> LocationsSlice : AddFeaturesLocations()
 
 AuthSlice --> Sql
 AuthSlice --> JWT
@@ -93,6 +107,8 @@ UserSlice --> Sql
 UserSlice --> SharedContracts
 UserSlice --> SharedApp
 
+LocationsSlice --> Sql
+
 EmailsSlice --> Email
 EmailsSlice --> EmailTemplates
 EmailsSlice --> SharedApp
@@ -101,20 +117,25 @@ EmailsSlice --> SharedApp
 AuthSlice ..> SharedApp : sends\nSendRegistrationEmailCommand
 EmailsSlice ..> SharedApp : handles\nSendRegistrationEmailCommand
 
-Sql --> SP
 Sql --> Domain
-SP --> Tables
+
+AuthSlice --> Tables : Dapper SQL
+BrewerySlice --> Tables : Dapper SQL
+UserSlice --> Tables : Dapper SQL
+LocationsSlice --> Tables : Dapper SQL
 
 AuthSlice --> Domain
 BrewerySlice --> Domain
 UserSlice --> Domain
+LocationsSlice --> Domain
 AuthSlice --> DomainExceptions
 
 ' Notes
 note left of Sql
   SQL-first approach
-  All queries via
-  stored procedures
+  Each slice's own repository issues
+  inline SQL via Dapper - no ORM,
+  no stored procedures
 end note
 
 note bottom of AuthSlice

@@ -12,6 +12,7 @@ namespace Infrastructure.Email.Templates.Rendering;
 public class EmailTemplateProvider(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
     : IEmailTemplateProvider
 {
+    /// <inheritdoc/>
     public async Task<string> RenderUserRegisteredEmailAsync(
         string username,
         string confirmationLink
@@ -26,6 +27,7 @@ public class EmailTemplateProvider(IServiceProvider serviceProvider, ILoggerFact
         return await RenderComponentAsync<UserRegistration>(parameters);
     }
 
+    /// <inheritdoc/>
     public async Task<string> RenderResendConfirmationEmailAsync(
         string username,
         string confirmationLink

@@ -14,6 +14,9 @@ namespace API.Core.Controllers;
 [Route("error")] // required
 public class NotFoundController : ControllerBase
 {
+    /// <summary>
+    ///     Returns a 404 response for any request that did not match a route.
+    /// </summary>
     [HttpGet("404")] //required
     public IActionResult Handle404()
     {

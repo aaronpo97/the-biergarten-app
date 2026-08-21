@@ -11,12 +11,12 @@ using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Jwt;
-using Infrastructure.Sql;
+using Infrastructure.Sql.DependencyInjection;
 using Shared.Application.Behaviors;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Global Exception Filter
+// Add current controllers to the exception filter
 builder
     .Services.AddControllers(options =>
     {
@@ -37,7 +37,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
-// Add MediatR. Each Features.* slice's assembly is registered here as it's introduced;
+// Add MediatR.
 // ValidationBehavior runs FluentValidation validators in the MediatR pipeline for command/query handlers.
 builder.Services.AddMediatR(cfg =>
 {
@@ -60,15 +60,14 @@ if (!builder.Environment.IsProduction())
 
 // Configure Dependency Injection -------------------------------------------------------------------------------------
 
-builder.Services.AddSingleton<ISqlConnectionFactory, DefaultSqlConnectionFactory>();
+builder.Services.AddInfrastructureSql();
 
 builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();
 builder.Services.AddFeaturesAuth();
 builder.Services.AddFeaturesEmails();
 
-// ITokenInfrastructure is registered here (not inside Features.Auth's own DI extension) because
-// JwtAuthenticationHandler, a host-level auth middleware concern, also depends on it directly.
+// ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
 
 // Register the exception filter

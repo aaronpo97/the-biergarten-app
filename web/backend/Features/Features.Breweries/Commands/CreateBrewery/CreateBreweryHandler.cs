@@ -5,10 +5,14 @@ using MediatR;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
+/// <summary>Handles <see cref="CreateBreweryCommand" /> by persisting a new brewery post.</summary>
 public class CreateBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<CreateBreweryCommand, BreweryDto>
 {
     /// <summary>Creates a new brewery post, generating new identifiers for the post and its location.</summary>
+    /// <exception cref="Domain.Exceptions.NotFoundException">
+    ///     Thrown when <paramref name="request" />'s <c>PostedById</c> or <c>Location.CityId</c> does not exist.
+    /// </exception>
     public async Task<BreweryDto> Handle(
         CreateBreweryCommand request,
         CancellationToken cancellationToken

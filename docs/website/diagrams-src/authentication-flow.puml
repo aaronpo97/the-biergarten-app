@@ -9,11 +9,11 @@ title User Authentication Flow - Expanded
 
 actor User
 participant "API\nController" as API
-box "Service Layer" #LightBlue
-participant "RegisterService" as RegSvc
-participant "LoginService" as LoginSvc
+participant "MediatR pipeline\n(ValidationBehavior)" as Mediator
+box "Handler Layer" #LightBlue
+participant "RegisterUserHandler" as RegHandler
+participant "LoginHandler" as LoginHandler
 participant "TokenService" as TokenSvc
-participant "EmailService" as EmailSvc
 end box
 box "Infrastructure Layer" #LightGreen
 participant "Argon2\nInfrastructure" as Argon2
@@ -21,55 +21,59 @@ participant "JWT\nInfrastructure" as JWT
 participant "Email\nProvider" as SMTP
 participant "Template\nProvider" as Template
 end box
-box "Repository Layer" #LightYellow
+box "Repository / Cross-slice" #LightYellow
 participant "AuthRepository" as AuthRepo
-participant "UserAccount\nRepository" as UserRepo
+participant "EmailDispatcher\n(Features.Emails)" as EmailDispatcher
 end box
-database "SQL Server\nStored Procedures" as DB
+database "SQL Server" as DB
 
 == Registration Flow ==
 
 User -> API: POST /api/auth/register\n{username, firstName, lastName,\nemail, dateOfBirth, password}
 activate API
 
-note right of API
-  FluentValidation runs:
+API -> Mediator: Send(RegisterUserCommand)
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs RegisterUserValidator
+  (FluentValidation) before the handler:
   - Username: 3-64 chars, alphanumeric + [._-]
   - Email: valid format, max 128 chars
   - Password: min 8 chars, uppercase,\n    lowercase, number, special char
   - DateOfBirth: must be 19+ years old
 end note
 
-API -> API: Validate request\n(FluentValidation)
-
 alt Validation fails
-  API -> User: 400 Bad Request\n{errors: {...}}
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request\n{message: "Validation failed", errors: {...}}
 else Validation succeeds
-  API -> RegSvc: RegisterAsync(userAccount, password)
-  activate RegSvc
+  Mediator -> RegHandler: Handle(command)
+  activate RegHandler
 
-  RegSvc -> AuthRepo: GetUserByUsernameAsync(username)
+  RegHandler -> AuthRepo: GetUserByUsernameAsync(username)
   activate AuthRepo
-  AuthRepo -> DB: EXEC usp_GetUserAccountByUsername
+  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
   activate DB
   DB --> AuthRepo: null (user doesn't exist)
   deactivate DB
   deactivate AuthRepo
 
-  RegSvc -> AuthRepo: GetUserByEmailAsync(email)
+  RegHandler -> AuthRepo: GetUserByEmailAsync(email)
   activate AuthRepo
-  AuthRepo -> DB: EXEC usp_GetUserAccountByEmail
+  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Email = @Email
   activate DB
   DB --> AuthRepo: null (email doesn't exist)
   deactivate DB
   deactivate AuthRepo
 
-  alt User/Email already exists
-    RegSvc -> API: throw ConflictException
+  alt Username or email already exists
+    RegHandler -> Mediator: throw ConflictException
+    Mediator -> API: propagate
     API -> User: 409 Conflict\n"Username or email already exists"
-  else User doesn't exist
+  else Username and email are free
 
-    RegSvc -> Argon2: Hash(password)
+    RegHandler -> Argon2: Hash(password)
     activate Argon2
     note right of Argon2
       Argon2id parameters:
@@ -81,33 +85,39 @@ else Validation succeeds
     end note
     Argon2 -> Argon2: Generate random salt\n(16 bytes)
     Argon2 -> Argon2: Hash password with\nArgon2id algorithm
-    Argon2 --> RegSvc: "base64(salt):base64(hash)"
+    Argon2 --> RegHandler: "base64(salt):base64(hash)"
     deactivate Argon2
 
-    RegSvc -> AuthRepo: RegisterUserAsync(\n  username, firstName, lastName,\n  email, dateOfBirth, hash)
+    RegHandler -> AuthRepo: RegisterUserAsync(userAccount)
     activate AuthRepo
 
-    AuthRepo -> DB: EXEC USP_RegisterUser
+    AuthRepo -> DB: BEGIN TRANSACTION
+    activate DB
+    AuthRepo -> DB: INSERT INTO dbo.UserAccount\n(Username, FirstName, LastName,\nDateOfBirth, Email)\nOUTPUT INSERTED.UserAccountID
+    DB --> AuthRepo: UserAccountId (GUID)
+    AuthRepo -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
+    AuthRepo -> DB: COMMIT TRANSACTION
+    deactivate DB
+    note right of AuthRepo
+      All three statements run via Dapper's
+      ExecuteScalarAsync/ExecuteAsync against
+      a single DbTransaction, not a stored
+      procedure - no manual parameter binding
+    end note
+
+    AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @UserAccountId
     activate DB
     note right of DB
-      Transaction begins:
-      1. INSERT UserAccount
-      2. INSERT UserCredential
-         (with hashed password)
-      Transaction commits
+      Round trip to load the row the
+      INSERT just created
     end note
-    DB -> DB: BEGIN TRANSACTION
-    DB -> DB: INSERT INTO UserAccount\n(Username, FirstName, LastName,\nEmail, DateOfBirth)
-    DB -> DB: OUTPUT INSERTED.UserAccountID
-    DB -> DB: INSERT INTO UserCredential\n(UserAccountId, Hash)
-    DB -> DB: COMMIT TRANSACTION
-    DB --> AuthRepo: UserAccountId (GUID)
+    DB --> AuthRepo: UserAccount row
     deactivate DB
 
-    AuthRepo --> RegSvc: UserAccount entity
+    AuthRepo --> RegHandler: UserAccount entity
     deactivate AuthRepo
 
-    RegSvc -> TokenSvc: GenerateAccessToken(userAccount)
+    RegHandler -> TokenSvc: GenerateAccessToken(user)
     activate TokenSvc
     TokenSvc -> JWT: GenerateJwt(userId, username, expiry)
     activate JWT
@@ -118,33 +128,55 @@ else Validation succeeds
       - Claims:
         * sub: userId
         * unique_name: username
-        * jti: unique token ID
+        * iat / jti
     end note
     JWT -> JWT: Create JWT with claims
     JWT -> JWT: Sign with secret key
     JWT --> TokenSvc: Access Token
     deactivate JWT
-    TokenSvc --> RegSvc: Access Token
+    TokenSvc --> RegHandler: Access Token
     deactivate TokenSvc
 
-    RegSvc -> TokenSvc: GenerateRefreshToken(userAccount)
+    RegHandler -> TokenSvc: GenerateRefreshToken(user)
     activate TokenSvc
     TokenSvc -> JWT: GenerateJwt(userId, username, expiry)
     activate JWT
     note right of JWT
       Refresh Token:
-      - Expires: 21 days
-      - Same structure as access token
+      - Expires: 21 days (504 hours)
+      - Same structure as access token,\n    signed with a separate secret
     end note
     JWT --> TokenSvc: Refresh Token
     deactivate JWT
-    TokenSvc --> RegSvc: Refresh Token
+    TokenSvc --> RegHandler: Refresh Token
     deactivate TokenSvc
 
-    RegSvc -> EmailSvc: SendRegistrationEmailAsync(\n  createdUser, confirmationToken)
-    activate EmailSvc
+    RegHandler -> TokenSvc: GenerateConfirmationToken(user)
+    activate TokenSvc
+    TokenSvc -> JWT: GenerateJwt(userId, username, expiry)
+    activate JWT
+    note right of JWT
+      Confirmation Token:
+      - Expires: 30 minutes (0.5 hours)
+      - Signed with a third, separate secret
+    end note
+    JWT --> TokenSvc: Confirmation Token
+    deactivate JWT
+    TokenSvc --> RegHandler: Confirmation Token
+    deactivate TokenSvc
 
-    EmailSvc -> Template: RenderUserRegisteredEmailAsync(\n  firstName, confirmationLink)
+    RegHandler -> Mediator: Send(SendRegistrationEmailCommand)\n(Shared.Application cross-slice contract)
+    activate Mediator
+    Mediator -> EmailDispatcher: SendRegistrationEmailAsync(\n  firstName, email, confirmationToken)
+    note right of Mediator
+      Routed to Features.Emails'
+      SendRegistrationEmailHandler,
+      the only cross-slice call in
+      the backend
+    end note
+    activate EmailDispatcher
+
+    EmailDispatcher -> Template: RenderUserRegisteredEmailAsync(\n  firstName, confirmationLink)
     activate Template
     note right of Template
       Razor Component:
@@ -154,38 +186,37 @@ else Validation succeeds
       - Footer
     end note
     Template -> Template: Render Razor component\nto HTML
-    Template --> EmailSvc: HTML email content
+    Template --> EmailDispatcher: HTML email content
     deactivate Template
 
-    EmailSvc -> SMTP: SendAsync(email, subject, body)
+    EmailDispatcher -> SMTP: SendAsync(email, subject, body)
     activate SMTP
     note right of SMTP
-      SMTP Configuration:
-      - Host: from env (SMTP_HOST)
-      - Port: from env (SMTP_PORT)
-      - TLS: StartTLS
-      - Auth: username/password
+      SMTP Configuration (MailKit):
+      - Host/port: from env (SMTP_HOST/SMTP_PORT)
+      - TLS: StartTLS when SMTP_USE_SSL=true
+      - Auth: username/password, if configured
     end note
-    SMTP -> SMTP: Create MIME message
-    SMTP -> SMTP: Connect to SMTP server
-    SMTP -> SMTP: Authenticate
-    SMTP -> SMTP: Send email
-    SMTP -> SMTP: Disconnect
-    SMTP --> EmailSvc: Success / Failure
+    SMTP -> SMTP: Build MIME message
+    SMTP -> SMTP: Connect, authenticate,\nsend, disconnect
+    SMTP --> EmailDispatcher: Success / throws
     deactivate SMTP
 
+    deactivate EmailDispatcher
+    deactivate Mediator
+
     alt Email sent successfully
-      EmailSvc --> RegSvc: emailSent = true
-    else Email failed
-      EmailSvc --> RegSvc: emailSent = false\n(error suppressed)
+      RegHandler -> RegHandler: emailSent = true
+    else mediator.Send throws
+      RegHandler -> RegHandler: catch(Exception),\nlog to stderr,\nemailSent = false
     end
-    deactivate EmailSvc
 
-    RegSvc --> API: RegisterServiceReturn(\n  userAccount, accessToken,\n  refreshToken, emailSent)
-    deactivate RegSvc
+    RegHandler --> Mediator: RegistrationPayload(\n  userAccountId, username,\n  refreshToken, accessToken,\n  confirmationEmailSent)
+    deactivate RegHandler
+    Mediator --> API: RegistrationPayload
+    deactivate Mediator
 
-    API -> API: Create response body
-    API -> User: 201 Created\n{\n  message: "User registered successfully",\n  payload: {\n    userAccountId, username,\n    accessToken, refreshToken,\n    confirmationEmailSent\n  }\n}
+    API -> User: 201 Created\n{\n  message: "User registered successfully.",\n  payload: {\n    userAccountId, username,\n    refreshToken, accessToken,\n    confirmationEmailSent\n  }\n}
   end
 end
 deactivate API
@@ -195,88 +226,94 @@ deactivate API
 User -> API: POST /api/auth/login\n{username, password}
 activate API
 
-API -> API: Validate request\n(FluentValidation)
+API -> Mediator: Send(LoginCommand)
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs LoginValidator:
+  username and password must both be non-empty
+end note
 
 alt Validation fails
-  API -> User: 400 Bad Request\n{errors: {...}}
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request\n{message: "Validation failed", errors: {...}}
 else Validation succeeds
 
-  API -> LoginSvc: LoginAsync(username, password)
-  activate LoginSvc
+  Mediator -> LoginHandler: Handle(command)
+  activate LoginHandler
 
-  LoginSvc -> AuthRepo: GetUserByUsernameAsync(username)
+  LoginHandler -> AuthRepo: GetUserByUsernameAsync(username)
   activate AuthRepo
-  AuthRepo -> DB: EXEC usp_GetUserAccountByUsername
+  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
   activate DB
-  DB -> DB: SELECT FROM UserAccount\nWHERE Username = @Username
-  DB --> AuthRepo: UserAccount entity
+  DB --> AuthRepo: UserAccount row or null
   deactivate DB
   deactivate AuthRepo
 
   alt User not found
-    LoginSvc -> API: throw UnauthorizedException\n"Invalid username or password"
+    LoginHandler -> Mediator: throw UnauthorizedException\n"Invalid username or password."
+    Mediator -> API: propagate
     API -> User: 401 Unauthorized
   else User found
 
-    LoginSvc -> AuthRepo: GetActiveCredentialByUserAccountIdAsync(userId)
+    LoginHandler -> AuthRepo: GetActiveCredentialByUserAccountIdAsync(userId)
     activate AuthRepo
-    AuthRepo -> DB: EXEC USP_GetActiveUserCredentialByUserAccountId
+    AuthRepo -> DB: SELECT UserCredentialId, UserAccountId,\nHash, CreatedAt, RowVersion\nFROM dbo.UserCredential\nWHERE UserAccountId = @UserAccountId\n  AND IsRevoked = 0
     activate DB
-    note right of DB
-      SELECT FROM UserCredential
-      WHERE UserAccountId = @UserAccountId
-        AND IsRevoked = 0
-    end note
-    DB --> AuthRepo: UserCredential entity
+    DB --> AuthRepo: UserCredential row or null
     deactivate DB
     deactivate AuthRepo
 
     alt No active credential
-      LoginSvc -> API: throw UnauthorizedException
+      LoginHandler -> Mediator: throw UnauthorizedException
+      Mediator -> API: propagate
       API -> User: 401 Unauthorized
     else Active credential found
 
-      LoginSvc -> Argon2: Verify(password, storedHash)
+      LoginHandler -> Argon2: Verify(password, storedHash)
       activate Argon2
       note right of Argon2
         1. Split stored hash: "salt:hash"
         2. Extract salt
         3. Hash provided password\n   with same salt
-        4. Constant-time comparison
+        4. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
       end note
       Argon2 -> Argon2: Parse salt from stored hash
       Argon2 -> Argon2: Hash provided password\nwith extracted salt
       Argon2 -> Argon2: FixedTimeEquals(\n  computed, stored)
-      Argon2 --> LoginSvc: true/false
+      Argon2 --> LoginHandler: true/false
       deactivate Argon2
 
       alt Password invalid
-        LoginSvc -> API: throw UnauthorizedException
+        LoginHandler -> Mediator: throw UnauthorizedException
+        Mediator -> API: propagate
         API -> User: 401 Unauthorized
       else Password valid
 
-        LoginSvc -> TokenSvc: GenerateAccessToken(user)
+        LoginHandler -> TokenSvc: GenerateAccessToken(user)
         activate TokenSvc
         TokenSvc -> JWT: GenerateJwt(...)
         activate JWT
         JWT --> TokenSvc: Access Token
         deactivate JWT
-        TokenSvc --> LoginSvc: Access Token
+        TokenSvc --> LoginHandler: Access Token
         deactivate TokenSvc
 
-        LoginSvc -> TokenSvc: GenerateRefreshToken(user)
+        LoginHandler -> TokenSvc: GenerateRefreshToken(user)
         activate TokenSvc
         TokenSvc -> JWT: GenerateJwt(...)
         activate JWT
         JWT --> TokenSvc: Refresh Token
         deactivate JWT
-        TokenSvc --> LoginSvc: Refresh Token
+        TokenSvc --> LoginHandler: Refresh Token
         deactivate TokenSvc
 
-        LoginSvc --> API: LoginServiceReturn(\n  userAccount, accessToken,\n  refreshToken)
-        deactivate LoginSvc
+        LoginHandler --> Mediator: LoginPayload(\n  userAccountId, username,\n  refreshToken, accessToken)
+        deactivate LoginHandler
+        Mediator --> API: LoginPayload
+        deactivate Mediator
 
-        API -> User: 200 OK\n{\n  message: "Logged in successfully",\n  payload: {\n    userAccountId, username,\n    accessToken, refreshToken\n  }\n}
+        API -> User: 200 OK\n{\n  message: "Logged in successfully.",\n  payload: {\n    userAccountId, username,\n    refreshToken, accessToken\n  }\n}
       end
     end
   end
@@ -286,13 +323,15 @@ deactivate API
 == Error Handling (Global Exception Filter) ==
 
 note over API
-  GlobalExceptionFilter catches:
-  - ValidationException → 400 Bad Request
-  - ConflictException → 409 Conflict
-  - NotFoundException → 404 Not Found
-  - UnauthorizedException → 401 Unauthorized
-  - ForbiddenException → 403 Forbidden
-  - All others → 500 Internal Server Error
+  API.Core's GlobalExceptionFilter catches:
+  - FluentValidation.ValidationException -> 400 Bad Request\n    {message, errors} (grouped by property)
+  - ConflictException -> 409 Conflict
+  - NotFoundException -> 404 Not Found
+  - UnauthorizedException -> 401 Unauthorized
+  - ForbiddenException -> 403 Forbidden
+  - Domain.Exceptions.ValidationException -> 400 Bad Request
+  - Microsoft.Data.SqlClient.SqlException -> 503 Service Unavailable
+  - All others -> 500 Internal Server Error
 end note
 
 @enduml

@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Exceptions;
 
 namespace Features.UserManagement.Repository;
 
@@ -7,30 +8,26 @@ namespace Features.UserManagement.Repository;
 /// </summary>
 public interface IUserAccountRepository
 {
-    /// <summary>
-    ///     Retrieves a user account by its unique identifier, or <c>null</c> if not found.
-    /// </summary>
+    /// <summary>Returns <c>null</c> if no user account exists with the given ID.</summary>
     Task<UserAccount?> GetByIdAsync(Guid id);
 
-    /// <summary>
-    ///     Retrieves all user accounts, optionally paginated.
-    /// </summary>
+    /// <summary>Returns user accounts ordered by creation date descending.</summary>
     /// <param name="limit"><c>null</c> for no limit.</param>
     /// <param name="offset"><c>null</c> for no offset.</param>
     Task<IEnumerable<UserAccount>> GetAllAsync(int? limit, int? offset);
 
+    /// <summary>Updates the mutable fields of an existing user account.</summary>
     /// <param name="userAccount">Must have a valid <c>UserAccountId</c>.</param>
+    /// <exception cref="NotFoundException">Thrown when no user account exists with the given ID.</exception>
     Task UpdateAsync(UserAccount userAccount);
 
+    /// <summary>Deletes the user account with the given ID.</summary>
+    /// <exception cref="NotFoundException">Thrown when no user account exists with the given ID.</exception>
     Task DeleteAsync(Guid id);
 
-    /// <summary>
-    ///     Retrieves a user account by username, or <c>null</c> if not found.
-    /// </summary>
+    /// <summary>Returns <c>null</c> if no user account exists with the given username.</summary>
     Task<UserAccount?> GetByUsernameAsync(string username);
 
-    /// <summary>
-    ///     Retrieves a user account by email address, or <c>null</c> if not found.
-    /// </summary>
+    /// <summary>Returns <c>null</c> if no user account exists with the given email address.</summary>
     Task<UserAccount?> GetByEmailAsync(string email);
 }

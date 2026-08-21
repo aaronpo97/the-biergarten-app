@@ -113,7 +113,7 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
   }
 
   node "unit.tests\n(Features.*.Tests, one container)" as UnitTests {
-    component "xUnit + Moq + DbMocker" as UnitComp
+    component "xUnit + Moq" as UnitComp
     note right
       Builds Dockerfile.tests, which
       restores/builds against Core.slnx
@@ -124,8 +124,8 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
       - Features.UserManagement.Tests
       - Features.Emails.Tests
 
-      Uses: Moq for handlers,
-      DbMocker for repositories
+      Uses: Moq to mock each handler's
+      repository/service dependencies
       No real database needed
     end note
   }
@@ -164,7 +164,7 @@ DevAPI .up.> DevSeed : depends_on
 TestMig --> TestDB : 1. Migrate
 TestSeed --> TestDB : 2. Seed
 Specs --> TestDB : 3. Integration test
-UnitTests ..> TestDB : depends_on for startup\nordering only (Moq/DbMocker,\nno real connection)
+UnitTests ..> TestDB : depends_on for startup\nordering only (Moq mocks,\nno real connection)
 
 TestMig .up.> TestDB : depends_on
 TestSeed .up.> TestMig : depends_on

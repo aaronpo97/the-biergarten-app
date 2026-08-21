@@ -12,6 +12,7 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
+    /// <inheritdoc/>
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,

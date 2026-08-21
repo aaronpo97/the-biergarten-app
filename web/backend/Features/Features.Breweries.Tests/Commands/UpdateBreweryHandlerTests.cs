@@ -21,6 +21,7 @@ public class UpdateBreweryHandlerTests
     {
         UpdateBreweryCommand command = new(
             Guid.NewGuid(),
+            [0x01, 0x02],
             Guid.NewGuid(),
             "Renamed",
             "New description",
@@ -31,7 +32,7 @@ public class UpdateBreweryHandlerTests
         _repoMock
             .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
             .Callback<BreweryPost>(b => persisted = b)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(() => persisted!);
 
         DateTime before = DateTime.UtcNow;
         await _handler.Handle(command, CancellationToken.None);
@@ -42,6 +43,7 @@ public class UpdateBreweryHandlerTests
         persisted.PostedById.Should().Be(command.PostedById);
         persisted.BreweryName.Should().Be("Renamed");
         persisted.Description.Should().Be("New description");
+        persisted.RowVersion.Should().Equal(command.RowVersion);
         persisted.UpdatedAt.Should().NotBeNull();
         persisted.UpdatedAt!.Value.Should().BeOnOrAfter(before).And.BeOnOrBefore(after);
     }
@@ -51,6 +53,7 @@ public class UpdateBreweryHandlerTests
     {
         UpdateBreweryCommand command = new(
             Guid.NewGuid(),
+            [0x01, 0x02],
             Guid.NewGuid(),
             "Name",
             "Description",
@@ -61,7 +64,7 @@ public class UpdateBreweryHandlerTests
         _repoMock
             .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
             .Callback<BreweryPost>(b => persisted = b)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);
 
@@ -81,6 +84,7 @@ public class UpdateBreweryHandlerTests
         );
         UpdateBreweryCommand command = new(
             Guid.NewGuid(),
+            [0x01, 0x02],
             Guid.NewGuid(),
             "Name",
             "Description",
@@ -91,7 +95,7 @@ public class UpdateBreweryHandlerTests
         _repoMock
             .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
             .Callback<BreweryPost>(b => persisted = b)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);
 

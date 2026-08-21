@@ -14,9 +14,7 @@ public class Argon2Infrastructure : IPasswordInfrastructure
     private const int ArgonIterations = 4;
     private const int ArgonMemoryKb = 65536; // 64MB
 
-    /// <summary>
-    ///     Hashes a plaintext password using Argon2id with a fresh random salt.
-    /// </summary>
+    /// <inheritdoc />
     /// <returns>A string of the form <c>"{base64Salt}:{base64Hash}"</c>, suitable for storage.</returns>
     public string Hash(string password)
     {
@@ -33,10 +31,8 @@ public class Argon2Infrastructure : IPasswordInfrastructure
         return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
-    /// <summary>
-    ///     Verifies a plaintext password against a stored salt/hash string, using a fixed-time comparison
-    ///     to mitigate timing attacks.
-    /// </summary>
+    /// <inheritdoc />
+    /// <remarks>Uses a fixed-time comparison to mitigate timing attacks.</remarks>
     /// <returns>
     ///     <c>false</c> if the password doesn't match, if <paramref name="stored" /> is malformed, or if any
     ///     other error occurs during verification.
