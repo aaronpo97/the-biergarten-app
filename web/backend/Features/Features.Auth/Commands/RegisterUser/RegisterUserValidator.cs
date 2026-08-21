@@ -2,6 +2,10 @@ using FluentValidation;
 
 namespace Features.Auth.Commands.RegisterUser;
 
+/// <summary>
+///     Validates the field-level constraints on <see cref="RegisterUserCommand" />: username format and
+///     length, name lengths, email format, minimum age of 19, and password complexity.
+/// </summary>
 public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
 {
     public RegisterUserValidator()

@@ -5,8 +5,10 @@ namespace Shared.Contracts;
 /// </summary>
 public record ResponseBody<T>
 {
+    /// <summary>Gets the human-readable message describing the response.</summary>
     public required string Message { get; init; }
 
+    /// <summary>Gets the response's data payload.</summary>
     public required T Payload { get; init; }
 }
 
@@ -15,5 +17,6 @@ public record ResponseBody<T>
 /// </summary>
 public record ResponseBody
 {
+    /// <summary>Gets the human-readable message describing the response.</summary>
     public required string Message { get; init; }
 }

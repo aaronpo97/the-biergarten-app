@@ -2,6 +2,7 @@
 using System.Reflection;
 using DbUp;
 using DbUp.Engine;
+using Infrastructure.Sql;
 using Microsoft.Data.SqlClient;
 
 namespace Database.Migrations;
@@ -96,12 +97,6 @@ public static class Program
         Console.WriteLine($"Database '{settings.DatabaseName}' is present.");
     }
 
-    /// <summary>
-    ///     Opens a connection, executes a non-query batch parameterised by database name, and
-    ///     disposes both the command and the connection.
-    /// </summary>
-    /// <param name="connectionString">The connection string to open.</param>
-    /// <param name="sql">The Transact-SQL batch to execute.</param>
     /// <param name="databaseName">The value bound to the <c>@databaseName</c> parameter.</param>
     private static async Task ExecuteNonQueryAsync(
         string connectionString,
@@ -171,16 +166,11 @@ public static class Program
         /// </exception>
         public static DatabaseSettings FromEnvironment()
         {
-            string server = Required("DB_SERVER");
-            string databaseName = Required("DB_NAME");
-            string user = Required("DB_USER");
-            string password = Required("DB_PASSWORD");
-
-            bool trustServerCertificate =
-                !bool.TryParse(
-                    Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE"),
-                    out bool parsedTrust
-                ) || parsedTrust;
+            string databaseName =
+                Environment.GetEnvironmentVariable("DB_NAME")
+                ?? throw new InvalidOperationException(
+                    "The DB_NAME environment variable is not set."
+                );
 
             bool clearDatabase = string.Equals(
                 Environment.GetEnvironmentVariable("CLEAR_DATABASE"),
@@ -189,28 +179,11 @@ public static class Program
             );
 
             return new DatabaseSettings(
-                Build(databaseName),
-                Build("master"),
+                SqlConnectionStringHelper.BuildConnectionString(databaseName),
+                SqlConnectionStringHelper.BuildMasterConnectionString(),
                 databaseName,
                 clearDatabase
             );
-
-            string Build(string initialCatalog) =>
-                new SqlConnectionStringBuilder
-                {
-                    DataSource = server,
-                    InitialCatalog = initialCatalog,
-                    UserID = user,
-                    Password = password,
-                    Encrypt = true,
-                    TrustServerCertificate = trustServerCertificate,
-                }.ConnectionString;
         }
-
-        private static string Required(string variableName) =>
-            Environment.GetEnvironmentVariable(variableName)
-            ?? throw new InvalidOperationException(
-                $"The {variableName} environment variable is not set."
-            );
     }
 }

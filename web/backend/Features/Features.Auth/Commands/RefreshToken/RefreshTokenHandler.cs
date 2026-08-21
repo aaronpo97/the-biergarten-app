@@ -11,6 +11,10 @@ namespace Features.Auth.Commands.RefreshToken;
 public class RefreshTokenHandler(ITokenService tokenService)
     : IRequestHandler<RefreshTokenCommand, LoginPayload>
 {
+    /// <exception cref="Domain.Exceptions.UnauthorizedException">
+    ///     Thrown when the refresh token is invalid or expired, or when the user account it refers to no
+    ///     longer exists.
+    /// </exception>
     public async Task<LoginPayload> Handle(
         RefreshTokenCommand request,
         CancellationToken cancellationToken

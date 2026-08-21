@@ -68,13 +68,13 @@ public class RegisterUserHandlerTests
         _authRepoMock
             .Setup(x =>
                 x.RegisterUserAsync(
-                    new UserRegistrationDto(
-                        command.Username,
-                        command.FirstName,
-                        command.LastName,
-                        command.Email,
-                        command.DateOfBirth,
-                        hashedPassword
+                    It.Is<UserAccount>(ua =>
+                        ua.FirstName == command.FirstName
+                        && ua.LastName == command.LastName
+                        && ua.Username == command.Username
+                        && ua.Email == command.Email
+                        && ua.DateOfBirth == command.DateOfBirth
+                        && ua.UserCredential!.Hash == hashedPassword
                     )
                 )
             )
@@ -141,7 +141,7 @@ public class RegisterUserHandlerTests
             .WithMessage("Username or email already exists");
 
         _authRepoMock.Verify(
-            x => x.RegisterUserAsync(It.IsAny<UserRegistrationDto>()),
+            x => x.RegisterUserAsync(It.IsAny<UserAccount>()),
             Times.Never
         );
     }
@@ -186,7 +186,7 @@ public class RegisterUserHandlerTests
         _authRepoMock
             .Setup(x =>
                 x.RegisterUserAsync(
-                    It.Is<UserRegistrationDto>(dto => dto.PasswordHash == hashedPassword)
+                    It.Is<UserAccount>(ua => ua.UserCredential!.Hash == hashedPassword)
                 )
             )
             .ReturnsAsync(new UserAccount { UserAccountId = Guid.NewGuid() });
@@ -204,13 +204,13 @@ public class RegisterUserHandlerTests
         _authRepoMock.Verify(
             x =>
                 x.RegisterUserAsync(
-                    new UserRegistrationDto(
-                        command.Username,
-                        command.FirstName,
-                        command.LastName,
-                        command.Email,
-                        command.DateOfBirth,
-                        hashedPassword
+                    It.Is<UserAccount>(ua =>
+                        ua.FirstName == command.FirstName
+                        && ua.LastName == command.LastName
+                        && ua.Username == command.Username
+                        && ua.DateOfBirth == command.DateOfBirth
+                        && ua.Email == command.Email
+                        && ua.UserCredential!.Hash == hashedPassword
                     )
                 ),
             Times.Once
@@ -230,7 +230,7 @@ public class RegisterUserHandlerTests
             .ReturnsAsync((UserAccount?)null);
         _passwordInfraMock.Setup(x => x.Hash(It.IsAny<string>())).Returns("hashed");
         _authRepoMock
-            .Setup(x => x.RegisterUserAsync(It.IsAny<UserRegistrationDto>()))
+            .Setup(x => x.RegisterUserAsync(It.IsAny<UserAccount>()))
             .ReturnsAsync(
                 new UserAccount
                 {

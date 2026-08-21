@@ -88,12 +88,26 @@ WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 
 **Generate Secrets**:
 
-```bash
-# macOS/Linux - Generate 127-character base64 secret
-openssl rand -base64 127
+**macOS/Linux - Generate a cryptographically secure base64 secret (127 raw bytes)**
 
-# Windows PowerShell
-[Convert]::ToBase64String((1..127 | %{Get-Random -Max 256}))
+```bash
+openssl rand -base64 127
+```
+
+**Windows - PowerShell 5.1 compatible (cryptographically secure, 127 raw bytes)**
+
+```powershell
+$bytes = New-Object byte[] 127
+$rng = [System.Security.Cryptography.RNGCryptoServiceProvider]::new()
+$rng.GetBytes($bytes)
+[Convert]::ToBase64String($bytes)
+$rng.Dispose()
+```
+
+**Windows - PowerShell 7+ compatible (cryptographically secure, 127 raw bytes)**
+
+```powershell
+[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(127))
 ```
 
 **Token Expiration**:
@@ -166,8 +180,8 @@ NODE_ENV=development                     # Standard Node runtime mode
 
 ### SMTP configuration (backend)
 
-Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation
-and account emails.
+Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation and
+account emails.
 
 ```bash
 SMTP_HOST=mailpit                        # Required, no default
@@ -183,8 +197,8 @@ SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten
   startup if `SMTP_HOST` or `SMTP_FROM_EMAIL` is missing
 - **Local dev**: point at the `mailpit` Docker service (SMTP on port 1025, web
   UI on http://localhost:8025)
-- **Production**: point at a real provider (SendGrid, Mailgun, Amazon SES,
-  and so on)
+- **Production**: point at a real provider (SendGrid, Mailgun, Amazon SES, and
+  so on)
 
 ## Docker-specific variables
 
@@ -234,35 +248,35 @@ reference only and is not run as part of the active stack.
 
 ## Variable reference table
 
-| Variable                      | Backend | Frontend | Docker | Required | Notes                      |
-| ----------------------------- | :-----: | :------: | :----: | :------: | -------------------------- |
-| `DB_SERVER`                   |    ✓    |          |   ✓    |  Yes\*   | SQL Server address         |
-| `DB_NAME`                     |    ✓    |          |   ✓    |  Yes\*   | Database name              |
-| `DB_USER`                     |    ✓    |          |   ✓    |  Yes\*   | SQL username               |
-| `DB_PASSWORD`                 |    ✓    |          |   ✓    |  Yes\*   | SQL password               |
-| `DB_CONNECTION_STRING`        |    ✓    |          |        |  Yes\*   | Alternative to components  |
-| `DB_TRUST_SERVER_CERTIFICATE` |    ✓    |          |   ✓    |    No    | Defaults to `True`         |
-| `ACCESS_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Access token signing       |
-| `REFRESH_TOKEN_SECRET`        |    ✓    |          |   ✓    |   Yes    | Refresh token signing      |
-| `CONFIRMATION_TOKEN_SECRET`   |    ✓    |          |   ✓    |   Yes    | Confirmation token signing |
-| `WEBSITE_BASE_URL`            |    ✓    |          |        |   Yes    | Website URL for emails     |
-| `SMTP_HOST`                   |    ✓    |          |   ✓    |   Yes    | SMTP server host           |
-| `SMTP_PORT`                   |    ✓    |          |   ✓    |    No    | Defaults to `587`          |
-| `SMTP_USERNAME`                |    ✓    |          |   ✓    |    No    | SMTP auth username         |
-| `SMTP_PASSWORD`                |    ✓    |          |   ✓    |    No    | SMTP auth password         |
-| `SMTP_USE_SSL`                 |    ✓    |          |   ✓    |    No    | Defaults to `true`         |
-| `SMTP_FROM_EMAIL`              |    ✓    |          |   ✓    |   Yes    | Email sender address       |
-| `SMTP_FROM_NAME`               |    ✓    |          |   ✓    |    No    | Defaults to `The Biergarten` |
-| `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL    |
-| `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing    |
-| `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode               |
-| `CLEAR_DATABASE`              |    ✓    |          |   ✓    |    No    | Dev/test reset flag        |
-| `ASPNETCORE_ENVIRONMENT`      |    ✓    |          |   ✓    |   Yes    | ASP.NET environment        |
-| `ASPNETCORE_URLS`             |    ✓    |          |   ✓    |   Yes    | API binding address        |
-| `SA_PASSWORD`                 |         |          |   ✓    |   Yes    | SQL Server container       |
-| `ACCEPT_EULA`                 |         |          |   ✓    |   Yes    | SQL Server EULA            |
-| `MSSQL_PID`                   |         |          |   ✓    |    No    | SQL Server edition         |
-| `DOTNET_RUNNING_IN_CONTAINER` |    ✓    |          |   ✓    |    No    | Container flag             |
+| Variable                      | Backend | Frontend | Docker | Required | Notes                        |
+| ----------------------------- | :-----: | :------: | :----: | :------: | ---------------------------- |
+| `DB_SERVER`                   |    ✓    |          |   ✓    |  Yes\*   | SQL Server address           |
+| `DB_NAME`                     |    ✓    |          |   ✓    |  Yes\*   | Database name                |
+| `DB_USER`                     |    ✓    |          |   ✓    |  Yes\*   | SQL username                 |
+| `DB_PASSWORD`                 |    ✓    |          |   ✓    |  Yes\*   | SQL password                 |
+| `DB_CONNECTION_STRING`        |    ✓    |          |        |  Yes\*   | Alternative to components    |
+| `DB_TRUST_SERVER_CERTIFICATE` |    ✓    |          |   ✓    |    No    | Defaults to `True`           |
+| `ACCESS_TOKEN_SECRET`         |    ✓    |          |   ✓    |   Yes    | Access token signing         |
+| `REFRESH_TOKEN_SECRET`        |    ✓    |          |   ✓    |   Yes    | Refresh token signing        |
+| `CONFIRMATION_TOKEN_SECRET`   |    ✓    |          |   ✓    |   Yes    | Confirmation token signing   |
+| `WEBSITE_BASE_URL`            |    ✓    |          |        |   Yes    | Website URL for emails       |
+| `SMTP_HOST`                   |    ✓    |          |   ✓    |   Yes    | SMTP server host             |
+| `SMTP_PORT`                   |    ✓    |          |   ✓    |    No    | Defaults to `587`            |
+| `SMTP_USERNAME`               |    ✓    |          |   ✓    |    No    | SMTP auth username           |
+| `SMTP_PASSWORD`               |    ✓    |          |   ✓    |    No    | SMTP auth password           |
+| `SMTP_USE_SSL`                |    ✓    |          |   ✓    |    No    | Defaults to `true`           |
+| `SMTP_FROM_EMAIL`             |    ✓    |          |   ✓    |   Yes    | Email sender address         |
+| `SMTP_FROM_NAME`              |    ✓    |          |   ✓    |    No    | Defaults to `The Biergarten` |
+| `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL      |
+| `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing      |
+| `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode                 |
+| `CLEAR_DATABASE`              |    ✓    |          |   ✓    |    No    | Dev/test reset flag          |
+| `ASPNETCORE_ENVIRONMENT`      |    ✓    |          |   ✓    |   Yes    | ASP.NET environment          |
+| `ASPNETCORE_URLS`             |    ✓    |          |   ✓    |   Yes    | API binding address          |
+| `SA_PASSWORD`                 |         |          |   ✓    |   Yes    | SQL Server container         |
+| `ACCEPT_EULA`                 |         |          |   ✓    |   Yes    | SQL Server EULA              |
+| `MSSQL_PID`                   |         |          |   ✓    |    No    | SQL Server edition           |
+| `DOTNET_RUNNING_IN_CONTAINER` |    ✓    |          |   ✓    |    No    | Container flag               |
 
 \* Either `DB_CONNECTION_STRING` OR the component variables (`DB_SERVER`,
 `DB_NAME`, `DB_USER`, `DB_PASSWORD`) must be provided.
@@ -276,9 +290,8 @@ Variables are validated at startup:
 - Missing required variables (`ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`,
   `CONFIRMATION_TOKEN_SECRET`, `SMTP_HOST`, `SMTP_FROM_EMAIL`, DB connection
   values) cause the application to fail with an `InvalidOperationException`
-- No minimum length is enforced on the token secrets in code; the
-  "minimum 32 characters" guidance above is a recommendation, not an
-  enforced check
+- No minimum length is enforced on the token secrets in code; the "minimum 32
+  characters" guidance above is a recommendation, not an enforced check
 
 ### Frontend validation
 

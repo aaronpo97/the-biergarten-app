@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Domain.Exceptions;
+using Features.Auth.Commands.Login;
 using Features.Auth.Dtos;
-using Features.Auth.Queries.Login;
 using Features.Auth.Repository;
 using Features.Auth.Services;
 using FluentAssertions;
@@ -68,7 +68,7 @@ public class LoginHandlerTests
             .Returns("refresh-token");
 
         LoginPayload result = await _handler.Handle(
-            new LoginQuery(username, "any-password"),
+            new LoginCommand(username, "any-password"),
             CancellationToken.None
         );
 
@@ -88,7 +88,7 @@ public class LoginHandlerTests
             .ReturnsAsync((UserAccount?)null);
 
         Func<Task<LoginPayload>> act = async () =>
-            await _handler.Handle(new LoginQuery(username, "password"), CancellationToken.None);
+            await _handler.Handle(new LoginCommand(username, "password"), CancellationToken.None);
 
         await act.Should().ThrowAsync<UnauthorizedException>();
         _authRepoMock.Verify(
@@ -110,7 +110,7 @@ public class LoginHandlerTests
             .ReturnsAsync((UserCredential?)null);
 
         Func<Task<LoginPayload>> act = async () =>
-            await _handler.Handle(new LoginQuery(username, "password"), CancellationToken.None);
+            await _handler.Handle(new LoginCommand(username, "password"), CancellationToken.None);
 
         await act.Should()
             .ThrowAsync<UnauthorizedException>()
@@ -144,7 +144,7 @@ public class LoginHandlerTests
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(
-                new LoginQuery(username, "wrong-password"),
+                new LoginCommand(username, "wrong-password"),
                 CancellationToken.None
             );
 

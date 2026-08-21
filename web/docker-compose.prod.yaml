@@ -31,8 +31,8 @@ services:
       sqlserver:
         condition: service_healthy
     build:
-      context: ./backend/Database
-      dockerfile: Database.Migrations/Dockerfile
+      context: ./backend
+      dockerfile: Database/Database.Migrations/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
         APP_UID: 1000

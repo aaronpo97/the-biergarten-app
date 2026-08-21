@@ -14,6 +14,7 @@ Scenario: Successful registration with valid details
 
 Scenario: Registration fails with existing username
     Given the API is running
+    And I have an existing account
     When I submit a registration request with values:
         | Username  | FirstName | LastName | Email               | DateOfBirth | Password   |
         | test.user | Test      | User     | example@example.com | 2001-11-11  | Password1! |
@@ -21,6 +22,7 @@ Scenario: Registration fails with existing username
 
 Scenario: Registration fails with existing email
     Given the API is running
+    And I have an existing account
     When I submit a registration request with values:
         | Username | FirstName | LastName | Email                       | DateOfBirth | Password   |
         | newuser  | New       | User     | test.user@thebiergarten.app | 1990-01-01  | Password1! |
