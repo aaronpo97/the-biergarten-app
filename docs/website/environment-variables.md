@@ -88,12 +88,26 @@ WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 
 **Generate Secrets**:
 
-```bash
-# macOS/Linux - Generate 127-character base64 secret
-openssl rand -base64 127
+**macOS/Linux - Generate a cryptographically secure base64 secret (127 raw bytes)**
 
-# Windows PowerShell
-[Convert]::ToBase64String((1..127 | %{Get-Random -Max 256}))
+```bash
+openssl rand -base64 127
+```
+
+**Windows - PowerShell 5.1 compatible (cryptographically secure, 127 raw bytes)**
+
+```powershell
+$bytes = New-Object byte[] 127
+$rng = [System.Security.Cryptography.RNGCryptoServiceProvider]::new()
+$rng.GetBytes($bytes)
+[Convert]::ToBase64String($bytes)
+$rng.Dispose()
+```
+
+**Windows - PowerShell 7+ compatible (cryptographically secure, 127 raw bytes)**
+
+```powershell
+[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(127))
 ```
 
 **Token Expiration**:
