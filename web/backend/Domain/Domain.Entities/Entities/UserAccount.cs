@@ -16,4 +16,8 @@ public sealed class UserAccount
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public byte[]? RowVersion { get; set; }
+
+    // Navigation properties
+    public UserCredential?  UserCredential { get; set; }
+
 }

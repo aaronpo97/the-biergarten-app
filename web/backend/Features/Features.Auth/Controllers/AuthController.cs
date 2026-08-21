@@ -1,9 +1,9 @@
 using Features.Auth.Commands.ConfirmUser;
+using Features.Auth.Commands.Login;
 using Features.Auth.Commands.RefreshToken;
 using Features.Auth.Commands.RegisterUser;
 using Features.Auth.Commands.ResendConfirmationEmail;
 using Features.Auth.Dtos;
-using Features.Auth.Queries.Login;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -51,9 +51,9 @@ public class AuthController(IMediator mediator) : ControllerBase
     /// </remarks>
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<ResponseBody<LoginPayload>>> Login([FromBody] LoginQuery query)
+    public async Task<ActionResult<ResponseBody<LoginPayload>>> Login([FromBody] LoginCommand command)
     {
-        LoginPayload payload = await mediator.Send(query);
+        LoginPayload payload = await mediator.Send(command);
         return Ok(
             new ResponseBody<LoginPayload>
             {

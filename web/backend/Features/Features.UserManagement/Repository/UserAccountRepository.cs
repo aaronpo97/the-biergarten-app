@@ -13,15 +13,16 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     : Repository<UserAccount>(connectionFactory),
         IUserAccountRepository
 {
-    private const string SelectColumns =
-        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion";
-
     /// <inheritdoc />
     public async Task<UserAccount?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE UserAccountID = @UserAccountId",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE UserAccountID = @UserAccountId
+            """,
             new { UserAccountId = id }
         );
     }
@@ -35,8 +36,8 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryAsync<UserAccount>(
-            $"""
-            SELECT {SelectColumns}
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
             FROM dbo.UserAccount
             ORDER BY CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
@@ -76,7 +77,10 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         int rows = await connection.ExecuteAsync(
-            "DELETE FROM dbo.UserAccount WHERE UserAccountId = @UserAccountId",
+            """
+            DELETE FROM dbo.UserAccount
+            WHERE UserAccountId = @UserAccountId
+            """,
             new { UserAccountId = id }
         );
 
@@ -89,7 +93,11 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE Username = @Username",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE Username = @Username
+            """,
             new { Username = username }
         );
     }
@@ -99,7 +107,11 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE Email = @Email",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE Email = @Email
+            """,
             new { Email = email }
         );
     }

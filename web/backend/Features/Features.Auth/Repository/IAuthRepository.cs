@@ -13,7 +13,7 @@ public interface IAuthRepository
     ///     returns the created account.
     /// </summary>
     /// <exception cref="Exception">Thrown when the newly registered user cannot be retrieved after registration.</exception>
-    Task<UserAccount> RegisterUserAsync(UserRegistrationDto userRegistrationDto);
+    Task<UserAccount> RegisterUserAsync(UserAccount ua);
 
     /// <summary>Retrieves a user account by email, or <see langword="null" /> if none exists.</summary>
     Task<UserAccount?> GetUserByEmailAsync(string email);

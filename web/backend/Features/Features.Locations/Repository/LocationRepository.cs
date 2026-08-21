@@ -45,13 +45,20 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
 
         bool cityExists =
             await connection.ExecuteScalarAsync<int?>(
-                "SELECT 1 FROM dbo.City WHERE CityName = @CityName AND StateProvinceID = @StateProvinceId",
+                """
+                SELECT 1
+                FROM dbo.City
+                WHERE CityName = @CityName AND StateProvinceID = @StateProvinceId
+                """,
                 new { location.CityName, StateProvinceId = stateProvinceId }
             ) is not null;
 
         if (!cityExists)
             await connection.ExecuteAsync(
-                "INSERT INTO dbo.City (StateProvinceID, CityName) VALUES (@StateProvinceId, @CityName)",
+                """
+                INSERT INTO dbo.City (StateProvinceID, CityName)
+                VALUES (@StateProvinceId, @CityName)
+                """,
                 new { StateProvinceId = stateProvinceId, location.CityName }
             );
 
@@ -70,7 +77,11 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
 
         bool exists =
             await connection.ExecuteScalarAsync<int?>(
-                "SELECT 1 FROM dbo.Country WHERE ISO3166_1 = @ISO3166_1",
+                """
+                SELECT 1
+                FROM dbo.Country
+                WHERE ISO3166_1 = @ISO3166_1
+                """,
                 new { ISO3166_1 = isoCode }
             ) is not null;
 
@@ -78,7 +89,10 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             // A concurrent caller may create this country between the check above and here; that
             // race is tolerated (the resulting duplicate row, if any, is out of scope for this method).
             await connection.ExecuteAsync(
-                "INSERT INTO dbo.Country (CountryName, ISO3166_1) VALUES (@CountryName, @ISO3166_1)",
+                """
+                INSERT INTO dbo.Country (CountryName, ISO3166_1)
+                VALUES (@CountryName, @ISO3166_1)
+                """,
                 new { CountryName = countryName, ISO3166_1 = isoCode }
             );
     }
@@ -108,13 +122,20 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
 
         bool exists =
             await connection.ExecuteScalarAsync<int?>(
-                "SELECT 1 FROM dbo.StateProvince WHERE ISO3166_2 = @ISO3166_2",
+                """
+                SELECT 1
+                FROM dbo.StateProvince
+                WHERE ISO3166_2 = @ISO3166_2
+                """,
                 new { ISO3166_2 = isoCode }
             ) is not null;
 
         if (!exists)
             await connection.ExecuteAsync(
-                "INSERT INTO dbo.StateProvince (StateProvinceName, ISO3166_2, CountryID) VALUES (@StateProvinceName, @ISO3166_2, @CountryId)",
+                """
+                INSERT INTO dbo.StateProvince (StateProvinceName, ISO3166_2, CountryID)
+                VALUES (@StateProvinceName, @ISO3166_2, @CountryId)
+                """,
                 new
                 {
                     StateProvinceName = stateProvinceName,
@@ -128,7 +149,11 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
-            "SELECT CountryID FROM dbo.Country WHERE ISO3166_1 = @ISO3166_1",
+            """
+            SELECT CountryID
+            FROM dbo.Country
+            WHERE ISO3166_1 = @ISO3166_1
+            """,
             new { ISO3166_1 = isoCode }
         );
     }
@@ -137,7 +162,11 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
-            "SELECT StateProvinceID FROM dbo.StateProvince WHERE ISO3166_2 = @ISO3166_2",
+            """
+            SELECT StateProvinceID
+            FROM dbo.StateProvince
+            WHERE ISO3166_2 = @ISO3166_2
+            """,
             new { ISO3166_2 = isoCode }
         );
     }

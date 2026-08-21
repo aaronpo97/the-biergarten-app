@@ -13,66 +13,60 @@ namespace Features.Breweries.Repository;
 ///     <c>BreweryPostLocation.Coordinates</c> is a SQL Server <c>GEOGRAPHY</c> column. Dapper's generic
 ///     <c>Query&lt;T&gt;</c> deserializer reads columns via <c>IDataRecord.GetValue</c>, which for a UDT
 ///     column returns a CLR UDT instance rather than raw bytes and cannot be coerced to <c>byte[]</c>.
-///     The two read methods below therefore read rows manually via <see cref="DbDataReader.GetFieldValue{T}" />
-///     (the same approach the previous ADO.NET implementation used, which SqlClient supports specifically
-///     for UDT columns). All write methods use Dapper, since they only bind parameters and never
-///     deserialize <c>Coordinates</c> back out of a result set.
+///     The read queries below therefore select <c>CONVERT(varbinary(max), bpl.Coordinates)</c>, which
+///     yields the UDT's serialized bytes as a plain <c>varbinary</c> value that Dapper can bind directly.
 /// </remarks>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : Repository<BreweryPost>(connectionFactory),
         IBreweryRepository
 {
-    private const string SelectColumns = """
-                                             bp.BreweryPostID,
-                                             bp.PostedByID,
-                                             bp.BreweryName,
-                                             bp.Description,
-                                             bp.CreatedAt,
-                                             bp.UpdatedAt,
-                                             bp.RowVersion,
-                                             bpl.BreweryPostLocationID,
-                                             bpl.CityID,
-                                             bpl.AddressLine1,
-                                             bpl.AddressLine2,
-                                             bpl.PostalCode,
-                                             bpl.Coordinates,
-                                             c.CityName,
-                                             c.StateProvinceID,
-                                             sp.StateProvinceName,
-                                             sp.ISO3166_2,
-                                             sp.CountryID,
-                                             co.CountryName,
-                                             co.ISO3166_1
-                                         """;
-
-    /// <summary>
-    ///     Joins from <c>dbo.BreweryPost</c> down to <c>dbo.Country</c> so a row carries everything needed
-    ///     to populate <see cref="BreweryPost.Location" />'s full <c>City</c> → <c>StateProvince</c> →
-    ///     <c>Country</c> chain. All joins are <c>LEFT JOIN</c> (matching the previous stored procedure's
-    ///     behavior), since a brewery post may have no location.
-    /// </summary>
-    private const string FromJoins = """
-                                         dbo.BreweryPost bp
-                                         LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                                         LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-                                         LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                                         LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
-                                     """;
-
     /// <inheritdoc/>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbCommand command = connection.CreateCommand();
-        command.CommandText = $"""
-                               SELECT {SelectColumns}
-                               FROM {FromJoins}
-                               WHERE bp.BreweryPostID = @BreweryPostId
-                               """;
-        AddParameter(command, "@BreweryPostId", id);
+        IEnumerable<BreweryPost> results = await connection.QueryAsync<
+            BreweryPost,
+            BreweryPostLocation,
+            City,
+            StateProvince,
+            Country,
+            BreweryPost
+        >(
+            """
+            SELECT
+                bp.BreweryPostID,
+                bp.PostedByID,
+                bp.BreweryName,
+                bp.Description,
+                bp.CreatedAt,
+                bp.UpdatedAt,
+                bp.RowVersion,
+                bpl.BreweryPostLocationID,
+                bpl.AddressLine1,
+                bpl.AddressLine2,
+                bpl.PostalCode,
+                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                c.CityID,
+                c.CityName,
+                sp.StateProvinceID,
+                sp.StateProvinceName,
+                sp.ISO3166_2,
+                co.CountryID,
+                co.CountryName,
+                co.ISO3166_1
+            FROM dbo.BreweryPost bp
+            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+            WHERE bp.BreweryPostID = @BreweryPostId
+            """,
+            MapBreweryRow,
+            new { BreweryPostId = id },
+            splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
+        );
 
-        await using DbDataReader reader = await command.ExecuteReaderAsync();
-        return await reader.ReadAsync() ? MapToEntity(reader) : null;
+        return results.SingleOrDefault();
     }
 
     /// <inheritdoc/>
@@ -80,23 +74,48 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         int? offset)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbCommand command = connection.CreateCommand();
-        command.CommandText = $"""
-                               SELECT {SelectColumns}
-                               FROM {FromJoins}
-                               ORDER BY bp.CreatedAt DESC
-                               OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
-                               """;
-        AddParameter(command, "@Offset", offset ?? 0);
-        AddParameter(command, "@Limit", limit ?? int.MaxValue);
-
-        await using DbDataReader reader = await command.ExecuteReaderAsync();
-        List<BreweryPost> breweries = [];
-
-        while (await reader.ReadAsync())
-            breweries.Add(MapToEntity(reader));
-
-        return breweries;
+        return await connection.QueryAsync<
+            BreweryPost,
+            BreweryPostLocation,
+            City,
+            StateProvince,
+            Country,
+            BreweryPost
+        >(
+            """
+            SELECT
+                bp.BreweryPostID,
+                bp.PostedByID,
+                bp.BreweryName,
+                bp.Description,
+                bp.CreatedAt,
+                bp.UpdatedAt,
+                bp.RowVersion,
+                bpl.BreweryPostLocationID,
+                bpl.AddressLine1,
+                bpl.AddressLine2,
+                bpl.PostalCode,
+                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                c.CityID,
+                c.CityName,
+                sp.StateProvinceID,
+                sp.StateProvinceName,
+                sp.ISO3166_2,
+                co.CountryID,
+                co.CountryName,
+                co.ISO3166_1
+            FROM dbo.BreweryPost bp
+            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+            ORDER BY bp.CreatedAt DESC
+            OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            """,
+            MapBreweryRow,
+            new { Offset = offset ?? 0, Limit = limit ?? int.MaxValue },
+            splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
+        );
     }
 
     /// <inheritdoc/>
@@ -112,8 +131,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 await connection.ExecuteScalarAsync<int?>(
                         new CommandDefinition(
                             """
-                            SELECT 1 FROM 
-                                dbo.BreweryPost 
+                            SELECT 1 FROM
+                                dbo.BreweryPost
                             WHERE
                                 BreweryPostID = @BreweryPostId
                             """,
@@ -146,11 +165,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 new CommandDefinition(
                     """
                     UPDATE dbo.BreweryPost
-                    SET BreweryName = @BreweryName, 
-                        Description = @Description, 
+                    SET BreweryName = @BreweryName,
+                        Description = @Description,
                         UpdatedAt = GETDATE()
-                    WHERE 
-                        BreweryPostID = @BreweryPostId 
+                    WHERE
+                        BreweryPostID = @BreweryPostId
                       AND RowVersion = @RowVersion
                     """,
                     new
@@ -175,8 +194,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 await connection.ExecuteAsync(
                     new CommandDefinition(
                         """
-                        DELETE FROM 
-                            dbo.BreweryPostLocation 
+                        DELETE FROM
+                            dbo.BreweryPostLocation
                         WHERE BreweryPostID = @BreweryPostId
                         """,
                         new { brewery.BreweryPostId },
@@ -190,8 +209,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     await connection.ExecuteScalarAsync<int?>(
                             new CommandDefinition(
                                 """
-                                SELECT 1 
-                                FROM dbo.BreweryPostLocation 
+                                SELECT 1
+                                FROM dbo.BreweryPostLocation
                                 WHERE BreweryPostID = @BreweryPostId
                                 """,
                                 new { brewery.BreweryPostId },
@@ -205,10 +224,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new CommandDefinition(
                             """
                             UPDATE dbo.BreweryPostLocation
-                            SET CityID = @CityId, 
-                                AddressLine1 = @AddressLine1, 
+                            SET CityID = @CityId,
+                                AddressLine1 = @AddressLine1,
                                 AddressLine2 = @AddressLine2,
-                                PostalCode = @PostalCode, 
+                                PostalCode = @PostalCode,
                                 Coordinates = @Coordinates
                             WHERE BreweryPostID = @BreweryPostId
                             """,
@@ -280,9 +299,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         await using DbConnection connection = await CreateConnection();
         int rows = await connection.ExecuteAsync(
             """
-            DELETE FROM 
-                dbo.BreweryPost 
-            WHERE 
+            DELETE FROM
+                dbo.BreweryPost
+            WHERE
                 BreweryPostID = @BreweryPostId
             """,
             new { BreweryPostId = id }
@@ -309,10 +328,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 await connection.ExecuteScalarAsync<int?>(
                         new CommandDefinition(
                             """
-                                        SELECT 1 
-                                        FROM 
-                                            dbo.UserAccount 
-                                        WHERE 
+                                        SELECT 1
+                                        FROM
+                                            dbo.UserAccount
+                                        WHERE
                                             UserAccountID = @PostedById
                             """,
                             new { brewery.PostedById },
@@ -328,10 +347,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 await connection.ExecuteScalarAsync<int?>(
                         new CommandDefinition(
                             """
-                                        SELECT 1 
-                                        FROM 
-                                            dbo.City 
-                                        WHERE 
+                                        SELECT 1
+                                        FROM
+                                            dbo.City
+                                        WHERE
                                             CityID = @CityId
                             """,
                             new { brewery.Location.CityId },
@@ -366,19 +385,19 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 new CommandDefinition(
                     """
                     INSERT INTO dbo.BreweryPostLocation
-                        (BreweryPostLocationID, 
-                         BreweryPostID, 
-                         CityID, 
-                         AddressLine1, 
-                         AddressLine2, 
-                         PostalCode, 
+                        (BreweryPostLocationID,
+                         BreweryPostID,
+                         CityID,
+                         AddressLine1,
+                         AddressLine2,
+                         PostalCode,
                          Coordinates)
-                    VALUES (@BreweryPostLocationId, 
-                            @BreweryPostId, 
-                            @CityId, 
+                    VALUES (@BreweryPostLocationId,
+                            @BreweryPostId,
+                            @CityId,
                             @AddressLine1,
-                            @AddressLine2, 
-                            @PostalCode, 
+                            @AddressLine2,
+                            @PostalCode,
                             @Coordinates)
                     """,
                     new
@@ -405,100 +424,35 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <summary>
-    ///     Maps the current row of <paramref name="reader" /> to a <see cref="BreweryPost" />, including its
-    ///     associated <see cref="BreweryPostLocation" /> if a location row was joined in.
+    ///     Composes a joined row's <see cref="BreweryPost" />, <see cref="BreweryPostLocation" />,
+    ///     <see cref="City" />, <see cref="StateProvince" /> and <see cref="Country" /> fragments into a
+    ///     single populated <see cref="BreweryPost" />. When the row has no location (a left-joined
+    ///     brewery with no address on file), <paramref name="location" /> is a blank instance produced
+    ///     from all-<c>NULL</c> columns; the schema guarantees that whenever a location row was joined
+    ///     in, its City/StateProvince/Country chain was too.
     /// </summary>
-    private static BreweryPost MapToEntity(DbDataReader reader)
+    private static BreweryPost MapBreweryRow(
+        BreweryPost post,
+        BreweryPostLocation location,
+        City city,
+        StateProvince stateProvince,
+        Country country
+    )
     {
-        int ordBreweryPostId = reader.GetOrdinal("BreweryPostId");
-        int ordPostedById = reader.GetOrdinal("PostedById");
-        int ordBreweryName = reader.GetOrdinal("BreweryName");
-        int ordDescription = reader.GetOrdinal("Description");
-        int ordCreatedAt = reader.GetOrdinal("CreatedAt");
-        int ordUpdatedAt = reader.GetOrdinal("UpdatedAt");
-        int ordRowVersion = reader.GetOrdinal("RowVersion");
+        if (location.BreweryPostLocationId == Guid.Empty)
+            return post;
 
-        BreweryPost brewery = new()
-        {
-            BreweryPostId = reader.GetGuid(ordBreweryPostId),
-            PostedById = reader.GetGuid(ordPostedById),
-            BreweryName = reader.GetString(ordBreweryName),
-            Description = reader.GetString(ordDescription),
-            CreatedAt = reader.GetDateTime(ordCreatedAt),
-            UpdatedAt = reader.IsDBNull(ordUpdatedAt)
-                ? null
-                : reader.GetDateTime(ordUpdatedAt),
-            RowVersion = reader.IsDBNull(ordRowVersion)
-                ? null
-                : reader.GetFieldValue<byte[]>(ordRowVersion),
-        };
+        stateProvince.CountryId = country.CountryId;
+        stateProvince.Country = country;
 
-        int ordLocationId = reader.GetOrdinal("BreweryPostLocationId");
-        if (!reader.IsDBNull(ordLocationId))
-        {
-            int ordCoordinates = reader.GetOrdinal("Coordinates");
-            int ordAddressLine2 = reader.GetOrdinal("AddressLine2");
+        city.StateProvinceId = stateProvince.StateProvinceId;
+        city.StateProvince = stateProvince;
 
-            brewery.Location = new BreweryPostLocation
-            {
-                BreweryPostLocationId = reader.GetGuid(ordLocationId),
-                BreweryPostId = brewery.BreweryPostId,
-                CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
-                City = MapCity(reader),
-                AddressLine1 =
-                    reader.GetString(reader.GetOrdinal("AddressLine1")),
-                AddressLine2 = reader.IsDBNull(ordAddressLine2)
-                    ? null
-                    : reader.GetString(ordAddressLine2),
-                PostalCode = reader.GetString(reader.GetOrdinal("PostalCode")),
-                Coordinates = reader.IsDBNull(ordCoordinates)
-                    ? null
-                    : reader.GetFieldValue<byte[]>(ordCoordinates),
-            };
-        }
+        location.BreweryPostId = post.BreweryPostId;
+        location.CityId = city.CityId;
+        location.City = city;
 
-        return brewery;
-    }
-
-    /// <summary>
-    ///     Maps the current row's <c>City</c> → <c>StateProvince</c> → <c>Country</c> columns. The schema
-    ///     enforces <c>NOT NULL</c> foreign keys down this whole chain, so whenever a location row was
-    ///     joined in (the caller only calls this when it was), these columns are always populated too.
-    /// </summary>
-    private static City MapCity(DbDataReader reader)
-    {
-        return new City
-        {
-            CityId = reader.GetGuid(reader.GetOrdinal("CityId")),
-            CityName = reader.GetString(reader.GetOrdinal("CityName")),
-            StateProvinceId =
-                reader.GetGuid(reader.GetOrdinal("StateProvinceId")),
-            StateProvince = new StateProvince
-            {
-                StateProvinceId =
-                    reader.GetGuid(reader.GetOrdinal("StateProvinceId")),
-                StateProvinceName =
-                    reader.GetString(reader.GetOrdinal("StateProvinceName")),
-                ISO3166_2 = reader.GetString(reader.GetOrdinal("ISO3166_2")),
-                CountryId = reader.GetGuid(reader.GetOrdinal("CountryId")),
-                Country = new Country
-                {
-                    CountryId = reader.GetGuid(reader.GetOrdinal("CountryId")),
-                    CountryName =
-                        reader.GetString(reader.GetOrdinal("CountryName")),
-                    ISO3166_1 =
-                        reader.GetString(reader.GetOrdinal("ISO3166_1")),
-                },
-            },
-        };
-    }
-
-    private static void AddParameter(DbCommand command, string name,
-        object? value)
-    {
-        DbParameter p = command.CreateParameter();
-        p.ParameterName = name;
-        p.Value = value ?? DBNull.Value;
-        command.Parameters.Add(p);
+        post.Location = location;
+        return post;
     }
 }

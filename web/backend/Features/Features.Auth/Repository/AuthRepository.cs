@@ -16,17 +16,14 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     : Repository<UserAccount>(connectionFactory),
         IAuthRepository
 {
-    private const string SelectColumns =
-        "UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion";
-
     /// <inheritdoc />
     /// <remarks>The account and credential are inserted within a single database transaction.</remarks>
-    public async Task<UserAccount> RegisterUserAsync(UserRegistrationDto userRegistrationDto)
+    public async Task<UserAccount> RegisterUserAsync(UserAccount ua)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbTransaction transaction = await connection.BeginTransactionAsync();
 
-        var (username, firstName, lastName, email, dateOfBirth, passwordHash) = userRegistrationDto;
+
         Guid userAccountId;
 
         try
@@ -38,15 +35,18 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
                     OUTPUT INSERTED.UserAccountID
                     VALUES (@Username, @FirstName, @LastName, @DateOfBirth, @Email);
                     """,
-                    new { username, firstName, lastName, dateOfBirth, email },
+                    new { ua.Username, ua.FirstName, ua.LastName, ua.DateOfBirth, ua.Email},
                     transaction
                 )
             );
 
             int credentialRows = await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "INSERT INTO dbo.UserCredential (UserAccountId, Hash) VALUES (@UserAccountId, @Hash);",
-                    new { UserAccountId = userAccountId, Hash = passwordHash },
+                    """
+                    INSERT INTO dbo.UserCredential (UserAccountId, Hash)
+                    VALUES (@UserAccountId, @Hash);
+                    """,
+                    new { UserAccountId = userAccountId, Hash = ua.UserCredential?.Hash },
                     transaction
                 )
             );
@@ -62,6 +62,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             throw;
         }
 
+        // perform round trip to get new User entity
         return await GetUserByIdAsync(userAccountId)
             ?? throw new Exception("Failed to retrieve newly registered user.");
     }
@@ -71,7 +72,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE Email = @Email",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE Email = @Email
+            """,
             new { Email = email }
         );
     }
@@ -81,7 +86,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE Username = @Username",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE Username = @Username
+            """,
             new { Username = username }
         );
     }
@@ -111,7 +120,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
             bool exists =
                 await connection.ExecuteScalarAsync<int?>(
                     new CommandDefinition(
-                        "SELECT 1 FROM dbo.UserAccount WHERE UserAccountID = @UserAccountId",
+                        """
+                        SELECT 1
+                        FROM dbo.UserAccount
+                        WHERE UserAccountID = @UserAccountId
+                        """,
                         new { UserAccountId = userAccountId },
                         transaction
                     )
@@ -122,7 +135,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
 
             await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "UPDATE dbo.UserCredential SET IsRevoked = 1, RevokedAt = GETDATE() WHERE UserAccountId = @UserAccountId",
+                    """
+                    UPDATE dbo.UserCredential
+                    SET IsRevoked = 1, RevokedAt = GETDATE()
+                    WHERE UserAccountId = @UserAccountId
+                    """,
                     new { UserAccountId = userAccountId },
                     transaction
                 )
@@ -130,7 +147,10 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
 
             await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "INSERT INTO dbo.UserCredential (UserAccountId, Hash) VALUES (@UserAccountId, @Hash)",
+                    """
+                    INSERT INTO dbo.UserCredential (UserAccountId, Hash)
+                    VALUES (@UserAccountId, @Hash)
+                    """,
                     new { UserAccountId = userAccountId, Hash = newPasswordHash },
                     transaction
                 )
@@ -150,7 +170,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserAccount>(
-            $"SELECT {SelectColumns} FROM dbo.UserAccount WHERE UserAccountID = @UserAccountId",
+            """
+            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            FROM dbo.UserAccount
+            WHERE UserAccountID = @UserAccountId
+            """,
             new { UserAccountId = userAccountId }
         );
     }
@@ -179,7 +203,10 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
         try
         {
             await connection.ExecuteAsync(
-                "INSERT INTO dbo.UserVerification (UserAccountId, VerificationDateTime) VALUES (@UserAccountId, GETDATE())",
+                """
+                INSERT INTO dbo.UserVerification (UserAccountId, VerificationDateTime)
+                VALUES (@UserAccountId, GETDATE())
+                """,
                 new { UserAccountId = userAccountId }
             );
         }
@@ -197,7 +224,11 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         await using DbConnection connection = await CreateConnection();
         int? result = await connection.ExecuteScalarAsync<int?>(
-            "SELECT TOP 1 1 FROM dbo.UserVerification WHERE UserAccountID = @UserAccountId",
+            """
+            SELECT TOP 1 1
+            FROM dbo.UserVerification
+            WHERE UserAccountID = @UserAccountId
+            """,
             new { UserAccountId = userAccountId }
         );
         return result.HasValue;

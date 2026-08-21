@@ -24,7 +24,8 @@ static async Task<int> RunAsync()
     try
     {
         ServiceCollection services = [];
-        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        services.AddSingleton<IConfiguration>(
+            new ConfigurationBuilder().Build());
         services.AddInfrastructureSql();
         services.AddFeaturesBreweries();
         services.AddFeaturesLocations();
@@ -32,17 +33,23 @@ static async Task<int> RunAsync()
 
         await using ServiceProvider provider = services.BuildServiceProvider();
 
-        IBreweryRepository breweryRepository = provider.GetRequiredService<IBreweryRepository>();
-        ILocationRepository locationRepository = provider.GetRequiredService<ILocationRepository>();
-        IAuthRepository authRepository = provider.GetRequiredService<IAuthRepository>();
+        IBreweryRepository breweryRepository =
+            provider.GetRequiredService<IBreweryRepository>();
+        ILocationRepository locationRepository =
+            provider.GetRequiredService<ILocationRepository>();
+        IAuthRepository authRepository =
+            provider.GetRequiredService<IAuthRepository>();
         IPasswordInfrastructure passwordInfrastructure =
             provider.GetRequiredService<IPasswordInfrastructure>();
 
-        AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]").LeftJustified());
-        AnsiConsole.MarkupLine("[grey]Connecting to SQLite source and loading seed data...[/]");
+        AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]")
+            .LeftJustified());
+        AnsiConsole.MarkupLine(
+            "[grey]Connecting to SQLite source and loading seed data...[/]");
         AnsiConsole.WriteLine();
 
-        PipelineSeedDataReader reader = new(ConnectionStrings.SqliteConnectionString);
+        PipelineSeedDataReader reader =
+            new(ConnectionStrings.SqliteConnectionString);
 
         SeedData seedData = null!;
         IReadOnlyList<Guid> postedByIds = [];
@@ -68,14 +75,16 @@ static async Task<int> RunAsync()
         AnsiConsole.Write(BuildBreweryTable(seedData.Breweries));
         AnsiConsole.WriteLine();
 
-        AnsiConsole.MarkupLine($"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
+        AnsiConsole.MarkupLine(
+            $"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
         AnsiConsole.Write(BuildUserTable(seedData.Users));
         AnsiConsole.WriteLine();
 
         AnsiConsole.WriteLine("Seed data loaded successfully.");
 
         AnsiConsole.Write(
-            new Rule("[bold green]Loading seed data into target database.[/]").LeftJustified()
+            new Rule("[bold green]Loading seed data into target database.[/]")
+                .LeftJustified()
         );
 
         await AnsiConsole
@@ -134,16 +143,19 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
     foreach (UserRecord userRecord in users)
     {
         UserAccount userAccount = await authRepository.RegisterUserAsync(
-            new UserRegistrationDto(
-                userRecord.User.Username,
-                userRecord.User.FirstName,
-                userRecord.User.LastName,
-                userRecord.Email,
-                DateTime.Parse(userRecord.DateOfBirth),
-                passwordInfrastructure.Hash(
-                    PasswordGenerator.Generate(length: 64, numberOfDigits: 10, numberOfSymbols: 10)
-                )
-            )
+            new UserAccount()
+            {
+                FirstName = userRecord.User.FirstName,
+                LastName = userRecord.User.LastName,
+                DateOfBirth = DateTime.Parse(userRecord.DateOfBirth),
+                Username = userRecord.User.Username,
+                Email = userRecord.Email,
+                UserCredential = new UserCredential
+                {
+                    Hash = passwordInfrastructure.Hash(
+                        password: PasswordGenerator.Generate(64, 12, 12))
+                }
+            }
         );
         userAccountIds.Add(userAccount.UserAccountId);
     }
@@ -166,7 +178,8 @@ static async Task LoadBreweriesIntoDatabaseAsync(
 )
 {
     if (posterUserIds.Count == 0)
-        throw new InvalidOperationException("Cannot load breweries without any registered users.");
+        throw new InvalidOperationException(
+            "Cannot load breweries without any registered users.");
 
     for (int i = 0; i < breweries.Count; i++)
     {

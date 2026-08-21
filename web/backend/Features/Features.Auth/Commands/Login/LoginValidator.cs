@@ -1,9 +1,9 @@
 using FluentValidation;
 
-namespace Features.Auth.Queries.Login;
+namespace Features.Auth.Commands.Login;
 
-/// <summary>Validates that <see cref="LoginQuery.Username" /> and <see cref="LoginQuery.Password" /> are present.</summary>
-public class LoginValidator : AbstractValidator<LoginQuery>
+/// <summary>Validates that <see cref="LoginCommand.Username" /> and <see cref="LoginCommand.Password" /> are present.</summary>
+public class LoginValidator : AbstractValidator<LoginCommand>
 {
     public LoginValidator()
     {
