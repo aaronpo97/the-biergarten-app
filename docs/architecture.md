@@ -71,7 +71,6 @@ MediatR/DI, never over HTTP:
                   ↓
 ┌─────────────────────────────────────┐
 │      Database (SQL Server)          │
-│   - Stored procedures               │
 │   - Tables & constraints            │
 └─────────────────────────────────────┘
 ```
@@ -121,7 +120,7 @@ own
 - `Commands/<Operation>/` and `Queries/<Operation>/`: one folder per operation,
   each containing the Command/Query record, its `IRequestHandler`, and (for
   commands) a FluentValidation validator
-- `Repository/`: the slice's own stored-procedure repository implementation
+- `Repository/`: the slice's own Dapper repository implementation
 - `Dtos/`: response shapes returned by query handlers (never the raw domain
   entity)
 - `DependencyInjection/`: an `AddFeaturesX()` extension method registering the
@@ -208,6 +207,11 @@ whichever slices need them
 - `BreweryPost` - A user-submitted brewery listing
 - `BreweryPostLocation` - A brewery's address and coordinates
 - `City` - A city referenced by a brewery location
+- `StateProvince` - A state/province referenced by a city
+- `Country` - A country referenced by a state/province
+- `BeerStyle` - A beer style/category (schema table exists; no repository yet)
+- `BeerPost` - A beer listing tied to a brewery and style (schema table
+  exists; no repository yet)
 
 **Dependencies**:
 
@@ -301,15 +305,16 @@ it, without an ORM's change-tracking or mapping magic
 
 **Strategy**:
 
-- No ORM (Entity Framework not used); each
-  repository issues inline SQL (a mix of Dapper and raw
-  `DbCommand`/`DbDataReader` for the few reads that need manual column mapping,
-  such as the `GEOGRAPHY` column on `BreweryPostLocation`)
+- No ORM (Entity Framework not used); each repository issues inline SQL
+  through Dapper, with no manual `IDbCommand` parameter binding. The one
+  wrinkle is the `GEOGRAPHY` column on `BreweryPostLocation`, which Dapper
+  can't deserialize as a UDT: reads select `CONVERT(varbinary(max),
+  Coordinates)` so the value comes back as a plain `byte[]` Dapper can bind
 - Referential checks that a stored procedure used to perform (e.g. "does this
   `CityId` exist?") are now explicit `SELECT 1 ...` existence checks in the
   repository method, run inside the same transaction as the write
-- Optimistic concurrency uses each table's `Timer` (`ROWVERSION`) column,
-  checked in the `UPDATE ... WHERE ... AND Timer = @Timer` clause
+- Optimistic concurrency uses each table's `RowVersion` (`ROWVERSION`) column,
+  checked in the `UPDATE ... WHERE ... AND RowVersion = @RowVersion` clause
 - Repositories throw `Domain.Exceptions` types (`NotFoundException`,
   `ConflictException`, ...) directly when a check fails, rather than relying on
   a database-side `THROW`; `API.Core`'s `GlobalExceptionFilter` maps those
@@ -436,23 +441,22 @@ for reference only. Active product and engineering documentation should point to
 
 ## Database architecture
 
-For the table-by-table schema, the stored procedure reference (parameters,
-behavior, and exactly what each one throws), and the custom SQL error code
-scheme, see [Database](website/database.md).
+For the table-by-table schema and the custom SQL error code scheme, see
+[Database](website/database.md).
 
 ### SQL-first philosophy
 
 **Principles**:
 
 1. Database is source of truth
-2. Complex queries in stored procedures
+2. Queries live in the owning repository, not scattered across the app
 3. Database handles referential integrity
 4. Application orchestrates, database executes
 
 **Benefits**:
 
 - Performance optimization via execution plans
-- Centralized query logic
+- Query logic scoped to the repository that owns it, not spread across layers
 - Version-controlled schema (migrations)
 - Easier query profiling and tuning
 
@@ -488,14 +492,15 @@ pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
 
 **Seed Data**:
 
-- Cities (via `Features.Locations`' `ILocationRepository`)
+- Countries, state/provinces, and cities (via `Features.Locations`'
+  `ILocationRepository`, which creates `Country`/`StateProvince` rows on
+  demand while resolving a city)
 - User accounts (via `Features.Auth`'s repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
-Tables that exist in the schema but have no corresponding `Domain.Entities` type
-or feature slice yet (`Photo`, `UserAvatar`, `UserFollow`, `Country`,
-`StateProvince`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`,
-`BreweryPostPhoto`) are not seeded.
+Tables that exist in the schema but have no repository yet (`Photo`,
+`UserAvatar`, `UserFollow`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`,
+`BeerPostComment`, `BreweryPostPhoto`) are not seeded.
 
 ## Deployment architecture
 
@@ -543,8 +548,8 @@ healthcheck:
     ├──────────────┤
     │  Unit Tests  │  ← Features.Auth.Tests, Features.Breweries.Tests,
     │ (per slice,  │     Features.UserManagement.Tests, Features.Emails.Tests
-    │  handlers +  │     (commands/queries/handlers + that slice's own
-    │  repository) │     repository, mocked with Moq/DbMocker)
+    │   handler    │     (commands/queries/handlers, with repository/service
+    │   tests)     │     dependencies mocked via Moq)
     └──────────────┘
 ```
 

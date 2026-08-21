@@ -12,8 +12,8 @@ The project uses a multi-layered testing approach across backend and frontend:
 - **Features.\*.Tests** - One unit test project per backend feature slice
   (`Features.Auth.Tests`, `Features.Breweries.Tests`,
   `Features.UserManagement.Tests`, `Features.Emails.Tests`), covering that
-  slice's command/query handlers and its own repository (mocked with Moq /
-  DbMocker, no real database required)
+  slice's command/query handlers, with dependencies mocked via Moq (no real
+  database required)
 - **Storybook Vitest project** - Browser-based interaction tests for shared
   website stories
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
@@ -77,8 +77,8 @@ dotnet test API/API.Specs/API.Specs.csproj
 
 ### Feature slice unit tests
 
-Each feature slice has its own test project, covering its command/query handlers
-and repository:
+Each feature slice has its own test project, covering its command/query
+handlers:
 
 ```bash
 cd web/backend
@@ -93,8 +93,8 @@ for proj in Features/*.Tests; do dotnet test "$proj"; done
 
 **Requirements**:
 
-- No database required (handlers use Moq; repository tests use DbMocker to
-  simulate SQL Server responses)
+- No database required (handlers are tested with their repository/service
+  dependencies mocked via Moq)
 
 ### Frontend Storybook tests
 
@@ -137,7 +137,6 @@ npm run test:storybook:playwright
 - Email confirmation and confirmation-email resend
 - Refresh token exchange
 - JWT token generation, validation, and claims handling
-- `IAuthRepository` data access (DbMocker-backed)
 - Invalid credentials and 404 error responses (via API.Specs)
 
 **Features.Breweries.Tests**:
@@ -173,7 +172,7 @@ npm run test:storybook:playwright
 ### xUnit
 
 - Primary unit testing framework
-- Used for Repository and Service layer tests
+- Used for handler and service layer tests
 - Supports parallel test execution
 
 ### Reqnroll (Gherkin/BDD)
@@ -193,12 +192,6 @@ npm run test:storybook:playwright
 - Mocking framework for .NET
 - Used in Service layer tests
 - Enables isolated unit testing
-
-### DbMocker
-
-- Database mocking for repository tests
-- Simulates SQL Server responses
-- No real database required for unit tests
 
 ## Test structure
 
@@ -248,9 +241,7 @@ Features.Auth.Tests/
 │   ├── ResendConfirmationEmailHandlerTests.cs
 │   └── RefreshTokenHandlerTests.cs
 ├── Queries/
-│   └── LoginHandlerTests.cs
-├── Repository/
-│   └── AuthRepositoryTests.cs          # DbMocker-backed repository tests
+│   └── LoginHandlerTests.cs            # tests LoginCommand, despite the folder name
 └── Services/
     ├── TokenServiceRefreshTests.cs
     └── TokenServiceValidationTests.cs
@@ -278,7 +269,7 @@ public class LoginHandlerTests
         // ...set up mocks for a known user/credential...
 
         // Act
-        var result = await handler.Handle(new LoginQuery("testuser", "password123"), CancellationToken.None);
+        var result = await handler.Handle(new LoginCommand("testuser", "password123"), CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();

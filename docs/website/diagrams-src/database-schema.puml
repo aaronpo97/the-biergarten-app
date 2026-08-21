@@ -6,7 +6,7 @@ skinparam linetype ortho
 skinparam packageStyle rectangle
 
 title Database Schema
-caption Every table also has a Timer ROWVERSION column (optimistic concurrency), omitted below for brevity.\nTables marked (*) have no CRUD stored procedures yet.
+caption Every table also has a RowVersion ROWVERSION column (optimistic concurrency), omitted below for brevity.\nTables marked (*) have no repository/feature slice yet.
 
 package "User & Auth" {
   entity "UserAccount" as User {
@@ -190,20 +190,18 @@ Beer ||--o{ BeerComment : "has"
 User ||--o{ BeerComment : "commented"
 
 note bottom of User
-  Core stored procedures:
-  - USP_RegisterUser
-  - usp_UpdateUserAccount
-  - usp_DeleteUserAccount
-  - USP_RotateUserCredential
-  - USP_CreateUserVerification
+  Backed by Features.Auth/Features.UserManagement's
+  Dapper repositories (AuthRepository,
+  UserAccountRepository) - registration, credential
+  rotation, and verification each issue their own
+  inline SQL, no stored procedures
 end note
 
 note bottom of Brewery
-  Core stored procedures:
-  - USP_CreateBrewery
-  - USP_UpdateBrewery
-  - USP_DeleteBrewery
-  (optimistic concurrency via Timer)
+  Backed by Features.Breweries' BreweryRepository
+  (Dapper); create/update/delete run inline SQL
+  inside a transaction, with optimistic concurrency
+  via RowVersion
 end note
 
 @enduml

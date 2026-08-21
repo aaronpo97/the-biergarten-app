@@ -13,8 +13,8 @@ owning feature slice's repository (see
 [Direct SQL via Dapper/ADO.NET](../architecture.md#direct-sql-via-dapperadonet)).
 
 All tables use a `UNIQUEIDENTIFIER` primary key defaulting to `NEWID()`, and
-most carry a `Timer ROWVERSION` column used for optimistic concurrency on
-updates (`UPDATE ... WHERE ... AND Timer = @Timer`).
+most carry a `RowVersion ROWVERSION` column used for optimistic concurrency on
+updates (`UPDATE ... WHERE ... AND RowVersion = @RowVersion`).
 
 ### Tables backed by the API today
 
@@ -24,23 +24,23 @@ updates (`UPDATE ... WHERE ... AND Timer = @Timer`).
 | `UserCredential`      | `Domain.Entities.UserCredential`, `Features.Auth`                        | Argon2id password hash; `IsRevoked`/`RevokedAt` track credential rotation, not JWTs                                                                                    |
 | `UserVerification`    | `Domain.Entities.UserVerification`, `Features.Auth`                      | Written when a user confirms their email                                                                                                                               |
 | `BreweryPost`         | `Domain.Entities.BreweryPost`, `Features.Breweries`                      | A user-submitted brewery listing                                                                                                                                       |
-| `BreweryPostLocation` | `Domain.Entities.BreweryPostLocation`, `Features.Breweries`              | 1:1 with `BreweryPost`; `Coordinates` is a `GEOGRAPHY` column, read manually via `DbDataReader.GetFieldValue<byte[]>` because Dapper can't deserialize SQL Server UDTs |
-| `City`                | `Domain.Entities.City`, `Features.Locations`                             | Referenced by `BreweryPostLocation.CityID`; looked up via `ILocationRepository`, currently consumed only by `Database.Seed`                                            |
+| `BreweryPostLocation` | `Domain.Entities.BreweryPostLocation`, `Features.Breweries`              | 1:1 with `BreweryPost`; `Coordinates` is a `GEOGRAPHY` column, read via a plain Dapper query that selects `CONVERT(varbinary(max), Coordinates)`, since Dapper can't deserialize SQL Server UDTs directly |
+| `City`                | `Domain.Entities.City`, `Features.Locations`                             | Referenced by `BreweryPostLocation.CityID`; written via `ILocationRepository`, read via `ILocationRepository` and `IBreweryRepository`'s location joins, currently written only by `Database.Seed` |
+| `StateProvince`       | `Domain.Entities.StateProvince`, `Features.Locations`                    | Referenced by `City.StateProvinceID`; created on demand by `ILocationRepository.GetOrCreateCityIdAsync`, read via `IBreweryRepository`'s location joins |
+| `Country`             | `Domain.Entities.Country`, `Features.Locations`                          | Referenced by `StateProvince.CountryID`; created on demand by `ILocationRepository.GetOrCreateCityIdAsync`, read via `IBreweryRepository`'s location joins |
 
 ### Tables defined in the schema but not yet wired to a feature slice
 
 These exist so the schema can support planned functionality, but have no
-`Domain.Entities` type, repository, or seed data yet:
+repository or seed data yet:
 
 | Table              | Purpose (from schema)                                                                                    |
 | ------------------ | -------------------------------------------------------------------------------------------------------- |
 | `Photo`            | A photo uploaded by a user account                                                                       |
 | `UserAvatar`       | Links a `UserAccount` to a `Photo` as its avatar                                                         |
 | `UserFollow`       | One user following another (`CannotFollowOwnAccount` check constraint)                                   |
-| `StateProvince`    | Referenced by `City.StateProvinceID`                                                                     |
-| `Country`          | Referenced by `StateProvince.CountryID`                                                                  |
-| `BeerStyle`        | A beer style/category                                                                                    |
-| `BeerPost`         | A beer listing, linked to a `BreweryPost` and `BeerStyle`; `ABV`/`IBU` are constrained (`0-67`, `0-120`) |
+| `BeerStyle`        | A beer style/category; has a `Domain.Entities.BeerStyle` type, but no repository yet                     |
+| `BeerPost`         | A beer listing, linked to a `BreweryPost` and `BeerStyle`; `ABV`/`IBU` are constrained (`0-67`, `0-120`); has a `Domain.Entities.BeerPost` type, but no repository yet |
 | `BeerPostPhoto`    | Links a `BeerPost` to a `Photo`                                                                          |
 | `BeerPostComment`  | A comment + 1-5 `Rating` on a `BeerPost`                                                                 |
 | `BreweryPostPhoto` | Links a `BreweryPost` to a `Photo`                                                                       |
@@ -58,14 +58,15 @@ already-applied script means it won't re-run against existing databases.
 ## Data seeding
 
 `Database.Seed` populates a target database from data produced by the C++
-pipeline (see [Pipeline README](../pipeline/README.md)): cities, user accounts,
-and brewery posts with locations. It only seeds tables that have a feature slice
-to write through (see the table above).
+pipeline (see [Pipeline README](../pipeline/README.md)): countries,
+state/provinces, and cities (created on demand while resolving each brewery's
+location), user accounts, and brewery posts with locations. It only seeds
+tables that have a feature slice to write through (see the table above).
 
 ## Database error handling
 
 - Optimistic-concurrency conflicts are detected by an `UPDATE` affecting zero
-  rows against the `Timer` column.
+  rows against the `RowVersion` column.
 - On failure, the repository throws a `Domain.Exceptions` type directly
   (`NotFoundException`, `ConflictException`, `ArgumentException`, ...).
   `API.Core`'s `GlobalExceptionFilter` maps these to HTTP status codes (404,
