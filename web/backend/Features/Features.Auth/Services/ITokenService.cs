@@ -48,19 +48,19 @@ public interface ITokenService
     ///     Generates a signed access token for the given user, expiring after
     ///     <see cref="TokenServiceExpirationHours.AccessTokenHours" /> hours.
     /// </summary>
-    string GenerateAccessToken(UserAccount user);
+    string GenerateAccessToken(Guid userId, string username);
 
     /// <summary>
     ///     Generates a signed refresh token for the given user, expiring after
     ///     <see cref="TokenServiceExpirationHours.RefreshTokenHours" /> hours.
     /// </summary>
-    string GenerateRefreshToken(UserAccount user);
+    string GenerateRefreshToken(Guid userId, string username);
 
     /// <summary>
     ///     Generates a signed confirmation token for the given user, expiring after
     ///     <see cref="TokenServiceExpirationHours.ConfirmationTokenHours" /> hours.
     /// </summary>
-    string GenerateConfirmationToken(UserAccount user);
+    string GenerateConfirmationToken(Guid userId, string username);
 
 
     /// <summary>Validates an access token's signature and expiration and extracts the caller's identity.</summary>

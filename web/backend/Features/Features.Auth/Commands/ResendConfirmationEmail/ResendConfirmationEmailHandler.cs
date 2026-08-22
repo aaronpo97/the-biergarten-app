@@ -32,7 +32,10 @@ public class ResendConfirmationEmailHandler(
         if (await authRepository.IsUserVerifiedAsync(request.UserId))
             return; // Already confirmed, no-op
 
-        string confirmationToken = tokenService.GenerateConfirmationToken(user);
+        string confirmationToken = tokenService.GenerateConfirmationToken(
+            user.UserAccountId,
+            user.Username
+        );
         await mediator.Send(
             new SendResendConfirmationEmailCommand(user.FirstName, user.Email, confirmationToken),
             cancellationToken
