@@ -3,7 +3,6 @@ using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
 using Features.Auth.DependencyInjection;
-using Features.Auth.Dtos;
 using Features.Auth.Repository;
 using Features.Breweries.DependencyInjection;
 using Features.Breweries.Repository;
@@ -255,7 +254,7 @@ static Table BuildUserTable(IReadOnlyList<UserRecord> users)
             user.User.FirstName,
             user.User.LastName,
             user.Email,
-            user.DateOfBirth.ToString()
+            user.DateOfBirth
         );
     }
 

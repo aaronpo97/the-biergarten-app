@@ -36,7 +36,7 @@ public class EmailDispatcher(
             confirmationLink
         );
 
-        await emailProvider.SendAsync(email, "Welcome to The Biergarten App!", emailHtml, true);
+        await emailProvider.SendAsync(email, "Welcome to The Biergarten App!", emailHtml);
     }
 
     /// <inheritdoc />

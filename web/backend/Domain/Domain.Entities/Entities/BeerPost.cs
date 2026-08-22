@@ -13,8 +13,8 @@ public sealed class BeerPost
     // Attributes
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public decimal ABV { get; set; }
-    public int IBU { get; set; }
+    public decimal Abv { get; set; }
+    public int Ibu { get; set; }
 
     // Audit Fields
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

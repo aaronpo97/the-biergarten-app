@@ -89,30 +89,6 @@ public class TokenService : ITokenService
     }
 
     /// <inheritdoc />
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when <typeparamref name="T" /> is not <see cref="TokenType" /> or does not resolve to a known token type.
-    /// </exception>
-    public string GenerateToken<T>(UserAccount user)
-        where T : struct, Enum
-    {
-        if (typeof(T) != typeof(TokenType))
-            throw new InvalidOperationException("Invalid token type");
-
-        string tokenTypeName = typeof(T).Name;
-        if (!Enum.TryParse(typeof(TokenType), tokenTypeName, out object? parsed))
-            throw new InvalidOperationException("Invalid token type");
-
-        TokenType tokenType = (TokenType)parsed;
-        return tokenType switch
-        {
-            TokenType.AccessToken => GenerateAccessToken(user),
-            TokenType.RefreshToken => GenerateRefreshToken(user),
-            TokenType.ConfirmationToken => GenerateConfirmationToken(user),
-            _ => throw new InvalidOperationException("Invalid token type"),
-        };
-    }
-
-    /// <inheritdoc />
     public async Task<ValidatedToken> ValidateAccessTokenAsync(string token)
     {
         return await ValidateTokenInternalAsync(token, _accessTokenSecret, "access");

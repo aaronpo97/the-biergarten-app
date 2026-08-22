@@ -25,7 +25,6 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 
         RuleFor(x => x.Location.CityId)
             .NotEmpty()
-            .When(x => x.Location is not null)
             .WithMessage("CityId is required.");
 
         RuleFor(x => x.Location.AddressLine1)
@@ -33,15 +32,12 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
             .When(x => x.Location is not null)
             .WithMessage("Address line 1 is required.")
             .MaximumLength(256)
-            .When(x => x.Location is not null)
             .WithMessage("Address line 1 cannot exceed 256 characters.");
 
         RuleFor(x => x.Location.PostalCode)
             .NotEmpty()
-            .When(x => x.Location is not null)
             .WithMessage("Postal code is required.")
             .MaximumLength(20)
-            .When(x => x.Location is not null)
             .WithMessage("Postal code cannot exceed 20 characters.");
     }
 }
