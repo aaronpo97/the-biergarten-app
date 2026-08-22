@@ -92,13 +92,13 @@ public class RegisterUserHandlerTests
             );
 
         _tokenServiceMock
-            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("access-token");
         _tokenServiceMock
-            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("refresh-token");
         _tokenServiceMock
-            .Setup(x => x.GenerateConfirmationToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateConfirmationToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("confirmation-token");
 
         RegistrationPayload result = await _handler.Handle(command, CancellationToken.None);
@@ -192,10 +192,10 @@ public class RegisterUserHandlerTests
             .ReturnsAsync(new UserAccount { UserAccountId = Guid.NewGuid() });
 
         _tokenServiceMock
-            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("access-token");
         _tokenServiceMock
-            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("refresh-token");
 
         await _handler.Handle(command, CancellationToken.None);
@@ -241,10 +241,10 @@ public class RegisterUserHandlerTests
             );
 
         _tokenServiceMock
-            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("access-token");
         _tokenServiceMock
-            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("refresh-token");
         _mediatorMock
             .Setup(x =>

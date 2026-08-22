@@ -37,7 +37,7 @@ public class ResendConfirmationEmailHandlerTests
 
         _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(user);
         _authRepositoryMock.Setup(x => x.IsUserVerifiedAsync(userId)).ReturnsAsync(false);
-        _tokenServiceMock.Setup(x => x.GenerateConfirmationToken(user)).Returns("fresh-token");
+        _tokenServiceMock.Setup(x => x.GenerateConfirmationToken(user.UserAccountId, user.Username)).Returns("fresh-token");
 
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 

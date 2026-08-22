@@ -61,10 +61,10 @@ public class LoginHandlerTests
             .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
         _tokenServiceMock
-            .Setup(x => x.GenerateAccessToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("access-token");
         _tokenServiceMock
-            .Setup(x => x.GenerateRefreshToken(It.IsAny<UserAccount>()))
+            .Setup(x => x.GenerateRefreshToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("refresh-token");
 
         LoginPayload result = await _handler.Handle(
