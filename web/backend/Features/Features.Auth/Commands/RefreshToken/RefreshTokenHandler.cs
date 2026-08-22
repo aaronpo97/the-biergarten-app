@@ -22,8 +22,8 @@ public class RefreshTokenHandler(ITokenService tokenService)
     {
         RefreshTokenResult result = await tokenService.RefreshTokenAsync(request.RefreshToken);
         return new LoginPayload(
-            result.UserAccount.UserAccountId,
-            result.UserAccount.Username,
+            result.UserId,
+            result.Username,
             result.RefreshToken,
             result.AccessToken
         );

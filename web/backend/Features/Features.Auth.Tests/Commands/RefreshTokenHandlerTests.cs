@@ -1,4 +1,3 @@
-using Domain.Entities;
 using Features.Auth.Commands.RefreshToken;
 using Features.Auth.Dtos;
 using Features.Auth.Services;
@@ -15,11 +14,12 @@ public class RefreshTokenHandlerTests
         Mock<ITokenService> tokenServiceMock = new();
         RefreshTokenHandler handler = new(tokenServiceMock.Object);
         Guid userId = Guid.NewGuid();
-        UserAccount user = new() { UserAccountId = userId, Username = "testuser" };
 
         tokenServiceMock
             .Setup(x => x.RefreshTokenAsync("old-refresh-token"))
-            .ReturnsAsync(new RefreshTokenResult(user, "new-refresh-token", "new-access-token"));
+            .ReturnsAsync(
+                new RefreshTokenResult(userId, "testuser", "new-refresh-token", "new-access-token")
+            );
 
         LoginPayload result = await handler.Handle(
             new RefreshTokenCommand("old-refresh-token"),

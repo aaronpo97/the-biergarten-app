@@ -1,25 +1,26 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
+using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Jwt;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace Features.Auth.Tests.Services;
 
 public class TokenServiceRefreshTests
 {
-    private readonly Mock<IAuthRepository> _authRepositoryMock;
     private readonly Mock<ITokenInfrastructure> _tokenInfraMock;
     private readonly TokenService _tokenService;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
 
     public TokenServiceRefreshTests()
     {
         _tokenInfraMock = new Mock<ITokenInfrastructure>();
-        _authRepositoryMock = new Mock<IAuthRepository>();
+        _userManagerMock = UserManagerMockFactory.Create();
 
         // Set environment variables for tokens
         Environment.SetEnvironmentVariable(
@@ -35,7 +36,7 @@ public class TokenServiceRefreshTests
             "test-confirmation-secret-that-is-very-long-1234567890"
         );
 
-        _tokenService = new TokenService(_tokenInfraMock.Object, _authRepositoryMock.Object);
+        _tokenService = new TokenService(_tokenInfraMock.Object, _userManagerMock.Object);
     }
 
     [Fact]
@@ -56,15 +57,7 @@ public class TokenServiceRefreshTests
         ClaimsIdentity claimsIdentity = new(claims);
         ClaimsPrincipal principal = new(claimsIdentity);
 
-        UserAccount userAccount = new()
-        {
-            UserAccountId = userId,
-            Username = username,
-            FirstName = "Test",
-            LastName = "User",
-            Email = "test@example.com",
-            DateOfBirth = new DateTime(1990, 1, 1),
-        };
+        ApplicationUser user = new() { Id = userId, UserName = username };
 
         // Mock the validation of refresh token
         _tokenInfraMock
@@ -78,19 +71,19 @@ public class TokenServiceRefreshTests
                 (Guid _, string _, DateTime _, string _) => $"generated-token-{Guid.NewGuid()}"
             );
 
-        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(userAccount);
+        _userManagerMock.Setup(x => x.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
 
         // Act
         RefreshTokenResult result = await _tokenService.RefreshTokenAsync(refreshToken);
 
         // Assert
         result.Should().NotBeNull();
-        result.UserAccount.UserAccountId.Should().Be(userId);
-        result.UserAccount.Username.Should().Be(username);
+        result.UserId.Should().Be(userId);
+        result.Username.Should().Be(username);
         result.AccessToken.Should().NotBeEmpty();
         result.RefreshToken.Should().NotBeEmpty();
 
-        _authRepositoryMock.Verify(x => x.GetUserByIdAsync(userId), Times.Once);
+        _userManagerMock.Verify(x => x.FindByIdAsync(userId.ToString()), Times.Once);
 
         // Verify tokens were generated (called twice - once for access, once for refresh)
         _tokenInfraMock.Verify(
@@ -161,7 +154,9 @@ public class TokenServiceRefreshTests
             .Setup(x => x.ValidateJwtAsync(refreshToken, It.IsAny<string>()))
             .ReturnsAsync(principal);
 
-        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync((UserAccount?)null);
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
 
         // Act & Assert
         await FluentActions
