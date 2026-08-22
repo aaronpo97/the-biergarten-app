@@ -12,21 +12,28 @@ test.describe('storybook component coverage', () => {
       test(`SubmitButton idle renders in ${theme}`, async ({ page }) => {
          await page.goto(`/iframe.html?id=forms-submitbutton--idle&globals=theme:${theme}`);
          await expect(page.getByRole('button', { name: /save changes/i })).toBeVisible();
-         await expect(page.locator(`[data-theme=\"${theme}\"]`)).toBeVisible();
+         await expect(page.locator(`[data-theme="${theme}"]`)).toBeVisible();
       });
 
       test(`FormField error renders in ${theme}`, async ({ page }) => {
          await page.goto(`/iframe.html?id=forms-formfield--with-error&globals=theme:${theme}`);
          await expect(page.getByLabel('Email address')).toBeVisible();
          await expect(page.getByText(/valid email address/i)).toBeVisible();
-         await expect(page.locator(`[data-theme=\"${theme}\"]`)).toBeVisible();
+         await expect(page.locator(`[data-theme="${theme}"]`)).toBeVisible();
+      });
+
+      test(`SectionCard open renders in ${theme}`, async ({ page }) => {
+         await page.goto(`/iframe.html?id=account-sectioncard--open&globals=theme:${theme}`);
+         await expect(page.getByRole('heading', { name: 'Password' })).toBeVisible();
+         await expect(page.getByText('Form fields go here.')).toBeVisible();
+         await expect(page.locator(`[data-theme="${theme}"]`)).toBeVisible();
       });
 
       test(`Navbar guest renders in ${theme}`, async ({ page }) => {
          await page.goto(`/iframe.html?id=navigation-navbar--guest&globals=theme:${theme}`);
          await expect(page.getByRole('link', { name: /the biergarten app/i })).toBeVisible();
          await expect(page.getByRole('link', { name: /^login$/i })).toBeVisible();
-         await expect(page.locator(`[data-theme=\"${theme}\"]`)).toBeVisible();
+         await expect(page.locator(`[data-theme="${theme}"]`)).toBeVisible();
       });
    }
 
@@ -47,3 +54,6 @@ test.describe('storybook component coverage', () => {
       await expect(page.getByRole('heading', { name: 'Biergarten Weizen' })).toBeVisible();
    });
 });
+
+// Form validation behaviour is covered by Gherkin scenarios in ./features/*.feature,
+// with step definitions in ./steps/form-validation.steps.ts.
