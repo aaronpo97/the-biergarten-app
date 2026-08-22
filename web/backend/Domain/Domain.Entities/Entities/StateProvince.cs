@@ -13,7 +13,7 @@ public sealed class StateProvince
 
     // this is the iso 3166-2 code for the state/province, e.g. "CA" for California, "ON" for Ontario, etc.
     // and is rendered like US-CA for California, CA-ON for Ontario, etc.
-    public string ISO3166_2 { get; set; } = string.Empty;
+    public string Iso31662 { get; set; } = string.Empty;
 
     // Audit Fields
     public byte[]? RowVersion { get; set; }

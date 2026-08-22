@@ -62,10 +62,6 @@ public interface ITokenService
     /// </summary>
     string GenerateConfirmationToken(UserAccount user);
 
-    /// <summary>Generates a token of the type specified by <typeparamref name="T" />.</summary>
-    /// <typeparam name="T">Must be <see cref="TokenType" />.</typeparam>
-    string GenerateToken<T>(UserAccount user)
-        where T : struct, Enum;
 
     /// <summary>Validates an access token's signature and expiration and extracts the caller's identity.</summary>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">

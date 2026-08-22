@@ -59,7 +59,7 @@ public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
             """,
             new
             {
-                UserAccountId = userAccount.UserAccountId,
+                userAccount.UserAccountId,
                 userAccount.Username,
                 userAccount.FirstName,
                 userAccount.LastName,

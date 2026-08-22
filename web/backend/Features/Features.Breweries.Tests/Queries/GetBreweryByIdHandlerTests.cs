@@ -29,7 +29,7 @@ public class GetBreweryByIdHandlerTests
         );
 
         result.Should().NotBeNull();
-        result!.BreweryPostId.Should().Be(brewery.BreweryPostId);
+        result.BreweryPostId.Should().Be(brewery.BreweryPostId);
     }
 
     [Fact]

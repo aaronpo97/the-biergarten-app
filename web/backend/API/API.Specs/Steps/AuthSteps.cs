@@ -413,7 +413,7 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a valid access token for my account")]
     public void GivenIHaveAValidAccessTokenForMyAccount()
     {
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found in scenario");
         string? username = scenario.TryGetValue<string>(RegisteredUsernameKey, out string? user)
@@ -432,7 +432,7 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a valid confirmation token for my account")]
     public void GivenIHaveAValidConfirmationTokenForMyAccount()
     {
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found in scenario");
         string? username = scenario.TryGetValue<string>(RegisteredUsernameKey, out string? user)
@@ -451,7 +451,7 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have an expired confirmation token for my account")]
     public void GivenIHaveAnExpiredConfirmationTokenForMyAccount()
     {
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found in scenario");
         string? username = scenario.TryGetValue<string>(RegisteredUsernameKey, out string? user)
@@ -470,7 +470,7 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have a confirmation token signed with the wrong secret")]
     public void GivenIHaveAConfirmationTokenSignedWithTheWrongSecret()
     {
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found in scenario");
         string? username = scenario.TryGetValue<string>(RegisteredUsernameKey, out string? user)
@@ -668,7 +668,7 @@ public class AuthSteps(ScenarioContext scenario)
     }
 
     [When("I submit a refresh token request using a GET request")]
-    public async Task WhenISubmitARefreshTokenRequestUsingAGETRequest()
+    public async Task WhenISubmitARefreshTokenRequestUsingAGetRequest()
     {
         HttpClient client = GetClient();
         HttpRequestMessage requestMessage = new(HttpMethod.Get, "/api/auth/refresh")
@@ -979,7 +979,7 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAResendConfirmationRequestForMyAccount()
     {
         HttpClient client = GetClient();
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("registered user ID not found");
         string? accessToken = scenario.TryGetValue<string>("accessToken", out string? at)
@@ -1025,7 +1025,7 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAResendConfirmationRequestWithoutAnAccessToken()
     {
         HttpClient client = GetClient();
-        Guid userId = scenario.TryGetValue<Guid>(RegisteredUserIdKey, out Guid id)
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
             ? id
             : Guid.NewGuid();
 

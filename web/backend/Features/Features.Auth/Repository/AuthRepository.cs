@@ -2,7 +2,6 @@ using System.Data.Common;
 using Dapper;
 using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Dtos;
 using Infrastructure.Sql;
 using Microsoft.Data.SqlClient;
 
@@ -46,7 +45,7 @@ public class AuthRepository(ISqlConnectionFactory connectionFactory)
                     INSERT INTO dbo.UserCredential (UserAccountId, Hash)
                     VALUES (@UserAccountId, @Hash);
                     """,
-                    new { UserAccountId = userAccountId, Hash = ua.UserCredential?.Hash },
+                    new { UserAccountId = userAccountId, ua.UserCredential?.Hash },
                     transaction
                 )
             );
