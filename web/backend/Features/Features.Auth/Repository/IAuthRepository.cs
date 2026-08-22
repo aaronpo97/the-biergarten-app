@@ -1,5 +1,4 @@
 using Domain.Entities;
-using Features.Auth.Dtos;
 
 namespace Features.Auth.Repository;
 

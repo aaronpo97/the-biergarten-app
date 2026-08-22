@@ -11,14 +11,12 @@ namespace Features.Auth.Tests.Services;
 
 public class TokenServiceValidationTests
 {
-    private readonly Mock<IAuthRepository> _authRepositoryMock;
     private readonly Mock<ITokenInfrastructure> _tokenInfraMock;
     private readonly TokenService _tokenService;
 
     public TokenServiceValidationTests()
     {
         _tokenInfraMock = new Mock<ITokenInfrastructure>();
-        _authRepositoryMock = new Mock<IAuthRepository>();
 
         // Set environment variables for tokens
         Environment.SetEnvironmentVariable(
@@ -34,7 +32,7 @@ public class TokenServiceValidationTests
             "test-confirmation-secret-that-is-very-long-1234567890"
         );
 
-        _tokenService = new TokenService(_tokenInfraMock.Object, _authRepositoryMock.Object);
+        _tokenService = new TokenService(_tokenInfraMock.Object, new Mock<IAuthRepository>().Object);
     }
 
     [Fact]

@@ -83,4 +83,4 @@ public class JwtAuthenticationHandler(
 /// <summary>
 ///     Options for the <c>JWT</c> authentication scheme handled by <see cref="JwtAuthenticationHandler" />.
 /// </summary>
-public class JwtAuthenticationOptions : AuthenticationSchemeOptions { }
+public class JwtAuthenticationOptions : AuthenticationSchemeOptions;
