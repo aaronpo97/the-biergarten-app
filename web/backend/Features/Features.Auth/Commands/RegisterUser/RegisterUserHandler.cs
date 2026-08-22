@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Domain.Exceptions;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
@@ -28,14 +29,14 @@ public class RegisterUserHandler(
         CancellationToken cancellationToken
     )
     {
-        ApplicationUser user = new()
+        ApplicationUser user = new UserAccount
         {
-            UserName = request.Username,
+            Username = request.Username,
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
             DateOfBirth = request.DateOfBirth,
-        };
+        }.ToApplicationUser();
 
         IdentityResult result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
