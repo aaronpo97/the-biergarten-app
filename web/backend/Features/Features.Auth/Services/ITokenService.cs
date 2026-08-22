@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Domain.Entities;
 
 namespace Features.Auth.Services;
 
@@ -22,7 +21,7 @@ public enum TokenType
 public record ValidatedToken(Guid UserId, string Username, ClaimsPrincipal Principal);
 
 /// <summary>Represents the result of refreshing a user's session.</summary>
-public record RefreshTokenResult(UserAccount UserAccount, string RefreshToken, string AccessToken);
+public record RefreshTokenResult(Guid UserId, string Username, string RefreshToken, string AccessToken);
 
 /// <summary>
 ///     Defines the expiration windows, in hours, for each type of token issued by <see cref="ITokenService" />.

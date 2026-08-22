@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
-using Features.Auth.Repository;
 using Features.Auth.Services;
+using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Jwt;
 using Moq;
@@ -32,7 +32,10 @@ public class TokenServiceValidationTests
             "test-confirmation-secret-that-is-very-long-1234567890"
         );
 
-        _tokenService = new TokenService(_tokenInfraMock.Object, new Mock<IAuthRepository>().Object);
+        _tokenService = new TokenService(
+            _tokenInfraMock.Object,
+            UserManagerMockFactory.Create().Object
+        );
     }
 
     [Fact]

@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Infrastructure.Jwt;
+using Microsoft.AspNetCore.Identity;
 
 namespace Features.Auth.Services;
 
@@ -14,20 +14,23 @@ namespace Features.Auth.Services;
 public class TokenService : ITokenService
 {
     private readonly string _accessTokenSecret;
-    private readonly IAuthRepository _authRepository;
     private readonly string _confirmationTokenSecret;
     private readonly string _refreshTokenSecret;
     private readonly ITokenInfrastructure _tokenInfrastructure;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     /// <summary>Initializes a new instance of the <see cref="TokenService" /> class.</summary>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when any of the <c>ACCESS_TOKEN_SECRET</c>, <c>REFRESH_TOKEN_SECRET</c>, or
     ///     <c>CONFIRMATION_TOKEN_SECRET</c> environment variables are not set.
     /// </exception>
-    public TokenService(ITokenInfrastructure tokenInfrastructure, IAuthRepository authRepository)
+    public TokenService(
+        ITokenInfrastructure tokenInfrastructure,
+        UserManager<ApplicationUser> userManager
+    )
     {
         _tokenInfrastructure = tokenInfrastructure;
-        _authRepository = authRepository;
+        _userManager = userManager;
 
         _accessTokenSecret =
             Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")
@@ -100,14 +103,14 @@ public class TokenService : ITokenService
     public async Task<RefreshTokenResult> RefreshTokenAsync(string refreshTokenString)
     {
         ValidatedToken validated = await ValidateRefreshTokenAsync(refreshTokenString);
-        UserAccount? user = await _authRepository.GetUserByIdAsync(validated.UserId);
+        ApplicationUser? user = await _userManager.FindByIdAsync(validated.UserId.ToString());
         if (user == null)
             throw new UnauthorizedException("User account not found");
 
-        string newAccess = GenerateAccessToken(user.UserAccountId, user.Username);
-        string newRefresh = GenerateRefreshToken(user.UserAccountId, user.Username);
+        string newAccess = GenerateAccessToken(user.Id, user.UserName);
+        string newRefresh = GenerateRefreshToken(user.Id, user.UserName);
 
-        return new RefreshTokenResult(user, newRefresh, newAccess);
+        return new RefreshTokenResult(user.Id, user.UserName, newRefresh, newAccess);
     }
 
     /// <summary>
