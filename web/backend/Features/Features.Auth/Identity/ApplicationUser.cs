@@ -13,6 +13,8 @@ public sealed class ApplicationUser
     public string Email { get; set; } = string.Empty;
     public string? NormalizedEmail { get; set; }
     public bool EmailConfirmed { get; set; }
+
+    /// <summary>The current Argon2 hash, or <see langword="null" /> if the account has no password set.</summary>
     public string? PasswordHash { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

@@ -602,12 +602,9 @@ public class AuthSteps(ScenarioContext scenario)
         string? token = scenario.TryGetValue<string>("refreshToken", out string? t)
             ? t
             : "valid-refresh-token";
-        string body = JsonSerializer.Serialize(new { refreshToken = token });
 
-        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh")
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh");
+        requestMessage.Headers.Add("X-Refresh-Token", token);
 
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -619,12 +616,9 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARefreshTokenRequestWithAnInvalidRefreshToken()
     {
         HttpClient client = GetClient();
-        string body = JsonSerializer.Serialize(new { refreshToken = "invalid-refresh-token" });
 
-        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh")
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh");
+        requestMessage.Headers.Add("X-Refresh-Token", "invalid-refresh-token");
 
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -636,13 +630,9 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARefreshTokenRequestWithTheExpiredRefreshToken()
     {
         HttpClient client = GetClient();
-        // Use an expired token
-        string body = JsonSerializer.Serialize(new { refreshToken = "expired-refresh-token" });
 
-        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh")
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh");
+        requestMessage.Headers.Add("X-Refresh-Token", "expired-refresh-token");
 
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -654,12 +644,8 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitARefreshTokenRequestWithAMissingRefreshToken()
     {
         HttpClient client = GetClient();
-        string body = JsonSerializer.Serialize(new { });
 
-        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh")
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
+        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/refresh");
 
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();

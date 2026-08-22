@@ -1,8 +1,15 @@
+using System.IdentityModel.Tokens.Jwt;
+using Domain.Exceptions;
 using Features.Auth.Commands.ConfirmUser;
+using Features.Auth.Commands.DeleteAccount;
 using Features.Auth.Commands.Login;
 using Features.Auth.Commands.RefreshToken;
 using Features.Auth.Commands.RegisterUser;
 using Features.Auth.Commands.ResendConfirmationEmail;
+using Features.Auth.Commands.UpdateEmail;
+using Features.Auth.Commands.UpdatePassword;
+using Features.Auth.Commands.UpdateProfile;
+using Features.Auth.Commands.UpdateUsername;
 using Features.Auth.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +19,8 @@ using Shared.Contracts;
 namespace Features.Auth.Controllers;
 
 /// <summary>
-///     Handles user authentication concerns: registration, login, email confirmation, and token refresh.
+///     Handles user authentication concerns: registration, login, email confirmation, token refresh, and
+///     self-service account management.
 /// </summary>
 /// <remarks>
 ///     The controller is decorated with <c>[Authorize(AuthenticationSchemes = "JWT")]</c> by default, but most
@@ -23,6 +31,18 @@ namespace Features.Auth.Controllers;
 [Authorize(AuthenticationSchemes = "JWT")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
+    /// <summary>
+    ///     Extracts the authenticated caller's user ID from the validated access token's <c>sub</c> claim.
+    /// </summary>
+    /// <exception cref="UnauthorizedException">Thrown when the claim is missing or malformed.</exception>
+    private Guid GetAuthenticatedUserId()
+    {
+        string? userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if (!Guid.TryParse(userIdClaim, out Guid userId))
+            throw new UnauthorizedException("Access token is missing a valid user ID claim");
+        return userId;
+    }
+
     /// <summary>Registers a new user account.</summary>
     /// <remarks>
     ///     Anonymous access. Returns 201 Created with the new account's ID, username, and issued tokens.
@@ -98,16 +118,19 @@ public class AuthController(IMediator mediator) : ControllerBase
 
     /// <summary>Exchanges a valid refresh token for a new access/refresh token pair.</summary>
     /// <remarks>
-    ///     Anonymous access. Returns 200 OK with the new tokens, or 401 Unauthorized if the refresh token is
-    ///     invalid or expired.
+    ///     Anonymous access. The refresh token is supplied via the <c>X-Refresh-Token</c> header, not the
+    ///     request body. Returns 200 OK with the new tokens, 400 Bad Request if the header is missing, or
+    ///     401 Unauthorized if the refresh token is invalid or expired.
     /// </remarks>
     [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<ActionResult<ResponseBody<LoginPayload>>> Refresh(
-        [FromBody] RefreshTokenCommand command
+        [FromHeader(Name = "X-Refresh-Token")] string? refreshToken
     )
     {
-        LoginPayload payload = await mediator.Send(command);
+        LoginPayload payload = await mediator.Send(
+            new RefreshTokenCommand(refreshToken ?? string.Empty)
+        );
         return Ok(
             new ResponseBody<LoginPayload>
             {
@@ -115,5 +138,108 @@ public class AuthController(IMediator mediator) : ControllerBase
                 Payload = payload,
             }
         );
+    }
+
+    /// <summary>Changes the authenticated user's username.</summary>
+    /// <remarks>Returns 200 OK with the updated username, or 409 Conflict if it is already taken.</remarks>
+    [HttpPatch("username")]
+    public async Task<ActionResult<ResponseBody<UpdateUsernamePayload>>> UpdateUsername(
+        [FromBody] UpdateUsernameRequest request
+    )
+    {
+        UpdateUsernamePayload payload = await mediator.Send(
+            new UpdateUsernameCommand(GetAuthenticatedUserId(), request.NewUsername)
+        );
+        return Ok(
+            new ResponseBody<UpdateUsernamePayload>
+            {
+                Message = "Username updated successfully.",
+                Payload = payload,
+            }
+        );
+    }
+
+    /// <summary>Changes the authenticated user's email address.</summary>
+    /// <remarks>
+    ///     Returns 200 OK with the updated (now unconfirmed) email address, or 409 Conflict if it is
+    ///     already in use. The caller should use <c>POST /api/auth/confirm/resend</c> to re-confirm.
+    /// </remarks>
+    [HttpPatch("email")]
+    public async Task<ActionResult<ResponseBody<UpdateEmailPayload>>> UpdateEmail(
+        [FromBody] UpdateEmailRequest request
+    )
+    {
+        UpdateEmailPayload payload = await mediator.Send(
+            new UpdateEmailCommand(GetAuthenticatedUserId(), request.NewEmail)
+        );
+        return Ok(
+            new ResponseBody<UpdateEmailPayload>
+            {
+                Message = "Email updated successfully.",
+                Payload = payload,
+            }
+        );
+    }
+
+    /// <summary>Changes the authenticated user's password.</summary>
+    /// <remarks>
+    ///     Returns 200 OK on success, or 401 Unauthorized if <c>CurrentPassword</c> does not match the
+    ///     account's current password.
+    /// </remarks>
+    [HttpPatch("password")]
+    public async Task<ActionResult<ResponseBody<UpdatePasswordPayload>>> UpdatePassword(
+        [FromBody] UpdatePasswordRequest request
+    )
+    {
+        UpdatePasswordPayload payload = await mediator.Send(
+            new UpdatePasswordCommand(
+                GetAuthenticatedUserId(),
+                request.CurrentPassword,
+                request.NewPassword
+            )
+        );
+        return Ok(
+            new ResponseBody<UpdatePasswordPayload>
+            {
+                Message = "Password updated successfully.",
+                Payload = payload,
+            }
+        );
+    }
+
+    /// <summary>Updates the authenticated user's profile fields (first name, last name, date of birth).</summary>
+    /// <remarks>Returns 200 OK with the updated profile.</remarks>
+    [HttpPatch("profile")]
+    public async Task<ActionResult<ResponseBody<UpdateProfilePayload>>> UpdateProfile(
+        [FromBody] UpdateProfileRequest request
+    )
+    {
+        UpdateProfilePayload payload = await mediator.Send(
+            new UpdateProfileCommand(
+                GetAuthenticatedUserId(),
+                request.FirstName,
+                request.LastName,
+                request.DateOfBirth
+            )
+        );
+        return Ok(
+            new ResponseBody<UpdateProfilePayload>
+            {
+                Message = "Profile updated successfully.",
+                Payload = payload,
+            }
+        );
+    }
+
+    /// <summary>Permanently deletes the authenticated user's account.</summary>
+    /// <remarks>
+    ///     Returns 200 OK on success, or 409 Conflict if the account still has associated posts, comments,
+    ///     photos, or follows.
+    /// </remarks>
+    [HttpDelete("account")]
+    public async Task<ActionResult<ResponseBody>> DeleteAccount()
+    {
+        await mediator.Send(new DeleteAccountCommand(GetAuthenticatedUserId()));
+        return Ok(new ResponseBody { Message = "Account deleted successfully." });
     }
 }
