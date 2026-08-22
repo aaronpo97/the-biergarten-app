@@ -3,8 +3,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # See API.Core/Dockerfile for why this copies every project file (with real relative paths) and
-# restores against Core.slnx rather than hand-listing API.Specs' transitive dependencies.
-COPY ["Core.slnx", "./"]
+# restores against Biergarten.API.slnx rather than hand-listing API.Specs' transitive dependencies.
+COPY ["Biergarten.API.slnx", "./"]
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
 COPY ["API/API.Specs/API.Specs.csproj", "API/API.Specs/"]
 COPY ["Database/Database.Migrations/Database.Migrations.csproj", "Database/Database.Migrations/"]
@@ -28,7 +28,7 @@ COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHash
 COPY ["Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj", "Infrastructure/Infrastructure.Sql/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
-RUN dotnet restore "Core.slnx"
+RUN dotnet restore "Biergarten.API.slnx"
 COPY . .
 WORKDIR "/src/API/API.Specs"
 RUN dotnet build "./API.Specs.csproj" -c $BUILD_CONFIGURATION -o /app/build
