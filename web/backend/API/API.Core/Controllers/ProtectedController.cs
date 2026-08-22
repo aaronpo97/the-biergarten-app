@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Contracts;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace API.Core.Controllers;
 
@@ -20,8 +20,8 @@ public class ProtectedController : ControllerBase
     [HttpGet]
     public ActionResult<ResponseBody<object>> Get()
     {
-        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        string? username = User.FindFirst(ClaimTypes.Name)?.Value;
+        string? userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        string? username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
 
         return Ok(
             new ResponseBody<object>
