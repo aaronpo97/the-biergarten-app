@@ -41,6 +41,11 @@ type Pages = {
   "/breweries": {
     params: {};
   };
+  "/breweries/:id": {
+    params: {
+      "id": string;
+    };
+  };
   "/beer-styles": {
     params: {};
   };
@@ -49,7 +54,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/theme" | "/login" | "/register" | "/logout" | "/dashboard" | "/account" | "/confirm" | "/beers" | "/breweries" | "/beer-styles";
+    page: "/" | "/theme" | "/login" | "/register" | "/logout" | "/dashboard" | "/account" | "/confirm" | "/beers" | "/breweries" | "/breweries/:id" | "/beer-styles";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -91,6 +96,10 @@ type RouteFiles = {
     id: "routes/breweries";
     page: "/breweries";
   };
+  "routes/brewery-detail.tsx": {
+    id: "routes/brewery-detail";
+    page: "/breweries/:id";
+  };
   "routes/beer-styles.tsx": {
     id: "routes/beer-styles";
     page: "/beer-styles";
@@ -109,5 +118,6 @@ type RouteModules = {
   "routes/confirm": typeof import("./app/routes/confirm.tsx");
   "routes/beers": typeof import("./app/routes/beers.tsx");
   "routes/breweries": typeof import("./app/routes/breweries.tsx");
+  "routes/brewery-detail": typeof import("./app/routes/brewery-detail.tsx");
   "routes/beer-styles": typeof import("./app/routes/beer-styles.tsx");
 };

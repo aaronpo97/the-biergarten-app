@@ -4,6 +4,7 @@ import { Lock, Mail, Settings, Trash, User, WarningTriangle } from 'iconoir-reac
 import { useEffect, useReducer, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { data, Link, redirect, useNavigation, useSubmit } from 'react-router';
+import SectionCard from '../components/account/SectionCard';
 import FormField from '../components/forms/FormField';
 import SubmitButton from '../components/forms/SubmitButton';
 import { showErrorToast, showSuccessToast } from '../components/toast/toast';
@@ -233,46 +234,6 @@ function sectionReducer(state: SectionState, action: SectionAction): SectionStat
    }
 }
 
-function SectionCard({
-   icon,
-   title,
-   description,
-   open,
-   onToggle,
-   children,
-}: {
-   icon: React.ReactNode;
-   title: string;
-   description: string;
-   open: boolean;
-   onToggle: () => void;
-   children: React.ReactNode;
-}) {
-   return (
-      <div className="card bg-base-100 shadow">
-         <div className="card-body">
-            <div className="flex w-full items-center justify-between gap-5">
-               <div className="flex items-start gap-3">
-                  <span className="text-base-content/60 mt-1">{icon}</span>
-                  <div>
-                     <h2 className="card-title text-lg">{title}</h2>
-                     <p className="text-sm text-base-content/70">{description}</p>
-                  </div>
-               </div>
-               <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={open}
-                  onChange={onToggle}
-                  aria-label={`Toggle ${title.toLowerCase()} form`}
-               />
-            </div>
-            {open && <div className="mt-4">{children}</div>}
-         </div>
-      </div>
-   );
-}
-
 export default function Account({ loaderData, actionData }: Route.ComponentProps) {
    const { username, userAccountId, firstName, lastName, email, dateOfBirth } = loaderData;
    const result = actionData as ActionResult | undefined;
@@ -301,7 +262,7 @@ export default function Account({ loaderData, actionData }: Route.ComponentProps
       if (!result) return;
 
       if (result.intent === 'username') {
-         if (!result.success) {
+         if (result.success === false) {
             showErrorToast(result.error);
             return;
          }
@@ -309,7 +270,7 @@ export default function Account({ loaderData, actionData }: Route.ComponentProps
          dispatch({ type: 'CLOSE_ALL' });
          usernameForm.reset({ newUsername: result.username });
       } else if (result.intent === 'email') {
-         if (!result.success) {
+         if (result.success === false) {
             showErrorToast(result.error);
             return;
          }
@@ -321,7 +282,7 @@ export default function Account({ loaderData, actionData }: Route.ComponentProps
          dispatch({ type: 'CLOSE_ALL' });
          emailForm.reset({ newEmail: result.email });
       } else if (result.intent === 'profile') {
-         if (!result.success) {
+         if (result.success === false) {
             showErrorToast(result.error);
             return;
          }
@@ -333,7 +294,7 @@ export default function Account({ loaderData, actionData }: Route.ComponentProps
             dateOfBirth: result.dateOfBirth,
          });
       } else if (result.intent === 'password') {
-         if (!result.success) {
+         if (result.success === false) {
             showErrorToast(result.error);
             return;
          }

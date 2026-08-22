@@ -11,5 +11,6 @@ export default [
    route('confirm', 'routes/confirm.tsx'),
    route('beers', 'routes/beers.tsx'),
    route('breweries', 'routes/breweries.tsx'),
+   route('breweries/:id', 'routes/brewery-detail.tsx'),
    route('beer-styles', 'routes/beer-styles.tsx'),
 ] satisfies RouteConfig;
