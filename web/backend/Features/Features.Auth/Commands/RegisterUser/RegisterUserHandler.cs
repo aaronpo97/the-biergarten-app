@@ -48,9 +48,18 @@ public class RegisterUserHandler(
             }
         );
 
-        string accessToken = tokenService.GenerateAccessToken(createdUser);
-        string refreshToken = tokenService.GenerateRefreshToken(createdUser);
-        string confirmationToken = tokenService.GenerateConfirmationToken(createdUser);
+        string accessToken = tokenService.GenerateAccessToken(
+            createdUser.UserAccountId,
+            createdUser.Username
+        );
+        string refreshToken = tokenService.GenerateRefreshToken(
+            createdUser.UserAccountId,
+            createdUser.Username
+        );
+        string confirmationToken = tokenService.GenerateConfirmationToken(
+            createdUser.UserAccountId,
+            createdUser.Username
+        );
 
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
             return new RegistrationPayload(

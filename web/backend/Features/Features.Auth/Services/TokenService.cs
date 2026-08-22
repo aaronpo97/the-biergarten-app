@@ -49,40 +49,30 @@ public class TokenService : ITokenService
     }
 
     /// <inheritdoc />
-    public string GenerateAccessToken(UserAccount user)
+    public string GenerateAccessToken(Guid userId, string username)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(TokenServiceExpirationHours.AccessTokenHours);
-        return _tokenInfrastructure.GenerateJwt(
-            user.UserAccountId,
-            user.Username,
-            expiresAt,
-            _accessTokenSecret
-        );
+        return _tokenInfrastructure.GenerateJwt(userId, username, expiresAt, _accessTokenSecret);
     }
 
     /// <inheritdoc />
-    public string GenerateRefreshToken(UserAccount user)
+    public string GenerateRefreshToken(Guid userId, string username)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
             TokenServiceExpirationHours.RefreshTokenHours
         );
-        return _tokenInfrastructure.GenerateJwt(
-            user.UserAccountId,
-            user.Username,
-            expiresAt,
-            _refreshTokenSecret
-        );
+        return _tokenInfrastructure.GenerateJwt(userId, username, expiresAt, _refreshTokenSecret);
     }
 
     /// <inheritdoc />
-    public string GenerateConfirmationToken(UserAccount user)
+    public string GenerateConfirmationToken(Guid userId, string username)
     {
         DateTime expiresAt = DateTime.UtcNow.AddHours(
             TokenServiceExpirationHours.ConfirmationTokenHours
         );
         return _tokenInfrastructure.GenerateJwt(
-            user.UserAccountId,
-            user.Username,
+            userId,
+            username,
             expiresAt,
             _confirmationTokenSecret
         );
@@ -114,8 +104,8 @@ public class TokenService : ITokenService
         if (user == null)
             throw new UnauthorizedException("User account not found");
 
-        string newAccess = GenerateAccessToken(user);
-        string newRefresh = GenerateRefreshToken(user);
+        string newAccess = GenerateAccessToken(user.UserAccountId, user.Username);
+        string newRefresh = GenerateRefreshToken(user.UserAccountId, user.Username);
 
         return new RefreshTokenResult(user, newRefresh, newAccess);
     }

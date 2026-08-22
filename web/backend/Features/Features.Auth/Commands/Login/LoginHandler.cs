@@ -35,8 +35,8 @@ public class LoginHandler(
         if (!passwordInfrastructure.Verify(request.Password, activeCred.Hash))
             throw new UnauthorizedException("Invalid username or password.");
 
-        string accessToken = tokenService.GenerateAccessToken(user);
-        string refreshToken = tokenService.GenerateRefreshToken(user);
+        string accessToken = tokenService.GenerateAccessToken(user.UserAccountId, user.Username);
+        string refreshToken = tokenService.GenerateRefreshToken(user.UserAccountId, user.Username);
 
         return new LoginPayload(user.UserAccountId, user.Username, refreshToken, accessToken);
     }
