@@ -1,32 +1,26 @@
-using Domain.Entities;
 using Domain.Exceptions;
 using Features.Auth.Commands.Login;
 using Features.Auth.Dtos;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
+using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
-using Infrastructure.PasswordHashing;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace Features.Auth.Tests.Queries;
 
 public class LoginHandlerTests
 {
-    private readonly Mock<IAuthRepository> _authRepoMock;
     private readonly LoginHandler _handler;
-    private readonly Mock<IPasswordInfrastructure> _passwordInfraMock;
     private readonly Mock<ITokenService> _tokenServiceMock;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
 
     public LoginHandlerTests()
     {
-        _authRepoMock = new Mock<IAuthRepository>();
-        _passwordInfraMock = new Mock<IPasswordInfrastructure>();
+        _userManagerMock = UserManagerMockFactory.Create();
         _tokenServiceMock = new Mock<ITokenService>();
-        _handler = new LoginHandler(
-            _authRepoMock.Object,
-            _passwordInfraMock.Object,
-            _tokenServiceMock.Object
-        );
+        _handler = new LoginHandler(_userManagerMock.Object, _tokenServiceMock.Object);
     }
 
     [Fact]
@@ -35,31 +29,20 @@ public class LoginHandlerTests
         const string username = "CogitoErgoSum";
         Guid userAccountId = Guid.NewGuid();
 
-        UserAccount userAccount = new()
+        ApplicationUser user = new()
         {
-            UserAccountId = userAccountId,
-            Username = username,
+            Id = userAccountId,
+            UserName = username,
             FirstName = "René",
             LastName = "Descartes",
             Email = "r.descartes@example.com",
             DateOfBirth = new DateTime(1596, 03, 31),
         };
 
-        UserCredential userCredential = new()
-        {
-            UserCredentialId = Guid.NewGuid(),
-            UserAccountId = userAccountId,
-            Hash = "some-hash",
-            Expiry = DateTime.MaxValue,
-        };
-
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(username)).ReturnsAsync(userAccount);
-        _authRepoMock
-            .Setup(x => x.GetActiveCredentialByUserAccountIdAsync(userAccountId))
-            .ReturnsAsync(userCredential);
-        _passwordInfraMock
-            .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(true);
+        _userManagerMock.Setup(x => x.FindByNameAsync(username)).ReturnsAsync(user);
+        _userManagerMock
+            .Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>()))
+            .ReturnsAsync(true);
         _tokenServiceMock
             .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns("access-token");
@@ -83,16 +66,16 @@ public class LoginHandlerTests
     public async Task Handle_WithUnregisteredUsername_ThrowsUnauthorizedException()
     {
         const string username = "de_beauvoir";
-        _authRepoMock
-            .Setup(x => x.GetUserByUsernameAsync(username))
-            .ReturnsAsync((UserAccount?)null);
+        _userManagerMock
+            .Setup(x => x.FindByNameAsync(username))
+            .ReturnsAsync((ApplicationUser?)null);
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(new LoginCommand(username, "password"), CancellationToken.None);
 
         await act.Should().ThrowAsync<UnauthorizedException>();
-        _authRepoMock.Verify(
-            x => x.GetActiveCredentialByUserAccountIdAsync(It.IsAny<Guid>()),
+        _userManagerMock.Verify(
+            x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
             Times.Never
         );
     }
@@ -101,13 +84,10 @@ public class LoginHandlerTests
     public async Task Handle_WithNoActiveCredential_ThrowsUnauthorizedException()
     {
         const string username = "BRussell";
-        Guid userAccountId = Guid.NewGuid();
-        UserAccount userAccount = new() { UserAccountId = userAccountId, Username = username };
+        ApplicationUser user = new() { Id = Guid.NewGuid(), UserName = username };
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(username)).ReturnsAsync(userAccount);
-        _authRepoMock
-            .Setup(x => x.GetActiveCredentialByUserAccountIdAsync(userAccountId))
-            .ReturnsAsync((UserCredential?)null);
+        _userManagerMock.Setup(x => x.FindByNameAsync(username)).ReturnsAsync(user);
+        _userManagerMock.Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>())).ReturnsAsync(false);
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(new LoginCommand(username, "password"), CancellationToken.None);
@@ -115,32 +95,16 @@ public class LoginHandlerTests
         await act.Should()
             .ThrowAsync<UnauthorizedException>()
             .WithMessage("Invalid username or password.");
-        _passwordInfraMock.Verify(
-            x => x.Verify(It.IsAny<string>(), It.IsAny<string>()),
-            Times.Never
-        );
     }
 
     [Fact]
     public async Task Handle_WithIncorrectPassword_ThrowsUnauthorizedException()
     {
         const string username = "RCarnap";
-        Guid userAccountId = Guid.NewGuid();
-        UserAccount userAccount = new() { UserAccountId = userAccountId, Username = username };
-        UserCredential userCredential = new()
-        {
-            UserCredentialId = Guid.NewGuid(),
-            UserAccountId = userAccountId,
-            Hash = "hashed-password",
-        };
+        ApplicationUser user = new() { Id = Guid.NewGuid(), UserName = username };
 
-        _authRepoMock.Setup(x => x.GetUserByUsernameAsync(username)).ReturnsAsync(userAccount);
-        _authRepoMock
-            .Setup(x => x.GetActiveCredentialByUserAccountIdAsync(userAccountId))
-            .ReturnsAsync(userCredential);
-        _passwordInfraMock
-            .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(false);
+        _userManagerMock.Setup(x => x.FindByNameAsync(username)).ReturnsAsync(user);
+        _userManagerMock.Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>())).ReturnsAsync(false);
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(

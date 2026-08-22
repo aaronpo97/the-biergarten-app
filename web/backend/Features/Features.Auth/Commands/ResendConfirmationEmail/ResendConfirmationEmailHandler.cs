@@ -1,7 +1,7 @@
-using Domain.Entities;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Shared.Application.Emails;
 
 namespace Features.Auth.Commands.ResendConfirmationEmail;
@@ -15,7 +15,7 @@ namespace Features.Auth.Commands.ResendConfirmationEmail;
 ///     or if the user's account is already verified.
 /// </remarks>
 public class ResendConfirmationEmailHandler(
-    IAuthRepository authRepository,
+    UserManager<ApplicationUser> userManager,
     ITokenService tokenService,
     IMediator mediator
 ) : IRequestHandler<ResendConfirmationEmailCommand>
@@ -25,17 +25,14 @@ public class ResendConfirmationEmailHandler(
         CancellationToken cancellationToken
     )
     {
-        UserAccount? user = await authRepository.GetUserByIdAsync(request.UserId);
+        ApplicationUser? user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
             return; // Silent return to prevent user enumeration
 
-        if (await authRepository.IsUserVerifiedAsync(request.UserId))
+        if (await userManager.IsEmailConfirmedAsync(user))
             return; // Already confirmed, no-op
 
-        string confirmationToken = tokenService.GenerateConfirmationToken(
-            user.UserAccountId,
-            user.Username
-        );
+        string confirmationToken = tokenService.GenerateConfirmationToken(user.Id, user.UserName);
         await mediator.Send(
             new SendResendConfirmationEmailCommand(user.FirstName, user.Email, confirmationToken),
             cancellationToken

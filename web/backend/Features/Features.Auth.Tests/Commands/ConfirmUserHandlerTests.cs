@@ -1,27 +1,34 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Domain.Entities;
 using Domain.Exceptions;
 using Features.Auth.Commands.ConfirmUser;
 using Features.Auth.Dtos;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
+using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace Features.Auth.Tests.Commands;
 
 public class ConfirmUserHandlerTests
 {
-    private readonly Mock<IAuthRepository> _authRepositoryMock;
+    private readonly Mock<IUserEmailStore<ApplicationUser>> _emailStoreMock;
     private readonly ConfirmUserHandler _handler;
     private readonly Mock<ITokenService> _tokenServiceMock;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
 
     public ConfirmUserHandlerTests()
     {
-        _authRepositoryMock = new Mock<IAuthRepository>();
+        _userManagerMock = UserManagerMockFactory.Create();
+        _emailStoreMock = new Mock<IUserEmailStore<ApplicationUser>>();
         _tokenServiceMock = new Mock<ITokenService>();
-        _handler = new ConfirmUserHandler(_authRepositoryMock.Object, _tokenServiceMock.Object);
+        _handler = new ConfirmUserHandler(
+            _userManagerMock.Object,
+            _emailStoreMock.Object,
+            _tokenServiceMock.Object
+        );
     }
 
     private static ValidatedToken MakeValidatedToken(Guid userId, string username)
@@ -44,12 +51,13 @@ public class ConfirmUserHandlerTests
         const string confirmationToken = "valid-confirmation-token";
 
         ValidatedToken validatedToken = MakeValidatedToken(userId, username);
-        UserAccount userAccount = new() { UserAccountId = userId, Username = username };
+        ApplicationUser user = new() { Id = userId, UserName = username };
 
         _tokenServiceMock
             .Setup(x => x.ValidateConfirmationTokenAsync(confirmationToken))
             .ReturnsAsync(validatedToken);
-        _authRepositoryMock.Setup(x => x.ConfirmUserAccountAsync(userId)).ReturnsAsync(userAccount);
+        _userManagerMock.Setup(x => x.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
+        _userManagerMock.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
         ConfirmationPayload result = await _handler.Handle(
             new ConfirmUserCommand(confirmationToken),
@@ -59,6 +67,12 @@ public class ConfirmUserHandlerTests
         result.Should().NotBeNull();
         result.UserAccountId.Should().Be(userId);
         result.ConfirmedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+
+        _emailStoreMock.Verify(
+            x => x.SetEmailConfirmedAsync(user, true, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+        _userManagerMock.Verify(x => x.UpdateAsync(user), Times.Once);
     }
 
     [Fact]
@@ -85,9 +99,9 @@ public class ConfirmUserHandlerTests
         _tokenServiceMock
             .Setup(x => x.ValidateConfirmationTokenAsync(confirmationToken))
             .ReturnsAsync(MakeValidatedToken(userId, username));
-        _authRepositoryMock
-            .Setup(x => x.ConfirmUserAccountAsync(userId))
-            .ReturnsAsync((UserAccount?)null);
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
 
         Func<Task<ConfirmationPayload>> act = async () =>
             await _handler.Handle(
