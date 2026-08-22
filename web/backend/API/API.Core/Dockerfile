@@ -12,9 +12,9 @@ WORKDIR /src
 # Copy the solution file and every project file first (preserving their real relative paths, since
 # ProjectReference paths are resolved relative to the referencing .csproj's location), so the
 # `dotnet restore` layer stays cached as long as no project file or package reference changes,
-# independent of source-only edits. Restoring against Core.slnx avoids hand-maintaining a per-project
+# independent of source-only edits. Restoring against Biergarten.API.slnx avoids hand-maintaining a per-project
 # dependency list here that silently drifts out of sync as ProjectReferences change.
-COPY ["Core.slnx", "./"]
+COPY ["Biergarten.API.slnx", "./"]
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
 COPY ["API/API.Specs/API.Specs.csproj", "API/API.Specs/"]
 COPY ["Database/Database.Migrations/Database.Migrations.csproj", "Database/Database.Migrations/"]
@@ -38,7 +38,7 @@ COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHash
 COPY ["Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj", "Infrastructure/Infrastructure.Sql/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
-RUN dotnet restore "Core.slnx"
+RUN dotnet restore "Biergarten.API.slnx"
 COPY . .
 WORKDIR "/src/API/API.Core"
 RUN dotnet build "./API.Core.csproj" -c $BUILD_CONFIGURATION -o /app/build
