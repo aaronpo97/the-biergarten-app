@@ -1,8 +1,9 @@
-using Domain.Entities;
 using Features.Auth.Commands.ResendConfirmationEmail;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
+using Features.Auth.Tests.TestSupport;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 using Shared.Application.Emails;
 
@@ -10,15 +11,15 @@ namespace Features.Auth.Tests.Commands;
 
 public class ResendConfirmationEmailHandlerTests
 {
-    private readonly Mock<IAuthRepository> _authRepositoryMock = new();
     private readonly ResendConfirmationEmailHandler _handler;
     private readonly Mock<IMediator> _mediatorMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock = UserManagerMockFactory.Create();
 
     public ResendConfirmationEmailHandlerTests()
     {
         _handler = new ResendConfirmationEmailHandler(
-            _authRepositoryMock.Object,
+            _userManagerMock.Object,
             _tokenServiceMock.Object,
             _mediatorMock.Object
         );
@@ -28,16 +29,18 @@ public class ResendConfirmationEmailHandlerTests
     public async Task Handle_SendsFreshConfirmationEmail_WhenUserExistsAndUnverified()
     {
         Guid userId = Guid.NewGuid();
-        UserAccount user = new()
+        ApplicationUser user = new()
         {
-            UserAccountId = userId,
+            Id = userId,
             FirstName = "Aaron",
             Email = "aaron@example.com",
         };
 
-        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(user);
-        _authRepositoryMock.Setup(x => x.IsUserVerifiedAsync(userId)).ReturnsAsync(false);
-        _tokenServiceMock.Setup(x => x.GenerateConfirmationToken(user.UserAccountId, user.Username)).Returns("fresh-token");
+        _userManagerMock.Setup(x => x.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
+        _userManagerMock.Setup(x => x.IsEmailConfirmedAsync(user)).ReturnsAsync(false);
+        _tokenServiceMock
+            .Setup(x => x.GenerateConfirmationToken(user.Id, user.UserName))
+            .Returns("fresh-token");
 
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 
@@ -59,7 +62,9 @@ public class ResendConfirmationEmailHandlerTests
     public async Task Handle_DoesNothing_WhenUserDoesNotExist()
     {
         Guid userId = Guid.NewGuid();
-        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync((UserAccount?)null);
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
 
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 
@@ -77,10 +82,10 @@ public class ResendConfirmationEmailHandlerTests
     public async Task Handle_DoesNothing_WhenUserAlreadyVerified()
     {
         Guid userId = Guid.NewGuid();
-        UserAccount user = new() { UserAccountId = userId };
+        ApplicationUser user = new() { Id = userId };
 
-        _authRepositoryMock.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(user);
-        _authRepositoryMock.Setup(x => x.IsUserVerifiedAsync(userId)).ReturnsAsync(true);
+        _userManagerMock.Setup(x => x.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
+        _userManagerMock.Setup(x => x.IsEmailConfirmedAsync(user)).ReturnsAsync(true);
 
         await _handler.Handle(new ResendConfirmationEmailCommand(userId), CancellationToken.None);
 

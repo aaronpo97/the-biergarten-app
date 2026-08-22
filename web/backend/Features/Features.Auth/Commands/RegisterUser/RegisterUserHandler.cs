@@ -1,84 +1,62 @@
-using Domain.Entities;
 using Domain.Exceptions;
 using Features.Auth.Dtos;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
-using Infrastructure.PasswordHashing;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Shared.Application.Emails;
 
 namespace Features.Auth.Commands.RegisterUser;
 
 /// <summary>
-///     Handles <see cref="RegisterUserCommand" />: validates uniqueness, hashes the password, persists the
-///     account, issues access/refresh/confirmation tokens, and attempts to send the registration
-///     confirmation email via Features.Emails.
+///     Handles <see cref="RegisterUserCommand" />: creates the user via <see cref="UserManager{TUser}" />
+///     (which validates uniqueness and hashes the password), issues access/refresh/confirmation tokens, and
+///     attempts to send the registration confirmation email via Features.Emails.
 /// </summary>
 public class RegisterUserHandler(
-    IAuthRepository authRepo,
-    IPasswordInfrastructure passwordInfrastructure,
+    UserManager<ApplicationUser> userManager,
     ITokenService tokenService,
     IMediator mediator
 ) : IRequestHandler<RegisterUserCommand, RegistrationPayload>
 {
     /// <exception cref="ConflictException">
-    ///     Thrown when an existing account already has the same username or email address.
+    ///     Thrown when an existing account already has the same username or email address, or when user
+    ///     creation otherwise fails.
     /// </exception>
     public async Task<RegistrationPayload> Handle(
         RegisterUserCommand request,
         CancellationToken cancellationToken
     )
     {
-        await ValidateUserDoesNotExist(request.Username, request.Email);
+        ApplicationUser user = new()
+        {
+            UserName = request.Username,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            DateOfBirth = request.DateOfBirth,
+        };
 
-        string hashed = passwordInfrastructure.Hash(request.Password);
+        IdentityResult result = await userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+        {
+            if (result.Errors.Any(e => e.Code is "DuplicateUserName" or "DuplicateEmail"))
+                throw new ConflictException("Username or email already exists");
+            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+        }
 
-        UserAccount createdUser = await authRepo.RegisterUserAsync(
-            new UserAccount
-            {
-                Username = request.Username,
-                FirstName =  request.FirstName,
-                LastName =  request.LastName,
-                DateOfBirth =  request.DateOfBirth,
-                Email = request.Email,
-                UserCredential = new UserCredential
-                {
-                    Hash = hashed,
-                }
-            }
-        );
-
-        string accessToken = tokenService.GenerateAccessToken(
-            createdUser.UserAccountId,
-            createdUser.Username
-        );
-        string refreshToken = tokenService.GenerateRefreshToken(
-            createdUser.UserAccountId,
-            createdUser.Username
-        );
-        string confirmationToken = tokenService.GenerateConfirmationToken(
-            createdUser.UserAccountId,
-            createdUser.Username
-        );
+        string accessToken = tokenService.GenerateAccessToken(user.Id, user.UserName);
+        string refreshToken = tokenService.GenerateRefreshToken(user.Id, user.UserName);
+        string confirmationToken = tokenService.GenerateConfirmationToken(user.Id, user.UserName);
 
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            return new RegistrationPayload(
-                createdUser.UserAccountId,
-                createdUser.Username,
-                string.Empty,
-                string.Empty,
-                false
-            );
+            return new RegistrationPayload(user.Id, user.UserName, string.Empty, string.Empty, false);
 
         bool emailSent = false;
         try
         {
             await mediator.Send(
-                new SendRegistrationEmailCommand(
-                    createdUser.FirstName,
-                    createdUser.Email,
-                    confirmationToken
-                ),
+                new SendRegistrationEmailCommand(user.FirstName, user.Email, confirmationToken),
                 cancellationToken
             );
             emailSent = true;
@@ -90,24 +68,6 @@ public class RegisterUserHandler(
             // ignored
         }
 
-        return new RegistrationPayload(
-            createdUser.UserAccountId,
-            createdUser.Username,
-            refreshToken,
-            accessToken,
-            emailSent
-        );
-    }
-
-    /// <exception cref="ConflictException">
-    ///     Thrown when an existing account already has the same username or email address.
-    /// </exception>
-    private async Task ValidateUserDoesNotExist(string username, string email)
-    {
-        UserAccount? existingUsername = await authRepo.GetUserByUsernameAsync(username);
-        UserAccount? existingEmail = await authRepo.GetUserByEmailAsync(email);
-
-        if (existingUsername != null || existingEmail != null)
-            throw new ConflictException("Username or email already exists");
+        return new RegistrationPayload(user.Id, user.UserName, refreshToken, accessToken, emailSent);
     }
 }

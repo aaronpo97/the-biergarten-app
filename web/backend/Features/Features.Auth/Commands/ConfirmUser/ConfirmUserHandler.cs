@@ -1,9 +1,9 @@
-using Domain.Entities;
 using Domain.Exceptions;
 using Features.Auth.Dtos;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Auth.Services;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace Features.Auth.Commands.ConfirmUser;
 
@@ -11,8 +11,11 @@ namespace Features.Auth.Commands.ConfirmUser;
 ///     Handles <see cref="ConfirmUserCommand" /> by validating the confirmation token and marking the
 ///     corresponding user account as confirmed.
 /// </summary>
-public class ConfirmUserHandler(IAuthRepository authRepository, ITokenService tokenService)
-    : IRequestHandler<ConfirmUserCommand, ConfirmationPayload>
+public class ConfirmUserHandler(
+    UserManager<ApplicationUser> userManager,
+    IUserEmailStore<ApplicationUser> emailStore,
+    ITokenService tokenService
+) : IRequestHandler<ConfirmUserCommand, ConfirmationPayload>
 {
     /// <exception cref="UnauthorizedException">
     ///     Thrown when the confirmation token is invalid or expired, or when the associated user account cannot be found.
@@ -26,11 +29,15 @@ public class ConfirmUserHandler(IAuthRepository authRepository, ITokenService to
             request.Token
         );
 
-        UserAccount? user = await authRepository.ConfirmUserAccountAsync(validatedToken.UserId);
-
+        ApplicationUser? user = await userManager.FindByIdAsync(
+            validatedToken.UserId.ToString()
+        );
         if (user == null)
             throw new UnauthorizedException("User account not found");
 
-        return new ConfirmationPayload(user.UserAccountId, DateTime.UtcNow);
+        await emailStore.SetEmailConfirmedAsync(user, true, cancellationToken);
+        await userManager.UpdateAsync(user);
+
+        return new ConfirmationPayload(user.Id, DateTime.UtcNow);
     }
 }
