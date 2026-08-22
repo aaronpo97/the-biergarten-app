@@ -3,15 +3,15 @@ using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
 using Features.Auth.DependencyInjection;
-using Features.Auth.Repository;
+using Features.Auth.Identity;
 using Features.Breweries.DependencyInjection;
 using Features.Breweries.Repository;
 using Features.Locations.DependencyInjection;
 using Features.Locations.Dtos;
 using Features.Locations.Repository;
 using idunno.Password;
-using Infrastructure.PasswordHashing;
 using Infrastructure.Sql.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -36,10 +36,8 @@ static async Task<int> RunAsync()
             provider.GetRequiredService<IBreweryRepository>();
         ILocationRepository locationRepository =
             provider.GetRequiredService<ILocationRepository>();
-        IAuthRepository authRepository =
-            provider.GetRequiredService<IAuthRepository>();
-        IPasswordInfrastructure passwordInfrastructure =
-            provider.GetRequiredService<IPasswordInfrastructure>();
+        UserManager<ApplicationUser> userManager =
+            provider.GetRequiredService<UserManager<ApplicationUser>>();
 
         AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]")
             .LeftJustified());
@@ -94,11 +92,7 @@ static async Task<int> RunAsync()
                 "Loading user data into target database...",
                 async ctx =>
                 {
-                    postedByIds = await LoadUsersIntoDatabaseAsync(
-                        authRepository,
-                        passwordInfrastructure,
-                        seedData.Users
-                    );
+                    postedByIds = await LoadUsersIntoDatabaseAsync(userManager, seedData.Users);
                     ctx.Status("User data loaded into target database.");
                 }
             );
@@ -132,8 +126,7 @@ static async Task<int> RunAsync()
 }
 
 static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
-    IAuthRepository authRepository,
-    IPasswordInfrastructure passwordInfrastructure,
+    UserManager<ApplicationUser> userManager,
     IReadOnlyList<UserRecord> users
 )
 {
@@ -141,22 +134,29 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
 
     foreach (UserRecord userRecord in users)
     {
-        UserAccount userAccount = await authRepository.RegisterUserAsync(
-            new UserAccount()
-            {
-                FirstName = userRecord.User.FirstName,
-                LastName = userRecord.User.LastName,
-                DateOfBirth = DateTime.Parse(userRecord.DateOfBirth),
-                Username = userRecord.User.Username,
-                Email = userRecord.Email,
-                UserCredential = new UserCredential
-                {
-                    Hash = passwordInfrastructure.Hash(
-                        password: PasswordGenerator.Generate(64, 12, 12))
-                }
-            }
+        ApplicationUser user = new()
+        {
+            FirstName = userRecord.User.FirstName,
+            LastName = userRecord.User.LastName,
+            DateOfBirth = DateTime.Parse(userRecord.DateOfBirth),
+            UserName = userRecord.User.Username,
+            Email = userRecord.Email,
+        };
+
+        // allowRepeatedCharacters: true -- 12 unique digits was requested from only 10 possible
+        // digit characters (0-9), which idunno.Password rejects outright.
+        IdentityResult result = await userManager.CreateAsync(
+            user,
+            PasswordGenerator.Generate(64, 12, 12, allowRepeatedCharacters: true)
         );
-        userAccountIds.Add(userAccount.UserAccountId);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException(
+                $"Failed to seed user '{userRecord.User.Username}': "
+                    + string.Join("; ", result.Errors.Select(e => e.Description))
+            );
+
+        userAccountIds.Add(user.Id);
     }
 
     return userAccountIds;
