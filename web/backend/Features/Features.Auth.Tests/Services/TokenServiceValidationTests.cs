@@ -5,6 +5,7 @@ using Features.Auth.Services;
 using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Jwt;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Features.Auth.Tests.Services;
@@ -18,23 +19,22 @@ public class TokenServiceValidationTests
     {
         _tokenInfraMock = new Mock<ITokenInfrastructure>();
 
-        // Set environment variables for tokens
-        Environment.SetEnvironmentVariable(
-            "ACCESS_TOKEN_SECRET",
-            "test-access-secret-that-is-very-long-1234567890"
-        );
-        Environment.SetEnvironmentVariable(
-            "REFRESH_TOKEN_SECRET",
-            "test-refresh-secret-that-is-very-long-1234567890"
-        );
-        Environment.SetEnvironmentVariable(
-            "CONFIRMATION_TOKEN_SECRET",
-            "test-confirmation-secret-that-is-very-long-1234567890"
-        );
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["ACCESS_TOKEN_SECRET"] = "test-access-secret-that-is-very-long-1234567890",
+                    ["REFRESH_TOKEN_SECRET"] = "test-refresh-secret-that-is-very-long-1234567890",
+                    ["CONFIRMATION_TOKEN_SECRET"] =
+                        "test-confirmation-secret-that-is-very-long-1234567890",
+                }
+            )
+            .Build();
 
         _tokenService = new TokenService(
             _tokenInfraMock.Object,
-            UserManagerMockFactory.Create().Object
+            UserManagerMockFactory.Create().Object,
+            configuration
         );
     }
 
