@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { HomeSimpleDoor, LogIn, UserPlus } from 'iconoir-react';
-import React, { BaseSyntheticEvent, useEffect } from 'react';
-import { FormState, useForm, UseFormRegister } from 'react-hook-form';
-import { Link, redirect, useNavigation, useSubmit } from 'react-router';
-import FormField from '../../../components/ui/forms/FormField';
-import SubmitButton from '../../../components/ui/forms/SubmitButton';
+import { LogIn } from 'iconoir-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { redirect, useNavigation, useSubmit } from 'react-router';
 import { showErrorToast } from '../../../components/ui/toast/toast';
 import { createAuthSession, getOptionalAuth, login } from '../auth.server';
+import LoginForm from '../components/LoginForm';
+import RegisterCallout from '../components/RegisterCallout';
 import { loginSchema, type LoginSchema } from '../schemas';
 import type { Route } from './+types/login';
 
@@ -38,62 +38,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
         return { error: err instanceof Error ? err.message : 'Login failed.' };
     }
 };
-
-function LoginForm(props: {
-    onSubmit: (e?: BaseSyntheticEvent) => Promise<Awaited<void> | undefined>;
-    formState: FormState<LoginSchema>;
-    register: UseFormRegister<{ username: string; password: string }>;
-    submitting: boolean;
-}) {
-    return (
-        <form onSubmit={props.onSubmit} className="space-y-3">
-            <FormField
-                id="username"
-                type="text"
-                autoComplete="username"
-                placeholder="your_username"
-                label="Username"
-                error={props.formState.errors.username?.message}
-                {...props.register('username')}
-            />
-
-            <FormField
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                label="Password"
-                error={props.formState.errors.password?.message}
-                {...props.register('password')}
-            />
-
-            <SubmitButton
-                isSubmitting={props.submitting}
-                idleText="Sign In"
-                submittingText="Signing in..."
-            />
-        </form>
-    );
-}
-
-const RegisterCard = () => (
-    <>
-        <div className="divider text-xs">New here?</div>
-        <div className="text-center space-y-2">
-            <Link to="/register" className="btn btn-outline btn-sm w-full gap-2">
-                <UserPlus className="size-4" aria-hidden="true" />
-                Create an account
-            </Link>
-            <Link
-                to="/"
-                className="link link-hover text-sm text-base-content/60 inline-flex items-center gap-1"
-            >
-                <HomeSimpleDoor className="size-4" aria-hidden="true" />
-                Back to home
-            </Link>
-        </div>
-    </>
-);
 
 const Login = ({ actionData }: Route.ComponentProps) => {
     const navigation = useNavigation();
@@ -139,7 +83,7 @@ const Login = ({ actionData }: Route.ComponentProps) => {
                         submitting={isSubmitting}
                     />
 
-                    <RegisterCard />
+                    <RegisterCallout />
                 </div>
             </div>
         </div>
