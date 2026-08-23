@@ -50,10 +50,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 c.CityName,
                 sp.StateProvinceID,
                 sp.StateProvinceName,
-                sp.ISO3166_2,
+                sp.ISO3166_2 AS Iso31662,
                 co.CountryID,
                 co.CountryName,
-                co.ISO3166_1
+                co.ISO3166_1 AS Iso31661
             FROM dbo.BreweryPost bp
             LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
             LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
@@ -100,10 +100,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 c.CityName,
                 sp.StateProvinceID,
                 sp.StateProvinceName,
-                sp.ISO3166_2,
+                sp.ISO3166_2 AS Iso31662,
                 co.CountryID,
                 co.CountryName,
-                co.ISO3166_1
+                co.ISO3166_1 AS Iso31661
             FROM dbo.BreweryPost bp
             LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
             LEFT JOIN dbo.City c ON bpl.CityID = c.CityID

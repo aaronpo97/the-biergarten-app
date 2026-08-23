@@ -1,3 +1,4 @@
+import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import BreweryCard from '../components/BreweryCard';
 import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
@@ -37,3 +38,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
 };
 
 export default Breweries;
+
+export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => (
+    <RouteErrorState error={error} />
+);

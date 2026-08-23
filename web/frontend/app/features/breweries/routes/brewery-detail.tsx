@@ -1,11 +1,12 @@
 import { data, Link } from 'react-router';
+import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import { getBreweryById } from '../breweries.server';
 import type { Route } from './+types/brewery-detail';
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
     const brewery = await getBreweryById(params.id);
     if (!brewery) {
-        throw data('Brewery not found.', { status: 404 });
+        throw data('Brewery not found.', { status: 404, statusText: 'Not Found' });
     }
 
     return { brewery };
@@ -57,3 +58,7 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
 };
 
 export default BreweryDetail;
+
+export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => (
+    <RouteErrorState error={error} />
+);

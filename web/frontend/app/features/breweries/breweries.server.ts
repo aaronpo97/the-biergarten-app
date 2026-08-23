@@ -1,3 +1,5 @@
+import { data } from 'react-router';
+
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080';
 
 interface ApiResponse<T> {
@@ -24,32 +26,49 @@ export interface Brewery {
     location: BreweryLocation | null;
 }
 
+const fetchApi = async (path: string): Promise<Response> => {
+    try {
+        return await fetch(`${API_BASE_URL}${path}`);
+    } catch {
+        throw data('The brewery service is unreachable right now. Please try again in a moment.', {
+            status: 503,
+            statusText: 'Service Unavailable',
+        });
+    }
+};
+
 export const getBreweries = async (limit?: number, offset?: number): Promise<Brewery[]> => {
     const params = new URLSearchParams();
     if (limit !== undefined) params.set('limit', String(limit));
     if (offset !== undefined) params.set('offset', String(offset));
 
-    const res = await fetch(`${API_BASE_URL}/api/brewery?${params}`);
+    const res = await fetchApi(`/api/brewery?${params}`);
 
     if (!res.ok) {
-        throw new Error(`Failed to load breweries (${res.status})`);
+        throw data(`Failed to load breweries (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
     }
 
-    const data: ApiResponse<Brewery[]> = await res.json();
-    return data.payload;
+    const body: ApiResponse<Brewery[]> = await res.json();
+    return body.payload;
 };
 
 export const getBreweryById = async (id: string): Promise<Brewery | null> => {
-    const res = await fetch(`${API_BASE_URL}/api/brewery/${encodeURIComponent(id)}`);
+    const res = await fetchApi(`/api/brewery/${encodeURIComponent(id)}`);
 
     if (res.status === 404) {
         return null;
     }
 
     if (!res.ok) {
-        throw new Error(`Failed to load brewery (${res.status})`);
+        throw data(`Failed to load brewery (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
     }
 
-    const data: ApiResponse<Brewery> = await res.json();
-    return data.payload;
+    const body: ApiResponse<Brewery> = await res.json();
+    return body.payload;
 };
