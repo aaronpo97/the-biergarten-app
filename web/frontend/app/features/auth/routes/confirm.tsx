@@ -2,11 +2,11 @@ import { Link } from 'react-router';
 import { confirmEmail, requireAuth } from '../auth.server';
 import type { Route } from './+types/confirm';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Confirm Email | The Biergarten App' }];
-}
+};
 
-export async function loader({ request }: Route.LoaderArgs) {
+export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await requireAuth(request);
     const url = new URL(request.url);
     const token = url.searchParams.get('token');
@@ -27,7 +27,7 @@ export async function loader({ request }: Route.LoaderArgs) {
             error: err instanceof Error ? err.message : 'Confirmation failed.',
         };
     }
-}
+};
 
 const Confirm = ({ loaderData }: Route.ComponentProps) => {
     return (

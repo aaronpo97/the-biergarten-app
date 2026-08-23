@@ -8,17 +8,17 @@ import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { registerSchema, type RegisterSchema } from '../schemas';
 import type { Route } from './+types/register';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Register | The Biergarten App' }];
-}
+};
 
-export async function loader({ request }: Route.LoaderArgs) {
+export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await getOptionalAuth(request);
     if (auth) throw redirect('/dashboard');
     return null;
-}
+};
 
-export async function action({ request }: Route.ActionArgs) {
+export const action = async ({ request }: Route.ActionArgs) => {
     const formData = await request.formData();
     const result = registerSchema.safeParse({
         username: formData.get('username'),
@@ -55,7 +55,7 @@ export async function action({ request }: Route.ActionArgs) {
             fieldErrors: null,
         };
     }
-}
+};
 
 const Register = ({ actionData }: Route.ComponentProps) => {
     const navigation = useNavigation();

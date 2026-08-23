@@ -8,7 +8,7 @@ import {
 } from '../themes';
 import type { Route } from './+types/theme';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [
         { title: 'Theme | The Biergarten App' },
         {
@@ -16,7 +16,7 @@ export function meta({}: Route.MetaArgs) {
             content: 'Theme guide and switcher for The Biergarten App',
         },
     ];
-}
+};
 
 const applyTheme = (theme: ThemeName) => {
     document.documentElement.setAttribute('data-theme', theme);

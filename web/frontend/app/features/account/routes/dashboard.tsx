@@ -2,17 +2,17 @@ import { Link } from 'react-router';
 import { requireAuth } from '../../auth/auth.server';
 import type { Route } from './+types/dashboard';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Dashboard | The Biergarten App' }];
-}
+};
 
-export async function loader({ request }: Route.LoaderArgs) {
+export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await requireAuth(request);
     return {
         username: auth.username,
         userAccountId: auth.userAccountId,
     };
-}
+};
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
     const { username, userAccountId } = loaderData;

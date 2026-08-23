@@ -1,8 +1,8 @@
 import type { Route } from './+types/beers';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Beers | The Biergarten App' }];
-}
+};
 
 const Beers = () => {
     return (

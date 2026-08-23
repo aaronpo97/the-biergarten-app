@@ -2,14 +2,14 @@ import { Link } from 'react-router';
 import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
 
-export function meta({}: Route.MetaArgs) {
+export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Breweries | The Biergarten App' }];
-}
+};
 
-export async function loader() {
+export const loader = async () => {
     const breweries = await getBreweries();
     return { breweries };
-}
+};
 
 const Breweries = ({ loaderData }: Route.ComponentProps) => {
     const { breweries } = loaderData;
