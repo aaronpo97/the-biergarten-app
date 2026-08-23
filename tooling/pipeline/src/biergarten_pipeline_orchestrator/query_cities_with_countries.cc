@@ -39,11 +39,17 @@ std::vector<City> BiergartenPipelineOrchestrator::QueryLocations() {
 
    logger_->Log({.level = LogLevel::Info,
                  .phase = PipelinePhase::Startup,
-                 .message = std::format("  Locations available: {}",
-                                        all_locations.size())});
-   logger_->Log({.level = LogLevel::Info,
-                 .phase = PipelinePhase::Startup,
-                 .message = std::format("  Sampled locations: {}",
-                                        sampled_locations.size())});
+                 .message = std::format(
+                     "  Locations available: {}\n Sampled Locations: {}",
+                     all_locations.size(), sampled_locations.size())});
+
+   for (const auto& location : all_locations) {
+      logger_->Log({.level = LogLevel::Info,
+                    .phase = PipelinePhase::Startup,
+                    .message = std::format("{} {} {} {}", location.city,
+                                           location.country, location.longitude,
+                                           location.latitude)});
+   }
+
    return sampled_locations;
 }

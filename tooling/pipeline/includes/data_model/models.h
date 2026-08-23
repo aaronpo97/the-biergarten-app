@@ -66,6 +66,9 @@ struct City {
     */
    std::string iso3166_1{};
 
+   double longitude{};
+   double latitude{};
+
    /**
     * @brief Local language codes in priority order.
     */
