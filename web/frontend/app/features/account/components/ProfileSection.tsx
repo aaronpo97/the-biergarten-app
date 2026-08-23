@@ -11,82 +11,82 @@ import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
 
 const ProfileSection = ({
-   firstName,
-   lastName,
-   dateOfBirth,
-   open,
-   onToggle,
-   onSuccess,
-   result,
+    firstName,
+    lastName,
+    dateOfBirth,
+    open,
+    onToggle,
+    onSuccess,
+    result,
 }: SectionProps & { firstName: string; lastName: string; dateOfBirth: string }) => {
-   const navigation = useNavigation();
-   const submit = useSubmit();
-   const isSubmitting = navigation.formData?.get('intent') === 'profile';
+    const navigation = useNavigation();
+    const submit = useSubmit();
+    const isSubmitting = navigation.formData?.get('intent') === 'profile';
 
-   const profileForm = useForm<UpdateProfileSchema>({
-      resolver: zodResolver(updateProfileSchema),
-      defaultValues: { firstName, lastName, dateOfBirth },
-   });
+    const profileForm = useForm<UpdateProfileSchema>({
+        resolver: zodResolver(updateProfileSchema),
+        defaultValues: { firstName, lastName, dateOfBirth },
+    });
 
-   useSectionResult(result, 'profile', (profileResult) => {
-      showSuccessToast('Profile updated successfully.');
-      onSuccess();
-      profileForm.reset({
-         firstName: profileResult.firstName,
-         lastName: profileResult.lastName,
-         dateOfBirth: profileResult.dateOfBirth,
-      });
-   });
+    useSectionResult(result, 'profile', (profileResult) => {
+        showSuccessToast('Profile updated successfully.');
+        onSuccess();
+        profileForm.reset({
+            firstName: profileResult.firstName,
+            lastName: profileResult.lastName,
+            dateOfBirth: profileResult.dateOfBirth,
+        });
+    });
 
-   return (
-      <SectionCard
-         icon={<User className="size-5" aria-hidden="true" />}
-         title="Profile"
-         description="Update your name and date of birth."
-         open={open}
-         onToggle={onToggle}
-      >
-         <form
-            className="space-y-3"
-            onSubmit={profileForm.handleSubmit((values) =>
-               submit({ ...values, intent: 'profile' }, { method: 'post' }),
-            )}
-         >
-            <div className="grid grid-cols-2 gap-3">
-               <FormField
-                  id="firstName"
-                  type="text"
-                  autoComplete="given-name"
-                  placeholder="Jane"
-                  label="First Name"
-                  error={profileForm.formState.errors.firstName?.message}
-                  {...profileForm.register('firstName')}
-               />
-               <FormField
-                  id="lastName"
-                  type="text"
-                  autoComplete="family-name"
-                  placeholder="Doe"
-                  label="Last Name"
-                  error={profileForm.formState.errors.lastName?.message}
-                  {...profileForm.register('lastName')}
-               />
-            </div>
-            <FormField
-               id="dateOfBirth"
-               type="date"
-               label="Date of Birth"
-               error={profileForm.formState.errors.dateOfBirth?.message}
-               {...profileForm.register('dateOfBirth')}
-            />
-            <SubmitButton
-               isSubmitting={isSubmitting}
-               idleText="Update Profile"
-               submittingText="Updating..."
-            />
-         </form>
-      </SectionCard>
-   );
+    return (
+        <SectionCard
+            icon={<User className="size-5" aria-hidden="true" />}
+            title="Profile"
+            description="Update your name and date of birth."
+            open={open}
+            onToggle={onToggle}
+        >
+            <form
+                className="space-y-3"
+                onSubmit={profileForm.handleSubmit((values) =>
+                    submit({ ...values, intent: 'profile' }, { method: 'post' }),
+                )}
+            >
+                <div className="grid grid-cols-2 gap-3">
+                    <FormField
+                        id="firstName"
+                        type="text"
+                        autoComplete="given-name"
+                        placeholder="Jane"
+                        label="First Name"
+                        error={profileForm.formState.errors.firstName?.message}
+                        {...profileForm.register('firstName')}
+                    />
+                    <FormField
+                        id="lastName"
+                        type="text"
+                        autoComplete="family-name"
+                        placeholder="Doe"
+                        label="Last Name"
+                        error={profileForm.formState.errors.lastName?.message}
+                        {...profileForm.register('lastName')}
+                    />
+                </div>
+                <FormField
+                    id="dateOfBirth"
+                    type="date"
+                    label="Date of Birth"
+                    error={profileForm.formState.errors.dateOfBirth?.message}
+                    {...profileForm.register('dateOfBirth')}
+                />
+                <SubmitButton
+                    isSubmitting={isSubmitting}
+                    idleText="Update Profile"
+                    submittingText="Updating..."
+                />
+            </form>
+        </SectionCard>
+    );
 };
 
 export default ProfileSection;

@@ -3,6 +3,7 @@ import storybook from 'eslint-plugin-storybook';
 
 import js from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -33,6 +34,12 @@ export default tseslint.config(
       },
       plugins: {
          'react-hooks': reactHooks,
+         react,
+      },
+      settings: {
+         react: {
+            version: '19.2',
+         },
       },
       rules: {
          ...reactHooks.configs.recommended.rules,
@@ -43,6 +50,14 @@ export default tseslint.config(
                argsIgnorePattern: '^_',
                varsIgnorePattern: '^_',
                caughtErrorsIgnorePattern: '^_',
+            },
+         ],
+         'func-style': ['error', 'expression'],
+         'react/function-component-definition': [
+            'error',
+            {
+               namedComponents: 'arrow-function',
+               unnamedComponents: 'arrow-function',
             },
          ],
       },

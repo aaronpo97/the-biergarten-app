@@ -1,22 +1,15 @@
 import type { ReactNode } from 'react';
 
 interface SectionCardProps {
-   icon: ReactNode;
-   title: string;
-   description: string;
-   open: boolean;
-   onToggle: () => void;
-   children: ReactNode;
+    icon: ReactNode;
+    title: string;
+    description: string;
+    open: boolean;
+    onToggle: () => void;
+    children: ReactNode;
 }
 
-const SectionCard = ({
-   icon,
-   title,
-   description,
-   open,
-   onToggle,
-   children,
-}: SectionCardProps) => (
+const SectionCard = ({ icon, title, description, open, onToggle, children }: SectionCardProps) => (
     <div className="card bg-base-100 shadow">
         <div className="card-body">
             <div className="flex w-full items-center justify-between gap-5">
@@ -39,6 +32,5 @@ const SectionCard = ({
         </div>
     </div>
 );
-
 
 export default SectionCard;

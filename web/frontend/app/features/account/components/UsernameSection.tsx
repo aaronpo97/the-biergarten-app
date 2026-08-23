@@ -11,57 +11,57 @@ import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
 
 const UsernameSection = ({
-   username,
-   open,
-   onToggle,
-   onSuccess,
-   result,
+    username,
+    open,
+    onToggle,
+    onSuccess,
+    result,
 }: SectionProps & { username: string }) => {
-   const navigation = useNavigation();
-   const submit = useSubmit();
-   const isSubmitting = navigation.formData?.get('intent') === 'username';
+    const navigation = useNavigation();
+    const submit = useSubmit();
+    const isSubmitting = navigation.formData?.get('intent') === 'username';
 
-   const usernameForm = useForm<UpdateUsernameSchema>({
-      resolver: zodResolver(updateUsernameSchema),
-      defaultValues: { newUsername: username },
-   });
+    const usernameForm = useForm<UpdateUsernameSchema>({
+        resolver: zodResolver(updateUsernameSchema),
+        defaultValues: { newUsername: username },
+    });
 
-   useSectionResult(result, 'username', (usernameResult) => {
-      showSuccessToast('Username updated successfully.');
-      onSuccess();
-      usernameForm.reset({ newUsername: usernameResult.username });
-   });
+    useSectionResult(result, 'username', (usernameResult) => {
+        showSuccessToast('Username updated successfully.');
+        onSuccess();
+        usernameForm.reset({ newUsername: usernameResult.username });
+    });
 
-   return (
-      <SectionCard
-         icon={<User className="size-5" aria-hidden="true" />}
-         title="Username"
-         description="Change the username you sign in with."
-         open={open}
-         onToggle={onToggle}
-      >
-         <form
-            className="space-y-3"
-            onSubmit={usernameForm.handleSubmit((values) =>
-               submit({ ...values, intent: 'username' }, { method: 'post' }),
-            )}
-         >
-            <FormField
-               id="newUsername"
-               type="text"
-               placeholder={username}
-               label="New Username"
-               error={usernameForm.formState.errors.newUsername?.message}
-               {...usernameForm.register('newUsername')}
-            />
-            <SubmitButton
-               isSubmitting={isSubmitting}
-               idleText="Update Username"
-               submittingText="Updating..."
-            />
-         </form>
-      </SectionCard>
-   );
+    return (
+        <SectionCard
+            icon={<User className="size-5" aria-hidden="true" />}
+            title="Username"
+            description="Change the username you sign in with."
+            open={open}
+            onToggle={onToggle}
+        >
+            <form
+                className="space-y-3"
+                onSubmit={usernameForm.handleSubmit((values) =>
+                    submit({ ...values, intent: 'username' }, { method: 'post' }),
+                )}
+            >
+                <FormField
+                    id="newUsername"
+                    type="text"
+                    placeholder={username}
+                    label="New Username"
+                    error={usernameForm.formState.errors.newUsername?.message}
+                    {...usernameForm.register('newUsername')}
+                />
+                <SubmitButton
+                    isSubmitting={isSubmitting}
+                    idleText="Update Username"
+                    submittingText="Updating..."
+                />
+            </form>
+        </SectionCard>
+    );
 };
 
 export default UsernameSection;
