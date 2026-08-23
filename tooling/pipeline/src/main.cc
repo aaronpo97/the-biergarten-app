@@ -67,7 +67,7 @@ int main(const int argc, char** argv) {
 
       std::unique_ptr<IPromptDirectory> prompt_directory;
 
-      if (!options.generator.use_mocked) {
+      if (options.generator.mode != GeneratorMode::kMock) {
          try {
             prompt_directory = std::make_unique<PromptDirectory>(
                 options.pipeline.prompt_dir, log_producer);
@@ -90,7 +90,7 @@ int main(const int argc, char** argv) {
           di::bind<IPostalCodeService>().to(
               [options,
                &log_producer]() -> std::unique_ptr<IPostalCodeService> {
-                 if (options.generator.use_mocked) {
+                 if (options.generator.mode == GeneratorMode::kMock) {
                     log_producer->Log(
                         {.level = LogLevel::Info,
                          .phase = PipelinePhase::Startup,
@@ -110,13 +110,13 @@ int main(const int argc, char** argv) {
           di::bind<ICuratedDataService>().to(
               [options,
                &log_producer]() -> std::unique_ptr<ICuratedDataService> {
-                 if (options.generator.use_mocked) {
-                    log_producer->Log({.level = LogLevel::Info,
-                                       .phase = PipelinePhase::Startup,
-                                       .message = "Curated data: mock"});
-
-                    return std::make_unique<MockCuratedDataService>();
-                 }
+                 // if (options.generator.mode == GeneratorMode::kMock) {
+                 //    log_producer->Log({.level = LogLevel::Info,
+                 //                       .phase = PipelinePhase::Startup,
+                 //                       .message = "Curated data: mock"});
+                 //
+                 //    return std::make_unique<MockCuratedDataService>();
+                 // }
 
                  log_producer->Log({.level = LogLevel::Info,
                                     .phase = PipelinePhase::Startup,
@@ -131,13 +131,12 @@ int main(const int argc, char** argv) {
                      });
               }),
           di::bind<IPromptFormatter>().to([options, log_producer] {
-             if (options.generator.use_mocked) {
-                {
-                   log_producer->Log(
-                       {.level = LogLevel::Info,
-                        .phase = PipelinePhase::Startup,
-                        .message = "Prompt formatter: none (mock mode)"});
-                }
+             if (options.generator.mode != GeneratorMode::kLlama) {
+                log_producer->Log(
+                    {.level = LogLevel::Info,
+                     .phase = PipelinePhase::Startup,
+                     .message = "Prompt formatter: none (not needed outside "
+                                "Llama mode)"});
                 return std::unique_ptr<IPromptFormatter>(nullptr);
              }
              {
@@ -151,7 +150,7 @@ int main(const int argc, char** argv) {
                  std::make_unique<Gemma4JinjaPromptFormatter>());
           }),
           di::bind<WebClient>().to([options, log_producer] {
-             if (options.generator.use_mocked) {
+             if (options.generator.mode == GeneratorMode::kMock) {
                 {
                    log_producer->Log(
                        {.level = LogLevel::Info,
@@ -171,7 +170,7 @@ int main(const int argc, char** argv) {
           di::bind<IEnrichmentService>().to(
               [options, &log_producer](
                   const auto& inj) -> std::unique_ptr<IEnrichmentService> {
-                 if (options.generator.use_mocked) {
+                 if (options.generator.mode == GeneratorMode::kMock) {
                     log_producer->Log({.level = LogLevel::Info,
                                        .phase = PipelinePhase::Startup,
                                        .message = "Enrichment: mock"});
@@ -191,7 +190,7 @@ int main(const int argc, char** argv) {
               [&options, &model_path, &sampling, &prompt_directory,
                &log_producer](
                   const auto& inj) -> std::unique_ptr<DataGenerator> {
-                 if (options.generator.use_mocked) {
+                 if (options.generator.mode == GeneratorMode::kMock) {
                     log_producer->Log({.level = LogLevel::Info,
                                        .phase = PipelinePhase::Startup,
                                        .message = "Generator: mock"});
@@ -199,10 +198,25 @@ int main(const int argc, char** argv) {
                     return std::make_unique<MockGenerator>();
                  }
 
+                 if (options.generator.mode == GeneratorMode::kOpenAI) {
+                    log_producer->Log(
+                        {.level = LogLevel::Info,
+                         .phase = PipelinePhase::Startup,
+                         .message = std::format(
+                             "Generator: OpenAIGenerator | model={}",
+                             options.generator.openai_model)});
+
+                    return std::make_unique<OpenAIGenerator>(
+                        options.generator.openai_api_key,
+                        options.generator.openai_model, log_producer,
+                        std::move(prompt_directory),
+                        inj.template create<std::unique_ptr<WebClient>>());
+                 }
+
 #ifdef BIERGARTEN_MOCK_ONLY
-                 // Unreachable: ParseArguments requires --mocked when
-                 // BIERGARTEN_MOCK_ONLY is compiled in, so LlamaGenerator is
-                 // never constructed and is not linked into this binary.
+                 // Only reachable when mode == Llama: Mock and OpenAI are
+                 // handled above and don't need llama.cpp, but LlamaGenerator
+                 // itself is not linked into a BIERGARTEN_MOCK_ONLY build.
                  throw std::runtime_error(
                      "LlamaGenerator is unavailable in a BIERGARTEN_MOCK_ONLY "
                      "build");

@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "services/logging/logger.h"
 
@@ -46,6 +47,44 @@ std::string HttpWebClient::Get(const std::string& url) {
                                {"User-Agent", "biergarten-pipeline/1.0"}});
 
    const httplib::Result result = client.Get(path);
+
+   if (!result) {
+      throw std::runtime_error(
+          std::format("[HttpWebClient] Request failed for URL: {} — {}", url,
+                      httplib::to_string(result.error())));
+   }
+
+   if (result->status < kSuccessMin || result->status >= kSuccessMax) {
+      if (logger_) {
+         logger_->Log({.level = LogLevel::Error,
+                       .phase = PipelinePhase::Enrichment,
+                       .message = std::format(
+                           "[HttpWebClient] Request failed for URL: {}", url)});
+      }
+      throw std::runtime_error(std::format(
+          "[HttpWebClient] HTTP {} for URL: {}", result->status, url));
+   }
+
+   return result->body;
+}
+
+std::string HttpWebClient::Post(
+    const std::string& url, const std::string& body,
+    const std::vector<std::pair<std::string, std::string>>& headers) {
+   const auto [origin, path] = SplitUrl(url);
+
+   httplib::Client client(origin);
+   client.set_follow_location(true);
+   client.set_connection_timeout(kConnectionTimeoutSeconds);
+   client.set_read_timeout(kReadTimeoutSeconds);
+
+   httplib::Headers httplib_headers;
+   for (const auto& [name, value] : headers) {
+      httplib_headers.emplace(name, value);
+   }
+
+   const httplib::Result result =
+       client.Post(path, httplib_headers, body, "application/json");
 
    if (!result) {
       throw std::runtime_error(

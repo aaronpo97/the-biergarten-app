@@ -192,6 +192,19 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/data_generation/mock/deterministic_hash.cc
 )
 
+# --- data_generation: shared JSON validation (always built — no llama.cpp dependency) ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/data_generation/generation_json_validation.cc
+)
+
+# --- data_generation: openai (always built — no llama.cpp dependency) ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/data_generation/openai/openai_generator.cc
+        src/data_generation/openai/call_chat_completions_api.cc
+        src/data_generation/openai/generate_brewery.cc
+        src/data_generation/openai/generate_user.cc
+)
+
 # --- data_generation: llama (skipped for mock-only builds) ---
 if(NOT BIERGARTEN_MOCK_ONLY)
         target_sources(${PROJECT_NAME} PRIVATE

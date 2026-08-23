@@ -7,6 +7,7 @@ public sealed class BreweryPost
 
     // FK References
     public Guid PostedById { get; set; }
+    public string PostedBy { get; set; } = string.Empty;
 
     // Attributes
     public string BreweryName { get; set; } = string.Empty;

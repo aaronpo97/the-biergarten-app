@@ -68,6 +68,18 @@ sqlite3_int64 SqliteExportService::ResolveCityId(const City& city) {
            .action = "Failed to bind SQLite city ISO 3166-1 code"});
    sqlite_export_service_internal::Bind(
        insert_city_stmt_,
+       sqlite_export_service_internal::BoundParam<double>{
+           .index = sqlite_export_service_internal::kCityLongitudeBindIndex,
+           .value = city.longitude,
+           .action = "Failed to bind SQLite city longitude"});
+   sqlite_export_service_internal::Bind(
+       insert_city_stmt_,
+       sqlite_export_service_internal::BoundParam<double>{
+           .index = sqlite_export_service_internal::kCityLatitudeBindIndex,
+           .value = city.latitude,
+           .action = "Failed to bind SQLite city latitude"});
+   sqlite_export_service_internal::Bind(
+       insert_city_stmt_,
        sqlite_export_service_internal::BoundParam<std::string_view>{
            .index = sqlite_export_service_internal::kCityLanguagesBindIndex,
            .value = local_languages_json,
@@ -165,6 +177,20 @@ uint64_t SqliteExportService::ProcessRecord(const BreweryRecord& brewery) {
                kBreweryAddressPostalCodeBindIndex,
            .value = brewery.address.postal_code,
            .action = "Failed to bind SQLite brewery address postal code"});
+   sqlite_export_service_internal::Bind(
+       insert_brewery_address_stmt_,
+       sqlite_export_service_internal::BoundParam<double>{
+           .index = sqlite_export_service_internal::
+               kBreweryAddressLongitudeBindIndex,
+           .value = brewery.address.longitude,
+           .action = "Failed to bind SQLite brewery address longitude"});
+   sqlite_export_service_internal::Bind(
+       insert_brewery_address_stmt_,
+       sqlite_export_service_internal::BoundParam<double>{
+           .index = sqlite_export_service_internal::
+               kBreweryAddressLatitudeBindIndex,
+           .value = brewery.address.latitude,
+           .action = "Failed to bind SQLite brewery address latitude"});
 
    sqlite_export_service_internal::StepStatement(
        db_handle_, insert_brewery_address_stmt_,

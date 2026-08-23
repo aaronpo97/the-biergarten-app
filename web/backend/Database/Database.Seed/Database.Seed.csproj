@@ -22,6 +22,6 @@
         <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\biergarten_seed_2026-07-20T05-46-02.993511Z.sqlite" />
+        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\open-ai-test2.sqlite" />
     </ItemGroup>
 </Project>

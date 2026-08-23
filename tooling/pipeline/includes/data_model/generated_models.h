@@ -94,6 +94,8 @@ struct EnrichedCity {
 struct BreweryAddress {
    City city;
    std::string postal_code{};
+   double longitude{};
+   double latitude{};
 };
 
 /**
