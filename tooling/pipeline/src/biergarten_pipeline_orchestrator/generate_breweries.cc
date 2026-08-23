@@ -31,8 +31,8 @@ double RadiansToDegrees(double radians) {
 }
 }  // namespace
 
-static Coords GetRandomCoordsWithinRange(Coords const& centre,
-                                         int const distance_km,
+static Coords GetRandomCoordsWithinRange(const Coords& centre,
+                                         const int distance_km,
                                          std::mt19937& rng) {
    std::uniform_real_distribution<double> angle_dist(0.0,
                                                      2.0 * std::numbers::pi);

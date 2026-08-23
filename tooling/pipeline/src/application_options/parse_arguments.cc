@@ -182,16 +182,16 @@ std::optional<ApplicationOptions> ParseArguments(
                             .phase = PipelinePhase::Startup,
                             .message = msg});
             } else {
-               std::cerr << msg << std::endl;
+               std::cerr << msg << '\n';
             }
             return std::nullopt;
          }
          options.generator.openai_api_key = api_key_env;
       }
 
-      options.generator.mode = use_mocked   ? GeneratorMode::Mock
-                               : use_openai ? GeneratorMode::OpenAI
-                                            : GeneratorMode::Llama;
+      options.generator.mode = use_mocked   ? GeneratorMode::kMock
+                               : use_openai ? GeneratorMode::kOpenAI
+                                            : GeneratorMode::kLlama;
       options.generator.model_path = model_path;
       options.generator.openai_model = var_map["openai-model"].as<std::string>();
 
@@ -208,7 +208,7 @@ std::optional<ApplicationOptions> ParseArguments(
       if (user_provided_sampling) {
          // Warn but do not fail — the run is still valid, the flags are just
          // silently irrelevant when no local model is loaded.
-         if (options.generator.mode != GeneratorMode::Llama) {
+         if (options.generator.mode != GeneratorMode::kLlama) {
             const std::string msg =
                 "Sampling parameters are ignored unless using --model "
                 "(Llama)";

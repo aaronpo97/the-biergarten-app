@@ -191,9 +191,9 @@ struct SamplingOptions {
  * @brief Selects which DataGenerator backend the pipeline uses.
  */
 enum class GeneratorMode {
-   Mock,
-   Llama,
-   OpenAI,
+   kMock,
+   kLlama,
+   kOpenAI,
 };
 
 /**
@@ -202,25 +202,25 @@ enum class GeneratorMode {
 struct GeneratorOptions {
    /**
     * @brief Path to the LLM model file (gguf format). Only meaningful for
-    * GeneratorMode::Llama.
+    * GeneratorMode::kLlama.
     */
    std::filesystem::path model_path;
 
    /**
     * @brief Which generator backend to use.
     */
-   GeneratorMode mode = GeneratorMode::Mock;
+   GeneratorMode mode = GeneratorMode::kMock;
 
    /**
     * @brief Specific sampling parameters for this generator. Only
-    * meaningful for GeneratorMode::Llama; if nullopt, LlamaGenerator uses
+    * meaningful for GeneratorMode::kLlama; if nullopt, LlamaGenerator uses
     * its own defaults.
     */
    std::optional<SamplingOptions> sampling;
 
    /**
     * @brief OpenAI API key, read from the OPENAI_API_KEY environment
-    * variable. Only populated for GeneratorMode::OpenAI.
+    * variable. Only populated for GeneratorMode::kOpenAI.
     */
    std::string openai_api_key;
 

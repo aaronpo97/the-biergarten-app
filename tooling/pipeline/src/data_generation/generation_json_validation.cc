@@ -8,11 +8,13 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/json.hpp>
 #include <cctype>
+#include <format>
 #include <span>
 #include <string>
 #include <string_view>
+
+#include <boost/json.hpp>
 
 namespace {
 /**
@@ -66,11 +68,18 @@ bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
                                     std::string* error_out) {
    const boost::json::value* field = obj.if_contains(key);
    if (field == nullptr || !field->is_string()) {
+      if (error_out != nullptr) {
+         *error_out =
+             std::format("Missing or invalid string field: {}", key);
+      }
       return false;
    }
 
    const auto& string_value = field->as_string();
    out = Trim(std::string_view(string_value.data(), string_value.size()));
+   if (out.empty() && error_out != nullptr) {
+      *error_out = std::format("Field must not be empty: {}", key);
+   }
    return !out.empty();
 }
 

@@ -9,13 +9,14 @@
  * Structured Outputs: https://platform.openai.com/docs/guides/structured-outputs
  */
 
-#include <boost/json.hpp>
 #include <format>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
+
+#include <boost/json.hpp>
 
 #include "data_generation/openai_generator.h"
 
