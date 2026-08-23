@@ -5,9 +5,9 @@ import { useEffect, useReducer, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { data, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import SectionCard from '../components/SectionCard';
-import FormField from '../../../components/forms/FormField';
-import SubmitButton from '../../../components/forms/SubmitButton';
-import { showErrorToast, showSuccessToast } from '../../../components/toast/toast';
+import FormField from '../../../components/ui/forms/FormField';
+import SubmitButton from '../../../components/ui/forms/SubmitButton';
+import { showErrorToast, showSuccessToast } from '../../../components/ui/toast/toast';
 import {
     commitSession,
     deleteAccount,

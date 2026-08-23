@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expect, userEvent, within } from 'storybook/test';
-import FormField from '../app/components/forms/FormField';
-import SubmitButton from '../app/components/forms/SubmitButton';
+import FormField from '../app/components/ui/forms/FormField';
+import SubmitButton from '../app/components/ui/forms/SubmitButton';
 import { updateUsernameSchema, type UpdateUsernameSchema } from '../app/features/account/schemas';
 
 const usernameFormDescription = `Exercises the real \`updateUsernameSchema\` (zod) through the same react-hook-form wiring used on the account page, so these stories validate actual client-side validation behavior rather than just rendering.`;

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router';
-import { showErrorToast, showSuccessToast } from '../../../components/toast/toast';
+import { showErrorToast, showSuccessToast } from '../../../components/ui/toast/toast';
 import { confirmEmail, requireAuth } from '../auth.server';
 import type { Route } from './+types/confirm';
 

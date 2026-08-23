@@ -9,8 +9,8 @@ import {
 
 import type { Route } from './+types/root';
 import './app.css';
-import Navbar from './components/Navbar';
-import ToastProvider from './components/toast/ToastProvider';
+import Navbar from './components/ui/Navbar';
+import ToastProvider from './components/ui/toast/ToastProvider';
 import { getOptionalAuth } from './features/auth/auth.server';
 import { themeStorageKey } from './features/theme/themes';
 

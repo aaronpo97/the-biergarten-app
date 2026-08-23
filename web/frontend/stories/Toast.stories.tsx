@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, screen, userEvent, within } from 'storybook/test';
-import ToastProvider from '../app/components/toast/ToastProvider';
+import ToastProvider from '../app/components/ui/toast/ToastProvider';
 import {
    dismissToasts,
    showErrorToast,
    showInfoToast,
    showSuccessToast,
-} from '../app/components/toast/toast';
+} from '../app/components/ui/toast/toast';
 
 const toastDescription = `Theme-aware toast feedback built on react-hot-toast. Use this page to trigger success, error, and info messages, check icon contrast and surface styling, and confirm notifications feel consistent across Biergarten themes.`;
 

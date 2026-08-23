@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import SubmitButton from '../app/components/forms/SubmitButton';
+import SubmitButton from '../app/components/ui/forms/SubmitButton';
 
 const submitButtonDescription = `Shared submit action for Biergarten forms. These stories cover the idle, loading, and custom-width states so you can verify button copy, disabled behavior during submission, and theme styling without wiring up a full form flow.`;
 
