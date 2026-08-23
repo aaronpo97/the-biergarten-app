@@ -1,12 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogIn } from 'iconoir-react';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { redirect, useNavigation, useSubmit } from 'react-router';
-import { showErrorToast } from '../../../components/ui/toast/toast';
 import { createAuthSession, getOptionalAuth, login } from '../auth.server';
 import LoginForm from '../components/LoginForm';
 import RegisterCallout from '../components/RegisterCallout';
+import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { loginSchema, type LoginSchema } from '../schemas';
 import type { Route } from './+types/login';
 
@@ -52,11 +51,7 @@ const Login = ({ actionData }: Route.ComponentProps) => {
         submit(data, { method: 'post' });
     });
 
-    useEffect(() => {
-        if (actionData?.error) {
-            showErrorToast(actionData.error);
-        }
-    }, [actionData?.error]);
+    useActionErrorToast(actionData?.error);
 
     return (
         <div className="hero min-h-screen bg-base-200">

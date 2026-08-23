@@ -1,11 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, redirect, useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showErrorToast } from '../../../components/ui/toast/toast';
 import { createAuthSession, getOptionalAuth, register } from '../auth.server';
+import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { registerSchema, type RegisterSchema } from '../schemas';
 import type { Route } from './+types/register';
 
@@ -73,11 +72,7 @@ export default function Register({ actionData }: Route.ComponentProps) {
         submit(data, { method: 'post' });
     });
 
-    useEffect(() => {
-        if (actionData?.error) {
-            showErrorToast(actionData.error);
-        }
-    }, [actionData?.error]);
+    useActionErrorToast(actionData?.error);
 
     return (
         <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
