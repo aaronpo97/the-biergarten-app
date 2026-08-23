@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router';
-import { showErrorToast, showSuccessToast } from '../../../components/ui/toast/toast';
 import { confirmEmail, requireAuth } from '../auth.server';
 import type { Route } from './+types/confirm';
 
@@ -32,15 +30,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Confirm({ loaderData }: Route.ComponentProps) {
-    useEffect(() => {
-        if (loaderData.success) {
-            showSuccessToast('Email confirmed successfully.');
-            return;
-        }
-
-        showErrorToast(loaderData.error);
-    }, [loaderData]);
-
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="card w-full max-w-md bg-base-100 shadow-xl">
