@@ -8,6 +8,7 @@ This Storybook is scoped to real app UI only:
 
 - `SubmitButton`
 - `FormField`
+- `SectionCard`
 - `Navbar`
 - `Themes` gallery
 
@@ -33,6 +34,13 @@ Run:
 
 - `npm run build-storybook -- --test`
 - `npm run test:storybook:playwright`
+
+### Running with a visible browser
+
+Both layers default to headless. To watch the browser while debugging:
+
+- Playwright layer: `npx playwright test -c playwright.storybook.config.ts --headed`, or `--ui` for the interactive step-through runner.
+- Vitest/story `play` layer: `npx vitest run --project storybook --browser.headless=false` (drop `run` and add `--ui` for Vitest's own UI). The default is set in `vite.config.ts`.
 
 ## Rules
 

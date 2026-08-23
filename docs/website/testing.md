@@ -1,3 +1,4 @@
+
 # Testing
 
 This document describes the testing strategy and how to run tests for The
@@ -124,6 +125,25 @@ npm run test:storybook:playwright
 - Playwright browser dependencies installed
 - The command will start or reuse the Storybook server defined in
   `playwright.storybook.config.ts`
+
+### Running Storybook tests with a visible browser
+
+Both of the above run headless by default. To watch the browser while
+debugging a failure:
+
+```bash
+# Playwright Storybook suite
+npx playwright test -c playwright.storybook.config.ts --headed
+# or the interactive step-through runner
+npx playwright test -c playwright.storybook.config.ts --ui
+
+# Vitest/story play-function suite
+npx vitest run --project storybook --browser.headless=false
+# or Vitest's own UI (drop `run` for watch mode)
+npx vitest --project storybook --browser.headless=false --ui
+```
+
+The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 ## Test coverage
 
