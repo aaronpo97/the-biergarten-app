@@ -12,9 +12,9 @@
 #include <string_view>
 #include <vector>
 
+#include "data_generation/generation_json_validation.h"
 #include "data_generation/json_grammars.h"
 #include "data_generation/llama_generator.h"
-#include "data_generation/llama_generator_helpers.h"
 
 static std::string FormatLocalLanguageCodes(
     const std::vector<std::string>& codes) {

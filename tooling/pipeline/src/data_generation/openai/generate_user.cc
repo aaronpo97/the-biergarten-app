@@ -1,24 +1,29 @@
 /**
- * @file data_generation/llama/generate_user.cc
- * @brief Builds persona/name-grounded user prompts, performs retry-based
- * inference, and validates structured JSON output for user records.
+ * @file data_generation/openai/generate_user.cc
+ * @brief Builds persona/name-grounded user prompts, calls the OpenAI Chat
+ * Completions API, and validates structured JSON output for user records.
  */
 
 #include <format>
 #include <optional>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 
 #include "data_generation/generation_json_validation.h"
-#include "data_generation/json_grammars.h"
-#include "data_generation/llama_generator.h"
+#include "data_generation/openai_generator.h"
+#include "data_generation/openai_json_schemas.h"
 
-static constexpr int kUserInitialMaxTokens = 1200;
+namespace {
+constexpr int kUserMaxTokens = 1200;
 
-UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
-                                        const UserPersona& persona,
-                                        const Name& name) {
+// Structured outputs already guarantee schema-valid JSON, so retries here
+// are only for transient failures or placeholder text -- not JSON shape.
+constexpr int kMaxAttempts = 2;
+}  // namespace
+
+UserResult OpenAIGenerator::GenerateUser(const EnrichedCity& city,
+                                         const UserPersona& persona,
+                                         const Name& name) {
    std::string style_affinities;
    for (const std::string& style : persona.style_affinities) {
       if (!style_affinities.empty()) {
@@ -43,21 +48,20 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
 
    const std::string retry_context = std::format(
        "Name: {} {}\nCity: {}, {}\nPersona: {}", name.first_name,
-       name.last_name, city.location.city, city.location.country, persona.name);
+       name.last_name, city.location.city, city.location.country,
+       persona.name);
 
-   constexpr int max_attempts = 3;
    std::string raw;
    std::string last_error;
-   int max_tokens = kUserInitialMaxTokens;
 
-   for (int attempt = 0; attempt < max_attempts; ++attempt) {
-      raw =
-          this->Infer(system_prompt, user_prompt, max_tokens, kUserJsonGrammar);
+   for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
+      raw = CallChatCompletionsApi(system_prompt, user_prompt, kUserJsonSchema,
+                                   "user_result", kUserMaxTokens);
       if (logger_) {
          logger_->Log({.level = LogLevel::Debug,
                        .phase = PipelinePhase::UserGeneration,
                        .message = std::format(
-                           "LlamaGenerator: raw output (attempt {}): {}",
+                           "OpenAIGenerator: raw output (attempt {}): {}",
                            attempt + 1, raw)});
       }
 
@@ -70,7 +74,7 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
             logger_->Log(
                 {.level = LogLevel::Info,
                  .phase = PipelinePhase::UserGeneration,
-                 .message = std::format("LlamaGenerator: successfully "
+                 .message = std::format("OpenAIGenerator: successfully "
                                         "generated user data on attempt {}",
                                         attempt + 1)});
          }
@@ -87,21 +91,14 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
              {.level = LogLevel::Warn,
               .phase = PipelinePhase::UserGeneration,
               .message = std::format(
-                  "LlamaGenerator: malformed user JSON (attempt {}): {}",
+                  "OpenAIGenerator: malformed user JSON (attempt {}): {}",
                   attempt + 1, *validation_error)});
       }
 
       user_prompt = std::format(
-          "Your previous response was invalid. Error: {}\nReturn the thought "
-          "process before the JSON if needed, then return ONLY valid JSON "
-          "with "
-          "exactly these keys, in this exact order: {{\"username\": "
-          "\"<handle "
-          "derived from the given name>\", \"bio\": \"<first-person bio "
-          "grounded in the persona>\", \"activity_weight\": <number between "
-          "0 "
-          "and 1>}}.\nDo not include markdown, comments, extra keys, or "
-          "literal placeholder values.\n\n{}",
+          "Your previous response was invalid. Error: {}\nReturn real "
+          "content matching the required schema -- do not return "
+          "placeholder values.\n\n{}",
           *validation_error, retry_context);
    }
 
@@ -109,9 +106,9 @@ UserResult LlamaGenerator::GenerateUser(const EnrichedCity& city,
       logger_->Log({.level = LogLevel::Error,
                     .phase = PipelinePhase::UserGeneration,
                     .message = std::format(
-                        "LlamaGenerator: malformed user response "
+                        "OpenAIGenerator: malformed user response "
                         "after {} attempts: {}",
-                        max_attempts, last_error.empty() ? raw : last_error)});
+                        kMaxAttempts, last_error.empty() ? raw : last_error)});
    }
-   throw std::runtime_error("LlamaGenerator: malformed user response");
+   throw std::runtime_error("OpenAIGenerator: malformed user response");
 }
