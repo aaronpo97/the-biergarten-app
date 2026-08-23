@@ -7,6 +7,7 @@ using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Features.Auth.Tests.Services;
@@ -22,21 +23,23 @@ public class TokenServiceRefreshTests
         _tokenInfraMock = new Mock<ITokenInfrastructure>();
         _userManagerMock = UserManagerMockFactory.Create();
 
-        // Set environment variables for tokens
-        Environment.SetEnvironmentVariable(
-            "ACCESS_TOKEN_SECRET",
-            "test-access-secret-that-is-very-long-1234567890"
-        );
-        Environment.SetEnvironmentVariable(
-            "REFRESH_TOKEN_SECRET",
-            "test-refresh-secret-that-is-very-long-1234567890"
-        );
-        Environment.SetEnvironmentVariable(
-            "CONFIRMATION_TOKEN_SECRET",
-            "test-confirmation-secret-that-is-very-long-1234567890"
-        );
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["ACCESS_TOKEN_SECRET"] = "test-access-secret-that-is-very-long-1234567890",
+                    ["REFRESH_TOKEN_SECRET"] = "test-refresh-secret-that-is-very-long-1234567890",
+                    ["CONFIRMATION_TOKEN_SECRET"] =
+                        "test-confirmation-secret-that-is-very-long-1234567890",
+                }
+            )
+            .Build();
 
-        _tokenService = new TokenService(_tokenInfraMock.Object, _userManagerMock.Object);
+        _tokenService = new TokenService(
+            _tokenInfraMock.Object,
+            _userManagerMock.Object,
+            configuration
+        );
     }
 
     [Fact]

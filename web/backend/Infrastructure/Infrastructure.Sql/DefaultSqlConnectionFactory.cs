@@ -20,21 +20,21 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlCon
 
     /// <summary>
     ///     Resolves the SQL Server connection string, preferring (in order): the <c>DB_CONNECTION_STRING</c>
-    ///     environment variable, a connection string built from individual <c>DB_*</c> environment variables,
+    ///     configuration value, a connection string built from individual <c>DB_*</c> configuration values,
     ///     and finally the <c>"Default"</c> connection string from configuration.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when no connection string can be resolved from any source.</exception>
     private static string GetConnectionString(IConfiguration configuration)
     {
         // Check for full connection string first
-        string? fullConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+        string? fullConnectionString = configuration["DB_CONNECTION_STRING"];
         if (!string.IsNullOrEmpty(fullConnectionString))
             return fullConnectionString;
 
-        // Try to build from individual environment variables (preferred method for Docker)
+        // Try to build from individual configuration values (preferred method for Docker)
         try
         {
-            return SqlConnectionStringHelper.BuildConnectionString();
+            return SqlConnectionStringHelper.BuildConnectionString(configuration);
         }
         catch (InvalidOperationException)
         {

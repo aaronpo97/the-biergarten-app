@@ -22,9 +22,12 @@ static async Task<int> RunAsync()
 {
     try
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .Build();
+
         ServiceCollection services = [];
-        services.AddSingleton<IConfiguration>(
-            new ConfigurationBuilder().Build());
+        services.AddSingleton(configuration);
         services.AddInfrastructureSql();
         services.AddFeaturesBreweries();
         services.AddFeaturesLocations();

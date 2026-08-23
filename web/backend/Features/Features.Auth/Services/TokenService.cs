@@ -4,12 +4,13 @@ using Domain.Exceptions;
 using Features.Auth.Identity;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace Features.Auth.Services;
 
 /// <summary>
 ///     Default implementation of <see cref="ITokenService" /> that generates and validates JWTs
-///     for access, refresh, and confirmation flows using secrets read from environment variables.
+///     for access, refresh, and confirmation flows using secrets read from configuration.
 /// </summary>
 public class TokenService : ITokenService
 {
@@ -22,30 +23,31 @@ public class TokenService : ITokenService
     /// <summary>Initializes a new instance of the <see cref="TokenService" /> class.</summary>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when any of the <c>ACCESS_TOKEN_SECRET</c>, <c>REFRESH_TOKEN_SECRET</c>, or
-    ///     <c>CONFIRMATION_TOKEN_SECRET</c> environment variables are not set.
+    ///     <c>CONFIRMATION_TOKEN_SECRET</c> configuration values are not set.
     /// </exception>
     public TokenService(
         ITokenInfrastructure tokenInfrastructure,
-        UserManager<ApplicationUser> userManager
+        UserManager<ApplicationUser> userManager,
+        IConfiguration configuration
     )
     {
         _tokenInfrastructure = tokenInfrastructure;
         _userManager = userManager;
 
         _accessTokenSecret =
-            Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")
+            configuration["ACCESS_TOKEN_SECRET"]
             ?? throw new InvalidOperationException(
                 "ACCESS_TOKEN_SECRET environment variable is not set"
             );
 
         _refreshTokenSecret =
-            Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")
+            configuration["REFRESH_TOKEN_SECRET"]
             ?? throw new InvalidOperationException(
                 "REFRESH_TOKEN_SECRET environment variable is not set"
             );
 
         _confirmationTokenSecret =
-            Environment.GetEnvironmentVariable("CONFIRMATION_TOKEN_SECRET")
+            configuration["CONFIRMATION_TOKEN_SECRET"]
             ?? throw new InvalidOperationException(
                 "CONFIRMATION_TOKEN_SECRET environment variable is not set"
             );
