@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, within } from 'storybook/test';
-import Navbar from '../app/components/ui/Navbar';
+import Navbar from '../app/components/ui/navbar/Navbar';
 
 const navbarDescription = `Top-level navigation for the Biergarten website. These stories cover guest, authenticated, and mobile states so you can review branding, route visibility, account menu behavior, and responsive collapse without leaving Storybook.`;
 

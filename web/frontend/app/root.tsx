@@ -9,7 +9,7 @@ import {
 
 import type { Route } from './+types/root';
 import './app.css';
-import Navbar from './components/ui/Navbar';
+import Navbar from './components/ui/navbar/Navbar';
 import ToastProvider from './components/ui/toast/ToastProvider';
 import { getOptionalAuth } from './features/auth/auth.server';
 import { themeStorageKey } from './features/theme/themes';
