@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import { biergartenThemes } from '../app/lib/themes';
+import { biergartenThemes } from '../app/features/theme/themes';
 
 const themesDescription = `Palette reference for all Biergarten themes. Each panel shows the main semantic color pairs, status tokens, and custom content tokens so you can catch contrast issues, pairing mistakes, and mood drift before they show up in real components.`;
 

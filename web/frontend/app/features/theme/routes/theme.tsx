@@ -5,7 +5,7 @@ import {
     isBiergartenTheme,
     type ThemeName,
     themeStorageKey,
-} from '../lib/themes';
+} from '../themes';
 import type { Route } from './+types/theme';
 
 export function meta({}: Route.MetaArgs) {

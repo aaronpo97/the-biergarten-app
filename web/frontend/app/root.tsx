@@ -12,7 +12,7 @@ import './app.css';
 import Navbar from './components/Navbar';
 import ToastProvider from './components/toast/ToastProvider';
 import { getOptionalAuth } from './lib/auth.server';
-import { themeStorageKey } from './lib/themes';
+import { themeStorageKey } from './features/theme/themes';
 
 const themeInitScript = `
   (function () {
