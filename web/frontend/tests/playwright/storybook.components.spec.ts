@@ -54,6 +54,3 @@ test.describe('storybook component coverage', () => {
         await expect(page.getByRole('heading', { name: 'Biergarten Weizen' })).toBeVisible();
     });
 });
-
-// Form validation behaviour is covered by Gherkin scenarios in ./features/*.feature,
-// with step definitions in ./steps/form-validation.steps.ts.

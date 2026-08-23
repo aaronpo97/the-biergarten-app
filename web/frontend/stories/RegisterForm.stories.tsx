@@ -3,79 +3,23 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
-import FormField from '../app/components/ui/forms/FormField';
-import SubmitButton from '../app/components/ui/forms/SubmitButton';
+import RegisterForm from '../app/features/auth/components/RegisterForm';
 import { registerSchema, type RegisterSchema } from '../app/features/auth/schemas';
 
-const registerFormDescription = `Exercises the real \`registerSchema\` (zod) through the same react-hook-form wiring used on the register page, including its cross-field rule that the confirmation must match the password, so these stories validate actual client-side validation behavior rather than just rendering.`;
+const registerFormDescription = `Renders the real \`RegisterForm\` component wired to the real \`registerSchema\` (zod) through the same react-hook-form setup used on the register page, including its cross-field rule that the confirmation must match the password, so these stories validate actual client-side validation behavior rather than a re-implemented form.`;
 
-const RegisterFormDemo = () => {
+const RegisterFormHarness = () => {
     const [submitted, setSubmitted] = useState<RegisterSchema | null>(null);
     const form = useForm<RegisterSchema>({ resolver: zodResolver(registerSchema) });
 
     return (
         <div className="w-full max-w-lg space-y-3 rounded-box bg-base-100 p-6 shadow-lg">
-            <form
-                className="space-y-3"
+            <RegisterForm
                 onSubmit={form.handleSubmit((values) => setSubmitted(values))}
-            >
-                <FormField
-                    id="username"
-                    type="text"
-                    label="Username"
-                    error={form.formState.errors.username?.message}
-                    {...form.register('username')}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                    <FormField
-                        id="firstName"
-                        type="text"
-                        label="First Name"
-                        error={form.formState.errors.firstName?.message}
-                        {...form.register('firstName')}
-                    />
-                    <FormField
-                        id="lastName"
-                        type="text"
-                        label="Last Name"
-                        error={form.formState.errors.lastName?.message}
-                        {...form.register('lastName')}
-                    />
-                </div>
-                <FormField
-                    id="email"
-                    type="email"
-                    label="Email"
-                    error={form.formState.errors.email?.message}
-                    {...form.register('email')}
-                />
-                <FormField
-                    id="dateOfBirth"
-                    type="date"
-                    label="Date of Birth"
-                    error={form.formState.errors.dateOfBirth?.message}
-                    {...form.register('dateOfBirth')}
-                />
-                <FormField
-                    id="password"
-                    type="password"
-                    label="Password"
-                    error={form.formState.errors.password?.message}
-                    {...form.register('password')}
-                />
-                <FormField
-                    id="confirmPassword"
-                    type="password"
-                    label="Confirm Password"
-                    error={form.formState.errors.confirmPassword?.message}
-                    {...form.register('confirmPassword')}
-                />
-                <SubmitButton
-                    isSubmitting={false}
-                    idleText="Create Account"
-                    submittingText="Creating account..."
-                />
-            </form>
+                formState={form.formState}
+                register={form.register}
+                submitting={false}
+            />
             {submitted ? <p data-testid="submit-result">Registered {submitted.username}</p> : null}
         </div>
     );
@@ -83,7 +27,7 @@ const RegisterFormDemo = () => {
 
 const meta = {
     title: 'Forms/RegisterForm',
-    component: RegisterFormDemo,
+    component: RegisterFormHarness,
     tags: ['autodocs'],
     parameters: {
         layout: 'centered',
@@ -93,7 +37,7 @@ const meta = {
             },
         },
     },
-} satisfies Meta<typeof RegisterFormDemo>;
+} satisfies Meta<typeof RegisterFormHarness>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

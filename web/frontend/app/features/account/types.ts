@@ -1,19 +1,10 @@
-export type ActionResult =
-    | { intent: 'username'; success: true; username: string }
-    | { intent: 'username'; success: false; error: string }
-    | { intent: 'email'; success: true; email: string; emailConfirmed: boolean }
-    | { intent: 'email'; success: false; error: string }
-    | {
-          intent: 'profile';
-          success: true;
-          firstName: string;
-          lastName: string;
-          dateOfBirth: string;
-      }
-    | { intent: 'profile'; success: false; error: string }
-    | { intent: 'password'; success: true }
-    | { intent: 'password'; success: false; error: string }
-    | { intent: 'delete'; success: false; error: string };
+// Success never reaches the component as action data - every intent redirects
+// back to this route (with a `?toast=` message) instead of returning a
+// payload, so the only shape an action can hand back here is an error.
+export interface ActionResult {
+    intent: 'username' | 'email' | 'profile' | 'password' | 'delete';
+    error: string;
+}
 
 export interface SectionState {
     usernameOpen: boolean;
@@ -36,6 +27,5 @@ export interface SectionAction {
 export interface SectionProps {
     open: boolean;
     onToggle: () => void;
-    onSuccess: () => void;
     result: ActionResult | undefined;
 }

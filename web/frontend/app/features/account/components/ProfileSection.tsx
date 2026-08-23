@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showSuccessToast } from '../../../components/ui/toast/toast';
-import { useSectionResult } from '../hooks/useSectionResult';
+import { useSectionError } from '../hooks/useSectionError';
 import { updateProfileSchema, type UpdateProfileSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
@@ -16,7 +15,6 @@ const ProfileSection = ({
     dateOfBirth,
     open,
     onToggle,
-    onSuccess,
     result,
 }: SectionProps & { firstName: string; lastName: string; dateOfBirth: string }) => {
     const navigation = useNavigation();
@@ -28,15 +26,7 @@ const ProfileSection = ({
         defaultValues: { firstName, lastName, dateOfBirth },
     });
 
-    useSectionResult(result, 'profile', (profileResult) => {
-        showSuccessToast('Profile updated successfully.');
-        onSuccess();
-        profileForm.reset({
-            firstName: profileResult.firstName,
-            lastName: profileResult.lastName,
-            dateOfBirth: profileResult.dateOfBirth,
-        });
-    });
+    useSectionError(result, 'profile');
 
     return (
         <SectionCard

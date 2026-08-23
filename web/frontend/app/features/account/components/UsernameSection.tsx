@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showSuccessToast } from '../../../components/ui/toast/toast';
-import { useSectionResult } from '../hooks/useSectionResult';
+import { useSectionError } from '../hooks/useSectionError';
 import { updateUsernameSchema, type UpdateUsernameSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
@@ -14,7 +13,6 @@ const UsernameSection = ({
     username,
     open,
     onToggle,
-    onSuccess,
     result,
 }: SectionProps & { username: string }) => {
     const navigation = useNavigation();
@@ -26,11 +24,7 @@ const UsernameSection = ({
         defaultValues: { newUsername: username },
     });
 
-    useSectionResult(result, 'username', (usernameResult) => {
-        showSuccessToast('Username updated successfully.');
-        onSuccess();
-        usernameForm.reset({ newUsername: usernameResult.username });
-    });
+    useSectionError(result, 'username');
 
     return (
         <SectionCard

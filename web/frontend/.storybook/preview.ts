@@ -32,18 +32,23 @@ const preview: Preview = {
                 ? context.globals.theme
                 : defaultThemeName;
 
-            return createElement(
-                MemoryRouter,
-                undefined,
-                createElement(
-                    'div',
-                    {
-                        'data-theme': theme,
-                        className: 'bg-base-200 p-6 text-base-content',
-                    },
-                    createElement('div', { className: 'mx-auto max-w-7xl' }, createElement(Story)),
-                ),
+            const content = createElement(
+                'div',
+                {
+                    'data-theme': theme,
+                    className: 'bg-base-200 p-6 text-base-content',
+                },
+                createElement('div', { className: 'mx-auto max-w-7xl' }, createElement(Story)),
             );
+
+            // Stories driving `useSubmit`/`useNavigation` bring their own data
+            // router (createMemoryRouter + RouterProvider), which can't nest
+            // inside another <Router>.
+            if (context.parameters.usesDataRouter) {
+                return content;
+            }
+
+            return createElement(MemoryRouter, undefined, content);
         },
     ],
     parameters: {

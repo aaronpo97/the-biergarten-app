@@ -2,7 +2,7 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Trash, WarningTriangle } from 'iconoir-react';
 import { useState } from 'react';
 import { useNavigation, useSubmit } from 'react-router';
-import { useSectionResult } from '../hooks/useSectionResult';
+import { useSectionError } from '../hooks/useSectionError';
 import type { ActionResult } from '../types';
 
 interface DeleteAccountSectionProps {
@@ -16,7 +16,7 @@ const DeleteAccountSection = ({ userAccountId, result }: DeleteAccountSectionPro
     const [dialogOpen, setDialogOpen] = useState(false);
     const isSubmitting = navigation.formData?.get('intent') === 'delete';
 
-    useSectionResult(result, 'delete', () => undefined);
+    useSectionError(result, 'delete');
 
     return (
         <>

@@ -15,8 +15,7 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "test:storybook": "vitest run --project storybook",
-        "bddgen": "bddgen -c playwright.storybook.config.ts",
-        "test:storybook:playwright": "npm run bddgen && playwright test -c playwright.storybook.config.ts"
+        "test:storybook:playwright": "playwright test -c playwright.storybook.config.ts"
     },
     "dependencies": {
         "@headlessui/react": "^2.2.10",
@@ -59,7 +58,6 @@
         "eslint-plugin-storybook": "^10.2.19",
         "globals": "^17.11.0",
         "playwright": "^1.62.1",
-        "playwright-bdd": "^9.2.0",
         "postcss": "^8.5.26",
         "prettier": "^3.9.6",
         "storybook": "^10.5.10",

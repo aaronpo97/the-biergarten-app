@@ -4,19 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showSuccessToast } from '../../../components/ui/toast/toast';
-import { useSectionResult } from '../hooks/useSectionResult';
+import { useSectionError } from '../hooks/useSectionError';
 import { updateEmailSchema, type UpdateEmailSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
 
-const EmailSection = ({
-    email,
-    open,
-    onToggle,
-    onSuccess,
-    result,
-}: SectionProps & { email: string }) => {
+const EmailSection = ({ email, open, onToggle, result }: SectionProps & { email: string }) => {
     const navigation = useNavigation();
     const submit = useSubmit();
     const isSubmitting = navigation.formData?.get('intent') === 'email';
@@ -26,15 +19,7 @@ const EmailSection = ({
         defaultValues: { newEmail: email },
     });
 
-    useSectionResult(result, 'email', (emailResult) => {
-        showSuccessToast(
-            emailResult.emailConfirmed
-                ? 'Email updated successfully.'
-                : 'Email updated. Please re-confirm your new address.',
-        );
-        onSuccess();
-        emailForm.reset({ newEmail: emailResult.email });
-    });
+    useSectionError(result, 'email');
 
     return (
         <SectionCard

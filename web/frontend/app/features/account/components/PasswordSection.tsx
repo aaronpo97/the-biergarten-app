@@ -4,13 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showSuccessToast } from '../../../components/ui/toast/toast';
-import { useSectionResult } from '../hooks/useSectionResult';
+import { useSectionError } from '../hooks/useSectionError';
 import { updatePasswordSchema, type UpdatePasswordSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
 
-const PasswordSection = ({ open, onToggle, onSuccess, result }: SectionProps) => {
+const PasswordSection = ({ open, onToggle, result }: SectionProps) => {
     const navigation = useNavigation();
     const submit = useSubmit();
     const isSubmitting = navigation.formData?.get('intent') === 'password';
@@ -19,11 +18,7 @@ const PasswordSection = ({ open, onToggle, onSuccess, result }: SectionProps) =>
         resolver: zodResolver(updatePasswordSchema),
     });
 
-    useSectionResult(result, 'password', () => {
-        showSuccessToast('Password changed successfully.');
-        onSuccess();
-        passwordForm.reset();
-    });
+    useSectionError(result, 'password');
 
     return (
         <SectionCard

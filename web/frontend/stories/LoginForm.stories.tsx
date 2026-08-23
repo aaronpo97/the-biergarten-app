@@ -3,42 +3,23 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expect, userEvent, within } from 'storybook/test';
-import FormField from '../app/components/ui/forms/FormField';
-import SubmitButton from '../app/components/ui/forms/SubmitButton';
+import LoginForm from '../app/features/auth/components/LoginForm';
 import { loginSchema, type LoginSchema } from '../app/features/auth/schemas';
 
-const loginFormDescription = `Exercises the real \`loginSchema\` (zod) through the same react-hook-form wiring used on the login page, so these stories validate actual client-side validation behavior rather than just rendering.`;
+const loginFormDescription = `Renders the real \`LoginForm\` component wired to the real \`loginSchema\` (zod) through the same react-hook-form setup used on the login page, so these stories validate actual client-side validation behavior rather than a re-implemented form.`;
 
-const LoginFormDemo = () => {
+const LoginFormHarness = () => {
     const [submitted, setSubmitted] = useState<LoginSchema | null>(null);
     const form = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
 
     return (
         <div className="w-full max-w-md space-y-3 rounded-box bg-base-100 p-6 shadow-lg">
-            <form
-                className="space-y-3"
+            <LoginForm
                 onSubmit={form.handleSubmit((values) => setSubmitted(values))}
-            >
-                <FormField
-                    id="username"
-                    type="text"
-                    label="Username"
-                    error={form.formState.errors.username?.message}
-                    {...form.register('username')}
-                />
-                <FormField
-                    id="password"
-                    type="password"
-                    label="Password"
-                    error={form.formState.errors.password?.message}
-                    {...form.register('password')}
-                />
-                <SubmitButton
-                    isSubmitting={false}
-                    idleText="Sign In"
-                    submittingText="Signing in..."
-                />
-            </form>
+                formState={form.formState}
+                register={form.register}
+                submitting={false}
+            />
             {submitted ? (
                 <p data-testid="submit-result">Signed in as {submitted.username}</p>
             ) : null}
@@ -48,7 +29,7 @@ const LoginFormDemo = () => {
 
 const meta = {
     title: 'Forms/LoginForm',
-    component: LoginFormDemo,
+    component: LoginFormHarness,
     tags: ['autodocs'],
     parameters: {
         layout: 'centered',
@@ -58,7 +39,7 @@ const meta = {
             },
         },
     },
-} satisfies Meta<typeof LoginFormDemo>;
+} satisfies Meta<typeof LoginFormHarness>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
