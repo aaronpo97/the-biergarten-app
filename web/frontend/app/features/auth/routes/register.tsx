@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link, redirect, useNavigation, useSubmit } from 'react-router';
-import FormField from '../../../components/ui/forms/FormField';
-import SubmitButton from '../../../components/ui/forms/SubmitButton';
+import { redirect, useNavigation, useSubmit } from 'react-router';
 import { createAuthSession, getOptionalAuth, register } from '../auth.server';
+import LoginCallout from '../components/LoginCallout';
+import RegisterForm from '../components/RegisterForm';
 import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { registerSchema, type RegisterSchema } from '../schemas';
 import type { Route } from './+types/register';
@@ -65,7 +65,7 @@ const Register = ({ actionData }: Route.ComponentProps) => {
     const {
         register: field,
         handleSubmit,
-        formState: { errors },
+        formState,
     } = useForm<RegisterSchema>({ resolver: zodResolver(registerSchema) });
 
     const onSubmit = handleSubmit((data) => {
@@ -89,97 +89,14 @@ const Register = ({ actionData }: Route.ComponentProps) => {
                         </div>
                     )}
 
-                    <form onSubmit={onSubmit} className="space-y-3">
-                        <FormField
-                            id="username"
-                            type="text"
-                            autoComplete="username"
-                            placeholder="your_username"
-                            label="Username"
-                            hint="3-64 characters, alphanumeric and . _ -"
-                            error={errors.username?.message}
-                            {...field('username')}
-                        />
+                    <RegisterForm
+                        onSubmit={onSubmit}
+                        formState={formState}
+                        register={field}
+                        submitting={isSubmitting}
+                    />
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <FormField
-                                id="firstName"
-                                type="text"
-                                autoComplete="given-name"
-                                placeholder="Jane"
-                                label="First Name"
-                                error={errors.firstName?.message}
-                                {...field('firstName')}
-                            />
-
-                            <FormField
-                                id="lastName"
-                                type="text"
-                                autoComplete="family-name"
-                                placeholder="Doe"
-                                label="Last Name"
-                                error={errors.lastName?.message}
-                                {...field('lastName')}
-                            />
-                        </div>
-
-                        <FormField
-                            id="email"
-                            type="email"
-                            autoComplete="email"
-                            placeholder="jane@example.com"
-                            label="Email"
-                            error={errors.email?.message}
-                            {...field('email')}
-                        />
-
-                        <FormField
-                            id="dateOfBirth"
-                            type="date"
-                            label="Date of Birth"
-                            hint="Must be 19 years or older"
-                            error={errors.dateOfBirth?.message}
-                            {...field('dateOfBirth')}
-                        />
-
-                        <FormField
-                            id="password"
-                            type="password"
-                            autoComplete="new-password"
-                            placeholder="••••••••"
-                            label="Password"
-                            hint="8+ chars: uppercase, lowercase, digit, special character"
-                            error={errors.password?.message}
-                            {...field('password')}
-                        />
-
-                        <FormField
-                            id="confirmPassword"
-                            type="password"
-                            autoComplete="new-password"
-                            placeholder="••••••••"
-                            label="Confirm Password"
-                            error={errors.confirmPassword?.message}
-                            {...field('confirmPassword')}
-                        />
-
-                        <SubmitButton
-                            isSubmitting={isSubmitting}
-                            idleText="Create Account"
-                            submittingText="Creating account..."
-                        />
-                    </form>
-
-                    <div className="divider text-xs">Already have an account?</div>
-
-                    <div className="text-center space-y-2">
-                        <Link to="/login" className="btn btn-outline btn-sm w-full">
-                            Sign in
-                        </Link>
-                        <Link to="/" className="link link-hover text-sm text-base-content/60">
-                            Back to home
-                        </Link>
-                    </div>
+                    <LoginCallout />
                 </div>
             </div>
         </div>
