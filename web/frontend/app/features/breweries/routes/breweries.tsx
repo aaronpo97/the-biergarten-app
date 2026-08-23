@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { getBreweries } from '../lib/breweries.server';
+import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
 
 export function meta({}: Route.MetaArgs) {

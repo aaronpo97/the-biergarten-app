@@ -1,5 +1,5 @@
 import { data, Link } from 'react-router';
-import { getBreweryById } from '../lib/breweries.server';
+import { getBreweryById } from '../breweries.server';
 import type { Route } from './+types/brewery-detail';
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
