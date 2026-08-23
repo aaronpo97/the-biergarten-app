@@ -18,12 +18,12 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
-function applyTheme(theme: ThemeName) {
+const applyTheme = (theme: ThemeName) => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(themeStorageKey, theme);
-}
+};
 
-export default function ThemePage() {
+const ThemePage = () => {
     const [selectedTheme, setSelectedTheme] = useState<ThemeName>(() => {
         if (typeof window === 'undefined') {
             return defaultThemeName;
@@ -173,4 +173,6 @@ export default function ThemePage() {
             </div>
         </main>
     );
-}
+};
+
+export default ThemePage;

@@ -18,7 +18,7 @@ interface NavbarProps {
    } | null;
 }
 
-export default function Navbar({ auth }: NavbarProps) {
+const Navbar = ({ auth }: NavbarProps) => {
    const navLinks = [
       { to: '/theme', label: 'Theme' },
       { to: '/beers', label: 'Beers' },
@@ -141,4 +141,6 @@ export default function Navbar({ auth }: NavbarProps) {
          )}
       </Disclosure>
    );
-}
+};
+
+export default Navbar;

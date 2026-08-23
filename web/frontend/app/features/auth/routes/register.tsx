@@ -57,7 +57,7 @@ export async function action({ request }: Route.ActionArgs) {
     }
 }
 
-export default function Register({ actionData }: Route.ComponentProps) {
+const Register = ({ actionData }: Route.ComponentProps) => {
     const navigation = useNavigation();
     const submit = useSubmit();
     const isSubmitting = navigation.state === 'submitting';
@@ -184,4 +184,6 @@ export default function Register({ actionData }: Route.ComponentProps) {
             </div>
         </div>
     );
-}
+};
+
+export default Register;

@@ -9,7 +9,7 @@ type FormFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
    hintClassName?: string;
 };
 
-export default function FormField({
+const FormField = ({
    label,
    error,
    hint,
@@ -18,7 +18,7 @@ export default function FormField({
    inputClassName,
    hintClassName,
    ...inputProps
-}: FormFieldProps) {
+}: FormFieldProps) => {
    return (
       <Field className={className ?? 'space-y-1'}>
          <Label htmlFor={inputProps.id} className={labelClassName ?? 'label font-medium'}>
@@ -37,4 +37,6 @@ export default function FormField({
          ) : null}
       </Field>
    );
-}
+};
+
+export default FormField;

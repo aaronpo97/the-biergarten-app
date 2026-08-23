@@ -12,7 +12,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     return { username: auth?.username ?? null };
 };
 
-export default function Home({ loaderData }: Route.ComponentProps) {
+const Home = ({ loaderData }: Route.ComponentProps) => {
     const { username } = loaderData;
 
     return (
@@ -51,4 +51,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </div>
         </div>
     );
-}
+};
+
+export default Home;

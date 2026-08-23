@@ -11,7 +11,7 @@ export async function loader() {
     return { breweries };
 }
 
-export default function Breweries({ loaderData }: Route.ComponentProps) {
+const Breweries = ({ loaderData }: Route.ComponentProps) => {
     const { breweries } = loaderData;
 
     return (
@@ -53,4 +53,6 @@ export default function Breweries({ loaderData }: Route.ComponentProps) {
             </div>
         </div>
     );
-}
+};
+
+export default Breweries;

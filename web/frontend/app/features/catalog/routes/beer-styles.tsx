@@ -4,7 +4,7 @@ export function meta({}: Route.MetaArgs) {
     return [{ title: 'Beer Styles | The Biergarten App' }];
 }
 
-export default function BeerStyles() {
+const BeerStyles = () => {
     return (
         <div className="min-h-screen bg-base-200">
             <div className="container mx-auto p-4">
@@ -13,4 +13,6 @@ export default function BeerStyles() {
             </div>
         </div>
     );
-}
+};
+
+export default BeerStyles;

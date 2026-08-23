@@ -7,12 +7,7 @@ interface SubmitButtonProps {
    className?: string;
 }
 
-export default function SubmitButton({
-   isSubmitting,
-   idleText,
-   submittingText,
-   className,
-}: SubmitButtonProps) {
+const SubmitButton = ({ isSubmitting, idleText, submittingText, className }: SubmitButtonProps) => {
    return (
       <Button
          type="submit"
@@ -28,4 +23,6 @@ export default function SubmitButton({
          )}
       </Button>
    );
-}
+};
+
+export default SubmitButton;

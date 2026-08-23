@@ -29,7 +29,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
 }
 
-export default function Confirm({ loaderData }: Route.ComponentProps) {
+const Confirm = ({ loaderData }: Route.ComponentProps) => {
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="card w-full max-w-md bg-base-100 shadow-xl">
@@ -77,4 +77,6 @@ export default function Confirm({ loaderData }: Route.ComponentProps) {
             </div>
         </div>
     );
-}
+};
+
+export default Confirm;
