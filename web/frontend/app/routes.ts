@@ -9,8 +9,8 @@ export default [
    route('dashboard', 'features/account/routes/dashboard.tsx'),
    route('account', 'features/account/routes/account.tsx'),
    route('confirm', 'features/auth/routes/confirm.tsx'),
-   route('beers', 'routes/beers.tsx'),
+   route('beers', 'features/catalog/routes/beers.tsx'),
    route('breweries', 'features/breweries/routes/breweries.tsx'),
    route('breweries/:id', 'features/breweries/routes/brewery-detail.tsx'),
-   route('beer-styles', 'routes/beer-styles.tsx'),
+   route('beer-styles', 'features/catalog/routes/beer-styles.tsx'),
 ] satisfies RouteConfig;
