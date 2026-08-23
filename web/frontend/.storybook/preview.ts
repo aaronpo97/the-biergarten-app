@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/react-vite';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router';
 import '../app/app.css';
-import { biergartenThemes, defaultThemeName, isBiergartenTheme } from '../app/lib/themes';
+import { biergartenThemes, defaultThemeName, isBiergartenTheme } from '../app/features/theme/themes';
 
 const preview: Preview = {
    globalTypes: {
