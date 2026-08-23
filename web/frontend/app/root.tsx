@@ -12,6 +12,16 @@ import './app.css';
 import Navbar from './components/Navbar';
 import ToastProvider from './components/toast/ToastProvider';
 import { getOptionalAuth } from './lib/auth.server';
+import { themeStorageKey } from './lib/themes';
+
+const themeInitScript = `
+  (function () {
+    try {
+      var theme = localStorage.getItem(${JSON.stringify(themeStorageKey)});
+      if (theme) document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+`;
 
 export const links: Route.LinksFunction = () => [
    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -39,6 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <Meta />
             <Links />
+            <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
          </head>
          <body>
             {children}

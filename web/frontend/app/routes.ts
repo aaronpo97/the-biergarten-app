@@ -7,6 +7,7 @@ export default [
    route('register', 'routes/register.tsx'),
    route('logout', 'routes/logout.tsx'),
    route('dashboard', 'routes/dashboard.tsx'),
+   route('account', 'routes/account.tsx'),
    route('confirm', 'routes/confirm.tsx'),
    route('beers', 'routes/beers.tsx'),
    route('breweries', 'routes/breweries.tsx'),

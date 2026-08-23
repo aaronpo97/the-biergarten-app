@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { requireAuth } from '../lib/auth.server';
 import type { Route } from './+types/dashboard';
 
@@ -41,6 +42,12 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                            <div className="stat-desc font-mono text-xs mt-1">{userAccountId}</div>
                         </div>
                      </div>
+                  </div>
+
+                  <div className="card-actions mt-4">
+                     <Link to="/account" className="btn btn-outline btn-sm">
+                        Account Settings
+                     </Link>
                   </div>
                </div>
             </div>
@@ -92,7 +99,23 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                            <p className="font-semibold">Token Refresh</p>
                            <p className="text-sm text-base-content/60">
                               POST to <code className="kbd kbd-sm">/api/auth/refresh</code> with
-                              refresh token
+                              the refresh token in an{' '}
+                              <code className="kbd kbd-sm">X-Refresh-Token</code> header
+                           </p>
+                        </div>
+                     </li>
+                     <li className="list-row">
+                        <div>
+                           <p className="font-semibold">Account Management</p>
+                           <p className="text-sm text-base-content/60">
+                              PATCH <code className="kbd kbd-sm">/api/auth/username</code>,{' '}
+                              <code className="kbd kbd-sm">/email</code>,{' '}
+                              <code className="kbd kbd-sm">/password</code>,{' '}
+                              <code className="kbd kbd-sm">/profile</code>, and DELETE{' '}
+                              <code className="kbd kbd-sm">/account</code> — see{' '}
+                              <Link to="/account" className="link">
+                                 Account Settings
+                              </Link>
                            </p>
                         </div>
                      </li>

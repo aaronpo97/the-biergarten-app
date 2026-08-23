@@ -29,6 +29,9 @@ type Pages = {
   "/dashboard": {
     params: {};
   };
+  "/account": {
+    params: {};
+  };
   "/confirm": {
     params: {};
   };
@@ -46,7 +49,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/theme" | "/login" | "/register" | "/logout" | "/dashboard" | "/confirm" | "/beers" | "/breweries" | "/beer-styles";
+    page: "/" | "/theme" | "/login" | "/register" | "/logout" | "/dashboard" | "/account" | "/confirm" | "/beers" | "/breweries" | "/beer-styles";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -71,6 +74,10 @@ type RouteFiles = {
   "routes/dashboard.tsx": {
     id: "routes/dashboard";
     page: "/dashboard";
+  };
+  "routes/account.tsx": {
+    id: "routes/account";
+    page: "/account";
   };
   "routes/confirm.tsx": {
     id: "routes/confirm";
@@ -98,6 +105,7 @@ type RouteModules = {
   "routes/register": typeof import("./app/routes/register.tsx");
   "routes/logout": typeof import("./app/routes/logout.tsx");
   "routes/dashboard": typeof import("./app/routes/dashboard.tsx");
+  "routes/account": typeof import("./app/routes/account.tsx");
   "routes/confirm": typeof import("./app/routes/confirm.tsx");
   "routes/beers": typeof import("./app/routes/beers.tsx");
   "routes/breweries": typeof import("./app/routes/breweries.tsx");

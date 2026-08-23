@@ -25,6 +25,37 @@ interface RegistrationPayload extends LoginPayload {
    confirmationEmailSent: boolean;
 }
 
+interface UpdateUsernamePayload {
+   userAccountId: string;
+   username: string;
+}
+
+interface UpdateEmailPayload {
+   userAccountId: string;
+   email: string;
+   emailConfirmed: boolean;
+}
+
+interface UpdateProfilePayload {
+   userAccountId: string;
+   firstName: string;
+   lastName: string;
+   dateOfBirth: string;
+}
+
+interface UpdatePasswordPayload {
+   userAccountId: string;
+   changedAt: string;
+}
+
+export interface UserAccountDetails {
+   username: string;
+   firstName: string;
+   lastName: string;
+   email: string;
+   dateOfBirth: string;
+}
+
 const sessionStorage = createCookieSessionStorage({
    cookie: {
       name: '__session',
@@ -122,8 +153,7 @@ export async function register(body: {
 export async function refreshTokens(refreshToken: string) {
    const res = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
+      headers: { 'X-Refresh-Token': refreshToken },
    });
 
    if (!res.ok) {
@@ -132,6 +162,17 @@ export async function refreshTokens(refreshToken: string) {
 
    const data: ApiResponse<LoginPayload> = await res.json();
    return data.payload;
+}
+
+export async function getUserAccount(userAccountId: string): Promise<UserAccountDetails> {
+   const res = await fetch(`${API_BASE_URL}/api/user/${userAccountId}`);
+
+   if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || `Failed to load account details (${res.status})`);
+   }
+
+   return res.json();
 }
 
 export async function confirmEmail(token: string, accessToken: string) {
@@ -147,6 +188,70 @@ export async function confirmEmail(token: string, accessToken: string) {
 
    const data: ApiResponse<{ userAccountId: string; confirmedDate: string }> = await res.json();
    return data.payload;
+}
+
+async function authorizedRequest<T>(
+   path: string,
+   accessToken: string,
+   init: { method: string; body?: unknown }
+): Promise<T> {
+   const res = await fetch(`${API_BASE_URL}${path}`, {
+      method: init.method,
+      headers: {
+         Authorization: `Bearer ${accessToken}`,
+         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: init.body ? JSON.stringify(init.body) : undefined,
+   });
+
+   if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || `Request failed (${res.status})`);
+   }
+
+   const data: ApiResponse<T> = await res.json();
+   return data.payload;
+}
+
+export async function updateUsername(accessToken: string, newUsername: string) {
+   return authorizedRequest<UpdateUsernamePayload>('/api/auth/username', accessToken, {
+      method: 'PATCH',
+      body: { newUsername },
+   });
+}
+
+export async function updateEmail(accessToken: string, newEmail: string) {
+   return authorizedRequest<UpdateEmailPayload>('/api/auth/email', accessToken, {
+      method: 'PATCH',
+      body: { newEmail },
+   });
+}
+
+export async function updateProfile(
+   accessToken: string,
+   firstName: string,
+   lastName: string,
+   dateOfBirth: string
+) {
+   return authorizedRequest<UpdateProfilePayload>('/api/auth/profile', accessToken, {
+      method: 'PATCH',
+      body: { firstName, lastName, dateOfBirth },
+   });
+}
+
+export async function updatePassword(
+   accessToken: string,
+   currentPassword: string,
+   newPassword: string
+) {
+   return authorizedRequest<UpdatePasswordPayload>('/api/auth/password', accessToken, {
+      method: 'PATCH',
+      body: { currentPassword, newPassword },
+   });
+}
+
+export async function deleteAccount(accessToken: string) {
+   await authorizedRequest<null>('/api/auth/account', accessToken, { method: 'DELETE' });
 }
 
 export async function createAuthSession(payload: LoginPayload, redirectTo: string) {
