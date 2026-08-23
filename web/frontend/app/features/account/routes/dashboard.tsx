@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { requireAuth } from '../features/auth/auth.server';
+import { requireAuth } from '../../auth/auth.server';
 import type { Route } from './+types/dashboard';
 
 export function meta({}: Route.MetaArgs) {

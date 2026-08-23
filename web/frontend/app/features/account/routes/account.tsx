@@ -4,10 +4,10 @@ import { Lock, Mail, Settings, Trash, User, WarningTriangle } from 'iconoir-reac
 import { useEffect, useReducer, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { data, Link, redirect, useNavigation, useSubmit } from 'react-router';
-import SectionCard from '../components/account/SectionCard';
-import FormField from '../components/forms/FormField';
-import SubmitButton from '../components/forms/SubmitButton';
-import { showErrorToast, showSuccessToast } from '../components/toast/toast';
+import SectionCard from '../components/SectionCard';
+import FormField from '../../../components/forms/FormField';
+import SubmitButton from '../../../components/forms/SubmitButton';
+import { showErrorToast, showSuccessToast } from '../../../components/toast/toast';
 import {
     commitSession,
     deleteAccount,
@@ -19,7 +19,7 @@ import {
     updatePassword,
     updateProfile,
     updateUsername,
-} from '../features/auth/auth.server';
+} from '../../auth/auth.server';
 
 import {
     updateEmailSchema,
@@ -30,7 +30,7 @@ import {
     type UpdateProfileSchema,
     updateUsernameSchema,
     type UpdateUsernameSchema,
-} from '../lib/schemas';
+} from '../../../lib/schemas';
 
 import type { Route } from './+types/account';
 
