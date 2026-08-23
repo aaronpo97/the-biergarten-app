@@ -1,8 +1,8 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Trash, WarningTriangle } from 'iconoir-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigation, useSubmit } from 'react-router';
-import { showErrorToast } from '../../../components/ui/toast/toast';
+import { useSectionResult } from '../hooks/useSectionResult';
 import type { ActionResult } from '../types';
 
 interface DeleteAccountSectionProps {
@@ -16,9 +16,7 @@ const DeleteAccountSection = ({ userAccountId, result }: DeleteAccountSectionPro
    const [dialogOpen, setDialogOpen] = useState(false);
    const isSubmitting = navigation.formData?.get('intent') === 'delete';
 
-   useEffect(() => {
-      if (result?.intent === 'delete') showErrorToast(result.error);
-   }, [result]);
+   useSectionResult(result, 'delete', () => undefined);
 
    return (
       <>

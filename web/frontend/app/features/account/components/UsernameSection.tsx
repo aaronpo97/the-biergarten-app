@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User } from 'iconoir-react';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showErrorToast, showSuccessToast } from '../../../components/ui/toast/toast';
+import { showSuccessToast } from '../../../components/ui/toast/toast';
+import { useSectionResult } from '../hooks/useSectionResult';
 import { updateUsernameSchema, type UpdateUsernameSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
@@ -26,16 +26,11 @@ const UsernameSection = ({
       defaultValues: { newUsername: username },
    });
 
-   useEffect(() => {
-      if (!result || result.intent !== 'username') return;
-      if (!result.success) {
-         showErrorToast(result.error);
-         return;
-      }
+   useSectionResult(result, 'username', (usernameResult) => {
       showSuccessToast('Username updated successfully.');
       onSuccess();
-      usernameForm.reset({ newUsername: result.username });
-   }, [result, onSuccess, usernameForm]);
+      usernameForm.reset({ newUsername: usernameResult.username });
+   });
 
    return (
       <SectionCard

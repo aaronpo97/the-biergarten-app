@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'iconoir-react';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { showErrorToast, showSuccessToast } from '../../../components/ui/toast/toast';
+import { showSuccessToast } from '../../../components/ui/toast/toast';
+import { useSectionResult } from '../hooks/useSectionResult';
 import { updateEmailSchema, type UpdateEmailSchema } from '../schemas';
 import type { SectionProps } from '../types';
 import SectionCard from './SectionCard';
@@ -26,20 +26,15 @@ const EmailSection = ({
       defaultValues: { newEmail: email },
    });
 
-   useEffect(() => {
-      if (!result || result.intent !== 'email') return;
-      if (!result.success) {
-         showErrorToast(result.error);
-         return;
-      }
+   useSectionResult(result, 'email', (emailResult) => {
       showSuccessToast(
-         result.emailConfirmed
+         emailResult.emailConfirmed
             ? 'Email updated successfully.'
             : 'Email updated. Please re-confirm your new address.',
       );
       onSuccess();
-      emailForm.reset({ newEmail: result.email });
-   }, [result, onSuccess, emailForm]);
+      emailForm.reset({ newEmail: emailResult.email });
+   });
 
    return (
       <SectionCard
