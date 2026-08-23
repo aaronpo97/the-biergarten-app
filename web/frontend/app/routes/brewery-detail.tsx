@@ -1,18 +1,18 @@
-import {Link, data} from 'react-router';
-import {getBreweryById} from '../lib/breweries.server';
-import type {Route} from './+types/brewery-detail';
+import { data, Link } from 'react-router';
+import { getBreweryById } from '../lib/breweries.server';
+import type { Route } from './+types/brewery-detail';
 
-export const loader = async ({params}: Route.LoaderArgs) => {
+export const loader = async ({ params }: Route.LoaderArgs) => {
     const brewery = await getBreweryById(params.id);
     if (!brewery) {
-        throw data('Brewery not found.', {status: 404});
+        throw data('Brewery not found.', { status: 404 });
     }
 
-    return {brewery};
-}
+    return { brewery };
+};
 
-export default function BreweryDetail({loaderData}: Route.ComponentProps) {
-    const {brewery} = loaderData;
+export default function BreweryDetail({ loaderData }: Route.ComponentProps) {
+    const { brewery } = loaderData;
 
     return (
         <div className="min-h-screen bg-base-200">
@@ -27,7 +27,9 @@ export default function BreweryDetail({loaderData}: Route.ComponentProps) {
                 <div className="card bg-base-100 shadow">
                     <div className="card-body">
                         <h1 className="card-title text-3xl">{brewery.breweryName}</h1>
-                        <p className="text-base-content/70 whitespace-pre-line">{brewery.description}</p>
+                        <p className="text-base-content/70 whitespace-pre-line">
+                            {brewery.description}
+                        </p>
 
                         {brewery.location && (
                             <div className="bg-base-200 rounded-box p-4 mt-4">
@@ -35,8 +37,9 @@ export default function BreweryDetail({loaderData}: Route.ComponentProps) {
                                     Location
                                 </p>
                                 <p>{brewery.location.addressLine1}</p>
-                                {brewery.location.addressLine2 &&
-                                    <p>{brewery.location.addressLine2}</p>}
+                                {brewery.location.addressLine2 && (
+                                    <p>{brewery.location.addressLine2}</p>
+                                )}
                                 <p>{brewery.location.postalCode}</p>
                             </div>
                         )}
