@@ -1,5 +1,6 @@
 using Infrastructure.Email;
 using Infrastructure.Email.Templates.Rendering;
+using Microsoft.Extensions.Configuration;
 
 namespace Features.Emails.Services;
 
@@ -8,18 +9,19 @@ namespace Features.Emails.Services;
 /// </summary>
 public class EmailDispatcher(
     IEmailProvider emailProvider,
-    IEmailTemplateProvider emailTemplateProvider
+    IEmailTemplateProvider emailTemplateProvider,
+    IConfiguration configuration
 ) : IEmailDispatcher
 {
     /// <summary>
     ///     The base URL of the website, used to build confirmation links. Read from the
-    ///     <c>WEBSITE_BASE_URL</c> environment variable.
+    ///     <c>WEBSITE_BASE_URL</c> configuration value.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    ///     Thrown at type initialization time when the <c>WEBSITE_BASE_URL</c> environment variable is not set.
+    ///     Thrown when the <c>WEBSITE_BASE_URL</c> configuration value is not set.
     /// </exception>
-    private static readonly string WebsiteBaseUrl =
-        Environment.GetEnvironmentVariable("WEBSITE_BASE_URL")
+    private string WebsiteBaseUrl =>
+        configuration["WEBSITE_BASE_URL"]
         ?? throw new InvalidOperationException("WEBSITE_BASE_URL environment variable is not set");
 
     /// <inheritdoc />
