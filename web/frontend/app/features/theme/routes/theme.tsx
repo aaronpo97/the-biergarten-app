@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     biergartenThemes,
     defaultThemeName,
@@ -32,10 +32,6 @@ export default function ThemePage() {
         const savedTheme = localStorage.getItem(themeStorageKey);
         return isBiergartenTheme(savedTheme) ? savedTheme : defaultThemeName;
     });
-
-    useEffect(() => {
-        applyTheme(selectedTheme);
-    }, [selectedTheme]);
 
     const activeTheme =
         biergartenThemes.find((theme) => theme.value === selectedTheme) ?? biergartenThemes[0];
