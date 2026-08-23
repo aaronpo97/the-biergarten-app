@@ -8,7 +8,7 @@ export interface ThemeOption {
 }
 
 export const defaultThemeName: ThemeName = 'biergarten-lager';
-export const themeStorageKey = 'biergarten-theme';
+export const themeCookieName = 'biergarten-theme';
 
 export const biergartenThemes: ThemeOption[] = [
     {
@@ -35,4 +35,10 @@ export const biergartenThemes: ThemeOption[] = [
 
 export const isBiergartenTheme = (value: string | null | undefined): value is ThemeName => {
     return biergartenThemes.some((theme) => theme.value === value);
+};
+
+export const parseThemeCookie = (cookieHeader: string | null): ThemeName => {
+    const match = cookieHeader?.match(new RegExp(`(?:^|; )${themeCookieName}=([^;]*)`));
+    const value = match ? decodeURIComponent(match[1]) : null;
+    return isBiergartenTheme(value) ? value : defaultThemeName;
 };

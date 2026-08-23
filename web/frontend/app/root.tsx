@@ -5,6 +5,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useRouteLoaderData,
 } from 'react-router';
 
 import type { Route } from './+types/root';
@@ -12,16 +13,7 @@ import './app.css';
 import Navbar from './components/ui/navbar/Navbar';
 import ToastProvider from './components/ui/toast/ToastProvider';
 import { getOptionalAuth } from './features/auth/auth.server';
-import { themeStorageKey } from './features/theme/themes';
-
-const themeInitScript = `
-  (function () {
-    try {
-      var theme = localStorage.getItem(${JSON.stringify(themeStorageKey)});
-      if (theme) document.documentElement.setAttribute('data-theme', theme);
-    } catch (e) {}
-  })();
-`;
+import { defaultThemeName, parseThemeCookie } from './features/theme/themes';
 
 export const links: Route.LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -38,18 +30,20 @@ export const links: Route.LinksFunction = () => [
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await getOptionalAuth(request);
-    return { auth };
+    const theme = parseThemeCookie(request.headers.get('Cookie'));
+    return { auth, theme };
 };
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
+    const theme = useRouteLoaderData<typeof loader>('root')?.theme ?? defaultThemeName;
+
     return (
-        <html lang="en">
+        <html lang="en" data-theme={theme}>
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <Meta />
                 <Links />
-                <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
             </head>
             <body>
                 {children}

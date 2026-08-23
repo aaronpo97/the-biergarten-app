@@ -1,26 +1,16 @@
 import { useState } from 'react';
-import {
-    biergartenThemes,
-    defaultThemeName,
-    isBiergartenTheme,
-    type ThemeName,
-    themeStorageKey,
-} from '../themes';
+import { useRouteLoaderData } from 'react-router';
+import type { loader as rootLoader } from '../../../root';
+import { biergartenThemes, defaultThemeName, themeCookieName, type ThemeName } from '../themes';
 
 const applyTheme = (theme: ThemeName) => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(themeStorageKey, theme);
+    document.cookie = `${themeCookieName}=${theme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
 };
 
 const ThemeSwitcher = () => {
-    const [selectedTheme, setSelectedTheme] = useState<ThemeName>(() => {
-        if (typeof window === 'undefined') {
-            return defaultThemeName;
-        }
-
-        const savedTheme = localStorage.getItem(themeStorageKey);
-        return isBiergartenTheme(savedTheme) ? savedTheme : defaultThemeName;
-    });
+    const rootTheme = useRouteLoaderData<typeof rootLoader>('root')?.theme ?? defaultThemeName;
+    const [selectedTheme, setSelectedTheme] = useState<ThemeName>(rootTheme);
 
     const activeTheme =
         biergartenThemes.find((theme) => theme.value === selectedTheme) ?? biergartenThemes[0];
