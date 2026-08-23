@@ -6,7 +6,7 @@ import FormField from '../../../components/forms/FormField';
 import SubmitButton from '../../../components/forms/SubmitButton';
 import { showErrorToast } from '../../../components/toast/toast';
 import { createAuthSession, getOptionalAuth, register } from '../auth.server';
-import { registerSchema, type RegisterSchema } from '../../../lib/schemas';
+import { registerSchema, type RegisterSchema } from '../schemas';
 import type { Route } from './+types/register';
 
 export function meta({}: Route.MetaArgs) {

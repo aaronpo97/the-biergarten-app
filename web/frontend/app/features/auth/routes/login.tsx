@@ -7,7 +7,7 @@ import FormField from '../../../components/forms/FormField';
 import SubmitButton from '../../../components/forms/SubmitButton';
 import { showErrorToast } from '../../../components/toast/toast';
 import { createAuthSession, getOptionalAuth, login } from '../auth.server';
-import { loginSchema, type LoginSchema } from '../../../lib/schemas';
+import { loginSchema, type LoginSchema } from '../schemas';
 import type { Route } from './+types/login';
 
 export const meta = ({}: Route.MetaArgs) => {

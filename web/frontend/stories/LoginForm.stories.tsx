@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { expect, userEvent, within } from 'storybook/test';
 import FormField from '../app/components/forms/FormField';
 import SubmitButton from '../app/components/forms/SubmitButton';
-import { loginSchema, type LoginSchema } from '../app/lib/schemas';
+import { loginSchema, type LoginSchema } from '../app/features/auth/schemas';
 
 const loginFormDescription = `Exercises the real \`loginSchema\` (zod) through the same react-hook-form wiring used on the login page, so these stories validate actual client-side validation behavior rather than just rendering.`;
 

@@ -30,7 +30,7 @@ import {
     type UpdateProfileSchema,
     updateUsernameSchema,
     type UpdateUsernameSchema,
-} from '../../../lib/schemas';
+} from '../schemas';
 
 import type { Route } from './+types/account';
 

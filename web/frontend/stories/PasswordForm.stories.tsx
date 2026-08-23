@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { expect, userEvent, within } from 'storybook/test';
 import FormField from '../app/components/forms/FormField';
 import SubmitButton from '../app/components/forms/SubmitButton';
-import { updatePasswordSchema, type UpdatePasswordSchema } from '../app/lib/schemas';
+import { updatePasswordSchema, type UpdatePasswordSchema } from '../app/features/account/schemas';
 
 const passwordFormDescription = `Exercises the real \`updatePasswordSchema\` (zod) through the same react-hook-form wiring used on the account page, including its cross-field rules (confirmation must match, new password must differ from the current one), so these stories validate actual client-side validation behavior rather than just rendering.`;
 

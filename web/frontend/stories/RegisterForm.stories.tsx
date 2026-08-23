@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
 import FormField from '../app/components/forms/FormField';
 import SubmitButton from '../app/components/forms/SubmitButton';
-import { registerSchema, type RegisterSchema } from '../app/lib/schemas';
+import { registerSchema, type RegisterSchema } from '../app/features/auth/schemas';
 
 const registerFormDescription = `Exercises the real \`registerSchema\` (zod) through the same react-hook-form wiring used on the register page, including its cross-field rule that the confirmation must match the password, so these stories validate actual client-side validation behavior rather than just rendering.`;
 
