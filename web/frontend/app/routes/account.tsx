@@ -19,7 +19,7 @@ import {
     updatePassword,
     updateProfile,
     updateUsername,
-} from '../lib/auth.server';
+} from '../features/auth/auth.server';
 
 import {
     updateEmailSchema,

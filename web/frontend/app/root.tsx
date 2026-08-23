@@ -11,7 +11,7 @@ import type { Route } from './+types/root';
 import './app.css';
 import Navbar from './components/Navbar';
 import ToastProvider from './components/toast/ToastProvider';
-import { getOptionalAuth } from './lib/auth.server';
+import { getOptionalAuth } from './features/auth/auth.server';
 import { themeStorageKey } from './features/theme/themes';
 
 const themeInitScript = `

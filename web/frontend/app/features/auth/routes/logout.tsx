@@ -1,5 +1,5 @@
 import { redirect } from 'react-router';
-import { destroySession, getSession } from '../lib/auth.server';
+import { destroySession, getSession } from '../auth.server';
 import type { Route } from './+types/logout';
 
 export async function loader({ request }: Route.LoaderArgs) {

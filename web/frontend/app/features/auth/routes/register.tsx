@@ -2,11 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, redirect, useNavigation, useSubmit } from 'react-router';
-import FormField from '../components/forms/FormField';
-import SubmitButton from '../components/forms/SubmitButton';
-import { showErrorToast } from '../components/toast/toast';
-import { createAuthSession, getOptionalAuth, register } from '../lib/auth.server';
-import { registerSchema, type RegisterSchema } from '../lib/schemas';
+import FormField from '../../../components/forms/FormField';
+import SubmitButton from '../../../components/forms/SubmitButton';
+import { showErrorToast } from '../../../components/toast/toast';
+import { createAuthSession, getOptionalAuth, register } from '../auth.server';
+import { registerSchema, type RegisterSchema } from '../../../lib/schemas';
 import type { Route } from './+types/register';
 
 export function meta({}: Route.MetaArgs) {

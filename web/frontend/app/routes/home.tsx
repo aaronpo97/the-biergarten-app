@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { getOptionalAuth } from '../lib/auth.server';
+import { getOptionalAuth } from '../features/auth/auth.server';
 import type { Route } from './+types/home';
 
 export const meta = ({}: Route.MetaArgs) => [

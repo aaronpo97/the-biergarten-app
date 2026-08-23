@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router';
-import { showErrorToast, showSuccessToast } from '../components/toast/toast';
-import { confirmEmail, requireAuth } from '../lib/auth.server';
+import { showErrorToast, showSuccessToast } from '../../../components/toast/toast';
+import { confirmEmail, requireAuth } from '../auth.server';
 import type { Route } from './+types/confirm';
 
 export function meta({}: Route.MetaArgs) {

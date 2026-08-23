@@ -3,11 +3,11 @@ import { HomeSimpleDoor, LogIn, UserPlus } from 'iconoir-react';
 import React, { BaseSyntheticEvent, useEffect } from 'react';
 import { FormState, useForm, UseFormRegister } from 'react-hook-form';
 import { Link, redirect, useNavigation, useSubmit } from 'react-router';
-import FormField from '../components/forms/FormField';
-import SubmitButton from '../components/forms/SubmitButton';
-import { showErrorToast } from '../components/toast/toast';
-import { createAuthSession, getOptionalAuth, login } from '../lib/auth.server';
-import { loginSchema, type LoginSchema } from '../lib/schemas';
+import FormField from '../../../components/forms/FormField';
+import SubmitButton from '../../../components/forms/SubmitButton';
+import { showErrorToast } from '../../../components/toast/toast';
+import { createAuthSession, getOptionalAuth, login } from '../auth.server';
+import { loginSchema, type LoginSchema } from '../../../lib/schemas';
 import type { Route } from './+types/login';
 
 export const meta = ({}: Route.MetaArgs) => {
