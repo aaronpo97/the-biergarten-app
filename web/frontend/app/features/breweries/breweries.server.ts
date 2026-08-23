@@ -24,7 +24,7 @@ export interface Brewery {
    location: BreweryLocation | null;
 }
 
-export async function getBreweries(limit?: number, offset?: number): Promise<Brewery[]> {
+export const getBreweries = async (limit?: number, offset?: number): Promise<Brewery[]> => {
    const params = new URLSearchParams();
    if (limit !== undefined) params.set('limit', String(limit));
    if (offset !== undefined) params.set('offset', String(offset));
@@ -37,9 +37,9 @@ export async function getBreweries(limit?: number, offset?: number): Promise<Bre
 
    const data: ApiResponse<Brewery[]> = await res.json();
    return data.payload;
-}
+};
 
-export async function getBreweryById(id: string): Promise<Brewery | null> {
+export const getBreweryById = async (id: string): Promise<Brewery | null> => {
    const res = await fetch(`${API_BASE_URL}/api/brewery/${encodeURIComponent(id)}`);
 
    if (res.status === 404) {
@@ -52,4 +52,4 @@ export async function getBreweryById(id: string): Promise<Brewery | null> {
 
    const data: ApiResponse<Brewery> = await res.json();
    return data.payload;
-}
+};

@@ -68,19 +68,19 @@ const sessionStorage = createCookieSessionStorage({
    },
 });
 
-export async function getSession(request: Request) {
+export const getSession = async (request: Request) => {
    return sessionStorage.getSession(request.headers.get('Cookie'));
-}
+};
 
-export async function commitSession(session: Awaited<ReturnType<typeof getSession>>) {
+export const commitSession = async (session: Awaited<ReturnType<typeof getSession>>) => {
    return sessionStorage.commitSession(session);
-}
+};
 
-export async function destroySession(session: Awaited<ReturnType<typeof getSession>>) {
+export const destroySession = async (session: Awaited<ReturnType<typeof getSession>>) => {
    return sessionStorage.destroySession(session);
-}
+};
 
-export async function requireAuth(request: Request): Promise<AuthTokens> {
+export const requireAuth = async (request: Request): Promise<AuthTokens> => {
    const session = await getSession(request);
    const accessToken = session.get('accessToken');
    const refreshToken = session.get('refreshToken');
@@ -95,9 +95,9 @@ export async function requireAuth(request: Request): Promise<AuthTokens> {
       userAccountId: session.get('userAccountId'),
       username: session.get('username'),
    };
-}
+};
 
-export async function getOptionalAuth(request: Request): Promise<AuthTokens | null> {
+export const getOptionalAuth = async (request: Request): Promise<AuthTokens | null> => {
    const session = await getSession(request);
    const accessToken = session.get('accessToken');
 
@@ -109,9 +109,9 @@ export async function getOptionalAuth(request: Request): Promise<AuthTokens | nu
       userAccountId: session.get('userAccountId'),
       username: session.get('username'),
    };
-}
+};
 
-export async function login(username: string, password: string) {
+export const login = async (username: string, password: string) => {
    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -125,16 +125,16 @@ export async function login(username: string, password: string) {
 
    const data: ApiResponse<LoginPayload> = await res.json();
    return data.payload;
-}
+};
 
-export async function register(body: {
+export const register = async (body: {
    username: string;
    firstName: string;
    lastName: string;
    email: string;
    dateOfBirth: string;
    password: string;
-}) {
+}) => {
    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -148,9 +148,9 @@ export async function register(body: {
 
    const data: ApiResponse<RegistrationPayload> = await res.json();
    return data.payload;
-}
+};
 
-export async function refreshTokens(refreshToken: string) {
+export const refreshTokens = async (refreshToken: string) => {
    const res = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'X-Refresh-Token': refreshToken },
@@ -162,9 +162,9 @@ export async function refreshTokens(refreshToken: string) {
 
    const data: ApiResponse<LoginPayload> = await res.json();
    return data.payload;
-}
+};
 
-export async function getUserAccount(userAccountId: string): Promise<UserAccountDetails> {
+export const getUserAccount = async (userAccountId: string): Promise<UserAccountDetails> => {
    const res = await fetch(`${API_BASE_URL}/api/user/${userAccountId}`);
 
    if (!res.ok) {
@@ -173,9 +173,9 @@ export async function getUserAccount(userAccountId: string): Promise<UserAccount
    }
 
    return res.json();
-}
+};
 
-export async function confirmEmail(token: string, accessToken: string) {
+export const confirmEmail = async (token: string, accessToken: string) => {
    const res = await fetch(`${API_BASE_URL}/api/auth/confirm?token=${encodeURIComponent(token)}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -188,13 +188,13 @@ export async function confirmEmail(token: string, accessToken: string) {
 
    const data: ApiResponse<{ userAccountId: string; confirmedDate: string }> = await res.json();
    return data.payload;
-}
+};
 
-async function authorizedRequest<T>(
+const authorizedRequest = async <T>(
    path: string,
    accessToken: string,
    init: { method: string; body?: unknown }
-): Promise<T> {
+): Promise<T> => {
    const res = await fetch(`${API_BASE_URL}${path}`, {
       method: init.method,
       headers: {
@@ -211,50 +211,50 @@ async function authorizedRequest<T>(
 
    const data: ApiResponse<T> = await res.json();
    return data.payload;
-}
+};
 
-export async function updateUsername(accessToken: string, newUsername: string) {
+export const updateUsername = async (accessToken: string, newUsername: string) => {
    return authorizedRequest<UpdateUsernamePayload>('/api/auth/username', accessToken, {
       method: 'PATCH',
       body: { newUsername },
    });
-}
+};
 
-export async function updateEmail(accessToken: string, newEmail: string) {
+export const updateEmail = async (accessToken: string, newEmail: string) => {
    return authorizedRequest<UpdateEmailPayload>('/api/auth/email', accessToken, {
       method: 'PATCH',
       body: { newEmail },
    });
-}
+};
 
-export async function updateProfile(
+export const updateProfile = async (
    accessToken: string,
    firstName: string,
    lastName: string,
    dateOfBirth: string
-) {
+) => {
    return authorizedRequest<UpdateProfilePayload>('/api/auth/profile', accessToken, {
       method: 'PATCH',
       body: { firstName, lastName, dateOfBirth },
    });
-}
+};
 
-export async function updatePassword(
+export const updatePassword = async (
    accessToken: string,
    currentPassword: string,
    newPassword: string
-) {
+) => {
    return authorizedRequest<UpdatePasswordPayload>('/api/auth/password', accessToken, {
       method: 'PATCH',
       body: { currentPassword, newPassword },
    });
-}
+};
 
-export async function deleteAccount(accessToken: string) {
+export const deleteAccount = async (accessToken: string) => {
    await authorizedRequest<null>('/api/auth/account', accessToken, { method: 'DELETE' });
-}
+};
 
-export async function createAuthSession(payload: LoginPayload, redirectTo: string) {
+export const createAuthSession = async (payload: LoginPayload, redirectTo: string) => {
    const session = await sessionStorage.getSession();
    session.set('accessToken', payload.accessToken);
    session.set('refreshToken', payload.refreshToken);
@@ -264,4 +264,4 @@ export async function createAuthSession(payload: LoginPayload, redirectTo: strin
    return redirect(redirectTo, {
       headers: { 'Set-Cookie': await commitSession(session) },
    });
-}
+};

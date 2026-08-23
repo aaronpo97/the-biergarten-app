@@ -36,6 +36,6 @@ export const biergartenThemes: ThemeOption[] = [
    },
 ];
 
-export function isBiergartenTheme(value: string | null | undefined): value is ThemeName {
+export const isBiergartenTheme = (value: string | null | undefined): value is ThemeName => {
    return biergartenThemes.some((theme) => theme.value === value);
-}
+};
