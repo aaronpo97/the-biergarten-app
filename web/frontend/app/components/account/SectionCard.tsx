@@ -9,7 +9,7 @@ interface SectionCardProps {
    children: ReactNode;
 }
 
-const SessionCard =({
+const SectionCard = ({
    icon,
    title,
    description,
@@ -41,4 +41,4 @@ const SessionCard =({
 );
 
 
-export default SessionCard;
+export default SectionCard;
