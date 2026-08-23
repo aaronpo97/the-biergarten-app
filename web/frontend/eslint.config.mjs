@@ -3,50 +3,65 @@ import storybook from 'eslint-plugin-storybook';
 
 import js from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-   {
-      ignores: ['build/**', 'node_modules/**', '.react-router/**', 'coverage/**'],
-   },
-   {
-      files: ['**/*.{ts,tsx}'],
-      extends: [
-         js.configs.recommended,
-         ...tseslint.configs.recommended,
-         ...tseslint.configs.stylistic,
-      ],
-      languageOptions: {
-         ecmaVersion: 'latest',
-         sourceType: 'module',
-         globals: {
-            ...globals.browser,
-            ...globals.node,
-         },
-         parserOptions: {
-            ecmaFeatures: {
-               jsx: true,
+    {
+        ignores: ['build/**', 'node_modules/**', '.react-router/**', 'coverage/**'],
+    },
+    {
+        files: ['**/*.{ts,tsx}'],
+        extends: [
+            js.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...tseslint.configs.stylistic,
+        ],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            globals: {
+                ...globals.browser,
+                ...globals.node,
             },
-         },
-      },
-      plugins: {
-         'react-hooks': reactHooks,
-      },
-      rules: {
-         ...reactHooks.configs.recommended.rules,
-         'no-empty-pattern': 'off',
-         '@typescript-eslint/no-unused-vars': [
-            'warn',
-            {
-               argsIgnorePattern: '^_',
-               varsIgnorePattern: '^_',
-               caughtErrorsIgnorePattern: '^_',
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
             },
-         ],
-      },
-   },
-   prettierConfig,
-   storybook.configs['flat/recommended'],
+        },
+        plugins: {
+            'react-hooks': reactHooks,
+            react,
+        },
+        settings: {
+            react: {
+                version: '19.2',
+            },
+        },
+        rules: {
+            ...reactHooks.configs.recommended.rules,
+            'no-empty-pattern': 'off',
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
+            'func-style': ['error', 'expression'],
+            'react/function-component-definition': [
+                'error',
+                {
+                    namedComponents: 'arrow-function',
+                    unnamedComponents: 'arrow-function',
+                },
+            ],
+        },
+    },
+    prettierConfig,
+    storybook.configs['flat/recommended'],
 );

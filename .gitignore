@@ -16,11 +16,11 @@
 /build
 
 # project-specific build artifacts
-/src/Website/build/
-/src/Website/storybook-static/
-/src/Website/.react-router/
-/src/Website/playwright-report/
-/src/Website/test-results/
+/web/frontend/build/
+/web/frontend/storybook-static/
+/web/frontend/.react-router/
+/web/frontend/playwright-report/
+/web/frontend/test-results/
 /test-results/
 
 # misc
