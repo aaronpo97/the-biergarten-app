@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using FluentAssertions;
 using Infrastructure.Jwt;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
 
 namespace API.Specs.Steps;
@@ -19,11 +21,8 @@ public class AuthSteps(ScenarioContext scenario)
     private const string PreviousAccessTokenKey = "previousAccessToken";
     private const string PreviousRefreshTokenKey = "previousRefreshToken";
 
-    private HttpClient GetClient()
+    private TestApiFactory GetFactory()
     {
-        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client))
-            return client;
-
         TestApiFactory? factory = scenario.TryGetValue<TestApiFactory>(
             FactoryKey,
             out TestApiFactory? f
@@ -31,16 +30,28 @@ public class AuthSteps(ScenarioContext scenario)
             ? f
             : new TestApiFactory();
         scenario[FactoryKey] = factory;
+        return factory;
+    }
 
-        client = factory.CreateClient();
+    private HttpClient GetClient()
+    {
+        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client))
+            return client;
+
+        client = GetFactory().CreateClient();
         scenario[ClientKey] = client;
         return client;
     }
 
-    private static string GetRequiredEnvVar(string name)
+    /// <summary>
+    ///     Reads a required configuration value from the running <see cref="TestApiFactory" />'s own
+    ///     <see cref="IConfiguration" />, so forged tokens are always signed with the exact secret the
+    ///     app under test resolved -- rather than assuming this process's environment variables match it.
+    /// </summary>
+    private string GetRequiredConfigValue(string key)
     {
-        return Environment.GetEnvironmentVariable(name)
-            ?? throw new InvalidOperationException($"{name} environment variable is not set");
+        return GetFactory().Services.GetRequiredService<IConfiguration>()[key]
+            ?? throw new InvalidOperationException($"{key} configuration value is not set");
     }
 
     private static string GenerateJwtToken(
@@ -420,7 +431,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredEnvVar("ACCESS_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue("ACCESS_TOKEN_SECRET");
         scenario["accessToken"] = GenerateJwtToken(
             userId,
             username,
@@ -439,7 +450,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue("CONFIRMATION_TOKEN_SECRET");
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,
@@ -458,7 +469,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredEnvVar("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue("CONFIRMATION_TOKEN_SECRET");
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,

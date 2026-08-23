@@ -11,6 +11,11 @@
     <ItemGroup>
         <PackageReference Include="dbup" Version="5.0.41" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+        <PackageReference
+            Include="Microsoft.Extensions.Configuration.EnvironmentVariables"
+            Version="9.0.0"
+        />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />

@@ -4,13 +4,14 @@ using DbUp;
 using DbUp.Engine;
 using Infrastructure.Sql;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace Database.Migrations;
 
 /// <summary>
-///     Entry point for the database migration runner. Reads connection details from environment
-///     variables, optionally drops and recreates the target database, and applies all SQL
-///     migration scripts embedded in this assembly using DbUp.
+///     Entry point for the database migration runner. Reads connection details from configuration
+///     (backed by environment variables), optionally drops and recreates the target database, and
+///     applies all SQL migration scripts embedded in this assembly using DbUp.
 /// </summary>
 public static class Program
 {
@@ -27,7 +28,10 @@ public static class Program
 
         try
         {
-            DatabaseSettings settings = DatabaseSettings.FromEnvironment();
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+            DatabaseSettings settings = DatabaseSettings.FromConfiguration(configuration);
 
             if (settings.ClearDatabase)
             {
@@ -159,28 +163,28 @@ public static class Program
         /// <summary>
         ///     Builds the settings from the <c>DB_SERVER</c>, <c>DB_NAME</c>, <c>DB_USER</c>,
         ///     <c>DB_PASSWORD</c>, <c>DB_TRUST_SERVER_CERTIFICATE</c>, and <c>CLEAR_DATABASE</c>
-        ///     environment variables.
+        ///     configuration values.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        ///     Thrown when a required environment variable is not set.
+        ///     Thrown when a required configuration value is not set.
         /// </exception>
-        public static DatabaseSettings FromEnvironment()
+        public static DatabaseSettings FromConfiguration(IConfiguration configuration)
         {
             string databaseName =
-                Environment.GetEnvironmentVariable("DB_NAME")
+                configuration["DB_NAME"]
                 ?? throw new InvalidOperationException(
                     "The DB_NAME environment variable is not set."
                 );
 
             bool clearDatabase = string.Equals(
-                Environment.GetEnvironmentVariable("CLEAR_DATABASE"),
+                configuration["CLEAR_DATABASE"],
                 "true",
                 StringComparison.OrdinalIgnoreCase
             );
 
             return new DatabaseSettings(
-                SqlConnectionStringHelper.BuildConnectionString(databaseName),
-                SqlConnectionStringHelper.BuildMasterConnectionString(),
+                SqlConnectionStringHelper.BuildConnectionString(configuration, databaseName),
+                SqlConnectionStringHelper.BuildMasterConnectionString(configuration),
                 databaseName,
                 clearDatabase
             );

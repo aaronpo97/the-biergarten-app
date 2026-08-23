@@ -32,7 +32,7 @@ public class JwtAuthenticationHandler(
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // Use the same access-token secret source as TokenService to avoid mismatched validation.
-        string? secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET");
+        string? secret = configuration["ACCESS_TOKEN_SECRET"];
         if (string.IsNullOrWhiteSpace(secret))
             secret = configuration["Jwt:SecretKey"];
 
