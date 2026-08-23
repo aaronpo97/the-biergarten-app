@@ -15,12 +15,15 @@
 
 // --- data_generation ---
 #include "data_generation/data_generator.h"
+#include "data_generation/generation_json_validation.h"
 #include "data_generation/json_grammars.h"
 #ifndef BIERGARTEN_MOCK_ONLY
 #include "data_generation/llama_generator.h"
 #include "data_generation/llama_generator_helpers.h"
 #endif
 #include "data_generation/mock_generator.h"
+#include "data_generation/openai_generator.h"
+#include "data_generation/openai_json_schemas.h"
 #include "data_generation/prompt_formatting/gemma4_jinja_prompt_formatter.h"
 #include "data_generation/prompt_formatting/prompt_formatter.h"
 

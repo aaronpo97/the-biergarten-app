@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "services/logging/logger.h"
 #include "web_client/web_client.h"
@@ -38,6 +39,22 @@ class HttpWebClient final : public WebClient {
     * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
     */
    std::string Get(const std::string& url) override;
+
+   /**
+    * @brief Executes a blocking HTTP/HTTPS POST request against a full URL.
+    *
+    * Sends @p body with a "Content-Type: application/json" header, plus any
+    * additional headers supplied by the caller (e.g. authentication).
+    *
+    * @param url Fully-qualified URL.
+    * @param body Request body, sent as-is.
+    * @param headers Additional request headers.
+    * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
+    */
+   std::string Post(
+       const std::string& url, const std::string& body,
+       const std::vector<std::pair<std::string, std::string>>& headers)
+       override;
 
    /**
     * @brief Percent-encodes a single URI component (query parameter value or

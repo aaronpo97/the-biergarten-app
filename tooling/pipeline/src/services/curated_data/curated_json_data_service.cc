@@ -30,6 +30,16 @@ static std::string ReadRequiredString(const boost::json::object& object,
    return std::string(text);
 }
 
+static double ReadRequiredDouble(const boost::json::object& object,
+                                 const char* key) {
+   const boost::json::value* value = object.if_contains(key);
+   if (value == nullptr || !value->is_double()) {
+      throw std::runtime_error(
+          std::format("Missing or invalid double field: {}", key));
+   }
+   return value->as_double();
+}
+
 static std::vector<std::string> ReadRequiredStringArray(
     const boost::json::object& object, const char* key) {
    const boost::json::value* value = object.if_contains(key);
@@ -67,7 +77,6 @@ static PostalCodeSpec ReadPostalCodeSpec(const boost::json::object& object) {
 }
 
 namespace {
-
 boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
                                  const char* what) {
    std::ifstream input(filepath);
@@ -108,7 +117,6 @@ std::string ReadFirstOfStringArray(const boost::json::object& object,
    throw std::runtime_error(
        std::format("Missing or invalid string array field: {}", key));
 }
-
 }  // namespace
 
 CuratedJsonDataService::CuratedJsonDataService(CuratedDataFilePaths filepaths)
@@ -144,6 +152,8 @@ const LocationsList& CuratedJsonDataService::LoadLocations() {
           .iso3166_2 = ReadRequiredString(object, "iso3166_2"),
           .country = ReadRequiredString(object, "country"),
           .iso3166_1 = ReadRequiredString(object, "iso3166_1"),
+          .latitude = ReadRequiredDouble(object, "latitude"),
+          .longitude = ReadRequiredDouble(object, "longitude"),
           .local_languages = ReadRequiredStringArray(object, "local_languages"),
           .postal_code = ReadPostalCodeSpec(object),
       });
