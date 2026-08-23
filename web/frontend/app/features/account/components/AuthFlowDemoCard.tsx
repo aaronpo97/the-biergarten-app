@@ -21,8 +21,8 @@ const AuthFlowDemoCard = () => (
                     <div>
                         <p className="font-semibold">Register</p>
                         <p className="text-sm text-base-content/60">
-                            POST to <code className="kbd kbd-sm">/api/auth/register</code> with
-                            full user details
+                            POST to <code className="kbd kbd-sm">/api/auth/register</code> with full
+                            user details
                         </p>
                     </div>
                 </li>

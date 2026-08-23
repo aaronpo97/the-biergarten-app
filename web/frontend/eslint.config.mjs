@@ -9,59 +9,59 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-   {
-      ignores: ['build/**', 'node_modules/**', '.react-router/**', 'coverage/**'],
-   },
-   {
-      files: ['**/*.{ts,tsx}'],
-      extends: [
-         js.configs.recommended,
-         ...tseslint.configs.recommended,
-         ...tseslint.configs.stylistic,
-      ],
-      languageOptions: {
-         ecmaVersion: 'latest',
-         sourceType: 'module',
-         globals: {
-            ...globals.browser,
-            ...globals.node,
-         },
-         parserOptions: {
-            ecmaFeatures: {
-               jsx: true,
+    {
+        ignores: ['build/**', 'node_modules/**', '.react-router/**', 'coverage/**'],
+    },
+    {
+        files: ['**/*.{ts,tsx}'],
+        extends: [
+            js.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...tseslint.configs.stylistic,
+        ],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            globals: {
+                ...globals.browser,
+                ...globals.node,
             },
-         },
-      },
-      plugins: {
-         'react-hooks': reactHooks,
-         react,
-      },
-      settings: {
-         react: {
-            version: '19.2',
-         },
-      },
-      rules: {
-         ...reactHooks.configs.recommended.rules,
-         'no-empty-pattern': 'off',
-         '@typescript-eslint/no-unused-vars': [
-            'warn',
-            {
-               argsIgnorePattern: '^_',
-               varsIgnorePattern: '^_',
-               caughtErrorsIgnorePattern: '^_',
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
             },
-         ],
-         'func-style': ['error', 'expression'],
-         'react/function-component-definition': [
-            'error',
-            {
-               namedComponents: 'arrow-function',
-               unnamedComponents: 'arrow-function',
+        },
+        plugins: {
+            'react-hooks': reactHooks,
+            react,
+        },
+        settings: {
+            react: {
+                version: '19.2',
             },
-         ],
-      },
-   },
-   prettierConfig,
-   storybook.configs['flat/recommended'],
+        },
+        rules: {
+            ...reactHooks.configs.recommended.rules,
+            'no-empty-pattern': 'off',
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
+            'func-style': ['error', 'expression'],
+            'react/function-component-definition': [
+                'error',
+                {
+                    namedComponents: 'arrow-function',
+                    unnamedComponents: 'arrow-function',
+                },
+            ],
+        },
+    },
+    prettierConfig,
+    storybook.configs['flat/recommended'],
 );

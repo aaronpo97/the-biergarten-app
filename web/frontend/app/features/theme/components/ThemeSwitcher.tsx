@@ -47,9 +47,7 @@ const ThemeSwitcher = () => {
             <section className="card border border-base-300 bg-base-100 shadow-xl">
                 <div className="card-body gap-4">
                     <h2 className="card-title text-2xl">Theme switcher</h2>
-                    <p className="text-base-content/70">
-                        Pick a theme and preview it immediately.
-                    </p>
+                    <p className="text-base-content/70">Pick a theme and preview it immediately.</p>
 
                     <div
                         className="join join-vertical sm:join-horizontal"

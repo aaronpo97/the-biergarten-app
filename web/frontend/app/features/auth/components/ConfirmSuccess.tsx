@@ -8,9 +8,7 @@ const ConfirmSuccess = ({ confirmedDate }: ConfirmSuccessProps) => (
     <>
         <div className="text-success text-6xl">✓</div>
         <h1 className="card-title text-2xl">Email Confirmed!</h1>
-        <p className="text-base-content/70">
-            Your email address has been successfully verified.
-        </p>
+        <p className="text-base-content/70">Your email address has been successfully verified.</p>
         <div className="bg-base-200 rounded-box w-full p-3 text-sm text-left">
             <span className="text-base-content/50 text-xs uppercase tracking-widest font-semibold">
                 Confirmed at
