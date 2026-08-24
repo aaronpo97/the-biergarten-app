@@ -190,11 +190,12 @@ Beer ||--o{ BeerComment : "has"
 User ||--o{ BeerComment : "commented"
 
 note bottom of User
-  Backed by Features.Auth/Features.UserManagement's
-  Dapper repositories (AuthRepository,
-  UserAccountRepository) - registration, credential
-  rotation, and verification each issue their own
-  inline SQL, no stored procedures
+  Auth reads/writes (registration, login, credential
+  rotation, verification) go through ASP.NET Core
+  Identity's UserManager<ApplicationUser>, backed by
+  Features.Auth's DapperUserStore - inline SQL, no
+  stored procedures. Profile data still goes through
+  Features.UserManagement's UserAccountRepository.
 end note
 
 note bottom of Brewery
