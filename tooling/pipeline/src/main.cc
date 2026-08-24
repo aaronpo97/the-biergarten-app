@@ -87,36 +87,16 @@ int main(const int argc, char** argv) {
           di::bind<ApplicationOptions>().to(options),
           di::bind<std::string>().to(model_path),
           di::bind<IExportService>().to<SqliteExportService>(),
-          di::bind<IPostalCodeService>().to(
-              [options,
-               &log_producer]() -> std::unique_ptr<IPostalCodeService> {
-                 if (options.generator.mode == GeneratorMode::kMock) {
-                    log_producer->Log(
-                        {.level = LogLevel::Info,
-                         .phase = PipelinePhase::Startup,
-                         .message = "Postal code: mock (curated examples)"});
-
-                    return std::make_unique<MockPostalCodeService>();
-                 }
-
-                 log_producer->Log(
-                     {.level = LogLevel::Info,
-                      .phase = PipelinePhase::Startup,
-                      .message =
-                          "Postal code: Xeger (regex-based generation)"});
-
-                 return std::make_unique<XegerPostalCodeService>();
-              }),
           di::bind<ICuratedDataService>().to(
               [options,
                &log_producer]() -> std::unique_ptr<ICuratedDataService> {
-                 // if (options.generator.mode == GeneratorMode::kMock) {
-                 //    log_producer->Log({.level = LogLevel::Info,
-                 //                       .phase = PipelinePhase::Startup,
-                 //                       .message = "Curated data: mock"});
-                 //
-                 //    return std::make_unique<MockCuratedDataService>();
-                 // }
+                 if (options.generator.mode == GeneratorMode::kMock) {
+                    log_producer->Log({.level = LogLevel::Info,
+                                       .phase = PipelinePhase::Startup,
+                                       .message = "Curated data: mock"});
+
+                    return std::make_unique<MockCuratedDataService>();
+                 }
 
                  log_producer->Log({.level = LogLevel::Info,
                                     .phase = PipelinePhase::Startup,
@@ -214,9 +194,7 @@ int main(const int argc, char** argv) {
                  }
 
 #ifdef BIERGARTEN_MOCK_ONLY
-                 // Only reachable when mode == Llama: Mock and OpenAI are
-                 // handled above and don't need llama.cpp, but LlamaGenerator
-                 // itself is not linked into a BIERGARTEN_MOCK_ONLY build.
+                 // Only reachable when mode == Llama, which requires llama.cpp and is excluded from a BIERGARTEN_MOCK_ONLY build.
                  throw std::runtime_error(
                      "LlamaGenerator is unavailable in a BIERGARTEN_MOCK_ONLY "
                      "build");

@@ -18,13 +18,9 @@
 
 /**
  * @brief Data generator implementation backed by the OpenAI Chat
- * Completions API.
- *
- * Unlike LlamaGenerator, this generator has no local model state and no
- * chat-template formatting step -- Chat Completions takes system/user
- * messages directly, and Structured Outputs (response_format: json_schema,
- * strict: true) guarantee schema-valid JSON, replacing llama.cpp's GBNF
- * grammar constraint.
+ * Completions API, sending system/user messages directly and using
+ * Structured Outputs (response_format: json_schema, strict: true) to
+ * guarantee schema-valid JSON.
  */
 class OpenAIGenerator final : public DataGenerator {
   public:

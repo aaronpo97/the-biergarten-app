@@ -15,8 +15,12 @@
 #include <unordered_set>
 
 #include "biergarten_pipeline_orchestrator.h"
+#include "biergarten_pipeline_orchestrator/coords.h"
 #include "services/curated_data/curated_json_data_service.h"
 #include "services/logging/logger.h"
+
+using biergarten_pipeline_orchestrator_internal::Coords;
+using biergarten_pipeline_orchestrator_internal::GetRandomCoordsWithinRange;
 
 namespace {
 std::string Sanitize(std::string_view value) {
@@ -135,12 +139,17 @@ void BiergartenPipelineOrchestrator::GenerateUsers(
       try {
          const UserResult user =
              generator_->GenerateUser(city, persona, sampled_name);
-         const std::string postal_code =
-             postal_code_service_->GeneratePostalCode(city.location);
+
+         constexpr int kMaxDistanceFromCentreKm = 5;
+         const Coords city_centre{.longitude = city.location.longitude,
+                                  .latitude = city.location.latitude};
+         const Coords user_coords = GetRandomCoordsWithinRange(
+             city_centre, kMaxDistanceFromCentreKm, rng);
 
          return UserRecord{
-             .address =
-                 UserAddress{.city = city.location, .postal_code = postal_code},
+             .address = UserAddress{.city = city.location,
+                                    .longitude = user_coords.longitude,
+                                    .latitude = user_coords.latitude},
              .user = user,
              .email = BuildEmail(sampled_name, used_email_local_parts),
              .date_of_birth = GenerateDateOfBirth(rng),

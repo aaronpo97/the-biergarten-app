@@ -16,8 +16,7 @@
 namespace {
 constexpr int kUserMaxTokens = 1200;
 
-// Structured outputs already guarantee schema-valid JSON, so retries here
-// are only for transient failures or placeholder text -- not JSON shape.
+// Structured outputs already guarantee schema-valid JSON, so retries here only cover transient failures or placeholder text.
 constexpr int kMaxAttempts = 2;
 }  // namespace
 

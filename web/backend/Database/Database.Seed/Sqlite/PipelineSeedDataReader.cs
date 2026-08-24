@@ -54,7 +54,7 @@ public sealed class PipelineSeedDataReader
     {
         const string sql = """
             SELECT b.name_en, b.description_en, b.name_local, b.description_local,
-                   ba.city_id, ba.postal_code, ba.longitude, ba.latitude
+                   ba.city_id, ba.longitude, ba.latitude
             FROM breweries b
             JOIN brewery_addresses ba ON ba.brewery_id = b.id;
             """;
@@ -67,9 +67,8 @@ public sealed class PipelineSeedDataReader
         const int nameLocalIndex = 2;
         const int descriptionLocalIndex = 3;
         const int cityIdIndex = 4;
-        const int postalCodeIndex = 5;
-        const int longitudeIndex = 6;
-        const int latitudeIndex = 7;
+        const int longitudeIndex = 5;
+        const int latitudeIndex = 6;
 
         List<BreweryRecord> records = [];
         while (await reader.ReadAsync(cancellationToken))
@@ -86,7 +85,6 @@ public sealed class PipelineSeedDataReader
                     Address = new BreweryAddress
                     {
                         City = cities[reader.GetInt64(cityIdIndex)],
-                        PostalCode = reader.GetString(postalCodeIndex),
                         Longitude = reader.GetDouble(longitudeIndex),
                         Latitude = reader.GetDouble(latitudeIndex),
                     },
@@ -105,7 +103,7 @@ public sealed class PipelineSeedDataReader
         const string sql = """
             SELECT u.first_name, u.last_name, u.gender, u.username, u.bio,
                    u.activity_weight, u.email, u.date_of_birth,
-                   ua.city_id, ua.postal_code
+                   ua.city_id, ua.longitude, ua.latitude
             FROM users u
             JOIN user_addresses ua ON ua.user_id = u.id;
             """;
@@ -122,7 +120,8 @@ public sealed class PipelineSeedDataReader
         const int emailIndex = 6;
         const int dateOfBirthIndex = 7;
         const int cityIdIndex = 8;
-        const int postalCodeIndex = 9;
+        const int longitudeIndex = 9;
+        const int latitudeIndex = 10;
 
         List<UserRecord> records = [];
         while (await reader.ReadAsync(cancellationToken))
@@ -143,7 +142,8 @@ public sealed class PipelineSeedDataReader
                     Address = new UserAddress
                     {
                         City = cities[reader.GetInt64(cityIdIndex)],
-                        PostalCode = reader.GetString(postalCodeIndex),
+                        Longitude = reader.GetDouble(longitudeIndex),
+                        Latitude = reader.GetDouble(latitudeIndex),
                     },
                 }
             );

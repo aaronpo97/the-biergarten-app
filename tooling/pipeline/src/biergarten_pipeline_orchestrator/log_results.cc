@@ -26,7 +26,6 @@ void BiergartenPipelineOrchestrator::LogResults() const {
              {"country", city.country},
              {"state_province", city.state_province},
              {"iso3166_2", city.iso3166_2},
-             {"postal_code", address.postal_code},
              {"longitude", address.longitude},
              {"latitude", address.latitude},
           }}});
