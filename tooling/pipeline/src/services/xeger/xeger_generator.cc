@@ -25,12 +25,11 @@ std::string XegerGenerator::Run(const Node& root) {
 void XegerGenerator::Visit(const Literal& node) { out_ += node.ch; }
 
 void XegerGenerator::Visit(const AnyChar&) {
-   static constexpr int kPrintableLow = ' ';   // empty space - character 32
-   static constexpr int kPrintableHigh = '~';  // tilde - character 126
+   static constexpr int kPrintableLow = ' ';
+   static constexpr int kPrintableHigh = '~';
 
    std::uniform_int_distribution<int> dist(kPrintableLow, kPrintableHigh);
 
-   // assert that the rand number is in the char range
    bool inCharRange = dist.min() >= std::numeric_limits<char>::min() &&
                       dist.max() <= std::numeric_limits<char>::max();
    assert(inCharRange && "Random number is out of char range");

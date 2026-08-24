@@ -67,7 +67,6 @@ class BoundedChannel {
    void Close();
 };
 
-// Include the template implementation
 #include "bounded_channel.tcc"
 
 #endif  // BIERGARTEN_PIPELINE_INCLUDES_CONCURRENCY_BOUNDED_CHANNEL_H_
