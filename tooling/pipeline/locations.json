@@ -1,1910 +1,2622 @@
-[
-  {
-    "city": "Cape Town",
-    "state_province": "Western Cape",
-    "iso3166_2": "ZA-WC",
-    "country": "South Africa",
-    "iso3166_1": "ZA",
-    "latitude": -33.9249,
-    "longitude": 18.4241,
-    "local_languages": ["af", "en", "xh"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:7(?:10[03]|4(?:[26][05]|0[04-7]|3[05-79]|4[0-4679]|5[0156]|8[09]|9[0139])|5(?:[56][01]|0[013-7]|25|3[0235-9]|40|8[12])|7(?:[23]5|0[058]|4[05]|5[0-256]|6[02-4679]|7[09]|8[02-9]|9[08])|8(?:[26]4|0[0-2568]|48|72|8[08])|9(?:[12]5|[59]0|3[57]|4[156]|6[56]|7[4-9]))|8(?:0(?:[246]0|0[0-3578]|1[0278]|5[01])|160))$"
+{
+  "cities": [
+    {
+      "city": "Cape Town",
+      "state_province": "Western Cape",
+      "iso3166_2": "ZA-WC",
+      "country": "South Africa",
+      "iso3166_1": "ZA",
+      "latitude": -33.9249,
+      "longitude": 18.4241,
+      "local_languages": [
+        "af",
+        "en",
+        "xh"
       ],
-      "examples": ["7100", "7103", "7400"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 135,
-      "notes": "Cape Town metro spans roughly 7000-8099; 7xxx also covers parts of the wider Western Cape. Enumerated from 135 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Johannesburg",
-    "state_province": "Gauteng",
-    "iso3166_2": "ZA-GT",
-    "country": "South Africa",
-    "iso3166_1": "ZA",
-    "latitude": -26.2041,
-    "longitude": 28.0473,
-    "local_languages": ["en", "zu", "st", "af"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:1(?:7(?:0[08]|1[1256])|8(?:0[13-9]|1[14-689]|37|41|5[23]|6[35]))|2(?:0(?:[156]\\d|0[013-9]|2[0-468]|3[0-8]|4[0-47-9]|7[02-46-8]|8[12]|9[0-5])|1(?:[01]\\d|2[0-489]|3[0-24-79]|4[0-57-9]|5[1-9]|6[0-579]|7[01]|8[89]|9[0-8])))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:7(?:10[03]|4(?:[26][05]|0[04-7]|3[05-79]|4[0-4679]|5[0156]|8[09]|9[0139])|5(?:[56][01]|0[013-7]|25|3[0235-9]|40|8[12])|7(?:[23]5|0[058]|4[05]|5[0-256]|6[02-4679]|7[09]|8[02-9]|9[08])|8(?:[26]4|0[0-2568]|48|72|8[08])|9(?:[12]5|[59]0|3[57]|4[156]|6[56]|7[4-9]))|8(?:0(?:[246]0|0[0-3578]|1[0278]|5[01])|160))$"
+        ],
+        "examples": [
+          "7100",
+          "7103",
+          "7400"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 135,
+        "notes": "Cape Town metro spans roughly 7000-8099; 7xxx also covers parts of the wider Western Cape. Enumerated from 135 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Johannesburg",
+      "state_province": "Gauteng",
+      "iso3166_2": "ZA-GT",
+      "country": "South Africa",
+      "iso3166_1": "ZA",
+      "latitude": -26.2041,
+      "longitude": 28.0473,
+      "local_languages": [
+        "en",
+        "zu",
+        "st",
+        "af"
       ],
-      "examples": ["1700", "1708", "1711"],
-      "source": "derived from GeoNames postal data (radius, r=18km)",
-      "codes_matched": 178,
-      "notes": "Johannesburg street codes cluster in 2000-2199; PO Box codes differ. Enumerated from 178 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Durban",
-    "state_province": "KwaZulu-Natal",
-    "iso3166_2": "ZA-NL",
-    "country": "South Africa",
-    "iso3166_1": "ZA",
-    "latitude": -29.8587,
-    "longitude": 31.0218,
-    "local_languages": ["zu", "en"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:36(?:0[02-57-9]|1[0-7]|2[014-69]|3[0145]|5[0-25])|4(?:0(?:0[014-8]|1[13-9]|2[1-9]|3[124-9]|5[0-36-9]|6\\d|7[0-24589]|8[023589]|9[0-48])|1(?:0[149]|1[0135]|3[378]|4[48]|53)|3(?:[02]1|10|5[09]|6[0-24])))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:1(?:7(?:0[08]|1[1256])|8(?:0[13-9]|1[14-689]|37|41|5[23]|6[35]))|2(?:0(?:[156]\\d|0[013-9]|2[0-468]|3[0-8]|4[0-47-9]|7[02-46-8]|8[12]|9[0-5])|1(?:[01]\\d|2[0-489]|3[0-24-79]|4[0-57-9]|5[1-9]|6[0-579]|7[01]|8[89]|9[0-8])))$"
+        ],
+        "examples": [
+          "1700",
+          "1708",
+          "1711"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=18km)",
+        "codes_matched": 178,
+        "notes": "Johannesburg street codes cluster in 2000-2199; PO Box codes differ. Enumerated from 178 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Durban",
+      "state_province": "KwaZulu-Natal",
+      "iso3166_2": "ZA-NL",
+      "country": "South Africa",
+      "iso3166_1": "ZA",
+      "latitude": -29.8587,
+      "longitude": 31.0218,
+      "local_languages": [
+        "zu",
+        "en"
       ],
-      "examples": ["3600", "3602", "3603"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 121,
-      "notes": "eThekwini/Durban street codes cluster in 4000-4199. Enumerated from 121 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Franschhoek",
-    "state_province": "Western Cape",
-    "iso3166_2": "ZA-WC",
-    "country": "South Africa",
-    "iso3166_1": "ZA",
-    "latitude": -33.9146,
-    "longitude": 19.1198,
-    "local_languages": ["af", "en"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^769[01]$"],
-      "examples": ["7690", "7691"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 2,
-      "notes": "Single town code. Enumerated from 2 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Nairobi",
-    "state_province": "Nairobi",
-    "iso3166_2": "KE-30",
-    "country": "Kenya",
-    "iso3166_1": "KE",
-    "latitude": -1.2921,
-    "longitude": 36.8219,
-    "local_languages": ["sw", "en"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^00(?:[348]00|10[0-2]|2(?:1[03-69]|3[013569])|5(?:0\\d|1[0-35-9]|2[0-3])|6(?:0[013-79]|1[0-589]|2[0-35-7])|90[02356])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:36(?:0[02-57-9]|1[0-7]|2[014-69]|3[0145]|5[0-25])|4(?:0(?:0[014-8]|1[13-9]|2[1-9]|3[124-9]|5[0-36-9]|6\\d|7[0-24589]|8[023589]|9[0-48])|1(?:0[149]|1[0135]|3[378]|4[48]|53)|3(?:[02]1|10|5[09]|6[0-24])))$"
+        ],
+        "examples": [
+          "3600",
+          "3602",
+          "3603"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 121,
+        "notes": "eThekwini/Durban street codes cluster in 4000-4199. Enumerated from 121 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Franschhoek",
+      "state_province": "Western Cape",
+      "iso3166_2": "ZA-WC",
+      "country": "South Africa",
+      "iso3166_1": "ZA",
+      "latitude": -33.9146,
+      "longitude": 19.1198,
+      "local_languages": [
+        "af",
+        "en"
       ],
-      "examples": ["00100", "00101", "00102"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 69,
-      "notes": "All Nairobi County codes begin 00; GPO is 00100. Range 00100-00999. Enumerated from 69 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Buenos Aires",
-    "state_province": "Buenos Aires City",
-    "iso3166_2": "AR-C",
-    "country": "Argentina",
-    "iso3166_1": "AR",
-    "latitude": -34.6037,
-    "longitude": -58.3816,
-    "local_languages": ["es-AR"],
-    "postal_code": {
-      "country_format_regex": "^(?:[A-HJ-NP-TV-Z]\\d{4}[A-Z]{3}|\\d{4})$",
-      "city_regex": ["^C1[0-4]\\d{2}[A-Z]{3}$", "^1[0-4]\\d{2}$"],
-      "examples": ["C1425DKE", "1425"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "CABA uses CPA prefix 'C'. Legacy 4-digit form 1000-1499 still widely accepted."
-    }
-  },
-  {
-    "city": "Bariloche",
-    "state_province": "Río Negro",
-    "iso3166_2": "AR-R",
-    "country": "Argentina",
-    "iso3166_1": "AR",
-    "latitude": -41.1335,
-    "longitude": -71.3103,
-    "local_languages": ["es-AR"],
-    "postal_code": {
-      "country_format_regex": "^(?:[A-HJ-NP-TV-Z]\\d{4}[A-Z]{3}|\\d{4})$",
-      "city_regex": ["^840[09]$"],
-      "examples": ["8400", "8409"],
-      "source": "derived from GeoNames postal data (sub, r=25km)",
-      "codes_matched": 2,
-      "notes": "San Carlos de Bariloche legacy code 8400; CPA prefix 'R' (Rio Negro). Enumerated from 2 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Bogotá",
-    "state_province": "Bogotá D.C.",
-    "iso3166_2": "CO-DC",
-    "country": "Colombia",
-    "iso3166_1": "CO",
-    "latitude": 4.711,
-    "longitude": -74.0721,
-    "local_languages": ["es-CO"],
-    "postal_code": {
-      "country_format_regex": "^\\d{6}$",
-      "city_regex": [
-        "^11(?:0(?:[29][1-3]1|[36][12]1|[47][1-4]1|1[1-5]1|8[1-8]1)|1(?:[457]11|[23][12]1|[89][1-4]1|0[1-7]1|1(?:[1-4]1|[5-7][16])|6[1-3]1))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^769[01]$"
+        ],
+        "examples": [
+          "7690",
+          "7691"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 2,
+        "notes": "Single town code. Enumerated from 2 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Nairobi",
+      "state_province": "Nairobi",
+      "iso3166_2": "KE-30",
+      "country": "Kenya",
+      "iso3166_1": "KE",
+      "latitude": -1.2921,
+      "longitude": 36.8219,
+      "local_languages": [
+        "sw",
+        "en"
       ],
-      "examples": ["110111", "110121", "110131"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 66,
-      "notes": "Bogota D.C. = DANE department code 11. Enumerated from 66 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Medellín",
-    "state_province": "Antioquia",
-    "iso3166_2": "CO-ANT",
-    "country": "Colombia",
-    "iso3166_1": "CO",
-    "latitude": 6.2442,
-    "longitude": -75.5812,
-    "local_languages": ["es-CO"],
-    "postal_code": {
-      "country_format_regex": "^\\d{6}$",
-      "city_regex": ["^0500(?:0[1-7]|1[0-8]|2\\d|3[0-7]|4[0-478])$"],
-      "examples": ["050001", "050002", "050003"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 41,
-      "notes": "Antioquia = 05; Medellin zone = 050xxx. Wider metro uses 051xxx-055xxx. Enumerated from 41 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "São Paulo",
-    "state_province": "São Paulo",
-    "iso3166_2": "BR-SP",
-    "country": "Brazil",
-    "iso3166_1": "BR",
-    "latitude": -23.5505,
-    "longitude": -46.6333,
-    "local_languages": ["pt-BR"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}-?\\d{3}$",
-      "city_regex": ["^0[1-5]\\d{3}-?\\d{3}$", "^08[0-4]\\d{2}-?\\d{3}$"],
-      "examples": ["01310-100"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Sao Paulo city CEP: 01000-000 to 05999-999, plus 08000-000 to 08499-999."
-    }
-  },
-  {
-    "city": "Curitiba",
-    "state_province": "Paraná",
-    "iso3166_2": "BR-PR",
-    "country": "Brazil",
-    "iso3166_1": "BR",
-    "latitude": -25.4284,
-    "longitude": -49.2733,
-    "local_languages": ["pt-BR"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}-?\\d{3}$",
-      "city_regex": ["^8[0-2]\\d{3}-?\\d{3}$"],
-      "examples": ["80010-010"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Curitiba CEP: 80000-000 to 82999-999."
-    }
-  },
-  {
-    "city": "Rio de Janeiro",
-    "state_province": "Rio de Janeiro",
-    "iso3166_2": "BR-RJ",
-    "country": "Brazil",
-    "iso3166_1": "BR",
-    "latitude": -22.9068,
-    "longitude": -43.1729,
-    "local_languages": ["pt-BR"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}-?\\d{3}$",
-      "city_regex": ["^(?:2[0-2]\\d{3}|23[0-7]\\d{2})-?\\d{3}$"],
-      "examples": ["20040-020"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Rio city CEP: 20000-000 to 23799-999."
-    }
-  },
-  {
-    "city": "Santiago",
-    "state_province": "Santiago Metropolitan",
-    "iso3166_2": "CL-RM",
-    "country": "Chile",
-    "iso3166_1": "CL",
-    "latitude": -33.4489,
-    "longitude": -70.6693,
-    "local_languages": ["es-CL"],
-    "postal_code": {
-      "country_format_regex": "^\\d{7}$",
-      "city_regex": [
-        "^(?:7(?:5[05]|63|75|8[15]|9[17])|8(?:[26]4|[48][26]|[59][048]|01|3[28]|7[08])|9(?:0[28]|1[26]|2[05]))\\d{4}$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^00(?:[348]00|10[0-2]|2(?:1[03-69]|3[013569])|5(?:0\\d|1[0-35-9]|2[0-3])|6(?:0[013-79]|1[0-589]|2[0-35-7])|90[02356])$"
+        ],
+        "examples": [
+          "00100",
+          "00101",
+          "00102"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 69,
+        "notes": "All Nairobi County codes begin 00; GPO is 00100. Range 00100-00999. Enumerated from 69 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Buenos Aires",
+      "state_province": "Buenos Aires City",
+      "iso3166_2": "AR-C",
+      "country": "Argentina",
+      "iso3166_1": "AR",
+      "latitude": -34.6037,
+      "longitude": -58.3816,
+      "local_languages": [
+        "es-AR"
       ],
-      "examples": ["7500000", "7550000", "7630000"],
-      "source": "derived from GeoNames postal data (radius, r=18km)",
-      "codes_matched": 31,
-      "notes": "Santiago Province spans approx. 7500000-9250000; 7xx = eastern communes, 8xx = central. Dataset is commune-level (nnn0000); 3-digit commune prefix + block. Enumerated from 31 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Valdivia",
-    "state_province": "Los Ríos",
-    "iso3166_2": "CL-LR",
-    "country": "Chile",
-    "iso3166_1": "CL",
-    "latitude": -39.8142,
-    "longitude": -73.2459,
-    "local_languages": ["es-CL"],
-    "postal_code": {
-      "country_format_regex": "^\\d{7}$",
-      "city_regex": ["^509\\d{4}$"],
-      "examples": ["5090000"],
-      "source": "derived from GeoNames postal data (sub, r=20km)",
-      "codes_matched": 1,
-      "notes": "Los Rios region range approx. 5090000-5230000; Valdivia commune base code 5090000. Dataset is commune-level (nnn0000); 3-digit commune prefix + block. Enumerated from 1 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Lima",
-    "state_province": "Lima",
-    "iso3166_2": "PE-LMA",
-    "country": "Peru",
-    "iso3166_1": "PE",
-    "latitude": -12.0464,
-    "longitude": -77.0428,
-    "local_languages": ["es-PE"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^15(?:0(?:0[1346-9]|1[1289]|2[1-46]|3[346-9]|4[6-9]|5[46-8]|6[3467]|7[2-469]|8[1-46-8]|9[346])|1(?:0[1-36-9]|1[23])|3(?:0[12467]|1[124]|2[6-8]|3[1-3])|4(?:[039][148]|[14][269]|[28][37]|53|79)|8(?:0[13469]|1[126-8]|2[489]|3[1467]|42))$"
+      "postal_code": {
+        "country_format_regex": "^(?:[A-HJ-NP-TV-Z]\\d{4}[A-Z]{3}|\\d{4})$",
+        "city_regex": [
+          "^C1[0-4]\\d{2}[A-Z]{3}$",
+          "^1[0-4]\\d{2}$"
+        ],
+        "examples": [
+          "C1425DKE",
+          "1425"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "CABA uses CPA prefix 'C'. Legacy 4-digit form 1000-1499 still widely accepted."
+      }
+    },
+    {
+      "city": "Bariloche",
+      "state_province": "Río Negro",
+      "iso3166_2": "AR-R",
+      "country": "Argentina",
+      "iso3166_1": "AR",
+      "latitude": -41.1335,
+      "longitude": -71.3103,
+      "local_languages": [
+        "es-AR"
       ],
-      "examples": ["15001", "15003", "15004"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 111,
-      "notes": "Lima Region = prefix 15; metropolitan Lima districts sit in 15001-15099. Callao is 07xxx. Enumerated from 111 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Tokyo",
-    "state_province": "Tokyo",
-    "iso3166_2": "JP-13",
-    "country": "Japan",
-    "iso3166_1": "JP",
-    "latitude": 35.6762,
-    "longitude": 139.6503,
-    "local_languages": ["ja"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3}-?\\d{4}$",
-      "city_regex": [
-        "^(?:1(?:[068]\\d|[14][0-6]|2[013-5]|3[0-24-7]|5[0-8]|7[013-9]|95)|20[1-46])-?\\d{4}$"
+      "postal_code": {
+        "country_format_regex": "^(?:[A-HJ-NP-TV-Z]\\d{4}[A-Z]{3}|\\d{4})$",
+        "city_regex": [
+          "^840[09]$"
+        ],
+        "examples": [
+          "8400",
+          "8409"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=25km)",
+        "codes_matched": 2,
+        "notes": "San Carlos de Bariloche legacy code 8400; CPA prefix 'R' (Rio Negro). Enumerated from 2 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Bogotá",
+      "state_province": "Bogotá D.C.",
+      "iso3166_2": "CO-DC",
+      "country": "Colombia",
+      "iso3166_1": "CO",
+      "latitude": 4.711,
+      "longitude": -74.0721,
+      "local_languages": [
+        "es-CO"
       ],
-      "examples": ["100-0000", "100-0001", "100-0002"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 7876,
-      "notes": "Tokyo Metropolis: 100-xxxx to 208-xxxx. The 23 wards are 100-179. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 7876 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Osaka",
-    "state_province": "Osaka",
-    "iso3166_2": "JP-27",
-    "country": "Japan",
-    "iso3166_1": "JP",
-    "latitude": 34.6937,
-    "longitude": 135.5023,
-    "local_languages": ["ja"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3}-?\\d{4}$",
-      "city_regex": ["^5(?:[35]\\d|4[0-7])-?\\d{4}$"],
-      "examples": ["530-0000", "530-0001", "530-0002"],
-      "source": "derived from GeoNames postal data (radius, r=12km)",
-      "codes_matched": 1440,
-      "notes": "Osaka City: 530-xxxx to 559-xxxx. Wider Osaka Prefecture is 5xx. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 1440 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Kyoto",
-    "state_province": "Kyoto",
-    "iso3166_2": "JP-26",
-    "country": "Japan",
-    "iso3166_1": "JP",
-    "latitude": 35.0116,
-    "longitude": 135.7681,
-    "local_languages": ["ja"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3}-?\\d{4}$",
-      "city_regex": ["^6(?:0[0-7]|1[0-256])-?\\d{4}$"],
-      "examples": ["600-0000", "600-8001", "600-8002"],
-      "source": "derived from GeoNames postal data (radius, r=12km)",
-      "codes_matched": 4614,
-      "notes": "Kyoto City: 600-xxxx to 616-xxxx. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 4614 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Sapporo",
-    "state_province": "Hokkaido",
-    "iso3166_2": "JP-01",
-    "country": "Japan",
-    "iso3166_1": "JP",
-    "latitude": 43.0618,
-    "longitude": 141.3545,
-    "local_languages": ["ja"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3}-?\\d{4}$",
-      "city_regex": ["^0(?:0[1-7]|6[0-5])-?\\d{4}$"],
-      "examples": ["001-0000", "001-0010", "001-0011"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 1373,
-      "notes": "Sapporo: 001-xxxx to 007-xxxx (north/west) and 060-xxxx to 065-xxxx (central/east). Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 1373 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Seoul",
-    "state_province": "Seoul",
-    "iso3166_2": "KR-11",
-    "country": "South Korea",
-    "iso3166_1": "KR",
-    "latitude": 37.5665,
-    "longitude": 126.978,
-    "local_languages": ["ko"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^0(?:1[0-46-9]|2[0-24-8]|3[013-79]|4\\d|5[0-8]|6[0-35-9]|7[02-9]|8[0-35-8])\\d{2}$"
+      "postal_code": {
+        "country_format_regex": "^\\d{6}$",
+        "city_regex": [
+          "^11(?:0(?:[29][1-3]1|[36][12]1|[47][1-4]1|1[1-5]1|8[1-8]1)|1(?:[457]11|[23][12]1|[89][1-4]1|0[1-7]1|1(?:[1-4]1|[5-7][16])|6[1-3]1))$"
+        ],
+        "examples": [
+          "110111",
+          "110121",
+          "110131"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 66,
+        "notes": "Bogota D.C. = DANE department code 11. Enumerated from 66 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Medellín",
+      "state_province": "Antioquia",
+      "iso3166_2": "CO-ANT",
+      "country": "Colombia",
+      "iso3166_1": "CO",
+      "latitude": 6.2442,
+      "longitude": -75.5812,
+      "local_languages": [
+        "es-CO"
       ],
-      "examples": ["01000", "01001", "01002"],
-      "source": "derived from GeoNames postal data (radius, r=18km)",
-      "codes_matched": 5628,
-      "notes": "Post-2015 5-digit system: Seoul = 01000-09999. Compressed on the 3-digit prefix. Enumerated from 5628 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Busan",
-    "state_province": "Busan",
-    "iso3166_2": "KR-26",
-    "country": "South Korea",
-    "iso3166_1": "KR",
-    "latitude": 35.1796,
-    "longitude": 129.0756,
-    "local_languages": ["ko"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^4(?:6[0235-79]|7[0-35-9]|8[0-57-9]|9[0-5])\\d{2}$"],
-      "examples": ["46002", "46018", "46027"],
-      "source": "derived from GeoNames postal data (radius, r=18km)",
-      "codes_matched": 2214,
-      "notes": "Busan = 46000-49999. Compressed on the 3-digit prefix. Enumerated from 2214 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Ho Chi Minh City",
-    "state_province": "Ho Chi Minh",
-    "iso3166_2": "VN-SG",
-    "country": "Vietnam",
-    "iso3166_1": "VN",
-    "latitude": 10.8231,
-    "longitude": 106.6297,
-    "local_languages": ["vi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5,6}$",
-      "city_regex": ["^7[0-4]\\d{3}$", "^7[0-4]\\d{4}$"],
-      "examples": ["70000", "700000"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Current 5-digit system: HCMC = 70000-74999. Legacy/6-digit form (700000) still appears in some systems."
-    }
-  },
-  {
-    "city": "Hanoi",
-    "state_province": "Hanoi",
-    "iso3166_2": "VN-HN",
-    "country": "Vietnam",
-    "iso3166_1": "VN",
-    "latitude": 21.0285,
-    "longitude": 105.8542,
-    "local_languages": ["vi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5,6}$",
-      "city_regex": ["^1[0-4]\\d{3}$", "^1[0-4]\\d{4}$"],
-      "examples": ["10000", "100000"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Hanoi = 10000-14999 (5-digit). Legacy 6-digit form 100000 still in circulation."
-    }
-  },
-  {
-    "city": "Da Nang",
-    "state_province": "Da Nang",
-    "iso3166_2": "VN-DN",
-    "country": "Vietnam",
-    "iso3166_1": "VN",
-    "latitude": 16.0544,
-    "longitude": 108.2022,
-    "local_languages": ["vi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5,6}$",
-      "city_regex": ["^5[0-5]\\d{3}$", "^5[0-5]\\d{4}$"],
-      "examples": ["50000", "550000"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Sources conflict: Da Nang is cited as both 50000 and 55000. Pattern accepts 50000-55999 and the 6-digit legacy form."
-    }
-  },
-  {
-    "city": "Bangkok",
-    "state_province": "Bangkok",
-    "iso3166_2": "TH-10",
-    "country": "Thailand",
-    "iso3166_1": "TH",
-    "latitude": 13.7563,
-    "longitude": 100.5018,
-    "local_languages": ["th"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^10(?:[4-8]00|1[0-7]0|2[024-69]0|3[0-3]0)$"],
-      "examples": ["10100", "10110", "10120"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 23,
-      "notes": "Bangkok = province code 10; codes run 10100-10900. Enumerated from 23 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Taipei",
-    "state_province": "Taipei",
-    "iso3166_2": "TW-TPE",
-    "country": "Taiwan",
-    "iso3166_1": "TW",
-    "latitude": 25.033,
-    "longitude": 121.5654,
-    "local_languages": ["zh-TW"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3}(?:\\d{2}|\\d{3})?$",
-      "city_regex": ["^1(?:0[0-9]|1[0-6])(?:\\d{2}|\\d{3})?$"],
-      "examples": ["100", "10058", "100013"],
-      "source": "researched (no usable open dataset)",
-      "codes_matched": null,
-      "notes": "Taipei City districts = 100-116. 3-digit is valid alone; 3+2 is legacy, 3+3 is current."
-    }
-  },
-  {
-    "city": "Beijing",
-    "state_province": "Beijing",
-    "iso3166_2": "CN-BJ",
-    "country": "China",
-    "iso3166_1": "CN",
-    "latitude": 39.9042,
-    "longitude": 116.4074,
-    "local_languages": ["zh-CN"],
-    "postal_code": {
-      "country_format_regex": "^\\d{6}$",
-      "city_regex": ["^10[0-2]\\d{3}$"],
-      "examples": ["100000", "101100", "101200"],
-      "source": "derived from GeoNames postal data (radius, r=40km)",
-      "codes_matched": 11,
-      "notes": "Beijing municipality = 100000-102629. Dataset is city-level; compressed on the 3-digit prefix. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Shanghai",
-    "state_province": "Shanghai",
-    "iso3166_2": "CN-SH",
-    "country": "China",
-    "iso3166_1": "CN",
-    "latitude": 31.2304,
-    "longitude": 121.4737,
-    "local_languages": ["zh-CN"],
-    "postal_code": {
-      "country_format_regex": "^\\d{6}$",
-      "city_regex": ["^20[0-2]\\d{3}$"],
-      "examples": ["200000", "201100", "201300"],
-      "source": "derived from GeoNames postal data (radius, r=40km)",
-      "codes_matched": 10,
-      "notes": "Shanghai municipality = 200000-202699. Dataset is city-level; compressed on the 3-digit prefix. Enumerated from 10 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Bengaluru",
-    "state_province": "Karnataka",
-    "iso3166_2": "IN-KA",
-    "country": "India",
-    "iso3166_1": "IN",
-    "latitude": 12.9716,
-    "longitude": 77.5946,
-    "local_languages": ["kn", "en"],
-    "postal_code": {
-      "country_format_regex": "^[1-9]\\d{5}$",
-      "city_regex": ["^560\\d{3}$"],
-      "examples": ["560001", "560002", "560003"],
-      "source": "derived from GeoNames postal data (field)",
-      "codes_matched": 106,
-      "notes": "Bengaluru urban PIN codes = 560xxx. Bengaluru Rural uses 561xxx/562xxx. Compressed on the 3-digit pin prefix. Enumerated from 106 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Singapore",
-    "state_province": "Central Singapore",
-    "iso3166_2": "SG-01",
-    "country": "Singapore",
-    "iso3166_1": "SG",
-    "latitude": 1.3521,
-    "longitude": 103.8198,
-    "local_languages": ["en", "zh", "ms", "ta"],
-    "postal_code": {
-      "country_format_regex": "^\\d{6}$",
-      "city_regex": ["^(?:[1-6]\\d|0[1-9]|7[0-35-9]|8[0-28]|91)\\d{4}$"],
-      "examples": ["018906", "018907", "018910"],
-      "source": "derived from GeoNames postal data (radius, r=30km)",
-      "codes_matched": 121135,
-      "notes": "Singapore is a single postal district; sectors 01-82 cover the whole island. Compressed on the 2-digit sector prefix. Enumerated from 121135 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Melbourne",
-    "state_province": "Victoria",
-    "iso3166_2": "AU-VIC",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -37.8136,
-    "longitude": 144.9631,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:3(?:0(?:[45]\\d|0[0-68]|1[0-35689]|2[0-35-9]|3[1-46-9]|6[0-25-8]|7[0-689]|8[1-9]|9[013-5])|1(?:[0248][1-9]|[39][0-4]|1[14]|5[0-2]|6[1-35-9]|7[0-24])|20[24-7]|428|752)|8(?:0(?:0[1-9]|1[0-2]|45|51|6[69]|7[01])|1(?:0[27]|11|20)|205|383|438|511))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{6}$",
+        "city_regex": [
+          "^0500(?:0[1-7]|1[0-8]|2\\d|3[0-7]|4[0-478])$"
+        ],
+        "examples": [
+          "050001",
+          "050002",
+          "050003"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 41,
+        "notes": "Antioquia = 05; Medellin zone = 050xxx. Wider metro uses 051xxx-055xxx. Enumerated from 41 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "São Paulo",
+      "state_province": "São Paulo",
+      "iso3166_2": "BR-SP",
+      "country": "Brazil",
+      "iso3166_1": "BR",
+      "latitude": -23.5505,
+      "longitude": -46.6333,
+      "local_languages": [
+        "pt-BR"
       ],
-      "examples": ["3000", "3001", "3002"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 179,
-      "notes": "Greater Melbourne approx. 3000-3207. Victoria as a whole is 3000-3999. Enumerated from 179 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Sydney",
-    "state_province": "New South Wales",
-    "iso3166_2": "AU-NSW",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -33.8688,
-    "longitude": 151.2093,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:1(?:0(?:0[1-9]|10|2[0-35-9]|3\\d|4[0-6])|1(?:[2-9]\\d|0[015-9]|1[02-9])|2(?:0[1-3578]|3\\d|40|9[1-9])|3(?:[046]0|14|35|5[05])|4(?:[35][05]|[67][056]|0[15]|19|2[02-9]|4[015]|8[0145]|9[0359])|5(?:[18]5|6[05]|70|9[057])|6(?:[46]0|[78][05]|02|3[059]|5[58])|7(?:[09]0|[15][05]|[78]1|4[01]|65)|8(?:0[05]|1[19]|25|3[015]|60|7[45]|8[58]|91))|2(?:0(?:[2-46]\\d|[79][0-79]|0[0-246-9]|1[0-35-9]|5[0257-9]|8[4-9])|1(?:[1-39]\\d|0[0-49]|4[0-6]|5[0-24]|6[0-35]|7[23])|2(?:0[03-9]|1[0-46-9]|2\\d|3[014])))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}-?\\d{3}$",
+        "city_regex": [
+          "^0[1-5]\\d{3}-?\\d{3}$",
+          "^08[0-4]\\d{2}-?\\d{3}$"
+        ],
+        "examples": [
+          "01310-100"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Sao Paulo city CEP: 01000-000 to 05999-999, plus 08000-000 to 08499-999."
+      }
+    },
+    {
+      "city": "Curitiba",
+      "state_province": "Paraná",
+      "iso3166_2": "BR-PR",
+      "country": "Brazil",
+      "iso3166_1": "BR",
+      "latitude": -25.4284,
+      "longitude": -49.2733,
+      "local_languages": [
+        "pt-BR"
       ],
-      "examples": ["1001", "1002", "1003"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 424,
-      "notes": "Sydney metro approx. 2000-2249; 1000-1999 are Sydney PO Box / large-volume codes. Enumerated from 424 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Brisbane",
-    "state_province": "Queensland",
-    "iso3166_2": "AU-QLD",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -27.4705,
-    "longitude": 153.026,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:4(?:0(?:0\\d|1[0-478]|3[0-24-7]|5[13-59]|6[015-9]|7[02-8])|1(?:[05][1-9]|1\\d|2[0-37]|3[12]|6[0139]|7[0-489]))|90(?:0[0-2579]|1[035]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}-?\\d{3}$",
+        "city_regex": [
+          "^8[0-2]\\d{3}-?\\d{3}$"
+        ],
+        "examples": [
+          "80010-010"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Curitiba CEP: 80000-000 to 82999-999."
+      }
+    },
+    {
+      "city": "Rio de Janeiro",
+      "state_province": "Rio de Janeiro",
+      "iso3166_2": "BR-RJ",
+      "country": "Brazil",
+      "iso3166_1": "BR",
+      "latitude": -22.9068,
+      "longitude": -43.1729,
+      "local_languages": [
+        "pt-BR"
       ],
-      "examples": ["4000", "4001", "4002"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 99,
-      "notes": "Greater Brisbane approx. 4000-4207. Enumerated from 99 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Adelaide",
-    "state_province": "South Australia",
-    "iso3166_2": "AU-SA",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -34.9285,
-    "longitude": 138.6007,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^5(?:0(?:[14]\\d|[68][1-9]|0[015-9]|2[0-5]|3[1-57-9]|5[0-2]|7[0-6]|9[0-8])|1(?:0[6-9]|2[67]|3[1-46-9]|4[0-24]|5[0-24-689]|6[12])|8(?:0[01]|10|39)|9(?:42|50))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}-?\\d{3}$",
+        "city_regex": [
+          "^(?:2[0-2]\\d{3}|23[0-7]\\d{2})-?\\d{3}$"
+        ],
+        "examples": [
+          "20040-020"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Rio city CEP: 20000-000 to 23799-999."
+      }
+    },
+    {
+      "city": "Santiago",
+      "state_province": "Santiago Metropolitan",
+      "iso3166_2": "CL-RM",
+      "country": "Chile",
+      "iso3166_1": "CL",
+      "latitude": -33.4489,
+      "longitude": -70.6693,
+      "local_languages": [
+        "es-CL"
       ],
-      "examples": ["5000", "5001", "5005"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 112,
-      "notes": "Adelaide metro approx. 5000-5199. Enumerated from 112 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Perth",
-    "state_province": "Western Australia",
-    "iso3166_2": "AU-WA",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -31.9505,
-    "longitude": 115.8605,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^6(?:0(?:[56]\\d|0[013-9]|1[0-24-9]|2[0-79]|7[0167]|90)|1(?:[05]\\d|10|4[7-9]|6[02-46])|8(?:[79]2|0[039]|17|2[07]|3[0-27-9]|4\\d|50|65)|9(?:[18]\\d|[35][1-9]|0[0-79]|2[0-69]|4[0-7]|6[013-579]|7[09]|9[017]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{7}$",
+        "city_regex": [
+          "^(?:7(?:5[05]|63|75|8[15]|9[17])|8(?:[26]4|[48][26]|[59][048]|01|3[28]|7[08])|9(?:0[28]|1[26]|2[05]))\\d{4}$"
+        ],
+        "examples": [
+          "7500000",
+          "7550000",
+          "7630000"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=18km)",
+        "codes_matched": 31,
+        "notes": "Santiago Province spans approx. 7500000-9250000; 7xx = eastern communes, 8xx = central. Dataset is commune-level (nnn0000); 3-digit commune prefix + block. Enumerated from 31 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Valdivia",
+      "state_province": "Los Ríos",
+      "iso3166_2": "CL-LR",
+      "country": "Chile",
+      "iso3166_1": "CL",
+      "latitude": -39.8142,
+      "longitude": -73.2459,
+      "local_languages": [
+        "es-CL"
       ],
-      "examples": ["6000", "6001", "6003"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 182,
-      "notes": "Perth metro approx. 6000-6199. Enumerated from 182 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Hobart",
-    "state_province": "Tasmania",
-    "iso3166_2": "AU-TAS",
-    "country": "Australia",
-    "iso3166_1": "AU",
-    "latitude": -42.8821,
-    "longitude": 147.3272,
-    "local_languages": ["en-AU"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^7(?:0(?:0[0-24-9]|1[0-25-9]|2[13]|5[0-35])|170)$"],
-      "examples": ["7000", "7001", "7002"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 25,
-      "notes": "Hobart approx. 7000-7099. Enumerated from 25 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Wellington",
-    "state_province": "Wellington",
-    "iso3166_2": "NZ-WGN",
-    "country": "New Zealand",
-    "iso3166_1": "NZ",
-    "latitude": -41.2865,
-    "longitude": 174.7762,
-    "local_languages": ["en", "mi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^60(?:1[12]|2[1-3]|3[57])$"],
-      "examples": ["6011", "6012", "6021"],
-      "source": "derived from GeoNames postal data (radius, r=12km)",
-      "codes_matched": 7,
-      "notes": "Wellington City = 6011-6037. Wider region extends to 5010-5999. Enumerated from 7 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Auckland",
-    "state_province": "Auckland",
-    "iso3166_2": "NZ-AUK",
-    "country": "New Zealand",
-    "iso3166_1": "NZ",
-    "latitude": -36.8485,
-    "longitude": 174.7633,
-    "local_languages": ["en", "mi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:0(?:6(?:0[024]|1[0248]|2[024679]|3[02]|4[0-5]|5[0-7]|6[0-3])|7(?:4\\d|5[0-8]|82|9[2-4])|8(?:1[04]|20|41|9[12])|9(?:30|43))|1(?:0(?:[47][12]|[56][0-2]|1[01]|2[1-6])|1(?:4[0-57-9]|5[01])|24[56]|3(?:4[024-9]|5[0-2])|44[0356]|54[1-6]|64[0-3]|74[0-6]|84[02])|2(?:0(?:1[02-468]|2[2-5])|1(?:0[2-5]|4[0-79]|5[013-9]|60)|24[0-3]|5(?:7[16]|80)))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{7}$",
+        "city_regex": [
+          "^509\\d{4}$"
+        ],
+        "examples": [
+          "5090000"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=20km)",
+        "codes_matched": 1,
+        "notes": "Los Rios region range approx. 5090000-5230000; Valdivia commune base code 5090000. Dataset is commune-level (nnn0000); 3-digit commune prefix + block. Enumerated from 1 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Lima",
+      "state_province": "Lima",
+      "iso3166_2": "PE-LMA",
+      "country": "Peru",
+      "iso3166_1": "PE",
+      "latitude": -12.0464,
+      "longitude": -77.0428,
+      "local_languages": [
+        "es-PE"
       ],
-      "examples": ["0600", "0602", "0604"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 169,
-      "notes": "Auckland is non-contiguous: 0600-0999 (north/west), 1010-1081 (central), 2010-2699 (south). Enumerated from 169 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Christchurch",
-    "state_province": "Canterbury",
-    "iso3166_2": "NZ-CAN",
-    "country": "New Zealand",
-    "iso3166_1": "NZ",
-    "latitude": -43.532,
-    "longitude": 172.6306,
-    "local_languages": ["en", "mi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^80(?:[46][12]|[58][1-3]|1[134]|2[2-5])$"],
-      "examples": ["8011", "8013", "8014"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 17,
-      "notes": "Christchurch City = 8011-8062. Canterbury region extends 7600-8999. Enumerated from 17 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Nelson",
-    "state_province": "Nelson",
-    "iso3166_2": "NZ-NSN",
-    "country": "New Zealand",
-    "iso3166_1": "NZ",
-    "latitude": -41.2706,
-    "longitude": 173.284,
-    "local_languages": ["en", "mi"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^70(?:1[01]|4[0-79])$"],
-      "examples": ["7010", "7011", "7040"],
-      "source": "derived from GeoNames postal data (radius, r=10km)",
-      "codes_matched": 11,
-      "notes": "Nelson City = 7010-7011 and 7040-7047. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Munich",
-    "state_province": "Bavaria",
-    "iso3166_2": "DE-BY",
-    "country": "Germany",
-    "iso3166_1": "DE",
-    "latitude": 48.1351,
-    "longitude": 11.582,
-    "local_languages": ["de"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^8(?:0(?:33[135-79]|469|53[89]|6(?:3[46-9]|8[679])|79[6-9]|80[1-579]|9(?:3[3579]|9[23579]))|1(?:[89]2[579]|24[1357-9]|3(?:69|7[13579])|47[5-79]|5(?:39|4[13579])|6(?:6[79]|7[13579])|73[579]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^15(?:0(?:0[1346-9]|1[1289]|2[1-46]|3[346-9]|4[6-9]|5[46-8]|6[3467]|7[2-469]|8[1-46-8]|9[346])|1(?:0[1-36-9]|1[23])|3(?:0[12467]|1[124]|2[6-8]|3[1-3])|4(?:[039][148]|[14][269]|[28][37]|53|79)|8(?:0[13469]|1[126-8]|2[489]|3[1467]|42))$"
+        ],
+        "examples": [
+          "15001",
+          "15003",
+          "15004"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 111,
+        "notes": "Lima Region = prefix 15; metropolitan Lima districts sit in 15001-15099. Callao is 07xxx. Enumerated from 111 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Tokyo",
+      "state_province": "Tokyo",
+      "iso3166_2": "JP-13",
+      "country": "Japan",
+      "iso3166_1": "JP",
+      "latitude": 35.6762,
+      "longitude": 139.6503,
+      "local_languages": [
+        "ja"
       ],
-      "examples": ["80331", "80333", "80335"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 75,
-      "notes": "Munich = 80331-81929. Enumerated from 75 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Berlin",
-    "state_province": "Berlin",
-    "iso3166_2": "DE-BE",
-    "country": "Germany",
-    "iso3166_1": "DE",
-    "latitude": 52.52,
-    "longitude": 13.405,
-    "local_languages": ["de"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^1(?:0(?:[68]2[3579]|1(?:1[579]|7[89])|3(?:1[57-9]|6[579])|4[03][579]|5(?:5[13579]|8[579])|7(?:[07][79]|[18][13579]))|1011|2(?:0(?:4[3579]|5[13579]|99)|1(?:[06][13579]|5[79])|2(?:[47][79]|0[3579])|3(?:0[579]|4[79]|5[13579])|4(?:3[579]|59|8[79])|5(?:2[4679]|5[579]|8[79])|6(?:[17]9|2[1379]|8[13579]))|3(?:0(?:5[13579]|8[689])|1(?:2[579]|5[689]|8[79])|3(?:4[79]|5[13579])|4(?:[36][579]|0[3579])|5(?:[89][13579]|0[3579])|62[79])|4(?:0(?:5[023579]|89)|1(?:[02]9|[69][3579]|31)))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3}-?\\d{4}$",
+        "city_regex": [
+          "^(?:1(?:[068]\\d|[14][0-6]|2[013-5]|3[0-24-7]|5[0-8]|7[013-9]|95)|20[1-46])-?\\d{4}$"
+        ],
+        "examples": [
+          "100-0000",
+          "100-0001",
+          "100-0002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 7876,
+        "notes": "Tokyo Metropolis: 100-xxxx to 208-xxxx. The 23 wards are 100-179. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 7876 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Osaka",
+      "state_province": "Osaka",
+      "iso3166_2": "JP-27",
+      "country": "Japan",
+      "iso3166_1": "JP",
+      "latitude": 34.6937,
+      "longitude": 135.5023,
+      "local_languages": [
+        "ja"
       ],
-      "examples": ["10115", "10117", "10119"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 182,
-      "notes": "Berlin = 10115-14199. Enumerated from 182 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Cologne",
-    "state_province": "North Rhine-Westphalia",
-    "iso3166_2": "DE-NW",
-    "country": "Germany",
-    "iso3166_1": "DE",
-    "latitude": 50.9375,
-    "longitude": 6.9603,
-    "local_languages": ["de"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^5(?:0(?:6(?:6[78]|7[0246-9])|7(?:3[3579]|6[579])|8(?:2[3579]|5[89])|9(?:3[13579]|6[89]|9[679]))|1(?:06[13579]|1[04][3579]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3}-?\\d{4}$",
+        "city_regex": [
+          "^5(?:[35]\\d|4[0-7])-?\\d{4}$"
+        ],
+        "examples": [
+          "530-0000",
+          "530-0001",
+          "530-0002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=12km)",
+        "codes_matched": 1440,
+        "notes": "Osaka City: 530-xxxx to 559-xxxx. Wider Osaka Prefecture is 5xx. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 1440 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Kyoto",
+      "state_province": "Kyoto",
+      "iso3166_2": "JP-26",
+      "country": "Japan",
+      "iso3166_1": "JP",
+      "latitude": 35.0116,
+      "longitude": 135.7681,
+      "local_languages": [
+        "ja"
       ],
-      "examples": ["50667", "50668", "50670"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 45,
-      "notes": "Cologne = 50667-51149. Enumerated from 45 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Bamberg",
-    "state_province": "Bavaria",
-    "iso3166_2": "DE-BY",
-    "country": "Germany",
-    "iso3166_1": "DE",
-    "latitude": 49.8916,
-    "longitude": 10.8916,
-    "local_languages": ["de"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^960(?:4[79]|5[02])$"],
-      "examples": ["96047", "96049", "96050"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 4,
-      "notes": "Bamberg = 96047-96052. Enumerated from 4 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Brussels",
-    "state_province": "Brussels-Capital",
-    "iso3166_2": "BE-BRU",
-    "country": "Belgium",
-    "iso3166_1": "BE",
-    "latitude": 50.8503,
-    "longitude": 4.3517,
-    "local_languages": ["fr", "nl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^1(?:0(?:[02-79]0|8[0-3])|1[2-9]0|2[01]0)$"],
-      "examples": ["1000", "1020", "1030"],
-      "source": "derived from GeoNames postal data (radius, r=8km)",
-      "codes_matched": 22,
-      "notes": "Brussels-Capital Region = 1000-1210. Enumerated from 22 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Antwerp",
-    "state_province": "Flanders",
-    "iso3166_2": "BE-VLG",
-    "country": "Belgium",
-    "iso3166_1": "BE",
-    "latitude": 51.2194,
-    "longitude": 4.4025,
-    "local_languages": ["nl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^20(?:[02-6]0|18)$"],
-      "examples": ["2000", "2018", "2020"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 7,
-      "notes": "City of Antwerp = 2000-2660; 2xxx also covers other Antwerp Province towns. Enumerated from 7 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Bruges",
-    "state_province": "Flanders",
-    "iso3166_2": "BE-VLG",
-    "country": "Belgium",
-    "iso3166_1": "BE",
-    "latitude": 51.2093,
-    "longitude": 3.2247,
-    "local_languages": ["nl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^8(?:[02]00|3[148]0)$"],
-      "examples": ["8000", "8200", "8310"],
-      "source": "derived from GeoNames postal data (radius, r=12km)",
-      "codes_matched": 5,
-      "notes": "Bruges uses discrete codes: 8000 (centre), 8200, 8310, 8340, 8380 (submunicipalities). Enumerated from 5 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "London",
-    "state_province": "England",
-    "iso3166_2": "GB-ENG",
-    "country": "United Kingdom",
-    "iso3166_1": "GB",
-    "latitude": 51.5074,
-    "longitude": -0.1278,
-    "local_languages": ["en-GB"],
-    "postal_code": {
-      "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
-      "city_regex": [
-        "^(?:E(?:1W|C(?:[14][AMNRVY]|2[AMNPRVY]|3[AMNPV]))|SW1[EHPV-Y]|W(?:1[B-DF-HJKS-UW]|C(?:1[ABEHNRVX]|2[ABEHNR]))) ?\\d[A-Z]{2}$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3}-?\\d{4}$",
+        "city_regex": [
+          "^6(?:0[0-7]|1[0-256])-?\\d{4}$"
+        ],
+        "examples": [
+          "600-0000",
+          "600-8001",
+          "600-8002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=12km)",
+        "codes_matched": 4614,
+        "notes": "Kyoto City: 600-xxxx to 616-xxxx. Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 4614 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Sapporo",
+      "state_province": "Hokkaido",
+      "iso3166_2": "JP-01",
+      "country": "Japan",
+      "iso3166_1": "JP",
+      "latitude": 43.0618,
+      "longitude": 141.3545,
+      "local_languages": [
+        "ja"
       ],
-      "examples": ["E1W 1AA", "EC1A 1AA", "EC1M 1AA"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 58,
-      "notes": "First pattern = inner London postcode areas; second = outer Greater London areas. Dataset is outward-code level; inward code appended. Enumerated from 58 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Bristol",
-    "state_province": "England",
-    "iso3166_2": "GB-ENG",
-    "country": "United Kingdom",
-    "iso3166_1": "GB",
-    "latitude": 51.4545,
-    "longitude": -2.5879,
-    "local_languages": ["en-GB"],
-    "postal_code": {
-      "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
-      "city_regex": ["^BS(?:[1256]|3[12459]?|4[01]) ?\\d[A-Z]{2}$"],
-      "examples": ["BS1 1AA", "BS2 1AA", "BS3 1AA"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 12,
-      "notes": "BS postcode area (also covers parts of North Somerset / South Gloucestershire). Dataset is outward-code level; inward code appended. Enumerated from 12 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Edinburgh",
-    "state_province": "Scotland",
-    "iso3166_2": "GB-SCT",
-    "country": "United Kingdom",
-    "iso3166_1": "GB",
-    "latitude": 55.9533,
-    "longitude": -3.1883,
-    "local_languages": ["en-GB", "gd"],
-    "postal_code": {
-      "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
-      "city_regex": ["^EH(?:[2-9]|1[12]?) ?\\d[A-Z]{2}$"],
-      "examples": ["EH1 1AA", "EH11 1AA", "EH12 1AA"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 11,
-      "notes": "EH postcode area. Dataset is outward-code level; inward code appended. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Glasgow",
-    "state_province": "Scotland",
-    "iso3166_2": "GB-SCT",
-    "country": "United Kingdom",
-    "iso3166_1": "GB",
-    "latitude": 55.8642,
-    "longitude": -4.2518,
-    "local_languages": ["en-GB", "gd"],
-    "postal_code": {
-      "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
-      "city_regex": ["^G(?:[12][23]?|3[14]?|4[0-24]?|52?) ?\\d[A-Z]{2}$"],
-      "examples": ["G1 1AA", "G12 1AA", "G13 1AA"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 16,
-      "notes": "G postcode area. Dataset is outward-code level; inward code appended. Enumerated from 16 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Prague",
-    "state_province": "Prague",
-    "iso3166_2": "CZ-10",
-    "country": "Czechia",
-    "iso3166_1": "CZ",
-    "latitude": 50.0755,
-    "longitude": 14.4378,
-    "local_languages": ["cs"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3} ?\\d{2}$",
-      "city_regex": [
-        "^1(?:0[0-246-9]\\ 00|1[089]\\ 00|2[08]\\ 00|30\\ 00|4[0-37-9]\\ 00|5(?:[02489]\\ 00|5\\ (?:[23]1|00))|6[0-59]\\ 00|7[01]\\ 00|8[0-246]\\ 00|9(?:[3689]\\ 00|0\\ (?:00|1[1257])))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3}-?\\d{4}$",
+        "city_regex": [
+          "^0(?:0[1-7]|6[0-5])-?\\d{4}$"
+        ],
+        "examples": [
+          "001-0000",
+          "001-0010",
+          "001-0011"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 1373,
+        "notes": "Sapporo: 001-xxxx to 007-xxxx (north/west) and 060-xxxx to 065-xxxx (central/east). Dataset holds full 7-digit codes; compressed on the 3-digit area prefix. Enumerated from 1373 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Seoul",
+      "state_province": "Seoul",
+      "iso3166_2": "KR-11",
+      "country": "South Korea",
+      "iso3166_1": "KR",
+      "latitude": 37.5665,
+      "longitude": 126.978,
+      "local_languages": [
+        "ko"
       ],
-      "examples": ["100 00", "101 00", "102 00"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 52,
-      "notes": "Prague = 100 00 - 199 00. Enumerated from 52 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Pilsen",
-    "state_province": "Plzeň",
-    "iso3166_2": "CZ-32",
-    "country": "Czechia",
-    "iso3166_1": "CZ",
-    "latitude": 49.7384,
-    "longitude": 13.3736,
-    "local_languages": ["cs"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3} ?\\d{2}$",
-      "city_regex": ["^3(?:0[17]\\ 00|1[02]\\ 00)$"],
-      "examples": ["301 00", "307 00", "310 00"],
-      "source": "derived from GeoNames postal data (radius, r=10km)",
-      "codes_matched": 4,
-      "notes": "Plzen = 301 00 - 312 00. Enumerated from 4 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Amsterdam",
-    "state_province": "North Holland",
-    "iso3166_2": "NL-NH",
-    "country": "Netherlands",
-    "iso3166_1": "NL",
-    "latitude": 52.3676,
-    "longitude": 4.9041,
-    "local_languages": ["nl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4} ?[A-Z]{2}$",
-      "city_regex": [
-        "^1(?:0(?:[157][1-9]|[29][1-8]|[34][1-7]|6\\d|8[1-367])|10[1-9]) ?[A-Z]{2}$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^0(?:1[0-46-9]|2[0-24-8]|3[013-79]|4\\d|5[0-8]|6[0-35-9]|7[02-9]|8[0-35-8])\\d{2}$"
+        ],
+        "examples": [
+          "01000",
+          "01001",
+          "01002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=18km)",
+        "codes_matched": 5628,
+        "notes": "Post-2015 5-digit system: Seoul = 01000-09999. Compressed on the 3-digit prefix. Enumerated from 5628 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Busan",
+      "state_province": "Busan",
+      "iso3166_2": "KR-26",
+      "country": "South Korea",
+      "iso3166_1": "KR",
+      "latitude": 35.1796,
+      "longitude": 129.0756,
+      "local_languages": [
+        "ko"
       ],
-      "examples": ["1011 AB", "1012 AB", "1013 AB"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 81,
-      "notes": "Amsterdam = 1000-1109 numeric part. Dataset is 4-digit numeric; letter pair appended. Enumerated from 81 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Copenhagen",
-    "state_province": "Capital Region",
-    "iso3166_2": "DK-84",
-    "country": "Denmark",
-    "iso3166_1": "DK",
-    "latitude": 55.6761,
-    "longitude": 12.5683,
-    "local_languages": ["da"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:1(?:8(?:[017]\\d|2[02-9]|35|5[0-7]|6[0-8])|9(?:[16][0-7]|0[0-689]|2[0-8]|5\\d|7[0-4]))|2000)$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^4(?:6[0235-79]|7[0-35-9]|8[0-57-9]|9[0-5])\\d{2}$"
+        ],
+        "examples": [
+          "46002",
+          "46018",
+          "46027"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=18km)",
+        "codes_matched": 2214,
+        "notes": "Busan = 46000-49999. Compressed on the 3-digit prefix. Enumerated from 2214 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Ho Chi Minh City",
+      "state_province": "Ho Chi Minh",
+      "iso3166_2": "VN-SG",
+      "country": "Vietnam",
+      "iso3166_1": "VN",
+      "latitude": 10.8231,
+      "longitude": 106.6297,
+      "local_languages": [
+        "vi"
       ],
-      "examples": ["1800", "1801", "1802"],
-      "source": "derived from GeoNames postal data (sub, r=12km)",
-      "codes_matched": 107,
-      "notes": "Copenhagen K = 1000-1499; Frederiksberg and surrounding districts = 1800-2500. Enumerated from 107 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Warsaw",
-    "state_province": "Masovian",
-    "iso3166_2": "PL-MZ",
-    "country": "Poland",
-    "iso3166_1": "PL",
-    "latitude": 52.2297,
-    "longitude": 21.0122,
-    "local_languages": ["pl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{2}-\\d{3}$",
-      "city_regex": [
-        "^0(?:0\\-(?:[013-7]\\d|2[0-8]|8[0-79]|91)|1\\-(?:[13-57-9]\\d|[02][0-6]|6[0-57-9])|2\\-\\d\\d|3\\-(?:[0-79]\\d|8[0-46-9])|4\\-(?:[0-46-8]\\d|5[0-7]|9[05689]))\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5,6}$",
+        "city_regex": [
+          "^7[0-4]\\d{3}$",
+          "^7[0-4]\\d{4}$"
+        ],
+        "examples": [
+          "70000",
+          "700000"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Current 5-digit system: HCMC = 70000-74999. Legacy/6-digit form (700000) still appears in some systems."
+      }
+    },
+    {
+      "city": "Hanoi",
+      "state_province": "Hanoi",
+      "iso3166_2": "VN-HN",
+      "country": "Vietnam",
+      "iso3166_1": "VN",
+      "latitude": 21.0285,
+      "longitude": 105.8542,
+      "local_languages": [
+        "vi"
       ],
-      "examples": ["00-002", "00-003", "00-004"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 3661,
-      "notes": "Warsaw = 00-001 to 04-999. Compressed one digit short of full length. Enumerated from 3661 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Krakow",
-    "state_province": "Lesser Poland",
-    "iso3166_2": "PL-MA",
-    "country": "Poland",
-    "iso3166_1": "PL",
-    "latitude": 50.0647,
-    "longitude": 19.945,
-    "local_languages": ["pl"],
-    "postal_code": {
-      "country_format_regex": "^\\d{2}-\\d{3}$",
-      "city_regex": [
-        "^3(?:0\\-(?:[036]\\d|[27][0-589]|1[0-59]|4[0-49]|5[0-8]|8[0-69]|9[0469])|1\\-(?:[45][0-8]|[89]\\d|0[0-7]|1[0-6]|2[0-46-8]|3[0-79]|6[0-579]|7[0-2569]))\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5,6}$",
+        "city_regex": [
+          "^1[0-4]\\d{3}$",
+          "^1[0-4]\\d{4}$"
+        ],
+        "examples": [
+          "10000",
+          "100000"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Hanoi = 10000-14999 (5-digit). Legacy 6-digit form 100000 still in circulation."
+      }
+    },
+    {
+      "city": "Da Nang",
+      "state_province": "Da Nang",
+      "iso3166_2": "VN-DN",
+      "country": "Vietnam",
+      "iso3166_1": "VN",
+      "latitude": 16.0544,
+      "longitude": 108.2022,
+      "local_languages": [
+        "vi"
       ],
-      "examples": ["30-001", "30-002", "30-003"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 1106,
-      "notes": "Krakow = 30-001 to 31-999. Compressed one digit short of full length. Enumerated from 1106 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Rome",
-    "state_province": "Lazio",
-    "iso3166_2": "IT-62",
-    "country": "Italy",
-    "iso3166_1": "IT",
-    "latitude": 41.9028,
-    "longitude": 12.4964,
-    "local_languages": ["it"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^001(?:[3-9][1-9]|1[89]|2[0-8])$"],
-      "examples": ["00118", "00119", "00120"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 74,
-      "notes": "Rome = 00118-00199 (00120 = Vatican City, a separate state). Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Milan",
-    "state_province": "Lombardy",
-    "iso3166_2": "IT-25",
-    "country": "Italy",
-    "iso3166_1": "IT",
-    "latitude": 45.4642,
-    "longitude": 9.19,
-    "local_languages": ["it"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^201(?:[2-5][1-9]|6[12])$"],
-      "examples": ["20121", "20122", "20123"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 38,
-      "notes": "Milan city = 20121-20162. Enumerated from 38 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Barcelona",
-    "state_province": "Catalonia",
-    "iso3166_2": "ES-CT",
-    "country": "Spain",
-    "iso3166_1": "ES",
-    "latitude": 41.3851,
-    "longitude": 2.1734,
-    "local_languages": ["ca", "es"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^080(?:[1-3]\\d|0[1-9]|4[0-2]|7[015]|80)$"],
-      "examples": ["08001", "08002", "08003"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 46,
-      "notes": "Barcelona city = 08001-08042. Province is 08xxx. Enumerated from 46 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Madrid",
-    "state_province": "Madrid",
-    "iso3166_2": "ES-MD",
-    "country": "Spain",
-    "iso3166_1": "ES",
-    "latitude": 40.4168,
-    "longitude": -3.7038,
-    "local_languages": ["es"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^280(?:[1-4]\\d|0[1-9]|5[0-5]|7[01]|8[0235-7])$"],
-      "examples": ["28001", "28002", "28003"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 63,
-      "notes": "Madrid city = 28001-28080. Community of Madrid is 28xxx. Enumerated from 63 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Paris",
-    "state_province": "Île-de-France",
-    "iso3166_2": "FR-IDF",
-    "country": "France",
-    "iso3166_1": "FR",
-    "latitude": 48.8566,
-    "longitude": 2.3522,
-    "local_languages": ["fr"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^750(?:[01]\\d|20)$"],
-      "examples": ["75000", "75001", "75002"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 21,
-      "notes": "Paris = 75001-75020, plus 75116 (a second code for the 16th arrondissement). Enumerated from 21 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Lyon",
-    "state_province": "Auvergne-Rhône-Alpes",
-    "iso3166_2": "FR-ARA",
-    "country": "France",
-    "iso3166_1": "FR",
-    "latitude": 45.764,
-    "longitude": 4.8357,
-    "local_languages": ["fr"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": ["^6900\\d$"],
-      "examples": ["69000", "69001", "69002"],
-      "source": "derived from GeoNames postal data (name, r=15km)",
-      "codes_matched": 10,
-      "notes": "Lyon = 69001-69009 (nine arrondissements). Enumerated from 10 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Stockholm",
-    "state_province": "Stockholm",
-    "iso3166_2": "SE-AB",
-    "country": "Sweden",
-    "iso3166_1": "SE",
-    "latitude": 59.3293,
-    "longitude": 18.0686,
-    "local_languages": ["sv"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3} ?\\d{2}$",
-      "city_regex": [
-        "^1(?:0(?:[569]\\ \\d|[02]\\ [0-7]|1\\ [0-35]|3\\ [0-35-9]|4\\ [02-6]|7\\ [0-26-9])|1(?:[0-2478]\\ \\d|[35]\\ [02-9]|6\\ [0-46-9])|2(?:[17]\\ 2|0\\ [0-36-9]|5\\ 8|6\\ [0-278])|3(?:1\\ [12589]|5\\ 7)|4(?:1\\ [89]|5\\ 8)|6(?:[49]\\ [89]|1\\ 8|2\\ [18]|3\\ 9)|7(?:0\\ 8|1\\ [17]|2\\ [89]|3\\ [13-68])|82\\ 8|95\\ 8)\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5,6}$",
+        "city_regex": [
+          "^5[0-5]\\d{3}$",
+          "^5[0-5]\\d{4}$"
+        ],
+        "examples": [
+          "50000",
+          "550000"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Sources conflict: Da Nang is cited as both 50000 and 55000. Pattern accepts 50000-55999 and the 6-digit legacy form."
+      }
+    },
+    {
+      "city": "Bangkok",
+      "state_province": "Bangkok",
+      "iso3166_2": "TH-10",
+      "country": "Thailand",
+      "iso3166_1": "TH",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "local_languages": [
+        "th"
       ],
-      "examples": ["100 04", "100 05", "100 12"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 1139,
-      "notes": "Stockholm County = 1xx xx. Compressed one digit short of full length. Enumerated from 1139 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Gothenburg",
-    "state_province": "Västra Götaland",
-    "iso3166_2": "SE-O",
-    "country": "Sweden",
-    "iso3166_1": "SE",
-    "latitude": 57.7089,
-    "longitude": 11.9746,
-    "local_languages": ["sv"],
-    "postal_code": {
-      "country_format_regex": "^\\d{3} ?\\d{2}$",
-      "city_regex": [
-        "^4(?:0(?:[89]\\ \\d|0\\ [1-79]|1\\ [12589]|2\\ [2-7]|3\\ [0-4]|4\\ [0238]|5\\ [0-57-9]|7\\ 0)|1(?:[26]\\ [024-9]|1\\ [0-489]|3\\ [0-2489]|4\\ [025-8]|5\\ \\d|7\\ [0-8]|8\\ [0-47]))\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^10(?:[4-8]00|1[0-7]0|2[024-69]0|3[0-3]0)$"
+        ],
+        "examples": [
+          "10100",
+          "10110",
+          "10120"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 23,
+        "notes": "Bangkok = province code 10; codes run 10100-10900. Enumerated from 23 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Taipei",
+      "state_province": "Taipei",
+      "iso3166_2": "TW-TPE",
+      "country": "Taiwan",
+      "iso3166_1": "TW",
+      "latitude": 25.033,
+      "longitude": 121.5654,
+      "local_languages": [
+        "zh-TW"
       ],
-      "examples": ["400 10", "400 12", "400 13"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 755,
-      "notes": "Gothenburg = 400 00 - 425 99. Compressed one digit short of full length. Enumerated from 755 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Oslo",
-    "state_province": "Oslo",
-    "iso3166_2": "NO-03",
-    "country": "Norway",
-    "iso3166_1": "NO",
-    "latitude": 59.9139,
-    "longitude": 10.7522,
-    "local_languages": ["no"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^(?:0(?:[56][0-25-9]|0[0-5]|1\\d|2[013-8]|3[0-8]|4[0-24-9]|7[015-9]|8[04-9]|9[015-8])|1(?:[01][015-8]|2[015-9]))\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3}(?:\\d{2}|\\d{3})?$",
+        "city_regex": [
+          "^1(?:0[0-9]|1[0-6])(?:\\d{2}|\\d{3})?$"
+        ],
+        "examples": [
+          "100",
+          "10058",
+          "100013"
+        ],
+        "source": "researched (no usable open dataset)",
+        "codes_matched": null,
+        "notes": "Taipei City districts = 100-116. 3-digit is valid alone; 3+2 is legacy, 3+3 is current."
+      }
+    },
+    {
+      "city": "Beijing",
+      "state_province": "Beijing",
+      "iso3166_2": "CN-BJ",
+      "country": "China",
+      "iso3166_1": "CN",
+      "latitude": 39.9042,
+      "longitude": 116.4074,
+      "local_languages": [
+        "zh-CN"
       ],
-      "examples": ["0001", "0010", "0015"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 631,
-      "notes": "Oslo = 0001-1295; the 0xxx block is the city proper. Compressed one digit short of full length. Enumerated from 631 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Dublin",
-    "state_province": "Leinster",
-    "iso3166_2": "IE-L",
-    "country": "Ireland",
-    "iso3166_1": "IE",
-    "latitude": 53.3498,
-    "longitude": -6.2603,
-    "local_languages": ["en", "ga"],
-    "postal_code": {
-      "country_format_regex": "^(?:D6W|[AC-FHKNPRTV-Y]\\d{2}) ?[0-9AC-FHKNPRTV-Y]{4}$",
-      "city_regex": ["^D(?:0[1-9]|1[0-8]|2[024]|6W) ?[0-9AC-FHKNPRTV-Y]{4}$"],
-      "examples": ["D01 XY35", "D02 XY35", "D03 XY35"],
-      "source": "derived from GeoNames postal data (sub, r=25km)",
-      "codes_matched": 22,
-      "notes": "Dublin routing keys: D01-D18, D20, D22, D24 and the exception D6W. Note D19, D21, D23 are not issued. Dataset is routing-key level; unique identifier appended. Enumerated from 22 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Vienna",
-    "state_province": "Vienna",
-    "iso3166_2": "AT-9",
-    "country": "Austria",
-    "iso3166_1": "AT",
-    "latitude": 48.2082,
-    "longitude": 16.3738,
-    "local_languages": ["de-AT"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": ["^1(?:0[1-9]0|1\\d0|2[0-3]0)$"],
-      "examples": ["1010", "1020", "1030"],
-      "source": "derived from GeoNames postal data (field)",
-      "codes_matched": 23,
-      "notes": "Vienna = 1010-1230, always ending in 0 (district number x10). Enumerated from 23 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Zurich",
-    "state_province": "Zurich",
-    "iso3166_2": "CH-ZH",
-    "country": "Switzerland",
-    "iso3166_1": "CH",
-    "latitude": 47.3769,
-    "longitude": 8.5417,
-    "local_languages": ["de-CH"],
-    "postal_code": {
-      "country_format_regex": "^\\d{4}$",
-      "city_regex": [
-        "^80(?:0[0-68]|1[027]|2[247]|3[1246-8]|4[0-24-9]|5[0-3578]|6[034]|7[05]|8[178]|9[0-389])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{6}$",
+        "city_regex": [
+          "^10[0-2]\\d{3}$"
+        ],
+        "examples": [
+          "100000",
+          "101100",
+          "101200"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=40km)",
+        "codes_matched": 11,
+        "notes": "Beijing municipality = 100000-102629. Dataset is city-level; compressed on the 3-digit prefix. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Shanghai",
+      "state_province": "Shanghai",
+      "iso3166_2": "CN-SH",
+      "country": "China",
+      "iso3166_1": "CN",
+      "latitude": 31.2304,
+      "longitude": 121.4737,
+      "local_languages": [
+        "zh-CN"
       ],
-      "examples": ["8000", "8001", "8002"],
-      "source": "derived from GeoNames postal data (name, r=12km)",
-      "codes_matched": 50,
-      "notes": "City of Zurich = 8001-8064. Enumerated from 50 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Tallinn",
-    "state_province": "Harju",
-    "iso3166_2": "EE-37",
-    "country": "Estonia",
-    "iso3166_1": "EE",
-    "latitude": 59.437,
-    "longitude": 24.7536,
-    "local_languages": ["et"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^(?:1(?:0(?:001|1(?:[2-4]\\d|1[1-9]|5[0-689])|3(?:1[1-9]|2[013])|41[1-6]|6(?:1[1-9]|2[01])|9(?:1[1-9]|2[0-2]))|1(?:[23]1[1-8]|101|41[1-7]|6(?:1[1-9]|2[0-5])|71[1-3]|91[1-4])|2(?:01[1-5]|11[1-3]|6(?:1[1-9]|20)|91[1-9])|3(?:4(?:1[1-9]|2[0-6])|5(?:1[1-9]|2[0-4])|6(?:1[1-9]|2\\d)|81[1267]|91[1-9])|5(?:0(?:[16]5|0[79]|2[69]|30|4[17-9]|5[59]|7[01]|9[4589])|1(?:6[15]|70|8[58]|9[039]))|9086)|7(?:4(?:0(?:0[18]|1[014-69]|20)|20[168])|5(?:3(?:0[1346-8]|1[02]|2[1-357]|31)|4(?:03|12)|511)|69(?:0[12]|1[26]|2[2-4])))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{6}$",
+        "city_regex": [
+          "^20[0-2]\\d{3}$"
+        ],
+        "examples": [
+          "200000",
+          "201100",
+          "201300"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=40km)",
+        "codes_matched": 10,
+        "notes": "Shanghai municipality = 200000-202699. Dataset is city-level; compressed on the 3-digit prefix. Enumerated from 10 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Bengaluru",
+      "state_province": "Karnataka",
+      "iso3166_2": "IN-KA",
+      "country": "India",
+      "iso3166_1": "IN",
+      "latitude": 12.9716,
+      "longitude": 77.5946,
+      "local_languages": [
+        "kn",
+        "en"
       ],
-      "examples": ["10001", "10111", "10112"],
-      "source": "derived from GeoNames postal data (radius, r=12km)",
-      "codes_matched": 289,
-      "notes": "Tallinn = 10xxx-13xxx. Enumerated from 289 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Denver",
-    "state_province": "Colorado",
-    "iso3166_2": "US-CO",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 39.7392,
-    "longitude": -104.9903,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^802(?:[23]\\d|0[1-9]|1[0-24-9]|4[346-9]|5[0-2679]|6[0-6]|7[134]|81|9[01349])$"
+      "postal_code": {
+        "country_format_regex": "^[1-9]\\d{5}$",
+        "city_regex": [
+          "^560\\d{3}$"
+        ],
+        "examples": [
+          "560001",
+          "560002",
+          "560003"
+        ],
+        "source": "derived from GeoNames postal data (field)",
+        "codes_matched": 106,
+        "notes": "Bengaluru urban PIN codes = 560xxx. Bengaluru Rural uses 561xxx/562xxx. Compressed on the 3-digit pin prefix. Enumerated from 106 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Singapore",
+      "state_province": "Central Singapore",
+      "iso3166_2": "SG-01",
+      "country": "Singapore",
+      "iso3166_1": "SG",
+      "latitude": 1.3521,
+      "longitude": 103.8198,
+      "local_languages": [
+        "en",
+        "zh",
+        "ms",
+        "ta"
       ],
-      "examples": ["80201", "80202", "80203"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 66,
-      "notes": "Denver = 80202-80249 plus 80290-80299. Enumerated from 66 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Portland",
-    "state_province": "Oregon",
-    "iso3166_2": "US-OR",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 45.5152,
-    "longitude": -122.6784,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^972(?:[59][0-468]|0[1-9]|1\\d|2[0-57-9]|3[0-3689]|4[02]|6[6-9]|8[0-36])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{6}$",
+        "city_regex": [
+          "^(?:[1-6]\\d|0[1-9]|7[0-35-9]|8[0-28]|91)\\d{4}$"
+        ],
+        "examples": [
+          "018906",
+          "018907",
+          "018910"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=30km)",
+        "codes_matched": 121135,
+        "notes": "Singapore is a single postal district; sectors 01-82 cover the whole island. Compressed on the 2-digit sector prefix. Enumerated from 121135 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Melbourne",
+      "state_province": "Victoria",
+      "iso3166_2": "AU-VIC",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -37.8136,
+      "longitude": 144.9631,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["97201", "97202", "97203"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 60,
-      "notes": "Portland, Oregon = 972xx. Enumerated from 60 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "San Diego",
-    "state_province": "California",
-    "iso3166_2": "US-CA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 32.7157,
-    "longitude": -117.1611,
-    "local_languages": ["en-US", "es-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^921(?:0[1-9]|1[0-79]|2[0-469]|3[0-24-9]|4[02579]|5[02-589]|6[0135-9]|7[0-24-79]|8[267]|9[0-35-9])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:3(?:0(?:[45]\\d|0[0-68]|1[0-35689]|2[0-35-9]|3[1-46-9]|6[0-25-8]|7[0-689]|8[1-9]|9[013-5])|1(?:[0248][1-9]|[39][0-4]|1[14]|5[0-2]|6[1-35-9]|7[0-24])|20[24-7]|428|752)|8(?:0(?:0[1-9]|1[0-2]|45|51|6[69]|7[01])|1(?:0[27]|11|20)|205|383|438|511))$"
+        ],
+        "examples": [
+          "3000",
+          "3001",
+          "3002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 179,
+        "notes": "Greater Melbourne approx. 3000-3207. Victoria as a whole is 3000-3999. Enumerated from 179 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Sydney",
+      "state_province": "New South Wales",
+      "iso3166_2": "AU-NSW",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -33.8688,
+      "longitude": 151.2093,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["92101", "92102", "92103"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 74,
-      "notes": "San Diego = 921xx. Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Asheville",
-    "state_province": "North Carolina",
-    "iso3166_2": "US-NC",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 35.5951,
-    "longitude": -82.5515,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": ["^288(?:0[1-6]|1[03-6])$"],
-      "examples": ["28801", "28802", "28803"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 11,
-      "notes": "Asheville = 28801-28816. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Grand Rapids",
-    "state_province": "Michigan",
-    "iso3166_2": "US-MI",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 42.9634,
-    "longitude": -85.6681,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^495(?:0[1-8]|1[024-68]|2[358]|3[04]|4[468]|55|60|88|99)$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:1(?:0(?:0[1-9]|10|2[0-35-9]|3\\d|4[0-6])|1(?:[2-9]\\d|0[015-9]|1[02-9])|2(?:0[1-3578]|3\\d|40|9[1-9])|3(?:[046]0|14|35|5[05])|4(?:[35][05]|[67][056]|0[15]|19|2[02-9]|4[015]|8[0145]|9[0359])|5(?:[18]5|6[05]|70|9[057])|6(?:[46]0|[78][05]|02|3[059]|5[58])|7(?:[09]0|[15][05]|[78]1|4[01]|65)|8(?:0[05]|1[19]|25|3[015]|60|7[45]|8[58]|91))|2(?:0(?:[2-46]\\d|[79][0-79]|0[0-246-9]|1[0-35-9]|5[0257-9]|8[4-9])|1(?:[1-39]\\d|0[0-49]|4[0-6]|5[0-24]|6[0-35]|7[23])|2(?:0[03-9]|1[0-46-9]|2\\d|3[014])))$"
+        ],
+        "examples": [
+          "1001",
+          "1002",
+          "1003"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 424,
+        "notes": "Sydney metro approx. 2000-2249; 1000-1999 are Sydney PO Box / large-volume codes. Enumerated from 424 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Brisbane",
+      "state_province": "Queensland",
+      "iso3166_2": "AU-QLD",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -27.4705,
+      "longitude": 153.026,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["49501", "49502", "49503"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 26,
-      "notes": "Grand Rapids = 495xx. Enumerated from 26 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Chicago",
-    "state_province": "Illinois",
-    "iso3166_2": "US-IL",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 41.8781,
-    "longitude": -87.6298,
-    "local_languages": ["en-US", "es-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^60(?:6(?:0[1-9]|1\\d|2[0-689]|3[0-46-9]|4[0-79]|5[1-79]|6[014689]|7[03-578]|8[0-24-9]|9[013-79])|701)$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:4(?:0(?:0\\d|1[0-478]|3[0-24-7]|5[13-59]|6[015-9]|7[02-8])|1(?:[05][1-9]|1\\d|2[0-37]|3[12]|6[0139]|7[0-489]))|90(?:0[0-2579]|1[035]))$"
+        ],
+        "examples": [
+          "4000",
+          "4001",
+          "4002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 99,
+        "notes": "Greater Brisbane approx. 4000-4207. Enumerated from 99 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Adelaide",
+      "state_province": "South Australia",
+      "iso3166_2": "AU-SA",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -34.9285,
+      "longitude": 138.6007,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["60601", "60602", "60603"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 84,
-      "notes": "Chicago = 606xx-608xx. Enumerated from 84 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Seattle",
-    "state_province": "Washington",
-    "iso3166_2": "US-WA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 47.6062,
-    "longitude": -122.3321,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^981(?:[01][1-9]|2[124-79]|3[134689]|4[14-68]|5[458]|6[014-68]|7[04578]|8[158]|9[014589])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^5(?:0(?:[14]\\d|[68][1-9]|0[015-9]|2[0-5]|3[1-57-9]|5[0-2]|7[0-6]|9[0-8])|1(?:0[6-9]|2[67]|3[1-46-9]|4[0-24]|5[0-24-689]|6[12])|8(?:0[01]|10|39)|9(?:42|50))$"
+        ],
+        "examples": [
+          "5000",
+          "5001",
+          "5005"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 112,
+        "notes": "Adelaide metro approx. 5000-5199. Enumerated from 112 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Perth",
+      "state_province": "Western Australia",
+      "iso3166_2": "AU-WA",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -31.9505,
+      "longitude": 115.8605,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["98101", "98102", "98103"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 59,
-      "notes": "Seattle = 981xx. Enumerated from 59 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Austin",
-    "state_province": "Texas",
-    "iso3166_2": "US-TX",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 30.2672,
-    "longitude": -97.7431,
-    "local_languages": ["en-US", "es-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^7(?:33(?:01|44)|87(?:[1-356]\\d|0[1-589]|4[124-9]|7[2-489]|83|99))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^6(?:0(?:[56]\\d|0[013-9]|1[0-24-9]|2[0-79]|7[0167]|90)|1(?:[05]\\d|10|4[7-9]|6[02-46])|8(?:[79]2|0[039]|17|2[07]|3[0-27-9]|4\\d|50|65)|9(?:[18]\\d|[35][1-9]|0[0-79]|2[0-69]|4[0-7]|6[013-579]|7[09]|9[017]))$"
+        ],
+        "examples": [
+          "6000",
+          "6001",
+          "6003"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 182,
+        "notes": "Perth metro approx. 6000-6199. Enumerated from 182 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Hobart",
+      "state_province": "Tasmania",
+      "iso3166_2": "AU-TAS",
+      "country": "Australia",
+      "iso3166_1": "AU",
+      "latitude": -42.8821,
+      "longitude": 147.3272,
+      "local_languages": [
+        "en-AU"
       ],
-      "examples": ["73301", "73344", "78701"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 74,
-      "notes": "Austin = 787xx. Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Boston",
-    "state_province": "Massachusetts",
-    "iso3166_2": "US-MA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 42.3601,
-    "longitude": -71.0589,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^02(?:1(?:[36]3|0[89]|1[0-8]|2[378]|9[69])|2(?:0[13-6]|1[0-257]|22|41|66|8[34]|9[378]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^7(?:0(?:0[0-24-9]|1[0-25-9]|2[13]|5[0-35])|170)$"
+        ],
+        "examples": [
+          "7000",
+          "7001",
+          "7002"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 25,
+        "notes": "Hobart approx. 7000-7099. Enumerated from 25 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Wellington",
+      "state_province": "Wellington",
+      "iso3166_2": "NZ-WGN",
+      "country": "New Zealand",
+      "iso3166_1": "NZ",
+      "latitude": -41.2865,
+      "longitude": 174.7762,
+      "local_languages": [
+        "en",
+        "mi"
       ],
-      "examples": ["02108", "02109", "02110"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 36,
-      "notes": "Boston = 021xx and 022xx. Enumerated from 36 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Philadelphia",
-    "state_province": "Pennsylvania",
-    "iso3166_2": "US-PA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 39.9526,
-    "longitude": -75.1652,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^19(?:0(?:19|9[239])|1(?:[2-4]\\d|0[1-9]|1[0-689]|5[0-5]|6[0-2]|7[0-35-9]|8[1-578]|9[0-7])|2(?:44|55))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^60(?:1[12]|2[1-3]|3[57])$"
+        ],
+        "examples": [
+          "6011",
+          "6012",
+          "6021"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=12km)",
+        "codes_matched": 7,
+        "notes": "Wellington City = 6011-6037. Wider region extends to 5010-5999. Enumerated from 7 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Auckland",
+      "state_province": "Auckland",
+      "iso3166_2": "NZ-AUK",
+      "country": "New Zealand",
+      "iso3166_1": "NZ",
+      "latitude": -36.8485,
+      "longitude": 174.7633,
+      "local_languages": [
+        "en",
+        "mi"
       ],
-      "examples": ["19019", "19092", "19093"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 87,
-      "notes": "Philadelphia = 191xx. Enumerated from 87 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Brooklyn",
-    "state_province": "New York",
-    "iso3166_2": "US-NY",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 40.6782,
-    "longitude": -73.9442,
-    "local_languages": ["en-US", "es-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": ["^112(?:[13]\\d|0[1-9]|2[0-689]|4[1-3579]|5[126])$"],
-      "examples": ["11201", "11202", "11203"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 47,
-      "notes": "Brooklyn = 112xx. Enumerated from 47 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Milwaukee",
-    "state_province": "Wisconsin",
-    "iso3166_2": "US-WI",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 43.0389,
-    "longitude": -87.9065,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^532(?:0[1-9]|1\\d|2[0-8]|3[347]|59|6[378]|7[48]|88|9[035])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:0(?:6(?:0[024]|1[0248]|2[024679]|3[02]|4[0-5]|5[0-7]|6[0-3])|7(?:4\\d|5[0-8]|82|9[2-4])|8(?:1[04]|20|41|9[12])|9(?:30|43))|1(?:0(?:[47][12]|[56][0-2]|1[01]|2[1-6])|1(?:4[0-57-9]|5[01])|24[56]|3(?:4[024-9]|5[0-2])|44[0356]|54[1-6]|64[0-3]|74[0-6]|84[02])|2(?:0(?:1[02-468]|2[2-5])|1(?:0[2-5]|4[0-79]|5[013-9]|60)|24[0-3]|5(?:7[16]|80)))$"
+        ],
+        "examples": [
+          "0600",
+          "0602",
+          "0604"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 169,
+        "notes": "Auckland is non-contiguous: 0600-0999 (north/west), 1010-1081 (central), 2010-2699 (south). Enumerated from 169 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Christchurch",
+      "state_province": "Canterbury",
+      "iso3166_2": "NZ-CAN",
+      "country": "New Zealand",
+      "iso3166_1": "NZ",
+      "latitude": -43.532,
+      "longitude": 172.6306,
+      "local_languages": [
+        "en",
+        "mi"
       ],
-      "examples": ["53201", "53202", "53203"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 41,
-      "notes": "Milwaukee = 532xx. Enumerated from 41 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Richmond",
-    "state_province": "Virginia",
-    "iso3166_2": "US-VA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 37.5407,
-    "longitude": -77.436,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^23(?:173|2(?:1[89]|2[0-7]|3[024-7]|4[19]|50|6[019]|7[4689]|8[24-69]|9[0-3578]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^80(?:[46][12]|[58][1-3]|1[134]|2[2-5])$"
+        ],
+        "examples": [
+          "8011",
+          "8013",
+          "8014"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 17,
+        "notes": "Christchurch City = 8011-8062. Canterbury region extends 7600-8999. Enumerated from 17 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Nelson",
+      "state_province": "Nelson",
+      "iso3166_2": "NZ-NSN",
+      "country": "New Zealand",
+      "iso3166_1": "NZ",
+      "latitude": -41.2706,
+      "longitude": 173.284,
+      "local_languages": [
+        "en",
+        "mi"
       ],
-      "examples": ["23173", "23218", "23219"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 39,
-      "notes": "Richmond = 232xx. Enumerated from 39 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Cincinnati",
-    "state_province": "Ohio",
-    "iso3166_2": "US-OH",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 39.1031,
-    "longitude": -84.512,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^45(?:2(?:[01][1-9]|[34]\\d|2[0-79]|5[0-58]|6[2-47-9]|7[013-57]|80|9[689])|999)$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^70(?:1[01]|4[0-79])$"
+        ],
+        "examples": [
+          "7010",
+          "7011",
+          "7040"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=10km)",
+        "codes_matched": 11,
+        "notes": "Nelson City = 7010-7011 and 7040-7047. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Munich",
+      "state_province": "Bavaria",
+      "iso3166_2": "DE-BY",
+      "country": "Germany",
+      "iso3166_1": "DE",
+      "latitude": 48.1351,
+      "longitude": 11.582,
+      "local_languages": [
+        "de"
       ],
-      "examples": ["45201", "45202", "45203"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 71,
-      "notes": "Cincinnati = 452xx. Enumerated from 71 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "St. Louis",
-    "state_province": "Missouri",
-    "iso3166_2": "US-MO",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 38.627,
-    "longitude": -90.1994,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^631(?:[1-3]\\d|0[1-9]|4[013-7]|5[015-8]|6[034679]|7[17-9]|8[028]|9[579])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^8(?:0(?:33[135-79]|469|53[89]|6(?:3[46-9]|8[679])|79[6-9]|80[1-579]|9(?:3[3579]|9[23579]))|1(?:[89]2[579]|24[1357-9]|3(?:69|7[13579])|47[5-79]|5(?:39|4[13579])|6(?:6[79]|7[13579])|73[579]))$"
+        ],
+        "examples": [
+          "80331",
+          "80333",
+          "80335"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 75,
+        "notes": "Munich = 80331-81929. Enumerated from 75 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Berlin",
+      "state_province": "Berlin",
+      "iso3166_2": "DE-BE",
+      "country": "Germany",
+      "iso3166_1": "DE",
+      "latitude": 52.52,
+      "longitude": 13.405,
+      "local_languages": [
+        "de"
       ],
-      "examples": ["63101", "63102", "63103"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 68,
-      "notes": "St. Louis = 631xx. Enumerated from 68 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Tampa",
-    "state_province": "Florida",
-    "iso3166_2": "US-FL",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 27.9506,
-    "longitude": -82.4572,
-    "local_languages": ["en-US", "es-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^336(?:0[1-9]|1\\d|2[0-69]|3[013-57]|4[67]|5[05]|6[0-4]|7[2-579]|8[0-24-9]|94)$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^1(?:0(?:[68]2[3579]|1(?:1[579]|7[89])|3(?:1[57-9]|6[579])|4[03][579]|5(?:5[13579]|8[579])|7(?:[07][79]|[18][13579]))|1011|2(?:0(?:4[3579]|5[13579]|99)|1(?:[06][13579]|5[79])|2(?:[47][79]|0[3579])|3(?:0[579]|4[79]|5[13579])|4(?:3[579]|59|8[79])|5(?:2[4679]|5[579]|8[79])|6(?:[17]9|2[1379]|8[13579]))|3(?:0(?:5[13579]|8[689])|1(?:2[579]|5[689]|8[79])|3(?:4[79]|5[13579])|4(?:[36][579]|0[3579])|5(?:[89][13579]|0[3579])|62[79])|4(?:0(?:5[023579]|89)|1(?:[02]9|[69][3579]|31)))$"
+        ],
+        "examples": [
+          "10115",
+          "10117",
+          "10119"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 182,
+        "notes": "Berlin = 10115-14199. Enumerated from 182 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Cologne",
+      "state_province": "North Rhine-Westphalia",
+      "iso3166_2": "DE-NW",
+      "country": "Germany",
+      "iso3166_1": "DE",
+      "latitude": 50.9375,
+      "longitude": 6.9603,
+      "local_languages": [
+        "de"
       ],
-      "examples": ["33601", "33602", "33603"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 58,
-      "notes": "Tampa = 336xx. Enumerated from 58 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Minneapolis",
-    "state_province": "Minnesota",
-    "iso3166_2": "US-MN",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 44.9778,
-    "longitude": -93.265,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^554(?:[1-4]\\d|0[1-9]|5[04589]|6[07]|7[02-489]|8[03-8])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^5(?:0(?:6(?:6[78]|7[0246-9])|7(?:3[3579]|6[579])|8(?:2[3579]|5[89])|9(?:3[13579]|6[89]|9[679]))|1(?:06[13579]|1[04][3579]))$"
+        ],
+        "examples": [
+          "50667",
+          "50668",
+          "50670"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 45,
+        "notes": "Cologne = 50667-51149. Enumerated from 45 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Bamberg",
+      "state_province": "Bavaria",
+      "iso3166_2": "DE-BY",
+      "country": "Germany",
+      "iso3166_1": "DE",
+      "latitude": 49.8916,
+      "longitude": 10.8916,
+      "local_languages": [
+        "de"
       ],
-      "examples": ["55401", "55402", "55403"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 69,
-      "notes": "Minneapolis = 554xx. Enumerated from 69 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Burlington",
-    "state_province": "Vermont",
-    "iso3166_2": "US-VT",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 44.4759,
-    "longitude": -73.2121,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": ["^0540[12568]$"],
-      "examples": ["05401", "05402", "05405"],
-      "source": "derived from GeoNames postal data (name, r=20km)",
-      "codes_matched": 5,
-      "notes": "Burlington = 054xx. Enumerated from 5 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Portland",
-    "state_province": "Maine",
-    "iso3166_2": "US-ME",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 43.6591,
-    "longitude": -70.2568,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": ["^041(?:0[1-49]|12|2[2-4])$"],
-      "examples": ["04101", "04102", "04103"],
-      "source": "derived from GeoNames postal data (name, r=25km)",
-      "codes_matched": 9,
-      "notes": "Portland, Maine = 041xx. Distinct from Portland, Oregon (972xx). Enumerated from 9 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Atlanta",
-    "state_province": "Georgia",
-    "iso3166_2": "US-GA",
-    "country": "United States",
-    "iso3166_1": "US",
-    "latitude": 33.749,
-    "longitude": -84.388,
-    "local_languages": ["en-US"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
-      "city_regex": [
-        "^3(?:03(?:0[1-9]|1\\d|2[0-24-9]|3[1246-9]|4[0-689]|5[03-578]|6[013489]|7[014578]|8[0458]|9[2468])|11(?:0[67]|26|3[169]|5[06]|9[2356]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^960(?:4[79]|5[02])$"
+        ],
+        "examples": [
+          "96047",
+          "96049",
+          "96050"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 4,
+        "notes": "Bamberg = 96047-96052. Enumerated from 4 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Brussels",
+      "state_province": "Brussels-Capital",
+      "iso3166_2": "BE-BRU",
+      "country": "Belgium",
+      "iso3166_1": "BE",
+      "latitude": 50.8503,
+      "longitude": 4.3517,
+      "local_languages": [
+        "fr",
+        "nl"
       ],
-      "examples": ["30301", "30302", "30303"],
-      "source": "derived from GeoNames postal data (name, r=30km)",
-      "codes_matched": 82,
-      "notes": "Atlanta city = 303xx; the wider metro extends across 303xx-309xx. Enumerated from 82 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Toronto",
-    "state_province": "Ontario",
-    "iso3166_2": "CA-ON",
-    "country": "Canada",
-    "iso3166_1": "CA",
-    "latitude": 43.651,
-    "longitude": -79.347,
-    "local_languages": ["en-CA"],
-    "postal_code": {
-      "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
-      "city_regex": [
-        "^M(?:1[BCEGHJ-NPR-TV-X]|2[HJ-NPR]|3[A-CHJ-N]|4[A-CEGHJ-NPR-TV-Y]|5[A-CEGHJ-NPR-TV-X]|6[A-CEGHJ-NPRS]|7[AY]|8[V-Z]|9[A-CL-NPRVW]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^1(?:0(?:[02-79]0|8[0-3])|1[2-9]0|2[01]0)$"
+        ],
+        "examples": [
+          "1000",
+          "1020",
+          "1030"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=8km)",
+        "codes_matched": 22,
+        "notes": "Brussels-Capital Region = 1000-1210. Enumerated from 22 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Antwerp",
+      "state_province": "Flanders",
+      "iso3166_2": "BE-VLG",
+      "country": "Belgium",
+      "iso3166_1": "BE",
+      "latitude": 51.2194,
+      "longitude": 4.4025,
+      "local_languages": [
+        "nl"
       ],
-      "examples": ["M1B 1A1", "M1C 1A1", "M1E 1A1"],
-      "source": "derived from GeoNames postal data (radius, r=30km)",
-      "codes_matched": 102,
-      "notes": "Toronto = the entire 'M' forward sortation area. Dataset is fsa-level; local delivery unit appended. Enumerated from 102 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Vancouver",
-    "state_province": "British Columbia",
-    "iso3166_2": "CA-BC",
-    "country": "Canada",
-    "iso3166_1": "CA",
-    "latitude": 49.2827,
-    "longitude": -123.1207,
-    "local_languages": ["en-CA"],
-    "postal_code": {
-      "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
-      "city_regex": [
-        "^V(?:5[K-NPR-TV-Z]|6[A-CEGHJ-NPRSZ]|7[GHJ-NPR-TV-Y]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^20(?:[02-6]0|18)$"
+        ],
+        "examples": [
+          "2000",
+          "2018",
+          "2020"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 7,
+        "notes": "City of Antwerp = 2000-2660; 2xxx also covers other Antwerp Province towns. Enumerated from 7 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Bruges",
+      "state_province": "Flanders",
+      "iso3166_2": "BE-VLG",
+      "country": "Belgium",
+      "iso3166_1": "BE",
+      "latitude": 51.2093,
+      "longitude": 3.2247,
+      "local_languages": [
+        "nl"
       ],
-      "examples": ["V5K 1A1", "V5L 1A1", "V5M 1A1"],
-      "source": "derived from GeoNames postal data (sub, r=20km)",
-      "codes_matched": 43,
-      "notes": "Vancouver proper = V5/V6; V7 covers North/West Vancouver and Richmond. Dataset is fsa-level; local delivery unit appended. Enumerated from 43 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Montreal",
-    "state_province": "Quebec",
-    "iso3166_2": "CA-QC",
-    "country": "Canada",
-    "iso3166_1": "CA",
-    "latitude": 45.5017,
-    "longitude": -73.5673,
-    "local_languages": ["fr-CA", "en-CA"],
-    "postal_code": {
-      "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
-      "city_regex": [
-        "^H(?:[1-3][A-CEGHJ-NPR-TV-Z]|0M|4[A-CEGHJ-NPR-TV-XZ]|5[AB]|7[A-CEGHJ-NPR-TV-Y]|8[NPR-TYZ]|9[A-CGHJPRSW]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^8(?:[02]00|3[148]0)$"
+        ],
+        "examples": [
+          "8000",
+          "8200",
+          "8310"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=12km)",
+        "codes_matched": 5,
+        "notes": "Bruges uses discrete codes: 8000 (centre), 8200, 8310, 8340, 8380 (submunicipalities). Enumerated from 5 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "London",
+      "state_province": "England",
+      "iso3166_2": "GB-ENG",
+      "country": "United Kingdom",
+      "iso3166_1": "GB",
+      "latitude": 51.5074,
+      "longitude": -0.1278,
+      "local_languages": [
+        "en-GB"
       ],
-      "examples": ["H0M 1A1", "H1A 1A1", "H1B 1A1"],
-      "source": "derived from GeoNames postal data (radius, r=25km)",
-      "codes_matched": 118,
-      "notes": "Montreal = the entire 'H' forward sortation area. Dataset is fsa-level; local delivery unit appended. Enumerated from 118 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Calgary",
-    "state_province": "Alberta",
-    "iso3166_2": "CA-AB",
-    "country": "Canada",
-    "iso3166_1": "CA",
-    "latitude": 51.0447,
-    "longitude": -114.0719,
-    "local_languages": ["en-CA"],
-    "postal_code": {
-      "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
-      "city_regex": [
-        "^T(?:1Y|2[A-CEGHJ-NPR-TV-Z]|3[A-CEGHJ-NPRS]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+      "postal_code": {
+        "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
+        "city_regex": [
+          "^(?:E(?:1W|C(?:[14][AMNRVY]|2[AMNPRVY]|3[AMNPV]))|SW1[EHPV-Y]|W(?:1[B-DF-HJKS-UW]|C(?:1[ABEHNRVX]|2[ABEHNR]))) ?\\d[A-Z]{2}$"
+        ],
+        "examples": [
+          "E1W 1AA",
+          "EC1A 1AA",
+          "EC1M 1AA"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 58,
+        "notes": "First pattern = inner London postcode areas; second = outer Greater London areas. Dataset is outward-code level; inward code appended. Enumerated from 58 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Bristol",
+      "state_province": "England",
+      "iso3166_2": "GB-ENG",
+      "country": "United Kingdom",
+      "iso3166_1": "GB",
+      "latitude": 51.4545,
+      "longitude": -2.5879,
+      "local_languages": [
+        "en-GB"
       ],
-      "examples": ["T1Y 1A1", "T2A 1A1", "T2B 1A1"],
-      "source": "derived from GeoNames postal data (sub, r=30km)",
-      "codes_matched": 35,
-      "notes": "Calgary uses T1Y, T2A-T2Z and T3A-T3R; the T1/T3 blocks also include nearby communities. Dataset is fsa-level; local delivery unit appended. Enumerated from 35 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Halifax",
-    "state_province": "Nova Scotia",
-    "iso3166_2": "CA-NS",
-    "country": "Canada",
-    "iso3166_1": "CA",
-    "latitude": 44.6488,
-    "longitude": -63.5752,
-    "local_languages": ["en-CA"],
-    "postal_code": {
-      "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
-      "city_regex": ["^B3[HJ-NPRS] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"],
-      "examples": ["B3H 1A1", "B3J 1A1", "B3K 1A1"],
-      "source": "derived from GeoNames postal data (sub, r=25km)",
-      "codes_matched": 9,
-      "notes": "Halifax peninsula/urban = B3x. The wider municipality also uses B2x and B4x. Dataset is fsa-level; local delivery unit appended. Enumerated from 9 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Mexico City",
-    "state_province": "Mexico City",
-    "iso3166_2": "MX-CMX",
-    "country": "Mexico",
-    "iso3166_1": "MX",
-    "latitude": 19.4326,
-    "longitude": -99.1332,
-    "local_languages": ["es-MX"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^(?:0(?:1(?:[0247]\\d|1[0-8]|3[1-478]|5[0-689]|6[0-5]|8[0-24-7]|9[049])|2(?:[13][0-6]|[49]\\d|0[0-24-9]|2[03-6]|5[0-4]|6[03-8]|7[0-35-9]|8[013-7])|3(?:[3479][0-4]|0[0-2]|1[09]|2[02-4]|5\\d|6[0-6]|8[0-24])|4(?:0[0-4]|1[0-2]|2[013-8]|3\\d|4[0-24-9]|5[013]|6[0-6]|7[0-3]|8[013-579]|9[0-8])|5(?:0[0236]|1[0-3]|2[0-46-8]|3[1-467]|5[03]|6[02])|6(?:0\\d|1[047]|2[024578]|3[05]|4[0357]|5[089]|6[09]|7[024689]|8[024-9]|9[029])|7(?:[289]\\d|[3-5][0-8]|0[0-24-9]|1[013-9]|6[02-8]|7[02-9])|8(?:[028][0-4]|1[06-8]|3[0-2]|4[02]|5[0-268]|6[0-25]|7[0-367]|9[0-3])|9(?:[278]\\d|[14][0-8]|0[0-46-9]|3[0-356]|5[0-35-7]|6[02-46-9]|9[0-467]))|1(?:0(?:[04]0|1[013]|2[09]|3[0235-8]|5[08]|6[0-5]|7[0-4]|8[1-4]|9[0-2])|1(?:[17]0|[24]\\d|[38][0-7]|0[04]|5[0-689]|6[0145]|9[1-35])|2(?:0[078]|20)|3(?:0[0367]|1[128]|2[013578]|3[016]|4[13]|55|6[04])|4(?:[03]\\d|1[1-6]|2[0-7]|4[0-68]|6[0-5])|5(?:[48][0-7]|0[0-2]|1[02]|2\\d|3[0-57-9]|5[0-4]|6[0-8]|7[0-5]|9[04-9])|6(?:0[1-57]|10|3[0-4]|4[14]|62|7[1-58]|8[168])))\\d$"
+      "postal_code": {
+        "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
+        "city_regex": [
+          "^BS(?:[1256]|3[12459]?|4[01]) ?\\d[A-Z]{2}$"
+        ],
+        "examples": [
+          "BS1 1AA",
+          "BS2 1AA",
+          "BS3 1AA"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 12,
+        "notes": "BS postcode area (also covers parts of North Somerset / South Gloucestershire). Dataset is outward-code level; inward code appended. Enumerated from 12 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Edinburgh",
+      "state_province": "Scotland",
+      "iso3166_2": "GB-SCT",
+      "country": "United Kingdom",
+      "iso3166_1": "GB",
+      "latitude": 55.9533,
+      "longitude": -3.1883,
+      "local_languages": [
+        "en-GB",
+        "gd"
       ],
-      "examples": ["01000", "01010", "01020"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 1207,
-      "notes": "Mexico City = 01000-16999. Compressed one digit short of full length. Enumerated from 1207 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Tijuana",
-    "state_province": "Baja California",
-    "iso3166_2": "MX-BCN",
-    "country": "Mexico",
-    "iso3166_1": "MX",
-    "latitude": 32.5149,
-    "longitude": -117.0382,
-    "local_languages": ["es-MX"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^22(?:0(?:[23][045]|00|4[46])|1(?:15|2[03-7]|6[03-5]|70|94)|2(?:06|1[04-7]|50)|4(?:0[056]|24|4[046]|57)|5(?:0[04-6]|1[05-7]|2[3-6]|3[04-7]|5[057]|6[03-7])|6(?:0[04-6]|1[046]|2[4-6]|4[03-5]|5[04]|6[03-7]))$"
+      "postal_code": {
+        "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
+        "city_regex": [
+          "^EH(?:[2-9]|1[12]?) ?\\d[A-Z]{2}$"
+        ],
+        "examples": [
+          "EH1 1AA",
+          "EH11 1AA",
+          "EH12 1AA"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 11,
+        "notes": "EH postcode area. Dataset is outward-code level; inward code appended. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Glasgow",
+      "state_province": "Scotland",
+      "iso3166_2": "GB-SCT",
+      "country": "United Kingdom",
+      "iso3166_1": "GB",
+      "latitude": 55.8642,
+      "longitude": -4.2518,
+      "local_languages": [
+        "en-GB",
+        "gd"
       ],
-      "examples": ["22000", "22020", "22024"],
-      "source": "derived from GeoNames postal data (radius, r=20km)",
-      "codes_matched": 85,
-      "notes": "Tijuana = 22000-22699. Enumerated from 85 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Monterrey",
-    "state_province": "Nuevo León",
-    "iso3166_2": "MX-NLE",
-    "country": "Mexico",
-    "iso3166_1": "MX",
-    "latitude": 25.6866,
-    "longitude": -100.3161,
-    "local_languages": ["es-MX"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^64(?:0(?:[235-7]0|0[04679]|1[089]|4[09])|1(?:[239]0|0[024-9]|1[06-9]|4[058]|5[07-9]|6[05-8]|7[08]|8[06])|2(?:[7-9]0|0[04-689]|1[0589]|2[05-9]|3[03-8]|4[04-9]|5[089]|6[04-69])|3(?:[0-257-9]0|3[09]|4[04-9]|6[05-9])|4(?:[0135-79]0|4[02]|8[089])|5(?:[06][08]|[58]0|1[07]|3[06]|4[09]|7[01])|6(?:[06]0|[45][09]|1[089]|2[03])|7(?:[037]0|15|2[03]|5[034]|6[0459]|8[038]|9[08])|8(?:[0-28]0|3[0346]|4[04-69]|5[089]|6[05]|78|9[037-9])|9(?:[1356]0|[04][09]|2[056]|7[089]|8[034679]|9[067]))$"
+      "postal_code": {
+        "country_format_regex": "^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$",
+        "city_regex": [
+          "^G(?:[12][23]?|3[14]?|4[0-24]?|52?) ?\\d[A-Z]{2}$"
+        ],
+        "examples": [
+          "G1 1AA",
+          "G12 1AA",
+          "G13 1AA"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 16,
+        "notes": "G postcode area. Dataset is outward-code level; inward code appended. Enumerated from 16 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Prague",
+      "state_province": "Prague",
+      "iso3166_2": "CZ-10",
+      "country": "Czechia",
+      "iso3166_1": "CZ",
+      "latitude": 50.0755,
+      "longitude": 14.4378,
+      "local_languages": [
+        "cs"
       ],
-      "examples": ["64000", "64004", "64006"],
-      "source": "derived from GeoNames postal data (radius, r=18km)",
-      "codes_matched": 212,
-      "notes": "Monterrey city = 64000-64999; the metro area extends into 65xxx-67xxx. Enumerated from 212 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Guadalajara",
-    "state_province": "Jalisco",
-    "iso3166_2": "MX-JAL",
-    "country": "Mexico",
-    "iso3166_1": "MX",
-    "latitude": 20.6597,
-    "longitude": -103.3496,
-    "local_languages": ["es-MX"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^44(?:009|1(?:[01346-9]0|5[08])|2(?:[0378]0|1[04-9]|2[07]|4[0679]|5[07-9]|6[05-8]|9[089])|3(?:[3-8]0|0[067]|2[09]|9[0589])|4(?:[02457]0|1[09]|3[08]|6[079]|9[03])|5(?:[1268]0|[045][09]|3[058])|6(?:[029]0|[18][09]|3[0589]|4[78]|5[06-9]|6[0578]|7[089])|7(?:[078]0|1[069]|2[03-79]|3[079]|4[08]|5[057]|6[05689]|9[09])|8(?:[046]0|1[0578]|2[0457-9]|7[09]|9[05-9])|9(?:[039]0|[14][089]|2[09]|5[069]|6[0679]|7[078]|8[04-79]))$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3} ?\\d{2}$",
+        "city_regex": [
+          "^1(?:0[0-246-9]\\ 00|1[089]\\ 00|2[08]\\ 00|30\\ 00|4[0-37-9]\\ 00|5(?:[02489]\\ 00|5\\ (?:[23]1|00))|6[0-59]\\ 00|7[01]\\ 00|8[0-246]\\ 00|9(?:[3689]\\ 00|0\\ (?:00|1[1257])))$"
+        ],
+        "examples": [
+          "100 00",
+          "101 00",
+          "102 00"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 52,
+        "notes": "Prague = 100 00 - 199 00. Enumerated from 52 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Pilsen",
+      "state_province": "Plzeň",
+      "iso3166_2": "CZ-32",
+      "country": "Czechia",
+      "iso3166_1": "CZ",
+      "latitude": 49.7384,
+      "longitude": 13.3736,
+      "local_languages": [
+        "cs"
       ],
-      "examples": ["44009", "44100", "44110"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 183,
-      "notes": "Guadalajara city = 44100-44999; Zapopan/Tlaquepaque use 45xxx. Enumerated from 183 observed codes; the country_format_regex is the permissive fallback."
-    }
-  },
-  {
-    "city": "Ensenada",
-    "state_province": "Baja California",
-    "iso3166_2": "MX-BCN",
-    "country": "Mexico",
-    "iso3166_1": "MX",
-    "latitude": 31.8667,
-    "longitude": -116.5964,
-    "local_languages": ["es-MX"],
-    "postal_code": {
-      "country_format_regex": "^\\d{5}$",
-      "city_regex": [
-        "^228(?:[03]0|1[02-589]|2[023]|4[027]|5[0259]|6[03]|7[0239]|8[07-9]|9[578])$"
+      "postal_code": {
+        "country_format_regex": "^\\d{3} ?\\d{2}$",
+        "city_regex": [
+          "^3(?:0[17]\\ 00|1[02]\\ 00)$"
+        ],
+        "examples": [
+          "301 00",
+          "307 00",
+          "310 00"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=10km)",
+        "codes_matched": 4,
+        "notes": "Plzen = 301 00 - 312 00. Enumerated from 4 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Amsterdam",
+      "state_province": "North Holland",
+      "iso3166_2": "NL-NH",
+      "country": "Netherlands",
+      "iso3166_1": "NL",
+      "latitude": 52.3676,
+      "longitude": 4.9041,
+      "local_languages": [
+        "nl"
       ],
-      "examples": ["22800", "22810", "22812"],
-      "source": "derived from GeoNames postal data (radius, r=15km)",
-      "codes_matched": 32,
-      "notes": "Ensenada = 22800-22899. Enumerated from 32 observed codes; the country_format_regex is the permissive fallback."
+      "postal_code": {
+        "country_format_regex": "^\\d{4} ?[A-Z]{2}$",
+        "city_regex": [
+          "^1(?:0(?:[157][1-9]|[29][1-8]|[34][1-7]|6\\d|8[1-367])|10[1-9]) ?[A-Z]{2}$"
+        ],
+        "examples": [
+          "1011 AB",
+          "1012 AB",
+          "1013 AB"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 81,
+        "notes": "Amsterdam = 1000-1109 numeric part. Dataset is 4-digit numeric; letter pair appended. Enumerated from 81 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Copenhagen",
+      "state_province": "Capital Region",
+      "iso3166_2": "DK-84",
+      "country": "Denmark",
+      "iso3166_1": "DK",
+      "latitude": 55.6761,
+      "longitude": 12.5683,
+      "local_languages": [
+        "da"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:1(?:8(?:[017]\\d|2[02-9]|35|5[0-7]|6[0-8])|9(?:[16][0-7]|0[0-689]|2[0-8]|5\\d|7[0-4]))|2000)$"
+        ],
+        "examples": [
+          "1800",
+          "1801",
+          "1802"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=12km)",
+        "codes_matched": 107,
+        "notes": "Copenhagen K = 1000-1499; Frederiksberg and surrounding districts = 1800-2500. Enumerated from 107 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Warsaw",
+      "state_province": "Masovian",
+      "iso3166_2": "PL-MZ",
+      "country": "Poland",
+      "iso3166_1": "PL",
+      "latitude": 52.2297,
+      "longitude": 21.0122,
+      "local_languages": [
+        "pl"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{2}-\\d{3}$",
+        "city_regex": [
+          "^0(?:0\\-(?:[013-7]\\d|2[0-8]|8[0-79]|91)|1\\-(?:[13-57-9]\\d|[02][0-6]|6[0-57-9])|2\\-\\d\\d|3\\-(?:[0-79]\\d|8[0-46-9])|4\\-(?:[0-46-8]\\d|5[0-7]|9[05689]))\\d$"
+        ],
+        "examples": [
+          "00-002",
+          "00-003",
+          "00-004"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 3661,
+        "notes": "Warsaw = 00-001 to 04-999. Compressed one digit short of full length. Enumerated from 3661 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Krakow",
+      "state_province": "Lesser Poland",
+      "iso3166_2": "PL-MA",
+      "country": "Poland",
+      "iso3166_1": "PL",
+      "latitude": 50.0647,
+      "longitude": 19.945,
+      "local_languages": [
+        "pl"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{2}-\\d{3}$",
+        "city_regex": [
+          "^3(?:0\\-(?:[036]\\d|[27][0-589]|1[0-59]|4[0-49]|5[0-8]|8[0-69]|9[0469])|1\\-(?:[45][0-8]|[89]\\d|0[0-7]|1[0-6]|2[0-46-8]|3[0-79]|6[0-579]|7[0-2569]))\\d$"
+        ],
+        "examples": [
+          "30-001",
+          "30-002",
+          "30-003"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 1106,
+        "notes": "Krakow = 30-001 to 31-999. Compressed one digit short of full length. Enumerated from 1106 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Rome",
+      "state_province": "Lazio",
+      "iso3166_2": "IT-62",
+      "country": "Italy",
+      "iso3166_1": "IT",
+      "latitude": 41.9028,
+      "longitude": 12.4964,
+      "local_languages": [
+        "it"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^001(?:[3-9][1-9]|1[89]|2[0-8])$"
+        ],
+        "examples": [
+          "00118",
+          "00119",
+          "00120"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 74,
+        "notes": "Rome = 00118-00199 (00120 = Vatican City, a separate state). Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Milan",
+      "state_province": "Lombardy",
+      "iso3166_2": "IT-25",
+      "country": "Italy",
+      "iso3166_1": "IT",
+      "latitude": 45.4642,
+      "longitude": 9.19,
+      "local_languages": [
+        "it"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^201(?:[2-5][1-9]|6[12])$"
+        ],
+        "examples": [
+          "20121",
+          "20122",
+          "20123"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 38,
+        "notes": "Milan city = 20121-20162. Enumerated from 38 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Barcelona",
+      "state_province": "Catalonia",
+      "iso3166_2": "ES-CT",
+      "country": "Spain",
+      "iso3166_1": "ES",
+      "latitude": 41.3851,
+      "longitude": 2.1734,
+      "local_languages": [
+        "ca",
+        "es"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^080(?:[1-3]\\d|0[1-9]|4[0-2]|7[015]|80)$"
+        ],
+        "examples": [
+          "08001",
+          "08002",
+          "08003"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 46,
+        "notes": "Barcelona city = 08001-08042. Province is 08xxx. Enumerated from 46 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Madrid",
+      "state_province": "Madrid",
+      "iso3166_2": "ES-MD",
+      "country": "Spain",
+      "iso3166_1": "ES",
+      "latitude": 40.4168,
+      "longitude": -3.7038,
+      "local_languages": [
+        "es"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^280(?:[1-4]\\d|0[1-9]|5[0-5]|7[01]|8[0235-7])$"
+        ],
+        "examples": [
+          "28001",
+          "28002",
+          "28003"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 63,
+        "notes": "Madrid city = 28001-28080. Community of Madrid is 28xxx. Enumerated from 63 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Paris",
+      "state_province": "Île-de-France",
+      "iso3166_2": "FR-IDF",
+      "country": "France",
+      "iso3166_1": "FR",
+      "latitude": 48.8566,
+      "longitude": 2.3522,
+      "local_languages": [
+        "fr"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^750(?:[01]\\d|20)$"
+        ],
+        "examples": [
+          "75000",
+          "75001",
+          "75002"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 21,
+        "notes": "Paris = 75001-75020, plus 75116 (a second code for the 16th arrondissement). Enumerated from 21 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Lyon",
+      "state_province": "Auvergne-Rhône-Alpes",
+      "iso3166_2": "FR-ARA",
+      "country": "France",
+      "iso3166_1": "FR",
+      "latitude": 45.764,
+      "longitude": 4.8357,
+      "local_languages": [
+        "fr"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^6900\\d$"
+        ],
+        "examples": [
+          "69000",
+          "69001",
+          "69002"
+        ],
+        "source": "derived from GeoNames postal data (name, r=15km)",
+        "codes_matched": 10,
+        "notes": "Lyon = 69001-69009 (nine arrondissements). Enumerated from 10 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Stockholm",
+      "state_province": "Stockholm",
+      "iso3166_2": "SE-AB",
+      "country": "Sweden",
+      "iso3166_1": "SE",
+      "latitude": 59.3293,
+      "longitude": 18.0686,
+      "local_languages": [
+        "sv"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{3} ?\\d{2}$",
+        "city_regex": [
+          "^1(?:0(?:[569]\\ \\d|[02]\\ [0-7]|1\\ [0-35]|3\\ [0-35-9]|4\\ [02-6]|7\\ [0-26-9])|1(?:[0-2478]\\ \\d|[35]\\ [02-9]|6\\ [0-46-9])|2(?:[17]\\ 2|0\\ [0-36-9]|5\\ 8|6\\ [0-278])|3(?:1\\ [12589]|5\\ 7)|4(?:1\\ [89]|5\\ 8)|6(?:[49]\\ [89]|1\\ 8|2\\ [18]|3\\ 9)|7(?:0\\ 8|1\\ [17]|2\\ [89]|3\\ [13-68])|82\\ 8|95\\ 8)\\d$"
+        ],
+        "examples": [
+          "100 04",
+          "100 05",
+          "100 12"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 1139,
+        "notes": "Stockholm County = 1xx xx. Compressed one digit short of full length. Enumerated from 1139 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Gothenburg",
+      "state_province": "Västra Götaland",
+      "iso3166_2": "SE-O",
+      "country": "Sweden",
+      "iso3166_1": "SE",
+      "latitude": 57.7089,
+      "longitude": 11.9746,
+      "local_languages": [
+        "sv"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{3} ?\\d{2}$",
+        "city_regex": [
+          "^4(?:0(?:[89]\\ \\d|0\\ [1-79]|1\\ [12589]|2\\ [2-7]|3\\ [0-4]|4\\ [0238]|5\\ [0-57-9]|7\\ 0)|1(?:[26]\\ [024-9]|1\\ [0-489]|3\\ [0-2489]|4\\ [025-8]|5\\ \\d|7\\ [0-8]|8\\ [0-47]))\\d$"
+        ],
+        "examples": [
+          "400 10",
+          "400 12",
+          "400 13"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 755,
+        "notes": "Gothenburg = 400 00 - 425 99. Compressed one digit short of full length. Enumerated from 755 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Oslo",
+      "state_province": "Oslo",
+      "iso3166_2": "NO-03",
+      "country": "Norway",
+      "iso3166_1": "NO",
+      "latitude": 59.9139,
+      "longitude": 10.7522,
+      "local_languages": [
+        "no"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^(?:0(?:[56][0-25-9]|0[0-5]|1\\d|2[013-8]|3[0-8]|4[0-24-9]|7[015-9]|8[04-9]|9[015-8])|1(?:[01][015-8]|2[015-9]))\\d$"
+        ],
+        "examples": [
+          "0001",
+          "0010",
+          "0015"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 631,
+        "notes": "Oslo = 0001-1295; the 0xxx block is the city proper. Compressed one digit short of full length. Enumerated from 631 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Dublin",
+      "state_province": "Leinster",
+      "iso3166_2": "IE-L",
+      "country": "Ireland",
+      "iso3166_1": "IE",
+      "latitude": 53.3498,
+      "longitude": -6.2603,
+      "local_languages": [
+        "en",
+        "ga"
+      ],
+      "postal_code": {
+        "country_format_regex": "^(?:D6W|[AC-FHKNPRTV-Y]\\d{2}) ?[0-9AC-FHKNPRTV-Y]{4}$",
+        "city_regex": [
+          "^D(?:0[1-9]|1[0-8]|2[024]|6W) ?[0-9AC-FHKNPRTV-Y]{4}$"
+        ],
+        "examples": [
+          "D01 XY35",
+          "D02 XY35",
+          "D03 XY35"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=25km)",
+        "codes_matched": 22,
+        "notes": "Dublin routing keys: D01-D18, D20, D22, D24 and the exception D6W. Note D19, D21, D23 are not issued. Dataset is routing-key level; unique identifier appended. Enumerated from 22 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Vienna",
+      "state_province": "Vienna",
+      "iso3166_2": "AT-9",
+      "country": "Austria",
+      "iso3166_1": "AT",
+      "latitude": 48.2082,
+      "longitude": 16.3738,
+      "local_languages": [
+        "de-AT"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^1(?:0[1-9]0|1\\d0|2[0-3]0)$"
+        ],
+        "examples": [
+          "1010",
+          "1020",
+          "1030"
+        ],
+        "source": "derived from GeoNames postal data (field)",
+        "codes_matched": 23,
+        "notes": "Vienna = 1010-1230, always ending in 0 (district number x10). Enumerated from 23 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Zurich",
+      "state_province": "Zurich",
+      "iso3166_2": "CH-ZH",
+      "country": "Switzerland",
+      "iso3166_1": "CH",
+      "latitude": 47.3769,
+      "longitude": 8.5417,
+      "local_languages": [
+        "de-CH"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{4}$",
+        "city_regex": [
+          "^80(?:0[0-68]|1[027]|2[247]|3[1246-8]|4[0-24-9]|5[0-3578]|6[034]|7[05]|8[178]|9[0-389])$"
+        ],
+        "examples": [
+          "8000",
+          "8001",
+          "8002"
+        ],
+        "source": "derived from GeoNames postal data (name, r=12km)",
+        "codes_matched": 50,
+        "notes": "City of Zurich = 8001-8064. Enumerated from 50 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Tallinn",
+      "state_province": "Harju",
+      "iso3166_2": "EE-37",
+      "country": "Estonia",
+      "iso3166_1": "EE",
+      "latitude": 59.437,
+      "longitude": 24.7536,
+      "local_languages": [
+        "et"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^(?:1(?:0(?:001|1(?:[2-4]\\d|1[1-9]|5[0-689])|3(?:1[1-9]|2[013])|41[1-6]|6(?:1[1-9]|2[01])|9(?:1[1-9]|2[0-2]))|1(?:[23]1[1-8]|101|41[1-7]|6(?:1[1-9]|2[0-5])|71[1-3]|91[1-4])|2(?:01[1-5]|11[1-3]|6(?:1[1-9]|20)|91[1-9])|3(?:4(?:1[1-9]|2[0-6])|5(?:1[1-9]|2[0-4])|6(?:1[1-9]|2\\d)|81[1267]|91[1-9])|5(?:0(?:[16]5|0[79]|2[69]|30|4[17-9]|5[59]|7[01]|9[4589])|1(?:6[15]|70|8[58]|9[039]))|9086)|7(?:4(?:0(?:0[18]|1[014-69]|20)|20[168])|5(?:3(?:0[1346-8]|1[02]|2[1-357]|31)|4(?:03|12)|511)|69(?:0[12]|1[26]|2[2-4])))$"
+        ],
+        "examples": [
+          "10001",
+          "10111",
+          "10112"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=12km)",
+        "codes_matched": 289,
+        "notes": "Tallinn = 10xxx-13xxx. Enumerated from 289 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Denver",
+      "state_province": "Colorado",
+      "iso3166_2": "US-CO",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 39.7392,
+      "longitude": -104.9903,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^802(?:[23]\\d|0[1-9]|1[0-24-9]|4[346-9]|5[0-2679]|6[0-6]|7[134]|81|9[01349])$"
+        ],
+        "examples": [
+          "80201",
+          "80202",
+          "80203"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 66,
+        "notes": "Denver = 80202-80249 plus 80290-80299. Enumerated from 66 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Portland",
+      "state_province": "Oregon",
+      "iso3166_2": "US-OR",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 45.5152,
+      "longitude": -122.6784,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^972(?:[59][0-468]|0[1-9]|1\\d|2[0-57-9]|3[0-3689]|4[02]|6[6-9]|8[0-36])$"
+        ],
+        "examples": [
+          "97201",
+          "97202",
+          "97203"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 60,
+        "notes": "Portland, Oregon = 972xx. Enumerated from 60 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "San Diego",
+      "state_province": "California",
+      "iso3166_2": "US-CA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 32.7157,
+      "longitude": -117.1611,
+      "local_languages": [
+        "en-US",
+        "es-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^921(?:0[1-9]|1[0-79]|2[0-469]|3[0-24-9]|4[02579]|5[02-589]|6[0135-9]|7[0-24-79]|8[267]|9[0-35-9])$"
+        ],
+        "examples": [
+          "92101",
+          "92102",
+          "92103"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 74,
+        "notes": "San Diego = 921xx. Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Asheville",
+      "state_province": "North Carolina",
+      "iso3166_2": "US-NC",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 35.5951,
+      "longitude": -82.5515,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^288(?:0[1-6]|1[03-6])$"
+        ],
+        "examples": [
+          "28801",
+          "28802",
+          "28803"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 11,
+        "notes": "Asheville = 28801-28816. Enumerated from 11 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Grand Rapids",
+      "state_province": "Michigan",
+      "iso3166_2": "US-MI",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 42.9634,
+      "longitude": -85.6681,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^495(?:0[1-8]|1[024-68]|2[358]|3[04]|4[468]|55|60|88|99)$"
+        ],
+        "examples": [
+          "49501",
+          "49502",
+          "49503"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 26,
+        "notes": "Grand Rapids = 495xx. Enumerated from 26 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Chicago",
+      "state_province": "Illinois",
+      "iso3166_2": "US-IL",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 41.8781,
+      "longitude": -87.6298,
+      "local_languages": [
+        "en-US",
+        "es-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^60(?:6(?:0[1-9]|1\\d|2[0-689]|3[0-46-9]|4[0-79]|5[1-79]|6[014689]|7[03-578]|8[0-24-9]|9[013-79])|701)$"
+        ],
+        "examples": [
+          "60601",
+          "60602",
+          "60603"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 84,
+        "notes": "Chicago = 606xx-608xx. Enumerated from 84 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Seattle",
+      "state_province": "Washington",
+      "iso3166_2": "US-WA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^981(?:[01][1-9]|2[124-79]|3[134689]|4[14-68]|5[458]|6[014-68]|7[04578]|8[158]|9[014589])$"
+        ],
+        "examples": [
+          "98101",
+          "98102",
+          "98103"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 59,
+        "notes": "Seattle = 981xx. Enumerated from 59 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Austin",
+      "state_province": "Texas",
+      "iso3166_2": "US-TX",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 30.2672,
+      "longitude": -97.7431,
+      "local_languages": [
+        "en-US",
+        "es-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^7(?:33(?:01|44)|87(?:[1-356]\\d|0[1-589]|4[124-9]|7[2-489]|83|99))$"
+        ],
+        "examples": [
+          "73301",
+          "73344",
+          "78701"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 74,
+        "notes": "Austin = 787xx. Enumerated from 74 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Boston",
+      "state_province": "Massachusetts",
+      "iso3166_2": "US-MA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 42.3601,
+      "longitude": -71.0589,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^02(?:1(?:[36]3|0[89]|1[0-8]|2[378]|9[69])|2(?:0[13-6]|1[0-257]|22|41|66|8[34]|9[378]))$"
+        ],
+        "examples": [
+          "02108",
+          "02109",
+          "02110"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 36,
+        "notes": "Boston = 021xx and 022xx. Enumerated from 36 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Philadelphia",
+      "state_province": "Pennsylvania",
+      "iso3166_2": "US-PA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 39.9526,
+      "longitude": -75.1652,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^19(?:0(?:19|9[239])|1(?:[2-4]\\d|0[1-9]|1[0-689]|5[0-5]|6[0-2]|7[0-35-9]|8[1-578]|9[0-7])|2(?:44|55))$"
+        ],
+        "examples": [
+          "19019",
+          "19092",
+          "19093"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 87,
+        "notes": "Philadelphia = 191xx. Enumerated from 87 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Brooklyn",
+      "state_province": "New York",
+      "iso3166_2": "US-NY",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 40.6782,
+      "longitude": -73.9442,
+      "local_languages": [
+        "en-US",
+        "es-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^112(?:[13]\\d|0[1-9]|2[0-689]|4[1-3579]|5[126])$"
+        ],
+        "examples": [
+          "11201",
+          "11202",
+          "11203"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 47,
+        "notes": "Brooklyn = 112xx. Enumerated from 47 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Milwaukee",
+      "state_province": "Wisconsin",
+      "iso3166_2": "US-WI",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 43.0389,
+      "longitude": -87.9065,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^532(?:0[1-9]|1\\d|2[0-8]|3[347]|59|6[378]|7[48]|88|9[035])$"
+        ],
+        "examples": [
+          "53201",
+          "53202",
+          "53203"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 41,
+        "notes": "Milwaukee = 532xx. Enumerated from 41 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Richmond",
+      "state_province": "Virginia",
+      "iso3166_2": "US-VA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 37.5407,
+      "longitude": -77.436,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^23(?:173|2(?:1[89]|2[0-7]|3[024-7]|4[19]|50|6[019]|7[4689]|8[24-69]|9[0-3578]))$"
+        ],
+        "examples": [
+          "23173",
+          "23218",
+          "23219"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 39,
+        "notes": "Richmond = 232xx. Enumerated from 39 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Cincinnati",
+      "state_province": "Ohio",
+      "iso3166_2": "US-OH",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 39.1031,
+      "longitude": -84.512,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^45(?:2(?:[01][1-9]|[34]\\d|2[0-79]|5[0-58]|6[2-47-9]|7[013-57]|80|9[689])|999)$"
+        ],
+        "examples": [
+          "45201",
+          "45202",
+          "45203"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 71,
+        "notes": "Cincinnati = 452xx. Enumerated from 71 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "St. Louis",
+      "state_province": "Missouri",
+      "iso3166_2": "US-MO",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 38.627,
+      "longitude": -90.1994,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^631(?:[1-3]\\d|0[1-9]|4[013-7]|5[015-8]|6[034679]|7[17-9]|8[028]|9[579])$"
+        ],
+        "examples": [
+          "63101",
+          "63102",
+          "63103"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 68,
+        "notes": "St. Louis = 631xx. Enumerated from 68 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Tampa",
+      "state_province": "Florida",
+      "iso3166_2": "US-FL",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 27.9506,
+      "longitude": -82.4572,
+      "local_languages": [
+        "en-US",
+        "es-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^336(?:0[1-9]|1\\d|2[0-69]|3[013-57]|4[67]|5[05]|6[0-4]|7[2-579]|8[0-24-9]|94)$"
+        ],
+        "examples": [
+          "33601",
+          "33602",
+          "33603"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 58,
+        "notes": "Tampa = 336xx. Enumerated from 58 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Minneapolis",
+      "state_province": "Minnesota",
+      "iso3166_2": "US-MN",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 44.9778,
+      "longitude": -93.265,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^554(?:[1-4]\\d|0[1-9]|5[04589]|6[07]|7[02-489]|8[03-8])$"
+        ],
+        "examples": [
+          "55401",
+          "55402",
+          "55403"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 69,
+        "notes": "Minneapolis = 554xx. Enumerated from 69 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Burlington",
+      "state_province": "Vermont",
+      "iso3166_2": "US-VT",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 44.4759,
+      "longitude": -73.2121,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^0540[12568]$"
+        ],
+        "examples": [
+          "05401",
+          "05402",
+          "05405"
+        ],
+        "source": "derived from GeoNames postal data (name, r=20km)",
+        "codes_matched": 5,
+        "notes": "Burlington = 054xx. Enumerated from 5 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Portland",
+      "state_province": "Maine",
+      "iso3166_2": "US-ME",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 43.6591,
+      "longitude": -70.2568,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^041(?:0[1-49]|12|2[2-4])$"
+        ],
+        "examples": [
+          "04101",
+          "04102",
+          "04103"
+        ],
+        "source": "derived from GeoNames postal data (name, r=25km)",
+        "codes_matched": 9,
+        "notes": "Portland, Maine = 041xx. Distinct from Portland, Oregon (972xx). Enumerated from 9 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Atlanta",
+      "state_province": "Georgia",
+      "iso3166_2": "US-GA",
+      "country": "United States",
+      "iso3166_1": "US",
+      "latitude": 33.749,
+      "longitude": -84.388,
+      "local_languages": [
+        "en-US"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}(?:-\\d{4})?$",
+        "city_regex": [
+          "^3(?:03(?:0[1-9]|1\\d|2[0-24-9]|3[1246-9]|4[0-689]|5[03-578]|6[013489]|7[014578]|8[0458]|9[2468])|11(?:0[67]|26|3[169]|5[06]|9[2356]))$"
+        ],
+        "examples": [
+          "30301",
+          "30302",
+          "30303"
+        ],
+        "source": "derived from GeoNames postal data (name, r=30km)",
+        "codes_matched": 82,
+        "notes": "Atlanta city = 303xx; the wider metro extends across 303xx-309xx. Enumerated from 82 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Toronto",
+      "state_province": "Ontario",
+      "iso3166_2": "CA-ON",
+      "country": "Canada",
+      "iso3166_1": "CA",
+      "latitude": 43.651,
+      "longitude": -79.347,
+      "local_languages": [
+        "en-CA"
+      ],
+      "postal_code": {
+        "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
+        "city_regex": [
+          "^M(?:1[BCEGHJ-NPR-TV-X]|2[HJ-NPR]|3[A-CHJ-N]|4[A-CEGHJ-NPR-TV-Y]|5[A-CEGHJ-NPR-TV-X]|6[A-CEGHJ-NPRS]|7[AY]|8[V-Z]|9[A-CL-NPRVW]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+        ],
+        "examples": [
+          "M1B 1A1",
+          "M1C 1A1",
+          "M1E 1A1"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=30km)",
+        "codes_matched": 102,
+        "notes": "Toronto = the entire 'M' forward sortation area. Dataset is fsa-level; local delivery unit appended. Enumerated from 102 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Vancouver",
+      "state_province": "British Columbia",
+      "iso3166_2": "CA-BC",
+      "country": "Canada",
+      "iso3166_1": "CA",
+      "latitude": 49.2827,
+      "longitude": -123.1207,
+      "local_languages": [
+        "en-CA"
+      ],
+      "postal_code": {
+        "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
+        "city_regex": [
+          "^V(?:5[K-NPR-TV-Z]|6[A-CEGHJ-NPRSZ]|7[GHJ-NPR-TV-Y]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+        ],
+        "examples": [
+          "V5K 1A1",
+          "V5L 1A1",
+          "V5M 1A1"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=20km)",
+        "codes_matched": 43,
+        "notes": "Vancouver proper = V5/V6; V7 covers North/West Vancouver and Richmond. Dataset is fsa-level; local delivery unit appended. Enumerated from 43 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Montreal",
+      "state_province": "Quebec",
+      "iso3166_2": "CA-QC",
+      "country": "Canada",
+      "iso3166_1": "CA",
+      "latitude": 45.5017,
+      "longitude": -73.5673,
+      "local_languages": [
+        "fr-CA",
+        "en-CA"
+      ],
+      "postal_code": {
+        "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
+        "city_regex": [
+          "^H(?:[1-3][A-CEGHJ-NPR-TV-Z]|0M|4[A-CEGHJ-NPR-TV-XZ]|5[AB]|7[A-CEGHJ-NPR-TV-Y]|8[NPR-TYZ]|9[A-CGHJPRSW]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+        ],
+        "examples": [
+          "H0M 1A1",
+          "H1A 1A1",
+          "H1B 1A1"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=25km)",
+        "codes_matched": 118,
+        "notes": "Montreal = the entire 'H' forward sortation area. Dataset is fsa-level; local delivery unit appended. Enumerated from 118 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Calgary",
+      "state_province": "Alberta",
+      "iso3166_2": "CA-AB",
+      "country": "Canada",
+      "iso3166_1": "CA",
+      "latitude": 51.0447,
+      "longitude": -114.0719,
+      "local_languages": [
+        "en-CA"
+      ],
+      "postal_code": {
+        "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
+        "city_regex": [
+          "^T(?:1Y|2[A-CEGHJ-NPR-TV-Z]|3[A-CEGHJ-NPRS]) ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+        ],
+        "examples": [
+          "T1Y 1A1",
+          "T2A 1A1",
+          "T2B 1A1"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=30km)",
+        "codes_matched": 35,
+        "notes": "Calgary uses T1Y, T2A-T2Z and T3A-T3R; the T1/T3 blocks also include nearby communities. Dataset is fsa-level; local delivery unit appended. Enumerated from 35 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Halifax",
+      "state_province": "Nova Scotia",
+      "iso3166_2": "CA-NS",
+      "country": "Canada",
+      "iso3166_1": "CA",
+      "latitude": 44.6488,
+      "longitude": -63.5752,
+      "local_languages": [
+        "en-CA"
+      ],
+      "postal_code": {
+        "country_format_regex": "^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$",
+        "city_regex": [
+          "^B3[HJ-NPRS] ?\\d[ABCEGHJ-NPRSTV-Z]\\d$"
+        ],
+        "examples": [
+          "B3H 1A1",
+          "B3J 1A1",
+          "B3K 1A1"
+        ],
+        "source": "derived from GeoNames postal data (sub, r=25km)",
+        "codes_matched": 9,
+        "notes": "Halifax peninsula/urban = B3x. The wider municipality also uses B2x and B4x. Dataset is fsa-level; local delivery unit appended. Enumerated from 9 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Mexico City",
+      "state_province": "Mexico City",
+      "iso3166_2": "MX-CMX",
+      "country": "Mexico",
+      "iso3166_1": "MX",
+      "latitude": 19.4326,
+      "longitude": -99.1332,
+      "local_languages": [
+        "es-MX"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^(?:0(?:1(?:[0247]\\d|1[0-8]|3[1-478]|5[0-689]|6[0-5]|8[0-24-7]|9[049])|2(?:[13][0-6]|[49]\\d|0[0-24-9]|2[03-6]|5[0-4]|6[03-8]|7[0-35-9]|8[013-7])|3(?:[3479][0-4]|0[0-2]|1[09]|2[02-4]|5\\d|6[0-6]|8[0-24])|4(?:0[0-4]|1[0-2]|2[013-8]|3\\d|4[0-24-9]|5[013]|6[0-6]|7[0-3]|8[013-579]|9[0-8])|5(?:0[0236]|1[0-3]|2[0-46-8]|3[1-467]|5[03]|6[02])|6(?:0\\d|1[047]|2[024578]|3[05]|4[0357]|5[089]|6[09]|7[024689]|8[024-9]|9[029])|7(?:[289]\\d|[3-5][0-8]|0[0-24-9]|1[013-9]|6[02-8]|7[02-9])|8(?:[028][0-4]|1[06-8]|3[0-2]|4[02]|5[0-268]|6[0-25]|7[0-367]|9[0-3])|9(?:[278]\\d|[14][0-8]|0[0-46-9]|3[0-356]|5[0-35-7]|6[02-46-9]|9[0-467]))|1(?:0(?:[04]0|1[013]|2[09]|3[0235-8]|5[08]|6[0-5]|7[0-4]|8[1-4]|9[0-2])|1(?:[17]0|[24]\\d|[38][0-7]|0[04]|5[0-689]|6[0145]|9[1-35])|2(?:0[078]|20)|3(?:0[0367]|1[128]|2[013578]|3[016]|4[13]|55|6[04])|4(?:[03]\\d|1[1-6]|2[0-7]|4[0-68]|6[0-5])|5(?:[48][0-7]|0[0-2]|1[02]|2\\d|3[0-57-9]|5[0-4]|6[0-8]|7[0-5]|9[04-9])|6(?:0[1-57]|10|3[0-4]|4[14]|62|7[1-58]|8[168])))\\d$"
+        ],
+        "examples": [
+          "01000",
+          "01010",
+          "01020"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 1207,
+        "notes": "Mexico City = 01000-16999. Compressed one digit short of full length. Enumerated from 1207 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Tijuana",
+      "state_province": "Baja California",
+      "iso3166_2": "MX-BCN",
+      "country": "Mexico",
+      "iso3166_1": "MX",
+      "latitude": 32.5149,
+      "longitude": -117.0382,
+      "local_languages": [
+        "es-MX"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^22(?:0(?:[23][045]|00|4[46])|1(?:15|2[03-7]|6[03-5]|70|94)|2(?:06|1[04-7]|50)|4(?:0[056]|24|4[046]|57)|5(?:0[04-6]|1[05-7]|2[3-6]|3[04-7]|5[057]|6[03-7])|6(?:0[04-6]|1[046]|2[4-6]|4[03-5]|5[04]|6[03-7]))$"
+        ],
+        "examples": [
+          "22000",
+          "22020",
+          "22024"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=20km)",
+        "codes_matched": 85,
+        "notes": "Tijuana = 22000-22699. Enumerated from 85 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Monterrey",
+      "state_province": "Nuevo León",
+      "iso3166_2": "MX-NLE",
+      "country": "Mexico",
+      "iso3166_1": "MX",
+      "latitude": 25.6866,
+      "longitude": -100.3161,
+      "local_languages": [
+        "es-MX"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^64(?:0(?:[235-7]0|0[04679]|1[089]|4[09])|1(?:[239]0|0[024-9]|1[06-9]|4[058]|5[07-9]|6[05-8]|7[08]|8[06])|2(?:[7-9]0|0[04-689]|1[0589]|2[05-9]|3[03-8]|4[04-9]|5[089]|6[04-69])|3(?:[0-257-9]0|3[09]|4[04-9]|6[05-9])|4(?:[0135-79]0|4[02]|8[089])|5(?:[06][08]|[58]0|1[07]|3[06]|4[09]|7[01])|6(?:[06]0|[45][09]|1[089]|2[03])|7(?:[037]0|15|2[03]|5[034]|6[0459]|8[038]|9[08])|8(?:[0-28]0|3[0346]|4[04-69]|5[089]|6[05]|78|9[037-9])|9(?:[1356]0|[04][09]|2[056]|7[089]|8[034679]|9[067]))$"
+        ],
+        "examples": [
+          "64000",
+          "64004",
+          "64006"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=18km)",
+        "codes_matched": 212,
+        "notes": "Monterrey city = 64000-64999; the metro area extends into 65xxx-67xxx. Enumerated from 212 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Guadalajara",
+      "state_province": "Jalisco",
+      "iso3166_2": "MX-JAL",
+      "country": "Mexico",
+      "iso3166_1": "MX",
+      "latitude": 20.6597,
+      "longitude": -103.3496,
+      "local_languages": [
+        "es-MX"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^44(?:009|1(?:[01346-9]0|5[08])|2(?:[0378]0|1[04-9]|2[07]|4[0679]|5[07-9]|6[05-8]|9[089])|3(?:[3-8]0|0[067]|2[09]|9[0589])|4(?:[02457]0|1[09]|3[08]|6[079]|9[03])|5(?:[1268]0|[045][09]|3[058])|6(?:[029]0|[18][09]|3[0589]|4[78]|5[06-9]|6[0578]|7[089])|7(?:[078]0|1[069]|2[03-79]|3[079]|4[08]|5[057]|6[05689]|9[09])|8(?:[046]0|1[0578]|2[0457-9]|7[09]|9[05-9])|9(?:[039]0|[14][089]|2[09]|5[069]|6[0679]|7[078]|8[04-79]))$"
+        ],
+        "examples": [
+          "44009",
+          "44100",
+          "44110"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 183,
+        "notes": "Guadalajara city = 44100-44999; Zapopan/Tlaquepaque use 45xxx. Enumerated from 183 observed codes; the country_format_regex is the permissive fallback."
+      }
+    },
+    {
+      "city": "Ensenada",
+      "state_province": "Baja California",
+      "iso3166_2": "MX-BCN",
+      "country": "Mexico",
+      "iso3166_1": "MX",
+      "latitude": 31.8667,
+      "longitude": -116.5964,
+      "local_languages": [
+        "es-MX"
+      ],
+      "postal_code": {
+        "country_format_regex": "^\\d{5}$",
+        "city_regex": [
+          "^228(?:[03]0|1[02-589]|2[023]|4[027]|5[0259]|6[03]|7[0239]|8[07-9]|9[578])$"
+        ],
+        "examples": [
+          "22800",
+          "22810",
+          "22812"
+        ],
+        "source": "derived from GeoNames postal data (radius, r=15km)",
+        "codes_matched": 32,
+        "notes": "Ensenada = 22800-22899. Enumerated from 32 observed codes; the country_format_regex is the permissive fallback."
+      }
     }
-  }
-]
+  ]
+}

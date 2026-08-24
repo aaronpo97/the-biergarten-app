@@ -4,54 +4,16 @@
  */
 
 #include <chrono>
-#include <cmath>
 #include <format>
-#include <numbers>
 #include <optional>
 #include <random>
 
 #include "biergarten_pipeline_orchestrator.h"
+#include "biergarten_pipeline_orchestrator/coords.h"
 #include "services/logging/logger.h"
 
-struct Coords {
-   double longitude;
-   double latitude;
-};
-
-// @todo find a better home for this
-namespace {
-constexpr double kEarthRadiusKm = 6371.0;
-
-double DegreesToRadians(double degrees) {
-   return degrees * std::numbers::pi / 180.0;
-}
-
-double RadiansToDegrees(double radians) {
-   return radians * 180.0 / std::numbers::pi;
-}
-}  // namespace
-
-static Coords GetRandomCoordsWithinRange(const Coords& centre,
-                                         const int distance_km,
-                                         std::mt19937& rng) {
-   std::uniform_real_distribution<double> angle_dist(0.0,
-                                                     2.0 * std::numbers::pi);
-   std::uniform_real_distribution<double> unit_dist(0.0, 1.0);
-
-   const double angle_radians = angle_dist(rng);
-   // sqrt() keeps points uniformly distributed over the disc's area rather
-   // than clustering near the centre.
-   const double radius_km = distance_km * std::sqrt(unit_dist(rng));
-
-   const double delta_latitude_degrees =
-       RadiansToDegrees(radius_km * std::cos(angle_radians) / kEarthRadiusKm);
-   const double delta_longitude_degrees = RadiansToDegrees(
-       radius_km * std::sin(angle_radians) /
-       (kEarthRadiusKm * std::cos(DegreesToRadians(centre.latitude))));
-
-   return Coords{.longitude = centre.longitude + delta_longitude_degrees,
-                 .latitude = centre.latitude + delta_latitude_degrees};
-}
+using biergarten_pipeline_orchestrator_internal::Coords;
+using biergarten_pipeline_orchestrator_internal::GetRandomCoordsWithinRange;
 
 void BiergartenPipelineOrchestrator::GenerateBreweries(
     std::span<const EnrichedCity> cities) {
@@ -70,8 +32,6 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
       try {
          const BreweryResult brewery =
              generator_->GenerateBrewery(enriched_city);
-         const std::string postal_code =
-             postal_code_service_->GeneratePostalCode(enriched_city.location);
 
          constexpr int kMaxDistanceFromCentreKm = 5;
          const Coords city_centre{.longitude = enriched_city.location.longitude,
@@ -81,7 +41,6 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
 
          return BreweryRecord{
              .address = BreweryAddress{.city = enriched_city.location,
-                                       .postal_code = postal_code,
                                        .longitude = brewery_coords.longitude,
                                        .latitude = brewery_coords.latitude},
              .brewery = brewery};

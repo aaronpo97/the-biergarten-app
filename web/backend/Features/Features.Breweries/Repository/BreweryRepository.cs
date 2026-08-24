@@ -283,7 +283,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
         catch
         {
-            await transaction.RollbackAsync();
+            await RollbackQuietlyAsync(transaction);
             throw;
         }
 
@@ -418,8 +418,25 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
         catch
         {
-            await transaction.RollbackAsync();
+            await RollbackQuietlyAsync(transaction);
             throw;
+        }
+    }
+
+    /// <summary>
+    ///     Rolls back <paramref name="transaction" />, swallowing any exception the rollback itself
+    ///     raises (for example when the provider has already completed the transaction after a
+    ///     connection failure) so the exception that triggered the rollback is what propagates.
+    /// </summary>
+    private static async Task RollbackQuietlyAsync(DbTransaction transaction)
+    {
+        try
+        {
+            await transaction.RollbackAsync();
+        }
+        catch
+        {
+            // Ignore: the original exception (rethrown by the caller) is what matters here.
         }
     }
 

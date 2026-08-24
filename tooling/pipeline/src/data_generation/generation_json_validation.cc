@@ -55,9 +55,7 @@ std::string CondenseWhitespace(std::string_view text) {
    return out;
 }
 
-// Guard against truncating in the first half of the string.
-// This preserves the critical opening content and avoids cutting critical
-// context words early in the region description.
+// Keeps truncation past the string's midpoint, preserving the critical opening content.
 constexpr size_t kTruncationGuardDivisor = 2;
 
 bool ReadRequiredTrimmedStringField(const boost::json::object& obj,

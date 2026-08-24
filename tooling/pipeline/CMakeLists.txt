@@ -32,7 +32,9 @@ else()
         if(CUDAToolkit_FOUND)
                 message(STATUS "[biergarten] NVIDIA GPU detected — enabling CUDA acceleration.")
                 set(GGML_CUDA ON CACHE BOOL "Enable CUDA for NVIDIA GPUs" FORCE)
-                set(CMAKE_CUDA_ARCHITECTURES native)
+                if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+                        set(CMAKE_CUDA_ARCHITECTURES native)
+                endif()
         elseif(hip_FOUND OR DEFINED ENV{ROCM_PATH} OR EXISTS "/opt/rocm")
                 message(STATUS "[biergarten] AMD GPU detected — enabling HIP/ROCm acceleration.")
                 set(GGML_HIPBLAS ON CACHE BOOL "Enable HIP for AMD GPUs" FORCE)
@@ -149,7 +151,6 @@ add_executable(${PROJECT_NAME}
 target_sources(${PROJECT_NAME} PRIVATE
         src/main.cc
 )
-
 # --- json_handling ---
 target_sources(${PROJECT_NAME} PRIVATE
         src/services/curated_data/curated_json_data_service.cc
@@ -222,11 +223,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/services/enrichment/wikipedia/wikipedia_service.cc
         src/services/enrichment/wikipedia/fetch_extract.cc
         src/services/enrichment/wikipedia/get_summary.cc
-)
-
-# --- services: postal_code ---
-target_sources(${PROJECT_NAME} PRIVATE
-        src/services/postal_code/xeger_postal_code_service.cc
 )
 
 # --- services: xeger ---

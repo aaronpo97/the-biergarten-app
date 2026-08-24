@@ -1,4 +1,5 @@
 using Database.Seed.DatabaseHelpers;
+using Database.Seed.Geocoding;
 using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
@@ -15,6 +16,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
+
+const string NominatimUserAgent =
+    "TheBiergartenApp-Seeder/1.0 (+https://github.com/aaronpo97/the-biergarten-app)";
 
 return await RunAsync();
 
@@ -100,23 +104,34 @@ static async Task<int> RunAsync()
                 }
             );
 
-        await AnsiConsole
-            .Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("green"))
-            .StartAsync(
-                "Loading brewery data into target database...",
-                async ctx =>
-                {
-                    await LoadBreweriesIntoDatabaseAsync(
-                        breweryRepository,
-                        locationRepository,
-                        seedData.Breweries,
-                        postedByIds
-                    );
-                    ctx.Status("Brewery data loaded into target database.");
-                }
-            );
+        List<string> geocodingWarnings = [];
+
+        using (NominatimReverseGeocoder geocoder = new(NominatimUserAgent))
+        {
+            await AnsiConsole
+                .Status()
+                .Spinner(Spinner.Known.Dots)
+                .SpinnerStyle(Style.Parse("green"))
+                .StartAsync(
+                    "Loading brewery data into target database...",
+                    async ctx =>
+                    {
+                        await LoadBreweriesIntoDatabaseAsync(
+                            breweryRepository,
+                            locationRepository,
+                            geocoder,
+                            seedData.Breweries,
+                            postedByIds,
+                            geocodingWarnings,
+                            ctx
+                        );
+                        ctx.Status("Brewery data loaded into target database.");
+                    }
+                );
+        }
+
+        foreach (string warning in geocodingWarnings)
+            AnsiConsole.MarkupLine($"[yellow]![/] {warning.EscapeMarkup()}");
 
         return 0;
     }
@@ -165,20 +180,18 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
     return userAccountIds;
 }
 
-/// <summary>
-///     Persists each <paramref name="breweries" /> record, resolving (and creating, if needed) its
-///     Country/StateProvince/City chain via <paramref name="locationRepository" />. The pipeline
-///     data has no street-level address or a specific user tied to each brewery, so a placeholder
-///     address is used and <c>PostedById</c> is assigned round-robin from <paramref name="posterUserIds" />
-///     to keep seeding deterministic across runs.
-/// </summary>
 static async Task LoadBreweriesIntoDatabaseAsync(
     IBreweryRepository breweryRepository,
     ILocationRepository locationRepository,
+    NominatimReverseGeocoder geocoder,
     IReadOnlyList<BreweryRecord> breweries,
-    IReadOnlyList<Guid> posterUserIds
+    IReadOnlyList<Guid> posterUserIds,
+    List<string> geocodingWarnings,
+    StatusContext ctx
 )
 {
+    const string placeholderAddressLine1 = "Address unavailable";
+
     if (posterUserIds.Count == 0)
         throw new InvalidOperationException(
             "Cannot load breweries without any registered users.");
@@ -186,6 +199,10 @@ static async Task LoadBreweriesIntoDatabaseAsync(
     for (int i = 0; i < breweries.Count; i++)
     {
         BreweryRecord breweryRecord = breweries[i];
+
+        ctx.Status(
+            $"Geocoding and loading brewery {i + 1}/{breweries.Count} into target database..."
+        );
 
         Guid cityId = await locationRepository.GetOrCreateCityIdAsync(
             new CityLocation(
@@ -197,6 +214,18 @@ static async Task LoadBreweriesIntoDatabaseAsync(
             )
         );
 
+        ReverseGeocodeResult? geocoded = await geocoder.ReverseGeocodeAsync(
+            breweryRecord.Address.Longitude,
+            breweryRecord.Address.Latitude
+        );
+
+        if (geocoded is null)
+            geocodingWarnings.Add(
+                $"Could not reverse geocode '{breweryRecord.Brewery.NameEn}' "
+                    + $"({breweryRecord.Address.Latitude}, {breweryRecord.Address.Longitude}); "
+                    + "using a placeholder address."
+            );
+
         await breweryRepository.CreateAsync(
             new BreweryPost
             {
@@ -204,12 +233,13 @@ static async Task LoadBreweriesIntoDatabaseAsync(
                 BreweryName = breweryRecord.Brewery.NameEn,
                 Description = breweryRecord.Brewery.DescriptionEn,
                 PostedById = posterUserIds[i % posterUserIds.Count],
+                // TODO: Populate Coordinates from breweryRecord.Address.Latitude/Longitude once it goes through NetTopologySuite (NTS).
                 Location = new BreweryPostLocation
                 {
                     BreweryPostLocationId = Guid.NewGuid(),
                     CityId = cityId,
-                    AddressLine1 = "Address unavailable",
-                    PostalCode = breweryRecord.Address.PostalCode,
+                    AddressLine1 = geocoded?.AddressLine1 ?? placeholderAddressLine1,
+                    PostalCode = geocoded?.PostalCode ?? string.Empty,
                 },
             }
         );
@@ -224,7 +254,8 @@ static Table BuildBreweryTable(IReadOnlyList<BreweryRecord> breweries)
         .AddColumn("City")
         .AddColumn("State/Province")
         .AddColumn("Country")
-        .AddColumn("Postal Code");
+        .AddColumn("Longitude")
+        .AddColumn("Latitude");
 
     foreach (BreweryRecord brewery in breweries)
     {
@@ -234,7 +265,8 @@ static Table BuildBreweryTable(IReadOnlyList<BreweryRecord> breweries)
             brewery.Address.City.CityName,
             brewery.Address.City.StateProvince,
             brewery.Address.City.Country,
-            brewery.Address.PostalCode
+            brewery.Address.Longitude.ToString("F6"),
+            brewery.Address.Latitude.ToString("F6")
         );
     }
 

@@ -61,10 +61,7 @@
 #include "services/enrichment/mock_enrichment.h"
 #include "services/enrichment/wikipedia_service.h"
 
-// --- services: postal_code ---
-#include "services/postal_code/mock_postal_code_service.h"
-#include "services/postal_code/postal_code_service.h"
-#include "services/postal_code/xeger_postal_code_service.h"
+// --- services: xeger ---
 #include "services/xeger/xeger.h"
 
 // --- services: logging ---

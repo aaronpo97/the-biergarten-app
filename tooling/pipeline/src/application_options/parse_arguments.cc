@@ -38,9 +38,8 @@ std::optional<ApplicationOptions> ParseArguments(
           "Number of layers to offload to GPU");
    };
 
-   // --mocked, --model, and --openai are mutually exclusive; validation is
-   // enforced below rather than at registration to produce a clear
-   // diagnostic message.
+   // --mocked, --model, and --openai are mutually exclusive, validated below
+   // to produce a clear diagnostic message.
    auto add_generator_options = [&]() -> void {
       opt("mocked", prog_opts::bool_switch(),
           "Use mocked generator for brewery/user data");
@@ -154,9 +153,7 @@ std::optional<ApplicationOptions> ParseArguments(
          return std::nullopt;
       }
 
-      // Prompt directory is only meaningful for live inference (Llama or
-      // OpenAI) — the mock generator has no use for it and should not
-      // require it to be present.
+      // Prompt directory is required only for live inference (Llama or OpenAI).
       if (!use_mocked && options.pipeline.prompt_dir.empty()) {
          const std::string msg =
              "Invalid arguments: --prompt-dir is required when not using "

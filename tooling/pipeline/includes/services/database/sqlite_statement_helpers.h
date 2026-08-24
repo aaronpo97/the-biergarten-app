@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS brewery_addresses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   brewery_id INTEGER NOT NULL,
   city_id INTEGER NOT NULL,
-  postal_code TEXT NOT NULL,
   longitude REAL NOT NULL,
   latitude REAL NOT NULL,
   FOREIGN KEY(brewery_id) REFERENCES breweries(id) ON DELETE CASCADE,
@@ -90,7 +89,8 @@ CREATE TABLE IF NOT EXISTS user_addresses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   city_id INTEGER NOT NULL,
-  postal_code TEXT NOT NULL,
+  longitude REAL NOT NULL,
+  latitude REAL NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY(city_id) REFERENCES cities(id) ON DELETE CASCADE
 );
@@ -130,10 +130,9 @@ inline constexpr std::string_view kInsertBreweryAddressSql = R"sql(
 INSERT INTO brewery_addresses (
   brewery_id,
   city_id,
-  postal_code,
   longitude,
   latitude
-) VALUES (?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?);
 )sql";
 
 inline constexpr std::string_view kInsertUserSql = R"sql(
@@ -153,8 +152,9 @@ inline constexpr std::string_view kInsertUserAddressSql = R"sql(
 INSERT INTO user_addresses (
   user_id,
   city_id,
-  postal_code
-) VALUES (?, ?, ?);
+  longitude,
+  latitude
+) VALUES (?, ?, ?, ?);
 )sql";
 
 // sqlite3_bind_*() parameter indices are 1-based, matching the "?"
@@ -182,7 +182,6 @@ enum BreweryBindIndex {
 enum BreweryAddressBindIndex {
    kBreweryAddressBreweryIdBindIndex = 1,
    kBreweryAddressCityIdBindIndex,
-   kBreweryAddressPostalCodeBindIndex,
    kBreweryAddressLongitudeBindIndex,
    kBreweryAddressLatitudeBindIndex,
 };
@@ -201,7 +200,8 @@ enum UserBindIndex {
 enum UserAddressBindIndex {
    kUserAddressUserIdBindIndex = 1,
    kUserAddressCityIdBindIndex,
-   kUserAddressPostalCodeBindIndex,
+   kUserAddressLongitudeBindIndex,
+   kUserAddressLatitudeBindIndex,
 };
 
 SqliteStatementHandle PrepareStatement(const SqliteDatabaseHandle& db_handle,

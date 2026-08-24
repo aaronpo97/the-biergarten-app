@@ -77,12 +77,11 @@ static PostalCodeSpec ReadPostalCodeSpec(const boost::json::object& object) {
 }
 
 namespace {
-boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
-                                 const char* what) {
+boost::json::value ParseJsonFile(const std::filesystem::path& filepath) {
    std::ifstream input(filepath);
    if (!input.is_open()) {
       throw std::runtime_error(
-          std::format("Failed to open {} file: {}", what, filepath.string()));
+          std::format("Failed to open file: {}",  filepath.string()));
    }
 
    std::stringstream buffer;
@@ -92,7 +91,7 @@ boost::json::value ParseJsonFile(const std::filesystem::path& filepath,
    boost::json::value root = boost::json::parse(buffer.str(), error);
    if (error) {
       throw std::runtime_error(
-          std::format("Failed to parse {} JSON: {}", what, error.message()));
+          std::format("Failed to parse JSON: {}", error.message()));
    }
    return root;
 }
@@ -126,34 +125,47 @@ const LocationsList& CuratedJsonDataService::LoadLocations() {
    if (!cache_.locations.empty()) {
       return cache_.locations;
    }
+   boost::json::value root_val =
+       ParseJsonFile(filepaths_.locations_path);
 
-   const boost::json::value root =
-       ParseJsonFile(filepaths_.locations_path, "locations");
-
-   if (!root.is_array()) {
+   if (!root_val.is_object()) {
       throw std::runtime_error(
-          "Invalid locations JSON: root element must be an array");
+          "Invalid locations JSON: root element must be an object");
    }
 
-   LocationsList locations;
-   const auto& items = root.as_array();
-   locations.reserve(items.size());
+   boost::json::object root_obj = root_val.as_object();
 
-   for (const auto& item : items) {
+   if (!root_obj.contains("cities"))
+   {
+      throw std::runtime_error(
+          "Invalid locations JSON: root object must contain a 'cities' key");
+   }
+
+   if (!root_obj["cities"].is_array())
+   {
+      throw std::runtime_error(
+          "Invalid locations JSON: 'cities' key must be an array");
+   }
+   
+   LocationsList locations;
+   const boost::json::array& cities = root_obj["cities"].as_array();
+   locations.reserve(cities.size());
+
+   for (const boost::json::value& item : cities) {
       if (!item.is_object()) {
          throw std::runtime_error(
              "Invalid locations JSON: each entry must be an object");
       }
 
-      const auto& object = item.as_object();
+      const boost::json::object& object = item.as_object();
       locations.push_back(City{
           .city = ReadRequiredString(object, "city"),
           .state_province = ReadRequiredString(object, "state_province"),
           .iso3166_2 = ReadRequiredString(object, "iso3166_2"),
           .country = ReadRequiredString(object, "country"),
           .iso3166_1 = ReadRequiredString(object, "iso3166_1"),
-          .latitude = ReadRequiredDouble(object, "latitude"),
           .longitude = ReadRequiredDouble(object, "longitude"),
+          .latitude = ReadRequiredDouble(object, "latitude"),
           .local_languages = ReadRequiredStringArray(object, "local_languages"),
           .postal_code = ReadPostalCodeSpec(object),
       });
@@ -168,7 +180,7 @@ const PersonasList& CuratedJsonDataService::LoadPersonas() {
    }
 
    const boost::json::value root =
-       ParseJsonFile(filepaths_.personas_path, "personas");
+       ParseJsonFile(filepaths_.personas_path);
 
    if (!root.is_array()) {
       throw std::runtime_error(
@@ -176,10 +188,10 @@ const PersonasList& CuratedJsonDataService::LoadPersonas() {
    }
 
    PersonasList personas;
-   const auto& items = root.as_array();
+   const boost::json::array& items = root.as_array();
    personas.reserve(items.size());
 
-   for (const auto& item : items) {
+   for (const boost::json::value& item : items) {
       if (!item.is_object()) {
          throw std::runtime_error(
              "Invalid personas JSON: each entry must be an object");
@@ -204,7 +216,7 @@ const ForenamesByCountryMap& CuratedJsonDataService::LoadForenamesByCountry() {
    }
 
    const boost::json::value root =
-       ParseJsonFile(filepaths_.forenames_path, "forenames-by-country");
+       ParseJsonFile(filepaths_.forenames_path);
 
    if (!root.is_object()) {
       throw std::runtime_error(
@@ -252,7 +264,7 @@ const SurnamesByCountryMap& CuratedJsonDataService::LoadSurnamesByCountry() {
    }
 
    const boost::json::value root =
-       ParseJsonFile(filepaths_.surnames_path, "surnames-by-country");
+       ParseJsonFile(filepaths_.surnames_path);
 
    if (!root.is_object()) {
       throw std::runtime_error(
