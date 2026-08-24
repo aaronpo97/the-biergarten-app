@@ -13,19 +13,29 @@ participant "MediatR pipeline\n(ValidationBehavior)" as Mediator
 box "Handler Layer" #LightBlue
 participant "RegisterUserHandler" as RegHandler
 participant "LoginHandler" as LoginHandler
+participant "UserManager<ApplicationUser>" as UserMgr
 participant "TokenService" as TokenSvc
 end box
 box "Infrastructure Layer" #LightGreen
-participant "Argon2\nInfrastructure" as Argon2
+participant "Argon2PasswordHasher" as Argon2
 participant "JWT\nInfrastructure" as JWT
 participant "Email\nProvider" as SMTP
 participant "Template\nProvider" as Template
 end box
 box "Repository / Cross-slice" #LightYellow
-participant "AuthRepository" as AuthRepo
+participant "DapperUserStore\n(IUserStore/IUserPasswordStore/\nIUserEmailStore)" as UserStore
 participant "EmailDispatcher\n(Features.Emails)" as EmailDispatcher
 end box
 database "SQL Server" as DB
+
+note over UserMgr
+  ASP.NET Core Identity's UserManager<TUser>
+  replaces the deleted AuthRepository: handlers
+  no longer issue SQL or call Argon2 directly,
+  they delegate to UserManager, which in turn
+  calls DapperUserStore (persistence) and
+  Argon2PasswordHasher (IPasswordHasher<TUser>).
+end note
 
 == Registration Flow ==
 
@@ -51,71 +61,83 @@ else Validation succeeds
   Mediator -> RegHandler: Handle(command)
   activate RegHandler
 
-  RegHandler -> AuthRepo: GetUserByUsernameAsync(username)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
-  activate DB
-  DB --> AuthRepo: null (user doesn't exist)
-  deactivate DB
-  deactivate AuthRepo
+  RegHandler -> RegHandler: user = new UserAccount{...}\n.ToApplicationUser()
 
-  RegHandler -> AuthRepo: GetUserByEmailAsync(email)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Email = @Email
-  activate DB
-  DB --> AuthRepo: null (email doesn't exist)
-  deactivate DB
-  deactivate AuthRepo
+  RegHandler -> UserMgr: CreateAsync(user, password)
+  activate UserMgr
 
-  alt Username or email already exists
-    RegHandler -> Mediator: throw ConflictException
+  UserMgr -> Argon2: HashPassword(user, password)
+  activate Argon2
+  note right of Argon2
+    Delegates to IPasswordInfrastructure.Hash:
+    Argon2id parameters:
+    - Salt: 16 bytes (128-bit)
+    - Memory: 64MB
+    - Iterations: 4
+    - Parallelism: CPU count
+    - Hash output: 32 bytes
+  end note
+  Argon2 --> UserMgr: "base64(salt):base64(hash)"
+  deactivate Argon2
+
+  UserMgr -> UserStore: SetPasswordHashAsync(user, hash)
+  note right of UserStore
+    user.Id is still empty at this point -
+    only sets the in-memory hash. CreateAsync
+    writes it to dbo.UserCredential itself.
+  end note
+
+  UserMgr -> UserStore: FindByNameAsync(username)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
+  activate DB
+  DB --> UserStore: null (user doesn't exist)
+  deactivate DB
+  deactivate UserStore
+
+  UserMgr -> UserStore: FindByEmailAsync(email)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Email = @Email
+  activate DB
+  DB --> UserStore: null (email doesn't exist)
+  deactivate DB
+  deactivate UserStore
+  note right of UserMgr
+    Default UserManager validators check
+    uniqueness before CreateAsync is called;
+    DapperUserStore.CreateAsync also guards
+    against a genuine race via a caught
+    duplicate-key SqlException (2601/2627).
+  end note
+
+  UserMgr -> UserStore: CreateAsync(user)
+  activate UserStore
+
+  UserStore -> DB: BEGIN TRANSACTION
+  activate DB
+  UserStore -> DB: INSERT INTO dbo.UserAccount\n(Username, FirstName, LastName,\nDateOfBirth, Email)\nOUTPUT INSERTED.UserAccountID
+  DB --> UserStore: UserAccountId (GUID)
+  UserStore -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
+  UserStore -> DB: COMMIT TRANSACTION
+  deactivate DB
+  note right of UserStore
+    Both statements run via Dapper's
+    ExecuteScalarAsync/ExecuteAsync against
+    a single DbTransaction, not a stored
+    procedure - no manual parameter binding
+  end note
+
+  UserStore --> UserMgr: IdentityResult.Success\n(user.Id set)
+  deactivate UserStore
+
+  UserMgr --> RegHandler: IdentityResult
+  deactivate UserMgr
+
+  alt !result.Succeeded
+    RegHandler -> Mediator: throw ConflictException\n(DuplicateUserName/DuplicateEmail codes ->\n"Username or email already exists";\notherwise joined error descriptions)
     Mediator -> API: propagate
     API -> User: 409 Conflict\n"Username or email already exists"
-  else Username and email are free
-
-    RegHandler -> Argon2: Hash(password)
-    activate Argon2
-    note right of Argon2
-      Argon2id parameters:
-      - Salt: 16 bytes (128-bit)
-      - Memory: 64MB
-      - Iterations: 4
-      - Parallelism: CPU count
-      - Hash output: 32 bytes
-    end note
-    Argon2 -> Argon2: Generate random salt\n(16 bytes)
-    Argon2 -> Argon2: Hash password with\nArgon2id algorithm
-    Argon2 --> RegHandler: "base64(salt):base64(hash)"
-    deactivate Argon2
-
-    RegHandler -> AuthRepo: RegisterUserAsync(userAccount)
-    activate AuthRepo
-
-    AuthRepo -> DB: BEGIN TRANSACTION
-    activate DB
-    AuthRepo -> DB: INSERT INTO dbo.UserAccount\n(Username, FirstName, LastName,\nDateOfBirth, Email)\nOUTPUT INSERTED.UserAccountID
-    DB --> AuthRepo: UserAccountId (GUID)
-    AuthRepo -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
-    AuthRepo -> DB: COMMIT TRANSACTION
-    deactivate DB
-    note right of AuthRepo
-      All three statements run via Dapper's
-      ExecuteScalarAsync/ExecuteAsync against
-      a single DbTransaction, not a stored
-      procedure - no manual parameter binding
-    end note
-
-    AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @UserAccountId
-    activate DB
-    note right of DB
-      Round trip to load the row the
-      INSERT just created
-    end note
-    DB --> AuthRepo: UserAccount row
-    deactivate DB
-
-    AuthRepo --> RegHandler: UserAccount entity
-    deactivate AuthRepo
+  else result.Succeeded
 
     RegHandler -> TokenSvc: GenerateAccessToken(user)
     activate TokenSvc
@@ -242,13 +264,19 @@ else Validation succeeds
   Mediator -> LoginHandler: Handle(command)
   activate LoginHandler
 
-  LoginHandler -> AuthRepo: GetUserByUsernameAsync(username)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
+  LoginHandler -> UserMgr: FindByNameAsync(username)
+  activate UserMgr
+  UserMgr -> UserStore: FindByNameAsync(username)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
   activate DB
-  DB --> AuthRepo: UserAccount row or null
+  DB --> UserStore: UserAccount row or null
   deactivate DB
-  deactivate AuthRepo
+  UserStore -> UserStore: HydrateAsync\n(load active UserCredential.Hash,\nUserVerification -> EmailConfirmed)
+  UserStore --> UserMgr: ApplicationUser or null
+  deactivate UserStore
+  UserMgr --> LoginHandler: ApplicationUser or null
+  deactivate UserMgr
 
   alt User not found
     LoginHandler -> Mediator: throw UnauthorizedException\n"Invalid username or password."
@@ -256,41 +284,34 @@ else Validation succeeds
     API -> User: 401 Unauthorized
   else User found
 
-    LoginHandler -> AuthRepo: GetActiveCredentialByUserAccountIdAsync(userId)
-    activate AuthRepo
-    AuthRepo -> DB: SELECT UserCredentialId, UserAccountId,\nHash, CreatedAt, RowVersion\nFROM dbo.UserCredential\nWHERE UserAccountId = @UserAccountId\n  AND IsRevoked = 0
-    activate DB
-    DB --> AuthRepo: UserCredential row or null
-    deactivate DB
-    deactivate AuthRepo
+    LoginHandler -> UserMgr: CheckPasswordAsync(user, password)
+    activate UserMgr
+    note right of UserMgr
+      HasPasswordAsync short-circuits to false
+      (no active UserCredential was hydrated)
+      without calling the hasher; otherwise
+      delegates to Argon2PasswordHasher.
+    end note
+    UserMgr -> Argon2: VerifyHashedPassword(\n  user, user.PasswordHash, password)
+    activate Argon2
+    note right of Argon2
+      Delegates to IPasswordInfrastructure.Verify:
+      1. Split stored hash: "salt:hash"
+      2. Hash provided password with the same salt
+      3. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
+    end note
+    Argon2 --> UserMgr: Success/Failed
+    deactivate Argon2
+    UserMgr --> LoginHandler: true/false
+    deactivate UserMgr
 
-    alt No active credential
+    alt Password invalid
       LoginHandler -> Mediator: throw UnauthorizedException
       Mediator -> API: propagate
       API -> User: 401 Unauthorized
-    else Active credential found
+    else Password valid
 
-      LoginHandler -> Argon2: Verify(password, storedHash)
-      activate Argon2
-      note right of Argon2
-        1. Split stored hash: "salt:hash"
-        2. Extract salt
-        3. Hash provided password\n   with same salt
-        4. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
-      end note
-      Argon2 -> Argon2: Parse salt from stored hash
-      Argon2 -> Argon2: Hash provided password\nwith extracted salt
-      Argon2 -> Argon2: FixedTimeEquals(\n  computed, stored)
-      Argon2 --> LoginHandler: true/false
-      deactivate Argon2
-
-      alt Password invalid
-        LoginHandler -> Mediator: throw UnauthorizedException
-        Mediator -> API: propagate
-        API -> User: 401 Unauthorized
-      else Password valid
-
-        LoginHandler -> TokenSvc: GenerateAccessToken(user)
+      LoginHandler -> TokenSvc: GenerateAccessToken(user)
         activate TokenSvc
         TokenSvc -> JWT: GenerateJwt(...)
         activate JWT
@@ -317,7 +338,6 @@ else Validation succeeds
       end
     end
   end
-end
 deactivate API
 
 == Error Handling (Global Exception Filter) ==
