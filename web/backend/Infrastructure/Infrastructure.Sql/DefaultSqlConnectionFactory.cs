@@ -26,7 +26,6 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlCon
     /// <exception cref="InvalidOperationException">Thrown when no connection string can be resolved from any source.</exception>
     private static string GetConnectionString(IConfiguration configuration)
     {
-        // Check for full connection string first
         string? fullConnectionString = configuration["DB_CONNECTION_STRING"];
         if (!string.IsNullOrEmpty(fullConnectionString))
             return fullConnectionString;

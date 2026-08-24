@@ -4,9 +4,6 @@ using MediatR;
 
 namespace Features.UserManagement.Queries.GetAllUsers;
 
-/// <summary>
-///     Handles <see cref="GetAllUsersQuery" />.
-/// </summary>
 public class GetAllUsersHandler(IUserAccountRepository repository)
     : IRequestHandler<GetAllUsersQuery, IEnumerable<UserAccount>>
 {

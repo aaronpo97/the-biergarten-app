@@ -39,7 +39,6 @@ public class JwtAuthenticationHandler(
         if (string.IsNullOrWhiteSpace(secret))
             return AuthenticateResult.Fail("JWT secret is not configured");
 
-        // Check if Authorization header exists
         if (!Request.Headers.TryGetValue("Authorization", out StringValues authHeaderValue))
             return AuthenticateResult.Fail("Authorization header is missing");
 

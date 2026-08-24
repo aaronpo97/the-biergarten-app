@@ -38,9 +38,6 @@ public static class SqlConnectionStringHelper
         return builder.ConnectionString;
     }
 
-    /// <summary>
-    ///     Builds a connection string to the master database using configuration.
-    /// </summary>
     public static string BuildMasterConnectionString(IConfiguration configuration)
     {
         return BuildConnectionString(configuration, "master");

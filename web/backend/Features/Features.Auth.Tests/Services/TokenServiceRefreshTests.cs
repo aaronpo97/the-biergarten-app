@@ -62,12 +62,10 @@ public class TokenServiceRefreshTests
 
         ApplicationUser user = new() { Id = userId, UserName = username };
 
-        // Mock the validation of refresh token
         _tokenInfraMock
             .Setup(x => x.ValidateJwtAsync(refreshToken, It.IsAny<string>()))
             .ReturnsAsync(principal);
 
-        // Mock the generation of new tokens
         _tokenInfraMock
             .Setup(x => x.GenerateJwt(userId, username, It.IsAny<DateTime>(), It.IsAny<string>()))
             .Returns(

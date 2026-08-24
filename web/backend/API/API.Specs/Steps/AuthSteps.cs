@@ -264,7 +264,6 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitALoginRequestUsingAgetRequest()
     {
         HttpClient client = GetClient();
-        // testing GET
         HttpRequestMessage requestMessage = new(HttpMethod.Get, "/api/auth/login")
         {
             Content = new StringContent("{}", Encoding.UTF8, "application/json"),
@@ -703,7 +702,6 @@ public class AuthSteps(ScenarioContext scenario)
     [Given("I have an access token signed with the wrong secret")]
     public void GivenIHaveAnAccessTokenSignedWithTheWrongSecret()
     {
-        // Create a token with a different secret
         scenario["accessToken"] =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     }

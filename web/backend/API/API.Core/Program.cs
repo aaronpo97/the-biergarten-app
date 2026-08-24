@@ -61,7 +61,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddOpenApi();
 
-// Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
@@ -80,7 +79,6 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
-// Add health checks
 builder.Services.AddHealthChecks();
 
 // Configure logging for container output
@@ -101,10 +99,8 @@ builder.Services.AddFeaturesEmails();
 // ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
 
-// Register the exception filter
 builder.Services.AddScoped<GlobalExceptionFilter>();
 
-// Configure JWT Authentication
 builder
     .Services.AddAuthentication("JWT")
     .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>("JWT", options => { });
@@ -128,7 +124,6 @@ app.MapHealthChecks("/health");
 app.MapControllers();
 app.MapFallbackToController("Handle404", "NotFound");
 
-// Graceful shutdown handling
 IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 lifetime.ApplicationStopping.Register(() =>
 {

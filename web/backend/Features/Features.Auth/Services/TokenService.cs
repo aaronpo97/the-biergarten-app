@@ -20,7 +20,6 @@ public class TokenService : ITokenService
     private readonly ITokenInfrastructure _tokenInfrastructure;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    /// <summary>Initializes a new instance of the <see cref="TokenService" /> class.</summary>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when any of the <c>ACCESS_TOKEN_SECRET</c>, <c>REFRESH_TOKEN_SECRET</c>, or
     ///     <c>CONFIRMATION_TOKEN_SECRET</c> configuration values are not set.

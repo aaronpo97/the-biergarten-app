@@ -190,7 +190,6 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
 
             if (brewery.Location is null)
             {
-                // No location supplied: clear any existing location for this brewery.
                 await connection.ExecuteAsync(
                     new CommandDefinition(
                         """

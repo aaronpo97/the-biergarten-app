@@ -15,7 +15,6 @@ public class TestApiFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            // Replace the real email provider with mock for testing
             ServiceDescriptor? emailProviderDescriptor = services.SingleOrDefault(d =>
                 d.ServiceType == typeof(IEmailProvider)
             );
@@ -25,7 +24,6 @@ public class TestApiFactory : WebApplicationFactory<Program>
 
             services.AddScoped<IEmailProvider, MockEmailProvider>();
 
-            // Replace the real email dispatcher with mock for testing
             ServiceDescriptor? emailDispatcherDescriptor = services.SingleOrDefault(d =>
                 d.ServiceType == typeof(IEmailDispatcher)
             );

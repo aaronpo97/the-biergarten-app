@@ -93,14 +93,12 @@ public class SmtpEmailProvider : IEmailProvider
 
         try
         {
-            // Determine the SecureSocketOptions based on SSL setting
             SecureSocketOptions secureSocketOptions = _useSsl
                 ? SecureSocketOptions.StartTls
                 : SecureSocketOptions.None;
 
             await client.ConnectAsync(_host, _port, secureSocketOptions);
 
-            // Authenticate if credentials are provided
             if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password))
                 await client.AuthenticateAsync(_username, _password);
 
