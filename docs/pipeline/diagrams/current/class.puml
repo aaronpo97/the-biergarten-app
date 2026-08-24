@@ -35,11 +35,19 @@ class BiergartenPipelineOrchestrator {
   - generated_breweries_ : std::vector<BreweryRecord>
   - generated_users_ : std::vector<UserRecord>
   + Run() : bool
-  - QueryCitiesWithCountries() : std::vector<Location>
+  - QueryLocations() : std::vector<City>
   - GenerateBreweries(cities : std::span<const EnrichedCity>) : void
   - GenerateUsers(cities : std::span<const EnrichedCity>) : void
-  - LogResults() : void
+  - LogResults() const : void
 }
+
+note right of BiergartenPipelineOrchestrator
+  GenerateBreweries and GenerateUsers both call the
+  free function GetRandomCoordsWithinRange()
+  (biergarten_pipeline_orchestrator/coords.h) to jitter
+  a coordinate pair uniformly within 5km of the city
+  centre for each generated record's address.
+end note
 
 class LogLevel <<enumeration>> {
   Debug
@@ -50,6 +58,7 @@ class LogLevel <<enumeration>> {
 
 class PipelinePhase <<enumeration>> {
   Startup
+  Enrichment
   UserGeneration
   BreweryAndBeerGeneration
   CheckinGeneration
@@ -115,12 +124,12 @@ class HttpWebClient {
 }
 
 interface DataGenerator <<interface>> {
-  + GenerateBrewery(location : const Location&, region_context : const std::string&) : BreweryResult
+  + GenerateBrewery(city : const EnrichedCity&) : BreweryResult
   + GenerateUser(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult
 }
 
 class MockGenerator {
-  + GenerateBrewery(location : const Location&, region_context : const std::string&) : BreweryResult
+  + GenerateBrewery(city : const EnrichedCity&) : BreweryResult
   + GenerateUser(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult
   - DeterministicHash(location : const Location&) : size_t
   - DeterministicHash(location : const Location&, persona : const UserPersona&, name : const Name&) : size_t
@@ -138,6 +147,25 @@ class LlamaGenerator {
   - Infer(...) : std::string
   - InferFormatted(...) : std::string
 }
+
+class OpenAIGenerator {
+  - api_key_ : std::string
+  - model_ : std::string
+  - logger_ : std::shared_ptr<ILogger>
+  - prompt_directory_ : std::unique_ptr<IPromptDirectory>
+  - web_client_ : std::unique_ptr<WebClient>
+  + GenerateBrewery(city : const EnrichedCity&) : BreweryResult
+  + GenerateUser(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult
+  - CallChatCompletionsApi(...) : std::string
+}
+
+note right of OpenAIGenerator
+  Chat Completions with Structured Outputs
+  (response_format: json_schema, strict: true)
+  guarantees schema-valid JSON, replacing
+  llama.cpp's GBNF grammar constraint -
+  no IPromptFormatter needed.
+end note
 
 interface IPromptFormatter <<interface>> {
   + Format(system_prompt : std::string_view, user_prompt : std::string_view) : std::string
@@ -252,9 +280,13 @@ WebClient <|.. HttpWebClient : implements
 
 DataGenerator <|.. MockGenerator : implements
 DataGenerator <|.. LlamaGenerator : implements
+DataGenerator <|.. OpenAIGenerator : implements
 
 LlamaGenerator *-- IPromptFormatter : uses
 LlamaGenerator *-- IPromptDirectory : uses
+
+OpenAIGenerator *-- IPromptDirectory : uses
+OpenAIGenerator *-- WebClient : uses
 
 IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
 IPromptDirectory <|.. PromptDirectory : implements
