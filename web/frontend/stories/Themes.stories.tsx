@@ -53,7 +53,6 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                     <p className="text-sm text-base-content/70">{vibe}</p>
                 </div>
 
-                {/* Core palette */}
                 <div>
                     <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
                         Core
@@ -69,7 +68,6 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                     </div>
                 </div>
 
-                {/* Status tokens */}
                 <div>
                     <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
                         Status
@@ -82,7 +80,6 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                     </div>
                 </div>
 
-                {/* Content tokens (custom) */}
                 <div>
                     <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
                         Content
