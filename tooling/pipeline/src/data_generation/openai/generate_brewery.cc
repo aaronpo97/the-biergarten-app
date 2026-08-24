@@ -17,8 +17,7 @@
 
 namespace {
 
-std::string FormatLocalLanguageCodes(
-    const std::vector<std::string>& codes) {
+std::string FormatLocalLanguageCodes(const std::vector<std::string>& codes) {
    if (codes.empty()) {
       return "Not provided";
    }
@@ -36,7 +35,8 @@ std::string FormatLocalLanguageCodes(
 
 constexpr int kBreweryMaxTokens = 2800;
 
-// Structured outputs already guarantee schema-valid JSON, so retries here only cover transient failures or the model returning placeholder text.
+// Structured outputs already guarantee schema-valid JSON, so retries here only
+// cover transient failures or the model returning placeholder text.
 constexpr int kMaxAttempts = 2;
 
 }  // namespace
@@ -51,7 +51,8 @@ BreweryResult OpenAIGenerator::GenerateBrewery(
        FormatLocalLanguageCodes(location.local_languages);
 
    /**
-    * Loads the backend-agnostic brewery system prompt via the injected prompt directory.
+    * Loads the backend-agnostic brewery system prompt via the injected prompt
+    * directory.
     */
    const std::string system_prompt =
        prompt_directory_->Load("BREWERY_GENERATION");
@@ -70,9 +71,9 @@ BreweryResult OpenAIGenerator::GenerateBrewery(
    std::string last_error;
 
    for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
-      raw = CallChatCompletionsApi(system_prompt, user_prompt,
-                                   kBreweryJsonSchema, "brewery_result",
-                                   kBreweryMaxTokens);
+      raw =
+          CallChatCompletionsApi(system_prompt, user_prompt, kBreweryJsonSchema,
+                                 "brewery_result", kBreweryMaxTokens);
       if (logger_) {
          logger_->Log({.level = LogLevel::Debug,
                        .phase = PipelinePhase::BreweryAndBeerGeneration,

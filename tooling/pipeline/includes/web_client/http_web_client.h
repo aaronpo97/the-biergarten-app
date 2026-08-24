@@ -51,10 +51,9 @@ class HttpWebClient final : public WebClient {
     * @param headers Additional request headers.
     * @return Response body on HTTP 2xx; throws std::runtime_error otherwise.
     */
-   std::string Post(
-       const std::string& url, const std::string& body,
-       const std::vector<std::pair<std::string, std::string>>& headers)
-       override;
+   std::string Post(const std::string& url, const std::string& body,
+                    const std::vector<std::pair<std::string, std::string>>&
+                        headers) override;
 
    /**
     * @brief Percent-encodes a single URI component (query parameter value or

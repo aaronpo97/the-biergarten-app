@@ -8,13 +8,12 @@
 
 #include <algorithm>
 #include <array>
+#include <boost/json.hpp>
 #include <cctype>
 #include <format>
 #include <span>
 #include <string>
 #include <string_view>
-
-#include <boost/json.hpp>
 
 namespace {
 std::string Trim(std::string_view value) {
@@ -55,7 +54,8 @@ std::string CondenseWhitespace(std::string_view text) {
    return out;
 }
 
-// Keeps truncation past the string's midpoint, preserving the critical opening content.
+// Keeps truncation past the string's midpoint, preserving the critical opening
+// content.
 constexpr size_t kTruncationGuardDivisor = 2;
 
 bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
@@ -64,8 +64,7 @@ bool ReadRequiredTrimmedStringField(const boost::json::object& obj,
    const boost::json::value* field = obj.if_contains(key);
    if (field == nullptr || !field->is_string()) {
       if (error_out != nullptr) {
-         *error_out =
-             std::format("Missing or invalid string field: {}", key);
+         *error_out = std::format("Missing or invalid string field: {}", key);
       }
       return false;
    }

@@ -16,7 +16,8 @@
 namespace {
 constexpr int kUserMaxTokens = 1200;
 
-// Structured outputs already guarantee schema-valid JSON, so retries here only cover transient failures or placeholder text.
+// Structured outputs already guarantee schema-valid JSON, so retries here only
+// cover transient failures or placeholder text.
 constexpr int kMaxAttempts = 2;
 }  // namespace
 
@@ -47,8 +48,7 @@ UserResult OpenAIGenerator::GenerateUser(const EnrichedCity& city,
 
    const std::string retry_context = std::format(
        "Name: {} {}\nCity: {}, {}\nPersona: {}", name.first_name,
-       name.last_name, city.location.city, city.location.country,
-       persona.name);
+       name.last_name, city.location.city, city.location.country, persona.name);
 
    std::string raw;
    std::string last_error;

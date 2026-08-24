@@ -180,8 +180,8 @@ uint64_t SqliteExportService::ProcessRecord(const BreweryRecord& brewery) {
    sqlite_export_service_internal::Bind(
        insert_brewery_address_stmt_,
        sqlite_export_service_internal::BoundParam<double>{
-           .index = sqlite_export_service_internal::
-               kBreweryAddressLatitudeBindIndex,
+           .index =
+               sqlite_export_service_internal::kBreweryAddressLatitudeBindIndex,
            .value = brewery.address.latitude,
            .action = "Failed to bind SQLite brewery address latitude"});
 

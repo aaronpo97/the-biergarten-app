@@ -17,18 +17,18 @@ void BiergartenPipelineOrchestrator::LogResults() const {
    for (const auto& [address, brewery] : generated_breweries_) {
       const City& city = address.city;
       brewery_output.push_back(boost::json::object{
-         {"name_en", brewery.name_en},
-         {"description_en", brewery.description_en},
-         {"name_local", brewery.name_local},
-         {"description_local", brewery.description_local},
-         {"address", boost::json::object{
-             {"city", city.city},
-             {"country", city.country},
-             {"state_province", city.state_province},
-             {"iso3166_2", city.iso3166_2},
-             {"longitude", address.longitude},
-             {"latitude", address.latitude},
-          }}});
+          {"name_en", brewery.name_en},
+          {"description_en", brewery.description_en},
+          {"name_local", brewery.name_local},
+          {"description_local", brewery.description_local},
+          {"address", boost::json::object{
+                          {"city", city.city},
+                          {"country", city.country},
+                          {"state_province", city.state_province},
+                          {"iso3166_2", city.iso3166_2},
+                          {"longitude", address.longitude},
+                          {"latitude", address.latitude},
+                      }}});
    }
 
    std::ostringstream brewery_oss;
@@ -41,14 +41,14 @@ void BiergartenPipelineOrchestrator::LogResults() const {
 
    for (const auto& generated_user : generated_users_) {
       user_output.push_back(boost::json::object{
-         {"first_name", generated_user.user.first_name},
-         {"last_name", generated_user.user.last_name},
-         {"gender", generated_user.user.gender},
-         {"username", generated_user.user.username},
-         {"bio", generated_user.user.bio},
-         {"activity_weight", generated_user.user.activity_weight},
-         {"email", generated_user.email},
-         {"date_of_birth", generated_user.date_of_birth},
+          {"first_name", generated_user.user.first_name},
+          {"last_name", generated_user.user.last_name},
+          {"gender", generated_user.user.gender},
+          {"username", generated_user.user.username},
+          {"bio", generated_user.user.bio},
+          {"activity_weight", generated_user.user.activity_weight},
+          {"email", generated_user.email},
+          {"date_of_birth", generated_user.date_of_birth},
       });
    }
 

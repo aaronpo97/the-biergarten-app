@@ -166,54 +166,54 @@ int main(const int argc, char** argv) {
                      inj.template create<std::unique_ptr<WebClient>>(),
                      log_producer);
               }),
-          di::bind<DataGenerator>().to(
-              [&options, &model_path, &sampling, &prompt_directory,
-               &log_producer](
-                  const auto& inj) -> std::unique_ptr<DataGenerator> {
-                 if (options.generator.mode == GeneratorMode::kMock) {
-                    log_producer->Log({.level = LogLevel::Info,
-                                       .phase = PipelinePhase::Startup,
-                                       .message = "Generator: mock"});
+          di::bind<DataGenerator>().to([&options, &model_path, &sampling,
+                                        &prompt_directory,
+                                        &log_producer](const auto& inj)
+                                           -> std::unique_ptr<DataGenerator> {
+             if (options.generator.mode == GeneratorMode::kMock) {
+                log_producer->Log({.level = LogLevel::Info,
+                                   .phase = PipelinePhase::Startup,
+                                   .message = "Generator: mock"});
 
-                    return std::make_unique<MockGenerator>();
-                 }
+                return std::make_unique<MockGenerator>();
+             }
 
-                 if (options.generator.mode == GeneratorMode::kOpenAI) {
-                    log_producer->Log(
-                        {.level = LogLevel::Info,
-                         .phase = PipelinePhase::Startup,
-                         .message = std::format(
-                             "Generator: OpenAIGenerator | model={}",
-                             options.generator.openai_model)});
+             if (options.generator.mode == GeneratorMode::kOpenAI) {
+                log_producer->Log({.level = LogLevel::Info,
+                                   .phase = PipelinePhase::Startup,
+                                   .message = std::format(
+                                       "Generator: OpenAIGenerator | model={}",
+                                       options.generator.openai_model)});
 
-                    return std::make_unique<OpenAIGenerator>(
-                        options.generator.openai_api_key,
-                        options.generator.openai_model, log_producer,
-                        std::move(prompt_directory),
-                        inj.template create<std::unique_ptr<WebClient>>());
-                 }
+                return std::make_unique<OpenAIGenerator>(
+                    options.generator.openai_api_key,
+                    options.generator.openai_model, log_producer,
+                    std::move(prompt_directory),
+                    inj.template create<std::unique_ptr<WebClient>>());
+             }
 
 #ifdef BIERGARTEN_MOCK_ONLY
-                 // Only reachable when mode == Llama, which requires llama.cpp and is excluded from a BIERGARTEN_MOCK_ONLY build.
-                 throw std::runtime_error(
-                     "LlamaGenerator is unavailable in a BIERGARTEN_MOCK_ONLY "
-                     "build");
+             // Only reachable when mode == Llama, which requires llama.cpp and
+             // is excluded from a BIERGARTEN_MOCK_ONLY build.
+             throw std::runtime_error(
+                 "LlamaGenerator is unavailable in a BIERGARTEN_MOCK_ONLY "
+                 "build");
 #else
-                 log_producer->Log(
-                     {.level = LogLevel::Info,
-                      .phase = PipelinePhase::Startup,
-                      .message = std::format(
-                          "Generator: LlamaGenerator | model={} | "
-                          "temp={:.2f} top_p={:.2f} top_k={} n_ctx={} seed={}",
-                          model_path, sampling.temperature, sampling.top_p,
-                          sampling.top_k, sampling.n_ctx, sampling.seed)});
+             log_producer->Log(
+                 {.level = LogLevel::Info,
+                  .phase = PipelinePhase::Startup,
+                  .message = std::format(
+                      "Generator: LlamaGenerator | model={} | "
+                      "temp={:.2f} top_p={:.2f} top_k={} n_ctx={} seed={}",
+                      model_path, sampling.temperature, sampling.top_p,
+                      sampling.top_k, sampling.n_ctx, sampling.seed)});
 
-                 return std::make_unique<LlamaGenerator>(
-                     options, model_path, log_producer,
-                     inj.template create<std::unique_ptr<IPromptFormatter>>(),
-                     std::move(prompt_directory));
+             return std::make_unique<LlamaGenerator>(
+                 options, model_path, log_producer,
+                 inj.template create<std::unique_ptr<IPromptFormatter>>(),
+                 std::move(prompt_directory));
 #endif
-              }));
+          }));
 
       const auto orchestrator =
           injector.create<std::unique_ptr<BiergartenPipelineOrchestrator>>();

@@ -3,11 +3,11 @@
  * @brief OpenAIGenerator constructor.
  */
 
+#include "data_generation/openai_generator.h"
+
 #include <memory>
 #include <string>
 #include <utility>
-
-#include "data_generation/openai_generator.h"
 
 OpenAIGenerator::OpenAIGenerator(
     std::string api_key, std::string model, std::shared_ptr<ILogger> logger,

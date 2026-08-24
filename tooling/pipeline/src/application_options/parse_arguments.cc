@@ -121,9 +121,9 @@ std::optional<ApplicationOptions> ParseArguments(
 
       // Enforce mutual exclusivity before any further configuration is
       // applied.
-      const int selected_generator_count =
-          (use_mocked ? 1 : 0) + (!model_path.empty() ? 1 : 0) +
-          (use_openai ? 1 : 0);
+      const int selected_generator_count = (use_mocked ? 1 : 0) +
+                                           (!model_path.empty() ? 1 : 0) +
+                                           (use_openai ? 1 : 0);
 
       if (selected_generator_count > 1) {
          const std::string msg =
@@ -190,7 +190,8 @@ std::optional<ApplicationOptions> ParseArguments(
                                : use_openai ? GeneratorMode::kOpenAI
                                             : GeneratorMode::kLlama;
       options.generator.model_path = model_path;
-      options.generator.openai_model = var_map["openai-model"].as<std::string>();
+      options.generator.openai_model =
+          var_map["openai-model"].as<std::string>();
 
       // Only populate sampling config when the user explicitly overrides at
       // least one value. Leaving it as std::nullopt lets LlamaGenerator fall

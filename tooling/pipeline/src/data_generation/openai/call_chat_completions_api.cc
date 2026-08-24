@@ -6,9 +6,11 @@
  *
  * API docs last accessed 2026-08-23.
  * Docs: https://platform.openai.com/docs/api-reference/chat/create
- * Structured Outputs: https://platform.openai.com/docs/guides/structured-outputs
+ * Structured Outputs:
+ * https://platform.openai.com/docs/guides/structured-outputs
  */
 
+#include <boost/json.hpp>
 #include <format>
 #include <stdexcept>
 #include <string>
@@ -16,15 +18,13 @@
 #include <utility>
 #include <vector>
 
-#include <boost/json.hpp>
-
 #include "data_generation/openai_generator.h"
 
 namespace {
 // https://platform.openai.com/docs/api-reference/chat/create
 constexpr std::string_view kChatCompletionsUrl =
-   "https://api.openai.com/v1/chat/completions";
-} // namespace
+    "https://api.openai.com/v1/chat/completions";
+}  // namespace
 
 /**
  * @brief Sends a single Chat Completions request constrained by a JSON
@@ -45,22 +45,22 @@ constexpr std::string_view kChatCompletionsUrl =
  *   response, model refusal, or missing content.
  */
 std::string OpenAIGenerator::CallChatCompletionsApi(
-   const std::string& system_prompt, const std::string& user_prompt,
-   std::string_view json_schema, std::string_view schema_name,
-   int max_tokens) {
-
+    const std::string& system_prompt, const std::string& user_prompt,
+    std::string_view json_schema, std::string_view schema_name,
+    int max_tokens) {
    boost::system::error_code schema_error;
    boost::json::value schema_value =
-      boost::json::parse(json_schema, schema_error);
+       boost::json::parse(json_schema, schema_error);
 
    bool schema_is_invalid = static_cast<bool>(schema_error);
    if (schema_is_invalid) {
       throw std::runtime_error(
-         "OpenAIGenerator: invalid embedded JSON schema: " +
-         schema_error.message());
+          "OpenAIGenerator: invalid embedded JSON schema: " +
+          schema_error.message());
    }
 
-   // response_format: https://platform.openai.com/docs/guides/structured-outputs
+   // response_format:
+   // https://platform.openai.com/docs/guides/structured-outputs
    boost::json::object json_schema_wrapper;
    json_schema_wrapper["name"] = std::string(schema_name);
    json_schema_wrapper["strict"] = true;
@@ -91,27 +91,27 @@ std::string OpenAIGenerator::CallChatCompletionsApi(
    const std::string body = boost::json::serialize(request);
 
    const std::vector<std::pair<std::string, std::string>> headers = {
-      {"Authorization", std::format("Bearer {}", api_key_)},
+       {"Authorization", std::format("Bearer {}", api_key_)},
    };
 
    const std::string response_body =
-      web_client_->Post(std::string(kChatCompletionsUrl), body, headers);
+       web_client_->Post(std::string(kChatCompletionsUrl), body, headers);
 
    boost::system::error_code response_error;
    boost::json::value response_value =
-      boost::json::parse(response_body, response_error);
+       boost::json::parse(response_body, response_error);
 
    bool response_body_is_invalid = static_cast<bool>(response_error);
    if (response_body_is_invalid) {
       throw std::runtime_error(
-         "OpenAIGenerator: failed to parse API response: " +
-         response_error.message());
+          "OpenAIGenerator: failed to parse API response: " +
+          response_error.message());
    }
 
    bool response_root_is_not_object = !response_value.is_object();
    if (response_root_is_not_object) {
       throw std::runtime_error(
-         "OpenAIGenerator: API response root is not an object");
+          "OpenAIGenerator: API response root is not an object");
    }
    const auto& response_obj = response_value.get_object();
 
@@ -119,63 +119,63 @@ std::string OpenAIGenerator::CallChatCompletionsApi(
    const boost::json::value* error_field = response_obj.if_contains("error");
 
    bool top_level_error_occurred =
-      error_field != nullptr && error_field->is_object();
+       error_field != nullptr && error_field->is_object();
    if (top_level_error_occurred) {
       std::string error_message = "unknown error";
       if (const boost::json::value* message_field =
-            error_field->get_object().if_contains("message");
-         message_field != nullptr && message_field->is_string()) {
+              error_field->get_object().if_contains("message");
+          message_field != nullptr && message_field->is_string()) {
          error_message = std::string(message_field->as_string());
       }
-      throw std::runtime_error(
-         std::format("OpenAIGenerator: API request failed: {}", error_message));
+      throw std::runtime_error(std::format(
+          "OpenAIGenerator: API request failed: {}", error_message));
    }
 
-   const boost::json::value* choices_field = response_obj.
-      if_contains("choices");
-   bool choices_field_missing_or_invalid =
-      choices_field == nullptr || !choices_field->is_array() ||
-      choices_field->get_array().empty();
+   const boost::json::value* choices_field =
+       response_obj.if_contains("choices");
+   bool choices_field_missing_or_invalid = choices_field == nullptr ||
+                                           !choices_field->is_array() ||
+                                           choices_field->get_array().empty();
 
    if (choices_field_missing_or_invalid) {
       throw std::runtime_error(
-         "OpenAIGenerator: API response missing choices array");
+          "OpenAIGenerator: API response missing choices array");
    }
 
    const boost::json::value& first_choice = choices_field->get_array().front();
    bool first_choice_is_not_object = !first_choice.is_object();
    if (first_choice_is_not_object) {
       throw std::runtime_error(
-         "OpenAIGenerator: API response choice is not an object");
+          "OpenAIGenerator: API response choice is not an object");
    }
    const auto& choice_obj = first_choice.get_object();
 
    const boost::json::value* message_field = choice_obj.if_contains("message");
    bool message_field_missing_or_invalid =
-      message_field == nullptr || !message_field->is_object();
+       message_field == nullptr || !message_field->is_object();
    if (message_field_missing_or_invalid) {
       throw std::runtime_error(
-         "OpenAIGenerator: API response choice missing message");
+          "OpenAIGenerator: API response choice missing message");
    }
    const auto& message_obj = message_field->get_object();
 
    // Refusal field: https://platform.openai.com/docs/guides/structured-outputs
    const boost::json::value* refusal_field = message_obj.if_contains("refusal");
-   bool model_refused_request =
-      refusal_field != nullptr && refusal_field->is_string() &&
-      !refusal_field->as_string().empty();
+   bool model_refused_request = refusal_field != nullptr &&
+                                refusal_field->is_string() &&
+                                !refusal_field->as_string().empty();
    if (model_refused_request) {
-      throw std::runtime_error(std::format(
-         "OpenAIGenerator: request refused by safety policies: {}",
-         std::string(refusal_field->as_string())));
+      throw std::runtime_error(
+          std::format("OpenAIGenerator: request refused by safety policies: {}",
+                      std::string(refusal_field->as_string())));
    }
 
    const boost::json::value* content_field = message_obj.if_contains("content");
    bool content_field_missing_or_invalid =
-      content_field == nullptr || !content_field->is_string();
+       content_field == nullptr || !content_field->is_string();
    if (content_field_missing_or_invalid) {
       throw std::runtime_error(
-         "OpenAIGenerator: API response message had no text content");
+          "OpenAIGenerator: API response message had no text content");
    }
 
    return std::string(content_field->as_string());

@@ -43,6 +43,5 @@ std::vector<City> BiergartenPipelineOrchestrator::QueryLocations() {
                      "  Locations available: {}\n Sampled Locations: {}",
                      all_locations.size(), sampled_locations.size())});
 
-
    return sampled_locations;
 }
