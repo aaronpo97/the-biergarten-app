@@ -12,9 +12,6 @@ public interface ITokenInfrastructure
     /// </summary>
     string GenerateJwt(Guid userId, string username, DateTime expiry, string secret);
 
-    /// <summary>
-    ///     Validates a JWT and returns the resulting claims principal.
-    /// </summary>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">Thrown when the token is invalid, expired, or fails validation.</exception>
     Task<ClaimsPrincipal> ValidateJwtAsync(string token, string secret);
 }

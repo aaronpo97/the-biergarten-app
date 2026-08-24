@@ -15,8 +15,6 @@
 #include <string_view>
 #include <utility>
 
-// PromptDirectory
-
 PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir)
     : PromptDirectory(prompt_dir, nullptr) {}
 
@@ -25,14 +23,12 @@ PromptDirectory::PromptDirectory(const std::filesystem::path& prompt_dir,
     : prompt_dir_(prompt_dir), logger_(std::move(logger)) {
    std::error_code ec;
 
-   // Directory must exist.
    if (!std::filesystem::exists(prompt_dir_, ec) || ec) {
       throw std::runtime_error(
           "PromptDirectory: prompt directory does not exist: " +
           prompt_dir_.string());
    }
 
-   // Path must be a directory, not a file.
    if (!std::filesystem::is_directory(prompt_dir_, ec) || ec) {
       throw std::runtime_error(
           "PromptDirectory: prompt directory path is not a directory: " +
@@ -96,7 +92,6 @@ std::string PromptDirectory::Load(std::string_view key) {
                key_str, file_path.string(), content.size())});
    }
 
-   // Cache the loaded content for future calls.
    cache_.emplace(key_str, content);
    return content;
 }

@@ -67,6 +67,17 @@ package "Development Environment\n(docker-compose.dev.yaml)" #E3F2FD {
     end note
   }
 
+  node "Mailpit\n(axllent/mailpit)" as DevMailpit {
+    portin "8025 (Web UI)" as DevMailpitWeb
+    portin "1025 (SMTP)" as DevMailpitSmtp
+    note right
+      Local SMTP catcher for dev email testing.
+      Environment:
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
+    end note
+  }
+
 }
 
 package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
@@ -132,6 +143,122 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
 
 }
 
+package "Production Environment\n(docker-compose.prod.yaml)" #FCE4EC {
+
+  node "SQL Server\n(mcr.microsoft.com/mssql/server:2022-latest)" as ProdDB {
+    database "Biergarten\nDatabase" as ProdDBInner
+    note right
+      Environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=***
+      - MSSQL_PID=Express
+
+      Volumes:
+      - sqlserverdata-prod
+      No host port published.
+    end note
+  }
+
+  node "Migrations\n(run-once)" as ProdMig {
+    component "Database.Migrations" as ProdMig1
+    note bottom
+      Depends on: sql-server (healthy)
+      No seed step in production.
+    end note
+  }
+
+  node "API Container\n(API.Core)" as ProdAPI {
+    component "ASP.NET Core 10" as ProdAPI1
+    portin "8080:8080 (HTTP)" as ProdPort1
+    portin "8081:8081 (HTTPS)" as ProdPort2
+    note right
+      Environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_SERVER/NAME/USER/PASSWORD
+      - ACCESS/REFRESH/CONFIRMATION_TOKEN_SECRET
+      - WEBSITE_BASE_URL
+
+      Depends on: sql-server (healthy) -
+      does not wait on migrations/seed.
+    end note
+  }
+
+  ProdMig --> ProdDB : 1. Run migrations
+  ProdAPI --> ProdDB : 2. Connect & serve
+  ProdMig .up.> ProdDB : depends_on
+  ProdAPI .up.> ProdDB : depends_on
+
+  note bottom of ProdDB
+    <b>Prod Network (bridge: prodnet)</b>
+    Isolated from dev/test networks.
+    Volumes: sqlserverdata-prod,
+    nuget-cache-prod
+  end note
+}
+
+package "Database-only Environment\n(docker-compose.db.yaml)" #EDE7F6 {
+
+  node "SQL Server" as DbOnlyDB {
+    database "Biergarten\nDatabase" as DbOnlyDBInner {
+      portin "1434"
+    }
+  }
+
+  node "Migrations\n(run-once)" as DbOnlyMig {
+    component "Database.Migrations"
+  }
+
+  node "Seed\n(run-once)" as DbOnlySeed {
+    component "Database.Seed"
+  }
+
+  note bottom of DbOnlyDB
+    Same devnet volumes/images as
+    docker-compose.dev.yaml, minus
+    api.core and mailpit - for working
+    against the database without
+    running the API.
+  end note
+
+  DbOnlyMig --> DbOnlyDB : 1. Run migrations
+  DbOnlySeed --> DbOnlyDB : 2. Seed data
+  DbOnlyMig .up.> DbOnlyDB : depends_on
+  DbOnlySeed .up.> DbOnlyMig : depends_on
+}
+
+package "Minimal Environment\n(docker-compose.min.yaml)" #FFF9C4 {
+
+  node "SQL Server" as MinDB {
+    database "Biergarten\nDatabase" as MinDBInner {
+      portin "1433"
+    }
+  }
+
+  node "Migrations\n(run-once)" as MinMig {
+    component "Database.Migrations"
+  }
+
+  node "Mailpit" as MinMailpit {
+    portin "8025 / 1025"
+  }
+
+  node "Seed\n(run-once)" as MinSeed {
+    component "Database.Seed"
+  }
+
+  note bottom of MinDB
+    Database + mailpit only, no API
+    container - for frontend development
+    against an API.Core process run
+    outside Docker.
+  end note
+
+  MinMig --> MinDB : 1. Run migrations
+  MinSeed --> MinDB : 2. Seed data
+  MinMig .up.> MinDB : depends_on
+  MinSeed .up.> MinMig : depends_on
+}
+
 folder "test-results/\n(mounted volume)" as Results {
   file "api-specs/\n  results.trx" as Result1
   file "Features.Auth.Tests.trx" as Result2
@@ -156,6 +283,7 @@ Host --> DevAPI : http://localhost:8080
 DevMig --> DevDB : 1. Run migrations
 DevSeed --> DevDB : 2. Seed data
 DevAPI --> DevDB : 3. Connect & serve
+DevAPI ..> DevMailpit : 4. SMTP_HOST/PORT
 DevMig .up.> DevDB : depends_on
 DevSeed .up.> DevMig : depends_on
 DevAPI .up.> DevSeed : depends_on
@@ -201,20 +329,6 @@ note top of Specs
   Test Execution:
   All tests run in parallel
   Results aggregated
-end note
-
-' Production note
-note as ProductionNote
-  <b>Production Deployment (not shown):</b>
-
-  Would include:
-  • Azure SQL Database / AWS RDS
-  • Azure Container Apps / ECS
-  • Azure Key Vault for secrets
-  • Application Insights / CloudWatch
-  • Load balancer
-  • HTTPS termination
-  • CDN for static assets
 end note
 
 @enduml

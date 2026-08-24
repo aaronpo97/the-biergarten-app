@@ -66,7 +66,6 @@ public class RegisterUserHandler(
         {
             await Console.Error.WriteLineAsync(ex.Message);
             Console.WriteLine("Could not send email.");
-            // ignored
         }
 
         return new RegistrationPayload(user.Id, user.UserName, refreshToken, accessToken, emailSent);

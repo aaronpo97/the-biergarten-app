@@ -34,7 +34,7 @@ representation.
 **Services**:
 
 ```yaml
-sqlserver           # SQL Server 2022 (port 1433)
+sqlserver           # SQL Server 2022 (port 1434)
 database.migrations # DbUp migrations
 database.seed      # Seed initial data
 api.core           # Web API (ports 8080, 8081)
@@ -52,7 +52,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
 - Mailpit UI: http://localhost:8025
-- SQL Server: localhost:1433 (sa credentials from .env.dev)
+- SQL Server: localhost:1434 (sa credentials from .env.dev)
 
 **Stop Environment**:
 
@@ -126,6 +126,51 @@ api.core          # Production API
 
 ```bash
 docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d
+```
+
+### 4. Database only (`docker-compose.db.yaml`)
+
+**Purpose**: Run just the database for local backend development outside Docker
+(for example, `dotnet run` against a containerized SQL Server)
+
+**Services**:
+
+```yaml
+sqlserver           # SQL Server 2022 (port 1434)
+database.migrations # DbUp migrations
+database.seed      # Seed initial data
+```
+
+No `api.core` or `mailpit` container. Uses `.env.dev`, same as development.
+
+**Start**:
+
+```bash
+docker compose --env-file web/.env.dev -f web/docker-compose.db.yaml up -d
+```
+
+### 5. Minimal (`docker-compose.min.yaml`)
+
+**Purpose**: Local dev where the API runs outside Docker but the database and
+mail capture still run in containers
+
+**Services**:
+
+```yaml
+sqlserver           # SQL Server 2022 (port 1433)
+database.migrations # DbUp migrations
+database.seed      # Seed initial data
+mailpit            # Local dev SMTP server + UI (port 8025)
+```
+
+No `api.core` container. Uses `.env.local` instead of `.env.dev`, and exposes
+SQL Server on the standard port 1433 (`docker-compose.db.yaml` and
+`docker-compose.dev.yaml` both use 1434).
+
+**Start**:
+
+```bash
+docker compose --env-file web/.env.local -f web/docker-compose.min.yaml up -d
 ```
 
 ## Service dependencies

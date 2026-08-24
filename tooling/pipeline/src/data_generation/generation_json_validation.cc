@@ -17,9 +17,6 @@
 #include <boost/json.hpp>
 
 namespace {
-/**
- * String trimming: removes leading and trailing whitespace
- */
 std::string Trim(std::string_view value) {
    constexpr std::string_view whitespace = " \t\n\r\f\v";
    const size_t first_index = value.find_first_not_of(whitespace);

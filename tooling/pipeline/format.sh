@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Check for -y flag
 SKIP_CONFIRM=false
 if [[ "$1" == "-y" ]]; then
     SKIP_CONFIRM=true

@@ -17,7 +17,6 @@ using namespace boost;
 std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
    const std::string cache_key(query);
 
-   // 1. Cache Lookup
    if (const auto cache_it = this->extract_cache_.find(cache_key);
        cache_it != this->extract_cache_.end()) {
       if (logger_) {
@@ -42,7 +41,6 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
       std::this_thread::sleep_for(1s);
    }
 
-   // 2. Parse JSON
    system::error_code ec;
    json::value doc = json::parse(body, ec);
 
@@ -57,7 +55,6 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
       return {};
    }
 
-   // 3. Safe Extraction
    const json::object* obj = doc.if_object();
    if (obj == nullptr) {
       if (logger_) {
@@ -118,7 +115,6 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
 
    const json::object& page = page_val.get_object();
 
-   // Handle 404/Missing status
    if (page.contains("missing")) {
       if (logger_) {
          logger_->Log({.level = LogLevel::Warn,
@@ -145,7 +141,6 @@ std::string WikipediaEnrichmentService::FetchExtract(std::string_view query) {
       return {};
    }
 
-   // 4. Success
    std::string extract(extract_ptr->as_string());
    if (logger_) {
       logger_->Log(

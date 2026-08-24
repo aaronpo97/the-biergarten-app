@@ -11,8 +11,6 @@ public class ConflictException(string message) : Exception(message);
 /// </summary>
 public class NotFoundException(string message) : Exception(message);
 
-// Domain.Exceptions/UnauthorizedException.cs
-
 /// <summary>
 ///     The exception that is thrown when authentication fails or is required. Maps to HTTP 401 Unauthorized.
 /// </summary>

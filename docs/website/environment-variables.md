@@ -30,6 +30,25 @@ Environment-specific `.env` files loaded via `env_file:` in docker-compose.yaml:
 - `.env.test` - Testing
 - `.env.prod` - Production
 
+### Generating an env file
+
+`web/generate-env.sh` copies `.env.example` to a target file and replaces the
+secret-bearing values (`DB_PASSWORD`, `ACCESS_TOKEN_SECRET`,
+`REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`, `SMTP_USERNAME`,
+`SMTP_PASSWORD`) with freshly randomized ones via `openssl`. Non-secret values
+are left untouched. The output file is written with `600` permissions.
+
+```bash
+cd web
+./generate-env.sh .env.dev
+```
+
+Pass the output path, and optionally a template path, as arguments (default
+output: `.env`, default template: `.env.example`). The script prompts before
+overwriting an existing file. Randomized `SMTP_USERNAME`/`SMTP_PASSWORD` are dev
+placeholders; replace them with real provider credentials for
+staging/production.
+
 ## Backend variables (.NET API)
 
 ### Database connection
@@ -88,13 +107,15 @@ WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 
 **Generate Secrets**:
 
-**macOS/Linux - Generate a cryptographically secure base64 secret (127 raw bytes)**
+**macOS/Linux - Generate a cryptographically secure base64 secret (127 raw
+bytes)**
 
 ```bash
 openssl rand -base64 127
 ```
 
-**Windows - PowerShell 5.1 compatible (cryptographically secure, 127 raw bytes)**
+**Windows - PowerShell 5.1 compatible (cryptographically secure, 127 raw
+bytes)**
 
 ```powershell
 $bytes = New-Object byte[] 127

@@ -13,19 +13,37 @@ participant "MediatR pipeline\n(ValidationBehavior)" as Mediator
 box "Handler Layer" #LightBlue
 participant "RegisterUserHandler" as RegHandler
 participant "LoginHandler" as LoginHandler
+participant "RefreshTokenHandler" as RefreshHandler
+participant "ConfirmUserHandler" as ConfirmHandler
+participant "ResendConfirmationEmailHandler" as ResendHandler
+participant "UpdateUsernameHandler" as UpdateUsernameHandler
+participant "UpdateEmailHandler" as UpdateEmailHandler
+participant "UpdatePasswordHandler" as UpdatePasswordHandler
+participant "UpdateProfileHandler" as UpdateProfileHandler
+participant "DeleteAccountHandler" as DeleteAccountHandler
+participant "UserManager<ApplicationUser>" as UserMgr
 participant "TokenService" as TokenSvc
 end box
 box "Infrastructure Layer" #LightGreen
-participant "Argon2\nInfrastructure" as Argon2
+participant "Argon2PasswordHasher" as Argon2
 participant "JWT\nInfrastructure" as JWT
 participant "Email\nProvider" as SMTP
 participant "Template\nProvider" as Template
 end box
 box "Repository / Cross-slice" #LightYellow
-participant "AuthRepository" as AuthRepo
+participant "DapperUserStore\n(IUserStore/IUserPasswordStore/\nIUserEmailStore)" as UserStore
 participant "EmailDispatcher\n(Features.Emails)" as EmailDispatcher
 end box
 database "SQL Server" as DB
+
+note over UserMgr
+  ASP.NET Core Identity's UserManager<TUser>
+  replaces the deleted AuthRepository: handlers
+  no longer issue SQL or call Argon2 directly,
+  they delegate to UserManager, which in turn
+  calls DapperUserStore (persistence) and
+  Argon2PasswordHasher (IPasswordHasher<TUser>).
+end note
 
 == Registration Flow ==
 
@@ -51,71 +69,83 @@ else Validation succeeds
   Mediator -> RegHandler: Handle(command)
   activate RegHandler
 
-  RegHandler -> AuthRepo: GetUserByUsernameAsync(username)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
-  activate DB
-  DB --> AuthRepo: null (user doesn't exist)
-  deactivate DB
-  deactivate AuthRepo
+  RegHandler -> RegHandler: user = new UserAccount{...}\n.ToApplicationUser()
 
-  RegHandler -> AuthRepo: GetUserByEmailAsync(email)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Email = @Email
-  activate DB
-  DB --> AuthRepo: null (email doesn't exist)
-  deactivate DB
-  deactivate AuthRepo
+  RegHandler -> UserMgr: CreateAsync(user, password)
+  activate UserMgr
 
-  alt Username or email already exists
-    RegHandler -> Mediator: throw ConflictException
+  UserMgr -> Argon2: HashPassword(user, password)
+  activate Argon2
+  note right of Argon2
+    Delegates to IPasswordInfrastructure.Hash:
+    Argon2id parameters:
+    - Salt: 16 bytes (128-bit)
+    - Memory: 64MB
+    - Iterations: 4
+    - Parallelism: CPU count
+    - Hash output: 32 bytes
+  end note
+  Argon2 --> UserMgr: "base64(salt):base64(hash)"
+  deactivate Argon2
+
+  UserMgr -> UserStore: SetPasswordHashAsync(user, hash)
+  note right of UserStore
+    user.Id is still empty at this point -
+    only sets the in-memory hash. CreateAsync
+    writes it to dbo.UserCredential itself.
+  end note
+
+  UserMgr -> UserStore: FindByNameAsync(username)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
+  activate DB
+  DB --> UserStore: null (user doesn't exist)
+  deactivate DB
+  deactivate UserStore
+
+  UserMgr -> UserStore: FindByEmailAsync(email)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Email = @Email
+  activate DB
+  DB --> UserStore: null (email doesn't exist)
+  deactivate DB
+  deactivate UserStore
+  note right of UserMgr
+    Default UserManager validators check
+    uniqueness before CreateAsync is called;
+    DapperUserStore.CreateAsync also guards
+    against a genuine race via a caught
+    duplicate-key SqlException (2601/2627).
+  end note
+
+  UserMgr -> UserStore: CreateAsync(user)
+  activate UserStore
+
+  UserStore -> DB: BEGIN TRANSACTION
+  activate DB
+  UserStore -> DB: INSERT INTO dbo.UserAccount\n(Username, FirstName, LastName,\nDateOfBirth, Email)\nOUTPUT INSERTED.UserAccountID
+  DB --> UserStore: UserAccountId (GUID)
+  UserStore -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
+  UserStore -> DB: COMMIT TRANSACTION
+  deactivate DB
+  note right of UserStore
+    Both statements run via Dapper's
+    ExecuteScalarAsync/ExecuteAsync against
+    a single DbTransaction, not a stored
+    procedure - no manual parameter binding
+  end note
+
+  UserStore --> UserMgr: IdentityResult.Success\n(user.Id set)
+  deactivate UserStore
+
+  UserMgr --> RegHandler: IdentityResult
+  deactivate UserMgr
+
+  alt !result.Succeeded
+    RegHandler -> Mediator: throw ConflictException\n(DuplicateUserName/DuplicateEmail codes ->\n"Username or email already exists";\notherwise joined error descriptions)
     Mediator -> API: propagate
     API -> User: 409 Conflict\n"Username or email already exists"
-  else Username and email are free
-
-    RegHandler -> Argon2: Hash(password)
-    activate Argon2
-    note right of Argon2
-      Argon2id parameters:
-      - Salt: 16 bytes (128-bit)
-      - Memory: 64MB
-      - Iterations: 4
-      - Parallelism: CPU count
-      - Hash output: 32 bytes
-    end note
-    Argon2 -> Argon2: Generate random salt\n(16 bytes)
-    Argon2 -> Argon2: Hash password with\nArgon2id algorithm
-    Argon2 --> RegHandler: "base64(salt):base64(hash)"
-    deactivate Argon2
-
-    RegHandler -> AuthRepo: RegisterUserAsync(userAccount)
-    activate AuthRepo
-
-    AuthRepo -> DB: BEGIN TRANSACTION
-    activate DB
-    AuthRepo -> DB: INSERT INTO dbo.UserAccount\n(Username, FirstName, LastName,\nDateOfBirth, Email)\nOUTPUT INSERTED.UserAccountID
-    DB --> AuthRepo: UserAccountId (GUID)
-    AuthRepo -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
-    AuthRepo -> DB: COMMIT TRANSACTION
-    deactivate DB
-    note right of AuthRepo
-      All three statements run via Dapper's
-      ExecuteScalarAsync/ExecuteAsync against
-      a single DbTransaction, not a stored
-      procedure - no manual parameter binding
-    end note
-
-    AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @UserAccountId
-    activate DB
-    note right of DB
-      Round trip to load the row the
-      INSERT just created
-    end note
-    DB --> AuthRepo: UserAccount row
-    deactivate DB
-
-    AuthRepo --> RegHandler: UserAccount entity
-    deactivate AuthRepo
+  else result.Succeeded
 
     RegHandler -> TokenSvc: GenerateAccessToken(user)
     activate TokenSvc
@@ -242,13 +272,19 @@ else Validation succeeds
   Mediator -> LoginHandler: Handle(command)
   activate LoginHandler
 
-  LoginHandler -> AuthRepo: GetUserByUsernameAsync(username)
-  activate AuthRepo
-  AuthRepo -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
+  LoginHandler -> UserMgr: FindByNameAsync(username)
+  activate UserMgr
+  UserMgr -> UserStore: FindByNameAsync(username)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
   activate DB
-  DB --> AuthRepo: UserAccount row or null
+  DB --> UserStore: UserAccount row or null
   deactivate DB
-  deactivate AuthRepo
+  UserStore -> UserStore: HydrateAsync\n(load active UserCredential.Hash,\nUserVerification -> EmailConfirmed)
+  UserStore --> UserMgr: ApplicationUser or null
+  deactivate UserStore
+  UserMgr --> LoginHandler: ApplicationUser or null
+  deactivate UserMgr
 
   alt User not found
     LoginHandler -> Mediator: throw UnauthorizedException\n"Invalid username or password."
@@ -256,41 +292,34 @@ else Validation succeeds
     API -> User: 401 Unauthorized
   else User found
 
-    LoginHandler -> AuthRepo: GetActiveCredentialByUserAccountIdAsync(userId)
-    activate AuthRepo
-    AuthRepo -> DB: SELECT UserCredentialId, UserAccountId,\nHash, CreatedAt, RowVersion\nFROM dbo.UserCredential\nWHERE UserAccountId = @UserAccountId\n  AND IsRevoked = 0
-    activate DB
-    DB --> AuthRepo: UserCredential row or null
-    deactivate DB
-    deactivate AuthRepo
+    LoginHandler -> UserMgr: CheckPasswordAsync(user, password)
+    activate UserMgr
+    note right of UserMgr
+      HasPasswordAsync short-circuits to false
+      (no active UserCredential was hydrated)
+      without calling the hasher; otherwise
+      delegates to Argon2PasswordHasher.
+    end note
+    UserMgr -> Argon2: VerifyHashedPassword(\n  user, user.PasswordHash, password)
+    activate Argon2
+    note right of Argon2
+      Delegates to IPasswordInfrastructure.Verify:
+      1. Split stored hash: "salt:hash"
+      2. Hash provided password with the same salt
+      3. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
+    end note
+    Argon2 --> UserMgr: Success/Failed
+    deactivate Argon2
+    UserMgr --> LoginHandler: true/false
+    deactivate UserMgr
 
-    alt No active credential
+    alt Password invalid
       LoginHandler -> Mediator: throw UnauthorizedException
       Mediator -> API: propagate
       API -> User: 401 Unauthorized
-    else Active credential found
+    else Password valid
 
-      LoginHandler -> Argon2: Verify(password, storedHash)
-      activate Argon2
-      note right of Argon2
-        1. Split stored hash: "salt:hash"
-        2. Extract salt
-        3. Hash provided password\n   with same salt
-        4. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
-      end note
-      Argon2 -> Argon2: Parse salt from stored hash
-      Argon2 -> Argon2: Hash provided password\nwith extracted salt
-      Argon2 -> Argon2: FixedTimeEquals(\n  computed, stored)
-      Argon2 --> LoginHandler: true/false
-      deactivate Argon2
-
-      alt Password invalid
-        LoginHandler -> Mediator: throw UnauthorizedException
-        Mediator -> API: propagate
-        API -> User: 401 Unauthorized
-      else Password valid
-
-        LoginHandler -> TokenSvc: GenerateAccessToken(user)
+      LoginHandler -> TokenSvc: GenerateAccessToken(user)
         activate TokenSvc
         TokenSvc -> JWT: GenerateJwt(...)
         activate JWT
@@ -316,6 +345,567 @@ else Validation succeeds
         API -> User: 200 OK\n{\n  message: "Logged in successfully.",\n  payload: {\n    userAccountId, username,\n    refreshToken, accessToken\n  }\n}
       end
     end
+  end
+deactivate API
+
+== Refresh Token Flow ==
+
+User -> API: POST /api/auth/refresh\nHeader: X-Refresh-Token: <token>
+activate API
+
+API -> Mediator: Send(RefreshTokenCommand(refreshToken))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs RefreshTokenValidator:
+  refreshToken must be non-empty. Anonymous
+  endpoint - no Bearer token required.
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request\n{message: "Validation failed", errors: {...}}
+else Validation succeeds
+
+  Mediator -> RefreshHandler: Handle(command)
+  activate RefreshHandler
+
+  RefreshHandler -> TokenSvc: RefreshTokenAsync(refreshToken)
+  activate TokenSvc
+
+  TokenSvc -> JWT: ValidateRefreshTokenAsync(refreshToken)
+  activate JWT
+  note right of JWT
+    Validates signature/expiry against the
+    refresh token secret, extracts userId/
+    username claims.
+  end note
+  JWT --> TokenSvc: ValidatedToken or throws
+  deactivate JWT
+
+  alt Token invalid or expired
+    TokenSvc -> RefreshHandler: throw UnauthorizedException
+    RefreshHandler -> Mediator: propagate
+    Mediator -> API: propagate
+    API -> User: 401 Unauthorized
+  else Token valid
+
+    TokenSvc -> UserMgr: FindByIdAsync(validated.UserId)
+    activate UserMgr
+    UserMgr -> UserStore: FindByIdAsync(userId)
+    activate UserStore
+    UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @Id
+    activate DB
+    DB --> UserStore: row or null
+    deactivate DB
+    UserStore --> UserMgr: ApplicationUser or null
+    deactivate UserStore
+    UserMgr --> TokenSvc: ApplicationUser or null
+    deactivate UserMgr
+
+    alt User not found
+      TokenSvc -> RefreshHandler: throw UnauthorizedException\n"User account not found"
+      RefreshHandler -> Mediator: propagate
+      Mediator -> API: propagate
+      API -> User: 401 Unauthorized
+    else User found
+      TokenSvc -> JWT: GenerateAccessToken(user)\nGenerateRefreshToken(user)
+      JWT --> TokenSvc: new access + refresh tokens
+      TokenSvc --> RefreshHandler: RefreshTokenResult
+      deactivate TokenSvc
+
+      RefreshHandler --> Mediator: LoginPayload(\n  userId, username,\n  refreshToken, accessToken)
+      deactivate RefreshHandler
+      Mediator --> API: LoginPayload
+      deactivate Mediator
+
+      API -> User: 200 OK\n{message: "Token refreshed successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+== Confirm User Flow ==
+
+User -> API: POST /api/auth/confirm?token=<token>\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(ConfirmUserCommand(token))
+activate Mediator
+
+Mediator -> ConfirmHandler: Handle(command)
+activate ConfirmHandler
+
+ConfirmHandler -> TokenSvc: ValidateConfirmationTokenAsync(token)
+activate TokenSvc
+TokenSvc -> JWT: Validate against confirmation\ntoken secret, extract userId
+activate JWT
+JWT --> TokenSvc: ValidatedToken or throws
+deactivate JWT
+TokenSvc --> ConfirmHandler: ValidatedToken
+deactivate TokenSvc
+
+alt Token invalid or expired
+  ConfirmHandler -> Mediator: throw UnauthorizedException
+  Mediator -> API: propagate
+  API -> User: 401 Unauthorized
+else Token valid
+
+  ConfirmHandler -> UserMgr: FindByIdAsync(validatedToken.UserId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userId)
+  activate UserStore
+  UserStore -> DB: SELECT ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @Id
+  activate DB
+  DB --> UserStore: row or null
+  deactivate DB
+  UserStore --> UserMgr: ApplicationUser or null
+  deactivate UserStore
+  UserMgr --> ConfirmHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt User not found
+    ConfirmHandler -> Mediator: throw UnauthorizedException\n"User account not found"
+    Mediator -> API: propagate
+    API -> User: 401 Unauthorized
+  else User found
+
+    ConfirmHandler -> UserStore: SetEmailConfirmedAsync(user, true)
+    note right of UserStore
+      IUserEmailStore<ApplicationUser> is injected
+      directly into the handler (not via UserManager),
+      setting the confirmed flag in-memory here.
+    end note
+
+    ConfirmHandler -> UserMgr: UpdateAsync(user)
+    activate UserMgr
+    UserMgr -> UserStore: UpdateAsync(user)
+    activate UserStore
+    UserStore -> DB: UPDATE dbo.UserAccount SET ...
+    UserStore -> DB: INSERT INTO dbo.UserVerification\n(UserAccountId, VerificationDateTime)
+    note right of UserStore
+      Idempotent: skipped (duplicate-key
+      exception swallowed) if a verification
+      row already exists.
+    end note
+    UserStore --> UserMgr: IdentityResult.Success
+    deactivate UserStore
+    UserMgr --> ConfirmHandler: IdentityResult
+    deactivate UserMgr
+
+    ConfirmHandler --> Mediator: ConfirmationPayload(\n  user.Id, DateTime.UtcNow)
+    deactivate ConfirmHandler
+    Mediator --> API: ConfirmationPayload
+    deactivate Mediator
+
+    API -> User: 200 OK\n{message: "User with ID {id} is confirmed.",\npayload: {...}}
+  end
+end
+deactivate API
+
+== Resend Confirmation Email Flow ==
+
+User -> API: POST /api/auth/confirm/resend?userId=<id>\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(ResendConfirmationEmailCommand(userId))
+activate Mediator
+
+Mediator -> ResendHandler: Handle(command)
+activate ResendHandler
+
+ResendHandler -> UserMgr: FindByIdAsync(userId)
+activate UserMgr
+UserMgr -> UserStore: FindByIdAsync(userId)
+activate UserStore
+UserStore -> DB: SELECT ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @Id
+activate DB
+DB --> UserStore: row or null
+deactivate DB
+UserStore --> UserMgr: ApplicationUser or null
+deactivate UserStore
+UserMgr --> ResendHandler: ApplicationUser or null
+deactivate UserMgr
+
+alt User not found
+  ResendHandler -> ResendHandler: return silently\n(prevents user enumeration)
+else User found
+
+  ResendHandler -> UserMgr: IsEmailConfirmedAsync(user)
+  UserMgr --> ResendHandler: bool
+
+  alt Already confirmed
+    ResendHandler -> ResendHandler: return silently (no-op)
+  else Not yet confirmed
+
+    ResendHandler -> TokenSvc: GenerateConfirmationToken(user)
+    activate TokenSvc
+    TokenSvc --> ResendHandler: confirmation token
+    deactivate TokenSvc
+
+    ResendHandler -> Mediator: Send(SendResendConfirmationEmailCommand)
+    activate Mediator
+    Mediator -> EmailDispatcher: SendResendConfirmationEmailAsync(\n  firstName, email, confirmationToken)
+    activate EmailDispatcher
+    EmailDispatcher -> Template: Render email\n(same Razor pipeline as registration)
+    EmailDispatcher -> SMTP: SendAsync(email, subject, body)
+    deactivate EmailDispatcher
+    deactivate Mediator
+  end
+end
+
+ResendHandler --> Mediator: (void)
+deactivate ResendHandler
+Mediator --> API: (void)
+deactivate Mediator
+
+API -> User: 200 OK\n{message: "confirmation email has been resent"}
+note right of API
+  Always 200 OK regardless of outcome above -
+  same user-enumeration precaution as a not-found
+  user or an already-confirmed account.
+end note
+deactivate API
+
+== Update Username Flow ==
+
+User -> API: PATCH /api/auth/username\n{newUsername}\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(UpdateUsernameCommand(\n  GetAuthenticatedUserId(), newUsername))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs UpdateUsernameValidator
+  (same format rules as registration)
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request
+else Validation succeeds
+
+  Mediator -> UpdateUsernameHandler: Handle(command)
+  activate UpdateUsernameHandler
+
+  UpdateUsernameHandler -> UserMgr: FindByIdAsync(userAccountId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userAccountId)
+  activate UserStore
+  UserStore -> DB: SELECT ...\nFROM dbo.UserAccount\nWHERE UserAccountID = @Id
+  activate DB
+  DB --> UserStore: row or null
+  deactivate DB
+  UserStore --> UserMgr: ApplicationUser or null
+  deactivate UserStore
+  UserMgr --> UpdateUsernameHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt Account not found
+    UpdateUsernameHandler -> Mediator: throw NotFoundException
+    Mediator -> API: propagate
+    API -> User: 404 Not Found
+  else Account found
+
+    UpdateUsernameHandler -> UserMgr: SetUserNameAsync(user, newUsername)
+    activate UserMgr
+    UserMgr -> UserStore: FindByNameAsync(newUsername)
+    note right of UserMgr
+      Uniqueness check before the UPDATE.
+    end note
+    UserMgr -> UserStore: UpdateAsync(user)
+    UserStore -> DB: UPDATE dbo.UserAccount\nSET Username = @UserName, ...
+    UserStore --> UserMgr: IdentityResult
+    UserMgr --> UpdateUsernameHandler: IdentityResult
+    deactivate UserMgr
+
+    alt !result.Succeeded
+      UpdateUsernameHandler -> Mediator: throw ConflictException\n(DuplicateUserName code ->\n"Username already exists")
+      Mediator -> API: propagate
+      API -> User: 409 Conflict
+    else result.Succeeded
+      UpdateUsernameHandler --> Mediator: UpdateUsernamePayload(\n  user.Id, user.UserName)
+      deactivate UpdateUsernameHandler
+      Mediator --> API: UpdateUsernamePayload
+      deactivate Mediator
+      API -> User: 200 OK\n{message: "Username updated successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+== Update Email Flow ==
+
+User -> API: PATCH /api/auth/email\n{newEmail}\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(UpdateEmailCommand(\n  GetAuthenticatedUserId(), newEmail))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs UpdateEmailValidator
+  (same format rules as registration)
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request
+else Validation succeeds
+
+  Mediator -> UpdateEmailHandler: Handle(command)
+  activate UpdateEmailHandler
+
+  UpdateEmailHandler -> UserMgr: FindByIdAsync(userAccountId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userAccountId)
+  UserStore -> DB: SELECT ...
+  UserStore --> UserMgr: ApplicationUser or null
+  UserMgr --> UpdateEmailHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt Account not found
+    UpdateEmailHandler -> Mediator: throw NotFoundException
+    Mediator -> API: propagate
+    API -> User: 404 Not Found
+  else Account found
+
+    UpdateEmailHandler -> UserMgr: SetEmailAsync(user, newEmail)
+    activate UserMgr
+    UserMgr -> UserStore: FindByEmailAsync(newEmail)
+    note right of UserMgr
+      Uniqueness check. Also resets
+      user.EmailConfirmed = false -
+      the caller must re-confirm via
+      POST /api/auth/confirm/resend.
+    end note
+    UserMgr -> UserStore: UpdateAsync(user)
+    UserStore -> DB: UPDATE dbo.UserAccount\nSET Email = @Email, ...
+    UserStore -> DB: DELETE FROM dbo.UserVerification\nWHERE UserAccountID = @Id
+    UserStore --> UserMgr: IdentityResult
+    UserMgr --> UpdateEmailHandler: IdentityResult
+    deactivate UserMgr
+
+    alt !result.Succeeded
+      UpdateEmailHandler -> Mediator: throw ConflictException\n(DuplicateEmail code ->\n"Email address already exists")
+      Mediator -> API: propagate
+      API -> User: 409 Conflict
+    else result.Succeeded
+      UpdateEmailHandler --> Mediator: UpdateEmailPayload(\n  user.Id, user.Email,\n  user.EmailConfirmed = false)
+      deactivate UpdateEmailHandler
+      Mediator --> API: UpdateEmailPayload
+      deactivate Mediator
+      API -> User: 200 OK\n{message: "Email updated successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+== Update Password Flow ==
+
+User -> API: PATCH /api/auth/password\n{currentPassword, newPassword}\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(UpdatePasswordCommand(\n  GetAuthenticatedUserId(),\n  currentPassword, newPassword))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs UpdatePasswordValidator
+  (same password strength rules as registration)
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request
+else Validation succeeds
+
+  Mediator -> UpdatePasswordHandler: Handle(command)
+  activate UpdatePasswordHandler
+
+  UpdatePasswordHandler -> UserMgr: FindByIdAsync(userAccountId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userAccountId)
+  UserStore --> UserMgr: ApplicationUser or null
+  UserMgr --> UpdatePasswordHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt Account not found
+    UpdatePasswordHandler -> Mediator: throw NotFoundException
+    Mediator -> API: propagate
+    API -> User: 404 Not Found
+  else Account found
+
+    UpdatePasswordHandler -> UserMgr: ChangePasswordAsync(\n  user, currentPassword, newPassword)
+    activate UserMgr
+    UserMgr -> Argon2: VerifyHashedPassword(\n  user, user.PasswordHash, currentPassword)
+    activate Argon2
+    Argon2 --> UserMgr: Success/Failed
+    deactivate Argon2
+
+    alt Current password mismatch
+      UserMgr --> UpdatePasswordHandler: IdentityResult.Failed\n(PasswordMismatch)
+    else Current password matches
+      UserMgr -> Argon2: HashPassword(user, newPassword)
+      activate Argon2
+      Argon2 --> UserMgr: new hash
+      deactivate Argon2
+      UserMgr -> UserStore: SetPasswordHashAsync(user, newHash)
+      activate UserStore
+      UserStore -> DB: UPDATE dbo.UserCredential\nSET IsRevoked = 1, RevokedAt = GETDATE()\nWHERE UserAccountId = @Id AND IsRevoked = 0
+      UserStore -> DB: INSERT INTO dbo.UserCredential\n(UserAccountId, Hash)
+      note right of UserStore
+        Revoke-then-insert runs inside one
+        DbTransaction (credential rotation).
+      end note
+      UserStore --> UserMgr: (void)
+      deactivate UserStore
+      UserMgr --> UpdatePasswordHandler: IdentityResult.Success
+    end
+    deactivate UserMgr
+
+    alt Current password is incorrect
+      UpdatePasswordHandler -> Mediator: throw UnauthorizedException\n"Current password is incorrect"
+      Mediator -> API: propagate
+      API -> User: 401 Unauthorized
+    else !result.Succeeded (other failure)
+      UpdatePasswordHandler -> Mediator: throw ConflictException
+      Mediator -> API: propagate
+      API -> User: 409 Conflict
+    else result.Succeeded
+      UpdatePasswordHandler --> Mediator: UpdatePasswordPayload(\n  user.Id, DateTime.UtcNow)
+      deactivate UpdatePasswordHandler
+      Mediator --> API: UpdatePasswordPayload
+      deactivate Mediator
+      API -> User: 200 OK\n{message: "Password updated successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+== Update Profile Flow ==
+
+User -> API: PATCH /api/auth/profile\n{firstName, lastName, dateOfBirth}\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(UpdateProfileCommand(\n  GetAuthenticatedUserId(),\n  firstName, lastName, dateOfBirth))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs UpdateProfileValidator
+  (same name/DateOfBirth rules as registration)
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request
+else Validation succeeds
+
+  Mediator -> UpdateProfileHandler: Handle(command)
+  activate UpdateProfileHandler
+
+  UpdateProfileHandler -> UserMgr: FindByIdAsync(userAccountId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userAccountId)
+  UserStore --> UserMgr: ApplicationUser or null
+  UserMgr --> UpdateProfileHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt Account not found
+    UpdateProfileHandler -> Mediator: throw NotFoundException
+    Mediator -> API: propagate
+    API -> User: 404 Not Found
+  else Account found
+
+    UpdateProfileHandler -> UpdateProfileHandler: user.FirstName = ...\nuser.LastName = ...\nuser.DateOfBirth = ...
+    note right of UpdateProfileHandler
+      First/last name and date of birth aren't
+      tracked by any Identity store interface -
+      mutated directly on the ApplicationUser,
+      then saved via UserManager.UpdateAsync.
+    end note
+
+    UpdateProfileHandler -> UserMgr: UpdateAsync(user)
+    activate UserMgr
+    UserMgr -> UserStore: UpdateAsync(user)
+    UserStore -> DB: UPDATE dbo.UserAccount\nSET FirstName = @FirstName,\n    LastName = @LastName,\n    DateOfBirth = @DateOfBirth, ...
+    UserStore --> UserMgr: IdentityResult
+    UserMgr --> UpdateProfileHandler: IdentityResult
+    deactivate UserMgr
+
+    alt !result.Succeeded
+      UpdateProfileHandler -> Mediator: throw ConflictException
+      Mediator -> API: propagate
+      API -> User: 409 Conflict
+    else result.Succeeded
+      UpdateProfileHandler --> Mediator: UpdateProfilePayload(\n  user.Id, firstName,\n  lastName, dateOfBirth)
+      deactivate UpdateProfileHandler
+      Mediator --> API: UpdateProfilePayload
+      deactivate Mediator
+      API -> User: 200 OK\n{message: "Profile updated successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+== Delete Account Flow ==
+
+User -> API: DELETE /api/auth/account\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(DeleteAccountCommand(\n  GetAuthenticatedUserId()))
+activate Mediator
+
+Mediator -> DeleteAccountHandler: Handle(command)
+activate DeleteAccountHandler
+
+DeleteAccountHandler -> UserMgr: FindByIdAsync(userAccountId)
+activate UserMgr
+UserMgr -> UserStore: FindByIdAsync(userAccountId)
+UserStore --> UserMgr: ApplicationUser or null
+UserMgr --> DeleteAccountHandler: ApplicationUser or null
+deactivate UserMgr
+
+alt Account not found
+  DeleteAccountHandler -> Mediator: throw NotFoundException
+  Mediator -> API: propagate
+  API -> User: 404 Not Found
+else Account found
+
+  DeleteAccountHandler -> UserMgr: DeleteAsync(user)
+  activate UserMgr
+  UserMgr -> UserStore: DeleteAsync(user)
+  activate UserStore
+  UserStore -> DB: DELETE FROM dbo.UserAccount\nWHERE UserAccountID = @Id
+  note right of UserStore
+    UserCredential/UserVerification/UserAvatar
+    cascade on delete. Posts, comments, photos,
+    and follows use ON DELETE NO ACTION - if any
+    reference this account, the DELETE throws a
+    foreign key violation (SQL error 547).
+  end note
+
+  alt Foreign key violation (dependent records exist)
+    UserStore --> UserMgr: IdentityResult.Failed\n(AccountHasDependentRecords)
+  else Delete succeeds
+    UserStore --> UserMgr: IdentityResult.Success
+  end
+  deactivate UserStore
+  UserMgr --> DeleteAccountHandler: IdentityResult
+  deactivate UserMgr
+
+  alt Account has dependent records
+    DeleteAccountHandler -> Mediator: throw ConflictException\n"Account cannot be deleted while it still\nhas associated posts, comments, photos,\nor follows."
+    Mediator -> API: propagate
+    API -> User: 409 Conflict
+  else !result.Succeeded (other failure)
+    DeleteAccountHandler -> Mediator: throw ConflictException
+    Mediator -> API: propagate
+    API -> User: 409 Conflict
+  else result.Succeeded
+    DeleteAccountHandler --> Mediator: (void)
+    deactivate DeleteAccountHandler
+    Mediator --> API: (void)
+    deactivate Mediator
+    API -> User: 200 OK\n{message: "Account deleted successfully."}
   end
 end
 deactivate API

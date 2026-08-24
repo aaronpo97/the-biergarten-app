@@ -112,6 +112,21 @@ middleware) also depends on it directly.
 - `POST /api/auth/confirm/resend?userId=...` - Resend the confirmation email
 - `POST /api/auth/refresh` - Refresh access token
 
+Account management (require a valid access token; user ID comes from the token,
+never the request body):
+
+- `PATCH /api/auth/username` - Change the authenticated user's username
+- `PATCH /api/auth/email` - Change the authenticated user's email address;
+  resets `EmailConfirmed` to false, so the user must re-confirm via
+  `POST /api/auth/confirm/resend`
+- `PATCH /api/auth/password` - Change the authenticated user's password;
+  requires the current password
+- `PATCH /api/auth/profile` - Update the authenticated user's profile (first
+  name, last name, date of birth)
+- `DELETE /api/auth/account` - Permanently delete the authenticated user's
+  account; blocked while the account still has associated posts, comments,
+  photos, or follows
+
 ## Validation security
 
 ### Token secrets

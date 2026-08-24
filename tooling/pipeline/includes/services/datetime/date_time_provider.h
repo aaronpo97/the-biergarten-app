@@ -15,9 +15,6 @@
 
 /**
  * @brief Interface for UTC timestamp providers.
- *
- * @todo Yagni, consider removing this and just use SystemDateTimeProvider
- * directly
  */
 class IDateTimeProvider {
   public:

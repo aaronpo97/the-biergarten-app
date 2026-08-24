@@ -9,12 +9,10 @@ PROMPT_DIR="/app/prompts"
 
 echo "--- Starting Biergarten Pipeline Environment Check ---"
 
-# Ensure directories exist
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$(dirname "$LOG_PATH")"
 mkdir -p "$(dirname "$MODEL_PATH")"
 
-# Download model if missing
 if [ ! -f "$MODEL_PATH" ]; then
     echo "Model not found. Downloading (this may take a while)..."
 
@@ -25,16 +23,13 @@ if [ ! -f "$MODEL_PATH" ]; then
     echo "Download complete."
 fi
 
-# Verify model exists
 if [ ! -f "$MODEL_PATH" ]; then
     echo "ERROR: Model still not found after download attempt."
     exit 1
 fi
 
-# Default GPU layers
 GL_LAYERS="${BIERGARTEN_GL_LAYERS:-40}"
 
-# Build args
 ARGS=(
     "--model"      "$MODEL_PATH"
     "--prompt-dir" "$PROMPT_DIR"
@@ -43,14 +38,12 @@ ARGS=(
     "--n-gpu-layers" "$GL_LAYERS"
 )
 
-# Optional params
 [[ -n "$BIERGARTEN_TEMPERATURE" ]] && ARGS+=("--temperature"  "$BIERGARTEN_TEMPERATURE")
 [[ -n "$BIERGARTEN_TOP_P" ]]       && ARGS+=("--top-p"        "$BIERGARTEN_TOP_P")
 [[ -n "$BIERGARTEN_TOP_K" ]]       && ARGS+=("--top-k"        "$BIERGARTEN_TOP_K")
 [[ -n "$BIERGARTEN_N_CTX" ]]       && ARGS+=("--n-ctx"        "$BIERGARTEN_N_CTX")
 [[ -n "$BIERGARTEN_SEED" ]]        && ARGS+=("--seed"         "$BIERGARTEN_SEED")
 
-# Extra args
 [[ -n "$BIERGARTEN_EXTRA_ARGS" ]] && ARGS+=($BIERGARTEN_EXTRA_ARGS)
 
 echo "--- Executing: $EXECUTABLE ${ARGS[*]} ---"
