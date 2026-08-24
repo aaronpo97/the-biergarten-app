@@ -88,23 +88,23 @@ struct EnrichedCity {
 };
 
 /**
- * @brief A physical address: the city plus a concrete postal code selected
- * from that city's curated postal-code examples.
+ * @brief A physical address: the city plus a coordinate pair sampled near
+ * the city's centre.
  */
 struct BreweryAddress {
    City city;
-   std::string postal_code{};
    double longitude{};
    double latitude{};
 };
 
 /**
- * @brief A physical address for a generated user: the city plus a concrete
- * postal code selected from that city's curated postal-code examples.
+ * @brief A physical address for a generated user: the city plus a
+ * coordinate pair sampled near the city's centre.
  */
 struct UserAddress {
    City city;
-   std::string postal_code{};
+   double longitude{};
+   double latitude{};
 };
 
 /**

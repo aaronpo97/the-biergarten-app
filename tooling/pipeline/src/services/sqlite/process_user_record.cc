@@ -87,11 +87,18 @@ uint64_t SqliteExportService::ProcessRecord(const UserRecord& user) {
            .action = "Failed to bind SQLite user address city id"});
    sqlite_export_service_internal::Bind(
        insert_user_address_stmt_,
-       sqlite_export_service_internal::BoundParam<std::string_view>{
+       sqlite_export_service_internal::BoundParam<double>{
            .index =
-               sqlite_export_service_internal::kUserAddressPostalCodeBindIndex,
-           .value = user.address.postal_code,
-           .action = "Failed to bind SQLite user address postal code"});
+               sqlite_export_service_internal::kUserAddressLongitudeBindIndex,
+           .value = user.address.longitude,
+           .action = "Failed to bind SQLite user address longitude"});
+   sqlite_export_service_internal::Bind(
+       insert_user_address_stmt_,
+       sqlite_export_service_internal::BoundParam<double>{
+           .index =
+               sqlite_export_service_internal::kUserAddressLatitudeBindIndex,
+           .value = user.address.latitude,
+           .action = "Failed to bind SQLite user address latitude"});
 
    sqlite_export_service_internal::StepStatement(
        db_handle_, insert_user_address_stmt_,

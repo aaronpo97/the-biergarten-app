@@ -3,9 +3,9 @@
 
 /**
  * @file data_generation/generation_json_validation.h
- * @brief Generator-agnostic helpers for preparing prompt context and
- * validating structured JSON output. Shared across all DataGenerator
- * implementations (Llama, OpenAI, ...).
+ * @brief Generator-agnostic helpers, shared across all DataGenerator
+ * implementations (Llama, OpenAI, ...), for preparing prompt context and
+ * validating structured JSON output.
  */
 
 #include <cstddef>
@@ -36,11 +36,9 @@ std::optional<std::string> ValidateBreweryJson(const std::string& raw,
                                                BreweryResult& brewery_out);
 
 /**
- * @brief Validates and parses user JSON output.
- *
- * Only populates `username`, `bio`, and `activity_weight` -- `first_name`
- * and `last_name` are not LLM-authored and are set separately from the
- * sampled Name.
+ * @brief Validates and parses user JSON output, populating only
+ * `username`, `bio`, and `activity_weight` (`first_name` and `last_name`
+ * come from the sampled Name).
  *
  * @param raw Raw model output.
  * @param user_out Parsed user payload.

@@ -36,10 +36,7 @@ std::string FormatLocalLanguageCodes(
 
 constexpr int kBreweryMaxTokens = 2800;
 
-// Structured outputs already guarantee schema-valid JSON, so retries here
-// are only for transient failures or the model returning placeholder text
-// -- not for malformed JSON shape, unlike LlamaGenerator's grammar-assisted
-// retry loop.
+// Structured outputs already guarantee schema-valid JSON, so retries here only cover transient failures or the model returning placeholder text.
 constexpr int kMaxAttempts = 2;
 
 }  // namespace
@@ -54,9 +51,7 @@ BreweryResult OpenAIGenerator::GenerateBrewery(
        FormatLocalLanguageCodes(location.local_languages);
 
    /**
-    * Load brewery system prompt via the injected prompt directory. The
-    * same file LlamaGenerator uses -- the prompt content is backend
-    * agnostic.
+    * Loads the backend-agnostic brewery system prompt via the injected prompt directory.
     */
    const std::string system_prompt =
        prompt_directory_->Load("BREWERY_GENERATION");

@@ -18,7 +18,7 @@ low-resource language failures.
 - [Known issues](#known-issues)
   - [Hallucinated brewing techniques](#hallucinated-brewing-techniques)
   - [Low-resource language hallucination](#low-resource-language-hallucination)
-  - [Synthetic postal codes](#synthetic-postal-codes)
+  - [Synthetic coordinates](#synthetic-coordinates)
 
 ---
 
@@ -284,20 +284,17 @@ Output sample: [./french-cities.example](french-cities.example)
   SQLite schema so downstream applications can filter or flag potentially
   hallucinated text by language tier.
 
-### Synthetic postal codes
+### Synthetic coordinates
 
-When the pipeline is run without `--mocked`, `XegerPostalCodeService` generates
-a fresh postal code per brewery/user address by reverse-matching one of the
-city's curated postal-code regexes from `locations.json` (falling back to the
-country format regex), rather than returning one of `MockPostalCodeService`'s
-curated real-world examples.
+Each brewery and user address carries a longitude/latitude pair, sampled
+uniformly at random within a 5 km disc centred on the city's curated
+`latitude`/`longitude` from `locations.json`.
 
-The generated code is **format-conformant by construction** — it always
-satisfies the regex it was generated from — but it is not looked up from any
-real postal registry. It does not correspond to a real address, business, or
-resident, and should not be treated as accurate geocoding or delivery data. This
-is consistent with the rest of the dataset: fixture data for a proof-of-concept,
-not a source of truth.
+The resulting point is **plausible by construction** — it always falls within
+the city's vicinity — but it is not looked up from any real address registry.
+It does not correspond to a real address, business, or resident, and should
+not be treated as accurate geocoding data. This is consistent with the rest of
+the dataset: fixture data for a proof-of-concept, not a source of truth.
 
 ---
 
