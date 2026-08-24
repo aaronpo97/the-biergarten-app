@@ -21,6 +21,16 @@ cd the-biergarten-app
 
 ### 2. Configure backend environment variables
 
+Generate `.env.dev` with freshly randomized secrets:
+
+```bash
+cd web
+./generate-env.sh .env.dev
+cd ..
+```
+
+Or copy the template and fill in values manually:
+
 ```bash
 cp web/.env.example web/.env.dev
 ```
@@ -38,7 +48,9 @@ CONFIRMATION_TOKEN_SECRET=<generated>
 WEBSITE_BASE_URL=http://localhost:3000
 ```
 
-See [Environment Variables](environment-variables.md) for the full list.
+See [Environment Variables](environment-variables.md) for the full list, and its
+[Generating an env file](environment-variables.md#generating-an-env-file)
+section for details on `generate-env.sh`.
 
 ### 3. Start the backend stack
 

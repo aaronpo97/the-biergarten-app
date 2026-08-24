@@ -1,4 +1,3 @@
-
 # Testing
 
 This document describes the testing strategy and how to run tests for The
@@ -128,8 +127,8 @@ npm run test:storybook:playwright
 
 ### Running Storybook tests with a visible browser
 
-Both of the above run headless by default. To watch the browser while
-debugging a failure:
+Both of the above run headless by default. To watch the browser while debugging
+a failure:
 
 ```bash
 # Playwright Storybook suite
@@ -158,6 +157,9 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 - Refresh token exchange
 - JWT token generation, validation, and claims handling
 - Invalid credentials and 404 error responses (via API.Specs)
+- Account management: username, email, password, and profile updates, and
+  account deletion (blocked while dependent posts, comments, photos, or follows
+  exist)
 
 **Features.Breweries.Tests**:
 
@@ -259,7 +261,12 @@ Features.Auth.Tests/
 │   ├── RegisterUserHandlerTests.cs
 │   ├── ConfirmUserHandlerTests.cs
 │   ├── ResendConfirmationEmailHandlerTests.cs
-│   └── RefreshTokenHandlerTests.cs
+│   ├── RefreshTokenHandlerTests.cs
+│   ├── UpdateUsernameHandlerTests.cs
+│   ├── UpdateEmailHandlerTests.cs
+│   ├── UpdatePasswordHandlerTests.cs
+│   ├── UpdateProfileHandlerTests.cs
+│   └── DeleteAccountHandlerTests.cs
 ├── Queries/
 │   └── LoginHandlerTests.cs            # tests LoginCommand, despite the folder name
 └── Services/
