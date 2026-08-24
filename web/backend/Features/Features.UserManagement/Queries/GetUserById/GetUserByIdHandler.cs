@@ -5,9 +5,6 @@ using MediatR;
 
 namespace Features.UserManagement.Queries.GetUserById;
 
-/// <summary>
-///     Handles <see cref="GetUserByIdQuery" />.
-/// </summary>
 public class GetUserByIdHandler(IUserAccountRepository repository)
     : IRequestHandler<GetUserByIdQuery, UserAccount>
 {

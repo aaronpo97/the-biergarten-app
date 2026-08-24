@@ -87,8 +87,6 @@ builder.Logging.AddConsole();
 if (!builder.Environment.IsProduction())
     builder.Logging.AddDebug();
 
-// Configure Dependency Injection -------------------------------------------------------------------------------------
-
 builder.Services.AddInfrastructureSql();
 
 builder.Services.AddFeaturesBreweries();
