@@ -31,7 +31,9 @@ public class UpdateProfileHandler(UserManager<ApplicationUser> userManager)
 
         IdentityResult result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
 
         return new UpdateProfilePayload(user.Id, user.FirstName, user.LastName, user.DateOfBirth);
     }

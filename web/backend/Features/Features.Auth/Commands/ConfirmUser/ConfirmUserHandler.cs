@@ -29,9 +29,7 @@ public class ConfirmUserHandler(
             request.Token
         );
 
-        ApplicationUser? user = await userManager.FindByIdAsync(
-            validatedToken.UserId.ToString()
-        );
+        ApplicationUser? user = await userManager.FindByIdAsync(validatedToken.UserId.ToString());
         if (user == null)
             throw new UnauthorizedException("User account not found");
 

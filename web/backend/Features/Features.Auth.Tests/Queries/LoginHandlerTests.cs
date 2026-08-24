@@ -87,7 +87,9 @@ public class LoginHandlerTests
         ApplicationUser user = new() { Id = Guid.NewGuid(), UserName = username };
 
         _userManagerMock.Setup(x => x.FindByNameAsync(username)).ReturnsAsync(user);
-        _userManagerMock.Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>())).ReturnsAsync(false);
+        _userManagerMock
+            .Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>()))
+            .ReturnsAsync(false);
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(new LoginCommand(username, "password"), CancellationToken.None);
@@ -104,7 +106,9 @@ public class LoginHandlerTests
         ApplicationUser user = new() { Id = Guid.NewGuid(), UserName = username };
 
         _userManagerMock.Setup(x => x.FindByNameAsync(username)).ReturnsAsync(user);
-        _userManagerMock.Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>())).ReturnsAsync(false);
+        _userManagerMock
+            .Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>()))
+            .ReturnsAsync(false);
 
         Func<Task<LoginPayload>> act = async () =>
             await _handler.Handle(

@@ -12,5 +12,6 @@ public class ConnectionStrings
     public static string GetSqlServerConnectionString(IConfiguration configuration) =>
         SqlConnectionStringHelper.BuildConnectionString(configuration);
 
-    public static string SqliteConnectionString => "Data Source=SeedData/biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite";
+    public static string SqliteConnectionString =>
+        "Data Source=SeedData/biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite";
 }

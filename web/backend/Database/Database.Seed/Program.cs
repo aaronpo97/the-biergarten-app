@@ -26,9 +26,7 @@ static async Task<int> RunAsync()
 {
     try
     {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
+        IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
 
         ServiceCollection services = [];
         services.AddSingleton(configuration);
@@ -39,21 +37,17 @@ static async Task<int> RunAsync()
 
         await using ServiceProvider provider = services.BuildServiceProvider();
 
-        IBreweryRepository breweryRepository =
-            provider.GetRequiredService<IBreweryRepository>();
-        ILocationRepository locationRepository =
-            provider.GetRequiredService<ILocationRepository>();
-        UserManager<ApplicationUser> userManager =
-            provider.GetRequiredService<UserManager<ApplicationUser>>();
+        IBreweryRepository breweryRepository = provider.GetRequiredService<IBreweryRepository>();
+        ILocationRepository locationRepository = provider.GetRequiredService<ILocationRepository>();
+        UserManager<ApplicationUser> userManager = provider.GetRequiredService<
+            UserManager<ApplicationUser>
+        >();
 
-        AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]")
-            .LeftJustified());
-        AnsiConsole.MarkupLine(
-            "[grey]Connecting to SQLite source and loading seed data...[/]");
+        AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]").LeftJustified());
+        AnsiConsole.MarkupLine("[grey]Connecting to SQLite source and loading seed data...[/]");
         AnsiConsole.WriteLine();
 
-        PipelineSeedDataReader reader =
-            new(ConnectionStrings.SqliteConnectionString);
+        PipelineSeedDataReader reader = new(ConnectionStrings.SqliteConnectionString);
 
         SeedData seedData = null!;
         IReadOnlyList<Guid> postedByIds = [];
@@ -79,16 +73,14 @@ static async Task<int> RunAsync()
         AnsiConsole.Write(BuildBreweryTable(seedData.Breweries));
         AnsiConsole.WriteLine();
 
-        AnsiConsole.MarkupLine(
-            $"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
+        AnsiConsole.MarkupLine($"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
         AnsiConsole.Write(BuildUserTable(seedData.Users));
         AnsiConsole.WriteLine();
 
         AnsiConsole.WriteLine("Seed data loaded successfully.");
 
         AnsiConsole.Write(
-            new Rule("[bold green]Loading seed data into target database.[/]")
-                .LeftJustified()
+            new Rule("[bold green]Loading seed data into target database.[/]").LeftJustified()
         );
 
         await AnsiConsole
@@ -193,8 +185,7 @@ static async Task LoadBreweriesIntoDatabaseAsync(
     const string placeholderAddressLine1 = "Address unavailable";
 
     if (posterUserIds.Count == 0)
-        throw new InvalidOperationException(
-            "Cannot load breweries without any registered users.");
+        throw new InvalidOperationException("Cannot load breweries without any registered users.");
 
     for (int i = 0; i < breweries.Count; i++)
     {

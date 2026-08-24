@@ -11,4 +11,5 @@ namespace Features.Auth.Commands.UpdateEmail;
 ///     The authenticated caller's own ID, extracted from the access token -- never bind this from
 ///     client-supplied input.
 /// </param>
-public record UpdateEmailCommand(Guid UserAccountId, string NewEmail) : IRequest<UpdateEmailPayload>;
+public record UpdateEmailCommand(Guid UserAccountId, string NewEmail)
+    : IRequest<UpdateEmailPayload>;

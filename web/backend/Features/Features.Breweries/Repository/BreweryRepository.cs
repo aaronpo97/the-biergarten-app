@@ -70,8 +70,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit,
-        int? offset)
+    public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryAsync<
@@ -122,25 +121,24 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     public async Task<BreweryPost> UpdateAsync(BreweryPost brewery)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction =
-            await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
             bool breweryExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                            SELECT 1 FROM
-                                dbo.BreweryPost
-                            WHERE
-                                BreweryPostID = @BreweryPostId
-                            """,
-                            new { brewery.BreweryPostId },
-                            transaction
-                        )
+                    new CommandDefinition(
+                        """
+                        SELECT 1 FROM
+                            dbo.BreweryPost
+                        WHERE
+                            BreweryPostID = @BreweryPostId
+                        """,
+                        new { brewery.BreweryPostId },
+                        transaction
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!breweryExists)
                 throw new NotFoundException("Brewery not found.");
@@ -149,13 +147,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             {
                 bool cityExists =
                     await connection.ExecuteScalarAsync<int?>(
-                            new CommandDefinition(
-                                "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
-                                new { brewery.Location.CityId },
-                                transaction
-                            )
+                        new CommandDefinition(
+                            "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
+                            new { brewery.Location.CityId },
+                            transaction
                         )
-                        is not null;
+                    )
+                    is not null;
 
                 if (!cityExists)
                     throw new NotFoundException("City not found.");
@@ -207,17 +205,17 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             {
                 bool locationExists =
                     await connection.ExecuteScalarAsync<int?>(
-                            new CommandDefinition(
-                                """
-                                SELECT 1
-                                FROM dbo.BreweryPostLocation
-                                WHERE BreweryPostID = @BreweryPostId
-                                """,
-                                new { brewery.BreweryPostId },
-                                transaction
-                            )
+                        new CommandDefinition(
+                            """
+                            SELECT 1
+                            FROM dbo.BreweryPostLocation
+                            WHERE BreweryPostID = @BreweryPostId
+                            """,
+                            new { brewery.BreweryPostId },
+                            transaction
                         )
-                        is not null;
+                    )
+                    is not null;
 
                 if (locationExists)
                     await connection.ExecuteAsync(
@@ -288,9 +286,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
 
         return await GetByIdAsync(brewery.BreweryPostId)
-               ?? throw new InvalidOperationException(
-                   $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
-               );
+            ?? throw new InvalidOperationException(
+                $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
+            );
     }
 
     /// <inheritdoc/>
@@ -315,49 +313,47 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     public async Task CreateAsync(BreweryPost brewery)
     {
         if (brewery.Location is null)
-            throw new ArgumentException(
-                "Location must be provided when creating a brewery.");
+            throw new ArgumentException("Location must be provided when creating a brewery.");
 
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction =
-            await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
             bool userExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                                        SELECT 1
-                                        FROM
-                                            dbo.UserAccount
-                                        WHERE
-                                            UserAccountID = @PostedById
-                            """,
-                            new { brewery.PostedById },
-                            transaction
-                        )
+                    new CommandDefinition(
+                        """
+                                    SELECT 1
+                                    FROM
+                                        dbo.UserAccount
+                                    WHERE
+                                        UserAccountID = @PostedById
+                        """,
+                        new { brewery.PostedById },
+                        transaction
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!userExists)
                 throw new NotFoundException("User not found.");
 
             bool cityExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                                        SELECT 1
-                                        FROM
-                                            dbo.City
-                                        WHERE
-                                            CityID = @CityId
-                            """,
-                            new { brewery.Location.CityId },
-                            transaction
-                        )
+                    new CommandDefinition(
+                        """
+                                    SELECT 1
+                                    FROM
+                                        dbo.City
+                                    WHERE
+                                        CityID = @CityId
+                        """,
+                        new { brewery.Location.CityId },
+                        transaction
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!cityExists)
                 throw new NotFoundException("City not found.");

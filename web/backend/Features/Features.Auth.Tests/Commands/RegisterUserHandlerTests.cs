@@ -103,7 +103,11 @@ public class RegisterUserHandlerTests
             .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), command.Password))
             .ReturnsAsync(
                 IdentityResult.Failed(
-                    new IdentityError { Code = "DuplicateUserName", Description = "Username taken." }
+                    new IdentityError
+                    {
+                        Code = "DuplicateUserName",
+                        Description = "Username taken.",
+                    }
                 )
             );
 

@@ -8,20 +8,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="idunno.Password.Generator" Version="2.0.0"/>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2"/>
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11"/>
-        <PackageReference Include="Spectre.Console" Version="0.57.2"/>
+        <PackageReference Include="idunno.Password.Generator" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+        <PackageReference Include="Spectre.Console" Version="0.57.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj"/>
-        <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj"/>
-        <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj"/>
-        <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj"/>
+        <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite"/>
+        <None
+            CopyToOutputDirectory="PreserveNewest"
+            Include="SeedData\biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite"
+        />
     </ItemGroup>
 </Project>

@@ -23,9 +23,7 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 
         RuleFor(x => x.Location).NotNull().WithMessage("Location is required.");
 
-        RuleFor(x => x.Location.CityId)
-            .NotEmpty()
-            .WithMessage("CityId is required.");
+        RuleFor(x => x.Location.CityId).NotEmpty().WithMessage("CityId is required.");
 
         RuleFor(x => x.Location.AddressLine1)
             .NotEmpty()

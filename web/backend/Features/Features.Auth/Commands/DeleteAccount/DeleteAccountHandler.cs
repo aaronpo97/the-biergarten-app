@@ -27,7 +27,9 @@ public class DeleteAccountHandler(UserManager<ApplicationUser> userManager)
                 throw new ConflictException(
                     "Account cannot be deleted while it still has associated posts, comments, photos, or follows."
                 );
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
         }
     }
 }

@@ -52,8 +52,7 @@ public static class SqlConnectionStringHelper
         return !bool.TryParse(
                 configuration["DB_TRUST_SERVER_CERTIFICATE"],
                 out bool trustServerCertificate
-            )
-            || trustServerCertificate;
+            ) || trustServerCertificate;
     }
 
     private static string Required(IConfiguration configuration, string key) =>

@@ -14,7 +14,8 @@ public class ResendConfirmationEmailHandlerTests
     private readonly ResendConfirmationEmailHandler _handler;
     private readonly Mock<IMediator> _mediatorMock = new();
     private readonly Mock<ITokenService> _tokenServiceMock = new();
-    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock = UserManagerMockFactory.Create();
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock =
+        UserManagerMockFactory.Create();
 
     public ResendConfirmationEmailHandlerTests()
     {

@@ -18,6 +18,5 @@ public sealed class UserAccount
     public byte[]? RowVersion { get; set; }
 
     // Navigation properties
-    public UserCredential?  UserCredential { get; set; }
-
+    public UserCredential? UserCredential { get; set; }
 }

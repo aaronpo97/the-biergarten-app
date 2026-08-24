@@ -19,8 +19,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
         IUserPasswordStore<ApplicationUser>,
         IUserEmailStore<ApplicationUser>
 {
-    private const string SelectUserSql =
-        """
+    private const string SelectUserSql = """
         SELECT UserAccountID AS Id, Username AS UserName, FirstName, LastName, Email, DateOfBirth
         FROM dbo.UserAccount
         """;
@@ -33,8 +32,10 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
         Task.FromResult(user.Id.ToString());
 
     /// <inheritdoc />
-    public Task<string?> GetUserNameAsync(ApplicationUser user, CancellationToken cancellationToken) =>
-        Task.FromResult<string?>(user.UserName);
+    public Task<string?> GetUserNameAsync(
+        ApplicationUser user,
+        CancellationToken cancellationToken
+    ) => Task.FromResult<string?>(user.UserName);
 
     /// <inheritdoc />
     public Task SetUserNameAsync(

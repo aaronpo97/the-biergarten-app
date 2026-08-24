@@ -34,7 +34,9 @@ public class UpdatePasswordHandler(UserManager<ApplicationUser> userManager)
         {
             if (result.Errors.Any(e => e.Code == "PasswordMismatch"))
                 throw new UnauthorizedException("Current password is incorrect");
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
         }
 
         return new UpdatePasswordPayload(user.Id, DateTime.UtcNow);

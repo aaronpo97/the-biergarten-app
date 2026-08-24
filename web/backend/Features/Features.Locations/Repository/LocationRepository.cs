@@ -51,7 +51,8 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
                 WHERE CityName = @CityName AND StateProvinceID = @StateProvinceId
                 """,
                 new { location.CityName, StateProvinceId = stateProvinceId }
-            ) is not null;
+            )
+            is not null;
 
         if (!cityExists)
             await connection.ExecuteAsync(
@@ -83,7 +84,8 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
                 WHERE ISO3166_1 = @ISO3166_1
                 """,
                 new { ISO3166_1 = isoCode }
-            ) is not null;
+            )
+            is not null;
 
         if (!exists)
             // A concurrent caller may create this country between the check above and here; that
@@ -128,7 +130,8 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
                 WHERE ISO3166_2 = @ISO3166_2
                 """,
                 new { ISO3166_2 = isoCode }
-            ) is not null;
+            )
+            is not null;
 
         if (!exists)
             await connection.ExecuteAsync(

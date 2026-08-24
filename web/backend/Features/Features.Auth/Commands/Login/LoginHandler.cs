@@ -18,7 +18,10 @@ public class LoginHandler(UserManager<ApplicationUser> userManager, ITokenServic
     ///     Thrown when the username does not match any account or the supplied password does not match
     ///     the stored hash.
     /// </exception>
-    public async Task<LoginPayload> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<LoginPayload> Handle(
+        LoginCommand request,
+        CancellationToken cancellationToken
+    )
     {
         ApplicationUser user =
             await userManager.FindByNameAsync(request.Username)

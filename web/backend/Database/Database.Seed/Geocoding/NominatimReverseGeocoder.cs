@@ -79,8 +79,8 @@ public sealed class NominatimReverseGeocoder : IDisposable
 
             string addressLine1 = string.Join(
                 ' ',
-                new[] { response.Address.HouseNumber, response.Address.Road }.Where(
-                    part => !string.IsNullOrWhiteSpace(part)
+                new[] { response.Address.HouseNumber, response.Address.Road }.Where(part =>
+                    !string.IsNullOrWhiteSpace(part)
                 )
             );
 

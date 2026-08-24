@@ -26,7 +26,9 @@ public class UpdateUsernameHandler(UserManager<ApplicationUser> userManager)
         {
             if (result.Errors.Any(e => e.Code == "DuplicateUserName"))
                 throw new ConflictException("Username already exists");
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
         }
 
         return new UpdateUsernamePayload(user.Id, user.UserName);

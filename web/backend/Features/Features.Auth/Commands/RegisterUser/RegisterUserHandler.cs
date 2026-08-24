@@ -43,7 +43,9 @@ public class RegisterUserHandler(
         {
             if (result.Errors.Any(e => e.Code is "DuplicateUserName" or "DuplicateEmail"))
                 throw new ConflictException("Username or email already exists");
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
         }
 
         string accessToken = tokenService.GenerateAccessToken(user.Id, user.UserName);
@@ -51,7 +53,13 @@ public class RegisterUserHandler(
         string confirmationToken = tokenService.GenerateConfirmationToken(user.Id, user.UserName);
 
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            return new RegistrationPayload(user.Id, user.UserName, string.Empty, string.Empty, false);
+            return new RegistrationPayload(
+                user.Id,
+                user.UserName,
+                string.Empty,
+                string.Empty,
+                false
+            );
 
         bool emailSent = false;
         try
@@ -68,6 +76,12 @@ public class RegisterUserHandler(
             Console.WriteLine("Could not send email.");
         }
 
-        return new RegistrationPayload(user.Id, user.UserName, refreshToken, accessToken, emailSent);
+        return new RegistrationPayload(
+            user.Id,
+            user.UserName,
+            refreshToken,
+            accessToken,
+            emailSent
+        );
     }
 }

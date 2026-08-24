@@ -31,7 +31,9 @@ public class UpdateEmailHandler(UserManager<ApplicationUser> userManager)
         {
             if (result.Errors.Any(e => e.Code == "DuplicateEmail"))
                 throw new ConflictException("Email address already exists");
-            throw new ConflictException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            throw new ConflictException(
+                string.Join("; ", result.Errors.Select(e => e.Description))
+            );
         }
 
         return new UpdateEmailPayload(user.Id, user.Email, user.EmailConfirmed);

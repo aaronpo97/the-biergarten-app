@@ -71,7 +71,9 @@ public class AuthController(IMediator mediator) : ControllerBase
     /// </remarks>
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<ResponseBody<LoginPayload>>> Login([FromBody] LoginCommand command)
+    public async Task<ActionResult<ResponseBody<LoginPayload>>> Login(
+        [FromBody] LoginCommand command
+    )
     {
         LoginPayload payload = await mediator.Send(command);
         return Ok(

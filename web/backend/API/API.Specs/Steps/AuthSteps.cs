@@ -1020,9 +1020,7 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitAResendConfirmationRequestWithoutAnAccessToken()
     {
         HttpClient client = GetClient();
-        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id)
-            ? id
-            : Guid.NewGuid();
+        Guid userId = scenario.TryGetValue(RegisteredUserIdKey, out Guid id) ? id : Guid.NewGuid();
 
         HttpRequestMessage requestMessage = new(
             HttpMethod.Post,
