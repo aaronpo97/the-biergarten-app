@@ -66,7 +66,7 @@ note right
 end note
 
 |#EAF0E8|BiergartenPipelineOrchestrator|
-:QueryCitiesWithCountries();
+:QueryLocations();
 
 |#E2EBDC|JsonLoader|
 :JsonLoader::LoadLocations("locations.json");
@@ -118,7 +118,7 @@ while (For each EnrichedCity?) is (Remaining cities)
     |#E5EDE1|DataGenerator|
     if (Generator Mode) then (MockGenerator)
       :DeterministicHash & Format;
-    else (LlamaGenerator)
+    elseif (Generator Mode) then (LlamaGenerator)
       :prompt_directory_->Load("USER_GENERATION");
       note right
         Resolves to USER_GENERATION.md inside --prompt-dir.
@@ -133,15 +133,43 @@ while (For each EnrichedCity?) is (Remaining cities)
           :Append validation error to retry prompt;
         endif
       repeat while (Attempt < 3?) is (yes)
+    else (OpenAIGenerator)
+      :prompt_directory_->Load("USER_GENERATION");
+      note right
+        Same prompt file as LlamaGenerator - content
+        is backend-agnostic.
+      end note
+      repeat
+        :CallChatCompletionsApi(system_prompt, user_prompt,\nkUserJsonSchema, max_tokens);
+        :ValidateUserJson(raw, user);
+        if (Is JSON Valid?) then (yes)
+          break
+        else (no)
+          :Attempt++;
+          :Append validation error to retry prompt;
+        endif
+      repeat while (Attempt < 2?) is (yes)
+      note right
+        Structured Outputs (response_format:
+        json_schema, strict: true) already
+        guarantees schema shape, so only 2
+        attempts are needed - retries here cover
+        transient failures / placeholder text,
+        not malformed JSON.
+      end note
     endif
 
     |#EAF0E8|BiergartenPipelineOrchestrator|
     if (Generation successful?) then (yes)
+      :GetRandomCoordsWithinRange(city_centre, 5km, rng);
       :BuildEmail(name, used_email_local_parts);
       :GenerateDateOfBirth(rng);
       note right
         email and date_of_birth are generated
         programmatically, never LLM-authored.
+        Generation + coordinate jitter run inside
+        one try/catch per record. UserRecord.address
+        now carries {city, longitude, latitude}.
       end note
 
       |#E0EAE0|SqliteExportService|
@@ -171,7 +199,7 @@ endwhile (Done)
 while (For each EnrichedCity?) is (Remaining cities)
   if (Generator Mode) then (MockGenerator)
     :DeterministicHash & Format;
-  else (LlamaGenerator)
+  elseif (Generator Mode) then (LlamaGenerator)
     :PrepareRegionContext;
     :prompt_directory_->Load("BREWERY_GENERATION");
     note right
@@ -191,10 +219,40 @@ while (For each EnrichedCity?) is (Remaining cities)
       max_tokens is fixed across retries —
       it is not raised on truncation.
     end note
+  else (OpenAIGenerator)
+    :PrepareRegionContext;
+    :prompt_directory_->Load("BREWERY_GENERATION");
+    note right
+      Same prompt file as LlamaGenerator - content
+      is backend-agnostic.
+    end note
+    repeat
+      :CallChatCompletionsApi(system_prompt, user_prompt,\nkBreweryJsonSchema, max_tokens);
+      :ValidateBreweryJson(raw, brewery);
+      if (Is JSON Valid?) then (yes)
+        break
+      else (no)
+        :Attempt++;
+        :Append validation error to retry prompt;
+      endif
+    repeat while (Attempt < 2?) is (yes)
+    note right
+      Structured Outputs already guarantees schema
+      shape, so only 2 attempts are needed - retries
+      here cover transient failures / placeholder
+      text, not malformed JSON.
+    end note
   endif
 
   |#EAF0E8|BiergartenPipelineOrchestrator|
   if (Generation successful?) then (yes)
+    :GetRandomCoordsWithinRange(city_centre, 5km, rng);
+    note right
+      Generation + coordinate jitter run inside one
+      try/catch per record. BreweryRecord.address
+      now carries {city, longitude, latitude}.
+    end note
+
     |#E0EAE0|SqliteExportService|
     :ProcessRecord(GeneratedBrewery);
     if (Location in cache?) then (yes)
