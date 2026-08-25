@@ -39,42 +39,6 @@ public class TokenServiceValidationTests
     }
 
     [Fact]
-    public async Task ValidateAccessTokenAsync_WithValidToken_ReturnsValidatedToken()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
-        const string username = "testuser";
-        const string token = "valid-access-token";
-
-        List<Claim> claims = new()
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-
-        ClaimsIdentity claimsIdentity = new(claims);
-        ClaimsPrincipal principal = new(claimsIdentity);
-
-        _tokenInfraMock
-            .Setup(x => x.ValidateJwtAsync(token, It.IsAny<string>()))
-            .ReturnsAsync(principal);
-
-        // Act
-        ValidatedToken result = await _tokenService.ValidateAccessTokenAsync(token);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(userId);
-        result.Username.Should().Be(username);
-        result.Principal.Should().NotBeNull();
-        result
-            .Principal.FindFirst(JwtRegisteredClaimNames.Sub)
-            ?.Value.Should()
-            .Be(userId.ToString());
-    }
-
-    [Fact]
     public async Task ValidateRefreshTokenAsync_WithValidToken_ReturnsValidatedToken()
     {
         // Arrange
@@ -137,24 +101,7 @@ public class TokenServiceValidationTests
     }
 
     [Fact]
-    public async Task ValidateAccessTokenAsync_WithInvalidToken_ThrowsUnauthorizedException()
-    {
-        // Arrange
-        const string token = "invalid-token";
-
-        _tokenInfraMock
-            .Setup(x => x.ValidateJwtAsync(token, It.IsAny<string>()))
-            .ThrowsAsync(new UnauthorizedException("Invalid token"));
-
-        // Act & Assert
-        await FluentActions
-            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
-            .Should()
-            .ThrowAsync<UnauthorizedException>();
-    }
-
-    [Fact]
-    public async Task ValidateAccessTokenAsync_WithExpiredToken_ThrowsUnauthorizedException()
+    public async Task ValidateRefreshTokenAsync_WithExpiredToken_ThrowsUnauthorizedException()
     {
         // Arrange
         const string token = "expired-token";
@@ -165,13 +112,13 @@ public class TokenServiceValidationTests
 
         // Act & Assert
         await FluentActions
-            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Invoking(async () => await _tokenService.ValidateRefreshTokenAsync(token))
             .Should()
             .ThrowAsync<UnauthorizedException>();
     }
 
     [Fact]
-    public async Task ValidateAccessTokenAsync_WithMissingUserIdClaim_ThrowsUnauthorizedException()
+    public async Task ValidateRefreshTokenAsync_WithMissingUserIdClaim_ThrowsUnauthorizedException()
     {
         // Arrange
         const string username = "testuser";
@@ -193,14 +140,14 @@ public class TokenServiceValidationTests
 
         // Act & Assert
         await FluentActions
-            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Invoking(async () => await _tokenService.ValidateRefreshTokenAsync(token))
             .Should()
             .ThrowAsync<UnauthorizedException>()
             .WithMessage("*missing required claims*");
     }
 
     [Fact]
-    public async Task ValidateAccessTokenAsync_WithMissingUsernameClaim_ThrowsUnauthorizedException()
+    public async Task ValidateRefreshTokenAsync_WithMissingUsernameClaim_ThrowsUnauthorizedException()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
@@ -222,14 +169,14 @@ public class TokenServiceValidationTests
 
         // Act & Assert
         await FluentActions
-            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Invoking(async () => await _tokenService.ValidateRefreshTokenAsync(token))
             .Should()
             .ThrowAsync<UnauthorizedException>()
             .WithMessage("*missing required claims*");
     }
 
     [Fact]
-    public async Task ValidateAccessTokenAsync_WithMalformedUserId_ThrowsUnauthorizedException()
+    public async Task ValidateRefreshTokenAsync_WithMalformedUserId_ThrowsUnauthorizedException()
     {
         // Arrange
         const string username = "testuser";
@@ -252,7 +199,7 @@ public class TokenServiceValidationTests
 
         // Act & Assert
         await FluentActions
-            .Invoking(async () => await _tokenService.ValidateAccessTokenAsync(token))
+            .Invoking(async () => await _tokenService.ValidateRefreshTokenAsync(token))
             .Should()
             .ThrowAsync<UnauthorizedException>()
             .WithMessage("*malformed user ID*");

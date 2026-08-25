@@ -1,5 +1,6 @@
 using API.Core;
 using API.Core.Authentication;
+using Database.Connection.DependencyInjection;
 using Features.Auth.Controllers;
 using Features.Auth.DependencyInjection;
 using Features.Breweries.Controllers;
@@ -11,7 +12,6 @@ using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Jwt;
-using Infrastructure.Sql.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
 
@@ -87,7 +87,7 @@ builder.Logging.AddConsole();
 if (!builder.Environment.IsProduction())
     builder.Logging.AddDebug();
 
-builder.Services.AddInfrastructureSql();
+builder.Services.AddDatabaseConnection();
 
 builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();

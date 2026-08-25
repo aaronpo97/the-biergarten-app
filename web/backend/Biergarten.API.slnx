@@ -6,6 +6,7 @@
     <Folder Name="/Database/">
         <Project Path="Database/Database.Migrations/Database.Migrations.csproj" />
         <Project Path="Database/Database.Seed/Database.Seed.csproj" />
+        <Project Path="Database/Database.Connection/Database.Connection.csproj" />
     </Folder>
     <Folder Name="/Domain/">
         <Project Path="Domain/Domain.Entities/Domain.Entities.csproj" />
@@ -16,7 +17,6 @@
         <Project Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj" />
         <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
         <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj" />
     </Folder>
     <Folder Name="/Features/">
         <Project Path="Features/Features.Breweries/Features.Breweries.csproj" />

@@ -17,6 +17,7 @@ WORKDIR /src
 COPY ["Biergarten.API.slnx", "./"]
 COPY ["API/API.Core/API.Core.csproj", "API/API.Core/"]
 COPY ["API/API.Specs/API.Specs.csproj", "API/API.Specs/"]
+COPY ["Database/Database.Connection/Database.Connection.csproj", "Database/Database.Connection/"]
 COPY ["Database/Database.Migrations/Database.Migrations.csproj", "Database/Database.Migrations/"]
 COPY ["Database/Database.Seed/Database.Seed.csproj", "Database/Database.Seed/"]
 COPY ["Domain/Domain.Entities/Domain.Entities.csproj", "Domain/Domain.Entities/"]
@@ -35,7 +36,6 @@ COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infras
 COPY ["Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj", "Infrastructure/Infrastructure.Email.Templates/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
 COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
-COPY ["Infrastructure/Infrastructure.Sql/Infrastructure.Sql.csproj", "Infrastructure/Infrastructure.Sql/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
 RUN dotnet restore "Biergarten.API.slnx"

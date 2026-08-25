@@ -83,12 +83,6 @@ public class TokenService : ITokenService
     }
 
     /// <inheritdoc />
-    public async Task<ValidatedToken> ValidateAccessTokenAsync(string token)
-    {
-        return await ValidateTokenInternalAsync(token, _accessTokenSecret, "access");
-    }
-
-    /// <inheritdoc />
     public async Task<ValidatedToken> ValidateRefreshTokenAsync(string token)
     {
         return await ValidateTokenInternalAsync(token, _refreshTokenSecret, "refresh");

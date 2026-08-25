@@ -1,6 +1,6 @@
 using System.Data.Common;
 using Dapper;
-using Infrastructure.Sql;
+using Database.Connection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 
@@ -14,7 +14,7 @@ namespace Features.Auth.Identity;
 ///     existing unique indexes are already case-insensitive under SQL Server's default collation).
 /// </summary>
 public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
-    : Repository<ApplicationUser>(connectionFactory),
+    : DapperRepository(connectionFactory),
         IUserStore<ApplicationUser>,
         IUserPasswordStore<ApplicationUser>,
         IUserEmailStore<ApplicationUser>

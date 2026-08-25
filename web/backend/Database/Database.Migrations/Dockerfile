@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 # Copy everything from the context (src/Core), matching Database.Seed/Dockerfile's context so
-# ProjectReference paths outside Database/ (e.g. Infrastructure.Sql) resolve.
+# ProjectReference paths resolve.
 COPY . .
 RUN dotnet restore "./Database/Database.Migrations/Database.Migrations.csproj"
 RUN dotnet build "./Database/Database.Migrations/Database.Migrations.csproj" -c $BUILD_CONFIGURATION -o /app/build

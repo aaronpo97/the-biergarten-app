@@ -1,8 +1,8 @@
 using System.Data.Common;
 using Dapper;
+using Database.Connection;
 using Domain.Entities;
 using Domain.Exceptions;
-using Infrastructure.Sql;
 
 namespace Features.Breweries.Repository;
 
@@ -17,7 +17,7 @@ namespace Features.Breweries.Repository;
 ///     yields the UDT's serialized bytes as a plain <c>varbinary</c> value that Dapper can bind directly.
 /// </remarks>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
-    : Repository<BreweryPost>(connectionFactory),
+    : Database.Connection.DapperRepository(connectionFactory),
         IBreweryRepository
 {
     /// <inheritdoc/>
