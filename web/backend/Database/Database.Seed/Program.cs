@@ -1,3 +1,4 @@
+using Database.Connection.DependencyInjection;
 using Database.Seed.DatabaseHelpers;
 using Database.Seed.Geocoding;
 using Database.Seed.PipelineData;
@@ -11,7 +12,6 @@ using Features.Locations.DependencyInjection;
 using Features.Locations.Dtos;
 using Features.Locations.Repository;
 using idunno.Password;
-using Infrastructure.Sql.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +30,7 @@ static async Task<int> RunAsync()
 
         ServiceCollection services = [];
         services.AddSingleton(configuration);
-        services.AddInfrastructureSql();
+        services.AddDatabaseConnection();
         services.AddFeaturesBreweries();
         services.AddFeaturesLocations();
         services.AddFeaturesAuth();

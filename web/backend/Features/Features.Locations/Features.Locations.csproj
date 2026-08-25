@@ -13,7 +13,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
         <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
+        <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>

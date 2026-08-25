@@ -18,7 +18,7 @@
         />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
+        <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="scripts/**/*.sql" />

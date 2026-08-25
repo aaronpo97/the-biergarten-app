@@ -65,7 +65,7 @@ MediatR/DI, never over HTTP:
 └─────────────────────────┴─────────────────────────┴────────────────────┘
        ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ Infrastructure.Sql, Infrastructure.Jwt, Infrastructure.PasswordHashing,  │
+│ Database.Connection, Infrastructure.Jwt, Infrastructure.PasswordHashing,│
 │ Infrastructure.Email, Infrastructure.Email.Templates                    │
 └─────────────────────────────────────────────────────────────────────────┘
                   ↓
@@ -176,8 +176,8 @@ whichever slices need them
 
 **Components**:
 
-- **Infrastructure.Sql**: generic ADO.NET connection/command plumbing
-  (`ISqlConnectionFactory`, the abstract `Repository<T>` base class), not
+- **Database.Connection**: generic ADO.NET connection/command plumbing
+  (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not
   domain-specific; each slice's own `Repository/` folder builds on this
 - **Infrastructure.Jwt**: JWT token generation and validation
 - **Infrastructure.PasswordHashing**: Argon2id password hashing
@@ -266,7 +266,7 @@ only:
 - `Features.Auth/Repository/IAuthRepository.cs`
 - `Features.Breweries/Repository/IBreweryRepository.cs`
 - `Features.UserManagement/Repository/IUserAccountRepository.cs`
-- `Infrastructure.Sql/DefaultSqlConnectionFactory.cs`: the generic connection
+- `Database.Connection/DefaultSqlConnectionFactory.cs`: the generic connection
   factory every slice's repository builds on
 
 **Benefits**:
@@ -295,7 +295,7 @@ method that registers its repository and slice-internal services
 **Lifetimes**:
 
 - Scoped: Repositories, slice-internal services (per request)
-- Singleton: `ISqlConnectionFactory`
+- Singleton: `DefaultSqlConnectionFactory`
 - Transient: Utilities, helpers
 
 #### Direct SQL via Dapper/ADO.NET

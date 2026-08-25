@@ -1,8 +1,8 @@
 using System.Data.Common;
 using Dapper;
+using Database.Connection;
 using Domain.Entities;
 using Domain.Exceptions;
-using Infrastructure.Sql;
 
 namespace Features.UserManagement.Repository;
 
@@ -10,7 +10,7 @@ namespace Features.UserManagement.Repository;
 ///     Dapper-based implementation of <see cref="IUserAccountRepository" />.
 /// </summary>
 public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
-    : Repository<UserAccount>(connectionFactory),
+    : Database.Connection.DapperRepository(connectionFactory),
         IUserAccountRepository
 {
     /// <inheritdoc />

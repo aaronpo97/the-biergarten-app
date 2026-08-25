@@ -3,7 +3,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Infrastructure.Sql</RootNamespace>
+        <RootNamespace>Database.Connection</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.1.79" />

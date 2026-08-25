@@ -1,9 +1,8 @@
 using System.Data.Common;
 using Dapper;
-using Domain.Entities;
+using Database.Connection;
 using Domain.Exceptions;
 using Features.Locations.Dtos;
-using Infrastructure.Sql;
 
 namespace Features.Locations.Repository;
 
@@ -11,7 +10,7 @@ namespace Features.Locations.Repository;
 ///     Dapper-based implementation of <see cref="ILocationRepository" />.
 /// </summary>
 public class LocationRepository(ISqlConnectionFactory connectionFactory)
-    : Repository<City>(connectionFactory),
+    : Database.Connection.DapperRepository(connectionFactory),
         ILocationRepository
 {
     /// <inheritdoc />

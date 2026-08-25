@@ -1,13 +1,12 @@
 using System.Data.Common;
 
-namespace Infrastructure.Sql;
+namespace Database.Connection;
 
 /// <summary>
 ///     Base class for Dapper-based repositories, providing shared connection creation for derived
 ///     repository implementations.
 /// </summary>
-public abstract class Repository<T>(ISqlConnectionFactory connectionFactory)
-    where T : class
+public abstract class DapperRepository(ISqlConnectionFactory connectionFactory)
 {
     /// <summary>
     ///     Creates and opens a new database connection using the configured <see cref="ISqlConnectionFactory" />.
