@@ -21,5 +21,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Features.Auth\Features.Auth.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
     </ItemGroup>
 </Project>

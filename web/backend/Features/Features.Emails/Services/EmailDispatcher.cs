@@ -1,3 +1,4 @@
+using Infrastructure.Configuration;
 using Infrastructure.Email;
 using Infrastructure.Email.Templates.Rendering;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +22,7 @@ public class EmailDispatcher(
     ///     Thrown when the <c>WEBSITE_BASE_URL</c> configuration value is not set.
     /// </exception>
     private string WebsiteBaseUrl =>
-        configuration["WEBSITE_BASE_URL"]
-        ?? throw new InvalidOperationException("WEBSITE_BASE_URL environment variable is not set");
+        ConfigurationHelpers.GetKeyOrThrow(configuration, ConfigurationKeys.WebsiteBaseUrl);
 
     /// <inheritdoc />
     public async Task SendRegistrationEmailAsync(

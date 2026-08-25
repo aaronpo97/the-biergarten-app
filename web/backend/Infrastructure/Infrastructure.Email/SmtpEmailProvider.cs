@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using Infrastructure.Configuration;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
@@ -25,31 +26,27 @@ public class SmtpEmailProvider : IEmailProvider
     ///     <c>SMTP_FROM_EMAIL</c>, <c>SMTP_FROM_NAME</c>) from <paramref name="configuration" />.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    ///     Thrown when <c>SMTP_HOST</c> or <c>SMTP_FROM_EMAIL</c> is not set, or when <c>SMTP_PORT</c> is not a valid integer.
+    ///     Thrown when <c>SMTP_HOST</c>, <c>SMTP_PORT</c>, or <c>SMTP_FROM_EMAIL</c> is not set,
+    ///     or when <c>SMTP_PORT</c> is not a valid integer.
     /// </exception>
     public SmtpEmailProvider(IConfiguration configuration)
     {
-        _host =
-            configuration["SMTP_HOST"]
-            ?? throw new InvalidOperationException("SMTP_HOST environment variable is not set");
+        _host = ConfigurationHelpers.GetKeyOrThrow(configuration, ConfigurationKeys.SmtpHost);
 
-        string portString = configuration["SMTP_PORT"] ?? "587";
-        if (!int.TryParse(portString, out _port))
-            throw new InvalidOperationException($"SMTP_PORT '{portString}' is not a valid integer");
+        _port = ConfigurationHelpers.GetIntKeyOrThrow(configuration, ConfigurationKeys.SmtpPort);
 
-        _username = configuration["SMTP_USERNAME"];
-        _password = configuration["SMTP_PASSWORD"];
+        _username = configuration[ConfigurationKeys.SmtpUsername];
+        _password = configuration[ConfigurationKeys.SmtpPassword];
 
-        string useSslString = configuration["SMTP_USE_SSL"] ?? "true";
+        string useSslString = configuration[ConfigurationKeys.SmtpUseSsl] ?? "true";
         _useSsl = bool.Parse(useSslString);
 
-        _fromEmail =
-            configuration["SMTP_FROM_EMAIL"]
-            ?? throw new InvalidOperationException(
-                "SMTP_FROM_EMAIL environment variable is not set"
-            );
+        _fromEmail = ConfigurationHelpers.GetKeyOrThrow(
+            configuration,
+            ConfigurationKeys.SmtpFromEmail
+        );
 
-        _fromName = configuration["SMTP_FROM_NAME"] ?? "The Biergarten";
+        _fromName = configuration[ConfigurationKeys.SmtpFromName] ?? "The Biergarten";
     }
 
     /// <inheritdoc/>

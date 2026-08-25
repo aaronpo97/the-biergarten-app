@@ -5,6 +5,7 @@ using Features.Auth.Identity;
 using Features.Auth.Services;
 using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
+using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -27,9 +28,11 @@ public class TokenServiceRefreshTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    ["ACCESS_TOKEN_SECRET"] = "test-access-secret-that-is-very-long-1234567890",
-                    ["REFRESH_TOKEN_SECRET"] = "test-refresh-secret-that-is-very-long-1234567890",
-                    ["CONFIRMATION_TOKEN_SECRET"] =
+                    [ConfigurationKeys.AccessTokenSecret] =
+                        "test-access-secret-that-is-very-long-1234567890",
+                    [ConfigurationKeys.RefreshTokenSecret] =
+                        "test-refresh-secret-that-is-very-long-1234567890",
+                    [ConfigurationKeys.ConfirmationTokenSecret] =
                         "test-confirmation-secret-that-is-very-long-1234567890",
                 }
             )

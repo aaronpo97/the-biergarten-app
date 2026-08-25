@@ -1,4 +1,4 @@
-using System.Data.Common;
+using Infrastructure.Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -19,7 +19,7 @@ public class DefaultSqlConnectionFactory(IConfiguration configuration) : ISqlCon
     {
         get
         {
-            string? fullConnectionString = configuration["DB_CONNECTION_STRING"];
+            string? fullConnectionString = configuration[ConfigurationKeys.DbConnectionString];
             if (!string.IsNullOrEmpty(fullConnectionString))
                 return fullConnectionString;
 

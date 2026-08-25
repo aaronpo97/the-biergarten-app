@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
 using Features.Auth.Identity;
+using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -33,23 +34,20 @@ public class TokenService : ITokenService
         _tokenInfrastructure = tokenInfrastructure;
         _userManager = userManager;
 
-        _accessTokenSecret =
-            configuration["ACCESS_TOKEN_SECRET"]
-            ?? throw new InvalidOperationException(
-                "ACCESS_TOKEN_SECRET environment variable is not set"
-            );
+        _accessTokenSecret = ConfigurationHelpers.GetKeyOrThrow(
+            configuration,
+            ConfigurationKeys.AccessTokenSecret
+        );
 
-        _refreshTokenSecret =
-            configuration["REFRESH_TOKEN_SECRET"]
-            ?? throw new InvalidOperationException(
-                "REFRESH_TOKEN_SECRET environment variable is not set"
-            );
+        _refreshTokenSecret = ConfigurationHelpers.GetKeyOrThrow(
+            configuration,
+            ConfigurationKeys.RefreshTokenSecret
+        );
 
-        _confirmationTokenSecret =
-            configuration["CONFIRMATION_TOKEN_SECRET"]
-            ?? throw new InvalidOperationException(
-                "CONFIRMATION_TOKEN_SECRET environment variable is not set"
-            );
+        _confirmationTokenSecret = ConfigurationHelpers.GetKeyOrThrow(
+            configuration,
+            ConfigurationKeys.ConfirmationTokenSecret
+        );
     }
 
     /// <inheritdoc />

@@ -1,4 +1,5 @@
 using Database.Connection;
+using Infrastructure.Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -21,7 +22,7 @@ internal static class Program
                 .Build();
 
             bool clearDatabase = string.Equals(
-                configuration["CLEAR_DATABASE"],
+                configuration[ConfigurationKeys.ClearDatabase],
                 "true",
                 StringComparison.OrdinalIgnoreCase
             );

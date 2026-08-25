@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using FluentAssertions;
+using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -430,7 +431,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredConfigValue("ACCESS_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue(ConfigurationKeys.AccessTokenSecret);
         scenario["accessToken"] = GenerateJwtToken(
             userId,
             username,
@@ -449,7 +450,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredConfigValue("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue(ConfigurationKeys.ConfirmationTokenSecret);
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,
@@ -468,7 +469,7 @@ public class AuthSteps(ScenarioContext scenario)
             ? user
             : throw new InvalidOperationException("registered username not found in scenario");
 
-        string secret = GetRequiredConfigValue("CONFIRMATION_TOKEN_SECRET");
+        string secret = GetRequiredConfigValue(ConfigurationKeys.ConfirmationTokenSecret);
         scenario["confirmationToken"] = GenerateJwtToken(
             userId,
             username,
