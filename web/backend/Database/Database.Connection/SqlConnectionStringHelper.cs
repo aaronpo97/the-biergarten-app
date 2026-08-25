@@ -1,3 +1,4 @@
+using Infrastructure.Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -14,9 +15,15 @@ public static class SqlConnectionStringHelper
     ) =>
         new()
         {
-            DataSource = ConfigurationHelpers.GetKeyOrThrow(configuration, "DB_SERVER"),
-            UserID = ConfigurationHelpers.GetKeyOrThrow(configuration, "DB_USER"),
-            Password = ConfigurationHelpers.GetKeyOrThrow(configuration, "DB_PASSWORD"),
+            DataSource = ConfigurationHelpers.GetKeyOrThrow(
+                configuration,
+                ConfigurationKeys.DbServer
+            ),
+            UserID = ConfigurationHelpers.GetKeyOrThrow(configuration, ConfigurationKeys.DbUser),
+            Password = ConfigurationHelpers.GetKeyOrThrow(
+                configuration,
+                ConfigurationKeys.DbPassword
+            ),
             TrustServerCertificate = ResolveTrustServerCertificate(configuration),
             Encrypt = true,
         };
@@ -38,7 +45,10 @@ public static class SqlConnectionStringHelper
         try
         {
             SqlConnectionStringBuilder builder = MakeConfiguredConnectionBuilder(configuration);
-            builder.InitialCatalog = ConfigurationHelpers.GetKeyOrThrow(configuration, "DB_NAME");
+            builder.InitialCatalog = ConfigurationHelpers.GetKeyOrThrow(
+                configuration,
+                ConfigurationKeys.DbName
+            );
             connectionString = builder.ConnectionString;
             return true;
         }
@@ -95,7 +105,7 @@ public static class SqlConnectionStringHelper
     private static bool ResolveTrustServerCertificate(IConfiguration configuration)
     {
         return !bool.TryParse(
-                configuration["DB_TRUST_SERVER_CERTIFICATE"],
+                configuration[ConfigurationKeys.DbTrustServerCertificate],
                 out bool trustServerCertificate
             ) || trustServerCertificate;
     }

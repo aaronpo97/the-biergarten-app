@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -32,9 +33,9 @@ public class JwtAuthenticationHandler(
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // Use the same access-token secret source as TokenService to avoid mismatched validation.
-        string? secret = configuration["ACCESS_TOKEN_SECRET"];
+        string? secret = configuration[ConfigurationKeys.AccessTokenSecret];
         if (string.IsNullOrWhiteSpace(secret))
-            secret = configuration["Jwt:SecretKey"];
+            secret = configuration[ConfigurationKeys.JwtSecretKeyFallback];
 
         if (string.IsNullOrWhiteSpace(secret))
             return AuthenticateResult.Fail("JWT secret is not configured");

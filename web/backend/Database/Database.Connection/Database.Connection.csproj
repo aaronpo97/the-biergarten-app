@@ -11,11 +11,14 @@
         <PackageReference Include="Microsoft.SqlServer.Types" Version="160.1000.6" />
         <PackageReference
             Include="Microsoft.Extensions.Configuration.Abstractions"
-            Version="9.0.0"
+            Version="10.0.1"
         />
         <PackageReference
             Include="Microsoft.Extensions.DependencyInjection.Abstractions"
             Version="10.0.0"
         />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
     </ItemGroup>
 </Project>

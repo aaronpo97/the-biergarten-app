@@ -38,6 +38,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\API.Core\API.Core.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
         <ProjectReference Include="..\..\Features\Features.Emails\Features.Emails.csproj" />
     </ItemGroup>
