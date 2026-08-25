@@ -6,7 +6,7 @@ namespace Database.Migrations;
 
 /// <summary>
 /// Application entry point. Responsible only for wiring up configuration
-/// and delegating the migration run to <see cref="DbMigrater"/>.
+/// and delegating the migration run to <see cref="DbMigrator"/>.
 /// </summary>
 internal static class Program
 {
@@ -26,12 +26,12 @@ internal static class Program
                 StringComparison.OrdinalIgnoreCase
             );
 
-            DbMigrater migrater = new(
+            DbMigrator migrator = new(
                 new DefaultSqlConnectionFactory(configuration),
                 new MasterSqlConnectionFactory(configuration),
                 clearDatabase
             );
-            await migrater.RunAsync();
+            await migrator.RunAsync();
         }
         catch (Exception ex) when (ex is InvalidOperationException or SqlException)
         {

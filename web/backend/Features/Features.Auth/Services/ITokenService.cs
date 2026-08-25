@@ -66,12 +66,6 @@ public interface ITokenService
     /// </summary>
     string GenerateConfirmationToken(Guid userId, string username);
 
-    /// <summary>Validates an access token's signature and expiration and extracts the caller's identity.</summary>
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.
-    /// </exception>
-    Task<ValidatedToken> ValidateAccessTokenAsync(string token);
-
     /// <summary>Validates a refresh token's signature and expiration and extracts the caller's identity.</summary>
     /// <exception cref="Domain.Exceptions.UnauthorizedException">
     ///     Thrown when the token is missing required claims, has a malformed user ID, or otherwise fails validation.

@@ -11,30 +11,18 @@ namespace Database.Migrations;
 /// Owns the configuration and state for a single database migration run,
 /// and performs the drop/create/deploy steps against SQL Server.
 /// </summary>
-internal sealed class DbMigrater
+internal sealed class DbMigrator(
+    ISqlConnectionFactory standardConnectionStandardConnectionFactory,
+    ISqlConnectionFactory masterConnectionConnectionFactory,
+    bool clearDatabase)
 {
-    private readonly ISqlConnectionFactory _standardConnectionFactory;
-    private readonly ISqlConnectionFactory _masterConnectionFactory;
-    private readonly bool _clearDatabase;
-
-    public DbMigrater(
-        ISqlConnectionFactory standardConnectionStandardConnectionFactory,
-        ISqlConnectionFactory masterConnectionConnectionFactory,
-        bool clearDatabase
-    )
-    {
-        _standardConnectionFactory = standardConnectionStandardConnectionFactory;
-        _masterConnectionFactory = masterConnectionConnectionFactory;
-        _clearDatabase = clearDatabase;
-    }
-
     /// <summary>
     /// Runs the full migration workflow: optional drop, create-if-not-exists,
     /// then deploy DbUp scripts. Throws if the upgrade fails.
     /// </summary>
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
-        if (_clearDatabase)
+        if (clearDatabase)
         {
             await DropDatabaseIfExistsAsync(cancellationToken);
         }
@@ -53,7 +41,7 @@ internal sealed class DbMigrater
     {
         string databaseName = ResolveDatabaseName();
 
-        await using SqlConnection connection = _masterConnectionFactory.CreateConnection();
+        await using SqlConnection connection = masterConnectionConnectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
         await connection.ExecuteAsync(
@@ -78,7 +66,7 @@ internal sealed class DbMigrater
     {
         string databaseName = ResolveDatabaseName();
 
-        await using SqlConnection connection = _masterConnectionFactory.CreateConnection();
+        await using SqlConnection connection = masterConnectionConnectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
         await connection.ExecuteAsync(
@@ -102,7 +90,7 @@ internal sealed class DbMigrater
     private DatabaseUpgradeResult DeployMigrations()
     {
         UpgradeEngine upgrader = DeployChanges
-            .To.SqlDatabase(_standardConnectionFactory.ConnectionString)
+            .To.SqlDatabase(standardConnectionStandardConnectionFactory.ConnectionString)
             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
             .WithTransactionPerScript()
             .LogToConsole()
@@ -114,7 +102,7 @@ internal sealed class DbMigrater
     private string ResolveDatabaseName()
     {
         return !SqlConnectionStringHelper.TryGetDatabaseNameFromConnectionString(
-            _standardConnectionFactory.ConnectionString,
+            standardConnectionStandardConnectionFactory.ConnectionString,
             out var databaseName
         )
             ? throw new InvalidOperationException(
