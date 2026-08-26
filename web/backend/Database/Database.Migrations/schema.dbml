@@ -1,0 +1,238 @@
+Project biergarten_app {
+  database_type: 'SQL Server'
+  Note: 'Generated from Database.Migrations/scripts/01-schema. Default schema is dbo.'
+}
+
+Table UserAccount {
+  UserAccountID uniqueidentifier [pk, default: `newid()`]
+  Username varchar(64) [not null, unique]
+  FirstName nvarchar(128) [not null]
+  LastName nvarchar(128) [not null]
+  Email varchar(128) [not null, unique]
+  CreatedAt datetime [not null, default: `getdate()`]
+  UpdatedAt datetime
+  DateOfBirth date [not null]
+  RowVersion rowversion
+}
+
+Table Photo {
+  PhotoID uniqueidentifier [pk, default: `newid()`]
+  Hyperlink nvarchar(256) [note: 'storage handled via filesystem/cloud service']
+  UploadedByID uniqueidentifier [not null]
+  UploadedAt datetime [not null, default: `getdate()`]
+  RowVersion rowversion
+
+  Note: 'A user account cannot be deleted while it has uploaded photos'
+
+  Indexes {
+    UploadedByID
+  }
+}
+
+Table UserAvatar {
+  UserAvatarID uniqueidentifier [pk, default: `newid()`]
+  UserAccountID uniqueidentifier [not null, unique]
+  PhotoID uniqueidentifier [not null]
+  RowVersion rowversion
+
+  Note: 'Deleted when the user account is deleted'
+}
+
+Table UserVerification {
+  UserVerificationID uniqueidentifier [pk, default: `newid()`]
+  UserAccountID uniqueidentifier [not null, unique]
+  VerificationDateTime datetime [not null, default: `getdate()`]
+  RowVersion rowversion
+
+  Note: 'Deleted when the user account is deleted'
+}
+
+Table UserCredential {
+  UserCredentialID uniqueidentifier [pk, default: `newid()`]
+  UserAccountID uniqueidentifier [not null]
+  CreatedAt datetime [not null, default: `getdate()`]
+  Expiry datetime [not null, default: `dateadd(day, 90, getdate())`]
+  Hash nvarchar(256) [not null, note: 'argon2 hash']
+  IsRevoked bit [not null, default: 0]
+  RevokedAt datetime
+  RowVersion rowversion
+
+  Note: 'Deleted when the user account is deleted'
+
+  Indexes {
+    UserAccountID
+    (UserAccountID, IsRevoked, Expiry) [name: 'IX_UserCredential_Account_Active', note: 'includes Hash']
+  }
+}
+
+Table UserFollow {
+  UserFollowID uniqueidentifier [pk, default: `newid()`]
+  UserAccountID uniqueidentifier [not null]
+  FollowingID uniqueidentifier [not null]
+  CreatedAt datetime [not null, default: `getdate()`]
+  RowVersion rowversion
+
+  Note: 'CHECK: UserAccountID != FollowingID (cannot follow own account)'
+
+  Indexes {
+    (UserAccountID, FollowingID)
+    (FollowingID, UserAccountID)
+  }
+}
+
+Table Country {
+  CountryID uniqueidentifier [pk, default: `newid()`]
+  CountryName nvarchar(100) [not null]
+  ISO3166_1 char(2) [not null, unique]
+  RowVersion rowversion
+}
+
+Table StateProvince {
+  StateProvinceID uniqueidentifier [pk, default: `newid()`]
+  StateProvinceName nvarchar(100) [not null]
+  ISO3166_2 char(6) [not null, unique, note: "e.g. 'US-CA' for California, 'CA-ON' for Ontario"]
+  CountryID uniqueidentifier [not null]
+  RowVersion rowversion
+
+  Indexes {
+    CountryID
+  }
+}
+
+Table City {
+  CityID uniqueidentifier [pk, default: `newid()`]
+  CityName nvarchar(100) [not null]
+  StateProvinceID uniqueidentifier [not null]
+  RowVersion rowversion
+
+  Indexes {
+    StateProvinceID
+  }
+}
+
+Table BreweryPost {
+  BreweryPostID uniqueidentifier [pk, default: `newid()`]
+  BreweryName nvarchar(256) [not null]
+  PostedByID uniqueidentifier [not null]
+  Description "nvarchar(max)" [not null]
+  CreatedAt datetime [not null, default: `getdate()`]
+  UpdatedAt datetime
+  RowVersion rowversion
+
+  Note: 'A user cannot be deleted if they have a post'
+
+  Indexes {
+    PostedByID
+  }
+}
+
+Table BreweryPostLocation {
+  BreweryPostLocationID uniqueidentifier [pk, default: `newid()`]
+  BreweryPostID uniqueidentifier [not null, unique]
+  AddressLine1 nvarchar(256) [not null]
+  AddressLine2 nvarchar(256)
+  PostalCode nvarchar(20) [not null]
+  CityID uniqueidentifier [not null]
+  Coordinates geography [note: 'spatial index deferred, see schema.sql history']
+  RowVersion rowversion
+
+  Indexes {
+    BreweryPostID
+    CityID
+  }
+}
+
+Table BreweryPostPhoto {
+  BreweryPostPhotoID uniqueidentifier [pk, default: `newid()`]
+  BreweryPostID uniqueidentifier [not null]
+  PhotoID uniqueidentifier [not null]
+  LinkedAt datetime [not null, default: `getdate()`]
+  RowVersion rowversion
+
+  Note: 'All photos linked to a post are deleted if the post is deleted'
+
+  Indexes {
+    (PhotoID, BreweryPostID)
+    (BreweryPostID, PhotoID)
+  }
+}
+
+Table BeerStyle {
+  BeerStyleID uniqueidentifier [pk, default: `newid()`]
+  StyleName nvarchar(100) [not null, unique]
+  Description "nvarchar(max)"
+  RowVersion rowversion
+}
+
+Table BeerPost {
+  BeerPostID uniqueidentifier [pk, default: `newid()`]
+  Name nvarchar(100) [not null]
+  Description "nvarchar(max)" [not null]
+  ABV "decimal(4,2)" [not null, note: 'CHECK ABV BETWEEN 0 AND 67']
+  IBU int [not null, note: 'CHECK IBU BETWEEN 0 AND 120']
+  PostedByID uniqueidentifier [not null]
+  BeerStyleID uniqueidentifier [not null]
+  BrewedByID uniqueidentifier [not null]
+  CreatedAt datetime [not null, default: `getdate()`]
+  UpdatedAt datetime
+  RowVersion rowversion
+
+  Indexes {
+    PostedByID
+    BeerStyleID
+    BrewedByID
+  }
+}
+
+Table BeerPostPhoto {
+  BeerPostPhotoID uniqueidentifier [pk, default: `newid()`]
+  BeerPostID uniqueidentifier [not null]
+  PhotoID uniqueidentifier [not null]
+  LinkedAt datetime [not null, default: `getdate()`]
+  RowVersion rowversion
+
+  Note: 'All photos linked to a beer post are deleted if the post is deleted'
+
+  Indexes {
+    (PhotoID, BeerPostID)
+    (BeerPostID, PhotoID)
+  }
+}
+
+Table BeerPostComment {
+  BeerPostCommentID uniqueidentifier [pk, default: `newid()`]
+  Comment nvarchar(250) [not null]
+  BeerPostID uniqueidentifier [not null]
+  CommentedByID uniqueidentifier [not null]
+  Rating int [not null, note: 'CHECK Rating BETWEEN 1 AND 5']
+  CreatedAt datetime [not null, default: `getdate()`]
+  UpdatedAt datetime
+  RowVersion rowversion
+
+  Indexes {
+    BeerPostID
+    CommentedByID
+  }
+}
+
+Ref: Photo.UploadedByID > UserAccount.UserAccountID [delete: no action]
+Ref: UserAvatar.UserAccountID - UserAccount.UserAccountID [delete: cascade]
+Ref: UserAvatar.PhotoID > Photo.PhotoID
+Ref: UserVerification.UserAccountID - UserAccount.UserAccountID [delete: cascade]
+Ref: UserCredential.UserAccountID > UserAccount.UserAccountID [delete: cascade]
+Ref: UserFollow.UserAccountID > UserAccount.UserAccountID [delete: no action]
+Ref: UserFollow.FollowingID > UserAccount.UserAccountID [delete: no action]
+Ref: StateProvince.CountryID > Country.CountryID
+Ref: City.StateProvinceID > StateProvince.StateProvinceID
+Ref: BreweryPost.PostedByID > UserAccount.UserAccountID [delete: no action]
+Ref: BreweryPostLocation.BreweryPostID - BreweryPost.BreweryPostID [delete: cascade]
+Ref: BreweryPostLocation.CityID > City.CityID
+Ref: BreweryPostPhoto.BreweryPostID > BreweryPost.BreweryPostID [delete: cascade]
+Ref: BreweryPostPhoto.PhotoID > Photo.PhotoID [delete: cascade]
+Ref: BeerPost.PostedByID > UserAccount.UserAccountID [delete: no action]
+Ref: BeerPost.BeerStyleID > BeerStyle.BeerStyleID
+Ref: BeerPost.BrewedByID > BreweryPost.BreweryPostID
+Ref: BeerPostPhoto.BeerPostID > BeerPost.BeerPostID [delete: cascade]
+Ref: BeerPostPhoto.PhotoID > Photo.PhotoID [delete: cascade]
+Ref: BeerPostComment.BeerPostID > BeerPost.BeerPostID
+Ref: BeerPostComment.CommentedByID > UserAccount.UserAccountID [delete: no action]
