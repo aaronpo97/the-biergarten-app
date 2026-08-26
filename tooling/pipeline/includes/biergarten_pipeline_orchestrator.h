@@ -12,6 +12,7 @@
 
 #include "data_generation/data_generator.h"
 #include "data_model/generated_models.h"
+#include "services/address/address_service.h"
 #include "services/curated_data/curated_data_service.h"
 #include "services/database/export_service.h"
 #include "services/enrichment/enrichment_service.h"
@@ -34,6 +35,8 @@ class BiergartenPipelineOrchestrator {
     * @param exporter Database backend for persisting generated records.
     * @param curated_data_service Loads curated location, persona, and name
     * data used to seed generation.
+    * @param address_service Resolves a street address for generated
+    * brewery coordinates.
     * @param application_options CLI configuration and paths.
     */
    BiergartenPipelineOrchestrator(
@@ -42,6 +45,7 @@ class BiergartenPipelineOrchestrator {
        std::unique_ptr<DataGenerator> generator,
        std::unique_ptr<IExportService> exporter,
        std::unique_ptr<ICuratedDataService> curated_data_service,
+       std::unique_ptr<IAddressService> address_service,
        const ApplicationOptions& application_options);
 
    /**
@@ -78,6 +82,7 @@ class BiergartenPipelineOrchestrator {
     */
    std::unique_ptr<IExportService> exporter_;
    std::unique_ptr<ICuratedDataService> curated_data_service_;
+   std::unique_ptr<IAddressService> address_service_;
 
    ApplicationOptions application_options_;
 

@@ -95,6 +95,18 @@ struct BreweryAddress {
    City city;
    double longitude{};
    double latitude{};
+
+   /**
+    * @brief Street address line (e.g. house number + road), resolved once
+    * via reverse geocoding at generation time.
+    */
+   std::string address_line1{};
+
+   /**
+    * @brief Postal code, resolved once via reverse geocoding at generation
+    * time.
+    */
+   std::string postal_code{};
 };
 
 /**

@@ -24,7 +24,7 @@
     <ItemGroup>
         <None
             CopyToOutputDirectory="PreserveNewest"
-            Include="SeedData\biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite"
+            Include="SeedData\biergarten_seed_2026-08-25T18-30-53.419803Z.sqlite"
         />
     </ItemGroup>
 </Project>

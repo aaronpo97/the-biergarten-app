@@ -1,6 +1,5 @@
 using Database.Connection.DependencyInjection;
 using Database.Seed.DatabaseHelpers;
-using Database.Seed.Geocoding;
 using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
@@ -16,9 +15,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
-
-const string NominatimUserAgent =
-    "TheBiergartenApp-Seeder/1.0 (+https://github.com/aaronpo97/the-biergarten-app)";
 
 return await RunAsync();
 
@@ -96,34 +92,24 @@ static async Task<int> RunAsync()
                 }
             );
 
-        List<string> geocodingWarnings = [];
-
-        using (NominatimReverseGeocoder geocoder = new(NominatimUserAgent))
-        {
-            await AnsiConsole
-                .Status()
-                .Spinner(Spinner.Known.Dots)
-                .SpinnerStyle(Style.Parse("green"))
-                .StartAsync(
-                    "Loading brewery data into target database...",
-                    async ctx =>
-                    {
-                        await LoadBreweriesIntoDatabaseAsync(
-                            breweryRepository,
-                            locationRepository,
-                            geocoder,
-                            seedData.Breweries,
-                            postedByIds,
-                            geocodingWarnings,
-                            ctx
-                        );
-                        ctx.Status("Brewery data loaded into target database.");
-                    }
-                );
-        }
-
-        foreach (string warning in geocodingWarnings)
-            AnsiConsole.MarkupLine($"[yellow]![/] {warning.EscapeMarkup()}");
+        await AnsiConsole
+            .Status()
+            .Spinner(Spinner.Known.Dots)
+            .SpinnerStyle(Style.Parse("green"))
+            .StartAsync(
+                "Loading brewery data into target database...",
+                async ctx =>
+                {
+                    await LoadBreweriesIntoDatabaseAsync(
+                        breweryRepository,
+                        locationRepository,
+                        seedData.Breweries,
+                        postedByIds,
+                        ctx
+                    );
+                    ctx.Status("Brewery data loaded into target database.");
+                }
+            );
 
         return 0;
     }
@@ -175,15 +161,11 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
 static async Task LoadBreweriesIntoDatabaseAsync(
     IBreweryRepository breweryRepository,
     ILocationRepository locationRepository,
-    NominatimReverseGeocoder geocoder,
     IReadOnlyList<BreweryRecord> breweries,
     IReadOnlyList<Guid> posterUserIds,
-    List<string> geocodingWarnings,
     StatusContext ctx
 )
 {
-    const string placeholderAddressLine1 = "Address unavailable";
-
     if (posterUserIds.Count == 0)
         throw new InvalidOperationException("Cannot load breweries without any registered users.");
 
@@ -191,9 +173,7 @@ static async Task LoadBreweriesIntoDatabaseAsync(
     {
         BreweryRecord breweryRecord = breweries[i];
 
-        ctx.Status(
-            $"Geocoding and loading brewery {i + 1}/{breweries.Count} into target database..."
-        );
+        ctx.Status($"Loading brewery {i + 1}/{breweries.Count} into target database...");
 
         Guid cityId = await locationRepository.GetOrCreateCityIdAsync(
             new CityLocation(
@@ -204,18 +184,6 @@ static async Task LoadBreweriesIntoDatabaseAsync(
                 breweryRecord.Address.City.Iso31661
             )
         );
-
-        ReverseGeocodeResult? geocoded = await geocoder.ReverseGeocodeAsync(
-            breweryRecord.Address.Longitude,
-            breweryRecord.Address.Latitude
-        );
-
-        if (geocoded is null)
-            geocodingWarnings.Add(
-                $"Could not reverse geocode '{breweryRecord.Brewery.NameEn}' "
-                    + $"({breweryRecord.Address.Latitude}, {breweryRecord.Address.Longitude}); "
-                    + "using a placeholder address."
-            );
 
         await breweryRepository.CreateAsync(
             new BreweryPost
@@ -229,8 +197,8 @@ static async Task LoadBreweriesIntoDatabaseAsync(
                 {
                     BreweryPostLocationId = Guid.NewGuid(),
                     CityId = cityId,
-                    AddressLine1 = geocoded?.AddressLine1 ?? placeholderAddressLine1,
-                    PostalCode = geocoded?.PostalCode ?? string.Empty,
+                    AddressLine1 = breweryRecord.Address.AddressLine1,
+                    PostalCode = breweryRecord.Address.PostalCode,
                 },
             }
         );

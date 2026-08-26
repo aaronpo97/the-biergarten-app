@@ -184,6 +184,20 @@ uint64_t SqliteExportService::ProcessRecord(const BreweryRecord& brewery) {
                sqlite_export_service_internal::kBreweryAddressLatitudeBindIndex,
            .value = brewery.address.latitude,
            .action = "Failed to bind SQLite brewery address latitude"});
+   sqlite_export_service_internal::Bind(
+       insert_brewery_address_stmt_,
+       sqlite_export_service_internal::BoundParam<std::string_view>{
+           .index =
+               sqlite_export_service_internal::kBreweryAddressLine1BindIndex,
+           .value = brewery.address.address_line1,
+           .action = "Failed to bind SQLite brewery address line 1"});
+   sqlite_export_service_internal::Bind(
+       insert_brewery_address_stmt_,
+       sqlite_export_service_internal::BoundParam<std::string_view>{
+           .index = sqlite_export_service_internal::
+               kBreweryAddressPostalCodeBindIndex,
+           .value = brewery.address.postal_code,
+           .action = "Failed to bind SQLite brewery address postal code"});
 
    sqlite_export_service_internal::StepStatement(
        db_handle_, insert_brewery_address_stmt_,

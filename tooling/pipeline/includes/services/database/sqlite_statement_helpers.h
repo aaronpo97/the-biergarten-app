@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS brewery_addresses (
   city_id INTEGER NOT NULL,
   longitude REAL NOT NULL,
   latitude REAL NOT NULL,
+  address_line1 TEXT NOT NULL,
+  postal_code TEXT NOT NULL,
   FOREIGN KEY(brewery_id) REFERENCES breweries(id) ON DELETE CASCADE,
   FOREIGN KEY(city_id) REFERENCES cities(id) ON DELETE CASCADE
 );
@@ -131,8 +133,10 @@ INSERT INTO brewery_addresses (
   brewery_id,
   city_id,
   longitude,
-  latitude
-) VALUES (?, ?, ?, ?);
+  latitude,
+  address_line1,
+  postal_code
+) VALUES (?, ?, ?, ?, ?, ?);
 )sql";
 
 inline constexpr std::string_view kInsertUserSql = R"sql(
@@ -184,6 +188,8 @@ enum BreweryAddressBindIndex {
    kBreweryAddressCityIdBindIndex,
    kBreweryAddressLongitudeBindIndex,
    kBreweryAddressLatitudeBindIndex,
+   kBreweryAddressLine1BindIndex,
+   kBreweryAddressPostalCodeBindIndex,
 };
 
 enum UserBindIndex {
