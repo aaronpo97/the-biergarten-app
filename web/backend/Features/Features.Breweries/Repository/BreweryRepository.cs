@@ -17,7 +17,7 @@ namespace Features.Breweries.Repository;
 ///     yields the UDT's serialized bytes as a plain <c>varbinary</c> value that Dapper can bind directly.
 /// </remarks>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
-    : Database.Connection.DapperRepository(connectionFactory),
+    : DapperRepository(connectionFactory),
         IBreweryRepository
 {
     /// <inheritdoc/>

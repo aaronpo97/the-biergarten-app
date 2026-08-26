@@ -10,7 +10,7 @@ namespace Features.Locations.Repository;
 ///     Dapper-based implementation of <see cref="ILocationRepository" />.
 /// </summary>
 public class LocationRepository(ISqlConnectionFactory connectionFactory)
-    : Database.Connection.DapperRepository(connectionFactory),
+    : DapperRepository(connectionFactory),
         ILocationRepository
 {
     /// <inheritdoc />

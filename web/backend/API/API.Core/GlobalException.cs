@@ -13,16 +13,16 @@ namespace API.Core;
 /// </summary>
 public class GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger) : IExceptionFilter
 {
-    /// <summary>
-    ///     Logs the exception and sets <see cref="ExceptionContext.Result" /> to an appropriate error response.
-    /// </summary>
-    /// <remarks>
-    ///     Maps <see cref="FluentValidation.ValidationException" /> to 400, <see cref="ConflictException" /> to 409,
-    ///     <see cref="NotFoundException" /> to 404, <see cref="UnauthorizedException" /> to 401,
-    ///     <see cref="ForbiddenException" /> to 403, <see cref="SqlException" /> to 503,
-    ///     <see cref="Domain.Exceptions.ValidationException" /> to 400, and anything else to 500.
-    /// </remarks>
-    public void OnException(ExceptionContext context)
+   /// <summary>
+   ///     Logs the exception and sets <see cref="ExceptionContext.Result" /> to an appropriate error response.
+   /// </summary>
+   /// <remarks>
+   ///     Maps <see cref="ValidationException" /> to 400, <see cref="ConflictException" /> to 409,
+   ///     <see cref="NotFoundException" /> to 404, <see cref="UnauthorizedException" /> to 401,
+   ///     <see cref="ForbiddenException" /> to 403, <see cref="SqlException" /> to 503,
+   ///     <see cref="Domain.Exceptions.ValidationException" /> to 400, and anything else to 500.
+   /// </remarks>
+   public void OnException(ExceptionContext context)
     {
         logger.LogError(context.Exception, "Unhandled exception occurred");
 

@@ -160,10 +160,7 @@ public class AuthSteps(ScenarioContext scenario)
     public async Task WhenISubmitALoginRequestWithAUsernameAndPassword()
     {
         HttpClient client = GetClient();
-        (string username, string password) = scenario.TryGetValue<(
-            string username,
-            string password
-        )>(TestUserKey, out (string username, string password) user)
+        (string username, string password) = scenario.TryGetValue(TestUserKey, out (string username, string password) user)
             ? user
             : ("test.user", "password");
 
