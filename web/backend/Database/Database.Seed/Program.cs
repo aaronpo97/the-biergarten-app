@@ -192,13 +192,16 @@ static async Task LoadBreweriesIntoDatabaseAsync(
                 BreweryName = breweryRecord.Brewery.NameEn,
                 Description = breweryRecord.Brewery.DescriptionEn,
                 PostedById = posterUserIds[i % posterUserIds.Count],
-                // TODO: Populate Coordinates from breweryRecord.Address.Latitude/Longitude once it goes through NetTopologySuite (NTS).
                 Location = new BreweryPostLocation
                 {
                     BreweryPostLocationId = Guid.NewGuid(),
                     CityId = cityId,
                     AddressLine1 = breweryRecord.Address.AddressLine1,
                     PostalCode = breweryRecord.Address.PostalCode,
+                    Coordinates = new CoordinateData(
+                        breweryRecord.Address.Latitude,
+                        breweryRecord.Address.Longitude
+                    ),
                 },
             }
         );

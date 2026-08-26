@@ -106,16 +106,16 @@ public class TokenService : ITokenService
         return new RefreshTokenResult(user.Id, user.UserName, newRefresh, newAccess);
     }
 
-    /// <summary>
-    ///     Performs the shared validation logic for access, refresh, and confirmation tokens:
-    ///     validates the JWT signature/expiration, then extracts and parses the user ID and username claims.
-    /// </summary>
-    /// <param name="tokenType">A human-readable label (e.g. "access", "refresh", "confirmation") used in error messages.</param>
-    /// <exception cref="Domain.Exceptions.UnauthorizedException">
-    ///     Thrown when required claims are missing, the user ID claim is not a valid <see cref="Guid" />,
-    ///     or the underlying token validation fails for any other reason (e.g. expired or invalid signature).
-    /// </exception>
-    private async Task<ValidatedToken> ValidateTokenInternalAsync(
+   /// <summary>
+   ///     Performs the shared validation logic for access, refresh, and confirmation tokens:
+   ///     validates the JWT signature/expiration, then extracts and parses the user ID and username claims.
+   /// </summary>
+   /// <param name="tokenType">A human-readable label (e.g. "access", "refresh", "confirmation") used in error messages.</param>
+   /// <exception cref="UnauthorizedException">
+   ///     Thrown when required claims are missing, the user ID claim is not a valid <see cref="Guid" />,
+   ///     or the underlying token validation fails for any other reason (e.g. expired or invalid signature).
+   /// </exception>
+   private async Task<ValidatedToken> ValidateTokenInternalAsync(
         string token,
         string secret,
         string tokenType

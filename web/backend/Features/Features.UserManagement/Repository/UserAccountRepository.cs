@@ -10,7 +10,7 @@ namespace Features.UserManagement.Repository;
 ///     Dapper-based implementation of <see cref="IUserAccountRepository" />.
 /// </summary>
 public class UserAccountRepository(ISqlConnectionFactory connectionFactory)
-    : Database.Connection.DapperRepository(connectionFactory),
+    : DapperRepository(connectionFactory),
         IUserAccountRepository
 {
     /// <inheritdoc />

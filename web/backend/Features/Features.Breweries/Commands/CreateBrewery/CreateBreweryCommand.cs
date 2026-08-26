@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Features.Breweries.Dtos;
 using MediatR;
 
@@ -10,7 +11,7 @@ public record CreateBreweryLocation(
     string AddressLine1,
     string? AddressLine2,
     string PostalCode,
-    byte[]? Coordinates
+    CoordinateData? Coordinates
 );
 
 /// <summary>

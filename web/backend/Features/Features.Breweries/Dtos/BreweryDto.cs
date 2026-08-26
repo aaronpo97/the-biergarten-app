@@ -1,3 +1,5 @@
+using Domain.Entities;
+
 namespace Features.Breweries.Dtos;
 
 /// <summary>Location details of a brewery, as returned by the API.</summary>
@@ -13,7 +15,7 @@ public record BreweryLocationDto(
     string AddressLine1,
     string? AddressLine2,
     string PostalCode,
-    byte[]? Coordinates
+    CoordinateData? Coordinates
 );
 
 /// <summary>A brewery post, as returned by the API.</summary>
