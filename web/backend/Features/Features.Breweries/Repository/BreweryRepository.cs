@@ -20,6 +20,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : DapperRepository(connectionFactory),
         IBreweryRepository
 {
+    private const int GeographySrid = 4326;
+
+    static BreweryRepository()
+    {
+        SqlMapper.AddTypeHandler(new CoordinateDataTypeHandler());
+    }
+
     /// <inheritdoc/>
     public async Task<BreweryPost?> GetByIdAsync(Guid id)
     {
@@ -226,7 +233,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 AddressLine1 = @AddressLine1,
                                 AddressLine2 = @AddressLine2,
                                 PostalCode = @PostalCode,
-                                Coordinates = @Coordinates
+                                Coordinates = CASE
+                                    WHEN @Latitude IS NULL THEN NULL
+                                    ELSE geography::Point(@Latitude, @Longitude, @Srid)
+                                END
                             WHERE BreweryPostID = @BreweryPostId
                             """,
                             new
@@ -236,7 +246,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 brewery.Location.AddressLine1,
                                 brewery.Location.AddressLine2,
                                 brewery.Location.PostalCode,
-                                brewery.Location.Coordinates,
+                                Latitude = brewery.Location.Coordinates?.Latitude,
+                                Longitude = brewery.Location.Coordinates?.Longitude,
+                                Srid = GeographySrid,
                             },
                             transaction
                         )
@@ -260,7 +272,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                     @AddressLine1,
                                     @AddressLine2,
                                     @PostalCode,
-                                    @Coordinates)
+                                    CASE
+                                        WHEN @Latitude IS NULL THEN NULL
+                                        ELSE geography::Point(@Latitude, @Longitude, @Srid)
+                                    END)
                             """,
                             new
                             {
@@ -270,7 +285,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 brewery.Location.AddressLine1,
                                 brewery.Location.AddressLine2,
                                 brewery.Location.PostalCode,
-                                brewery.Location.Coordinates,
+                                Latitude = brewery.Location.Coordinates?.Latitude,
+                                Longitude = brewery.Location.Coordinates?.Longitude,
+                                Srid = GeographySrid,
                             },
                             transaction
                         )
@@ -394,7 +411,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             @AddressLine1,
                             @AddressLine2,
                             @PostalCode,
-                            @Coordinates)
+                            CASE
+                                WHEN @Latitude IS NULL THEN NULL
+                                ELSE geography::Point(@Latitude, @Longitude, @Srid)
+                            END)
                     """,
                     new
                     {
@@ -404,7 +424,9 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         brewery.Location.AddressLine1,
                         brewery.Location.AddressLine2,
                         brewery.Location.PostalCode,
-                        brewery.Location.Coordinates,
+                        Latitude = brewery.Location.Coordinates?.Latitude,
+                        Longitude = brewery.Location.Coordinates?.Longitude,
+                        Srid = GeographySrid,
                     },
                     transaction
                 )
