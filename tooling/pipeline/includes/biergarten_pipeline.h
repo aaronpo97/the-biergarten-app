@@ -13,6 +13,11 @@
 // --- concurrency ---
 #include "concurrency/bounded_channel.h"
 
+// --- services: address ---
+#include "services/address/address_service.h"
+#include "services/address/mock_address_service.h"
+#include "services/address/nominatim_address_service.h"
+
 // --- data_generation ---
 #include "data_generation/data_generator.h"
 #include "data_generation/generation_json_validation.h"

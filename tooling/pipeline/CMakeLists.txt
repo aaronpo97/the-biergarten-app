@@ -144,6 +144,8 @@ FetchContent_MakeAvailable(cpp-httplib)
 # 5. Executable & Sources
 add_executable(${PROJECT_NAME}
         includes/services/enrichment/mock_enrichment.h
+        includes/services/address/address_service.h
+        includes/services/address/mock_address_service.h
         includes/services/curated_data/mock_curated_data_service.h
         includes/json_handling/pretty_print.h)
 
@@ -223,6 +225,11 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/services/enrichment/wikipedia/wikipedia_service.cc
         src/services/enrichment/wikipedia/fetch_extract.cc
         src/services/enrichment/wikipedia/get_summary.cc
+)
+
+# --- services: address ---
+target_sources(${PROJECT_NAME} PRIVATE
+        src/services/address/nominatim_address_service.cc
 )
 
 # --- services: xeger ---

@@ -22,6 +22,7 @@ COPY ["Features/Features.Locations/Features.Locations.csproj", "Features/Feature
 COPY ["Features/Features.Locations.Tests/Features.Locations.Tests.csproj", "Features/Features.Locations.Tests/"]
 COPY ["Features/Features.UserManagement/Features.UserManagement.csproj", "Features/Features.UserManagement/"]
 COPY ["Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj", "Features/Features.UserManagement.Tests/"]
+COPY ["Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.csproj", "Infrastructure/Infrastructure.Configuration/"]
 COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
 COPY ["Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj", "Infrastructure/Infrastructure.Email.Templates/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]

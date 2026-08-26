@@ -20,5 +20,5 @@ public static class ConnectionStrings
             );
 
     public static string SqliteConnectionString =>
-        "Data Source=SeedData/biergarten_seed_2026-08-24T01-52-09.841693Z.sqlite";
+        "Data Source=SeedData/biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite";
 }

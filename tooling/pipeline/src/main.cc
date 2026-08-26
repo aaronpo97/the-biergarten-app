@@ -166,6 +166,26 @@ int main(const int argc, char** argv) {
                      inj.template create<std::unique_ptr<WebClient>>(),
                      log_producer);
               }),
+          di::bind<IAddressService>().to(
+              [options, &log_producer](
+                  const auto& inj) -> std::unique_ptr<IAddressService> {
+                 if (options.generator.mode == GeneratorMode::kMock) {
+                    log_producer->Log({.level = LogLevel::Info,
+                                       .phase = PipelinePhase::Startup,
+                                       .message = "Address service: mock"});
+
+                    return std::make_unique<MockAddressService>();
+                 }
+
+                 log_producer->Log(
+                     {.level = LogLevel::Info,
+                      .phase = PipelinePhase::Startup,
+                      .message = "Address service: Nominatim"});
+
+                 return std::make_unique<NominatimAddressService>(
+                     inj.template create<std::unique_ptr<WebClient>>(),
+                     log_producer);
+              }),
           di::bind<DataGenerator>().to([&options, &model_path, &sampling,
                                         &prompt_directory,
                                         &log_producer](const auto& inj)

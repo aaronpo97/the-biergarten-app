@@ -54,7 +54,7 @@ public sealed class PipelineSeedDataReader
     {
         const string sql = """
             SELECT b.name_en, b.description_en, b.name_local, b.description_local,
-                   ba.city_id, ba.longitude, ba.latitude
+                   ba.city_id, ba.longitude, ba.latitude, ba.address_line1, ba.postal_code
             FROM breweries b
             JOIN brewery_addresses ba ON ba.brewery_id = b.id;
             """;
@@ -69,6 +69,8 @@ public sealed class PipelineSeedDataReader
         const int cityIdIndex = 4;
         const int longitudeIndex = 5;
         const int latitudeIndex = 6;
+        const int addressLine1Index = 7;
+        const int postalCodeIndex = 8;
 
         List<BreweryRecord> records = [];
         while (await reader.ReadAsync(cancellationToken))
@@ -87,6 +89,8 @@ public sealed class PipelineSeedDataReader
                         City = cities[reader.GetInt64(cityIdIndex)],
                         Longitude = reader.GetDouble(longitudeIndex),
                         Latitude = reader.GetDouble(latitudeIndex),
+                        AddressLine1 = reader.GetString(addressLine1Index),
+                        PostalCode = reader.GetString(postalCodeIndex),
                     },
                 }
             );

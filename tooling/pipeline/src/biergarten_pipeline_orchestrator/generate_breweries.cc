@@ -7,13 +7,20 @@
 #include <format>
 #include <optional>
 #include <random>
+#include <string>
+#include <string_view>
 
 #include "biergarten_pipeline_orchestrator.h"
 #include "biergarten_pipeline_orchestrator/coords.h"
+#include "services/address/address_service.h"
 #include "services/logging/logger.h"
 
 using biergarten_pipeline_orchestrator_internal::Coords;
 using biergarten_pipeline_orchestrator_internal::GetRandomCoordsWithinRange;
+
+namespace {
+constexpr std::string_view kPlaceholderAddressLine1 = "Address unavailable";
+}  // namespace
 
 void BiergartenPipelineOrchestrator::GenerateBreweries(
     std::span<const EnrichedCity> cities) {
@@ -39,10 +46,32 @@ void BiergartenPipelineOrchestrator::GenerateBreweries(
          const Coords brewery_coords = GetRandomCoordsWithinRange(
              city_centre, kMaxDistanceFromCentreKm, rng);
 
+         const std::optional<AddressLookupResult> geocoded =
+             address_service_->ReverseGeocode(brewery_coords.longitude,
+                                              brewery_coords.latitude);
+
+         if (!geocoded.has_value()) {
+            logger_->Log(
+                {.level = LogLevel::Warn,
+                 .phase = PipelinePhase::BreweryAndBeerGeneration,
+                 .message = std::format(
+                     "[Pipeline] Could not reverse geocode brewery in '{}' "
+                     "({}, {}); using a placeholder address.",
+                     enriched_city.location.city, brewery_coords.latitude,
+                     brewery_coords.longitude)});
+         }
+
          return BreweryRecord{
-             .address = BreweryAddress{.city = enriched_city.location,
-                                       .longitude = brewery_coords.longitude,
-                                       .latitude = brewery_coords.latitude},
+             .address =
+                 BreweryAddress{
+                     .city = enriched_city.location,
+                     .longitude = brewery_coords.longitude,
+                     .latitude = brewery_coords.latitude,
+                     .address_line1 = geocoded.has_value()
+                                          ? geocoded->address_line1
+                                          : std::string(kPlaceholderAddressLine1),
+                     .postal_code =
+                         geocoded.has_value() ? geocoded->postal_code : ""},
              .brewery = brewery};
       } catch (const std::exception& e) {
          ++skipped_count;
