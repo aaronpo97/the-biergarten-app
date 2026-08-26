@@ -1,6 +1,7 @@
 import { data, Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import { getBreweryById } from '../breweries.server';
+import { formatBreweryAddress } from '../utils/format-address';
 import type { Route } from './+types/brewery-detail';
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
@@ -37,11 +38,7 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
                                 <p className="text-xs font-semibold uppercase tracking-widest text-base-content/50 mb-2">
                                     Location
                                 </p>
-                                <p>{brewery.location.addressLine1}</p>
-                                {brewery.location.addressLine2 && (
-                                    <p>{brewery.location.addressLine2}</p>
-                                )}
-                                <p>{brewery.location.postalCode}</p>
+                                <p>{formatBreweryAddress(brewery.location)}</p>
                             </div>
                         )}
 

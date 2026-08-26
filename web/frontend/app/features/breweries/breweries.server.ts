@@ -7,13 +7,24 @@ interface ApiResponse<T> {
     payload: T;
 }
 
+export interface BreweryCoordinates {
+    latitude: number;
+    longitude: number;
+}
+
 export interface BreweryLocation {
     breweryPostLocationId: string;
     breweryPostId: string;
     cityId: string;
+    cityName: string;
+    stateProvinceName: string;
+    stateProvinceCode: string;
+    countryName: string;
+    countryCode: string;
     addressLine1: string;
     addressLine2: string | null;
     postalCode: string;
+    coordinates: BreweryCoordinates | null;
 }
 
 export interface Brewery {
