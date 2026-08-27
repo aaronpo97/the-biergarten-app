@@ -86,6 +86,30 @@ export const getBreweryLocations = async (): Promise<SimplifiedBrewery[]> => {
     return body.payload;
 };
 
+export const getBreweryLocationsNearby = async (
+    latitude: number,
+    longitude: number,
+    rangeInMetres: number,
+): Promise<SimplifiedBrewery[]> => {
+    const params = new URLSearchParams({
+        latitude: String(latitude),
+        longitude: String(longitude),
+        rangeInMetres: String(rangeInMetres),
+    });
+
+    const res = await fetchApi(`/api/brewery/locations/nearby?${params}`);
+
+    if (!res.ok) {
+        throw data(`Failed to load nearby breweries (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const body: ApiResponse<SimplifiedBrewery[]> = await res.json();
+    return body.payload;
+};
+
 export const getBreweryById = async (id: string): Promise<Brewery | null> => {
     const res = await fetchApi(`/api/brewery/${encodeURIComponent(id)}`);
 
