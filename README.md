@@ -60,7 +60,8 @@ Archived/reference areas:
 ## Tech stack
 
 - **Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp
-- **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5
+- **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5,
+  Leaflet/React Leaflet (brewery maps)
 - **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
 - **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
 - **Infrastructure**: Docker, Docker Compose

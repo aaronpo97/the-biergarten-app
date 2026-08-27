@@ -164,6 +164,8 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 **Features.Breweries.Tests**:
 
 - Brewery create/update/delete commands and get-by-id/get-all queries
+- Brewery location queries: all locations, and locations within a given range
+  of a coordinate
 
 **Features.UserManagement.Tests**:
 
