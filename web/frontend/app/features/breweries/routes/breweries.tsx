@@ -24,24 +24,22 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
     const { featured, recent } = loaderData;
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
-    const featuredPin =
-        featured?.location?.coordinates ?
-            {
-                id: featured.breweryPostId,
-                name: featured.breweryName,
-                latitude: featured.location.coordinates.latitude,
-                longitude: featured.location.coordinates.longitude,
-            }
-        :   null;
+    const featuredPin = featured?.location?.coordinates
+        ? {
+              id: featured.breweryPostId,
+              name: featured.breweryName,
+              latitude: featured.location.coordinates.latitude,
+              longitude: featured.location.coordinates.longitude,
+          }
+        : null;
 
-    const fallbackCenter =
-        featured?.location?.coordinates ?
-            {
-                latitude: featured.location.coordinates.latitude,
-                longitude: featured.location.coordinates.longitude,
-                label: featured.location.cityName,
-            }
-        :   null;
+    const fallbackCenter = featured?.location?.coordinates
+        ? {
+              latitude: featured.location.coordinates.latitude,
+              longitude: featured.location.coordinates.longitude,
+              label: featured.location.cityName,
+          }
+        : null;
 
     return (
         <div className="min-h-screen bg-base-200 text-base-content pb-16">
@@ -85,7 +83,9 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
             <section className="max-w-7xl mx-auto px-5 pt-11">
                 <div className="bg-[var(--color-highlight)] text-[var(--color-highlight-content)] rounded-box p-7 flex items-center justify-between gap-6 flex-wrap">
                     <div>
-                        <h2 className="font-serif text-2xl mb-1">Looking for something specific?</h2>
+                        <h2 className="font-serif text-2xl mb-1">
+                            Looking for something specific?
+                        </h2>
                         <p className="m-0">
                             All {FILLER_TOTAL_BREWERY_COUNT} partner breweries, filterable by
                             country, region, and beer style.

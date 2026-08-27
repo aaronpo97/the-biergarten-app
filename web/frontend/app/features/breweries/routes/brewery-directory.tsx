@@ -103,10 +103,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
                         ))}
                         {fetcher.state !== 'idle' &&
                             Array.from({ length: PAGE_SIZE }).map((_, index) => (
-                                <div
-                                    key={index}
-                                    className="skeleton h-32 w-full rounded-box"
-                                />
+                                <div key={index} className="skeleton h-32 w-full rounded-box" />
                             ))}
                     </div>
                 )}

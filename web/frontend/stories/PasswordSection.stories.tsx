@@ -14,7 +14,11 @@ const PasswordSectionRoute = () => {
 
     return (
         <div className="w-full max-w-md">
-            <PasswordSection open={open} onToggle={() => setOpen((value) => !value)} result={result} />
+            <PasswordSection
+                open={open}
+                onToggle={() => setOpen((value) => !value)}
+                result={result}
+            />
         </div>
     );
 };

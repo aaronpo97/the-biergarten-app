@@ -61,7 +61,13 @@ const CurrentLocationMarker = ({ position }: { position: LatLngTuple }) => (
 
 const CURRENT_LOCATION_ZOOM = 6;
 
-const RecenterMap = ({ bounds, currentLocation }: { bounds: LatLngTuple[]; currentLocation: LatLngTuple | null }) => {
+const RecenterMap = ({
+    bounds,
+    currentLocation,
+}: {
+    bounds: LatLngTuple[];
+    currentLocation: LatLngTuple | null;
+}) => {
     const map = useMap();
 
     useEffect(() => {
@@ -77,10 +83,7 @@ const RecenterMap = ({ bounds, currentLocation }: { bounds: LatLngTuple[]; curre
 
 const BreweryMap = ({ breweries }: BreweryMapProps) => {
     const currentLocation = useCurrentLocation();
-    const bounds: LatLngTuple[] = breweries.map((brewery) => [
-        brewery.latitude,
-        brewery.longitude,
-    ]);
+    const bounds: LatLngTuple[] = breweries.map((brewery) => [brewery.latitude, brewery.longitude]);
 
     return (
         <MapContainer

@@ -98,7 +98,9 @@ const NearbyBreweryMap = ({
             >
                 <Popup>
                     <p className="font-semibold font-serif">{pin.name}</p>
-                    {pin.cityLabel && <p className="text-sm text-base-content/70">{pin.cityLabel}</p>}
+                    {pin.cityLabel && (
+                        <p className="text-sm text-base-content/70">{pin.cityLabel}</p>
+                    )}
                     <a href={`/breweries/${pin.id}`} className="link link-primary text-sm">
                         View brewery &rarr;
                     </a>

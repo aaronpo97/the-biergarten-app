@@ -7,8 +7,7 @@ interface FeaturedBreweryCardProps {
     onShowOnMap: () => void;
 }
 
-// Founded year, beers-listed count, and house style aren't tracked anywhere yet -
-// see BREWERY_INDEX_HANDOFF.md. Filler until those fields/queries exist.
+// see BREWERY_INDEX_HANDOFF.md
 const FILLER_STATS = [
     { label: 'Founded', value: '2014' },
     { label: 'Beers listed', value: '18' },
