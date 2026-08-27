@@ -6,11 +6,16 @@ convention. For the vertical-slice code that talks to this schema, see
 
 ## Schema
 
-The full schema lives in one script:
-`web/backend/Database/Database.Migrations/scripts/01-schema/schema.sql`, run by
+The full schema lives under
+`web/backend/Database/Database.Migrations/scripts/01-schema/`, one numbered
+script per table (`01-UserAccount.sql`, `02-Photo.sql`, ...), run in order by
 `Database.Migrations` (DbUp) on startup. Each table is queried directly by the
 owning feature slice's repository (see
 [Direct SQL via Dapper/ADO.NET](../architecture.md#direct-sql-via-dapperadonet)).
+
+A generated DBML copy of the schema (for import into a diagramming tool such
+as dbdiagram.io) lives at
+`web/backend/Database/Database.Migrations/schema.dbml`.
 
 All tables use a `UNIQUEIDENTIFIER` primary key defaulting to `NEWID()`, and
 most carry a `RowVersion ROWVERSION` column used for optimistic concurrency on
@@ -50,10 +55,11 @@ repository or seed data yet:
 **Tool**: DbUp, run by the `Database.Migrations` project/container.
 
 Scripts live under `scripts/`, applied in order and tracked so a script never
-re-runs once it has succeeded. Today that's a single `01-schema/schema.sql`.
-When the schema needs to change, add a new numbered script rather than editing
-`schema.sql` in place — DbUp's tracking is per-script, so editing an
-already-applied script means it won't re-run against existing databases.
+re-runs once it has succeeded. Today that's `01-schema/`, with one script per
+table, numbered so a table's foreign keys always point at an earlier-numbered
+script. When the schema needs to change, add a new numbered script rather than
+editing an existing one in place — DbUp's tracking is per-script, so editing
+an already-applied script means it won't re-run against existing databases.
 
 ## Data seeding
 

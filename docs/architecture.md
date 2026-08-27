@@ -476,12 +476,16 @@ For the table-by-table schema and the custom SQL error code scheme, see
 ```
 scripts/
 └── 01-schema/
-    └── schema.sql   # full table/index/constraint definitions
+    ├── 01-UserAccount.sql
+    ├── 02-Photo.sql
+    ├── ...
+    └── 16-BeerPostComment.sql   # one script per CREATE TABLE
 ```
 
-Currently the whole schema is a single versioned script. As the schema evolves,
-new numbered scripts get added alongside it rather than editing `schema.sql` in
-place, so DbUp's already-applied tracking stays valid.
+Each table has its own script, numbered so a table's foreign keys always point
+at an earlier-numbered script. As the schema evolves, new numbered scripts get
+added rather than editing an existing one in place, so DbUp's already-applied
+tracking stays valid.
 
 ### Data seeding
 
