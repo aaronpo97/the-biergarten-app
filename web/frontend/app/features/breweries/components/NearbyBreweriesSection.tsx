@@ -4,7 +4,7 @@ import type { LatLngTuple } from 'leaflet';
 import ClientOnly from '../../../components/ClientOnly';
 import type { SimplifiedBrewery } from '../breweries.server';
 import type { loader as nearbyLoader } from '../routes/breweries-nearby';
-import { formatDistance, haversineDistanceMetres, type DistanceUnit } from '../utils/distance';
+import { formatDistance, type DistanceUnit } from '../utils/distance';
 import type { NearbyMapPin } from './NearbyBreweryMap';
 
 const NearbyBreweryMap = lazy(() => import('./NearbyBreweryMap'));
@@ -43,6 +43,139 @@ const cardClassName = (selected: boolean) =>
         selected ? 'border-l-primary' : 'border-l-transparent'
     }`;
 
+interface BreweriesNearByHeaderParams {
+    center: LatLngTuple | null;
+    withDistance: { brewery: SimplifiedBrewery; distanceMetres: number }[];
+    radiusKm: number;
+    unit: 'km' | 'mi';
+    centerLabel: string;
+}
+
+const BreweriesNearByHeader = ({
+    center,
+    centerLabel,
+    radiusKm,
+    unit,
+    withDistance,
+}: BreweriesNearByHeaderParams) => {
+    return (
+        <div className="flex items-baseline justify-between gap-4 flex-wrap mb-3.5">
+            <h2 className="font-serif text-2xl m-0">Breweries near you</h2>
+            <span className="text-sm text-base-content/60">
+                {center
+                    ? `${withDistance.length} within ${formatDistance(radiusKm * 1000, unit)} of ${centerLabel}`
+                    : 'Finding breweries near you…'}
+            </span>
+        </div>
+    );
+};
+
+interface RadiusUnitControlsProps {
+    radiusKm: number;
+    unit: DistanceUnit;
+    onRadiusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSelectKm: () => void;
+    onSelectMi: () => void;
+}
+
+const RadiusUnitControls = ({
+    radiusKm,
+    unit,
+    onRadiusChange,
+    onSelectKm,
+    onSelectMi,
+}: RadiusUnitControlsProps) => {
+    return (
+        <div className="flex items-center justify-between gap-3">
+            <label className="flex-1 flex flex-col gap-1 text-sm text-base-content/70">
+                <span className="flex justify-between">
+                    <span>Search radius</span>
+                    <span className="font-semibold">{formatDistance(radiusKm * 1000, unit)}</span>
+                </span>
+                <input
+                    type="range"
+                    min={MIN_RADIUS_KM}
+                    max={MAX_RADIUS_KM}
+                    step={RADIUS_STEP_KM}
+                    value={radiusKm}
+                    onChange={onRadiusChange}
+                    className="range range-primary range-sm"
+                />
+            </label>
+            <div className="join self-end">
+                <button
+                    type="button"
+                    onClick={onSelectKm}
+                    className={`btn btn-xs join-item ${unit === 'km' ? 'btn-active' : ''}`}
+                >
+                    km
+                </button>
+                <button
+                    type="button"
+                    onClick={onSelectMi}
+                    className={`btn btn-xs join-item ${unit === 'mi' ? 'btn-active' : ''}`}
+                >
+                    mi
+                </button>
+            </div>
+        </div>
+    );
+};
+
+interface BreweryWithDistance {
+    brewery: SimplifiedBrewery;
+    distanceMetres: number;
+}
+
+interface NearbyBreweryListProps {
+    withDistance: BreweryWithDistance[];
+    center: LatLngTuple | null;
+    radiusKm: number;
+    unit: DistanceUnit;
+    renderItem: (item: BreweryWithDistance) => React.JSX.Element;
+}
+
+const NearbyBreweryList = ({
+    withDistance,
+    center,
+    radiusKm,
+    unit,
+    renderItem,
+}: NearbyBreweryListProps) => {
+    return (
+        <>
+            {withDistance.length === 0 && center && (
+                <p className="text-sm text-base-content/60">
+                    No partner breweries within {formatDistance(radiusKm * 1000, unit)}.
+                </p>
+            )}
+            {withDistance.map(renderItem)}
+        </>
+    );
+};
+
+interface ChangeLocationButtonProps {
+    onClick: () => void;
+}
+
+const ChangeLocationButton = ({ onClick }: ChangeLocationButtonProps) => {
+    return (
+        <div className="pt-1">
+            <button type="button" onClick={onClick} className="btn btn-ghost btn-sm">
+                Change location
+            </button>
+        </div>
+    );
+};
+
+interface ClientOnlyMapProps {
+    render: () => React.JSX.Element;
+}
+
+const ClientOnlyMap = ({ render }: ClientOnlyMapProps) => {
+    return <ClientOnly fallback={<div className={MAP_PLACEHOLDER_CLASS} />}>{render}</ClientOnly>;
+};
+
 const NearbyBreweriesSection = ({
     featured,
     fallbackCenter,
@@ -77,7 +210,10 @@ const NearbyBreweriesSection = ({
     }, []);
 
     const center: LatLngTuple | null =
-        userLocation ?? (geoAttempted && fallbackCenter ? [fallbackCenter.latitude, fallbackCenter.longitude] : null);
+        userLocation ??
+        (geoAttempted && fallbackCenter
+            ? [fallbackCenter.latitude, fallbackCenter.longitude]
+            : null);
     const centerLabel = userLocation ? locationLabel : (fallbackCenter?.label ?? locationLabel);
 
     useEffect(() => {
@@ -91,13 +227,10 @@ const NearbyBreweriesSection = ({
     const nearby: SimplifiedBrewery[] = fetcher.data?.breweries ?? [];
     const withDistance = center
         ? nearby
-              .filter((b) => b.location?.coordinates)
+              .filter((b) => b.location?.coordinates && b.distanceMetres !== null)
               .map((b) => ({
                   brewery: b,
-                  distanceMetres: haversineDistanceMetres(
-                      { latitude: center[0], longitude: center[1] },
-                      b.location!.coordinates!,
-                  ),
+                  distanceMetres: b.distanceMetres as number,
               }))
               .sort((a, b) => a.distanceMetres - b.distanceMetres)
         : [];
@@ -105,7 +238,9 @@ const NearbyBreweriesSection = ({
     const pins: NearbyMapPin[] = withDistance.map(({ brewery }) => ({
         id: brewery.breweryPostId,
         name: brewery.breweryName,
-        cityLabel: brewery.location ? `${brewery.location.cityName}, ${brewery.location.stateProvinceCode}` : null,
+        cityLabel: brewery.location
+            ? `${brewery.location.cityName}, ${brewery.location.stateProvinceCode}`
+            : null,
         latitude: brewery.location!.coordinates!.latitude,
         longitude: brewery.location!.coordinates!.longitude,
     }));
@@ -121,86 +256,59 @@ const NearbyBreweriesSection = ({
 
     return (
         <section id="breweries-near-you" className="max-w-7xl mx-auto px-5 pt-11">
-            <div className="flex items-baseline justify-between gap-4 flex-wrap mb-3.5">
-                <h2 className="font-serif text-2xl m-0">Breweries near you</h2>
-                <span className="text-sm text-base-content/60">
-                    {center
-                        ? `${withDistance.length} within ${formatDistance(radiusKm * 1000, unit)} of ${centerLabel}`
-                        : 'Finding breweries near you…'}
-                </span>
-            </div>
+            <BreweriesNearByHeader
+                center={center}
+                withDistance={withDistance}
+                radiusKm={radiusKm}
+                unit={unit}
+                centerLabel={centerLabel}
+            />
 
             <div className="grid gap-5 items-stretch md:grid-cols-[22rem_1fr]">
                 <div className="flex flex-col gap-3 order-2 md:order-1">
-                    <div className="flex items-center justify-between gap-3">
-                        <label className="flex-1 flex flex-col gap-1 text-sm text-base-content/70">
-                            <span className="flex justify-between">
-                                <span>Search radius</span>
-                                <span className="font-semibold">{formatDistance(radiusKm * 1000, unit)}</span>
-                            </span>
-                            <input
-                                type="range"
-                                min={MIN_RADIUS_KM}
-                                max={MAX_RADIUS_KM}
-                                step={RADIUS_STEP_KM}
-                                value={radiusKm}
-                                onChange={(e) => setRadiusKm(Number(e.target.value))}
-                                className="range range-primary range-sm"
-                            />
-                        </label>
-                        <div className="join self-end">
+                    <RadiusUnitControls
+                        radiusKm={radiusKm}
+                        unit={unit}
+                        onRadiusChange={(e) => setRadiusKm(Number(e.target.value))}
+                        onSelectKm={() => setUnit('km')}
+                        onSelectMi={() => setUnit('mi')}
+                    />
+                    <NearbyBreweryList
+                        withDistance={withDistance}
+                        center={center}
+                        radiusKm={radiusKm}
+                        unit={unit}
+                        renderItem={({ brewery, distanceMetres }) => (
                             <button
+                                key={brewery.breweryPostId}
                                 type="button"
-                                onClick={() => setUnit('km')}
-                                className={`btn btn-xs join-item ${unit === 'km' ? 'btn-active' : ''}`}
+                                onClick={() => onSelect(brewery.breweryPostId)}
+                                className={cardClassName(selectedId === brewery.breweryPostId)}
                             >
-                                km
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setUnit('mi')}
-                                className={`btn btn-xs join-item ${unit === 'mi' ? 'btn-active' : ''}`}
-                            >
-                                mi
-                            </button>
-                        </div>
-                    </div>
-                    {withDistance.length === 0 && center && (
-                        <p className="text-sm text-base-content/60">
-                            No partner breweries within {formatDistance(radiusKm * 1000, unit)}.
-                        </p>
-                    )}
-                    {withDistance.map(({ brewery, distanceMetres }) => (
-                        <button
-                            key={brewery.breweryPostId}
-                            type="button"
-                            onClick={() => onSelect(brewery.breweryPostId)}
-                            className={cardClassName(selectedId === brewery.breweryPostId)}
-                        >
-                            <div className="flex justify-between items-baseline gap-3">
-                                <h3 className="font-serif text-lg m-0">{brewery.breweryName}</h3>
-                                <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                                    {formatDistance(distanceMetres, unit)}
-                                </span>
-                            </div>
-                            {brewery.location && (
-                                <div className="text-sm text-base-content/60 mt-1">
-                                    {brewery.location.cityName}, {brewery.location.stateProvinceCode}
+                                <div className="flex justify-between items-baseline gap-3">
+                                    <h3 className="font-serif text-lg m-0">
+                                        {brewery.breweryName}
+                                    </h3>
+                                    <span className="text-sm font-semibold text-primary whitespace-nowrap">
+                                        {formatDistance(distanceMetres, unit)}
+                                    </span>
                                 </div>
-                            )}
-                            <div className="text-sm mt-2">{FILLER_NOTE}</div>
-                        </button>
-                    ))}
-                    <div className="pt-1">
-                        <button type="button" onClick={requestGeolocation} className="btn btn-ghost btn-sm">
-                            Change location
-                        </button>
-                    </div>
+                                {brewery.location && (
+                                    <div className="text-sm text-base-content/60 mt-1">
+                                        {brewery.location.cityName},{' '}
+                                        {brewery.location.stateProvinceCode}
+                                    </div>
+                                )}
+                                <div className="text-sm mt-2">{FILLER_NOTE}</div>
+                            </button>
+                        )}
+                    />
+                    <ChangeLocationButton onClick={requestGeolocation} />
                 </div>
 
                 <div className="order-1 md:order-2">
-                    <ClientOnly fallback={<div className={MAP_PLACEHOLDER_CLASS} />}>
-                        {() =>
+                    <ClientOnlyMap
+                        render={() =>
                             center ? (
                                 <Suspense fallback={<div className={MAP_PLACEHOLDER_CLASS} />}>
                                     <NearbyBreweryMap
@@ -215,7 +323,7 @@ const NearbyBreweriesSection = ({
                                 <div className={MAP_PLACEHOLDER_CLASS} />
                             )
                         }
-                    </ClientOnly>
+                    />
                 </div>
             </div>
         </section>

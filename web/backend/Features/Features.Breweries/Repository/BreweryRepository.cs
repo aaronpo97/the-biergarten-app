@@ -134,6 +134,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         City,
         StateProvince,
         Country,
+        DistanceRow,
         BreweryPost
             > (
                 """
@@ -154,7 +155,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     sp.ISO3166_2 AS Iso31662,
                     co.CountryID,
                     co.CountryName,
-                    co.ISO3166_1 AS Iso31661
+                    co.ISO3166_1 AS Iso31661,
+                    bpl.Coordinates.STDistance(@Origin) AS DistanceMetres
                 FROM dbo.BreweryPost bp
                 INNER JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
                 LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
@@ -164,14 +166,15 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                   AND bpl.Coordinates.STDistance(@Origin) <= @RangeInMetres
                 ORDER BY bpl.Coordinates.STDistance(@Origin) ASC
                 """,
-                MapBreweryRow,
+                (post, location, city, stateProvince, country, distance) =>
+                    MapBreweryRowWithDistance(post, location, city, stateProvince, country, distance, coords),
                 param: new
                 {
                     coords.Latitude,
                     coords.Longitude,
                     RangeInMetres = rangeInMetres
                 },
-                splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
+                splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID,DistanceMetres"
             );
     }
 
@@ -582,5 +585,30 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
 
         post.Location = location;
         return post;
+    }
+
+    /// <summary>Dapper multi-mapping row for the <c>DistanceMetres</c> column computed by a range query.</summary>
+    private sealed class DistanceRow
+    {
+        public double DistanceMetres { get; set; }
+    }
+
+    /// <summary>
+    ///     Composes a joined row via <see cref="MapBreweryRow" />, then attaches the DB-computed distance
+    ///     from <paramref name="origin" /> as the result's <see cref="BreweryPost.Distance" />.
+    /// </summary>
+    private static BreweryPost MapBreweryRowWithDistance(
+        BreweryPost post,
+        BreweryPostLocation location,
+        City city,
+        StateProvince stateProvince,
+        Country country,
+        DistanceRow distance,
+        CoordinateData origin
+    )
+    {
+        BreweryPost mapped = MapBreweryRow(post, location, city, stateProvince, country);
+        mapped.Distance = new DistanceInformation(origin, distance.DistanceMetres);
+        return mapped;
     }
 }

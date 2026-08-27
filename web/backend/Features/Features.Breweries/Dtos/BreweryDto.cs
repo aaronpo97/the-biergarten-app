@@ -32,8 +32,13 @@ public record BreweryDto(
     byte[]? RowVersion,
     BreweryLocationDto? Location
 );
+/// <param name="DistanceMetres">
+///     The distance, in metres, from a query's origin point, or <see langword="null"/> for queries with no
+///     origin point (e.g. <c>GET /api/brewery/locations</c>).
+/// </param>
 public record SimplifiedBreweryDto(
     Guid BreweryPostId,
     string BreweryName,
-    BreweryLocationDto? Location
+    BreweryLocationDto? Location,
+    double? DistanceMetres
 );

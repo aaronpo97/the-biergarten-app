@@ -41,14 +41,10 @@ CREATE
 NONCLUSTERED INDEX IX_BreweryPostLocation_City
     ON BreweryPostLocation(CityID);
 
--- To assess when the time comes:
-
--- This would allow for efficient spatial queries to find breweries within a certain distance of a location, but it adds overhead to insert/update operations.
-
--- CREATE SPATIAL INDEX SIDX_BreweryPostLocation_Coordinates
---     ON BreweryPostLocation(Coordinates)
---     USING GEOGRAPHY_GRID
---     WITH (
---         GRIDS = (LEVEL_1 = MEDIUM, LEVEL_2 = MEDIUM, LEVEL_3 = MEDIUM, LEVEL_4 = MEDIUM),
---         CELLS_PER_OBJECT = 16
---     );
+CREATE SPATIAL INDEX SIDX_BreweryPostLocation_Coordinates
+    ON BreweryPostLocation(Coordinates)
+    USING GEOGRAPHY_GRID
+    WITH (
+        GRIDS = (LEVEL_1 = MEDIUM, LEVEL_2 = MEDIUM, LEVEL_3 = MEDIUM, LEVEL_4 = MEDIUM),
+        CELLS_PER_OBJECT = 16
+    );

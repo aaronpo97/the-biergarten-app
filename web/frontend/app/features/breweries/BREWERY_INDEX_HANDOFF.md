@@ -18,7 +18,7 @@ Static copy only. No data.
 ## 2. Featured brewery
 
 | Field                                | Status | Current source                                       | Gap                                                                                                                                                                                    |
-|--------------------------------------|--------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------ | ------ | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Name, description, address, location | ✅     | `GET /api/brewery` (`BreweryDto`)                    | —                                                                                                                                                                                      |
 | "Editorially featured" selection     | ❌     | none — defaults to the most recently created brewery | No `IsFeatured` flag or rotation concept anywhere in `BreweryPost`. Needs a field + an admin toggle, or a scheduled rotation query, to back the "THIS WEEK" cadence the badge implies. |
 | Founded year                         | ❌     | none                                                 | `BreweryPost` has no founding date. Would need a new column (distinct from `CreatedAt`, which is post-creation time, not the brewery's actual founding).                               |
@@ -28,9 +28,9 @@ Static copy only. No data.
 ## 3. Breweries near you
 
 | Field                                                   | Status | Current source                                                                     | Gap                                                                                                                                                                                                                              |
-|---------------------------------------------------------|--------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Nearby breweries by coordinates + radius                | ✅     | `GET /api/brewery/locations/nearby?latitude&longitude&rangeInMetres`               | —                                                                                                                                                                                                                                |
-| Distance from search center                             | ✅     | Computed client-side (Haversine) from the coordinates the endpoint already returns | —                                                                                                                                                                                                                                |
+| Distance from search center                             | ✅     | `SimplifiedBreweryDto.DistanceMetres`, computed server-side via `geography::STDistance` | —                                                                                                                                                                                                                                |
 | One-line note / tagline per brewery                     | ❌     | none                                                                               | `SimplifiedBreweryDto` (used by both `/locations` and `/locations/nearby`) has no description-like field. List and map-popup text use filler. Needs either a short tagline field or a truncated `Description` added to that DTO. |
 | User's current location                                 | ✅     | Browser Geolocation API                                                            | —                                                                                                                                                                                                                                |
 | Fallback region (before permission granted / on denial) | ⚠️     | Falls back to the featured brewery's own coordinates as a proxy center             | Works, but isn't a deliberate "default region." A real deployment likely wants a configured default (e.g. per-tenant HQ city) rather than borrowing the featured brewery's location.                                             |
@@ -40,7 +40,7 @@ Static copy only. No data.
 ## 4. Recently added
 
 | Field                                   | Status | Current source                                   | Gap |
-|-----------------------------------------|--------|--------------------------------------------------|-----|
+| --------------------------------------- | ------ | ------------------------------------------------ | --- |
 | Newest breweries, name/city/description | ✅     | `GET /api/brewery` (already sorted newest-first) | —   |
 
 No gaps — this section is fully real.
@@ -48,7 +48,7 @@ No gaps — this section is fully real.
 ## 5. Directory CTA
 
 | Field                                   | Status | Current source              | Gap                                                                                                                                                                                                                              |
-|-----------------------------------------|--------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------------------------------- | ------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Total partner brewery count             | ❌     | Filler number (`128`)       | No lightweight count endpoint. Needs something like `GET /api/brewery/count` rather than fetching the full unbounded list just to measure it.                                                                                    |
 | Filter by country / region / beer style | ❌     | Copy only — not implemented | This is CTA copy describing the destination directory page's future capability, not a data need of this page itself. Tracked here because it implies the directory page will eventually need country/region/style filter params. |
 

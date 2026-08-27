@@ -68,7 +68,8 @@ public static class BreweryDtoMapper
                     AddressLine2: brewery.Location.AddressLine2,
                     PostalCode: brewery.Location.PostalCode,
                     Coordinates: brewery.Location.Coordinates
-                )
+                ),
+            DistanceMetres: brewery.Distance?.DistanceMetres
         );
     }
 }

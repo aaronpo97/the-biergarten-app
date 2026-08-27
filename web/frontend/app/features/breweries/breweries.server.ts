@@ -41,6 +41,7 @@ export interface SimplifiedBrewery {
     breweryPostId: string;
     breweryName: string;
     location: BreweryLocation | null;
+    distanceMetres: number | null;
 }
 
 const fetchApi = async (path: string): Promise<Response> => {
