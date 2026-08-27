@@ -32,3 +32,8 @@ public record BreweryDto(
     byte[]? RowVersion,
     BreweryLocationDto? Location
 );
+public record SimplifiedBreweryDto(
+    Guid BreweryPostId,
+    string BreweryName,
+    BreweryLocationDto? Location
+);

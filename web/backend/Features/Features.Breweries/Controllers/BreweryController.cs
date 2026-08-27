@@ -3,7 +3,9 @@ using Features.Breweries.Commands.DeleteBrewery;
 using Features.Breweries.Commands.UpdateBrewery;
 using Features.Breweries.Dtos;
 using Features.Breweries.Queries.GetAllBreweries;
+using Features.Breweries.Queries.GetAllBreweryLocations;
 using Features.Breweries.Queries.GetBreweryById;
+using Features.Breweries.Queries.GetBreweryLocationsWithinRange;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +61,49 @@ public class BreweryController(IMediator mediator) : ControllerBase
             new ResponseBody<IEnumerable<BreweryDto>>
             {
                 Message = "Breweries retrieved successfully.",
+                Payload = breweries,
+            }
+        );
+    }
+
+    /// <summary>Retrieves all brewery posts that have a set location.</summary>
+    /// <remarks>Allows anonymous access.</remarks>
+    [AllowAnonymous]
+    [HttpGet("locations")]
+    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetAllLocations()
+    {
+        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+            new GetAllBreweryLocationsQuery()
+        );
+        return Ok(
+            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            {
+                Message = "Brewery locations retrieved successfully.",
+                Payload = breweries,
+            }
+        );
+    }
+
+    /// <summary>Retrieves brewery posts with a set location within range of the given coordinates, nearest first.</summary>
+    /// <param name="latitude">The origin latitude, in decimal degrees.</param>
+    /// <param name="longitude">The origin longitude, in decimal degrees.</param>
+    /// <param name="rangeInMetres">The maximum distance, in metres, from the origin coordinates.</param>
+    /// <remarks>Allows anonymous access.</remarks>
+    [AllowAnonymous]
+    [HttpGet("locations/nearby")]
+    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetLocationsWithinRange(
+        [FromQuery] double latitude,
+        [FromQuery] double longitude,
+        [FromQuery] double rangeInMetres
+    )
+    {
+        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+            new GetBreweryLocationsWithinRangeQuery(latitude, longitude, rangeInMetres)
+        );
+        return Ok(
+            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            {
+                Message = "Brewery locations retrieved successfully.",
                 Payload = breweries,
             }
         );

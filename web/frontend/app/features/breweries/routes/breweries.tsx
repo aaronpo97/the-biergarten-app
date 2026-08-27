@@ -1,7 +1,7 @@
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import ClientOnly from '../../../components/ClientOnly';
 import BreweryCard from '../components/BreweryCard';
-import { getBreweries, type Brewery } from '../breweries.server';
+import { getBreweries, getBreweryLocations, type SimplifiedBrewery } from '../breweries.server';
 import type { Route } from './+types/breweries';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useFetcher } from 'react-router';
@@ -18,13 +18,16 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit')) || PAGE_SIZE;
     const offset = Number(url.searchParams.get('offset')) || 0;
-    const breweries = await getBreweries(limit, offset);
-    return { breweries, limit, offset };
+    const [breweries, locations] = await Promise.all([
+        getBreweries(limit, offset),
+        getBreweryLocations(),
+    ]);
+    return { breweries, locations, limit, offset };
 };
 
 const BreweryMap = lazy(() => import('../components/BreweryMap'));
 
-const toPins = (breweries: Brewery[]): BreweryMapPin[] =>
+const toPins = (breweries: SimplifiedBrewery[]): BreweryMapPin[] =>
     breweries
         .filter((brewery) => brewery.location?.coordinates)
         .map((brewery) => ({
@@ -64,7 +67,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
         return () => observer.disconnect();
     }, [hasMore, offset, fetcher]);
 
-    const pins = toPins(allBreweries);
+    const pins = toPins(loaderData.locations);
 
     return (
         <div className="min-h-screen bg-base-200">

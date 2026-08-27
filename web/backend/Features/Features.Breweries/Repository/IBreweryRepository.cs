@@ -22,6 +22,20 @@ public interface IBreweryRepository
     Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset);
 
     /// <summary>
+    ///     Retrieves brewery posts with a set location within <paramref name="rangeInMetres" /> of
+    ///     <paramref name="coords" />, nearest first. Posts without coordinates are excluded.
+    /// </summary>
+    /// <param name="coords">The origin point to measure distance from.</param>
+    /// <param name="rangeInMetres">The maximum distance, in metres, from <paramref name="coords" />.</param>
+    Task<IEnumerable<BreweryPost>> GetAllLocationsWithinRange(CoordinateData coords, double rangeInMetres);
+
+    /// <summary>
+    ///     Retrieves all brewery posts that have a set location, ordered by <c>BreweryPostId</c>. Posts
+    ///     without coordinates are excluded.
+    /// </summary>
+    Task<IEnumerable<BreweryPost>> GetAllLocations();
+
+    /// <summary>
     ///     Updates a brewery post's name and description, and upserts or clears its location, enforcing
     ///     optimistic concurrency via <paramref name="brewery" />'s <c>RowVersion</c>: the update is rejected
     ///     if the row was modified since <c>RowVersion</c> was read. When <paramref name="brewery" />'s

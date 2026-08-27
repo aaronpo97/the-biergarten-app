@@ -37,6 +37,12 @@ export interface Brewery {
     location: BreweryLocation | null;
 }
 
+export interface SimplifiedBrewery {
+    breweryPostId: string;
+    breweryName: string;
+    location: BreweryLocation | null;
+}
+
 const fetchApi = async (path: string): Promise<Response> => {
     try {
         return await fetch(`${API_BASE_URL}${path}`);
@@ -63,6 +69,20 @@ export const getBreweries = async (limit?: number, offset?: number): Promise<Bre
     }
 
     const body: ApiResponse<Brewery[]> = await res.json();
+    return body.payload;
+};
+
+export const getBreweryLocations = async (): Promise<SimplifiedBrewery[]> => {
+    const res = await fetchApi('/api/brewery/locations');
+
+    if (!res.ok) {
+        throw data(`Failed to load brewery locations (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const body: ApiResponse<SimplifiedBrewery[]> = await res.json();
     return body.payload;
 };
 
