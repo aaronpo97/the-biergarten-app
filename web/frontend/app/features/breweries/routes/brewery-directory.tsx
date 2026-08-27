@@ -1,8 +1,9 @@
+import { Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import ClientOnly from '../../../components/ClientOnly';
 import BreweryCard from '../components/BreweryCard';
 import { getBreweries, getBreweryLocations, type SimplifiedBrewery } from '../breweries.server';
-import type { Route } from './+types/breweries';
+import type { Route } from './+types/brewery-directory';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useFetcher } from 'react-router';
 import type { BreweryMapPin } from '../components/BreweryMap';
@@ -11,7 +12,7 @@ const PAGE_SIZE = 12;
 const MAP_PLACEHOLDER_CLASS = 'h-[28rem] md:h-[34rem] w-full rounded-box bg-base-300';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Breweries | The Biergarten App' }];
+    return [{ title: 'Brewery Directory | The Biergarten App' }];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -59,7 +60,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
 
         const observer = new IntersectionObserver((entries) => {
             if (entries[0]?.isIntersecting && fetcher.state === 'idle') {
-                fetcher.load(`/breweries?limit=${PAGE_SIZE}&offset=${offset}`);
+                fetcher.load(`/breweries/directory?limit=${PAGE_SIZE}&offset=${offset}`);
             }
         });
 
@@ -72,8 +73,16 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
     return (
         <div className="min-h-screen bg-base-200">
             <div className="container mx-auto p-14">
-                <h1 className="text-4xl font-bold mb-4">Breweries</h1>
-                <p className="text-base-content/70 mb-6">Discover our partner breweries.</p>
+                <Link
+                    to="/breweries"
+                    className="link link-hover text-sm text-base-content/60 mb-4 inline-block"
+                >
+                    &larr; Back to Breweries
+                </Link>
+                <h1 className="text-4xl font-bold mb-4">Full brewery directory</h1>
+                <p className="text-base-content/70 mb-6">
+                    All of our partner breweries, newest first.
+                </p>
 
                 <ClientOnly fallback={<div className={MAP_PLACEHOLDER_CLASS} />}>
                     {() => (
