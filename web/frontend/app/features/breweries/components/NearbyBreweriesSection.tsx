@@ -4,7 +4,7 @@ import type { LatLngTuple } from 'leaflet';
 import ClientOnly from '../../../components/ClientOnly';
 import type { SimplifiedBrewery } from '../breweries.server';
 import type { loader as nearbyLoader } from '../routes/breweries-nearby';
-import { formatDistance, haversineDistanceMetres } from '../utils/distance';
+import { formatDistance, haversineDistanceMetres, type DistanceUnit } from '../utils/distance';
 import type { NearbyMapPin } from './NearbyBreweryMap';
 
 const NearbyBreweryMap = lazy(() => import('./NearbyBreweryMap'));
@@ -53,6 +53,7 @@ const NearbyBreweriesSection = ({
     const [locationLabel, setLocationLabel] = useState('your location');
     const [geoAttempted, setGeoAttempted] = useState(false);
     const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
+    const [unit, setUnit] = useState<DistanceUnit>('km');
     const fetcher = useFetcher<typeof nearbyLoader>();
 
     const requestGeolocation = () => {
@@ -124,31 +125,49 @@ const NearbyBreweriesSection = ({
                 <h2 className="font-serif text-2xl m-0">Breweries near you</h2>
                 <span className="text-sm text-base-content/60">
                     {center
-                        ? `${withDistance.length} within ${radiusKm} km of ${centerLabel}`
+                        ? `${withDistance.length} within ${formatDistance(radiusKm * 1000, unit)} of ${centerLabel}`
                         : 'Finding breweries near you…'}
                 </span>
             </div>
 
             <div className="grid gap-5 items-stretch md:grid-cols-[22rem_1fr]">
                 <div className="flex flex-col gap-3 order-2 md:order-1">
-                    <label className="flex flex-col gap-1 text-sm text-base-content/70">
-                        <span className="flex justify-between">
-                            <span>Search radius</span>
-                            <span className="font-semibold">{radiusKm} km</span>
-                        </span>
-                        <input
-                            type="range"
-                            min={MIN_RADIUS_KM}
-                            max={MAX_RADIUS_KM}
-                            step={RADIUS_STEP_KM}
-                            value={radiusKm}
-                            onChange={(e) => setRadiusKm(Number(e.target.value))}
-                            className="range range-primary range-sm"
-                        />
-                    </label>
+                    <div className="flex items-center justify-between gap-3">
+                        <label className="flex-1 flex flex-col gap-1 text-sm text-base-content/70">
+                            <span className="flex justify-between">
+                                <span>Search radius</span>
+                                <span className="font-semibold">{formatDistance(radiusKm * 1000, unit)}</span>
+                            </span>
+                            <input
+                                type="range"
+                                min={MIN_RADIUS_KM}
+                                max={MAX_RADIUS_KM}
+                                step={RADIUS_STEP_KM}
+                                value={radiusKm}
+                                onChange={(e) => setRadiusKm(Number(e.target.value))}
+                                className="range range-primary range-sm"
+                            />
+                        </label>
+                        <div className="join self-end">
+                            <button
+                                type="button"
+                                onClick={() => setUnit('km')}
+                                className={`btn btn-xs join-item ${unit === 'km' ? 'btn-active' : ''}`}
+                            >
+                                km
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setUnit('mi')}
+                                className={`btn btn-xs join-item ${unit === 'mi' ? 'btn-active' : ''}`}
+                            >
+                                mi
+                            </button>
+                        </div>
+                    </div>
                     {withDistance.length === 0 && center && (
                         <p className="text-sm text-base-content/60">
-                            No partner breweries within {radiusKm} km.
+                            No partner breweries within {formatDistance(radiusKm * 1000, unit)}.
                         </p>
                     )}
                     {withDistance.map(({ brewery, distanceMetres }) => (
@@ -161,7 +180,7 @@ const NearbyBreweriesSection = ({
                             <div className="flex justify-between items-baseline gap-3">
                                 <h3 className="font-serif text-lg m-0">{brewery.breweryName}</h3>
                                 <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                                    {formatDistance(distanceMetres)}
+                                    {formatDistance(distanceMetres, unit)}
                                 </span>
                             </div>
                             {brewery.location && (

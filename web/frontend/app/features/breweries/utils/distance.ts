@@ -19,7 +19,12 @@ export const haversineDistanceMetres = (a: Coordinates, b: Coordinates): number 
     return 2 * EARTH_RADIUS_METRES * Math.asin(Math.sqrt(h));
 };
 
-export const formatDistance = (metres: number): string => {
-    const km = metres / 1000;
-    return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
+export type DistanceUnit = 'km' | 'mi';
+
+const METRES_PER_MILE = 1609.344;
+
+export const formatDistance = (metres: number, unit: DistanceUnit = 'km'): string => {
+    const value = unit === 'mi' ? metres / METRES_PER_MILE : metres / 1000;
+    const rounded = value < 10 ? value.toFixed(1) : String(Math.round(value));
+    return `${rounded} ${unit}`;
 };
