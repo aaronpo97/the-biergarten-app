@@ -46,10 +46,11 @@ const FitAndFocus = ({
         const points: LatLngTuple[] = pins.map((pin) => [pin.latitude, pin.longitude]);
         if (userLocation) points.push(userLocation);
         if (points.length > 0) {
-            map.fitBounds(points, { padding: [40, 40] });
+            map.fitBounds(points, { padding: [40, 40], animate: false });
             didInitialFit.current = true;
         }
-        setTimeout(() => map.invalidateSize(), 200);
+        const timeout = setTimeout(() => map.invalidateSize(), 200);
+        return () => clearTimeout(timeout);
     }, [map, pins, userLocation]);
 
     useEffect(() => {

@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useFetcher } from 'react-router';
 import type { LatLngTuple } from 'leaflet';
 import ClientOnly from '../../../components/ClientOnly';
+import useDebouncedValue from '../../../hooks/useDebouncedValue';
 import type { SimplifiedBrewery } from '../breweries.server';
 import type { loader as nearbyLoader } from '../routes/breweries-nearby';
 import { formatDistance, type DistanceUnit } from '../utils/distance';
@@ -14,6 +15,7 @@ const DEFAULT_RADIUS_KM = 120;
 const MIN_RADIUS_KM = 10;
 const MAX_RADIUS_KM = 150;
 const RADIUS_STEP_KM = 10;
+const RADIUS_DEBOUNCE_MS = 300;
 
 export interface FeaturedPin {
     id: string;
@@ -186,6 +188,7 @@ const NearbyBreweriesSection = ({
     const [locationLabel, setLocationLabel] = useState('your location');
     const [geoAttempted, setGeoAttempted] = useState(false);
     const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
+    const debouncedRadiusKm = useDebouncedValue(radiusKm, RADIUS_DEBOUNCE_MS);
     const [unit, setUnit] = useState<DistanceUnit>('km');
     const fetcher = useFetcher<typeof nearbyLoader>();
 
@@ -219,10 +222,10 @@ const NearbyBreweriesSection = ({
     useEffect(() => {
         if (!center) return;
         fetcher.load(
-            `/breweries/nearby?latitude=${center[0]}&longitude=${center[1]}&rangeInMetres=${radiusKm * 1000}`,
+            `/breweries/nearby?latitude=${center[0]}&longitude=${center[1]}&rangeInMetres=${debouncedRadiusKm * 1000}`,
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [center?.[0], center?.[1], radiusKm]);
+    }, [center?.[0], center?.[1], debouncedRadiusKm]);
 
     const nearby: SimplifiedBrewery[] = fetcher.data?.breweries ?? [];
     const withDistance = center

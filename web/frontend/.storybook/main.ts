@@ -12,6 +12,12 @@ const config: StorybookConfig = {
         '../stories/RegisterForm.stories.tsx',
         '../stories/Navbar.stories.tsx',
         '../stories/Toast.stories.tsx',
+        '../stories/BreweryCard.stories.tsx',
+        '../stories/FeaturedBreweryCard.stories.tsx',
+        '../stories/RecentBreweries.stories.tsx',
+        '../stories/NearbyBreweriesSection.stories.tsx',
+        '../stories/BreweryMap.stories.tsx',
+        '../stories/NearbyBreweryMap.stories.tsx',
         '../stories/Themes.stories.tsx',
     ],
     addons: [

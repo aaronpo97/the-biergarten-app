@@ -72,9 +72,9 @@ const RecenterMap = ({
 
     useEffect(() => {
         if (currentLocation) {
-            map.setView(currentLocation, CURRENT_LOCATION_ZOOM);
+            map.setView(currentLocation, CURRENT_LOCATION_ZOOM, { animate: false });
         } else if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [32, 32], maxZoom: 6 });
+            map.fitBounds(bounds, { padding: [32, 32], maxZoom: 6, animate: false });
         }
     }, [map, bounds, currentLocation]);
 
