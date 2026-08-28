@@ -7,10 +7,13 @@ using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
 using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
+using Features.ImageUploads.Commands.UploadPhoto;
+using Features.ImageUploads.DependencyInjection;
 using Features.UserManagement.Controllers;
 using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.FileUpload;
 using Infrastructure.Jwt;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
@@ -65,6 +68,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(UploadPhotoCommand).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
 // Add MediatR.
@@ -75,6 +79,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
@@ -93,9 +98,12 @@ builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();
 builder.Services.AddFeaturesAuth();
 builder.Services.AddFeaturesEmails();
+builder.Services.AddFeaturesPhotoUpload();
 
 // ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
+
+builder.Services.AddSingleton<IFileStorageProvider, S3FileStorageProvider>();
 
 builder.Services.AddScoped<GlobalExceptionFilter>();
 

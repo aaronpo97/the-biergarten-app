@@ -15,8 +15,10 @@
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
         <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
         <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.FileUpload\Infrastructure.FileUpload.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
+
 </Project>
 

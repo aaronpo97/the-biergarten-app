@@ -20,10 +20,12 @@
         <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Jwt\Infrastructure.Jwt.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.FileUpload\Infrastructure.FileUpload.csproj" />
         <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
         <ProjectReference Include="..\..\Features\Features.UserManagement\Features.UserManagement.csproj" />
         <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
         <ProjectReference Include="..\..\Features\Features.Emails\Features.Emails.csproj" />
+        <ProjectReference Include="..\..\Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
