@@ -31,7 +31,12 @@ const LocationCard = ({ breweryName, location, website }: LocationCardProps) => 
         )}
         <p className="text-sm leading-relaxed m-0">{formatBreweryAddress(location)}</p>
         <p className="text-sm m-0">
-            <a href={`https://${website}`} className="link link-primary" target="_blank" rel="noreferrer">
+            <a
+                href={`https://${website}`}
+                className="link link-primary"
+                target="_blank"
+                rel="noreferrer"
+            >
                 {website}
             </a>
         </p>
