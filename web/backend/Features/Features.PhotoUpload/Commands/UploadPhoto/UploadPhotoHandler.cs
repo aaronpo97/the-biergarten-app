@@ -6,8 +6,10 @@ using MediatR;
 namespace Features.ImageUploads.Commands.UploadPhoto;
 
 /// <summary>Handles <see cref="UploadPhotoCommand" />.</summary>
-public class UploadPhotoHandler(IFileStorageProvider fileStorageProvider, IPhotoUploadRepository photoUploadRepository)
-    : IRequestHandler<UploadPhotoCommand, Guid>
+public class UploadPhotoHandler(
+    IFileStorageProvider fileStorageProvider,
+    IPhotoUploadRepository photoUploadRepository
+) : IRequestHandler<UploadPhotoCommand, Guid>
 {
     public async Task<Guid> Handle(UploadPhotoCommand request, CancellationToken cancellationToken)
     {
@@ -16,7 +18,6 @@ public class UploadPhotoHandler(IFileStorageProvider fileStorageProvider, IPhoto
 
         await using Stream stream = request.File.OpenReadStream();
 
-
         await fileStorageProvider.UploadAsync(
             key,
             stream,
@@ -24,16 +25,9 @@ public class UploadPhotoHandler(IFileStorageProvider fileStorageProvider, IPhoto
             cancellationToken
         );
 
+        Photo photo = new() { Hyperlink = key, UploadedById = request.UploadedById };
 
-        Photo photo = new()
-        {
-            Hyperlink = key,
-            UploadedById = request.UploadedById,
-        };
-
-
-        await photoUploadRepository.CreateAsync(photo,cancellationToken);
-
+        await photoUploadRepository.CreateAsync(photo, cancellationToken);
 
         return photoId;
     }

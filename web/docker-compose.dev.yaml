@@ -80,6 +80,8 @@ services:
     depends_on:
       database.seed:
         condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     build:
       context: ./backend
       dockerfile: API/API.Core/Dockerfile
@@ -101,6 +103,10 @@ services:
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
       WEBSITE_BASE_URL: "${WEBSITE_BASE_URL}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     restart: unless-stopped
     networks:
       - devnet

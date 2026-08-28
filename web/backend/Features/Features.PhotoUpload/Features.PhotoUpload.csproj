@@ -4,7 +4,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Features.ImageUploads</RootNamespace>
-
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,6 +18,4 @@
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
-
 </Project>
-

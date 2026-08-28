@@ -19,7 +19,10 @@ public class UploadPhotoHandlerTests
         _handler = new UploadPhotoHandler(_fileStorageProviderMock.Object, _repoMock.Object);
     }
 
-    private static Mock<IFormFile> ValidFile(string content = "fake-image-bytes", string contentType = "image/png")
+    private static Mock<IFormFile> ValidFile(
+        string content = "fake-image-bytes",
+        string contentType = "image/png"
+    )
     {
         Mock<IFormFile> file = new();
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(content);
@@ -38,16 +41,21 @@ public class UploadPhotoHandlerTests
         string? uploadedKey = null;
         string? uploadedContentType = null;
         _fileStorageProviderMock
-            .Setup(p => p.UploadAsync(
-                It.IsAny<string>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<string, Stream, string, CancellationToken>((key, _, contentType, _) =>
-            {
-                uploadedKey = key;
-                uploadedContentType = contentType;
-            })
+            .Setup(p =>
+                p.UploadAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Callback<string, Stream, string, CancellationToken>(
+                (key, _, contentType, _) =>
+                {
+                    uploadedKey = key;
+                    uploadedContentType = contentType;
+                }
+            )
             .Returns(Task.CompletedTask);
 
         Photo? persisted = null;
@@ -68,9 +76,19 @@ public class UploadPhotoHandlerTests
         persisted.UploadedById.Should().Be(command.UploadedById);
 
         _fileStorageProviderMock.Verify(
-            p => p.UploadAsync(uploadedKey!, It.IsAny<Stream>(), "image/png", It.IsAny<CancellationToken>()),
-            Times.Once);
-        _repoMock.Verify(r => r.CreateAsync(It.IsAny<Photo>(), It.IsAny<CancellationToken>()), Times.Once);
+            p =>
+                p.UploadAsync(
+                    uploadedKey!,
+                    It.IsAny<Stream>(),
+                    "image/png",
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
+        _repoMock.Verify(
+            r => r.CreateAsync(It.IsAny<Photo>(), It.IsAny<CancellationToken>()),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -80,16 +98,22 @@ public class UploadPhotoHandlerTests
         UploadPhotoCommand command = new(Guid.NewGuid(), "avatars", file.Object);
 
         _fileStorageProviderMock
-            .Setup(p => p.UploadAsync(
-                It.IsAny<string>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(p =>
+                p.UploadAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ThrowsAsync(new InvalidOperationException("storage unavailable"));
 
         Func<Task> act = () => _handler.Handle(command, CancellationToken.None);
 
         await act.Should().ThrowAsync<InvalidOperationException>();
-        _repoMock.Verify(r => r.CreateAsync(It.IsAny<Photo>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repoMock.Verify(
+            r => r.CreateAsync(It.IsAny<Photo>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
     }
 }

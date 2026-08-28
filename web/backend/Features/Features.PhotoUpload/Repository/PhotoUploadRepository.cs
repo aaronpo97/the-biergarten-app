@@ -17,7 +17,6 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
 {
     public async Task CreateAsync(Photo photo, CancellationToken cancellationToken)
     {
-
         await using DbConnection connection = await CreateConnection();
         await using DbTransaction transaction = await connection.BeginTransactionAsync();
 
@@ -48,11 +47,7 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
                     INSERT INTO dbo.Photo (Hyperlink, UploadedByID)
                     VALUES (@Hyperlink, @UploadedById)
                     """,
-                    new
-                    {
-                        photo.Hyperlink,
-                        photo.UploadedById
-                    },
+                    new { photo.Hyperlink, photo.UploadedById },
                     transaction
                 )
             );
@@ -65,5 +60,4 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
             throw;
         }
     }
-
 }
