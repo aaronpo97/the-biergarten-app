@@ -13,7 +13,7 @@ const NearbyBreweryMap = lazy(() => import('./NearbyBreweryMap'));
 const MAP_PLACEHOLDER_CLASS = 'skeleton min-h-[30rem] h-full w-full rounded-box';
 const DEFAULT_RADIUS_KM = 120;
 const MIN_RADIUS_KM = 10;
-const MAX_RADIUS_KM = 150;
+const MAX_RADIUS_KM = 300;
 const RADIUS_STEP_KM = 10;
 const RADIUS_DEBOUNCE_MS = 300;
 

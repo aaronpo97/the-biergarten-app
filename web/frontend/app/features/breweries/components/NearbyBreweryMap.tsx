@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from 're
 import L, { type LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+const DEFAULT_ZOOM = 11;
+const MIN_ZOOM = 8;
+
 export interface NearbyMapPin {
     id: string;
     name: string;
@@ -51,10 +54,10 @@ const FitAndFocus = ({
 
     useEffect(() => {
         if (didInitialFit.current) return;
-        const points: LatLngTuple[] = pins.map((pin) => [pin.latitude, pin.longitude]);
-        if (userLocation) points.push(userLocation);
-        if (points.length > 0) {
-            map.fitBounds(points, { padding: [40, 40], animate: false });
+        const focus: LatLngTuple | null =
+            userLocation ?? (pins[0] ? [pins[0].latitude, pins[0].longitude] : null);
+        if (focus) {
+            map.setView(focus, DEFAULT_ZOOM, { animate: false });
             didInitialFit.current = true;
         }
         const timeout = setTimeout(() => map.invalidateSize(), 200);
@@ -71,6 +74,33 @@ const FitAndFocus = ({
     return null;
 };
 
+const RecenterButton = ({ userLocation }: { userLocation: LatLngTuple | null }) => {
+    const map = useMap();
+    if (!userLocation) return null;
+    return (
+        <button
+            type="button"
+            onClick={() => map.setView(userLocation, DEFAULT_ZOOM, { animate: true })}
+            className="btn btn-circle btn-sm bg-base-100 absolute top-2.5 right-2.5 z-[1000] shadow"
+            aria-label="Recenter on your location"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+            >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+        </button>
+    );
+};
+
 const NearbyBreweryMap = ({
     pins,
     selectedId,
@@ -80,7 +110,8 @@ const NearbyBreweryMap = ({
 }: NearbyBreweryMapProps) => (
     <MapContainer
         center={userLocation ?? [pins[0]?.latitude ?? 20, pins[0]?.longitude ?? 0]}
-        zoom={11}
+        zoom={DEFAULT_ZOOM}
+        minZoom={MIN_ZOOM}
         scrollWheelZoom={false}
         className="min-h-[30rem] h-full w-full rounded-box relative z-0"
     >
@@ -89,6 +120,7 @@ const NearbyBreweryMap = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitAndFocus pins={pins} userLocation={userLocation} selectedId={selectedId} />
+        <RecenterButton userLocation={userLocation} />
         {userLocation && (
             <CircleMarker
                 center={userLocation}
