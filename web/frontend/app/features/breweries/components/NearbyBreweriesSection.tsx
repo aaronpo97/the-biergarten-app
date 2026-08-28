@@ -10,7 +10,7 @@ import type { NearbyMapPin } from './NearbyBreweryMap';
 
 const NearbyBreweryMap = lazy(() => import('./NearbyBreweryMap'));
 
-const MAP_PLACEHOLDER_CLASS = 'min-h-[30rem] h-full w-full rounded-box bg-base-300';
+const MAP_PLACEHOLDER_CLASS = 'skeleton min-h-[30rem] h-full w-full rounded-box';
 const DEFAULT_RADIUS_KM = 120;
 const MIN_RADIUS_KM = 10;
 const MAX_RADIUS_KM = 150;
@@ -41,8 +41,8 @@ interface NearbyBreweriesSectionProps {
 const FILLER_NOTE = 'A stop worth the detour.';
 
 const cardClassName = (selected: boolean) =>
-    `text-left rounded-box bg-base-100 shadow p-4 cursor-pointer transition-shadow hover:shadow-lg border-l-4 ${
-        selected ? 'border-l-primary' : 'border-l-transparent'
+    `card card-sm card-border bg-base-100 text-left shadow transition-shadow hover:shadow-lg ${
+        selected ? 'border-2 border-primary' : ''
     }`;
 
 interface BreweriesNearByHeaderParams {
@@ -288,21 +288,23 @@ const NearbyBreweriesSection = ({
                                 onClick={() => onSelect(brewery.breweryPostId)}
                                 className={cardClassName(selectedId === brewery.breweryPostId)}
                             >
-                                <div className="flex justify-between items-baseline gap-3">
-                                    <h3 className="font-serif text-lg m-0">
-                                        {brewery.breweryName}
-                                    </h3>
-                                    <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                                        {formatDistance(distanceMetres, unit)}
-                                    </span>
-                                </div>
-                                {brewery.location && (
-                                    <div className="text-sm text-base-content/60 mt-1">
-                                        {brewery.location.cityName},{' '}
-                                        {brewery.location.stateProvinceCode}
+                                <div className="card-body">
+                                    <div className="flex justify-between items-baseline gap-3">
+                                        <h3 className="card-title font-serif text-lg">
+                                            {brewery.breweryName}
+                                        </h3>
+                                        <span className="text-sm font-semibold text-primary whitespace-nowrap">
+                                            {formatDistance(distanceMetres, unit)}
+                                        </span>
                                     </div>
-                                )}
-                                <div className="text-sm mt-2">{FILLER_NOTE}</div>
+                                    {brewery.location && (
+                                        <div className="text-sm text-base-content/60">
+                                            {brewery.location.cityName},{' '}
+                                            {brewery.location.stateProvinceCode}
+                                        </div>
+                                    )}
+                                    <div className="text-sm mt-2">{FILLER_NOTE}</div>
+                                </div>
                             </button>
                         )}
                     />

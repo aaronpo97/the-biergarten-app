@@ -19,6 +19,14 @@ interface NearbyBreweryMapProps {
     userLocationLabel: string;
 }
 
+// Leaflet paints markers as SVG attributes, which can't reference CSS custom
+// properties the way class names can - resolve the current theme's colors instead.
+const resolveThemeColor = (variable: string, fallback: string) => {
+    if (typeof document === 'undefined') return fallback;
+    const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+    return value || fallback;
+};
+
 const pinIcon = (active: boolean) =>
     L.divIcon({
         className: '',
@@ -85,7 +93,12 @@ const NearbyBreweryMap = ({
             <CircleMarker
                 center={userLocation}
                 radius={6}
-                pathOptions={{ color: '#fff', weight: 2, fillColor: '#2b6cb0', fillOpacity: 1 }}
+                pathOptions={{
+                    color: resolveThemeColor('--color-base-100', '#fff'),
+                    weight: 2,
+                    fillColor: resolveThemeColor('--color-primary', '#2b6cb0'),
+                    fillOpacity: 1,
+                }}
             >
                 <Popup>You are here &mdash; {userLocationLabel}</Popup>
             </CircleMarker>

@@ -32,7 +32,7 @@ const WORLD_BOUNDS: LatLngTuple[] = [
 
 const CURRENT_LOCATION_ICON = L.divIcon({
     className: 'brewery-map-current-location',
-    html: '<span class="block h-3.5 w-3.5 rounded-full bg-blue-500 border-2 border-white shadow-md"></span>',
+    html: '<span class="block h-3.5 w-3.5 rounded-full bg-primary border-2 border-base-100 shadow-md"></span>',
     iconSize: [14, 14],
     iconAnchor: [7, 7],
 });

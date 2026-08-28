@@ -13,25 +13,27 @@ const RecentBreweries = ({ breweries }: RecentBreweriesProps) => {
             <h2 className="font-serif text-2xl mb-3.5">Recently added</h2>
             <div className="grid gap-5 grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
                 {breweries.map((brewery) => (
-                    <div
-                        key={brewery.breweryPostId}
-                        className="card bg-base-100 shadow p-6 flex flex-col gap-1.5"
-                    >
-                        <h3 className="font-serif text-xl m-0">{brewery.breweryName}</h3>
-                        {brewery.location && (
-                            <div className="text-sm text-base-content/60">
-                                {brewery.location.cityName}, {brewery.location.stateProvinceCode}
-                            </div>
-                        )}
-                        <p className="text-sm leading-snug mt-1 line-clamp-2">
-                            {brewery.description}
-                        </p>
-                        <Link
-                            to={`/breweries/${brewery.breweryPostId}`}
-                            className="link link-hover text-sm font-semibold text-secondary hover:text-primary mt-2"
-                        >
-                            View brewery &rarr;
-                        </Link>
+                    <div key={brewery.breweryPostId} className="card bg-base-100 shadow">
+                        <div className="card-body gap-1.5">
+                            <h3 className="card-title font-serif text-xl">
+                                {brewery.breweryName}
+                            </h3>
+                            {brewery.location && (
+                                <div className="text-sm text-base-content/60">
+                                    {brewery.location.cityName},{' '}
+                                    {brewery.location.stateProvinceCode}
+                                </div>
+                            )}
+                            <p className="text-sm leading-snug mt-1 line-clamp-2">
+                                {brewery.description}
+                            </p>
+                            <Link
+                                to={`/breweries/${brewery.breweryPostId}`}
+                                className="link link-hover text-sm font-semibold text-secondary hover:text-primary mt-2"
+                            >
+                                View brewery &rarr;
+                            </Link>
+                        </div>
                     </div>
                 ))}
             </div>

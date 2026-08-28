@@ -9,7 +9,7 @@ import { useFetcher } from 'react-router';
 import type { BreweryMapPin } from '../components/BreweryMap';
 
 const PAGE_SIZE = 12;
-const MAP_PLACEHOLDER_CLASS = 'h-[28rem] md:h-[34rem] w-full rounded-box bg-base-300';
+const MAP_PLACEHOLDER_CLASS = 'skeleton h-[28rem] md:h-[34rem] w-full rounded-box';
 
 export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Brewery Directory | The Biergarten App' }];
