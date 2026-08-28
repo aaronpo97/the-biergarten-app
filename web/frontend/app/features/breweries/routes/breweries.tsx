@@ -7,7 +7,7 @@ import RecentBreweries from '../components/RecentBreweries';
 import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
 
-// No count endpoint exists yet - see BREWERY_INDEX_HANDOFF.md.
+// No count endpoint exists yet - see BREWERY_HANDOFF.md.
 const FILLER_TOTAL_BREWERY_COUNT = 128;
 
 export const meta = ({}: Route.MetaArgs) => {
@@ -15,7 +15,7 @@ export const meta = ({}: Route.MetaArgs) => {
 };
 
 export const loader = async () => {
-    // "Featured" is just the most recently posted brewery for now - see BREWERY_INDEX_HANDOFF.md.
+    // "Featured" is just the most recently posted brewery for now - see BREWERY_HANDOFF.md.
     const [featured, ...recent] = await getBreweries(4, 0);
     return { featured: featured ?? null, recent };
 };

@@ -1,4 +1,4 @@
-// see BREWERY_DETAIL_HANDOFF.md — filler data pending backend support for
+// see BREWERY_HANDOFF.md — filler data pending backend support for
 // beers-by-brewery, likes, ratings, comments, and brewery founded/type/website fields.
 
 export interface FillerBeer {

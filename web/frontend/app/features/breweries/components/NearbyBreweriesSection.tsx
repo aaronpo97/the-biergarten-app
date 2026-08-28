@@ -37,7 +37,7 @@ interface NearbyBreweriesSectionProps {
     onSelect: (id: string) => void;
 }
 
-// Notes aren't tracked on brewery locations yet - see BREWERY_INDEX_HANDOFF.md.
+// Notes aren't tracked on brewery locations yet - see BREWERY_HANDOFF.md.
 const FILLER_NOTE = 'A stop worth the detour.';
 
 const cardClassName = (selected: boolean) =>

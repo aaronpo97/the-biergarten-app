@@ -7,7 +7,7 @@ interface FeaturedBreweryCardProps {
     onShowOnMap: () => void;
 }
 
-// see BREWERY_INDEX_HANDOFF.md
+// see BREWERY_HANDOFF.md
 const FILLER_STATS = [
     { label: 'Founded', value: '2014' },
     { label: 'Beers listed', value: '18' },

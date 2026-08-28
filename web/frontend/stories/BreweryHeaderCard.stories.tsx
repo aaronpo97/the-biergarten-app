@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import BreweryHeaderCard from '../app/features/breweries/components/BreweryHeaderCard';
 import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
 
-const breweryHeaderCardDescription = `Top card on the brewery detail page: eyebrow + "Est." badge, name, address, like button, average rating, and description. Founded year and average rating are currently filler pending backend support — see BREWERY_DETAIL_HANDOFF.md.`;
+const breweryHeaderCardDescription = `Top card on the brewery detail page: eyebrow + "Est." badge, name, address, like button, average rating, and description. Founded year and average rating are currently filler pending backend support — see BREWERY_HANDOFF.md.`;
 
 const portlandLocation: BreweryLocation = {
     breweryPostLocationId: 'loc-1',

@@ -3,7 +3,7 @@ import { expect, within } from 'storybook/test';
 import BeerListCard from '../app/features/breweries/components/BeerListCard';
 import { FILLER_BEERS } from '../app/features/breweries/utils/filler-brewery-detail';
 
-const beerListCardDescription = `A brewery's beer list on the detail page: name/description, style badge, ABV, and star rating per row. Currently filler pending a beers-by-brewery endpoint — see BREWERY_DETAIL_HANDOFF.md.`;
+const beerListCardDescription = `A brewery's beer list on the detail page: name/description, style badge, ABV, and star rating per row. Currently filler pending a beers-by-brewery endpoint — see BREWERY_HANDOFF.md.`;
 
 const meta = {
     title: 'Breweries/BeerListCard',
