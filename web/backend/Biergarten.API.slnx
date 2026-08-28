@@ -32,6 +32,7 @@
         <Project Path="Features/Features.Locations/Features.Locations.csproj" />
         <Project Path="Features/Features.Locations.Tests/Features.Locations.Tests.csproj" />
         <Project Path="Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
+        <Project Path="Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj" />
     </Folder>
     <Folder Name="/Shared/">
         <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
