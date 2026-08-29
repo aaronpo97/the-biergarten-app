@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import BeerStyleBreakdownCard from '../app/features/breweries/components/BeerStyleBreakdownCard';
+import BeerStyleBreakdownCard from '../app/features/breweries/components/detail/BeerStyleBreakdownCard';
 import { FILLER_BEERS } from '../app/features/breweries/utils/filler-brewery-detail';
 
 const beerStyleBreakdownCardDescription = `Sidebar "Beer styles" card: per-style progress bars, sorted by count descending, derived client-side from a brewery's beer list.`;

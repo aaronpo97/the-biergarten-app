@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import StarRating from '../app/features/breweries/components/StarRating';
+import StarRating from '../app/features/breweries/components/shared/StarRating';
 
 const starRatingDescription = `Dual-purpose star control built on daisyUI's \`rating\` component. Read-only (no \`onChange\`) when used for an average or a display rating; interactive otherwise — clicking the currently-selected star clears the rating, since daisyUI radios can't do that natively.`;
 

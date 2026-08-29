@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { expect, fireEvent, waitFor, within } from 'storybook/test';
-import NearbyBreweriesSection from '../app/features/breweries/components/NearbyBreweriesSection';
+import NearbyBreweriesSection from '../app/features/breweries/components/overview/nearby/NearbyBreweriesSection';
 import type {
     BreweryLocation,
     SimplifiedBrewery,

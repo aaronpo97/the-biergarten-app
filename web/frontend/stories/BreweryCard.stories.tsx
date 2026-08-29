@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import BreweryCard from '../app/features/breweries/components/BreweryCard';
+import BreweryCard from '../app/features/breweries/components/directory/BreweryCard';
 import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
 import { formatBreweryAddress } from '../app/features/breweries/utils/format-address';
 

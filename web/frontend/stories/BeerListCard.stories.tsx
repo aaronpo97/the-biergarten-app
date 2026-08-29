@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import BeerListCard from '../app/features/breweries/components/BeerListCard';
+import BeerListCard from '../app/features/breweries/components/detail/BeerListCard';
 import { FILLER_BEERS } from '../app/features/breweries/utils/filler-brewery-detail';
 
 const beerListCardDescription = `A brewery's beer list on the detail page: name/description, style badge, ABV, and star rating per row. Currently filler pending a beers-by-brewery endpoint — see BREWERY_HANDOFF.md.`;

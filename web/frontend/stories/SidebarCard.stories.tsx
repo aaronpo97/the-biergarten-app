@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import SidebarCard from '../app/features/breweries/components/SidebarCard';
+import SidebarCard from '../app/features/breweries/components/shared/SidebarCard';
 
 const sidebarCardDescription = `Shared card shell used by the brewery detail page's sidebar sections (Location, Details, Beer styles, Community) — an uppercase eyebrow label over arbitrary content.`;
 

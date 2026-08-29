@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import BreweryLocationMap from '../app/features/breweries/components/BreweryLocationMap';
+import BreweryLocationMap from '../app/features/breweries/components/detail/BreweryLocationMap';
 
 const breweryLocationMapDescription = `Small fixed single-pin Leaflet map used by the brewery detail page's Location sidebar card. Smoke-render only - this hits the real OpenStreetMap tile server in the browser test run.`;
 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import FeaturedBreweryCard from '../app/features/breweries/components/FeaturedBreweryCard';
+import FeaturedBreweryCard from '../app/features/breweries/components/overview/FeaturedBreweryCard';
 import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
 
 const featuredBreweryCardDescription = `Larger "featured brewery" card shown above the fold on the breweries page. These stories cover a brewery with mappable coordinates (the "Show on map" button is present and wired to \`onShowOnMap\`), one with a location but no coordinates, and one with no location at all.`;

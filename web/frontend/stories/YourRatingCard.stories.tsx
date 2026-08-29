@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import YourRatingCard from '../app/features/breweries/components/YourRatingCard';
+import YourRatingCard from '../app/features/breweries/components/detail/YourRatingCard';
 
 const yourRatingCardDescription = `Interactive 1-5 star rating control on the brewery detail page. The hint text switches once a rating is set, and clicking the selected star again clears it.`;
 
