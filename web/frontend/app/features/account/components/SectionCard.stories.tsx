@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Lock } from 'iconoir-react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import SectionCard from '../app/features/account/components/SectionCard';
+import SectionCard from './SectionCard';
 
 const sectionCardDescription = `Collapsible card used on the account settings page to group a labeled form behind a toggle. These stories cover the closed and open states, plus the toggle interaction, so you can review spacing, icon alignment, and disclosure behavior in isolation.`;
 

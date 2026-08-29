@@ -1,55 +1,132 @@
+import { useState } from 'react';
 import { data, Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
+import { getOptionalAuth } from '../../auth/auth.server';
 import { getBreweryById } from '../breweries.server';
+import BreweryHeaderCard from '../components/detail/BreweryHeaderCard';
+import YourRatingCard from '../components/detail/YourRatingCard';
+import BeerListCard from '../components/detail/BeerListCard';
+import CommentsCard from '../components/detail/comments/CommentsCard';
+import LocationCard from '../components/detail/LocationCard';
+import BreweryDetailsCard from '../components/detail/BreweryDetailsCard';
+import BeerStyleBreakdownCard from '../components/detail/BeerStyleBreakdownCard';
+import CommunityStatsCard from '../components/detail/CommunityStatsCard';
+import { FILLER_BEERS, FILLER_BREWERY_META, FILLER_COMMENTS } from '../utils/filler-brewery-detail';
 import type { Route } from './+types/brewery-detail';
 
-export const loader = async ({ params }: Route.LoaderArgs) => {
-    const brewery = await getBreweryById(params.id);
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+    const [brewery, auth] = await Promise.all([
+        getBreweryById(params.id),
+        getOptionalAuth(request),
+    ]);
+
     if (!brewery) {
         throw data('Brewery not found.', { status: 404, statusText: 'Not Found' });
     }
 
-    return { brewery };
+    return {
+        brewery,
+        loggedIn: auth !== null,
+        username: auth?.username ?? null,
+    };
 };
 
+const initials = (username: string) => username.slice(0, 2).toUpperCase();
+
 const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
-    const { brewery } = loaderData;
+    const { brewery, loggedIn, username } = loaderData;
+
+    const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(FILLER_BREWERY_META.likeCount);
+    const [yourRating, setYourRating] = useState(0);
+    const [ratingsCount, setRatingsCount] = useState(FILLER_BREWERY_META.ratingsCount);
+    const [comments, setComments] = useState(FILLER_COMMENTS);
+
+    const handleToggleLike = () => {
+        setLiked((prev) => !prev);
+        setLikeCount((prev) => prev + (liked ? -1 : 1));
+    };
+
+    const handleRatingChange = (next: number) => {
+        setRatingsCount((prev) => prev + (next === 0 ? -1 : yourRating === 0 ? 1 : 0));
+        setYourRating(next);
+    };
+
+    const handleAddComment = (text: string) => {
+        setComments((prev) => [
+            {
+                id: crypto.randomUUID(),
+                user: username ?? 'you',
+                initials: username ? initials(username) : 'YO',
+                rating: yourRating,
+                time: 'just now',
+                text,
+                likes: 0,
+                liked: false,
+            },
+            ...prev,
+        ]);
+    };
+
+    const handleToggleCommentLike = (id: string) => {
+        setComments((prev) =>
+            prev.map((comment) =>
+                comment.id === id ? { ...comment, liked: !comment.liked } : comment,
+            ),
+        );
+    };
 
     return (
         <div className="min-h-screen bg-base-200">
-            <div className="container mx-auto p-4 max-w-2xl">
+            <div className="max-w-4xl mx-auto px-6 pt-8 pb-16">
                 <Link
                     to="/breweries"
                     className="link link-hover text-sm text-base-content/60 mb-4 inline-block"
                 >
-                    &larr; Back to Breweries
+                    &larr; Back to breweries
                 </Link>
 
-                <div className="card bg-base-100 shadow">
-                    <div className="card-body">
-                        <h1 className="card-title text-3xl">{brewery.breweryName}</h1>
-                        <p className="text-base-content/70 whitespace-pre-line">
-                            {brewery.description}
-                        </p>
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_19rem] gap-5 items-start">
+                    <div className="flex flex-col gap-5">
+                        <BreweryHeaderCard
+                            brewery={brewery}
+                            foundedYear={FILLER_BREWERY_META.foundedYear}
+                            liked={liked}
+                            likeCount={likeCount}
+                            avgRating={FILLER_BREWERY_META.avgRating}
+                            ratingsCount={ratingsCount}
+                            onToggleLike={handleToggleLike}
+                        />
+                        <YourRatingCard value={yourRating} onChange={handleRatingChange} />
+                        <BeerListCard beers={FILLER_BEERS} />
+                        <CommentsCard
+                            comments={comments}
+                            loggedIn={loggedIn}
+                            currentUserInitials={username ? initials(username) : 'YO'}
+                            onAddComment={handleAddComment}
+                            onToggleCommentLike={handleToggleCommentLike}
+                        />
+                    </div>
 
+                    <div className="flex flex-col gap-5">
                         {brewery.location && (
-                            <div className="bg-base-200 rounded-box p-4 mt-4">
-                                <p className="text-xs font-semibold uppercase tracking-widest text-base-content/50 mb-2">
-                                    Location
-                                </p>
-                                <p>{brewery.location.addressLine1}</p>
-                                {brewery.location.addressLine2 && (
-                                    <p>{brewery.location.addressLine2}</p>
-                                )}
-                                <p>{brewery.location.postalCode}</p>
-                            </div>
+                            <LocationCard
+                                breweryName={brewery.breweryName}
+                                location={brewery.location}
+                                website={FILLER_BREWERY_META.website}
+                            />
                         )}
-
-                        <p className="text-xs text-base-content/40 mt-4">
-                            Posted {new Date(brewery.createdAt).toLocaleDateString()}
-                            {brewery.updatedAt &&
-                                ` · Updated ${new Date(brewery.updatedAt).toLocaleDateString()}`}
-                        </p>
+                        <BreweryDetailsCard
+                            foundedYear={FILLER_BREWERY_META.foundedYear}
+                            type={FILLER_BREWERY_META.type}
+                            beerCount={FILLER_BEERS.length}
+                        />
+                        <BeerStyleBreakdownCard beers={FILLER_BEERS} />
+                        <CommunityStatsCard
+                            likeCount={likeCount}
+                            ratingsCount={ratingsCount}
+                            commentCount={comments.length}
+                        />
                     </div>
                 </div>
             </div>

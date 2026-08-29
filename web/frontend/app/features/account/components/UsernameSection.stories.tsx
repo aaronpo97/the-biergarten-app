@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { createMemoryRouter, redirect, RouterProvider, useActionData } from 'react-router';
 import { expect, userEvent, within } from 'storybook/test';
-import UsernameSection from '../app/features/account/components/UsernameSection';
-import { updateUsernameSchema } from '../app/features/account/schemas';
-import type { ActionResult } from '../app/features/account/types';
+import UsernameSection from './UsernameSection';
+import { updateUsernameSchema } from '../schemas';
+import type { ActionResult } from '../types';
 
 const usernameSectionDescription = `Renders the real \`UsernameSection\` component (the account page's collapsible username-change card) behind a memory router so its \`useSubmit\`/\`useNavigation\` wiring runs against a fake action, exercising the real \`updateUsernameSchema\` (zod) validation. On success the real action redirects back to the account page with a toast message instead of returning data - here it redirects to a marker route so the redirect itself is the observable outcome, matching how the real route behaves.`;
 

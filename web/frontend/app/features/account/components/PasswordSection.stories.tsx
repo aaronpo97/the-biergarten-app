@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { createMemoryRouter, redirect, RouterProvider, useActionData } from 'react-router';
 import { expect, userEvent, within } from 'storybook/test';
-import PasswordSection from '../app/features/account/components/PasswordSection';
-import { updatePasswordSchema } from '../app/features/account/schemas';
-import type { ActionResult } from '../app/features/account/types';
+import PasswordSection from './PasswordSection';
+import { updatePasswordSchema } from '../schemas';
+import type { ActionResult } from '../types';
 
 const passwordSectionDescription = `Renders the real \`PasswordSection\` component (the account page's collapsible password-change card) behind a memory router so its \`useSubmit\`/\`useNavigation\` wiring runs against a fake action, exercising the real \`updatePasswordSchema\` (zod) cross-field rules. On success the real action redirects back to the account page with a toast message instead of returning data - here it redirects to a marker route so the redirect itself is the observable outcome, matching how the real route behaves.`;
 
@@ -14,7 +14,11 @@ const PasswordSectionRoute = () => {
 
     return (
         <div className="w-full max-w-md">
-            <PasswordSection open={open} onToggle={() => setOpen((value) => !value)} result={result} />
+            <PasswordSection
+                open={open}
+                onToggle={() => setOpen((value) => !value)}
+                result={result}
+            />
         </div>
     );
 };

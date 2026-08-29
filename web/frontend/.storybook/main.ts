@@ -1,19 +1,7 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
-    stories: [
-        '../stories/Configure.mdx',
-        '../stories/SubmitButton.stories.tsx',
-        '../stories/FormField.stories.tsx',
-        '../stories/SectionCard.stories.tsx',
-        '../stories/UsernameSection.stories.tsx',
-        '../stories/PasswordSection.stories.tsx',
-        '../stories/LoginForm.stories.tsx',
-        '../stories/RegisterForm.stories.tsx',
-        '../stories/Navbar.stories.tsx',
-        '../stories/Toast.stories.tsx',
-        '../stories/Themes.stories.tsx',
-    ],
+    stories: ['../stories/Configure.mdx', '../app/**/*.stories.tsx'],
     addons: [
         '@chromatic-com/storybook',
         '@storybook/addon-vitest',

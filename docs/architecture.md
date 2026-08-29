@@ -309,7 +309,12 @@ it, without an ORM's change-tracking or mapping magic
   through Dapper, with no manual `IDbCommand` parameter binding. The one
   wrinkle is the `GEOGRAPHY` column on `BreweryPostLocation`, which Dapper
   can't deserialize as a UDT: reads select `CONVERT(varbinary(max),
-  Coordinates)` so the value comes back as a plain `byte[]` Dapper can bind
+  Coordinates)` so the value comes back as a plain `byte[]` Dapper can bind.
+  Proximity search (`GET /api/brewery/locations/nearby`) filters and orders
+  rows server-side with `Coordinates.STDistance(@Origin) <= @RangeInMetres`,
+  avoiding a client-side distance calculation over every row. No spatial
+  index backs the query yet; `schema.sql` sketches one, commented out, for
+  when the table grows large enough to need it
 - Referential checks that a stored procedure used to perform (e.g. "does this
   `CityId` exist?") are now explicit `SELECT 1 ...` existence checks in the
   repository method, run inside the same transaction as the write
@@ -335,11 +340,24 @@ enabled.
 ```text
 web/frontend/
 ├── app/
-│   ├── components/      Shared UI such as Navbar, FormField, SubmitButton, ToastProvider
-│   ├── lib/             Auth helpers, schemas, and theme metadata
-│   ├── routes/          Route modules for home, login, register, dashboard, confirm, theme
-│   ├── root.tsx         App shell and global providers
-│   └── app.css          Theme tokens and global styling
+│   ├── components/      Shared UI: Navbar, FormField, SubmitButton, ToastProvider,
+│   │                    RouteErrorState, ClientOnly (defers client-only children,
+│   │                    for example Leaflet maps, past hydration)
+│   ├── features/        One folder per feature slice, each owning its own
+│   │                    routes/, components/, hooks/, schemas, and server-side
+│   │                    loader helpers:
+│   │                      - account    profile/dashboard management
+│   │                      - auth       login, register, confirm, logout
+│   │                      - breweries  index/directory/detail routes, Leaflet
+│   │                                   map components, nearby-search resource
+│   │                                   route, distance/address utils
+│   │                      - catalog    beers, beer styles
+│   │                      - home       landing page
+│   │                      - theme      theme switcher/guide
+│   ├── hooks/            Shared hooks not tied to one feature, for example useMediaQuery
+│   ├── routes.ts         Route table (React Router 7 config-based routing)
+│   ├── root.tsx          App shell and global providers
+│   └── app.css           Theme tokens and global styling
 ├── .storybook/          Storybook config and preview setup
 ├── stories/             Storybook stories for shared UI and themes
 ├── tests/playwright/    Storybook Playwright coverage
@@ -348,9 +366,13 @@ web/frontend/
 
 ### Frontend responsibilities
 
-- Render the auth demo and theme guide routes
+- Render brewery discovery routes (`/breweries` index, `/breweries/directory`,
+  `/breweries/:id`) with Leaflet-powered maps and geolocation-based "nearby"
+  search
+- Render the auth demo, account dashboard, and theme guide routes
 - Manage cookie-backed website session state
-- Call the .NET API for login, registration, token refresh, and confirmation
+- Call the .NET API for login, registration, token refresh, confirmation, and
+  brewery/location data
 - Provide shared UI building blocks for forms, navigation, themes, and toasts
 - Supply Storybook documentation and browser-based component verification
 

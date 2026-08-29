@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
-import RegisterForm from '../app/features/auth/components/RegisterForm';
-import { registerSchema, type RegisterSchema } from '../app/features/auth/schemas';
+import RegisterForm from './RegisterForm';
+import { registerSchema, type RegisterSchema } from '../schemas';
 
 const registerFormDescription = `Renders the real \`RegisterForm\` component wired to the real \`registerSchema\` (zod) through the same react-hook-form setup used on the register page, including its cross-field rule that the confirmation must match the password, so these stories validate actual client-side validation behavior rather than a re-implemented form.`;
 

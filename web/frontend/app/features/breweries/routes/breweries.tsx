@@ -1,38 +1,101 @@
+import { useState } from 'react';
+import { Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
-import BreweryCard from '../components/BreweryCard';
+import FeaturedBreweryCard from '../components/overview/FeaturedBreweryCard';
+import NearbyBreweriesSection from '../components/overview/nearby/NearbyBreweriesSection';
+import RecentBreweries from '../components/overview/RecentBreweries';
 import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
+
+// No count endpoint exists yet - see BREWERY_HANDOFF.md.
+const FILLER_TOTAL_BREWERY_COUNT = 128;
 
 export const meta = ({}: Route.MetaArgs) => {
     return [{ title: 'Breweries | The Biergarten App' }];
 };
 
 export const loader = async () => {
-    const breweries = await getBreweries();
-    return { breweries };
+    // "Featured" is just the most recently posted brewery for now - see BREWERY_HANDOFF.md.
+    const [featured, ...recent] = await getBreweries(4, 0);
+    return { featured: featured ?? null, recent };
 };
 
 const Breweries = ({ loaderData }: Route.ComponentProps) => {
-    const { breweries } = loaderData;
+    const { featured, recent } = loaderData;
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    const featuredPin = featured?.location?.coordinates
+        ? {
+              id: featured.breweryPostId,
+              name: featured.breweryName,
+              latitude: featured.location.coordinates.latitude,
+              longitude: featured.location.coordinates.longitude,
+          }
+        : null;
+
+    const fallbackCenter = featured?.location?.coordinates
+        ? {
+              latitude: featured.location.coordinates.latitude,
+              longitude: featured.location.coordinates.longitude,
+              label: featured.location.cityName,
+          }
+        : null;
 
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="container mx-auto p-4">
-                <h1 className="text-4xl font-bold mb-4">Breweries</h1>
-                <p className="text-base-content/70 mb-6">Discover our partner breweries.</p>
-
-                {breweries.length === 0 ? (
-                    <div className="alert alert-info alert-soft">
-                        <span>No breweries have been posted yet.</span>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {breweries.map((brewery) => (
-                            <BreweryCard key={brewery.breweryPostId} brewery={brewery} />
-                        ))}
-                    </div>
-                )}
+        <div className="min-h-screen bg-base-200 text-base-content pb-16">
+            <div className="max-w-7xl mx-auto px-5 pt-10">
+                <h1 className="font-serif text-5xl leading-tight mb-2">Breweries</h1>
+                <p className="text-lg text-base-content/60 max-w-xl m-0">
+                    Discover our partner breweries — start with this week&apos;s feature, then see
+                    what&apos;s pouring near you.
+                </p>
             </div>
+
+            {featured && (
+                <section className="max-w-7xl mx-auto px-5 pt-8">
+                    <div className="flex items-baseline gap-3 mb-3.5">
+                        <h2 className="font-serif text-2xl m-0">Featured brewery</h2>
+                        <span className="badge badge-primary badge-sm uppercase tracking-widest font-bold">
+                            This week
+                        </span>
+                    </div>
+                    <FeaturedBreweryCard
+                        brewery={featured}
+                        onShowOnMap={() => {
+                            setSelectedId(featured.breweryPostId);
+                            document
+                                .getElementById('breweries-near-you')
+                                ?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                    />
+                </section>
+            )}
+
+            <NearbyBreweriesSection
+                featured={featuredPin}
+                fallbackCenter={fallbackCenter}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+            />
+
+            <RecentBreweries breweries={recent} />
+
+            <section className="max-w-7xl mx-auto px-5 pt-11">
+                <div className="bg-[var(--color-highlight)] text-[var(--color-highlight-content)] rounded-box p-7 flex items-center justify-between gap-6 flex-wrap">
+                    <div>
+                        <h2 className="font-serif text-2xl mb-1">
+                            Looking for something specific?
+                        </h2>
+                        <p className="m-0">
+                            All {FILLER_TOTAL_BREWERY_COUNT} partner breweries, filterable by
+                            country, region, and beer style.
+                        </p>
+                    </div>
+                    <Link to="/breweries/directory" className="btn btn-primary">
+                        Browse the full directory
+                    </Link>
+                </div>
+            </section>
         </div>
     );
 };

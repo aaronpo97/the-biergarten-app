@@ -7,13 +7,24 @@ interface ApiResponse<T> {
     payload: T;
 }
 
+export interface BreweryCoordinates {
+    latitude: number;
+    longitude: number;
+}
+
 export interface BreweryLocation {
     breweryPostLocationId: string;
     breweryPostId: string;
     cityId: string;
+    cityName: string;
+    stateProvinceName: string;
+    stateProvinceCode: string;
+    countryName: string;
+    countryCode: string;
     addressLine1: string;
     addressLine2: string | null;
     postalCode: string;
+    coordinates: BreweryCoordinates | null;
 }
 
 export interface Brewery {
@@ -24,6 +35,13 @@ export interface Brewery {
     createdAt: string;
     updatedAt: string | null;
     location: BreweryLocation | null;
+}
+
+export interface SimplifiedBrewery {
+    breweryPostId: string;
+    breweryName: string;
+    location: BreweryLocation | null;
+    distanceMetres: number | null;
 }
 
 const fetchApi = async (path: string): Promise<Response> => {
@@ -52,6 +70,44 @@ export const getBreweries = async (limit?: number, offset?: number): Promise<Bre
     }
 
     const body: ApiResponse<Brewery[]> = await res.json();
+    return body.payload;
+};
+
+export const getBreweryLocations = async (): Promise<SimplifiedBrewery[]> => {
+    const res = await fetchApi('/api/brewery/locations');
+
+    if (!res.ok) {
+        throw data(`Failed to load brewery locations (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const body: ApiResponse<SimplifiedBrewery[]> = await res.json();
+    return body.payload;
+};
+
+export const getBreweryLocationsNearby = async (
+    latitude: number,
+    longitude: number,
+    rangeInMetres: number,
+): Promise<SimplifiedBrewery[]> => {
+    const params = new URLSearchParams({
+        latitude: String(latitude),
+        longitude: String(longitude),
+        rangeInMetres: String(rangeInMetres),
+    });
+
+    const res = await fetchApi(`/api/brewery/locations/nearby?${params}`);
+
+    if (!res.ok) {
+        throw data(`Failed to load nearby breweries (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const body: ApiResponse<SimplifiedBrewery[]> = await res.json();
     return body.payload;
 };
 

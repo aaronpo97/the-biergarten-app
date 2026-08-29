@@ -40,4 +40,36 @@ public static class BreweryDtoMapper
                 )
         );
     }
+
+    /// <summary>
+    ///     Converts a <see cref="BreweryPost" /> to its simplified DTO representation, used for
+    ///     location-based queries that only need identifying and location details.
+    /// </summary>
+    public static SimplifiedBreweryDto ToSimplifiedDto(this BreweryPost brewery)
+    {
+        return new SimplifiedBreweryDto(
+            BreweryPostId: brewery.BreweryPostId,
+            BreweryName: brewery.BreweryName,
+            Location: brewery.Location is null
+                ? null
+                : new BreweryLocationDto(
+                    BreweryPostLocationId: brewery.Location.BreweryPostLocationId,
+                    CityId: brewery.Location.CityId,
+                    CityName: brewery.Location.City?.CityName ?? string.Empty,
+                    StateProvinceName: brewery.Location.City?.StateProvince?.StateProvinceName
+                        ?? string.Empty,
+                    StateProvinceCode: brewery.Location.City?.StateProvince?.Iso31662
+                        ?? string.Empty,
+                    CountryName: brewery.Location.City?.StateProvince?.Country?.CountryName
+                        ?? string.Empty,
+                    CountryCode: brewery.Location.City?.StateProvince?.Country?.Iso31661
+                        ?? string.Empty,
+                    AddressLine1: brewery.Location.AddressLine1,
+                    AddressLine2: brewery.Location.AddressLine2,
+                    PostalCode: brewery.Location.PostalCode,
+                    Coordinates: brewery.Location.Coordinates
+                ),
+            DistanceMetres: brewery.Distance?.DistanceMetres
+        );
+    }
 }

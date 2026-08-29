@@ -21,4 +21,7 @@ public sealed class BreweryPost
     // Navigation Properties
     public BreweryPostLocation? Location { get; set; }
     public List<BeerPost> BeerPosts { get; set; } = [];
+
+    // Query-computed
+    public DistanceInformation? Distance { get; set; }
 }

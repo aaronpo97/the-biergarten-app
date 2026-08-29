@@ -2,6 +2,8 @@ namespace Domain.Entities;
 
 public sealed record CoordinateData(double Latitude, double Longitude);
 
+/// <summary>The distance, as computed by the database, from a query's origin point to a brewery.</summary>
+public sealed record DistanceInformation(CoordinateData From, double DistanceMetres);
 
 public sealed class BreweryPostLocation
 {
