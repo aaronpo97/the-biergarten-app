@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import RecentBreweries from '../app/features/breweries/components/overview/RecentBreweries';
-import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
+import RecentBreweries from './RecentBreweries';
+import type { Brewery, BreweryLocation } from '../../breweries.server';
 
 const recentBreweriesDescription = `Grid of recently-added breweries shown on the breweries index page. Renders nothing when the list is empty.`;
 

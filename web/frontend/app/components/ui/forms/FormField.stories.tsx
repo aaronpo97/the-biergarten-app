@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import FormField from '../app/components/ui/forms/FormField';
+import FormField from './FormField';
 
 const formFieldDescription = `Reusable labeled input for Biergarten forms. This page shows guided, error, and password states so you can review label spacing, helper text, validation messaging, and ARIA behavior in the same card layout used across the app.`;
 

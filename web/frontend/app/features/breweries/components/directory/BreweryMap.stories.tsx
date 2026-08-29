@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import BreweryMap, {
-    type BreweryMapPin,
-} from '../app/features/breweries/components/directory/BreweryMap';
-import type { BreweryLocation } from '../app/features/breweries/breweries.server';
+import BreweryMap, { type BreweryMapPin } from './BreweryMap';
+import type { BreweryLocation } from '../../breweries.server';
 
 const breweryMapDescription = `Leaflet map plotting brewery locations, with an optional current-location marker. Smoke-render only - this hits the real OpenStreetMap tile server in the browser test run, and its \`navigator.geolocation\` call is tolerated whether or not it succeeds.`;
 

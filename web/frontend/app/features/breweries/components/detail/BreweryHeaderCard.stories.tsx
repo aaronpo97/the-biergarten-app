@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import BreweryHeaderCard from '../app/features/breweries/components/detail/BreweryHeaderCard';
-import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
+import BreweryHeaderCard from './BreweryHeaderCard';
+import type { Brewery, BreweryLocation } from '../../breweries.server';
 
 const breweryHeaderCardDescription = `Top card on the brewery detail page: eyebrow + "Est." badge, name, address, like button, average rating, and description. Founded year and average rating are currently filler pending backend support — see BREWERY_HANDOFF.md.`;
 

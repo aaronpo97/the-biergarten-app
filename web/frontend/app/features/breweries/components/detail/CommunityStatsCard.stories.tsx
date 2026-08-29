@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import CommunityStatsCard from '../app/features/breweries/components/detail/CommunityStatsCard';
+import CommunityStatsCard from './CommunityStatsCard';
 
 const communityStatsCardDescription = `Sidebar "Community" card: live likes/ratings/comments counts, kept in sync with the header, your-rating, and comments cards on the brewery detail page.`;
 

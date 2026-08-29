@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expect, userEvent, within } from 'storybook/test';
-import LoginForm from '../app/features/auth/components/LoginForm';
-import { loginSchema, type LoginSchema } from '../app/features/auth/schemas';
+import LoginForm from './LoginForm';
+import { loginSchema, type LoginSchema } from '../schemas';
 
 const loginFormDescription = `Renders the real \`LoginForm\` component wired to the real \`loginSchema\` (zod) through the same react-hook-form setup used on the login page, so these stories validate actual client-side validation behavior rather than a re-implemented form.`;
 

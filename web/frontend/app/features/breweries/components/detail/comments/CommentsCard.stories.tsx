@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import CommentsCard from '../app/features/breweries/components/detail/comments/CommentsCard';
-import { FILLER_COMMENTS } from '../app/features/breweries/utils/filler-brewery-detail';
+import CommentsCard from './CommentsCard';
+import { FILLER_COMMENTS } from '../../../utils/filler-brewery-detail';
 
 const commentsCardDescription = `Comments section on the brewery detail page: a post form (logged in) or a sign-in alert (logged out), followed by the comment list. Posting is disabled until the textarea has non-whitespace content.`;
 

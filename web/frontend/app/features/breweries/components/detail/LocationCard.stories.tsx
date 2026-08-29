@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import LocationCard from '../app/features/breweries/components/detail/LocationCard';
-import type { BreweryLocation } from '../app/features/breweries/breweries.server';
+import LocationCard from './LocationCard';
+import type { BreweryLocation } from '../../breweries.server';
 
 const locationCardDescription = `Sidebar "Location" card: an interactive single-pin map (when coordinates are available), address, and website link. Smoke-render only for the map portion - this hits the real OpenStreetMap tile server in the browser test run.`;
 

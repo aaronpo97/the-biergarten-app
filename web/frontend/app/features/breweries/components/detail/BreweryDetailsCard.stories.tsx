@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import BreweryDetailsCard from '../app/features/breweries/components/detail/BreweryDetailsCard';
+import BreweryDetailsCard from './BreweryDetailsCard';
 
 const breweryDetailsCardDescription = `Sidebar "Details" card on the brewery detail page: founded year, brewery type, and beer count. Founded year and type are currently filler pending backend support — see BREWERY_HANDOFF.md.`;
 

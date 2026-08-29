@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import CommentItem from '../app/features/breweries/components/detail/comments/CommentItem';
-import type { FillerComment } from '../app/features/breweries/utils/filler-brewery-detail';
+import CommentItem from './CommentItem';
+import type { FillerComment } from '../../../utils/filler-brewery-detail';
 
 const commentItemDescription = `A single comment row on the brewery detail page: avatar initials, username/star/timestamp, body, and a per-comment like toggle.`;
 

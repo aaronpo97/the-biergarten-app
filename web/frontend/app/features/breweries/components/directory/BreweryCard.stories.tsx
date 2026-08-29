@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import BreweryCard from '../app/features/breweries/components/directory/BreweryCard';
-import type { Brewery, BreweryLocation } from '../app/features/breweries/breweries.server';
-import { formatBreweryAddress } from '../app/features/breweries/utils/format-address';
+import BreweryCard from './BreweryCard';
+import type { Brewery, BreweryLocation } from '../../breweries.server';
+import { formatBreweryAddress } from '../../utils/format-address';
 
 const breweryCardDescription = `Link-card for a brewery shown in listing grids. These stories cover a brewery with a full mapped location, one whose location has no coordinates (no "View on map" link), and one with no location at all.`;
 
@@ -76,7 +76,7 @@ export const WithLocation: Story = {
         const cardLink = canvas.getByRole('link', { name: /cascade hollow brewing/i });
         await expect(cardLink).toHaveAttribute('href', '/breweries/brewery-1');
 
-        const mapLink = canvas.getByRole('link', { name: 'View on map →', exact: true });
+        const mapLink = canvas.getByRole('link', { name: 'View on map →' });
         await expect(mapLink).toHaveAttribute('href', expect.stringContaining('mlat=45.5152'));
         await expect(mapLink).toHaveAttribute('target', '_blank');
     },

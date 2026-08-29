@@ -2,11 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { expect, fireEvent, waitFor, within } from 'storybook/test';
-import NearbyBreweriesSection from '../app/features/breweries/components/overview/nearby/NearbyBreweriesSection';
-import type {
-    BreweryLocation,
-    SimplifiedBrewery,
-} from '../app/features/breweries/breweries.server';
+import NearbyBreweriesSection from './NearbyBreweriesSection';
+import type { BreweryLocation, SimplifiedBrewery } from '../../../breweries.server';
 
 const nearbyBreweriesSectionDescription = `Requests geolocation (falling back to \`fallbackCenter\` when it's unavailable or denied, as it reliably is in headless browser tests), then loads nearby breweries via \`useFetcher().load()\` against the \`/breweries/nearby\` route, re-fetching whenever the debounced search radius changes. This harness runs the real component behind a \`createMemoryRouter\` with a fake loader for that route, keyed by the requested radius, so the \`Default\` story's play function can prove both the initial load and that rapid radius changes are debounced into a single re-fetch rather than one per step. The lazily-loaded Leaflet map mounts for real here (Storybook's client-only render means \`ClientOnly\` reports "mounted" immediately) and will issue real tile requests - the play function doesn't assert anything about it.`;
 
