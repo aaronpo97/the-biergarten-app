@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
-import ClientOnly from '../../../components/ClientOnly';
-import SidebarCard from './SidebarCard';
-import { formatBreweryAddress } from '../utils/format-address';
-import type { BreweryLocation } from '../breweries.server';
+import ClientOnly from '../../../../components/ClientOnly';
+import SidebarCard from '../shared/SidebarCard';
+import { formatBreweryAddress } from '../../utils/format-address';
+import type { BreweryLocation } from '../../breweries.server';
 
 const BreweryLocationMap = lazy(() => import('./BreweryLocationMap'));
 

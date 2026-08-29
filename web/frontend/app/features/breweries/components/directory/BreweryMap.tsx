@@ -5,9 +5,9 @@ import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css';
-import useMediaQuery from '../../../hooks/useMediaQuery';
-import type { BreweryLocation } from '../breweries.server';
-import { formatBreweryAddress } from '../utils/format-address';
+import useMediaQuery from '../../../../hooks/useMediaQuery';
+import type { BreweryLocation } from '../../breweries.server';
+import { formatBreweryAddress } from '../../utils/format-address';
 
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });

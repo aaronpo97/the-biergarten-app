@@ -1,5 +1,5 @@
 import { data } from 'react-router';
-import { getBreweryLocationsNearby } from '../breweries.server';
+import { getBreweryLocationsNearby } from '../../breweries.server';
 import type { Route } from './+types/breweries-nearby';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

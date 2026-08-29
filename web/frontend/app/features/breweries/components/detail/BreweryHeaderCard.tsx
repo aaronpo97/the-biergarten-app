@@ -1,7 +1,7 @@
 import { Heart, HeartSolid, MapPin } from 'iconoir-react';
-import StarRating from './StarRating';
-import { formatBreweryAddress } from '../utils/format-address';
-import type { Brewery } from '../breweries.server';
+import StarRating from '../shared/StarRating';
+import { formatBreweryAddress } from '../../utils/format-address';
+import type { Brewery } from '../../breweries.server';
 
 interface BreweryHeaderCardProps {
     brewery: Brewery;

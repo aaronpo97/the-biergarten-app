@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
-import FeaturedBreweryCard from '../components/FeaturedBreweryCard';
-import NearbyBreweriesSection from '../components/NearbyBreweriesSection';
-import RecentBreweries from '../components/RecentBreweries';
+import FeaturedBreweryCard from '../components/overview/FeaturedBreweryCard';
+import NearbyBreweriesSection from '../components/overview/nearby/NearbyBreweriesSection';
+import RecentBreweries from '../components/overview/RecentBreweries';
 import { getBreweries } from '../breweries.server';
 import type { Route } from './+types/breweries';
 

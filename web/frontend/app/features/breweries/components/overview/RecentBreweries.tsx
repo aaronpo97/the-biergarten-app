@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import type { Brewery } from '../breweries.server';
+import type { Brewery } from '../../breweries.server';
 
 interface RecentBreweriesProps {
     breweries: Brewery[];
@@ -15,9 +15,7 @@ const RecentBreweries = ({ breweries }: RecentBreweriesProps) => {
                 {breweries.map((brewery) => (
                     <div key={brewery.breweryPostId} className="card bg-base-100 shadow">
                         <div className="card-body gap-1.5">
-                            <h3 className="card-title font-serif text-xl">
-                                {brewery.breweryName}
-                            </h3>
+                            <h3 className="card-title font-serif text-xl">{brewery.breweryName}</h3>
                             {brewery.location && (
                                 <div className="text-sm text-base-content/60">
                                     {brewery.location.cityName},{' '}

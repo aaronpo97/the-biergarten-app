@@ -1,5 +1,5 @@
-import SidebarCard from './SidebarCard';
-import type { FillerBeer } from '../utils/filler-brewery-detail';
+import SidebarCard from '../shared/SidebarCard';
+import type { FillerBeer } from '../../utils/filler-brewery-detail';
 
 interface BeerStyleBreakdownCardProps {
     beers: FillerBeer[];

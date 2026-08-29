@@ -1,6 +1,6 @@
 import { Heart, HeartSolid } from 'iconoir-react';
-import StarRating from './StarRating';
-import type { FillerComment } from '../utils/filler-brewery-detail';
+import StarRating from '../../shared/StarRating';
+import type { FillerComment } from '../../../utils/filler-brewery-detail';
 
 interface CommentItemProps {
     comment: FillerComment;

@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
-import StarRating from './StarRating';
-import type { FillerBeer } from '../utils/filler-brewery-detail';
+import StarRating from '../shared/StarRating';
+import type { FillerBeer } from '../../utils/filler-brewery-detail';
 
 interface BeerListCardProps {
     beers: FillerBeer[];

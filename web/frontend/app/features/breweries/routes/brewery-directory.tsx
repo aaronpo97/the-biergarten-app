@@ -1,12 +1,12 @@
 import { Link } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import ClientOnly from '../../../components/ClientOnly';
-import BreweryCard from '../components/BreweryCard';
+import BreweryCard from '../components/directory/BreweryCard';
 import { getBreweries, getBreweryLocations, type SimplifiedBrewery } from '../breweries.server';
 import type { Route } from './+types/brewery-directory';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useFetcher } from 'react-router';
-import type { BreweryMapPin } from '../components/BreweryMap';
+import type { BreweryMapPin } from '../components/directory/BreweryMap';
 
 const PAGE_SIZE = 12;
 const MAP_PLACEHOLDER_CLASS = 'skeleton h-[28rem] md:h-[34rem] w-full rounded-box';
@@ -26,7 +26,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     return { breweries, locations, limit, offset };
 };
 
-const BreweryMap = lazy(() => import('../components/BreweryMap'));
+const BreweryMap = lazy(() => import('../components/directory/BreweryMap'));
 
 const toPins = (breweries: SimplifiedBrewery[]): BreweryMapPin[] =>
     breweries

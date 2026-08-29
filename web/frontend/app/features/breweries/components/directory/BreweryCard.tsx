@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
-import type { Brewery } from '../breweries.server';
-import { formatBreweryAddress } from '../utils/format-address';
+import type { Brewery } from '../../breweries.server';
+import { formatBreweryAddress } from '../../utils/format-address';
 
 interface BreweryCardProps {
     brewery: Brewery;

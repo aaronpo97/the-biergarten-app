@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CommentItem from './CommentItem';
-import type { FillerComment } from '../utils/filler-brewery-detail';
+import type { FillerComment } from '../../../utils/filler-brewery-detail';
 
 interface CommentsCardProps {
     comments: FillerComment[];

@@ -1,4 +1,4 @@
-import SidebarCard from './SidebarCard';
+import SidebarCard from '../shared/SidebarCard';
 
 interface BreweryDetailsCardProps {
     foundedYear: number;

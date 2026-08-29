@@ -12,7 +12,7 @@ export default [
     route('beers', 'features/catalog/routes/beers.tsx'),
     route('breweries', 'features/breweries/routes/breweries.tsx'),
     route('breweries/directory', 'features/breweries/routes/brewery-directory.tsx'),
-    route('breweries/nearby', 'features/breweries/routes/breweries-nearby.tsx'),
+    route('breweries/nearby', 'features/breweries/routes/resources/breweries-nearby.ts'),
     route('breweries/:id', 'features/breweries/routes/brewery-detail.tsx'),
     route('beer-styles', 'features/catalog/routes/beer-styles.tsx'),
 ] satisfies RouteConfig;
