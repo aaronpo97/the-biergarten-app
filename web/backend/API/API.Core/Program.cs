@@ -15,8 +15,11 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.FileUpload;
 using Infrastructure.Jwt;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
+using System.Security.Claims;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -123,11 +126,24 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Health check endpoint (used by Docker health checks and orchestrators)
 app.MapHealthChecks("/health");
 
 app.MapControllers();
+
+app.MapPost(
+        "/upload-test",
+        async (IFormFile file, ClaimsPrincipal user, IMediator mediator) =>
+        {
+            Guid uploadedById = Guid.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)!.Value);
+            Guid photoId = await mediator.Send(
+                new UploadPhotoCommand(uploadedById, "upload-test", file)
+            );
+            return Results.Ok(photoId);
+        }
+    )
+    .RequireAuthorization()
+    .DisableAntiforgery();
+
 app.MapFallbackToController("Handle404", "NotFound");
 
 IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
