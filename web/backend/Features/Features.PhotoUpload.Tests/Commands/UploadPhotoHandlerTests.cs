@@ -91,6 +91,7 @@ public class UploadPhotoHandlerTests
         );
     }
 
+
     [Fact]
     public async Task Handle_UploadOrderedBeforePersist_DoesNotPersistWhenUploadFails()
     {
