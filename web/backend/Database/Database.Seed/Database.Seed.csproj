@@ -18,7 +18,7 @@
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
         <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
         <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
-        <ProjectReference Include="..\..\Features\Features.Auth\Features.Auth.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Users\Features.Users.csproj" />
         <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
     </ItemGroup>
     <ItemGroup>

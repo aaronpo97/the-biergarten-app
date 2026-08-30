@@ -9,8 +9,8 @@ using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
-using Features.UserManagement.Controllers;
-using Features.UserManagement.DependencyInjection;
+using Features.Users.Controllers;
+using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.FileUpload;
@@ -25,12 +25,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add current controllers to the exception filter
 builder
-    .Services.AddControllers(options =>
-    {
-        options.Filters.Add<GlobalExceptionFilter>();
-    })
+    .Services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); })
     .AddApplicationPart(typeof(BreweryController).Assembly)
-    .AddApplicationPart(typeof(UserController).Assembly)
     .AddApplicationPart(typeof(AuthController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -69,7 +65,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
-builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UploadPhotoCommand).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
@@ -80,7 +75,6 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<Program>();
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
@@ -98,7 +92,6 @@ if (!builder.Environment.IsProduction())
 builder.Services.AddDatabaseConnection();
 
 builder.Services.AddFeaturesBreweries();
-builder.Services.AddFeaturesUserManagement();
 builder.Services.AddFeaturesAuth();
 builder.Services.AddFeaturesEmails();
 builder.Services.AddFeaturesPhotoUpload();

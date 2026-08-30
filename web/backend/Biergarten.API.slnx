@@ -12,6 +12,10 @@
         <Project Path="Domain/Domain.Entities/Domain.Entities.csproj" />
         <Project Path="Domain/Domain.Exceptions/Domain.Exceptions.csproj" />
     </Folder>
+    <Folder Name="/Features/Users/">
+        <Project Path="Features\Features.Users.Tests\Features.Users.Tests.csproj" />
+        <Project Path="Features\Features.Users\Features.Users.csproj" />
+    </Folder>
     <Folder Name="/Infrastructure/">
         <Project Path="Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.csproj" />
         <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
@@ -20,18 +24,27 @@
         <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
         <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
     </Folder>
-    <Folder Name="/Features/">
+    <Folder Name="/Infrastructure/Email/">
+        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
+        <Project Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj" />
+    </Folder>
+    <Folder Name="/Features/" />
+    <Folder Name="/Features/Breweries/">
         <Project Path="Features/Features.Breweries/Features.Breweries.csproj" />
         <Project Path="Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj" />
-        <Project Path="Features/Features.UserManagement/Features.UserManagement.csproj" />
-        <Project Path="Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj" />
-        <Project Path="Features/Features.Auth/Features.Auth.csproj" />
-        <Project Path="Features/Features.Auth.Tests/Features.Auth.Tests.csproj" />
+    </Folder>
+    <Folder Name="/Features/Emails/">
         <Project Path="Features/Features.Emails/Features.Emails.csproj" />
         <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj" />
+    </Folder>
+    <Folder Name="/Features/Locations/">
         <Project Path="Features/Features.Locations/Features.Locations.csproj" />
         <Project Path="Features/Features.Locations.Tests/Features.Locations.Tests.csproj" />
         <Project Path="Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
+        <Project Path="Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj" />
+    </Folder>
+    <Folder Name="/Features/PhotoUpload/">
+        <Project Path="Features/Features.PhotoUpload/Features.PhotoUpload.csproj" />
         <Project Path="Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj" />
     </Folder>
     <Folder Name="/Shared/">

@@ -5,7 +5,7 @@ using Shared.Application.Emails;
 namespace Features.Emails.Commands.SendRegistrationEmail;
 
 /// <summary>
-///     Handles <see cref="SendRegistrationEmailCommand" />, the cross-slice command sent by Features.Auth
+///     Handles <see cref="SendRegistrationEmailCommand" />, the cross-slice command sent by Features.Users
 ///     after a new user registers.
 /// </summary>
 public class SendRegistrationEmailHandler(IEmailDispatcher emailDispatcher)
