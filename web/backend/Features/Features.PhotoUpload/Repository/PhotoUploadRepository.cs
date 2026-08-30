@@ -18,7 +18,7 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
     public async Task CreateAsync(Photo photo, CancellationToken cancellationToken)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         try
         {

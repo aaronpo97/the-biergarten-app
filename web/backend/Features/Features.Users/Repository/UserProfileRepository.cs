@@ -18,7 +18,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
     )
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         try
         {
