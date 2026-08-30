@@ -35,8 +35,9 @@ Environment-specific `.env` files loaded via `env_file:` in docker-compose.yaml:
 `web/generate-env.sh` copies `.env.example` to a target file and replaces the
 secret-bearing values (`DB_PASSWORD`, `ACCESS_TOKEN_SECRET`,
 `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`, `SMTP_USERNAME`,
-`SMTP_PASSWORD`) with freshly randomized ones via `openssl`. Non-secret values
-are left untouched. The output file is written with `600` permissions.
+`SMTP_PASSWORD`, `SEAWEEDFS_ACCESS_KEY_ID`, `SEAWEEDFS_SECRET_ACCESS_KEY`)
+with freshly randomized ones via `openssl`. Non-secret values are left
+untouched. The output file is written with `600` permissions.
 
 ```bash
 cd web
@@ -221,6 +222,25 @@ SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten
 - **Production**: point at a real provider (SendGrid, Mailgun, Amazon SES, and
   so on)
 
+### File storage configuration (backend)
+
+Read by `Infrastructure.FileUpload/S3FileStorageProvider.cs` for uploading and
+retrieving photos via an S3-compatible object store.
+
+```bash
+SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333   # Required, no default
+SEAWEEDFS_ACCESS_KEY_ID=admin                 # Required, no default
+SEAWEEDFS_SECRET_ACCESS_KEY=secret            # Required, no default
+SEAWEEDFS_BUCKET=my-bucket                    # Required, no default
+```
+
+- **Implementation**: `S3FileStorageProvider` throws on construction if any of
+  these four values is missing
+- **Local dev**: point at the `seaweedfs` Docker service (S3 API on port 8333)
+- **Production**: point at any S3-compatible endpoint (AWS S3, a hosted
+  SeaweedFS cluster, and so on); `ForcePathStyle` is always enabled, which
+  SeaweedFS requires and AWS S3 also accepts
+
 ## Docker-specific variables
 
 ### SQL Server container
@@ -288,6 +308,10 @@ reference only and is not run as part of the active stack.
 | `SMTP_USE_SSL`                |    ✓    |          |   ✓    |    No    | Defaults to `true`           |
 | `SMTP_FROM_EMAIL`             |    ✓    |          |   ✓    |   Yes    | Email sender address         |
 | `SMTP_FROM_NAME`              |    ✓    |          |   ✓    |    No    | Defaults to `The Biergarten` |
+| `SEAWEEDFS_SERVICE_URL`       |    ✓    |          |   ✓    |   Yes    | S3-compatible endpoint URL   |
+| `SEAWEEDFS_ACCESS_KEY_ID`     |    ✓    |          |   ✓    |   Yes    | S3 access key                |
+| `SEAWEEDFS_SECRET_ACCESS_KEY` |    ✓    |          |   ✓    |   Yes    | S3 secret key                |
+| `SEAWEEDFS_BUCKET`            |    ✓    |          |   ✓    |   Yes    | S3 bucket name               |
 | `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL      |
 | `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing      |
 | `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode                 |
@@ -309,8 +333,10 @@ reference only and is not run as part of the active stack.
 Variables are validated at startup:
 
 - Missing required variables (`ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`,
-  `CONFIRMATION_TOKEN_SECRET`, `SMTP_HOST`, `SMTP_FROM_EMAIL`, DB connection
-  values) cause the application to fail with an `InvalidOperationException`
+  `CONFIRMATION_TOKEN_SECRET`, `SMTP_HOST`, `SMTP_FROM_EMAIL`,
+  `SEAWEEDFS_SERVICE_URL`, `SEAWEEDFS_ACCESS_KEY_ID`,
+  `SEAWEEDFS_SECRET_ACCESS_KEY`, `SEAWEEDFS_BUCKET`, DB connection values)
+  cause the application to fail with an `InvalidOperationException`
 - No minimum length is enforced on the token secrets in code; the "minimum 32
   characters" guidance above is a recommendation, not an enforced check
 
@@ -346,6 +372,12 @@ SMTP_PORT=1025
 SMTP_USE_SSL=false
 SMTP_FROM_EMAIL=noreply@thebiergarten.app
 SMTP_FROM_NAME=The Biergarten App
+
+# SeaweedFS (S3-compatible storage)
+SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333
+SEAWEEDFS_ACCESS_KEY_ID=<generated-with-openssl>
+SEAWEEDFS_SECRET_ACCESS_KEY=<generated-with-openssl>
+SEAWEEDFS_BUCKET=my-bucket
 
 # Migration
 CLEAR_DATABASE=true
