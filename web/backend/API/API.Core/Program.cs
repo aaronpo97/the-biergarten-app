@@ -7,13 +7,19 @@ using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
 using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
+using Features.ImageUploads.Commands.UploadPhoto;
+using Features.ImageUploads.DependencyInjection;
 using Features.UserManagement.Controllers;
 using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.FileUpload;
 using Infrastructure.Jwt;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
+using System.Security.Claims;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +71,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(UploadPhotoCommand).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
 // Add MediatR.
@@ -75,6 +82,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
@@ -93,9 +101,12 @@ builder.Services.AddFeaturesBreweries();
 builder.Services.AddFeaturesUserManagement();
 builder.Services.AddFeaturesAuth();
 builder.Services.AddFeaturesEmails();
+builder.Services.AddFeaturesPhotoUpload();
 
 // ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
 builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
+
+builder.Services.AddSingleton<IFileStorageProvider, S3FileStorageProvider>();
 
 builder.Services.AddScoped<GlobalExceptionFilter>();
 
@@ -115,11 +126,24 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Health check endpoint (used by Docker health checks and orchestrators)
 app.MapHealthChecks("/health");
 
 app.MapControllers();
+
+app.MapPost(
+        "/upload-test",
+        async (IFormFile file, ClaimsPrincipal user, IMediator mediator) =>
+        {
+            Guid uploadedById = Guid.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)!.Value);
+            Guid photoId = await mediator.Send(
+                new UploadPhotoCommand(uploadedById, "upload-test", file)
+            );
+            return Results.Ok(photoId);
+        }
+    )
+    .RequireAuthorization()
+    .DisableAntiforgery();
+
 app.MapFallbackToController("Handle404", "NotFound");
 
 IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();

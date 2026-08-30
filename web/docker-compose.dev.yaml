@@ -1,4 +1,5 @@
 services:
+
   sqlserver:
     env_file: ".env.dev"
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -24,6 +25,7 @@ services:
       start_period: 30s
     networks:
       - devnet
+
   database.migrations:
     env_file: ".env.dev"
     image: database.migrations
@@ -78,6 +80,8 @@ services:
     depends_on:
       database.seed:
         condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     build:
       context: ./backend
       dockerfile: API/API.Core/Dockerfile
@@ -99,11 +103,34 @@ services:
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
       WEBSITE_BASE_URL: "${WEBSITE_BASE_URL}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     restart: unless-stopped
     networks:
       - devnet
     volumes:
       - nuget-cache-dev:/root/.nuget/packages
+
+  seaweedfs:
+    env_file: ".env.dev"
+    image: chrislusf/seaweedfs
+    container_name: dev-env-seaweedfs
+    ports:
+      - "8333:8333" # S3 API
+      - "8888:8888" # Filer UI
+      - "9333:9333" # Master UI
+      - "23646:23646" # Admin UI
+    environment:
+      AWS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      S3_BUCKET: "${SEAWEEDFS_BUCKET}"
+    volumes:
+      - seaweedfsdata-dev:/data
+    restart: unless-stopped
+    networks:
+      - devnet
 
   mailpit:
     image: axllent/mailpit:latest
@@ -111,17 +138,19 @@ services:
     ports:
       - "8025:8025" # Web UI
       - "1025:1025" # SMTP server
-
     restart: unless-stopped
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - devnet
+
 volumes:
   sqlserverdata-dev:
     driver: local
   nuget-cache-dev:
+    driver: local
+  seaweedfsdata-dev:
     driver: local
 
 networks:

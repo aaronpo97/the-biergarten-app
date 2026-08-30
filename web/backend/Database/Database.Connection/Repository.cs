@@ -18,4 +18,21 @@ public abstract class DapperRepository(ISqlConnectionFactory connectionFactory)
         await connection.OpenAsync();
         return connection;
     }
+
+    /// <summary>
+    ///     Rolls back <paramref name="transaction" />, swallowing any exception the rollback itself
+    ///     raises (for example when the provider has already completed the transaction after a
+    ///     connection failure) so the exception that triggered the rollback is what propagates.
+    /// </summary>
+    protected static async Task RollbackQuietlyAsync(DbTransaction transaction)
+    {
+        try
+        {
+            await transaction.RollbackAsync();
+        }
+        catch
+        {
+            // Ignore: the original exception (rethrown by the caller) is what matters here.
+        }
+    }
 }
