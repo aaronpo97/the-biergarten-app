@@ -123,20 +123,6 @@ app.MapHealthChecks("/health");
 
 app.MapControllers();
 
-app.MapPost(
-        "/upload-test",
-        async (IFormFile file, ClaimsPrincipal user, IMediator mediator) =>
-        {
-            Guid uploadedById = Guid.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)!.Value);
-            Guid photoId = await mediator.Send(
-                new UploadPhotoCommand(uploadedById, "upload-test", file)
-            );
-            return Results.Ok(photoId);
-        }
-    )
-    .RequireAuthorization()
-    .DisableAntiforgery();
-
 app.MapFallbackToController("Handle404", "NotFound");
 
 IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
