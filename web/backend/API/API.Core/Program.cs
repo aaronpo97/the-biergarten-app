@@ -9,8 +9,6 @@ using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
-using Features.Users.Controllers;
-using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.FileUpload;

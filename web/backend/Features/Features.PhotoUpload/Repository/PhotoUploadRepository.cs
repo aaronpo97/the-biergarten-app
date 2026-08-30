@@ -44,10 +44,10 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.Photo (Hyperlink, UploadedByID)
-                    VALUES (@Hyperlink, @UploadedById)
+                    INSERT INTO dbo.Photo (PhotoID, Hyperlink, UploadedByID)
+                    VALUES (@PhotoId, @Hyperlink, @UploadedById)
                     """,
-                    new { photo.Hyperlink, photo.UploadedById },
+                    new { photo.PhotoId, photo.Hyperlink, photo.UploadedById },
                     transaction
                 )
             );

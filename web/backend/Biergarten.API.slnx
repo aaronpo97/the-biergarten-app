@@ -24,10 +24,6 @@
         <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
         <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
     </Folder>
-    <Folder Name="/Infrastructure/Email/">
-        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj" />
-    </Folder>
     <Folder Name="/Features/" />
     <Folder Name="/Features/Breweries/">
         <Project Path="Features/Features.Breweries/Features.Breweries.csproj" />
@@ -40,8 +36,6 @@
     <Folder Name="/Features/Locations/">
         <Project Path="Features/Features.Locations/Features.Locations.csproj" />
         <Project Path="Features/Features.Locations.Tests/Features.Locations.Tests.csproj" />
-        <Project Path="Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
-        <Project Path="Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj" />
     </Folder>
     <Folder Name="/Features/PhotoUpload/">
         <Project Path="Features/Features.PhotoUpload/Features.PhotoUpload.csproj" />
