@@ -55,6 +55,8 @@ services:
     depends_on:
       database.migrations:
         condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     build:
       context: ./backend
       dockerfile: Database/Database.Seed/Dockerfile
@@ -67,13 +69,39 @@ services:
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     restart: "no"
     networks:
       - devnet
+
+  seaweedfs:
+    env_file: ".env.dev"
+    image: chrislusf/seaweedfs
+    container_name: dev-env-seaweedfs
+    ports:
+      - "8333:8333" # S3 API
+      - "8888:8888" # Filer UI
+      - "9333:9333" # Master UI
+      - "23646:23646" # Admin UI
+    environment:
+      AWS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      S3_BUCKET: "${SEAWEEDFS_BUCKET}"
+    volumes:
+      - seaweedfsdata-dev:/data
+    restart: unless-stopped
+    networks:
+      - devnet
+
 volumes:
   sqlserverdata-dev:
     driver: local
   nuget-cache-dev:
+    driver: local
+  seaweedfsdata-dev:
     driver: local
 
 networks:

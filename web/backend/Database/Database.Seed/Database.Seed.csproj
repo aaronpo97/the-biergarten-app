@@ -9,8 +9,11 @@
 
     <ItemGroup>
         <PackageReference Include="idunno.Password.Generator" Version="2.0.0" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+        <PackageReference Include="SkiaSharp" Version="4.151.1" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1" />
         <PackageReference Include="Spectre.Console" Version="0.57.2" />
     </ItemGroup>
 
@@ -20,11 +23,10 @@
         <ProjectReference Include="..\..\Features\Features.Breweries\Features.Breweries.csproj" />
         <ProjectReference Include="..\..\Features\Features.Users\Features.Users.csproj" />
         <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
+        <ProjectReference Include="..\..\Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.FileUpload\Infrastructure.FileUpload.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None
-            CopyToOutputDirectory="PreserveNewest"
-            Include="SeedData\biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite"
-        />
+        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite" />
     </ItemGroup>
 </Project>

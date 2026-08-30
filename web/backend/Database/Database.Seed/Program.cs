@@ -3,15 +3,22 @@ using Database.Seed.DatabaseHelpers;
 using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
+using Features.Auth.Commands.RegisterUser;
+using Features.Auth.Commands.UploadAvatar;
 using Features.Auth.DependencyInjection;
-using Features.Auth.Identity;
+using Features.Auth.Dtos;
+using Features.Auth.Services;
+using Features.Breweries.Commands.CreateBrewery;
 using Features.Breweries.DependencyInjection;
-using Features.Breweries.Repository;
+using Features.ImageUploads.Commands.UploadPhoto;
+using Features.ImageUploads.DependencyInjection;
+using Features.Locations.Commands.GetOrCreateCity;
 using Features.Locations.DependencyInjection;
 using Features.Locations.Dtos;
-using Features.Locations.Repository;
 using idunno.Password;
-using Microsoft.AspNetCore.Identity;
+using Infrastructure.FileUpload;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -30,14 +37,20 @@ static async Task<int> RunAsync()
         services.AddFeaturesBreweries();
         services.AddFeaturesLocations();
         services.AddFeaturesAuth();
+        services.AddFeaturesPhotoUpload();
+        services.AddSingleton<IFileStorageProvider, S3FileStorageProvider>();
+        services.AddScoped<ITokenService, NoOpTokenService>();
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssemblyContaining<CreateBreweryCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<GetOrCreateCityCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<UploadAvatarCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<UploadPhotoCommand>();
+        });
 
         await using ServiceProvider provider = services.BuildServiceProvider();
 
-        IBreweryRepository breweryRepository = provider.GetRequiredService<IBreweryRepository>();
-        ILocationRepository locationRepository = provider.GetRequiredService<ILocationRepository>();
-        UserManager<ApplicationUser> userManager = provider.GetRequiredService<
-            UserManager<ApplicationUser>
-        >();
+        IMediator mediator = provider.GetRequiredService<IMediator>();
 
         AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]").LeftJustified());
         AnsiConsole.MarkupLine("[grey]Connecting to SQLite source and loading seed data...[/]");
@@ -46,7 +59,7 @@ static async Task<int> RunAsync()
         PipelineSeedDataReader reader = new(ConnectionStrings.SqliteConnectionString);
 
         SeedData seedData = null!;
-        IReadOnlyList<Guid> postedByIds = [];
+        IReadOnlyList<Guid> userIds = [];
 
         await AnsiConsole
             .Status()
@@ -87,8 +100,21 @@ static async Task<int> RunAsync()
                 "Loading user data into target database...",
                 async ctx =>
                 {
-                    postedByIds = await LoadUsersIntoDatabaseAsync(userManager, seedData.Users);
+                    userIds = await LoadUsersIntoDatabaseAsync(mediator, seedData.Users);
                     ctx.Status("User data loaded into target database.");
+                }
+            );
+
+        await AnsiConsole
+            .Status()
+            .Spinner(Spinner.Known.Dots)
+            .SpinnerStyle(Style.Parse("green"))
+            .StartAsync(
+                "Loading avatars into target database...",
+                async ctx =>
+                {
+                    await LoadAvatarsIntoDatabaseAsync(mediator, userIds, ctx);
+                    ctx.Status("Avatar data loaded into target database.");
                 }
             );
 
@@ -100,13 +126,7 @@ static async Task<int> RunAsync()
                 "Loading brewery data into target database...",
                 async ctx =>
                 {
-                    await LoadBreweriesIntoDatabaseAsync(
-                        breweryRepository,
-                        locationRepository,
-                        seedData.Breweries,
-                        postedByIds,
-                        ctx
-                    );
+                    await LoadBreweriesIntoDatabaseAsync(mediator, seedData.Breweries, userIds, ctx);
                     ctx.Status("Brewery data loaded into target database.");
                 }
             );
@@ -122,7 +142,7 @@ static async Task<int> RunAsync()
 }
 
 static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
-    UserManager<ApplicationUser> userManager,
+    IMediator mediator,
     IReadOnlyList<UserRecord> users
 )
 {
@@ -130,37 +150,53 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
 
     foreach (UserRecord userRecord in users)
     {
-        ApplicationUser user = new()
-        {
-            FirstName = userRecord.User.FirstName,
-            LastName = userRecord.User.LastName,
-            DateOfBirth = DateTime.Parse(userRecord.DateOfBirth),
-            UserName = userRecord.User.Username,
-            Email = userRecord.Email,
-        };
-
         // allowRepeatedCharacters: true -- 12 unique digits was requested from only 10 possible
         // digit characters (0-9), which idunno.Password rejects outright.
-        IdentityResult result = await userManager.CreateAsync(
-            user,
-            PasswordGenerator.Generate(64, 12, 12, allowRepeatedCharacters: true)
+        string password = PasswordGenerator.Generate(64, 12, 12, allowRepeatedCharacters: true);
+
+        RegistrationPayload registration = await mediator.Send(
+            new RegisterUserCommand(
+                userRecord.User.Username,
+                userRecord.User.FirstName,
+                userRecord.User.LastName,
+                userRecord.Email,
+                DateTime.Parse(userRecord.DateOfBirth),
+                password
+            )
         );
 
-        if (!result.Succeeded)
-            throw new InvalidOperationException(
-                $"Failed to seed user '{userRecord.User.Username}': "
-                    + string.Join("; ", result.Errors.Select(e => e.Description))
-            );
-
-        userAccountIds.Add(user.Id);
+        userAccountIds.Add(registration.UserAccountId);
     }
 
     return userAccountIds;
 }
 
+static async Task LoadAvatarsIntoDatabaseAsync(
+    IMediator mediator,
+    IReadOnlyList<Guid> userIds,
+    StatusContext ctx
+)
+{
+    for (int i = 0; i < userIds.Count; i++)
+    {
+        ctx.Status($"Loading avatar {i + 1}/{userIds.Count} into target database...");
+
+        Guid userId = userIds[i];
+        byte[] avatarPng = AvatarGenerator.GeneratePng(userId);
+
+        await using MemoryStream stream = new(avatarPng);
+        IFormFile file = new FormFile(stream, 0, stream.Length, "file", $"{userId}.png")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/png",
+        };
+
+        await mediator.Send(new UploadAvatarCommand(userId, file));
+    }
+}
+
 static async Task LoadBreweriesIntoDatabaseAsync(
-    IBreweryRepository breweryRepository,
-    ILocationRepository locationRepository,
+    IMediator mediator,
     IReadOnlyList<BreweryRecord> breweries,
     IReadOnlyList<Guid> posterUserIds,
     StatusContext ctx
@@ -175,35 +211,34 @@ static async Task LoadBreweriesIntoDatabaseAsync(
 
         ctx.Status($"Loading brewery {i + 1}/{breweries.Count} into target database...");
 
-        Guid cityId = await locationRepository.GetOrCreateCityIdAsync(
-            new CityLocation(
-                breweryRecord.Address.City.CityName,
-                breweryRecord.Address.City.StateProvince,
-                breweryRecord.Address.City.Iso31662,
-                breweryRecord.Address.City.Country,
-                breweryRecord.Address.City.Iso31661
+        Guid cityId = await mediator.Send(
+            new GetOrCreateCityCommand(
+                new CityLocation(
+                    breweryRecord.Address.City.CityName,
+                    breweryRecord.Address.City.StateProvince,
+                    breweryRecord.Address.City.Iso31662,
+                    breweryRecord.Address.City.Country,
+                    breweryRecord.Address.City.Iso31661
+                )
             )
         );
 
-        await breweryRepository.CreateAsync(
-            new BreweryPost
-            {
-                BreweryPostId = Guid.NewGuid(),
-                BreweryName = breweryRecord.Brewery.NameEn,
-                Description = breweryRecord.Brewery.DescriptionEn,
-                PostedById = posterUserIds[i % posterUserIds.Count],
-                Location = new BreweryPostLocation
-                {
-                    BreweryPostLocationId = Guid.NewGuid(),
-                    CityId = cityId,
-                    AddressLine1 = breweryRecord.Address.AddressLine1,
-                    PostalCode = breweryRecord.Address.PostalCode,
-                    Coordinates = new CoordinateData(
+        await mediator.Send(
+            new CreateBreweryCommand(
+                posterUserIds[i % posterUserIds.Count],
+                breweryRecord.Brewery.NameEn,
+                breweryRecord.Brewery.DescriptionEn,
+                new CreateBreweryLocation(
+                    cityId,
+                    breweryRecord.Address.AddressLine1,
+                    null,
+                    breweryRecord.Address.PostalCode,
+                    new CoordinateData(
                         breweryRecord.Address.Latitude,
                         breweryRecord.Address.Longitude
-                    ),
-                },
-            }
+                    )
+                )
+            )
         );
     }
 }
