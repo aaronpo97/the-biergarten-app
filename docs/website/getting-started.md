@@ -58,14 +58,16 @@ section for details on `generate-env.sh`.
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 ```
 
-This starts SQL Server, migrations, seeding, the API, and Mailpit (local dev
-SMTP).
+This starts SQL Server, migrations, seeding, the API, Mailpit (local dev
+SMTP), and SeaweedFS (local dev S3-compatible object storage for photo
+uploads).
 
 Available endpoints:
 
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
 - Mailpit UI: http://localhost:8025
+- SeaweedFS S3 API: http://localhost:8333
 
 ### 4. Start the active frontend
 
@@ -124,6 +126,10 @@ export ACCESS_TOKEN_SECRET="<generated>"
 export REFRESH_TOKEN_SECRET="<generated>"
 export CONFIRMATION_TOKEN_SECRET="<generated>"
 export WEBSITE_BASE_URL="http://localhost:3000"
+export SEAWEEDFS_SERVICE_URL="http://localhost:8333"
+export SEAWEEDFS_ACCESS_KEY_ID="<generated>"
+export SEAWEEDFS_SECRET_ACCESS_KEY="<generated>"
+export SEAWEEDFS_BUCKET="my-bucket"
 ```
 
 ### 2. Run migrations and seed

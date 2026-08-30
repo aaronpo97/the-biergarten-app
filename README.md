@@ -50,6 +50,7 @@ Active areas in the repository:
 - React 19 website (React Router 7 + Vite)
 - Shared Biergarten theme system + Storybook coverage
 - Auth flows and account/email integration (local Mailpit in dev compose)
+- Photo upload to S3-compatible object storage (local SeaweedFS in dev compose)
 - Data generation pipeline with C++ and Llama.cpp
 
 Archived/reference areas:
@@ -98,6 +99,7 @@ Backend access:
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
 - Mailpit UI (dev SMTP): http://localhost:8025
+- SeaweedFS S3 API (dev object storage): http://localhost:8333
 
 ### Frontend (Node)
 

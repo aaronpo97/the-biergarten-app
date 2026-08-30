@@ -33,6 +33,7 @@ updates (`UPDATE ... WHERE ... AND RowVersion = @RowVersion`).
 | `City`                | `Domain.Entities.City`, `Features.Locations`                             | Referenced by `BreweryPostLocation.CityID`; written via `ILocationRepository`, read via `ILocationRepository` and `IBreweryRepository`'s location joins, currently written only by `Database.Seed` |
 | `StateProvince`       | `Domain.Entities.StateProvince`, `Features.Locations`                    | Referenced by `City.StateProvinceID`; created on demand by `ILocationRepository.GetOrCreateCityIdAsync`, read via `IBreweryRepository`'s location joins |
 | `Country`             | `Domain.Entities.Country`, `Features.Locations`                          | Referenced by `StateProvince.CountryID`; created on demand by `ILocationRepository.GetOrCreateCityIdAsync`, read via `IBreweryRepository`'s location joins |
+| `Photo`               | `Domain.Entities.Photo`, `Features.PhotoUpload`                          | Written via `IPhotoUploadRepository.CreateAsync`, sent as an `UploadPhotoCommand` from other features' handlers; not yet seeded by `Database.Seed` |
 
 ### Tables defined in the schema but not yet wired to a feature slice
 
@@ -41,7 +42,6 @@ repository or seed data yet:
 
 | Table              | Purpose (from schema)                                                                                    |
 | ------------------ | -------------------------------------------------------------------------------------------------------- |
-| `Photo`            | A photo uploaded by a user account                                                                       |
 | `UserAvatar`       | Links a `UserAccount` to a `Photo` as its avatar                                                         |
 | `UserFollow`       | One user following another (`CannotFollowOwnAccount` check constraint)                                   |
 | `BeerStyle`        | A beer style/category; has a `Domain.Entities.BeerStyle` type, but no repository yet                     |
@@ -66,8 +66,9 @@ an already-applied script means it won't re-run against existing databases.
 `Database.Seed` populates a target database from data produced by the C++
 pipeline (see [Pipeline README](../pipeline/README.md)): countries,
 state/provinces, and cities (created on demand while resolving each brewery's
-location), user accounts, and brewery posts with locations. It only seeds
-tables that have a feature slice to write through (see the table above).
+location), user accounts, and brewery posts with locations. It doesn't call
+every feature slice that has a write path — `Photo`, for example, has a
+repository (`Features.PhotoUpload`) but no seed data.
 
 ## Database error handling
 

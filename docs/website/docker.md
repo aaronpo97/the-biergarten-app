@@ -29,6 +29,7 @@ representation.
 - Swagger UI enabled
 - Seed data included
 - Local Mailpit SMTP server for dev email testing
+- Local SeaweedFS S3-compatible object storage for photo uploads
 - `CLEAR_DATABASE=true` (drops and recreates schema)
 
 **Services**:
@@ -39,6 +40,7 @@ database.migrations # DbUp migrations
 database.seed      # Seed initial data
 api.core           # Web API (ports 8080, 8081)
 mailpit            # Local dev SMTP server + UI (port 8025)
+seaweedfs           # S3-compatible object storage (ports 8333, 8888, 9333, 23646)
 ```
 
 **Start Development Environment**:
@@ -53,6 +55,10 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 - Health Check: http://localhost:8080/health
 - Mailpit UI: http://localhost:8025
 - SQL Server: localhost:1434 (sa credentials from .env.dev)
+- SeaweedFS S3 API: http://localhost:8333 (credentials from
+  `SEAWEEDFS_ACCESS_KEY_ID`/`SEAWEEDFS_SECRET_ACCESS_KEY` in .env.dev)
+- SeaweedFS Filer UI: http://localhost:8888
+- SeaweedFS Master UI: http://localhost:9333
 
 **Stop Environment**:
 
@@ -182,7 +188,11 @@ graph TD
     A[sqlserver: health check passes] --> B[database.migrations: completes successfully]
     B --> C[database.seed: completes successfully]
     C --> D[api.core / tests: start when ready]
+    E[seaweedfs: container started] --> D
 ```
+
+In development, `api.core` also depends on `seaweedfs` (`condition:
+service_started`, not a health check) alongside `database.seed`.
 
 **Health Check Example** (SQL Server):
 
@@ -216,6 +226,8 @@ api.core:
 
 - `sqlserverdata-dev` - Database files persist between restarts
 - `nuget-cache-dev` - NuGet package cache (speeds up builds)
+- `seaweedfsdata-dev` - SeaweedFS object storage data persists between
+  restarts
 
 **Testing**:
 
@@ -262,6 +274,10 @@ environment:
   ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
   REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
   CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
+  SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+  SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+  SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+  SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
 ```
 
 For complete list, see [Environment Variables](environment-variables.md).

@@ -11,9 +11,9 @@ The project uses a multi-layered testing approach across backend and frontend:
   live, seeded database
 - **Features.\*.Tests** - One unit test project per backend feature slice
   (`Features.Auth.Tests`, `Features.Breweries.Tests`,
-  `Features.UserManagement.Tests`, `Features.Emails.Tests`), covering that
-  slice's command/query handlers, with dependencies mocked via Moq (no real
-  database required)
+  `Features.UserManagement.Tests`, `Features.Emails.Tests`,
+  `Features.PhotoUpload.Tests`), covering that slice's command/query
+  handlers, with dependencies mocked via Moq (no real database required)
 - **Storybook Vitest project** - Browser-based interaction tests for shared
   website stories
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
@@ -49,6 +49,7 @@ cat test-results/Features.Auth.Tests.trx
 cat test-results/Features.Breweries.Tests.trx
 cat test-results/Features.UserManagement.Tests.trx
 cat test-results/Features.Emails.Tests.trx
+cat test-results/Features.PhotoUpload.Tests.trx
 ```
 
 ### Clean up
@@ -86,6 +87,7 @@ dotnet test Features/Features.Auth.Tests/Features.Auth.Tests.csproj
 dotnet test Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj
 dotnet test Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj
 dotnet test Features/Features.Emails.Tests/Features.Emails.Tests.csproj
+dotnet test Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj
 
 # Or run all of them at once via the solution:
 for proj in Features/*.Tests; do dotnet test "$proj"; done
@@ -175,6 +177,14 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 - Registration and resend-confirmation email dispatch handlers
 
+**Features.PhotoUpload.Tests**:
+
+- Upload command handler: storage key construction, content type passthrough,
+  and photo persistence via the mocked storage provider and repository
+- Upload validator: min/max file size bounds, and PNG/JPEG/WebP signature
+  checks (including rejection of files with a mismatched or missing
+  signature)
+
 **Frontend UI Coverage**:
 
 - Shared submit button states
@@ -188,7 +198,6 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 - [ ] Password reset functionality
 - [ ] Beer post operations
 - [ ] User follow/unfollow
-- [ ] Image upload service
 - [ ] Frontend route integration coverage beyond Storybook stories
 
 ## Testing frameworks and tools
@@ -276,9 +285,11 @@ Features.Auth.Tests/
     └── TokenServiceValidationTests.cs
 ```
 
-Each of the other three slices (`Features.Breweries.Tests`,
-`Features.UserManagement.Tests`, `Features.Emails.Tests`) follows the same
-shape: a `Commands/`/`Queries/` folder with one test file per handler.
+Each of the other slices (`Features.Breweries.Tests`,
+`Features.UserManagement.Tests`, `Features.Emails.Tests`,
+`Features.PhotoUpload.Tests`) follows the same shape: a `Commands/`/`Queries/`
+folder with one test file per handler (`Features.PhotoUpload.Tests` also adds
+a validator test file alongside its handler test).
 
 ## Writing tests
 

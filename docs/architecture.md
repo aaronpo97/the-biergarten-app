@@ -35,10 +35,11 @@ For visual representations, see:
 
 The backend organizes business capabilities as feature slices instead of
 technical layers. Each feature (`Features.Auth`, `Features.Breweries`,
-`Features.UserManagement`, `Features.Emails`, `Features.Locations`) is a single
-project that owns its own MediatR commands/queries/handlers, validators, and
-repository end to end. `Features.Emails` and `Features.Locations` have no
-`Controllers/` folder — both are invoked internally by other slices via
+`Features.UserManagement`, `Features.Emails`, `Features.Locations`,
+`Features.PhotoUpload`) is a single project that owns its own MediatR
+commands/queries/handlers, validators, and repository end to end.
+`Features.Emails`, `Features.Locations`, and `Features.PhotoUpload` have no
+`Controllers/` folder — all three are invoked internally by other slices via
 MediatR/DI, never over HTTP:
 
 ```
@@ -48,15 +49,15 @@ MediatR/DI, never over HTTP:
 │   - Swagger/OpenAPI, JWT auth middleware, global exception filter     │
 └───────────────────────────────────────────────────────────────────────┘
                   ↓ discovers controllers via AddApplicationPart
-┌───────────────┬───────────────┬───────────────────┬──────────────────┬──────────────────┐
-│ Features.Auth │Features.      │ Features.          │ Features.Emails  │ Features.        │
-│               │Breweries      │ UserManagement      │ (no controller,  │ Locations        │
-│ Controller    │ Controller    │ Controller          │  internal only)  │ (no controller,  │
-│ Commands/     │ Commands/     │ Commands/           │ Commands/        │  internal only)  │
-│  Queries +    │  Queries +    │  Queries +          │  Handlers        │ Repository       │
-│  Handlers     │  Handlers     │  Handlers           │                  │                  │
-│ Repository    │ Repository    │ Repository          │ EmailDispatcher  │                  │
-└───────────────┴───────────────┴───────────────────┴──────────────────┴──────────────────┘
+┌───────────────┬───────────────┬───────────────────┬──────────────────┬──────────────────┬──────────────────┐
+│ Features.Auth │Features.      │ Features.          │ Features.Emails  │ Features.        │ Features.        │
+│               │Breweries      │ UserManagement      │ (no controller,  │ Locations        │ PhotoUpload      │
+│ Controller    │ Controller    │ Controller          │  internal only)  │ (no controller,  │ (no controller,  │
+│ Commands/     │ Commands/     │ Commands/           │ Commands/        │  internal only)  │  internal only)  │
+│  Queries +    │  Queries +    │  Queries +          │  Handlers        │ Repository       │ Commands/        │
+│  Handlers     │  Handlers     │  Handlers           │                  │                  │  Handlers        │
+│ Repository    │ Repository    │ Repository          │ EmailDispatcher  │                  │ Repository       │
+└───────────────┴───────────────┴───────────────────┴──────────────────┴──────────────────┴──────────────────┘
        ↓ each slice depends only on shared/domain/infra, never on another slice
 ┌─────────────────────────┬─────────────────────────┬────────────────────┐
 │ Shared.Contracts        │ Shared.Application        │ Domain.Entities /  │
@@ -109,7 +110,7 @@ own
 - No controllers, no business logic, no feature-specific contracts
 - Exists purely to host and wire up the feature slices
 
-#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`, `Features.Locations`)
+#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`, `Features.Locations`, `Features.PhotoUpload`)
 
 **Purpose**: Each slice is the complete vertical for one business capability
 
@@ -132,7 +133,12 @@ no `Controllers/` folder and no MediatR handlers — it exposes
 `ILocationRepository` directly as a plain service, currently consumed only by
 `Database.Seed` to look up cities while seeding brewery locations. Other slices
 (for example, `Features.Breweries`) do not yet depend on it; they run their own
-`CityID` existence checks inline.
+`CityID` existence checks inline. `Features.PhotoUpload` also has no
+`Controllers/` folder — its `UploadPhotoCommand` is sent by other features'
+handlers (for example, a future brewery photo upload command) rather than
+bound to an HTTP route directly. The one exception today is the `/upload-test`
+minimal API endpoint wired directly in `API.Core/Program.cs`, a temporary route
+for exercising the upload path end to end.
 
 **Dependencies**:
 
@@ -140,7 +146,8 @@ no `Controllers/` folder and no MediatR handlers — it exposes
 - `Infrastructure.Sql` (generic ADO.NET plumbing) plus whichever infrastructure
   project the slice needs (`Infrastructure.Jwt`/
   `Infrastructure.PasswordHashing` for Auth, `Infrastructure.Email`/
-  `Infrastructure.Email.Templates` for Emails)
+  `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
+  PhotoUpload)
 - `Shared.Contracts`, `Shared.Application`
 - **Never** another `Features.*` project
 
@@ -184,11 +191,16 @@ whichever slices need them
 - **Infrastructure.Email**: Email sending capabilities (SMTP/MailKit)
 - **Infrastructure.Email.Templates**: Email template rendering (Razor
   components)
+- **Infrastructure.FileUpload**: `IFileStorageProvider` abstraction over
+  S3-compatible object storage, implemented by `S3FileStorageProvider`
+  (targets the SeaweedFS container in dev; any S3-compatible endpoint in
+  other environments) using the AWS SDK's `AmazonS3Client` with
+  `ForcePathStyle = true`
 
 **Dependencies**:
 
 - Domain entities
-- External libraries (ADO.NET, JWT, Argon2, MailKit, and so on)
+- External libraries (ADO.NET, JWT, Argon2, MailKit, AWSSDK.S3, and so on)
 
 **Rules**:
 
@@ -212,6 +224,8 @@ whichever slices need them
 - `BeerStyle` - A beer style/category (schema table exists; no repository yet)
 - `BeerPost` - A beer listing tied to a brewery and style (schema table
   exists; no repository yet)
+- `Photo` - A photo uploaded by a user account, written via
+  `Features.PhotoUpload`'s `IPhotoUploadRepository`
 
 **Dependencies**:
 
@@ -266,8 +280,14 @@ only:
 - `Features.Auth/Repository/IAuthRepository.cs`
 - `Features.Breweries/Repository/IBreweryRepository.cs`
 - `Features.UserManagement/Repository/IUserAccountRepository.cs`
+- `Features.PhotoUpload/Repository/IPhotoUploadRepository.cs`
 - `Database.Connection/DefaultSqlConnectionFactory.cs`: the generic connection
   factory every slice's repository builds on
+- `Database.Connection/DapperRepository.cs`: shared abstract base class every
+  repository extends, providing `CreateConnection()` and a
+  `RollbackQuietlyAsync()` helper that rolls back a transaction while
+  swallowing any exception the rollback itself raises, so the exception that
+  triggered the rollback is what propagates
 
 **Benefits**:
 
@@ -524,9 +544,11 @@ pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
 - User accounts (via `Features.Auth`'s repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
-Tables that exist in the schema but have no repository yet (`Photo`,
-`UserAvatar`, `UserFollow`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`,
-`BeerPostComment`, `BreweryPostPhoto`) are not seeded.
+`Photo` rows are written via `Features.PhotoUpload`'s `IPhotoUploadRepository`,
+but `Database.Seed` doesn't call it, so photos aren't part of the seed data.
+Tables that exist in the schema but have no repository yet (`UserAvatar`,
+`UserFollow`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`,
+`BreweryPostPhoto`) are not seeded either.
 
 ## Deployment architecture
 
@@ -539,6 +561,7 @@ Tables that exist in the schema but have no repository yet (`Photo`,
 - `database.seed` - Data seeder
 - `api.core` - ASP.NET Core Web API
 - `mailpit` - Local dev/test SMTP server + web UI (not used in production)
+- `seaweedfs` - S3-compatible object storage for uploaded photos (dev only)
 
 **Environments**:
 
@@ -573,9 +596,9 @@ healthcheck:
     │    Tests     │
     ├──────────────┤
     │  Unit Tests  │  ← Features.Auth.Tests, Features.Breweries.Tests,
-    │ (per slice,  │     Features.UserManagement.Tests, Features.Emails.Tests
-    │   handler    │     (commands/queries/handlers, with repository/service
-    │   tests)     │     dependencies mocked via Moq)
+    │ (per slice,  │     Features.UserManagement.Tests, Features.Emails.Tests,
+    │   handler    │     Features.PhotoUpload.Tests (commands/queries/handlers,
+    │   tests)     │     with repository/service dependencies mocked via Moq)
     └──────────────┘
 ```
 
