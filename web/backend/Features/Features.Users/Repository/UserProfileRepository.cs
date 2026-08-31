@@ -106,7 +106,8 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
                     WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL
                     """,
                     new { avatar.UserProfileId },
-                    transaction
+                    transaction: transaction,
+                    cancellationToken: cancellationToken
                 )
             );
 
@@ -122,7 +123,8 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
                         avatar.UserProfileId,
                         avatar.PhotoId,
                     },
-                    transaction
+                    transaction: transaction,
+                    cancellationToken: cancellationToken
                 )
             );
 
