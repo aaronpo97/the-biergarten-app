@@ -1,13 +1,4 @@
----
-title: System architecture — backend, frontend, database, and deployment
-last-updated: 2026-08-31
-tags:
-  - architecture
-  - backend
-  - frontend
-  - vertical-slice
-  - deployment
----
+# Architecture
 
 This document describes the architecture of The Biergarten App.
 
@@ -134,13 +125,12 @@ own
 
 **Components**:
 
-- `Program.cs`: registers MediatR (scanning every `Features.*` assembly),
-  FluentValidation, and uses `AddApplicationPart` so each slice's controllers
-  are discovered by MVC
-- `GlobalException.cs`: global exception filter (host-level cross-cutting
-  concern)
-- `Authentication/JwtAuthenticationHandler.cs`: JWT auth scheme middleware
-- Swagger/OpenAPI documentation, health check endpoints
+| Component                                             | Description                                                                                                                                                  |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Program.cs`                                          | Registers MediatR (scanning every `Features.*` assembly), FluentValidation, and uses `AddApplicationPart` so each slice's controllers are discovered by MVC. |
+| `GlobalException.cs`                                  | Global exception filter (host-level cross-cutting concern).                                                                                                  |
+| `Authentication/JwtAuthenticationHandler.cs`          | JWT auth scheme middleware.                                                                                                                                  |
+| Swagger/OpenAPI documentation, health check endpoints | Host-level documentation and health endpoints.                                                                                                               |
 
 **Dependencies**:
 
@@ -159,29 +149,28 @@ own
 
 **Components** (per slice):
 
-- `Controllers/`: HTTP endpoints, binding directly to Command/Query types as the
-  request contract
-- `Commands/<Operation>/` and `Queries/<Operation>/`: one folder per operation,
-  each containing the Command/Query record, its `IRequestHandler`, and (for
-  commands) a FluentValidation validator
-- `Repository/`: the slice's own Dapper repository implementation
-- `Dtos/`: response shapes returned by query handlers (never the raw domain
-  entity)
-- `DependencyInjection/`: an `AddFeaturesX()` extension method registering the
-  slice's repository/services
+| Component                                          | Description                                                                                                                                |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Controllers/`                                     | HTTP endpoints, binding directly to Command/Query types as the request contract                                                            |
+| `Commands/<Operation>/` and `Queries/<Operation>/` | One folder per operation, each containing the Command/Query record, its `IRequestHandler`, and (for commands) a FluentValidation validator |
+| `Repository/`                                      | The slice's own Dapper repository implementation                                                                                           |
+| `Dtos/`                                            | Response shapes returned by query handlers (never the raw domain entity)                                                                   |
+| `DependencyInjection/`                             | An `AddFeaturesX()` extension method registering the slice's repository/services                                                           |
+
+##### Note
 
 `Features.Emails` has no `Controllers/` folder. It's invoked only via MediatR
-commands sent from other slices, never over HTTP. `Features.Locations` also has
-no `Controllers/` folder and no MediatR handlers; it exposes
-`ILocationRepository` directly as a plain service, currently consumed only by
-`Database.Seed` to look up cities while seeding brewery locations. Other slices
-(for example, `Features.Breweries`) do not yet depend on it; they run their own
-`CityID` existence checks inline. `Features.PhotoUpload` also has no
-`Controllers/` folder; its `UploadPhotoCommand` is sent by other features'
-handlers (for example, a future brewery photo upload command) rather than bound
-to an HTTP route directly. The one exception today is the `/upload-test` minimal
-API endpoint wired directly in `API.Core/Program.cs`, a temporary route for
-exercising the upload path end to end.
+commands sent from other slices, never over HTTP.
+
+`Features.Locations` also has no `Controllers/` folder and no MediatR handlers;
+it exposes `ILocationRepository` directly as a plain service, currently consumed
+only by `Database.Seed` to look up cities while seeding brewery locations. Other
+slices (for example, `Features.Breweries`) do not yet depend on it; they run
+their own `CityID` existence checks inline.
+
+`Features.PhotoUpload` also has no `Controllers/` folder; its
+`UploadPhotoCommand` is sent by other features' handlers (for example, a future
+brewery photo upload command) rather than bound to an HTTP route directly.
 
 **Dependencies**:
 
@@ -207,12 +196,10 @@ needs it, or because duplicating it four times would be worse than sharing it
 
 **Components**:
 
-- `Shared.Contracts`: `ResponseBody<T>`/`ResponseBody`, the API response
-  envelope every controller returns
-- `Shared.Application`: `ValidationBehavior<TRequest,TResponse>` (the MediatR
-  pipeline behavior that runs FluentValidation before a handler executes) and
-  the cross-slice email commands (`SendRegistrationEmailCommand`,
-  `SendResendConfirmationEmailCommand`)
+| Project              | Purpose                                                                                                                                                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope every controller returns                                                                                                                                                    |
+| `Shared.Application` | `ValidationBehavior<TRequest,TResponse>` (the MediatR pipeline behavior that runs FluentValidation before a handler executes) and the cross-slice email commands (`SendRegistrationEmailCommand`, `SendResendConfirmationEmailCommand`) |
 
 **Rules**:
 
@@ -226,19 +213,14 @@ whichever slices need them
 
 **Components**:
 
-- **Database.Connection**: generic ADO.NET connection/command plumbing
-  (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class),
-  not domain-specific; each slice's own `Repository/` folder builds on this
-- **Infrastructure.Jwt**: JWT token generation and validation
-- **Infrastructure.PasswordHashing**: Argon2id password hashing
-- **Infrastructure.Email**: Email sending capabilities (SMTP/MailKit)
-- **Infrastructure.Email.Templates**: Email template rendering (Razor
-  components)
-- **Infrastructure.FileUpload**: `IFileStorageProvider` abstraction over
-  S3-compatible object storage, implemented by `S3FileStorageProvider` (targets
-  the SeaweedFS container in dev; any S3-compatible endpoint in other
-  environments) using the AWS SDK's `AmazonS3Client` with
-  `ForcePathStyle = true`
+| Project                          | Description                                                                                                                                                                                                                                                                |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Database.Connection`            | Generic ADO.NET connection/command plumbing (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not domain-specific; each slice's own `Repository/` folder builds on this.                                                                        |
+| `Infrastructure.Jwt`             | JWT token generation and validation.                                                                                                                                                                                                                                       |
+| `Infrastructure.PasswordHashing` | Argon2id password hashing.                                                                                                                                                                                                                                                 |
+| `Infrastructure.Email`           | Email sending capabilities (SMTP/MailKit).                                                                                                                                                                                                                                 |
+| `Infrastructure.Email.Templates` | Email template rendering (Razor components).                                                                                                                                                                                                                               |
+| `Infrastructure.FileUpload`      | `IFileStorageProvider` abstraction over S3-compatible object storage, implemented by `S3FileStorageProvider` (targets the SeaweedFS container in dev; any S3-compatible endpoint in other environments) using the AWS SDK's `AmazonS3Client` with `ForcePathStyle = true`. |
 
 **Dependencies**:
 
@@ -256,19 +238,19 @@ whichever slices need them
 
 **Components**:
 
-- `UserAccount` - User profile data
-- `UserCredential` - Authentication credentials
-- `UserVerification` - Account verification state
-- `BreweryPost` - A user-submitted brewery listing
-- `BreweryPostLocation` - A brewery's address and coordinates
-- `City` - A city referenced by a brewery location
-- `StateProvince` - A state/province referenced by a city
-- `Country` - A country referenced by a state/province
-- `BeerStyle` - A beer style/category (schema table exists; no repository yet)
-- `BeerPost` - A beer listing tied to a brewery and style (schema table exists;
-  no repository yet)
-- `Photo` - A photo uploaded by a user account, written via
-  `Features.PhotoUpload`'s `IPhotoUploadRepository`
+| Entity                | Description                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------------- |
+| `UserAccount`         | User profile data.                                                                                 |
+| `UserCredential`      | Authentication credentials.                                                                        |
+| `UserVerification`    | Account verification state.                                                                        |
+| `BreweryPost`         | A user-submitted brewery listing.                                                                  |
+| `BreweryPostLocation` | A brewery's address and coordinates.                                                               |
+| `City`                | A city referenced by a brewery location.                                                           |
+| `StateProvince`       | A state/province referenced by a city.                                                             |
+| `Country`             | A country referenced by a state/province.                                                          |
+| `BeerStyle`           | A beer style/category (schema table exists; no repository yet).                                    |
+| `BeerPost`            | A beer listing tied to a brewery and style (schema table exists; no repository yet).               |
+| `Photo`               | A photo uploaded by a user account, written via `Features.PhotoUpload`'s `IPhotoUploadRepository`. |
 
 **Dependencies**:
 

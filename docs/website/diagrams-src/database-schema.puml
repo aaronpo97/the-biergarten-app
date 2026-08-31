@@ -170,49 +170,33 @@ package "Beer (*)" {
 }
 
 ' Relationships: User & Auth
-User ||--o{ Cred : "has"
-User ||--o| Verify : "has"
-User ||--o| Profile : "has"
-Profile ||--o{ Avatar : "has (history)"
-Avatar }o--|| Photo : "refers to"
-User ||--o{ Follow : "follows (UserAccountID)"
-User ||--o{ Follow : "followed by (FollowingID)"
-User ||--o{ Photo : "uploaded"
+User ||--o{ Cred
+User ||--o| Verify
+User ||--o| Profile
+Profile ||--o{ Avatar
+Avatar }o--|| Photo
+User ||--o{ Follow
+User ||--o{ Follow
+User ||--o{ Photo
 
 ' Relationships: Location
-Country ||--o{ StateProvince : "has"
-StateProvince ||--o{ City : "has"
+Country ||--o{ StateProvince
+StateProvince ||--o{ City
 
 ' Relationships: Brewery
-User ||--o{ Brewery : "posted"
-Brewery ||--o| BreweryLoc : "has"
-City ||--o{ BreweryLoc : "located in"
-Brewery ||--o{ BreweryPhoto : "has"
-Photo ||--o{ BreweryPhoto : "linked to"
+User ||--o{ Brewery
+Brewery ||--o| BreweryLoc
+City ||--o{ BreweryLoc
+Brewery ||--o{ BreweryPhoto
+Photo ||--o{ BreweryPhoto
 
 ' Relationships: Beer
-User ||--o{ Beer : "posted"
-BeerStyle ||--o{ Beer : "categorizes"
-Brewery ||--o{ Beer : "brewed"
-Beer ||--o{ BeerPhoto : "has"
-Photo ||--o{ BeerPhoto : "linked to"
-Beer ||--o{ BeerComment : "has"
-User ||--o{ BeerComment : "commented"
-
-note bottom of User
-  Auth reads/writes (registration, login, credential
-  rotation, verification) go through ASP.NET Core
-  Identity's UserManager<ApplicationUser>, backed by
-  Features.Users' DapperUserStore - inline SQL, no
-  stored procedures. Profile/avatar data goes through
-  Features.Users' UserProfileRepository.
-end note
-
-note bottom of Brewery
-  Backed by Features.Breweries' BreweryRepository
-  (Dapper); create/update/delete run inline SQL
-  inside a transaction, with optimistic concurrency
-  via RowVersion
-end note
+User ||--o{ Beer
+BeerStyle ||--o{ Beer
+Brewery ||--o{ Beer
+Beer ||--o{ BeerPhoto
+Photo ||--o{ BeerPhoto
+Beer ||--o{ BeerComment
+User ||--o{ BeerComment
 
 @enduml

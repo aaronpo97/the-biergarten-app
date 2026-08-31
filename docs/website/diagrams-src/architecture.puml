@@ -1,5 +1,7 @@
-@startuml architecture
-!include ../../pipeline/diagrams/biergarten-weizen-theme.puml
+@startuml architecture_v6
+skinparam linetype ortho
+skinparam nodesep 90
+skinparam ranksep 110
 
 title The Biergarten App - Vertical Slice Architecture
 
@@ -85,13 +87,19 @@ database "SQL Server" {
 }
 
 node "Database.Seed\n(separate console app)" as Seed
+note right of Seed
+  Seed calls each slice's
+  AddFeatures*() DI extension
+  directly - no API host,
+  no MediatR pipeline
+end note
 
 ' Relationships
-API ..> UsersSlice : AddApplicationPart\n+ MediatR scan
-API ..> BrewerySlice : AddApplicationPart\n+ MediatR scan
-API ..> EmailsSlice : MediatR scan only\n(no controller)
+API ..> UsersSlice : AddApplicationPart
+API ..> BrewerySlice : AddApplicationPart
+API ..> EmailsSlice : MediatR scan only
 
-Seed ..> UsersSlice : AddFeaturesUsers()\n(DI only, no API/MediatR)
+Seed ..> UsersSlice : AddFeaturesUsers()
 Seed ..> BrewerySlice : AddFeaturesBreweries()
 Seed ..> LocationsSlice : AddFeaturesLocations()
 
@@ -118,8 +126,8 @@ EmailsSlice ..> SharedApp : handles\nSendRegistrationEmailCommand
 Sql --> Domain
 
 UsersSlice --> Tables : Dapper SQL
-BrewerySlice --> Tables : Dapper SQL
-LocationsSlice --> Tables : Dapper SQL
+BrewerySlice --> Tables
+LocationsSlice --> Tables
 
 UsersSlice --> Domain
 BrewerySlice --> Domain

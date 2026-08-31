@@ -1,0 +1,58 @@
+site_name: The Biergarten App
+site_url: https://github.io
+repo_url: https://github.com
+repo_name: the-biergarten-app
+
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Diagrams:
+      - Website:
+          - Architecture: website/diagrams-md/architecture.md
+          - Database Schema: website/diagrams-md/database-schema.md
+          - Deployment: website/diagrams-md/deployment.md
+          - Auth Flows:
+              - Registration: website/diagrams-md/auth/registration.md
+              - Login: website/diagrams-md/auth/login.md
+              - Refresh Token: website/diagrams-md/auth/refresh-token.md
+              - Confirm User: website/diagrams-md/auth/confirm-user.md
+              - Resend Confirmation: website/diagrams-md/auth/resend-confirmation.md
+              - Update Username: website/diagrams-md/auth/update-username.md
+              - Update Email: website/diagrams-md/auth/update-email.md
+              - Update Password: website/diagrams-md/auth/update-password.md
+              - Update Profile: website/diagrams-md/auth/update-profile.md
+              - Delete Account: website/diagrams-md/auth/delete-account.md
+              - Error Handling: website/diagrams-md/auth/error-handling.md
+      - Pipeline:
+          - Current:
+              - Activity: pipeline/diagrams-md/current/activity.md
+              - Class: pipeline/diagrams-md/current/class.md
+          - Planned:
+              - Activity: pipeline/diagrams-md/planned/activity.md
+              - Class: pipeline/diagrams-md/planned/class.md
+  - Website:
+      - Getting Started: website/getting-started.md
+      - Database: website/database.md
+      - Docker: website/docker.md
+      - Environment Variables: website/environment-variables.md
+      - Testing: website/testing.md
+      - Token Validation: website/token-validation.md
+  - Pipeline:
+      - Overview: pipeline/README.md
+      - Roadmap: pipeline/ROADMAP.md
+      - Ethics & Known Issues: pipeline/ETHICS-AND-KNOWN-ISSUES.md
+
+plugins:
+  - search
+  - glightbox
+  - panzoom:
+      mermaid: true
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

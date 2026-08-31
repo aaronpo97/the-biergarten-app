@@ -1,0 +1,83 @@
+# User Authentication Flow — Refresh Token
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as API Controller
+    participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
+    box rgb(241,243,234) Handler Layer
+        participant RefreshHandler as RefreshTokenHandler
+        participant UserMgr as UserManager(ApplicationUser)
+        participant TokenSvc as TokenService
+    end
+    box rgb(235,236,227) Infrastructure Layer
+        participant JWT as JWT Infrastructure
+    end
+    box rgb(219,238,221) Repository / Cross-slice
+        participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+    end
+    participant DB as SQL Server
+
+    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
+
+    User->>API: POST /api/auth/refresh<br/>Header: X-Refresh-Token: {token}
+    activate API
+    API->>Mediator: Send(RefreshTokenCommand(refreshToken))
+    activate Mediator
+    Note right of Mediator: ValidationBehavior runs RefreshTokenValidator — refreshToken must be non-empty. Anonymous endpoint, no Bearer token required.
+
+    alt Validation fails
+        Mediator->>API: throws FluentValidation.ValidationException
+        API->>User: 400 Bad Request {message, errors}
+    else Validation succeeds
+        Mediator->>RefreshHandler: Handle(command)
+        activate RefreshHandler
+
+        RefreshHandler->>TokenSvc: RefreshTokenAsync(refreshToken)
+        activate TokenSvc
+        TokenSvc->>JWT: ValidateRefreshTokenAsync(refreshToken)
+        activate JWT
+        Note right of JWT: Validates signature/expiry against the refresh token secret, extracts userId/username claims
+        JWT-->>TokenSvc: ValidatedToken or throws
+        deactivate JWT
+
+        alt Token invalid or expired
+            TokenSvc->>RefreshHandler: throw UnauthorizedException
+            RefreshHandler->>Mediator: propagate
+            Mediator->>API: propagate
+            API->>User: 401 Unauthorized
+        else Token valid
+            TokenSvc->>UserMgr: FindByIdAsync(validated.UserId)
+            activate UserMgr
+            UserMgr->>UserStore: FindByIdAsync(userId)
+            activate UserStore
+            UserStore->>DB: SELECT ... FROM UserAccount WHERE UserAccountID = @Id
+            activate DB
+            DB-->>UserStore: row or null
+            deactivate DB
+            UserStore-->>UserMgr: ApplicationUser or null
+            deactivate UserStore
+            UserMgr-->>TokenSvc: ApplicationUser or null
+            deactivate UserMgr
+
+            alt User not found
+                TokenSvc->>RefreshHandler: throw UnauthorizedException "User account not found"
+                RefreshHandler->>Mediator: propagate
+                Mediator->>API: propagate
+                API->>User: 401 Unauthorized
+            else User found
+                TokenSvc->>JWT: GenerateAccessToken(user) + GenerateRefreshToken(user)
+                JWT-->>TokenSvc: new access + refresh tokens
+                TokenSvc-->>RefreshHandler: RefreshTokenResult
+                deactivate TokenSvc
+
+                RefreshHandler-->>Mediator: LoginPayload(userId, username, refreshToken, accessToken)
+                deactivate RefreshHandler
+                Mediator-->>API: LoginPayload
+                deactivate Mediator
+                API->>User: 200 OK {message: "Token refreshed successfully.", payload: {...}}
+            end
+        end
+    end
+    deactivate API
+```

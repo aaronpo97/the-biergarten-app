@@ -10,13 +10,13 @@ tags:
 
 ## Overview
 
-The Core project validates JSON Web Tokens (JWTs) across three token types:
+The Biergarten API validates JSON Web Tokens (JWTs) across three token types:
 
-- **Access Tokens**: Short-lived (1 hour) tokens for API authentication
-- **Refresh Tokens**: Long-lived (21 days) tokens for obtaining new access
-  tokens
-- **Confirmation Tokens**: Short-lived (30 minutes) tokens for email
-  confirmation
+| Token Type | Lifetime | Purpose |
+| --- | --- | --- |
+| **Access Tokens** | 1 hour | API authentication |
+| **Refresh Tokens** | 21 days | Obtaining new access tokens |
+| **Confirmation Tokens** | 30 minutes | Email confirmation |
 
 ## Components
 
@@ -183,29 +183,35 @@ Validation failures return HTTP 401 Unauthorized:
 
 ### Access token lifecycle
 
-1. **Generation**: During login (1-hour validity)
-2. **Usage**: Included in Authorization header on API requests
-3. **Validation**: Validated on protected endpoints
-4. **Expiration**: Token becomes invalid after 1 hour
-5. **Refresh**: Use refresh token to obtain new access token
+| Step | Description |
+| --- | --- |
+| Generation | During login (1-hour validity) |
+| Usage | Included in Authorization header on API requests |
+| Validation | Validated on protected endpoints |
+| Expiration | Token becomes invalid after 1 hour |
+| Refresh | Use refresh token to obtain new access token |
 
 ### Refresh token lifecycle
 
-1. **Generation**: During login (21-day validity)
-2. **Storage**: Client-side (secure storage)
-3. **Usage**: Posted to `/api/auth/refresh` endpoint
-4. **Validation**: Validated by `ITokenService.RefreshTokenAsync()`
-5. **Rotation**: New refresh token issued on successful refresh
-6. **Expiration**: Token becomes invalid after 21 days
+| Step | Description |
+| --- | --- |
+| Generation | During login (21-day validity) |
+| Storage | Client-side (secure storage) |
+| Usage | Posted to `/api/auth/refresh` endpoint |
+| Validation | Validated by `ITokenService.RefreshTokenAsync()` |
+| Rotation | New refresh token issued on successful refresh |
+| Expiration | Token becomes invalid after 21 days |
 
 ### Confirmation token lifecycle
 
-1. **Generation**: During user registration (30-minute validity)
-2. **Delivery**: Emailed to user in confirmation link
-3. **Usage**: User clicks link, token posted to `/api/auth/confirm`
-4. **Validation**: Validated by `ConfirmUserHandler`
-5. **Completion**: User account marked as confirmed
-6. **Expiration**: Token becomes invalid after 30 minutes
+| Step | Description |
+| --- | --- |
+| Generation | During user registration (30-minute validity) |
+| Delivery | Emailed to user in confirmation link |
+| Usage | User clicks link, token posted to `/api/auth/confirm` |
+| Validation | Validated by `ConfirmUserHandler` |
+| Completion | User account marked as confirmed |
+| Expiration | Token becomes invalid after 30 minutes |
 
 ## Testing
 
@@ -266,21 +272,21 @@ All of the following live in `Features.Users.Tests`.
 ### Stretch goals
 
 1. **Middleware for Access Token Validation**
-   - Automatically validate access tokens on protected routes
-   - Populate HttpContext.User from token claims
-   - Return 401 for invalid/missing tokens
+	   - Automatically validate access tokens on protected routes
+	   - Populate HttpContext.User from token claims
+	   - Return 401 for invalid/missing tokens
 
 2. **Token Denylisting**
-   - Implement token revocation (for example, on logout)
-   - Store denylisted tokens in cache/database
-   - Check the denylist during validation
+	   - Implement token revocation (for example, on logout)
+	   - Store denylisted tokens in cache/database
+	   - Check the denylist during validation
 
 3. **Refresh Token Rotation Strategy**
-   - Detect token reuse (replay attacks)
-   - Automatically invalidate entire token chain on reuse
-   - Log suspicious activity
+	   - Detect token reuse (replay attacks)
+	   - Automatically invalidate entire token chain on reuse
+	   - Log suspicious activity
 
 4. **Structured Logging**
-   - Log token validation attempts
-   - Track failed validation reasons
-   - Alert on repeated validation failures (brute force detection)
+	   - Log token validation attempts
+	   - Track failed validation reasons
+	   - Alert on repeated validation failures (brute force detection)

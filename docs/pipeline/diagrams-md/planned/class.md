@@ -1,0 +1,593 @@
+# Biergarten Data Pipeline — Class Diagram (Planned)
+
+```mermaid
+classDiagram
+    namespace DomainModels {
+        class Location {
+            +string city
+            +string state_province
+            +string iso3166_2
+            +string country
+            +string iso3166_1
+            +vector~string~ local_languages
+            +double latitude
+            +double longitude
+        }
+
+        class LocationContext {
+            +string text
+            +Completeness completeness
+            +size_t char_count
+        }
+
+        class Completeness {
+            <<enumeration>>
+            Full
+            Partial
+            Absent
+        }
+
+        class EnrichedCity {
+            +Location location
+            +LocationContext context
+        }
+
+        class BeerStyle {
+            +string name
+            +string description
+            +float min_abv
+            +float max_abv
+            +int min_ibu
+            +int max_ibu
+        }
+
+        class BreweryResult {
+            +string name_en
+            +string description_en
+            +string name_local
+            +string description_local
+        }
+
+        class BeerResult {
+            +string name_en
+            +string description_en
+            +string name_local
+            +string description_local
+            +string style
+            +float abv
+            +int ibu
+        }
+
+        class UserResult {
+            +string first_name
+            +string last_name
+            +string gender
+            +string username
+            +string bio
+            +float activity_weight
+        }
+
+        class Name {
+            +string first_name
+            +string last_name
+            +string gender
+        }
+
+        class ForenameEntry {
+            +string name
+            +string gender
+        }
+
+        class CheckinResult {
+            +string checked_in_at
+            +string note
+        }
+
+        class RatingResult {
+            +float score
+            +string note
+        }
+
+        class GenerationMetadata {
+            +uint64_t generation_id
+            +string generated_time
+            +bool context_provided
+            +string generated_with
+        }
+
+        class GeneratedBrewery {
+            +uint64_t brewery_id
+            +Location location
+            +BreweryResult brewery
+            +Completeness context_completeness
+            +GenerationMetadata metadata
+        }
+
+        class GeneratedBeer {
+            +uint64_t beer_id
+            +uint64_t brewery_id
+            +Location location
+            +BeerStyle style
+            +BeerResult beer
+            +GenerationMetadata metadata
+        }
+
+        class GeneratedUser {
+            +uint64_t user_id
+            +Location location
+            +UserResult user
+            +string email
+            +string date_of_birth
+            +string password
+            +GenerationMetadata metadata
+        }
+
+        class GeneratedCheckin {
+            +uint64_t checkin_id
+            +uint64_t user_id
+            +uint64_t brewery_id
+            +CheckinResult checkin
+            +GenerationMetadata metadata
+        }
+
+        class GeneratedRating {
+            +uint64_t user_id
+            +uint64_t beer_id
+            +uint64_t checkin_id
+            +RatingResult rating
+            +GenerationMetadata metadata
+        }
+
+        class GeneratedFollow {
+            +uint64_t follower_id
+            +uint64_t followed_id
+            +GenerationMetadata metadata
+        }
+
+        class UserPersona {
+            +string name
+            +string description
+            +vector~string~ style_affinities
+        }
+    }
+    note for ForenameEntry "forename_list/surname_list are unordered_set aliases, keyed by ISO 3166-1 country code via ICuratedDataService. SampleName() is a free function, not a method, sourced from popular-names-by-country-dataset (CC0)."
+    note for GeneratedUser "email, date_of_birth, and password are generated programmatically by the orchestrator (not LLM-authored) so a downstream auth-account seeding consumer can register real accounts from this export."
+    ForenameEntry ..> Name : SampleName() produces
+    LocationContext *-- Completeness
+
+    namespace DomainApplicationConfiguration {
+        class SamplingOptions {
+            +float temperature
+            +float top_p
+            +uint32_t top_k
+            +uint32_t n_ctx
+            +int seed
+        }
+
+        class GeneratorOptions {
+            +path model_path
+            +bool use_mocked
+            +optional~SamplingOptions~ sampling
+        }
+
+        class PipelineOptions {
+            +path output_path
+            +path log_path
+        }
+
+        class ApplicationOptions {
+            +GeneratorOptions generator
+            +PipelineOptions pipeline
+        }
+    }
+    ApplicationOptions *-- GeneratorOptions
+    ApplicationOptions *-- PipelineOptions
+    GeneratorOptions o-- SamplingOptions
+
+    namespace DomainPolicy {
+        class ContextStrategy {
+            <<interface>>
+            +QueriesFor(loc) vector~string~
+            +MaxContextChars() size_t
+        }
+
+        class BreweryContextStrategy {
+            +QueriesFor(loc) vector~string~
+            +MaxContextChars() size_t
+        }
+
+        class BeerContextStrategy {
+            +QueriesFor(loc) vector~string~
+            +MaxContextChars() size_t
+        }
+
+        class SamplingStrategy {
+            <<interface>>
+            +Sample(locations) vector~Location~
+        }
+
+        class UniformSamplingStrategy {
+            -size_t sample_size_
+            +Sample(locations) vector~Location~
+        }
+
+        class BeerSelectionStrategy {
+            <<interface>>
+            +SelectStyles(brewery, palette) vector~BeerStyle~
+        }
+
+        class RandomBeerSelectionStrategy {
+            -mt19937 rng_
+            -size_t min_beers_
+            -size_t max_beers_
+            +SelectStyles(brewery, palette) vector~BeerStyle~
+        }
+
+        class CheckinDistributionStrategy {
+            <<interface>>
+            +AssignActivityWeights(users) void
+            +CheckinsForUser(user, brewery_count) size_t
+            +TimestampFor(user, index) string
+        }
+
+        class JCurveCheckinStrategy {
+            -mt19937 rng_
+            +AssignActivityWeights(users) void
+            +CheckinsForUser(user, brewery_count) size_t
+            +TimestampFor(user, index) string
+        }
+
+        class RandomCheckinStrategy {
+            -mt19937 rng_
+            -size_t min_checkins_
+            -size_t max_checkins_
+            +AssignActivityWeights(users) void
+            +CheckinsForUser(user, brewery_count) size_t
+            +TimestampFor(user, index) string
+        }
+
+        class FollowGenerationStrategy {
+            <<interface>>
+            +GenerateFollows(users) vector~GeneratedFollow~
+        }
+
+        class RandomFollowStrategy {
+            -mt19937 rng_
+            -size_t min_follows_
+            -size_t max_follows_
+            +GenerateFollows(users) vector~GeneratedFollow~
+        }
+
+        class ActivityWeightedFollowStrategy {
+            -mt19937 rng_
+            -size_t min_follows_
+            -size_t max_follows_
+            +GenerateFollows(users) vector~GeneratedFollow~
+        }
+    }
+
+    namespace InfrastructureLogging {
+        class LogLevel {
+            <<enumeration>>
+            Debug
+            Info
+            Warn
+            Error
+        }
+
+        class PipelinePhase {
+            <<enumeration>>
+            Startup
+            UserGeneration
+            BreweryAndBeerGeneration
+            CheckinGeneration
+            RatingGeneration
+            FollowGeneration
+            Teardown
+        }
+
+        class LogEntry {
+            +time_point timestamp
+            +LogLevel level
+            +PipelinePhase phase
+            +string message
+            +optional~string~ worker
+        }
+
+        class ILogger {
+            <<interface>>
+            +Log(entry) void
+        }
+
+        class LogProducer {
+            -BoundedChannel~LogEntry~ channel_
+            +Log(entry) void
+        }
+
+        class LogDispatcher {
+            -BoundedChannel~LogEntry~ channel_
+            +Run() void
+            -ToSpdlogLevel(level) level_enum
+        }
+    }
+    LogEntry *-- LogLevel
+    LogEntry *-- PipelinePhase
+    ILogger <|.. LogProducer
+    LogProducer ..> LogEntry : emits
+    LogDispatcher ..> LogEntry : consumes
+
+    namespace InfrastructurePipelineChannel {
+        class BoundedChannel~T~ {
+            -queue~T~ queue_
+            -mutex mutex_
+            -condition_variable not_full_
+            -condition_variable not_empty_
+            -size_t capacity_
+            -bool closed_
+            +Send(item) void
+            +Receive() optional~T~
+            +Close() void
+        }
+    }
+
+    namespace InfrastructureDataPreloading {
+        class ICuratedDataService {
+            <<interface>>
+            +LoadLocations(filepath) vector~Location~
+            +LoadBeerStyles(filepath) vector~BeerStyle~
+            +LoadPersonas(filepath) vector~UserPersona~
+            +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
+            +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        }
+
+        class JsonLoader {
+            +LoadLocations(filepath) vector~Location~
+            +LoadBeerStyles(filepath) vector~BeerStyle~
+            +LoadPersonas(filepath) vector~UserPersona~
+            +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
+            +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        }
+
+        class MockCuratedDataService {
+            +LoadLocations(filepath) vector~Location~
+            +LoadBeerStyles(filepath) vector~BeerStyle~
+            +LoadPersonas(filepath) vector~UserPersona~
+            +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
+            +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        }
+    }
+    note for JsonLoader "Each Load* call is memoized after its first parse — implemented today, ahead of LoadBeerStyles which is still planned."
+    note for MockCuratedDataService "Fixed in-memory dataset for --mocked mode, implemented today for Locations/Personas/Forenames/Surnames; would need a LoadBeerStyles fixture too once that method is implemented."
+
+    namespace InfrastructureEnrichment {
+        class EnrichmentService {
+            <<interface>>
+            +GetLocationContext(loc, strategy) LocationContext
+        }
+
+        class WikipediaService {
+            -unique_ptr~WebClient~ client_
+            -unordered_map~string, string~ extract_cache_
+            +GetLocationContext(loc, strategy) LocationContext
+            -FetchExtract(query) string
+        }
+
+        class WebClient {
+            <<interface>>
+            +Get(url) string
+            +UrlEncode(value) string
+        }
+
+        class HttpWebClient {
+            +Get(url) string
+            +UrlEncode(value) string
+        }
+    }
+
+    namespace InfrastructurePrompting {
+        class IPromptDirectory {
+            <<interface>>
+            +Load(key) string
+        }
+
+        class PromptDirectory {
+            -path prompt_dir_
+            -unordered_map~string, string~ cache_
+            +PromptDirectory(prompt_dir)
+            +Load(key) string
+        }
+    }
+    IPromptDirectory <|.. PromptDirectory
+
+    namespace InfrastructureDataGeneration {
+        class DataGenerator {
+            <<interface>>
+            +GenerateBrewery(location, context) BreweryResult
+            +GenerateBeer(brewery_id, location, context, style) BeerResult
+            +GenerateUser(city, persona, name) UserResult
+            +GenerateCheckin(user, brewery, timestamp) CheckinResult
+            +GenerateRating(user, beer, checkin_id) RatingResult
+        }
+
+        class MockGenerator {
+            +GenerateBrewery(...) BreweryResult
+            +GenerateBeer(...) BeerResult
+            +GenerateUser(...) UserResult
+            +GenerateCheckin(...) CheckinResult
+            +GenerateRating(...) RatingResult
+            -DeterministicHash(location) size_t
+        }
+
+        class LlamaGenerator {
+            -ModelHandle model_
+            -ContextHandle context_
+            -unique_ptr~PromptFormatter~ prompt_formatter_
+            -unique_ptr~IPromptDirectory~ prompt_directory_
+            -mt19937 rng_
+            +GenerateBrewery(...) BreweryResult
+            +GenerateBeer(...) BeerResult
+            +GenerateUser(...) UserResult
+            +GenerateCheckin(...) CheckinResult
+            +GenerateRating(...) RatingResult
+            -Load(opts) void
+            -Infer(system_prompt, user_prompt, max_tokens, grammar) string
+            -ValidateModelArchitecture() void
+        }
+
+        class PromptFormatter {
+            <<interface>>
+            +Format(system_prompt, user_prompt) string
+            +ExpectedArchitecture() string_view
+        }
+
+        class Gemma4JinjaPromptFormatter {
+            +Format(system_prompt, user_prompt) string
+            +ExpectedArchitecture() string_view
+        }
+    }
+
+    namespace InfrastructureDataExport {
+        class ExportService {
+            <<interface>>
+            +Initialize() void
+            +ProcessBrewery(brewery) uint64_t
+            +ProcessBeer(beer) uint64_t
+            +ProcessUser(user) uint64_t
+            +ProcessCheckin(checkin) uint64_t
+            +ProcessRating(rating) void
+            +ProcessFollow(follow) void
+            +Finalize() void
+        }
+
+        class SqliteExportService {
+            -unique_ptr~DateTimeProvider~ date_time_provider_
+            -SqliteDatabaseHandle db_handle_
+            -SqliteStatementHandle insert_location_stmt_
+            -SqliteStatementHandle insert_brewery_stmt_
+            -SqliteStatementHandle insert_beer_stmt_
+            -SqliteStatementHandle insert_user_stmt_
+            -SqliteStatementHandle insert_checkin_stmt_
+            -SqliteStatementHandle insert_rating_stmt_
+            -SqliteStatementHandle insert_follow_stmt_
+            -bool transaction_open_
+            -unordered_map~string, uint64_t~ location_cache_
+            -unordered_map~string, uint64_t~ brewery_cache_
+            +Initialize() void
+            +ProcessRecord(brewery) uint64_t
+            +ProcessRecord(beer) uint64_t
+            +ProcessRecord(user) uint64_t
+            +ProcessRecord(checkin) uint64_t
+            +ProcessRecord(rating) void
+            +ProcessRecord(follow) void
+            +Finalize() void
+            -InitializeSchema() void
+            -PrepareStatements() void
+            -RollbackAndCloseNoThrow() void
+            -FinalizeStatements() void
+        }
+
+        class DateTimeProvider {
+            <<interface>>
+            +GetUtcTimestamp() string
+        }
+
+        class SystemDateTimeProvider {
+            +GetUtcTimestamp() string
+        }
+    }
+
+    class BiergartenPipelineOrchestrator {
+        -unique_ptr~ICuratedDataService~ curated_data_service_
+        -unique_ptr~EnrichmentService~ enrichment_service_
+        -unique_ptr~DataGenerator~ generator_
+        -unique_ptr~Logger~ logger_
+        -unique_ptr~ExportService~ exporter_
+        -unique_ptr~ContextStrategy~ brewery_context_strategy_
+        -unique_ptr~SamplingStrategy~ sampling_strategy_
+        -unique_ptr~BeerSelectionStrategy~ beer_selection_strategy_
+        -unique_ptr~CheckinDistributionStrategy~ checkin_strategy_
+        -unique_ptr~FollowGenerationStrategy~ follow_strategy_
+        -vector~BeerStyle~ beer_style_palette_
+        -ApplicationOptions options_
+        -vector~GeneratedUser~ user_pool_
+        -vector~GeneratedBrewery~ brewery_pool_
+        -vector~GeneratedBeer~ beer_pool_
+        -vector~GeneratedCheckin~ checkin_pool_
+        -vector~GeneratedFollow~ follow_pool_
+        +Run() bool
+        -RunUserPhase(locations) void
+        -RunBreweryAndBeerPhase(locations) void
+        -RunCheckinPhase() void
+        -RunRatingPhase() void
+        -RunFollowPhase() void
+    }
+
+    BiergartenPipelineOrchestrator *-- ICuratedDataService
+    BiergartenPipelineOrchestrator *-- EnrichmentService
+    BiergartenPipelineOrchestrator *-- DataGenerator
+    BiergartenPipelineOrchestrator *-- ExportService
+    BiergartenPipelineOrchestrator *-- CheckinDistributionStrategy
+    BiergartenPipelineOrchestrator *-- FollowGenerationStrategy
+    BiergartenPipelineOrchestrator *-- SamplingStrategy
+    BiergartenPipelineOrchestrator *-- BeerSelectionStrategy
+    BiergartenPipelineOrchestrator *-- ApplicationOptions
+    BiergartenPipelineOrchestrator *-- Logger
+
+    BiergartenPipelineOrchestrator "1" *-- "0..*" GeneratedUser : user_pool_
+    BiergartenPipelineOrchestrator "1" *-- "0..*" GeneratedBrewery : brewery_pool_
+    BiergartenPipelineOrchestrator "1" *-- "0..*" GeneratedBeer : beer_pool_
+    BiergartenPipelineOrchestrator "1" *-- "0..*" GeneratedCheckin : checkin_pool_
+    BiergartenPipelineOrchestrator "1" *-- "0..*" GeneratedFollow : follow_pool_
+
+    ICuratedDataService <|.. JsonLoader
+    ICuratedDataService <|.. MockCuratedDataService
+    Logger <|.. PipelineLogger
+    ContextStrategy <|.. BreweryContextStrategy
+    ContextStrategy <|.. BeerContextStrategy
+    SamplingStrategy <|.. UniformSamplingStrategy
+    BeerSelectionStrategy <|.. RandomBeerSelectionStrategy
+    CheckinDistributionStrategy <|.. JCurveCheckinStrategy
+    CheckinDistributionStrategy <|.. RandomCheckinStrategy
+    FollowGenerationStrategy <|.. RandomFollowStrategy
+    FollowGenerationStrategy <|.. ActivityWeightedFollowStrategy
+    EnrichmentService <|.. WikipediaService
+    WebClient <|.. HttpWebClient
+    DataGenerator <|.. MockGenerator
+    DataGenerator <|.. LlamaGenerator
+    PromptFormatter <|.. Gemma4JinjaPromptFormatter
+    ExportService <|.. SqliteExportService
+    DateTimeProvider <|.. SystemDateTimeProvider
+
+    WikipediaService *-- WebClient
+    WikipediaService ..> ContextStrategy
+    LlamaGenerator *-- PromptFormatter
+    LlamaGenerator *-- IPromptDirectory
+    LlamaGenerator ..> GeneratorOptions
+    SqliteExportService *-- DateTimeProvider
+
+    PipelineLogger o-- BoundedChannel : logs to
+    LogWorker o-- BoundedChannel : drains from
+
+    EnrichedCity *-- Location
+    EnrichedCity *-- LocationContext
+    GeneratedBrewery *-- Location
+    GeneratedBrewery *-- BreweryResult
+    GeneratedBrewery *-- GenerationMetadata
+    GeneratedBeer *-- Location
+    GeneratedBeer *-- BeerStyle
+    GeneratedBeer *-- BeerResult
+    GeneratedBeer *-- GenerationMetadata
+    GeneratedUser *-- Location
+    GeneratedUser *-- UserResult
+    GeneratedUser *-- GenerationMetadata
+    GeneratedCheckin *-- CheckinResult
+    GeneratedCheckin *-- GenerationMetadata
+    GeneratedRating *-- RatingResult
+    GeneratedRating *-- GenerationMetadata
+    GeneratedFollow *-- GenerationMetadata
+```
+
+## Notes
+
+- `Logger`, `PipelineLogger`, and `LogWorker` are referenced only in relationships in the source PlantUML (not given their own class blocks there either) — they appear here as implicit nodes for the same reason.
+- Package grouping from the PlantUML source (`Domain: Models`, `Domain: Application Configuration`, `Domain: Policy`, `Infrastructure: Logging`, `Infrastructure: Pipeline Channel`, `Infrastructure: Data Preloading`, `Infrastructure: Enrichment`, `Infrastructure: Prompting`, `Infrastructure: Data Generation`, `Infrastructure: Data Export`) is preserved as Mermaid `namespace` blocks.

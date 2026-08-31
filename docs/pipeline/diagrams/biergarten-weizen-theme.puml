@@ -1,55 +1,56 @@
-skinparam shadowing false
-skinparam backgroundColor #FCFCF7
-skinparam defaultFontName "DM Sans"
-skinparam defaultFontColor #14180C
-skinparam titleFontName "Volkhov"
-skinparam titleFontColor #14180C
-skinparam ArrowColor #656F33
-skinparam NoteBackgroundColor #DBEEDD
-skinparam NoteFontColor #14180C
-skinparam NoteBorderColor #4A5837
-skinparam SwimlaneBorderColor #4A5837
-skinparam SwimlaneBorderThickness 1
-skinparam activityStartColor #EBECE3
-skinparam activityEndColor #4A5837
-skinparam activityStopColor #4A5837
-skinparam ActivityBackgroundColor #EBECE3
-skinparam ActivityBorderColor #4A5837
-skinparam ActivityDiamondBackgroundColor #CBD2B5
-skinparam ActivityDiamondBorderColor #4A5837
-skinparam packageStyle rectangle
-skinparam packageBackgroundColor #F1F3EA
-skinparam packageBorderColor #4A5837
-skinparam packageFontColor #14180C
-skinparam classBackgroundColor #EBECE3
-skinparam classBorderColor #4A5837
-skinparam classFontColor #14180C
-skinparam classAttributeFontColor #3F4724
-skinparam classStereotypeFontColor #4A5837
-skinparam interfaceBackgroundColor #DBEEDD
-skinparam interfaceBorderColor #4A5837
-skinparam interfaceFontColor #14180C
-skinparam enumBackgroundColor #E4E6D8
-skinparam enumBorderColor #4A5837
-skinparam enumFontColor #14180C
-skinparam ParticipantBackgroundColor #EBECE3
-skinparam ParticipantBorderColor #4A5837
-skinparam ParticipantFontColor #14180C
-skinparam ActorBackgroundColor #DBEEDD
-skinparam ActorBorderColor #4A5837
-skinparam ActorFontColor #14180C
-skinparam LifeLineBorderColor #4A5837
-skinparam LifeLineBackgroundColor #F1F3EA
-skinparam DatabaseBackgroundColor #EBECE3
-skinparam DatabaseBorderColor #4A5837
-skinparam DatabaseFontColor #14180C
-skinparam SequenceGroupBackgroundColor #DBEEDD
-skinparam SequenceGroupBorderColor #4A5837
-skinparam SequenceGroupFontColor #14180C
-skinparam SequenceGroupBodyBackgroundColor transparent
-skinparam SequenceDividerBackgroundColor #DBEEDD
-skinparam SequenceDividerBorderColor #4A5837
-skinparam SequenceDividerFontColor #14180C
-skinparam SequenceBoxBackgroundColor #F1F3EA
-skinparam SequenceBoxBorderColor #4A5837
-skinparam SequenceBoxFontColor #14180C
+' skinparam shadowing false
+' skinparam backgroundColor #FCFCF7
+' skinparam defaultFontName "DM Sans"
+' skinparam defaultFontColor #14180C
+' skinparam titleFontName "Volkhov"
+' skinparam titleFontColor #14180C
+' skinparam ArrowColor #656F33
+' skinparam NoteBackgroundColor #DBEEDD
+' skinparam NoteFontColor #14180C
+
+' skinparam NoteBorderColor #4A5837
+' skinparam SwimlaneBorderColor #4A5837
+' skinparam SwimlaneBorderThickness 1
+' skinparam activityStartColor #EBECE3
+' skinparam activityEndColor #4A5837
+' skinparam activityStopColor #4A5837
+' skinparam ActivityBackgroundColor #EBECE3
+' skinparam ActivityBorderColor #4A5837
+' skinparam ActivityDiamondBackgroundColor #CBD2B5
+' skinparam ActivityDiamondBorderColor #4A5837
+' skinparam packageStyle rectangle
+' skinparam packageBackgroundColor #F1F3EA
+' skinparam packageBorderColor #4A5837
+' skinparam packageFontColor #14180C
+' skinparam classBackgroundColor #EBECE3
+' skinparam classBorderColor #4A5837
+' skinparam classFontColor #14180C
+' skinparam classAttributeFontColor #3F4724
+' skinparam classStereotypeFontColor #4A5837
+' skinparam interfaceBackgroundColor #DBEEDD
+' skinparam interfaceBorderColor #4A5837
+' skinparam interfaceFontColor #14180C
+' skinparam enumBackgroundColor #E4E6D8
+' skinparam enumBorderColor #4A5837
+' skinparam enumFontColor #14180C
+' skinparam ParticipantBackgroundColor #EBECE3
+' skinparam ParticipantBorderColor #4A5837
+' skinparam ParticipantFontColor #14180C
+' skinparam ActorBackgroundColor #DBEEDD
+' skinparam ActorBorderColor #4A5837
+' skinparam ActorFontColor #14180C
+' skinparam LifeLineBorderColor #4A5837
+' skinparam LifeLineBackgroundColor #F1F3EA
+' skinparam DatabaseBackgroundColor #EBECE3
+' skinparam DatabaseBorderColor #4A5837
+' skinparam DatabaseFontColor #14180C
+' skinparam SequenceGroupBackgroundColor #DBEEDD
+' skinparam SequenceGroupBorderColor #4A5837
+' skinparam SequenceGroupFontColor #14180C
+' skinparam SequenceGroupBodyBackgroundColor transparent
+' skinparam SequenceDividerBackgroundColor #DBEEDD
+' skinparam SequenceDividerBorderColor #4A5837
+' skinparam SequenceDividerFontColor #14180C
+' skinparam SequenceBoxBackgroundColor #F1F3EA
+' skinparam SequenceBoxBorderColor #4A5837
+' skinparam SequenceBoxFontColor #14180C

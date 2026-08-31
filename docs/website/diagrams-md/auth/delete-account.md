@@ -1,0 +1,71 @@
+# User Authentication Flow — Delete Account
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as API Controller
+    participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
+    box rgb(241,243,234) Handler Layer
+        participant DeleteAccountHandler
+        participant UserMgr as UserManager(ApplicationUser)
+    end
+    box rgb(219,238,221) Repository / Cross-slice
+        participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+    end
+    participant DB as SQL Server
+
+    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
+
+    User->>API: DELETE /api/auth/account (requires Bearer access token)
+    activate API
+    API->>Mediator: Send(DeleteAccountCommand(GetAuthenticatedUserId()))
+    activate Mediator
+    Mediator->>DeleteAccountHandler: Handle(command)
+    activate DeleteAccountHandler
+
+    DeleteAccountHandler->>UserMgr: FindByIdAsync(userAccountId)
+    activate UserMgr
+    UserMgr->>UserStore: FindByIdAsync(userAccountId)
+    UserStore-->>UserMgr: ApplicationUser or null
+    UserMgr-->>DeleteAccountHandler: ApplicationUser or null
+    deactivate UserMgr
+
+    alt Account not found
+        DeleteAccountHandler->>Mediator: throw NotFoundException
+        Mediator->>API: propagate
+        API->>User: 404 Not Found
+    else Account found
+        DeleteAccountHandler->>UserMgr: DeleteAsync(user)
+        activate UserMgr
+        UserMgr->>UserStore: DeleteAsync(user)
+        activate UserStore
+        UserStore->>DB: DELETE FROM UserAccount WHERE UserAccountID = @Id
+        Note right of UserStore: UserCredential/UserVerification/UserAvatar cascade on delete. Posts, comments, photos, and follows use ON DELETE NO ACTION — if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
+
+        alt Foreign key violation (dependent records exist)
+            UserStore-->>UserMgr: IdentityResult.Failed (AccountHasDependentRecords)
+        else Delete succeeds
+            UserStore-->>UserMgr: IdentityResult.Success
+        end
+        deactivate UserStore
+        UserMgr-->>DeleteAccountHandler: IdentityResult
+        deactivate UserMgr
+
+        alt Account has dependent records
+            DeleteAccountHandler->>Mediator: throw ConflictException "Account cannot be deleted while it still has associated posts, comments, photos, or follows."
+            Mediator->>API: propagate
+            API->>User: 409 Conflict
+        else !result.Succeeded (other failure)
+            DeleteAccountHandler->>Mediator: throw ConflictException
+            Mediator->>API: propagate
+            API->>User: 409 Conflict
+        else result.Succeeded
+            DeleteAccountHandler-->>Mediator: (void)
+            deactivate DeleteAccountHandler
+            Mediator-->>API: (void)
+            deactivate Mediator
+            API->>User: 200 OK {message: "Account deleted successfully."}
+        end
+    end
+    deactivate API
+```
