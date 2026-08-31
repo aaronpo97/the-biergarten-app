@@ -545,25 +545,27 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     Composes a joined row's <see cref="BreweryPost" />, <see cref="BreweryPostLocation" />,
     ///     <see cref="City" />, <see cref="StateProvince" /> and <see cref="Country" /> fragments into a
     ///     single populated <see cref="BreweryPost" />. When the row has no location (a left-joined
-    ///     brewery with no address on file), <paramref name="location" /> is a blank instance produced
-    ///     from all-<c>NULL</c> columns; the schema guarantees that whenever a location row was joined
-    ///     in, its City/StateProvince/Country chain was too.
+    ///     brewery with no address on file), Dapper passes <see langword="null" /> for
+    ///     <paramref name="location" /> rather than a blank instance, since its identity column
+    ///     (<c>BreweryPostLocationID</c>) is <c>NULL</c>; the schema guarantees that whenever a location
+    ///     row was joined in, its City/StateProvince/Country chain was too.
     /// </summary>
     private static BreweryPost MapBreweryRow(
         BreweryPost post,
-        BreweryPostLocation location,
-        City city,
-        StateProvince stateProvince,
-        Country country
+        BreweryPostLocation? location,
+        City? city,
+        StateProvince? stateProvince,
+        Country? country
     )
     {
-        if (location.BreweryPostLocationId == Guid.Empty)
+        if (location is null)
             return post;
 
-        stateProvince.CountryId = country.CountryId;
+        // The schema guarantees that whenever a location row was joined in, its City/StateProvince/
+        // Country chain was too, so these are never null alongside a non-null location.
+        city!.StateProvinceId = stateProvince!.StateProvinceId;
+        stateProvince.CountryId = country!.CountryId;
         stateProvince.Country = country;
-
-        city.StateProvinceId = stateProvince.StateProvinceId;
         city.StateProvince = stateProvince;
 
         location.BreweryPostId = post.BreweryPostId;
