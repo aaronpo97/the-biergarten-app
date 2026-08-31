@@ -1,4 +1,13 @@
-# Ethics, bias, and known issues
+---
+title: Pipeline ethics, bias, and known issues
+last-updated: 2026-08-31
+tags:
+  - pipeline
+  - ethics
+  - bias
+  - known-issues
+  - ai-generated
+---
 
 This document covers the ethical context of the Biergarten Pipeline's output,
 the model's biases, and known issues including hallucinated brewing science and
@@ -290,11 +299,11 @@ Each brewery and user address carries a longitude/latitude pair, sampled
 uniformly at random within a 5 km disc centred on the city's curated
 `latitude`/`longitude` from `locations.json`.
 
-The resulting point is **plausible by construction**, always falling within
-the city's vicinity, but it is not looked up from any real address registry.
-It does not correspond to a real address, business, or resident, and should
-not be treated as accurate geocoding data. This is consistent with the rest of
-the dataset: fixture data for a proof-of-concept, not a source of truth.
+The resulting point is **plausible by construction**, always falling within the
+city's vicinity, but it is not looked up from any real address registry. It does
+not correspond to a real address, business, or resident, and should not be
+treated as accurate geocoding data. This is consistent with the rest of the
+dataset: fixture data for a proof-of-concept, not a source of truth.
 
 ---
 

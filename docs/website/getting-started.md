@@ -1,4 +1,11 @@
-# Getting started
+---
+title: Getting started — local setup for backend and frontend
+last-updated: 2026-08-31
+tags:
+  - getting-started
+  - setup
+  - onboarding
+---
 
 This guide covers local setup for the Biergarten stack: the .NET backend in
 `web/backend` and the React Router frontend in `web/frontend`.
@@ -58,9 +65,8 @@ section for details on `generate-env.sh`.
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 ```
 
-This starts SQL Server, migrations, seeding, the API, Mailpit (local dev
-SMTP), and SeaweedFS (local dev S3-compatible object storage for photo
-uploads).
+This starts SQL Server, migrations, seeding, the API, Mailpit (local dev SMTP),
+and SeaweedFS (local dev S3-compatible object storage for photo uploads).
 
 Available endpoints:
 

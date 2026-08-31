@@ -1,4 +1,12 @@
-# Pipeline Roadmap — Reaching the Planned Architecture
+---
+title: Pipeline roadmap — reaching the planned architecture
+last-updated: 2026-08-31
+tags:
+  - pipeline
+  - roadmap
+  - cpp
+  - concurrency
+---
 
 This is the engineering breakdown for closing the gap between the **current**
 pipeline and the **planned** architecture documented in

@@ -1,4 +1,13 @@
-# Architecture
+---
+title: System architecture — backend, frontend, database, and deployment
+last-updated: 2026-08-31
+tags:
+  - architecture
+  - backend
+  - frontend
+  - vertical-slice
+  - deployment
+---
 
 This document describes the architecture of The Biergarten App.
 
@@ -54,38 +63,60 @@ repository end to end. `Features.Emails`, `Features.Locations`, and
 `Features.PhotoUpload` have no `Controllers/` folder; all three are invoked
 internally by other slices via MediatR/DI, never over HTTP:
 
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│                          API.Core (thin host)                         │
-│   - Program.cs wiring: MediatR + AddApplicationPart per slice         │
-│   - Swagger/OpenAPI, JWT auth middleware, global exception filter     │
-└───────────────────────────────────────────────────────────────────────┘
-                  ↓ discovers controllers via AddApplicationPart
-┌────────────────┬───────────────┬──────────────────┬──────────────────┬──────────────────┐
-│ Features.Users  │Features.      │ Features.Emails  │ Features.        │ Features.        │
-│                 │Breweries      │ (no controller,  │ Locations        │ PhotoUpload      │
-│ Controllers     │ Controller    │  internal only)  │ (no controller,  │ (no controller,  │
-│ Commands/       │ Commands/     │ Commands/        │  internal only)  │  internal only)  │
-│  Queries +      │  Queries +    │  Handlers        │ Repository       │ Commands/        │
-│  Handlers       │  Handlers     │                  │                  │  Handlers        │
-│ Repository      │ Repository    │ EmailDispatcher  │                  │ Repository       │
-└────────────────┴───────────────┴──────────────────┴──────────────────┴──────────────────┘
-       ↓ each slice depends only on shared/domain/infra, never on another slice
-┌─────────────────────────┬─────────────────────────┬────────────────────┐
-│ Shared.Contracts        │ Shared.Application        │ Domain.Entities /  │
-│ (ResponseBody envelope) │ (ValidationBehavior,       │ Domain.Exceptions  │
-│                         │  cross-slice email cmds)   │                    │
-└─────────────────────────┴─────────────────────────┴────────────────────┘
-       ↓
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Database.Connection, Infrastructure.Jwt, Infrastructure.PasswordHashing,│
-│ Infrastructure.Email, Infrastructure.Email.Templates                    │
-└─────────────────────────────────────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────┐
-│      Database (SQL Server)          │
-│   - Tables & constraints            │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph HOST["API.Core (thin host)"]
+        direction LR
+        H1["Program.cs wiring:<br/>MediatR + AddApplicationPart per slice"]
+        H2["Swagger / OpenAPI"]
+        H3["JWT auth middleware"]
+        H4["GlobalExceptionFilter"]
+    end
+
+    subgraph SLICES["Feature Slices"]
+        direction LR
+        S1["Features.Users<br/>Controllers, Commands/Queries,<br/>Handlers, Repository"]
+        S2["Features.Breweries<br/>Controller, Commands/Queries,<br/>Handlers, Repository"]
+        S3["Features.Emails<br/>(internal only)<br/>Commands, Handlers,<br/>EmailDispatcher"]
+        S4["Features.Locations<br/>(internal only)<br/>Repository"]
+        S5["Features.PhotoUpload<br/>(internal only)<br/>Commands, Handlers,<br/>Repository"]
+    end
+
+    subgraph SHARED["Shared Projects"]
+        direction LR
+        SH1["Shared.Contracts<br/>ResponseBody envelope"]
+        SH2["Shared.Application<br/>ValidationBehavior,<br/>cross-slice email commands"]
+    end
+
+    subgraph DOMAIN["Domain Layer"]
+        direction LR
+        D1["Domain.Entities"]
+        D2["Domain.Exceptions"]
+    end
+
+    subgraph INFRA["Infrastructure Layer"]
+        direction LR
+        I1["Database.Connection"]
+        I2["Infrastructure.Jwt"]
+        I3["Infrastructure.PasswordHashing"]
+        I4["Infrastructure.Email /<br/>Email.Templates"]
+        I5["Infrastructure.FileUpload"]
+    end
+
+    DB[("Database (SQL Server)")]
+
+    HOST -- "discovers controllers via<br/>AddApplicationPart" --> SLICES
+    S1 -- "SendRegistrationEmailCommand<br/>(via Shared.Application contract)" --> S3
+
+    SLICES --> SHARED
+    SLICES --> DOMAIN
+    SLICES --> INFRA
+
+    INFRA --> DB
+
+    style S3 stroke-dasharray: 4 3
+    style S4 stroke-dasharray: 4 3
+    style S5 stroke-dasharray: 4 3
 ```
 
 Slices never reference each other's project. The one cross-slice interaction
@@ -147,10 +178,10 @@ no `Controllers/` folder and no MediatR handlers; it exposes
 (for example, `Features.Breweries`) do not yet depend on it; they run their own
 `CityID` existence checks inline. `Features.PhotoUpload` also has no
 `Controllers/` folder; its `UploadPhotoCommand` is sent by other features'
-handlers (for example, a future brewery photo upload command) rather than
-bound to an HTTP route directly. The one exception today is the `/upload-test`
-minimal API endpoint wired directly in `API.Core/Program.cs`, a temporary route
-for exercising the upload path end to end.
+handlers (for example, a future brewery photo upload command) rather than bound
+to an HTTP route directly. The one exception today is the `/upload-test` minimal
+API endpoint wired directly in `API.Core/Program.cs`, a temporary route for
+exercising the upload path end to end.
 
 **Dependencies**:
 
@@ -196,17 +227,17 @@ whichever slices need them
 **Components**:
 
 - **Database.Connection**: generic ADO.NET connection/command plumbing
-  (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not
-  domain-specific; each slice's own `Repository/` folder builds on this
+  (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class),
+  not domain-specific; each slice's own `Repository/` folder builds on this
 - **Infrastructure.Jwt**: JWT token generation and validation
 - **Infrastructure.PasswordHashing**: Argon2id password hashing
 - **Infrastructure.Email**: Email sending capabilities (SMTP/MailKit)
 - **Infrastructure.Email.Templates**: Email template rendering (Razor
   components)
 - **Infrastructure.FileUpload**: `IFileStorageProvider` abstraction over
-  S3-compatible object storage, implemented by `S3FileStorageProvider`
-  (targets the SeaweedFS container in dev; any S3-compatible endpoint in
-  other environments) using the AWS SDK's `AmazonS3Client` with
+  S3-compatible object storage, implemented by `S3FileStorageProvider` (targets
+  the SeaweedFS container in dev; any S3-compatible endpoint in other
+  environments) using the AWS SDK's `AmazonS3Client` with
   `ForcePathStyle = true`
 
 **Dependencies**:
@@ -234,8 +265,8 @@ whichever slices need them
 - `StateProvince` - A state/province referenced by a city
 - `Country` - A country referenced by a state/province
 - `BeerStyle` - A beer style/category (schema table exists; no repository yet)
-- `BeerPost` - A beer listing tied to a brewery and style (schema table
-  exists; no repository yet)
+- `BeerPost` - A beer listing tied to a brewery and style (schema table exists;
+  no repository yet)
 - `Photo` - A photo uploaded by a user account, written via
   `Features.PhotoUpload`'s `IPhotoUploadRepository`
 
@@ -297,9 +328,9 @@ only:
   factory every slice's repository builds on
 - `Database.Connection/DapperRepository.cs`: shared abstract base class every
   repository extends, providing `CreateConnection()` and a
-  `RollbackQuietlyAsync()` helper that rolls back a transaction while
-  swallowing any exception the rollback itself raises, so the exception that
-  triggered the rollback is what propagates
+  `RollbackQuietlyAsync()` helper that rolls back a transaction while swallowing
+  any exception the rollback itself raises, so the exception that triggered the
+  rollback is what propagates
 
 **Benefits**:
 
@@ -332,24 +363,23 @@ method that registers its repository and slice-internal services
 
 #### Direct SQL via Dapper/ADO.NET
 
-**Purpose**: Keep data access explicit and colocated with the slice that owns
-it
+**Purpose**: Keep data access explicit and colocated with the slice that owns it
 
 **Strategy**:
 
 - No ORM; each repository issues inline SQL through Dapper, which handles
-  parameter binding. The one
-  wrinkle is the `GEOGRAPHY` column on `BreweryPostLocation`, which Dapper
-  can't deserialize as a UDT: reads select `CONVERT(varbinary(max),
-  Coordinates)` so the value comes back as a plain `byte[]` Dapper can bind.
-  Proximity search (`GET /api/brewery/locations/nearby`) filters and orders
-  rows server-side with `Coordinates.STDistance(@Origin) <= @RangeInMetres`,
-  avoiding a client-side distance calculation over every row. No spatial
-  index backs the query yet; `schema.sql` sketches one, commented out, for
-  when the table grows large enough to need it
+  parameter binding. The one wrinkle is the `GEOGRAPHY` column on
+  `BreweryPostLocation`, which Dapper can't deserialize as a UDT: reads select
+  `CONVERT(varbinary(max), Coordinates)` so the value comes back as a plain
+  `byte[]` Dapper can bind. Proximity search
+  (`GET /api/brewery/locations/nearby`) filters and orders rows server-side with
+  `Coordinates.STDistance(@Origin) <= @RangeInMetres`, avoiding a client-side
+  distance calculation over every row. No spatial index backs the query yet;
+  `schema.sql` sketches one, commented out, for when the table grows large
+  enough to need it
 - Referential checks (for example, "does this `CityId` exist?") are explicit
-  `SELECT 1 ...` existence checks in the repository method, run inside the
-  same transaction as the write
+  `SELECT 1 ...` existence checks in the repository method, run inside the same
+  transaction as the write
 - Optimistic concurrency uses each table's `RowVersion` (`ROWVERSION`) column,
   checked in the `UPDATE ... WHERE ... AND RowVersion = @RowVersion` clause
 - Repositories throw `Domain.Exceptions` types (`NotFoundException`,
@@ -365,8 +395,7 @@ error-handling approach in more detail.
 
 ### Website (`web/frontend`)
 
-The website is a React Router 7 application with server-side rendering
-enabled.
+The website is a React Router 7 application with server-side rendering enabled.
 
 ```text
 web/frontend/
@@ -409,8 +438,7 @@ web/frontend/
 
 ### Theme system
 
-The website uses semantic DaisyUI theme tokens backed by four Biergarten
-themes:
+The website uses semantic DaisyUI theme tokens backed by four Biergarten themes:
 
 - Biergarten Lager
 - Biergarten Stout
@@ -550,8 +578,8 @@ pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
 **Seed Data**:
 
 - Countries, state/provinces, and cities (via `Features.Locations`'
-  `ILocationRepository`, which creates `Country`/`StateProvince` rows on
-  demand while resolving a city)
+  `ILocationRepository`, which creates `Country`/`StateProvince` rows on demand
+  while resolving a city)
 - User accounts (via `Features.Users`' repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
@@ -601,16 +629,12 @@ healthcheck:
 
 ### Test pyramid
 
-```
-    ┌──────────────┐
-    │  Integration │  ← API.Specs (Reqnroll)
-    │    Tests     │
-    ├──────────────┤
-    │  Unit Tests  │  ← Features.Users.Tests, Features.Breweries.Tests,
-    │ (per slice,  │     Features.Emails.Tests, Features.PhotoUpload.Tests
-    │   handler    │     (commands/queries/handlers, with repository/service
-    │   tests)     │     dependencies mocked via Moq)
-    └──────────────┘
+```mermaid
+flowchart TB
+    IT["Integration Tests<br/>API.Specs (Reqnroll)"]
+    UT["Unit Tests (per slice, handler tests)<br/>Features.Users.Tests, Features.Breweries.Tests,<br/>Features.Emails.Tests, Features.PhotoUpload.Tests<br/>(commands/queries/handlers, with repository/service<br/>dependencies mocked via Moq)"]
+
+    IT --- UT
 ```
 
 **Strategy**:

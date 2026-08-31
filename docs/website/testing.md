@@ -1,4 +1,13 @@
-# Testing
+---
+title: Testing strategy — unit, integration, and Storybook suites
+last-updated: 2026-08-31
+tags:
+  - testing
+  - ci
+  - xunit
+  - reqnroll
+  - storybook
+---
 
 This document describes the testing strategy and how to run tests for The
 Biergarten App.
@@ -10,10 +19,9 @@ The project uses a multi-layered testing approach across backend and frontend:
 - **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against a
   live, seeded database
 - **Features.\*.Tests** - One unit test project per backend feature slice
-  (`Features.Users.Tests`, `Features.Breweries.Tests`,
-  `Features.Emails.Tests`, `Features.PhotoUpload.Tests`), covering that
-  slice's command/query handlers, with dependencies mocked via Moq (no real
-  database required)
+  (`Features.Users.Tests`, `Features.Breweries.Tests`, `Features.Emails.Tests`,
+  `Features.PhotoUpload.Tests`), covering that slice's command/query handlers,
+  with dependencies mocked via Moq (no real database required)
 - **Storybook Vitest project** - Browser-based interaction tests for shared
   website stories
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
@@ -42,8 +50,8 @@ This command:
 `wait` blocks until `api.specs`, `unit.tests`, and `frontend.tests` have all
 stopped, regardless of which one finishes first. Long-running services
 (`sqlserver`, `seaweedfs`) and the one-shot `database.migrations` /
-`database.seed` jobs keep running in the background alongside them and are
-torn down separately (see below); `wait` doesn't touch them.
+`database.seed` jobs keep running in the background alongside them and are torn
+down separately (see below); `wait` doesn't touch them.
 
 ### View test results
 
@@ -175,8 +183,8 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 **Features.Breweries.Tests**:
 
 - Brewery create/update/delete commands and get-by-id/get-all queries
-- Brewery location queries: all locations, and locations within a given range
-  of a coordinate
+- Brewery location queries: all locations, and locations within a given range of
+  a coordinate
 
 **Features.Emails.Tests**:
 
@@ -186,9 +194,8 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 - Upload command handler: storage key construction, content type passthrough,
   and photo persistence via the mocked storage provider and repository
-- Upload validator: min/max file size bounds, and PNG/JPEG/WebP signature
-  checks (including rejection of files with a mismatched or missing
-  signature)
+- Upload validator: min/max file size bounds, and PNG/JPEG/WebP signature checks
+  (including rejection of files with a mismatched or missing signature)
 
 **Frontend UI Coverage**:
 
@@ -295,8 +302,8 @@ Features.Users.Tests/
 
 Each of the other slices (`Features.Breweries.Tests`, `Features.Emails.Tests`,
 `Features.PhotoUpload.Tests`) follows the same shape: a `Commands/`/`Queries/`
-folder with one test file per handler (`Features.PhotoUpload.Tests` also adds
-a validator test file alongside its handler test).
+folder with one test file per handler (`Features.PhotoUpload.Tests` also adds a
+validator test file alongside its handler test).
 
 ## Writing tests
 
@@ -337,10 +344,10 @@ Scenario: User login with valid credentials
 
 ## Continuous integration
 
-The `.github/workflows/tests.yml` GitHub Actions workflow runs on every push
-and pull request to `main`. It runs the same test Docker Compose
-configuration used locally, so backend and frontend tests execute in the same
-containerized environment in CI as they do on a developer machine:
+The `.github/workflows/tests.yml` GitHub Actions workflow runs on every push and
+pull request to `main`. It runs the same test Docker Compose configuration used
+locally, so backend and frontend tests execute in the same containerized
+environment in CI as they do on a developer machine:
 
 ```bash
 # CI/CD command
@@ -351,16 +358,15 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
 The workflow inspects the exit code of each test container
-(`test-env-api-specs`, `test-env-unit-tests`, `test-env-frontend-tests`)
-after `wait` returns and fails the job if any of them is non-zero.
-`./test-results/` is uploaded as a build artifact regardless of outcome.
+(`test-env-api-specs`, `test-env-unit-tests`, `test-env-frontend-tests`) after
+`wait` returns and fails the job if any of them is non-zero. `./test-results/`
+is uploaded as a build artifact regardless of outcome.
 
-`up -d` + `wait` keeps container teardown independent of any single
-container's exit. The one-shot `database.migrations`/`database.seed` jobs
-exit 0 partway through the run, and `frontend.tests` (which has no database
-dependency) reliably finishes before `api.specs`/`unit.tests` start; because
-`wait` blocks on all three test containers, neither early exit ends the run
-prematurely.
+`up -d` + `wait` keeps container teardown independent of any single container's
+exit. The one-shot `database.migrations`/`database.seed` jobs exit 0 partway
+through the run, and `frontend.tests` (which has no database dependency)
+reliably finishes before `api.specs`/`unit.tests` start; because `wait` blocks
+on all three test containers, neither early exit ends the run prematurely.
 
 Exit codes:
 
@@ -368,9 +374,9 @@ Exit codes:
 - Non-zero - Test failures occurred
 
 The frontend's Storybook Vitest and Playwright suites run inside the
-`frontend.tests` container (see [Docker Guide](docker.md)) as part of that
-same compose run, so no separate frontend CI step is needed. To run them
-locally without Docker:
+`frontend.tests` container (see [Docker Guide](docker.md)) as part of that same
+compose run, so no separate frontend CI step is needed. To run them locally
+without Docker:
 
 ```bash
 cd web/frontend
@@ -381,9 +387,9 @@ npm run test:storybook:playwright
 
 ### Running the workflow locally with `act`
 
-[`act`](https://github.com/nektos/act) replays `.github/workflows/*.yml` on
-your own machine using Docker, so you can reproduce a CI run (or a fix for
-one) without pushing a branch.
+[`act`](https://github.com/nektos/act) replays `.github/workflows/*.yml` on your
+own machine using Docker, so you can reproduce a CI run (or a fix for one)
+without pushing a branch.
 
 **Install** (macOS):
 
@@ -401,34 +407,31 @@ act push \
   --container-architecture linux/amd64
 ```
 
-- `-j containerized-tests` runs only that job (there's currently just the
-  one).
-- `-P ubuntu-latest=catthehacker/ubuntu:act-latest` pins the runner image
-  act uses to impersonate `ubuntu-latest`. Without it, act's first run
-  prompts interactively to choose a default image size, which hangs/fails
-  under a non-interactive shell.
+- `-j containerized-tests` runs only that job (there's currently just the one).
+- `-P ubuntu-latest=catthehacker/ubuntu:act-latest` pins the runner image act
+  uses to impersonate `ubuntu-latest`. Without it, act's first run prompts
+  interactively to choose a default image size, which hangs/fails under a
+  non-interactive shell.
 - `--container-architecture linux/amd64` is required on Apple Silicon: the
-  `sqlserver` service's image is amd64-only, and act needs to know to
-  emulate that platform for the whole job container, not just that one
-  service.
+  `sqlserver` service's image is amd64-only, and act needs to know to emulate
+  that platform for the whole job container, not just that one service.
 - No secrets or `.actrc` are needed: `generate-env.sh` creates its own
   `.env.test` with freshly randomized values, same as in real CI.
 
 **Known act-only limitation**: the "Upload test results" step
-(`actions/upload-artifact@v4`) fails locally with `Unable to get the
-ACTIONS_RUNTIME_TOKEN env variable`. act doesn't provide a real Actions
-artifact backend, so this step, and only this step, is expected to fail
-under act even when everything else passes. It works normally on
+(`actions/upload-artifact@v4`) fails locally with
+`Unable to get the ACTIONS_RUNTIME_TOKEN env variable`. act doesn't provide a
+real Actions artifact backend, so this step, and only this step, is expected to
+fail under act even when everything else passes. It works normally on
 GitHub-hosted runners.
 
-**Stale local state**: `docker-compose.test.yaml` uses fixed container
-names and named volumes (`sqlserverdata-test`, `seaweedfsdata-test`) scoped
-to the `web` compose project. If a previous local run (via `act` or a
-manual `docker compose` invocation) didn't get torn down, its SQL Server
-volume can persist with an old `SA_PASSWORD` baked in, while a fresh
-`.env.test` generates a new one each run, causing `Login failed for user
-'sa'` errors that look like a test bug but are really a leftover volume.
-Clear it before re-running:
+**Stale local state**: `docker-compose.test.yaml` uses fixed container names and
+named volumes (`sqlserverdata-test`, `seaweedfsdata-test`) scoped to the `web`
+compose project. If a previous local run (via `act` or a manual `docker compose`
+invocation) didn't get torn down, its SQL Server volume can persist with an old
+`SA_PASSWORD` baked in, while a fresh `.env.test` generates a new one each run,
+causing `Login failed for user 'sa'` errors that look like a test bug but are
+really a leftover volume. Clear it before re-running:
 
 ```bash
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v

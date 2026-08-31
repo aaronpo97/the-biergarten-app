@@ -1,4 +1,12 @@
-# Environment variables
+---
+title: Environment variables for the backend, frontend, and Docker
+last-updated: 2026-08-31
+tags:
+  - environment-variables
+  - configuration
+  - secrets
+  - docker
+---
 
 This document covers the environment variables used by the Biergarten stack.
 
@@ -37,9 +45,9 @@ Environment-specific `.env` files loaded via `env_file:` in docker-compose.yaml:
 secret-bearing values (`DB_PASSWORD`, `ACCESS_TOKEN_SECRET`,
 `REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`, `SESSION_SECRET`,
 `SMTP_USERNAME`, `SMTP_PASSWORD`, `SEAWEEDFS_ACCESS_KEY_ID`,
-`SEAWEEDFS_SECRET_ACCESS_KEY`)
-with freshly randomized ones via `openssl`. Non-secret values are left
-untouched. The output file is written with `600` permissions.
+`SEAWEEDFS_SECRET_ACCESS_KEY`) with freshly randomized ones via `openssl`.
+Non-secret values are left untouched. The output file is written with `600`
+permissions.
 
 ```bash
 cd web
@@ -171,12 +179,12 @@ DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 ```
 
 `ASPNETCORE_URLS` is hardcoded directly in `docker-compose.dev.yaml` and
-`docker-compose.prod.yaml` (not sourced from the `.env` file), so it's
-required only for Docker. Outside Docker, `dotnet run` falls back to the
-`http` profile in `API.Core/Properties/launchSettings.json`
-(`http://localhost:5069`), so manual backend setup (see
-[Getting Started](getting-started.md#manual-backend-setup)) doesn't need to
-set it.
+`docker-compose.prod.yaml` (not sourced from the `.env` file), so it's required
+only for Docker. Outside Docker, `dotnet run` falls back to the `http` profile
+in `API.Core/Properties/launchSettings.json` (`http://localhost:5069`), so
+manual backend setup (see
+[Getting Started](getting-started.md#manual-backend-setup)) doesn't need to set
+it.
 
 ## Frontend variables (`web/frontend`)
 
@@ -191,8 +199,8 @@ PORT=3000                                # Port the built server listens on
 
 The `frontend` Docker service hardcodes `API_BASE_URL` to `http://api.core:8080`
 (the backend's in-network service name) and `PORT` to `3000`; only
-`SESSION_SECRET` is sourced from the env file, and `NODE_ENV` is set per
-compose file (`development` in dev, `production` in prod).
+`SESSION_SECRET` is sourced from the env file, and `NODE_ENV` is set per compose
+file (`development` in dev, `production` in prod).
 
 ### Frontend variable details
 
@@ -357,8 +365,8 @@ Variables are validated at startup:
 - Missing required variables (`ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`,
   `CONFIRMATION_TOKEN_SECRET`, `SMTP_HOST`, `SMTP_FROM_EMAIL`,
   `SEAWEEDFS_SERVICE_URL`, `SEAWEEDFS_ACCESS_KEY_ID`,
-  `SEAWEEDFS_SECRET_ACCESS_KEY`, `SEAWEEDFS_BUCKET`, DB connection values)
-  cause the application to fail with an `InvalidOperationException`
+  `SEAWEEDFS_SECRET_ACCESS_KEY`, `SEAWEEDFS_BUCKET`, DB connection values) cause
+  the application to fail with an `InvalidOperationException`
 - No minimum length is enforced on the token secrets in code; the "minimum 32
   characters" guidance above is a recommendation, not an enforced check
 

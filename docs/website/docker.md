@@ -1,4 +1,11 @@
-# Docker guide
+---
+title: Docker deployment, configuration, and troubleshooting
+last-updated: 2026-08-31
+tags:
+  - docker
+  - docker-compose
+  - deployment
+---
 
 This document covers Docker deployment, configuration, and troubleshooting for
 The Biergarten App.
@@ -114,9 +121,9 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 
 `wait` blocks until `api.specs`, `unit.tests`, and `frontend.tests` have all
 stopped, regardless of which one finishes first; `up --abort-on-container-exit`
-isn't used here because the one-shot `database.migrations`/`database.seed`
-jobs and `frontend.tests` (no database dependency) can exit before the other
-test containers, which would end the run prematurely. See
+isn't used here because the one-shot `database.migrations`/`database.seed` jobs
+and `frontend.tests` (no database dependency) can exit before the other test
+containers, which would end the run prematurely. See
 [Testing](testing.md#running-tests-with-docker-recommended) for details.
 
 ### 3. Production (`docker-compose.prod.yaml`)
@@ -131,8 +138,8 @@ test containers, which would end the run prematurely. See
 - Health checks enabled
 - Restart policies (unless-stopped)
 - Security hardening
-- Only `frontend` publishes a port to the host; `sqlserver` and `api.core`
-  are reachable only from other containers on `prodnet`
+- Only `frontend` publishes a port to the host; `sqlserver` and `api.core` are
+  reachable only from other containers on `prodnet`
 
 **Services**:
 
@@ -206,8 +213,8 @@ graph TD
     E[seaweedfs: container started] --> D
 ```
 
-In development, `api.core` also depends on `seaweedfs` (`condition:
-service_started`, not a health check) alongside `database.seed`.
+In development, `api.core` also depends on `seaweedfs`
+(`condition: service_started`, not a health check) alongside `database.seed`.
 
 **Health Check Example** (SQL Server):
 
@@ -241,8 +248,7 @@ api.core:
 
 - `sqlserverdata-dev` - Database files persist between restarts
 - `nuget-cache-dev` - NuGet package cache (speeds up builds)
-- `seaweedfsdata-dev` - SeaweedFS object storage data persists between
-  restarts
+- `seaweedfsdata-dev` - SeaweedFS object storage data persists between restarts
 
 **Testing**:
 

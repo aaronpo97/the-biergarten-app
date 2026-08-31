@@ -1,4 +1,13 @@
-# Biergarten Pipeline
+---
+title: Biergarten Pipeline — C++ CLI for generating seed data
+last-updated: 2026-08-31
+tags:
+  - pipeline
+  - cpp
+  - llm
+  - seed-data
+  - docker
+---
 
 A C++20 command-line pipeline that samples city records from local JSON,
 enriches each with Wikipedia context, and generates bilingual brewery names and
@@ -436,8 +445,8 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 Paths below are relative to `tooling/pipeline/`.
 
 - `src/main.cc`: argument parsing and DI composition root.
-- `src/biergarten_pipeline_orchestrator/`: orchestration, sampling, logging,
-  and export.
+- `src/biergarten_pipeline_orchestrator/`: orchestration, sampling, logging, and
+  export.
 - `src/services/curated_data/`: `CuratedJsonDataService`, the file-backed
   `ICuratedDataService`, and `MockCuratedDataService`, the in-memory
   `ICuratedDataService` used in `--mocked` runs.
