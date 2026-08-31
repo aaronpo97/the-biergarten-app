@@ -50,7 +50,7 @@ public interface IBreweryRepository
     ///     Thrown when <paramref name="brewery" />'s <c>RowVersion</c> no longer matches the stored row (it was
     ///     modified by another request since it was last read).
     /// </exception>
-    Task<BreweryPost> UpdateAsync(BreweryPost brewery);
+    Task<BreweryPost> UpdateAsync(BreweryPost brewery, CancellationToken cancellationToken = default);
 
     /// <summary>Deletes a brewery post by ID. Its location and photos are removed via cascading foreign keys.</summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">Thrown when no brewery exists with the given <paramref name="id" />.</exception>

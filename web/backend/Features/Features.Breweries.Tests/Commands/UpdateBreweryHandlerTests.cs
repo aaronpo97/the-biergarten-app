@@ -49,8 +49,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         DateTime before = DateTime.UtcNow;
@@ -84,8 +84,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);
@@ -119,8 +119,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);

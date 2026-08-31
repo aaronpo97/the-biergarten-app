@@ -54,7 +54,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
                 },
         };
 
-        BreweryPost updated = await repository.UpdateAsync(entity);
+        BreweryPost updated = await repository.UpdateAsync(entity, cancellationToken);
         return updated.ToDto();
     }
 }

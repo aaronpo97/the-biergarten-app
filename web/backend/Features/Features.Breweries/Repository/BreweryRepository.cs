@@ -224,10 +224,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
-    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery)
+    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery, CancellationToken cancellationToken = default)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -241,7 +241,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 BreweryPostID = @BreweryPostId
                             """,
                             new { brewery.BreweryPostId },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     )
                     is not null;
@@ -256,7 +257,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             new CommandDefinition(
                                 "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
                                 new { brewery.Location.CityId },
-                                transaction
+                                transaction,
+                                cancellationToken: cancellationToken
                             )
                         )
                         is not null;
@@ -283,7 +285,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         brewery.Description,
                         brewery.RowVersion,
                     },
-                    transaction
+                    transaction,
+                    cancellationToken: cancellationToken
                 )
             );
 
@@ -303,7 +306,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         WHERE BreweryPostID = @BreweryPostId
                         """,
                         new { brewery.BreweryPostId },
-                        transaction
+                        transaction,
+                        cancellationToken: cancellationToken
                     )
                 );
             }
@@ -318,7 +322,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 WHERE BreweryPostID = @BreweryPostId
                                 """,
                                 new { brewery.BreweryPostId },
-                                transaction
+                                transaction,
+                                cancellationToken: cancellationToken
                             )
                         )
                         is not null;
@@ -349,7 +354,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 Longitude = brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     );
                 else
@@ -388,12 +394,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 Longitude = brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     );
             }
 
-            await transaction.CommitAsync();
+            await transaction.CommitAsync(cancellationToken);
         }
         catch
         {
@@ -401,7 +408,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             throw;
         }
 
-        return await GetByIdAsync(brewery.BreweryPostId)
+        return await GetByIdAsync(brewery.BreweryPostId, cancellationToken)
                ?? throw new InvalidOperationException(
                    $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
                );
