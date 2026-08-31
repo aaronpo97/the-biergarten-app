@@ -23,6 +23,7 @@ WORKDIR /app
 COPY package.json ./
 COPY --from=prod-deps /src/node_modules ./node_modules
 COPY --from=build /src/build ./build
+COPY --from=build /src/server.js ./server.js
 EXPOSE 3000
 USER node
-CMD ["node", "./build/server/index.js"]
+CMD ["node", "./server.js"]
