@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.DeleteAccount;
+using Features.Auth.Commands.Account.DeleteAccount;
 using Features.Auth.Identity;
 using Features.Auth.Tests.TestSupport;
 using FluentAssertions;

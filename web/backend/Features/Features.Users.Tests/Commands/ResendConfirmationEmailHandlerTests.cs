@@ -1,4 +1,4 @@
-using Features.Auth.Commands.ResendConfirmationEmail;
+using Features.Auth.Commands.Authentication.ResendConfirmationEmail;
 using Features.Auth.Identity;
 using Features.Auth.Services;
 using Features.Auth.Tests.TestSupport;

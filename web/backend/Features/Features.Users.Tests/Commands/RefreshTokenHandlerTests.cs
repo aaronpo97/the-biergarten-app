@@ -1,4 +1,4 @@
-using Features.Auth.Commands.RefreshToken;
+using Features.Auth.Commands.Authentication.RefreshToken;
 using Features.Auth.Dtos;
 using Features.Auth.Services;
 using FluentAssertions;

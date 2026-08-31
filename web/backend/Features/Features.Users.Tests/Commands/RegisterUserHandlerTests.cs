@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.RegisterUser;
+using Features.Auth.Commands.Authentication.RegisterUser;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
 using Features.Auth.Services;

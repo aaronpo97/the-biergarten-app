@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
-using Features.Auth.Commands.ConfirmUser;
+using Features.Auth.Commands.Authentication.ConfirmUser;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
 using Features.Auth.Services;

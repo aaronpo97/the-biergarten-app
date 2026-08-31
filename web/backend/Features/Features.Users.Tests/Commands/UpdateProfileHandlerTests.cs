@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.UpdateProfile;
+using Features.Auth.Commands.Profile.UpdateProfile;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
 using Features.Auth.Tests.TestSupport;

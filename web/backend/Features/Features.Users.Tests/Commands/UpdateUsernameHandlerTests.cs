@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.UpdateUsername;
+using Features.Auth.Commands.Account.UpdateUsername;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
 using Features.Auth.Tests.TestSupport;

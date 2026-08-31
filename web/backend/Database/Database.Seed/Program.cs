@@ -3,9 +3,9 @@ using Database.Seed.DatabaseHelpers;
 using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
-using Features.Auth.Commands.RegisterUser;
-using Features.Auth.Commands.UpdateBiography;
-using Features.Auth.Commands.UploadAvatar;
+using Features.Auth.Commands.Authentication.RegisterUser;
+using Features.Auth.Commands.Profile.UpdateBiography;
+using Features.Auth.Commands.Profile.UploadAvatar;
 using Features.Auth.DependencyInjection;
 using Features.Auth.Dtos;
 using Features.Auth.Services;
@@ -32,25 +32,23 @@ static async Task<int> RunAsync()
     {
         IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
 
-        ServiceCollection services = [];
-        services.AddSingleton(configuration);
-        services.AddDatabaseConnection();
-        services.AddFeaturesBreweries();
-        services.AddFeaturesLocations();
-        services.AddFeaturesAuth();
-        services.AddFeaturesPhotoUpload();
-        services.AddSingleton<IFileStorageProvider, S3FileStorageProvider>();
-        services.AddScoped<ITokenService, NoOpTokenService>();
-        services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssemblyContaining<CreateBreweryCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<GetOrCreateCityCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UploadAvatarCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UploadPhotoCommand>();
-        });
+        IServiceCollection services = new ServiceCollection()
+            .AddSingleton(configuration)
+            .AddDatabaseConnection()
+            .AddFeaturesBreweries()
+            .AddFeaturesLocations()
+            .AddFeaturesAuth()
+            .AddFeaturesPhotoUpload()
+            .AddSingleton<IFileStorageProvider, S3FileStorageProvider>()
+            .AddScoped<ITokenService, NoOpTokenService>()
+            .AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssemblyContaining<CreateBreweryCommand>()
+                    .RegisterServicesFromAssemblyContaining<GetOrCreateCityCommand>()
+                    .RegisterServicesFromAssemblyContaining<UploadAvatarCommand>()
+                    .RegisterServicesFromAssemblyContaining<UploadPhotoCommand>()
+            );
 
         await using ServiceProvider provider = services.BuildServiceProvider();
-
         IMediator mediator = provider.GetRequiredService<IMediator>();
 
         AnsiConsole.Write(new Rule("[bold green]Database Seeder[/]").LeftJustified());
@@ -127,7 +125,12 @@ static async Task<int> RunAsync()
                 "Loading brewery data into target database...",
                 async ctx =>
                 {
-                    await LoadBreweriesIntoDatabaseAsync(mediator, seedData.Breweries, userIds, ctx);
+                    await LoadBreweriesIntoDatabaseAsync(
+                        mediator,
+                        seedData.Breweries,
+                        userIds,
+                        ctx
+                    );
                     ctx.Status("Brewery data loaded into target database.");
                 }
             );
