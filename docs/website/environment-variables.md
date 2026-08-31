@@ -20,7 +20,9 @@ Direct environment variable access via `Environment.GetEnvironmentVariable()`.
 ### Frontend (`web/frontend`)
 
 The active website reads runtime values from the server environment for its auth
-and API integration.
+and API integration. In Docker, the `frontend` service is wired into the same
+`web/.env.dev` / `.env.test` / `.env.prod` files as the backend; running it
+locally with `npm run dev` still reads from the shell environment.
 
 ### Docker
 
@@ -34,8 +36,9 @@ Environment-specific `.env` files loaded via `env_file:` in docker-compose.yaml:
 
 `web/generate-env.sh` copies `.env.example` to a target file and replaces the
 secret-bearing values (`DB_PASSWORD`, `ACCESS_TOKEN_SECRET`,
-`REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`, `SMTP_USERNAME`,
-`SMTP_PASSWORD`, `SEAWEEDFS_ACCESS_KEY_ID`, `SEAWEEDFS_SECRET_ACCESS_KEY`)
+`REFRESH_TOKEN_SECRET`, `CONFIRMATION_TOKEN_SECRET`, `SESSION_SECRET`,
+`SMTP_USERNAME`, `SMTP_PASSWORD`, `SEAWEEDFS_ACCESS_KEY_ID`,
+`SEAWEEDFS_SECRET_ACCESS_KEY`)
 with freshly randomized ones via `openssl`. Non-secret values are left
 untouched. The output file is written with `600` permissions.
 
@@ -173,10 +176,16 @@ The active website does not use the old Next.js/Prisma environment model. Its
 core runtime variables are:
 
 ```bash
-API_BASE_URL=http://localhost:8080       # Base URL for the .NET API
+API_BASE_URL=http://api.core:8080        # Base URL for the .NET API (container DNS name in Docker)
 SESSION_SECRET=<generated-secret>        # Cookie session signing secret
 NODE_ENV=development                     # Standard Node runtime mode
+PORT=3000                                # Port the built server listens on
 ```
+
+The `frontend` Docker service hardcodes `API_BASE_URL` to `http://api.core:8080`
+(the backend's in-network service name) and `PORT` to `3000`; only
+`SESSION_SECRET` is sourced from the env file, and `NODE_ENV` is set per
+compose file (`development` in dev, `production` in prod).
 
 ### Frontend variable details
 
@@ -184,8 +193,9 @@ NODE_ENV=development                     # Standard Node runtime mode
 
 - **Required**: Yes for local development
 - **Default in code**: `http://localhost:8080`
-- **Used by**: `web/frontend/app/lib/auth.server.ts`
-- **Purpose**: Routes website auth actions to the .NET API
+- **Used by**: `web/frontend/app/features/auth/auth.server.ts`,
+  `web/frontend/app/features/breweries/breweries.server.ts`
+- **Purpose**: Routes website auth and API calls to the .NET API
 
 #### `SESSION_SECRET`
 
@@ -199,6 +209,12 @@ NODE_ENV=development                     # Standard Node runtime mode
 - **Required**: No
 - **Typical values**: `development`, `production`, `test`
 - **Purpose**: Controls secure cookie behavior and runtime mode
+
+#### `PORT`
+
+- **Required**: No
+- **Default**: `3000`
+- **Purpose**: Port the built server (`build/server/index.js`) binds to
 
 ### SMTP configuration (backend)
 
@@ -312,9 +328,10 @@ reference only and is not run as part of the active stack.
 | `SEAWEEDFS_ACCESS_KEY_ID`     |    ✓    |          |   ✓    |   Yes    | S3 access key                |
 | `SEAWEEDFS_SECRET_ACCESS_KEY` |    ✓    |          |   ✓    |   Yes    | S3 secret key                |
 | `SEAWEEDFS_BUCKET`            |    ✓    |          |   ✓    |   Yes    | S3 bucket name               |
-| `API_BASE_URL`                |         |    ✓     |        |   Yes    | Website-to-API base URL      |
-| `SESSION_SECRET`              |         |    ✓     |        |   Yes    | Website session signing      |
-| `NODE_ENV`                    |         |    ✓     |        |    No    | Runtime mode                 |
+| `API_BASE_URL`                |         |    ✓     |   ✓    |   Yes    | Website-to-API base URL      |
+| `SESSION_SECRET`              |         |    ✓     |   ✓    |   Yes    | Website session signing      |
+| `NODE_ENV`                    |         |    ✓     |   ✓    |    No    | Runtime mode                 |
+| `PORT`                        |         |    ✓     |   ✓    |    No    | Frontend server port         |
 | `CLEAR_DATABASE`              |    ✓    |          |   ✓    |    No    | Dev/test reset flag          |
 | `ASPNETCORE_ENVIRONMENT`      |    ✓    |          |   ✓    |   Yes    | ASP.NET environment          |
 | `ASPNETCORE_URLS`             |    ✓    |          |   ✓    |   Yes    | API binding address          |
@@ -365,6 +382,9 @@ ACCESS_TOKEN_SECRET=<generated-with-openssl>
 REFRESH_TOKEN_SECRET=<generated-with-openssl>
 CONFIRMATION_TOKEN_SECRET=<generated-with-openssl>
 WEBSITE_BASE_URL=http://localhost:3000
+
+# Frontend session signing
+SESSION_SECRET=<generated-with-openssl>
 
 # SMTP (Mailpit in dev)
 SMTP_HOST=mailpit

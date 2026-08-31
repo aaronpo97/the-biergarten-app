@@ -11,6 +11,7 @@ The project uses Docker Compose to orchestrate multiple services:
 - Database migrations runner (DbUp)
 - Database seeder
 - .NET API
+- React Router website (SSR frontend)
 - Test runners
 
 See the [deployment diagram](diagrams-out/deployment.svg) for visual
@@ -39,6 +40,7 @@ sqlserver           # SQL Server 2022 (port 1434)
 database.migrations # DbUp migrations
 database.seed      # Seed initial data
 api.core           # Web API (ports 8080, 8081)
+frontend           # React Router website (port 3000)
 mailpit            # Local dev SMTP server + UI (port 8025)
 seaweedfs           # S3-compatible object storage (ports 8333, 8888, 9333, 23646)
 ```
@@ -51,6 +53,7 @@ docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up -d
 
 **Access**:
 
+- Website: http://localhost:3000
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
 - Mailpit UI: http://localhost:8025
@@ -90,6 +93,7 @@ database.migrations # Fresh schema
 database.seed      # Test data
 api.specs          # Reqnroll BDD tests
 unit.tests         # All Features.*.Tests unit test projects
+frontend.tests     # Storybook Vitest + Playwright suites (own Playwright image)
 ```
 
 **Run Tests**:
@@ -119,13 +123,16 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 - Health checks enabled
 - Restart policies (unless-stopped)
 - Security hardening
+- Only `frontend` publishes a port to the host; `sqlserver` and `api.core`
+  are reachable only from other containers on `prodnet`
 
 **Services**:
 
 ```yaml
-sqlserver          # Production SQL Server
+sqlserver          # Production SQL Server (internal only)
 database.migrations # Schema updates only
-api.core          # Production API
+api.core          # Production API (internal only, no published ports)
+frontend          # Production website (port 3000, the only public binding)
 ```
 
 **Deploy Production**:

@@ -33,7 +33,8 @@ This command:
 1. Starts a fresh SQL Server instance
 2. Runs database migrations
 3. Seeds test data
-4. Executes all test suites in parallel
+4. Executes all test suites in parallel, including the frontend's Storybook
+   Vitest and Playwright suites (`frontend.tests`, which needs no database)
 5. Exports results to `./test-results/`
 6. Exits when tests complete
 
@@ -49,6 +50,8 @@ cat test-results/Features.Users.Tests.trx
 cat test-results/Features.Breweries.Tests.trx
 cat test-results/Features.Emails.Tests.trx
 cat test-results/Features.PhotoUpload.Tests.trx
+cat test-results/frontend/vitest-storybook.xml
+cat test-results/frontend/playwright-storybook.xml
 ```
 
 ### Clean up
@@ -327,8 +330,10 @@ Scenario: User login with valid credentials
 
 ## Continuous integration
 
-Tests run automatically in CI/CD pipelines using the test Docker Compose
-configuration:
+The `.github/workflows/tests.yml` GitHub Actions workflow runs on every push
+and pull request to `main`. It runs the same test Docker Compose
+configuration used locally, so backend and frontend tests execute in the same
+containerized environment in CI as they do on a developer machine:
 
 ```bash
 # CI/CD command
@@ -337,13 +342,22 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abo
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
 
+Because `--abort-on-container-exit` stops the stack as soon as any one-shot
+test container exits (success or failure), the workflow separately inspects
+the exit code of each test container (`test-env-api-specs`,
+`test-env-unit-tests`, `test-env-frontend-tests`) after `up` returns and fails
+the job if any of them is non-zero. `./test-results/` is uploaded as a build
+artifact regardless of outcome.
+
 Exit codes:
 
 - `0` - All tests passed
 - Non-zero - Test failures occurred
 
-Frontend UI checks should also be included in CI for the active website
-workspace:
+The frontend's Storybook Vitest and Playwright suites run inside the
+`frontend.tests` container (see [Docker Guide](docker.md)) as part of that
+same compose run, so no separate frontend CI step is needed. To run them
+locally without Docker:
 
 ```bash
 cd web/frontend
