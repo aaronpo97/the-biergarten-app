@@ -1,27 +1,8 @@
 @startuml
+!include ../biergarten-weizen-theme.puml
 skinparam style strictuml
-skinparam defaultFontName "DM Sans"
 skinparam defaultFontSize 14
-skinparam titleFontName "Volkhov"
 skinparam titleFontSize 20
-skinparam backgroundColor #FAFCF9
-skinparam defaultFontColor #28342A
-skinparam titleFontColor #28342A
-skinparam ArrowColor #628A5B
-
-skinparam class {
-  BackgroundColor #FAFCF9
-  HeaderBackgroundColor #EAF0E8
-  BorderColor #547461
-  ArrowColor #628A5B
-  FontColor #28342A
-}
-
-skinparam note {
-  BackgroundColor #EAF0E8
-  BorderColor #547461
-  FontColor #28342A
-}
 
 title The Biergarten Data Pipeline - Class Diagram
 

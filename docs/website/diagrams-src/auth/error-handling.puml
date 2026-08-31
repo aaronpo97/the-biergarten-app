@@ -1,0 +1,30 @@
+@startuml error-handling
+!include ../../../pipeline/diagrams/biergarten-weizen-theme.puml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 200
+
+title User Authentication Flow - Error Handling (Global Exception Filter)
+
+participant "API\nController" as API
+
+note over API
+  API.Core's GlobalExceptionFilter catches:
+  - FluentValidation.ValidationException -> 400 Bad Request\n    {message, errors} (grouped by property)
+  - ConflictException -> 409 Conflict
+  - NotFoundException -> 404 Not Found
+  - UnauthorizedException -> 401 Unauthorized
+  - ForbiddenException -> 403 Forbidden
+  - Domain.Exceptions.ValidationException -> 400 Bad Request
+  - Microsoft.Data.SqlClient.SqlException -> 503 Service Unavailable
+  - All others -> 500 Internal Server Error
+end note
+
+note over API
+  Applies uniformly across every authentication
+  endpoint (registration, login, refresh, confirm,
+  resend, update-username/email/password/profile,
+  delete-account) - see the per-flow diagrams for
+  where each exception type is thrown.
+end note
+
+@enduml

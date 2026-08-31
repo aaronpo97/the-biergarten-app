@@ -1,0 +1,129 @@
+@startuml login
+!include ../../../pipeline/diagrams/biergarten-weizen-theme.puml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 200
+
+title User Authentication Flow - Login
+
+actor User
+participant "API\nController" as API
+participant "MediatR pipeline\n(ValidationBehavior)" as Mediator
+box "Handler Layer" #F1F3EA
+participant "LoginHandler" as LoginHandler
+participant "UserManager<ApplicationUser>" as UserMgr
+participant "TokenService" as TokenSvc
+end box
+box "Infrastructure Layer" #EBECE3
+participant "Argon2PasswordHasher" as Argon2
+participant "JWT\nInfrastructure" as JWT
+end box
+box "Repository / Cross-slice" #DBEEDD
+participant "DapperUserStore\n(IUserStore/IUserPasswordStore/\nIUserEmailStore)" as UserStore
+end box
+database "SQL Server" as DB
+
+note over UserMgr
+  ASP.NET Core Identity's UserManager<TUser>
+  replaces the deleted AuthRepository: handlers
+  no longer issue SQL or call Argon2 directly,
+  they delegate to UserManager, which in turn
+  calls DapperUserStore (persistence) and
+  Argon2PasswordHasher (IPasswordHasher<TUser>).
+end note
+
+User -> API: POST /api/auth/login\n{username, password}
+activate API
+
+API -> Mediator: Send(LoginCommand)
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs LoginValidator:
+  username and password must both be non-empty
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request\n{message: "Validation failed", errors: {...}}
+else Validation succeeds
+
+  Mediator -> LoginHandler: Handle(command)
+  activate LoginHandler
+
+  LoginHandler -> UserMgr: FindByNameAsync(username)
+  activate UserMgr
+  UserMgr -> UserStore: FindByNameAsync(username)
+  activate UserStore
+  UserStore -> DB: SELECT UserAccountID, Username, ...\nFROM dbo.UserAccount\nWHERE Username = @Username
+  activate DB
+  DB --> UserStore: UserAccount row or null
+  deactivate DB
+  UserStore -> UserStore: HydrateAsync\n(load active UserCredential.Hash,\nUserVerification -> EmailConfirmed)
+  UserStore --> UserMgr: ApplicationUser or null
+  deactivate UserStore
+  UserMgr --> LoginHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt User not found
+    LoginHandler -> Mediator: throw UnauthorizedException\n"Invalid username or password."
+    Mediator -> API: propagate
+    API -> User: 401 Unauthorized
+  else User found
+
+    LoginHandler -> UserMgr: CheckPasswordAsync(user, password)
+    activate UserMgr
+    note right of UserMgr
+      HasPasswordAsync short-circuits to false
+      (no active UserCredential was hydrated)
+      without calling the hasher; otherwise
+      delegates to Argon2PasswordHasher.
+    end note
+    UserMgr -> Argon2: VerifyHashedPassword(\n  user, user.PasswordHash, password)
+    activate Argon2
+    note right of Argon2
+      Delegates to IPasswordInfrastructure.Verify:
+      1. Split stored hash: "salt:hash"
+      2. Hash provided password with the same salt
+      3. Constant-time comparison\n   (CryptographicOperations.FixedTimeEquals)
+    end note
+    Argon2 --> UserMgr: Success/Failed
+    deactivate Argon2
+    UserMgr --> LoginHandler: true/false
+    deactivate UserMgr
+
+    alt Password invalid
+      LoginHandler -> Mediator: throw UnauthorizedException
+      Mediator -> API: propagate
+      API -> User: 401 Unauthorized
+    else Password valid
+
+      LoginHandler -> TokenSvc: GenerateAccessToken(user)
+        activate TokenSvc
+        TokenSvc -> JWT: GenerateJwt(...)
+        activate JWT
+        JWT --> TokenSvc: Access Token
+        deactivate JWT
+        TokenSvc --> LoginHandler: Access Token
+        deactivate TokenSvc
+
+        LoginHandler -> TokenSvc: GenerateRefreshToken(user)
+        activate TokenSvc
+        TokenSvc -> JWT: GenerateJwt(...)
+        activate JWT
+        JWT --> TokenSvc: Refresh Token
+        deactivate JWT
+        TokenSvc --> LoginHandler: Refresh Token
+        deactivate TokenSvc
+
+        LoginHandler --> Mediator: LoginPayload(\n  userAccountId, username,\n  refreshToken, accessToken)
+        deactivate LoginHandler
+        Mediator --> API: LoginPayload
+        deactivate Mediator
+
+        API -> User: 200 OK\n{\n  message: "Logged in successfully.",\n  payload: {\n    userAccountId, username,\n    refreshToken, accessToken\n  }\n}
+      end
+    end
+  end
+deactivate API
+
+@enduml

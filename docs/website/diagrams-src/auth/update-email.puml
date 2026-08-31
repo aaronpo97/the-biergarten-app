@@ -1,0 +1,93 @@
+@startuml update-email
+!include ../../../pipeline/diagrams/biergarten-weizen-theme.puml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 200
+
+title User Authentication Flow - Update Email
+
+actor User
+participant "API\nController" as API
+participant "MediatR pipeline\n(ValidationBehavior)" as Mediator
+box "Handler Layer" #F1F3EA
+participant "UpdateEmailHandler" as UpdateEmailHandler
+participant "UserManager<ApplicationUser>" as UserMgr
+end box
+box "Repository / Cross-slice" #DBEEDD
+participant "DapperUserStore\n(IUserStore/IUserPasswordStore/\nIUserEmailStore)" as UserStore
+end box
+database "SQL Server" as DB
+
+note over UserMgr
+  ASP.NET Core Identity's UserManager<TUser>
+  replaces the deleted AuthRepository: handlers
+  no longer issue SQL or call Argon2 directly,
+  they delegate to UserManager, which in turn
+  calls DapperUserStore (persistence) and
+  Argon2PasswordHasher (IPasswordHasher<TUser>).
+end note
+
+User -> API: PATCH /api/auth/email\n{newEmail}\n(requires Bearer access token)
+activate API
+
+API -> Mediator: Send(UpdateEmailCommand(\n  GetAuthenticatedUserId(), newEmail))
+activate Mediator
+
+note right of Mediator
+  ValidationBehavior runs UpdateEmailValidator
+  (same format rules as registration)
+end note
+
+alt Validation fails
+  Mediator -> API: throws FluentValidation.ValidationException
+  API -> User: 400 Bad Request
+else Validation succeeds
+
+  Mediator -> UpdateEmailHandler: Handle(command)
+  activate UpdateEmailHandler
+
+  UpdateEmailHandler -> UserMgr: FindByIdAsync(userAccountId)
+  activate UserMgr
+  UserMgr -> UserStore: FindByIdAsync(userAccountId)
+  UserStore -> DB: SELECT ...
+  UserStore --> UserMgr: ApplicationUser or null
+  UserMgr --> UpdateEmailHandler: ApplicationUser or null
+  deactivate UserMgr
+
+  alt Account not found
+    UpdateEmailHandler -> Mediator: throw NotFoundException
+    Mediator -> API: propagate
+    API -> User: 404 Not Found
+  else Account found
+
+    UpdateEmailHandler -> UserMgr: SetEmailAsync(user, newEmail)
+    activate UserMgr
+    UserMgr -> UserStore: FindByEmailAsync(newEmail)
+    note right of UserMgr
+      Uniqueness check. Also resets
+      user.EmailConfirmed = false -
+      the caller must re-confirm via
+      POST /api/auth/confirm/resend.
+    end note
+    UserMgr -> UserStore: UpdateAsync(user)
+    UserStore -> DB: UPDATE dbo.UserAccount\nSET Email = @Email, ...
+    UserStore -> DB: DELETE FROM dbo.UserVerification\nWHERE UserAccountID = @Id
+    UserStore --> UserMgr: IdentityResult
+    UserMgr --> UpdateEmailHandler: IdentityResult
+    deactivate UserMgr
+
+    alt !result.Succeeded
+      UpdateEmailHandler -> Mediator: throw ConflictException\n(DuplicateEmail code ->\n"Email address already exists")
+      Mediator -> API: propagate
+      API -> User: 409 Conflict
+    else result.Succeeded
+      UpdateEmailHandler --> Mediator: UpdateEmailPayload(\n  user.Id, user.Email,\n  user.EmailConfirmed = false)
+      deactivate UpdateEmailHandler
+      Mediator --> API: UpdateEmailPayload
+      deactivate Mediator
+      API -> User: 200 OK\n{message: "Email updated successfully.",\npayload: {...}}
+    end
+  end
+end
+deactivate API
+
+@enduml

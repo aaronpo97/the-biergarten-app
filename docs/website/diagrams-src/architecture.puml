@@ -1,12 +1,9 @@
 @startuml architecture
-!theme plain
-skinparam backgroundColor #FFFFFF
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
+!include ../../pipeline/diagrams/biergarten-weizen-theme.puml
 
 title The Biergarten App - Vertical Slice Architecture
 
-package "API.Core (thin host)" #E3F2FD {
+package "API.Core (thin host)" #F1F3EA {
   [API.Core\nASP.NET Core Web API host] as API
   note right of API
     - Program.cs wiring only
@@ -18,7 +15,7 @@ package "API.Core (thin host)" #E3F2FD {
   end note
 }
 
-package "Feature Slices" #F3E5F5 {
+package "Feature Slices" #DBEEDD {
   [Features.Users] as UsersSlice
   [Features.Breweries] as BrewerySlice
   [Features.Emails] as EmailsSlice
@@ -50,7 +47,7 @@ package "Feature Slices" #F3E5F5 {
   end note
 }
 
-package "Shared" #FCE4EC {
+package "Shared" #E4E6D8 {
   [Shared.Contracts] as SharedContracts
   [Shared.Application] as SharedApp
   note right of SharedApp
@@ -62,7 +59,7 @@ package "Shared" #FCE4EC {
   end note
 }
 
-package "Infrastructure Layer" #FFF3E0 {
+package "Infrastructure Layer" #EBECE3 {
   [Infrastructure.Sql] as Sql
   [Infrastructure.Jwt] as JWT
   [Infrastructure.PasswordHashing] as PwdHash
@@ -70,7 +67,7 @@ package "Infrastructure Layer" #FFF3E0 {
   [Infrastructure.Email.Templates] as EmailTemplates
 }
 
-package "Domain Layer" #E8F5E9 {
+package "Domain Layer" #CBD2B5 {
   [Domain.Entities] as Domain
   [Domain.Exceptions] as DomainExceptions
   note right of Domain

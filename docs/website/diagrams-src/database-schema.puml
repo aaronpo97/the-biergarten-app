@@ -1,9 +1,6 @@
 @startuml database-schema
-!theme plain
-skinparam backgroundColor #FFFFFF
-skinparam defaultFontName Arial
+!include ../../pipeline/diagrams/biergarten-weizen-theme.puml
 skinparam linetype ortho
-skinparam packageStyle rectangle
 
 title Database Schema
 caption Every table also has a RowVersion ROWVERSION column (optimistic concurrency), omitted below for brevity.\nTables marked (*) have no repository/feature slice yet.

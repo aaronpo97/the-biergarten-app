@@ -1,7 +1,5 @@
 @startuml deployment
-!theme plain
-skinparam backgroundColor #FFFFFF
-skinparam defaultFontName Arial
+!include ../../pipeline/diagrams/biergarten-weizen-theme.puml
 skinparam linetype ortho
 
 title Docker Deployment Architecture
@@ -10,7 +8,7 @@ title Docker Deployment Architecture
 actor Developer
 cloud "Docker Host" as Host
 
-package "Development Environment\n(docker-compose.dev.yaml)" #E3F2FD {
+package "Development Environment\n(docker-compose.dev.yaml)" #F1F3EA {
 
   node "SQL Server\n(mcr.microsoft.com/mssql/server:2022-latest)" as DevDB {
     database "Biergarten\nDatabase" as DevDBInner {
@@ -80,7 +78,7 @@ package "Development Environment\n(docker-compose.dev.yaml)" #E3F2FD {
 
 }
 
-package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
+package "Test Environment\n(docker-compose.test.yaml)" #EBECE3 {
 
   node "SQL Server\n(isolated instance)" as TestDB {
     database "Biergarten\nTest Database" as TestDBInner {
@@ -142,7 +140,7 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
 
 }
 
-package "Production Environment\n(docker-compose.prod.yaml)" #FCE4EC {
+package "Production Environment\n(docker-compose.prod.yaml)" #CBD2B5 {
 
   node "SQL Server\n(mcr.microsoft.com/mssql/server:2022-latest)" as ProdDB {
     database "Biergarten\nDatabase" as ProdDBInner
@@ -195,7 +193,7 @@ package "Production Environment\n(docker-compose.prod.yaml)" #FCE4EC {
   end note
 }
 
-package "Database-only Environment\n(docker-compose.db.yaml)" #EDE7F6 {
+package "Database-only Environment\n(docker-compose.db.yaml)" #E4E6D8 {
 
   node "SQL Server" as DbOnlyDB {
     database "Biergarten\nDatabase" as DbOnlyDBInner {
@@ -225,7 +223,7 @@ package "Database-only Environment\n(docker-compose.db.yaml)" #EDE7F6 {
   DbOnlySeed .up.> DbOnlyMig : depends_on
 }
 
-package "Minimal Environment\n(docker-compose.min.yaml)" #FFF9C4 {
+package "Minimal Environment\n(docker-compose.min.yaml)" #DBEEDD {
 
   node "SQL Server" as MinDB {
     database "Biergarten\nDatabase" as MinDBInner {
