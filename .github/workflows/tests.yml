@@ -24,7 +24,7 @@ jobs:
         run: docker compose --env-file .env.test -f docker-compose.test.yaml build
 
       - name: Run tests
-        run: docker compose --env-file .env.test -f docker-compose.test.yaml up --abort-on-container-exit
+        run: docker compose --env-file .env.test -f docker-compose.test.yaml up --abort-on-container-exit || true
 
       - name: Check test container exit codes
         if: always()
