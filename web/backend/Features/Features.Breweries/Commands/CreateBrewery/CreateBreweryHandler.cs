@@ -37,6 +37,15 @@ public class CreateBreweryHandler(IBreweryRepository repository)
         };
 
         await repository.CreateAsync(entity);
-        return entity.ToDto();
+
+        // RowVersion is a DB-computed column, unset on the in-memory entity; re-fetch so callers
+        // get back the value needed for a subsequent optimistic-concurrency update.
+        BreweryPost created =
+            await repository.GetByIdAsync(entity.BreweryPostId, cancellationToken)
+            ?? throw new InvalidOperationException(
+                $"Brewery '{entity.BreweryPostId}' was not found after a successful creation."
+            );
+
+        return created.ToDto();
     }
 }
