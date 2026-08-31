@@ -503,3 +503,6 @@ FodyWeavers.xsd
 storybook-static
 web/test-results/frontend/vitest-storybook.xml
 web/test-results/frontend/playwright-storybook.xml
+
+# mkdocs build output
+/site
