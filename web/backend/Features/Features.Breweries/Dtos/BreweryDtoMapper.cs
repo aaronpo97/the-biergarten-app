@@ -45,9 +45,9 @@ public static class BreweryDtoMapper
     ///     Converts a <see cref="BreweryPost" /> to its simplified DTO representation, used for
     ///     location-based queries that only need identifying and location details.
     /// </summary>
-    public static SimplifiedBreweryDto ToSimplifiedDto(this BreweryPost brewery)
+    public static BreweryWithLocationDto ToSimplifiedDto(this BreweryPost brewery)
     {
-        return new SimplifiedBreweryDto(
+        return new BreweryWithLocationDto(
             BreweryPostId: brewery.BreweryPostId,
             BreweryName: brewery.BreweryName,
             Location: brewery.Location is null

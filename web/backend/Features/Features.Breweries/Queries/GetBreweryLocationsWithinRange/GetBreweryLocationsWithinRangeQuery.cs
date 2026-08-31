@@ -12,4 +12,4 @@ namespace Features.Breweries.Queries.GetBreweryLocationsWithinRange;
 /// <param name="Longitude">The origin longitude, in decimal degrees.</param>
 /// <param name="RangeInMetres">The maximum distance, in metres, from the origin coordinates.</param>
 public record GetBreweryLocationsWithinRangeQuery(double Latitude, double Longitude, double RangeInMetres)
-    : IRequest<IEnumerable<SimplifiedBreweryDto>>;
+    : IRequest<IEnumerable<BreweryWithLocationDto>>;

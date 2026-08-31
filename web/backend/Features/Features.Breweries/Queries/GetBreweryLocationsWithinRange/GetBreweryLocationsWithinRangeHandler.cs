@@ -9,10 +9,10 @@ namespace Features.Breweries.Queries.GetBreweryLocationsWithinRange;
 ///     Handles <see cref="GetBreweryLocationsWithinRangeQuery" /> by retrieving nearby located brewery posts.
 /// </summary>
 public class GetBreweryLocationsWithinRangeHandler(IBreweryRepository repository)
-    : IRequestHandler<GetBreweryLocationsWithinRangeQuery, IEnumerable<SimplifiedBreweryDto>>
+    : IRequestHandler<GetBreweryLocationsWithinRangeQuery, IEnumerable<BreweryWithLocationDto>>
 {
     /// <summary>Retrieves brewery posts within range of the requested coordinates, nearest first.</summary>
-    public async Task<IEnumerable<SimplifiedBreweryDto>> Handle(
+    public async Task<IEnumerable<BreweryWithLocationDto>> Handle(
         GetBreweryLocationsWithinRangeQuery request,
         CancellationToken cancellationToken
     )

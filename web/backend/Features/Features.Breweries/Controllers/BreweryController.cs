@@ -70,13 +70,13 @@ public class BreweryController(IMediator mediator) : ControllerBase
     /// <remarks>Allows anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetAllLocations()
+    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetAllLocations()
     {
-        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+        IEnumerable<BreweryWithLocationDto> breweries = await mediator.Send(
             new GetAllBreweryLocationsQuery()
         );
         return Ok(
-            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            new ResponseBody<IEnumerable<BreweryWithLocationDto>>
             {
                 Message = "Brewery locations retrieved successfully.",
                 Payload = breweries,
@@ -91,17 +91,17 @@ public class BreweryController(IMediator mediator) : ControllerBase
     /// <remarks>Allows anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations/nearby")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetLocationsWithinRange(
+    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetLocationsWithinRange(
         [FromQuery] double latitude,
         [FromQuery] double longitude,
         [FromQuery] double rangeInMetres
     )
     {
-        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+        IEnumerable<BreweryWithLocationDto> breweries = await mediator.Send(
             new GetBreweryLocationsWithinRangeQuery(latitude, longitude, rangeInMetres)
         );
         return Ok(
-            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            new ResponseBody<IEnumerable<BreweryWithLocationDto>>
             {
                 Message = "Brewery locations retrieved successfully.",
                 Payload = breweries,

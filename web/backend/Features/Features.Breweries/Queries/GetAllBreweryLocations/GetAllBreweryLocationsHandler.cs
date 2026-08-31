@@ -7,10 +7,10 @@ namespace Features.Breweries.Queries.GetAllBreweryLocations;
 
 /// <summary>Handles <see cref="GetAllBreweryLocationsQuery" /> by retrieving all located brewery posts.</summary>
 public class GetAllBreweryLocationsHandler(IBreweryRepository repository)
-    : IRequestHandler<GetAllBreweryLocationsQuery, IEnumerable<SimplifiedBreweryDto>>
+    : IRequestHandler<GetAllBreweryLocationsQuery, IEnumerable<BreweryWithLocationDto>>
 {
     /// <summary>Retrieves every brewery post that has a set location.</summary>
-    public async Task<IEnumerable<SimplifiedBreweryDto>> Handle(
+    public async Task<IEnumerable<BreweryWithLocationDto>> Handle(
         GetAllBreweryLocationsQuery request,
         CancellationToken cancellationToken
     )

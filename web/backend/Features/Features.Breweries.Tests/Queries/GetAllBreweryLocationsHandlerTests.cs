@@ -22,7 +22,7 @@ public class GetAllBreweryLocationsHandlerTests
     {
         _repoMock.Setup(r => r.GetAllLocations()).ReturnsAsync(Array.Empty<BreweryPost>());
 
-        IEnumerable<SimplifiedBreweryDto> result = await _handler.Handle(
+        IEnumerable<BreweryWithLocationDto> result = await _handler.Handle(
             new GetAllBreweryLocationsQuery(),
             CancellationToken.None
         );
@@ -41,7 +41,7 @@ public class GetAllBreweryLocationsHandlerTests
         ];
         _repoMock.Setup(r => r.GetAllLocations()).ReturnsAsync(breweries);
 
-        IEnumerable<SimplifiedBreweryDto> result = await _handler.Handle(
+        IEnumerable<BreweryWithLocationDto> result = await _handler.Handle(
             new GetAllBreweryLocationsQuery(),
             CancellationToken.None
         );
