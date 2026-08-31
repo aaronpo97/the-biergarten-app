@@ -15,7 +15,7 @@ public class GetBreweryByIdHandler(IBreweryRepository repository)
         CancellationToken cancellationToken
     )
     {
-        BreweryPost? brewery = await repository.GetByIdAsync(request.BreweryPostId);
+        BreweryPost? brewery = await repository.GetByIdAsync(request.BreweryPostId, cancellationToken);
         return brewery?.ToDto();
     }
 }

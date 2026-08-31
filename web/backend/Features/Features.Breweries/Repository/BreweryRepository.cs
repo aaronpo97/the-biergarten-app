@@ -28,7 +28,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
-    public async Task<BreweryPost?> GetByIdAsync(Guid id)
+    public async Task<BreweryPost?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await using DbConnection connection = await CreateConnection();
         IEnumerable<BreweryPost> results = await connection.QueryAsync<
@@ -39,37 +39,40 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             Country,
             BreweryPost
         >(
-            """
-            SELECT
-                bp.BreweryPostID,
-                bp.PostedByID,
-                bp.BreweryName,
-                bp.Description,
-                bp.CreatedAt,
-                bp.UpdatedAt,
-                bp.RowVersion,
-                bpl.BreweryPostLocationID,
-                bpl.AddressLine1,
-                bpl.AddressLine2,
-                bpl.PostalCode,
-                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
-                c.CityID,
-                c.CityName,
-                sp.StateProvinceID,
-                sp.StateProvinceName,
-                sp.ISO3166_2 AS Iso31662,
-                co.CountryID,
-                co.CountryName,
-                co.ISO3166_1 AS Iso31661
-            FROM dbo.BreweryPost bp
-            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
-            WHERE bp.BreweryPostID = @BreweryPostId
-            """,
+            new CommandDefinition(
+                """
+                SELECT
+                    bp.BreweryPostID,
+                    bp.PostedByID,
+                    bp.BreweryName,
+                    bp.Description,
+                    bp.CreatedAt,
+                    bp.UpdatedAt,
+                    bp.RowVersion,
+                    bpl.BreweryPostLocationID,
+                    bpl.AddressLine1,
+                    bpl.AddressLine2,
+                    bpl.PostalCode,
+                    CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                    c.CityID,
+                    c.CityName,
+                    sp.StateProvinceID,
+                    sp.StateProvinceName,
+                    sp.ISO3166_2 AS Iso31662,
+                    co.CountryID,
+                    co.CountryName,
+                    co.ISO3166_1 AS Iso31661
+                FROM dbo.BreweryPost bp
+                LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+                LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+                LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+                LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+                WHERE bp.BreweryPostID = @BreweryPostId
+                """,
+                new { BreweryPostId = id },
+                cancellationToken: cancellationToken
+            ),
             MapBreweryRow,
-            new { BreweryPostId = id },
             splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
         );
 

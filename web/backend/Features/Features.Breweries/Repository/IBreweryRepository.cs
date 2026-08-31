@@ -11,7 +11,7 @@ public interface IBreweryRepository
     ///     Retrieves a brewery post by ID, joined to its location. Returns <c>null</c> if no brewery post
     ///     exists with the given ID, or if it has no associated location.
     /// </summary>
-    Task<BreweryPost?> GetByIdAsync(Guid id);
+    Task<BreweryPost?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Retrieves all brewery posts, optionally paginated, ordered by creation date descending. Posts
