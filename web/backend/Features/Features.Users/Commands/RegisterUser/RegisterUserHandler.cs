@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Domain.Exceptions;
+using Features.Auth.Commands.CreateUserProfile;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
 using Features.Auth.Services;
@@ -47,6 +48,8 @@ public class RegisterUserHandler(
                 string.Join("; ", result.Errors.Select(e => e.Description))
             );
         }
+
+        await mediator.Send(new CreateUserProfileCommand(user.Id, string.Empty), cancellationToken);
 
         string accessToken = tokenService.GenerateAccessToken(user.Id, user.UserName);
         string refreshToken = tokenService.GenerateRefreshToken(user.Id, user.UserName);

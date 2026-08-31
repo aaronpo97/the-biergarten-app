@@ -1,6 +1,8 @@
 using System.Data.Common;
 using Dapper;
 using Database.Connection;
+using Domain.Entities;
+using Domain.Exceptions;
 
 namespace Features.Auth.Repository;
 
@@ -12,49 +14,105 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
         IUserProfileRepository
 {
     /// <inheritdoc />
-    public async Task<Guid> GetOrCreateProfileIdAsync(
+    public async Task<Guid> CreateProfileAsync(
         Guid userAccountId,
+        string biography,
         CancellationToken cancellationToken
     )
+    {
+        await using DbConnection connection = await CreateConnection();
+
+        return await connection.ExecuteScalarAsync<Guid>(
+            new CommandDefinition(
+                """
+                INSERT INTO dbo.UserProfile (UserAccountID, Biography)
+                OUTPUT INSERTED.UserProfileID
+                VALUES (@UserAccountId, @Biography)
+                """,
+                new { UserAccountId = userAccountId, Biography = biography },
+                cancellationToken: cancellationToken
+            )
+        );
+    }
+
+    /// <inheritdoc />
+    public async Task<Guid> GetProfileIdAsync(Guid userAccountId, CancellationToken cancellationToken)
+    {
+        await using DbConnection connection = await CreateConnection();
+
+        Guid? userProfileId = await connection.ExecuteScalarAsync<Guid?>(
+            new CommandDefinition(
+                """
+                SELECT UserProfileID
+                FROM dbo.UserProfile
+                WHERE UserAccountID = @UserAccountId
+                """,
+                new { UserAccountId = userAccountId },
+                cancellationToken: cancellationToken
+            )
+        );
+
+        return userProfileId
+            ?? throw new NotFoundException($"No user profile found for user account ID {userAccountId}");
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateBiographyAsync(
+        Guid userAccountId,
+        string biography,
+        CancellationToken cancellationToken
+    )
+    {
+        await using DbConnection connection = await CreateConnection();
+
+        int updatedRows = await connection.ExecuteAsync(
+            new CommandDefinition(
+                """
+                UPDATE dbo.UserProfile
+                SET Biography = @Biography
+                WHERE UserAccountID = @UserAccountId
+                """,
+                new { UserAccountId = userAccountId, Biography = biography },
+                cancellationToken: cancellationToken
+            )
+        );
+
+        if (updatedRows == 0)
+            throw new NotFoundException($"No user profile found for user account ID {userAccountId}");
+    }
+
+    /// <inheritdoc />
+    public async Task SaveAvatarAsync(UserAvatar avatar, CancellationToken cancellationToken)
     {
         await using DbConnection connection = await CreateConnection();
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            // UPDLOCK/HOLDLOCK: AK_UserProfile_UserAccountID is composite with UserProfileID, so it
-            // doesn't by itself stop two concurrent callers from creating duplicate profiles for the
-            // same account; holding the lock through the transaction serializes them instead.
-            Guid? userProfileId = await connection.ExecuteScalarAsync<Guid?>(
+            await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    SELECT UserProfileID
-                    FROM dbo.UserProfile WITH (UPDLOCK, HOLDLOCK)
-                    WHERE UserAccountID = @UserAccountId
+                    UPDATE dbo.UserAvatar
+                    SET ValidTo = SYSUTCDATETIME()
+                    WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL
                     """,
-                    new { UserAccountId = userAccountId },
+                    new { avatar.UserProfileId },
                     transaction
                 )
             );
 
-            if (userProfileId is null)
-            {
-                userProfileId = Guid.NewGuid();
-
-                await connection.ExecuteAsync(
-                    new CommandDefinition(
-                        """
-                        INSERT INTO dbo.UserProfile (UserProfileID, Biography, UserAccountID)
-                        VALUES (@UserProfileId, '', @UserAccountId)
-                        """,
-                        new { UserProfileId = userProfileId, UserAccountId = userAccountId },
-                        transaction
-                    )
-                );
-            }
+            await connection.ExecuteAsync(
+                new CommandDefinition(
+                    """
+                    INSERT INTO dbo.UserAvatar (UserAvatarID, UserProfileID, PhotoID)
+                    VALUES (@UserAvatarId, @UserProfileId, @PhotoId)
+                    """,
+                    new { avatar.UserAvatarId, avatar.UserProfileId, avatar.PhotoId },
+                    transaction
+                )
+            );
 
             await transaction.CommitAsync(cancellationToken);
-            return userProfileId.Value;
         }
         catch
         {

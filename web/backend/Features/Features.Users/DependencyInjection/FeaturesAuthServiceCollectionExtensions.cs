@@ -12,8 +12,8 @@ public static class FeaturesAuthServiceCollectionExtensions
 {
     /// <summary>
     ///     Adds <see cref="ITokenService" />, <see cref="IUserListRepository" />,
-    ///     <see cref="IUserAvatarRepository" />, <see cref="IUserProfileRepository" />, and ASP.NET Core
-    ///     Identity (<see cref="UserManager{TUser}" /> backed by <see cref="DapperUserStore" /> and
+    ///     <see cref="IUserProfileRepository" />, and ASP.NET Core Identity
+    ///     (<see cref="UserManager{TUser}" /> backed by <see cref="DapperUserStore" /> and
     ///     <see cref="Argon2PasswordHasher" />) as scoped services.
     /// </summary>
     public static IServiceCollection AddFeaturesAuth(this IServiceCollection services)
@@ -21,7 +21,6 @@ public static class FeaturesAuthServiceCollectionExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
         services.AddScoped<IUserListRepository, UserListRepository>();
-        services.AddScoped<IUserAvatarRepository, UserAvatarRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
         // AddDefaultTokenProviders() is deliberately not called: it registers

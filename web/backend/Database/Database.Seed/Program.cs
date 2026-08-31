@@ -4,6 +4,7 @@ using Database.Seed.PipelineData;
 using Database.Seed.Sqlite;
 using Domain.Entities;
 using Features.Auth.Commands.RegisterUser;
+using Features.Auth.Commands.UpdateBiography;
 using Features.Auth.Commands.UploadAvatar;
 using Features.Auth.DependencyInjection;
 using Features.Auth.Dtos;
@@ -113,7 +114,7 @@ static async Task<int> RunAsync()
                 "Loading avatars into target database...",
                 async ctx =>
                 {
-                    await LoadAvatarsIntoDatabaseAsync(mediator, userIds, ctx);
+                    await LoadAvatarsIntoDatabaseAsync(mediator, userIds, seedData.Users, ctx);
                     ctx.Status("Avatar data loaded into target database.");
                 }
             );
@@ -174,6 +175,7 @@ static async Task<IReadOnlyList<Guid>> LoadUsersIntoDatabaseAsync(
 static async Task LoadAvatarsIntoDatabaseAsync(
     IMediator mediator,
     IReadOnlyList<Guid> userIds,
+    IReadOnlyList<UserRecord> users,
     StatusContext ctx
 )
 {
@@ -182,6 +184,9 @@ static async Task LoadAvatarsIntoDatabaseAsync(
         ctx.Status($"Loading avatar {i + 1}/{userIds.Count} into target database...");
 
         Guid userId = userIds[i];
+
+        await mediator.Send(new UpdateBiographyCommand(userId, users[i].User.Bio));
+
         byte[] avatarPng = AvatarGenerator.GeneratePng(userId);
 
         await using MemoryStream stream = new(avatarPng);

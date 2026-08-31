@@ -9,11 +9,8 @@ namespace Features.Auth.Commands.UploadAvatar;
 ///     Handles <see cref="UploadAvatarCommand" />: uploads the photo via <see cref="UploadPhotoCommand" />,
 ///     then saves the <see cref="UserAvatar" /> record, replacing any existing avatar for the user.
 /// </summary>
-public class UploadAvatarHandler(
-    IMediator mediator,
-    IUserAvatarRepository userAvatarRepository,
-    IUserProfileRepository userProfileRepository
-) : IRequestHandler<UploadAvatarCommand, Guid>
+public class UploadAvatarHandler(IMediator mediator, IUserProfileRepository userProfileRepository)
+    : IRequestHandler<UploadAvatarCommand, Guid>
 {
     public async Task<Guid> Handle(UploadAvatarCommand request, CancellationToken cancellationToken)
     {
@@ -26,7 +23,7 @@ public class UploadAvatarHandler(
             cancellationToken
         );
 
-        Guid profileId = await userProfileRepository.GetOrCreateProfileIdAsync(
+        Guid profileId = await userProfileRepository.GetProfileIdAsync(
             request.UserAccountId,
             cancellationToken
         );
@@ -38,7 +35,7 @@ public class UploadAvatarHandler(
             PhotoId = photoId,
         };
 
-        await userAvatarRepository.SaveAsync(avatar, cancellationToken);
+        await userProfileRepository.SaveAvatarAsync(avatar, cancellationToken);
 
         return photoId;
     }
