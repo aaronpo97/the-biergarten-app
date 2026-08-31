@@ -80,6 +80,19 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
+    public async Task<Guid?> GetPostedByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<Guid?>(
+            new CommandDefinition(
+                "SELECT PostedByID FROM dbo.BreweryPost WHERE BreweryPostID = @BreweryPostId",
+                new { BreweryPostId = id },
+                cancellationToken: cancellationToken
+            )
+        );
+    }
+
+    /// <inheritdoc/>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();

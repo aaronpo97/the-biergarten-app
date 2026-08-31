@@ -20,15 +20,8 @@ public class UpdateBreweryHandlerTests
     private void SetUpExistingBrewery(Guid breweryPostId, Guid postedById)
     {
         _repoMock
-            .Setup(r => r.GetByIdAsync(breweryPostId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new BreweryPost
-            {
-                BreweryPostId = breweryPostId,
-                PostedById = postedById,
-                BreweryName = "Existing",
-                Description = "Existing description",
-                RowVersion = [0x00],
-            });
+            .Setup(r => r.GetPostedByIdAsync(breweryPostId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(postedById);
     }
 
     [Fact]

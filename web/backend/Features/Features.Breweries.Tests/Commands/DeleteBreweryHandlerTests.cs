@@ -1,4 +1,3 @@
-using Domain.Entities;
 using Domain.Exceptions;
 using Features.Breweries.Commands.DeleteBrewery;
 using Features.Breweries.Repository;
@@ -20,8 +19,8 @@ public class DeleteBreweryHandlerTests
     private void SetUpExistingBrewery(Guid breweryPostId, Guid postedById)
     {
         _repoMock
-            .Setup(r => r.GetByIdAsync(breweryPostId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new BreweryPost { BreweryPostId = breweryPostId, PostedById = postedById });
+            .Setup(r => r.GetPostedByIdAsync(breweryPostId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(postedById);
     }
 
     [Fact]

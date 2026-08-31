@@ -1,5 +1,3 @@
-using Domain.Exceptions;
-using Domain.Entities;
 using Features.Breweries.Repository;
 using MediatR;
 
@@ -17,11 +15,11 @@ public class DeleteBreweryHandler(IBreweryRepository repository)
     /// </exception>
     public async Task Handle(DeleteBreweryCommand request, CancellationToken cancellationToken)
     {
-        BreweryPost brewery = await repository.GetByIdAsync(request.BreweryPostId, cancellationToken)
-                              ?? throw new NotFoundException($"Brewery with ID {request.BreweryPostId} not found.");
-
-        if (brewery.PostedById != request.RequestingUserId)
-            throw new ForbiddenException("You are not authorized to delete this brewery.");
+        await repository.EnsureCallerOwnsBreweryAsync(
+            request.BreweryPostId,
+            request.RequestingUserId,
+            cancellationToken
+        );
 
         await repository.DeleteAsync(request.BreweryPostId);
     }
