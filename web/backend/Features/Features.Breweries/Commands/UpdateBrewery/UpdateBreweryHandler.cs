@@ -26,13 +26,18 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
         CancellationToken cancellationToken
     )
     {
+        await repository.EnsureCallerOwnsBreweryAsync(
+            request.BreweryPostId,
+            request.RequestingUserId,
+            cancellationToken
+        );
+
         BreweryPost entity = new()
         {
             BreweryPostId = request.BreweryPostId,
-            PostedById = request.PostedById,
+            RowVersion = request.RowVersion,
             BreweryName = request.BreweryName,
             Description = request.Description,
-            RowVersion = request.RowVersion,
             UpdatedAt = DateTime.UtcNow,
             Location = request.Location is null
                 ? null
@@ -48,7 +53,7 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
                 },
         };
 
-        BreweryPost updated = await repository.UpdateAsync(entity);
+        BreweryPost updated = await repository.UpdateAsync(entity, cancellationToken);
         return updated.ToDto();
     }
 }

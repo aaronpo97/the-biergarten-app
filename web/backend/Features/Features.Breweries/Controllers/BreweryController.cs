@@ -70,13 +70,13 @@ public class BreweryController(IMediator mediator) : ControllerBase
     /// <remarks>Allows anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetAllLocations()
+    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetAllLocations()
     {
-        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+        IEnumerable<BreweryWithLocationDto> breweries = await mediator.Send(
             new GetAllBreweryLocationsQuery()
         );
         return Ok(
-            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            new ResponseBody<IEnumerable<BreweryWithLocationDto>>
             {
                 Message = "Brewery locations retrieved successfully.",
                 Payload = breweries,
@@ -91,17 +91,17 @@ public class BreweryController(IMediator mediator) : ControllerBase
     /// <remarks>Allows anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations/nearby")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<SimplifiedBreweryDto>>>> GetLocationsWithinRange(
+    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetLocationsWithinRange(
         [FromQuery] double latitude,
         [FromQuery] double longitude,
         [FromQuery] double rangeInMetres
     )
     {
-        IEnumerable<SimplifiedBreweryDto> breweries = await mediator.Send(
+        IEnumerable<BreweryWithLocationDto> breweries = await mediator.Send(
             new GetBreweryLocationsWithinRangeQuery(latitude, longitude, rangeInMetres)
         );
         return Ok(
-            new ResponseBody<IEnumerable<SimplifiedBreweryDto>>
+            new ResponseBody<IEnumerable<BreweryWithLocationDto>>
             {
                 Message = "Brewery locations retrieved successfully.",
                 Payload = breweries,
@@ -113,10 +113,17 @@ public class BreweryController(IMediator mediator) : ControllerBase
     /// <returns><c>201 Created</c> with the newly created brewery.</returns>
     [HttpPost]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Create(
-        [FromBody] CreateBreweryCommand command
+        [FromBody] CreateBreweryRequest request
     )
     {
-        BreweryDto brewery = await mediator.Send(command);
+        BreweryDto brewery = await mediator.Send(
+            new CreateBreweryCommand(
+                User.GetAuthenticatedUserId(),
+                request.BreweryName,
+                request.Description,
+                request.Location
+            )
+        );
         return Created(
             $"/api/brewery/{brewery.BreweryPostId}",
             new ResponseBody<BreweryDto>
@@ -128,27 +135,37 @@ public class BreweryController(IMediator mediator) : ControllerBase
     }
 
     /// <summary>Updates an existing brewery post.</summary>
-    /// <param name="id">Must match <paramref name="command" />'s <c>BreweryPostId</c>.</param>
+    /// <param name="id">Must match <paramref name="request" />'s <c>BreweryPostId</c>.</param>
     /// <returns>
     ///     <c>200 OK</c> with the updated brewery; <c>400 Bad Request</c> if the route ID does not match the
     ///     payload ID; <c>404 Not Found</c> if the brewery or its <c>CityId</c> does not exist; or
-    ///     <c>409 Conflict</c> if the brewery was modified since <c>command.RowVersion</c> was read.
+    ///     <c>409 Conflict</c> if the brewery was modified since <c>request.RowVersion</c> was read.
     /// </returns>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(
         Guid id,
-        [FromBody] UpdateBreweryCommand command
+        [FromBody] UpdateBreweryRequest request
     )
     {
-        if (command.BreweryPostId != id)
+        if (request.BreweryPostId != id)
             return BadRequest(new ResponseBody { Message = "Route ID does not match payload ID." });
 
-        BreweryDto brewery = await mediator.Send(command);
+        BreweryDto breweryUpdated = await mediator.Send(
+            new UpdateBreweryCommand(
+                request.BreweryPostId,
+                User.GetAuthenticatedUserId(),
+                request.RowVersion,
+                request.BreweryName,
+                request.Description,
+                request.Location
+            )
+        );
+
         return Ok(
             new ResponseBody<BreweryDto>
             {
                 Message = "Brewery updated successfully.",
-                Payload = brewery,
+                Payload = breweryUpdated,
             }
         );
     }
@@ -158,7 +175,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ResponseBody>> Delete(Guid id)
     {
-        await mediator.Send(new DeleteBreweryCommand(id));
+        await mediator.Send(new DeleteBreweryCommand(id, User.GetAuthenticatedUserId()));
         return Ok(new ResponseBody { Message = "Brewery deleted successfully." });
     }
 }

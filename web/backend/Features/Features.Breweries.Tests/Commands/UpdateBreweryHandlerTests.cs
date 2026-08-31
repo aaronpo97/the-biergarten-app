@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Exceptions;
 using Features.Breweries.Commands.UpdateBrewery;
 using Features.Breweries.Repository;
 using FluentAssertions;
@@ -16,13 +17,24 @@ public class UpdateBreweryHandlerTests
         _handler = new UpdateBreweryHandler(_repoMock.Object);
     }
 
+    private void SetUpExistingBrewery(Guid breweryPostId, Guid postedById)
+    {
+        _repoMock
+            .Setup(r => r.GetPostedByIdAsync(breweryPostId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(postedById);
+    }
+
     [Fact]
     public async Task Handle_UpdatesNameDescription_AndSetsUpdatedAt()
     {
+        Guid breweryPostId = Guid.NewGuid();
+        Guid requestingUserId = Guid.NewGuid();
+        SetUpExistingBrewery(breweryPostId, requestingUserId);
+
         UpdateBreweryCommand command = new(
-            Guid.NewGuid(),
+            breweryPostId,
+            requestingUserId,
             [0x01, 0x02],
-            Guid.NewGuid(),
             "Renamed",
             "New description",
             null
@@ -30,8 +42,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         DateTime before = DateTime.UtcNow;
@@ -40,7 +52,6 @@ public class UpdateBreweryHandlerTests
 
         persisted.Should().NotBeNull();
         persisted!.BreweryPostId.Should().Be(command.BreweryPostId);
-        persisted.PostedById.Should().Be(command.PostedById);
         persisted.BreweryName.Should().Be("Renamed");
         persisted.Description.Should().Be("New description");
         persisted.RowVersion.Should().Equal(command.RowVersion);
@@ -51,10 +62,14 @@ public class UpdateBreweryHandlerTests
     [Fact]
     public async Task Handle_ClearsLocation_WhenCommandLocationIsNull()
     {
+        Guid breweryPostId = Guid.NewGuid();
+        Guid requestingUserId = Guid.NewGuid();
+        SetUpExistingBrewery(breweryPostId, requestingUserId);
+
         UpdateBreweryCommand command = new(
-            Guid.NewGuid(),
+            breweryPostId,
+            requestingUserId,
             [0x01, 0x02],
-            Guid.NewGuid(),
             "Name",
             "Description",
             null
@@ -62,8 +77,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);
@@ -74,6 +89,10 @@ public class UpdateBreweryHandlerTests
     [Fact]
     public async Task Handle_SetsLocation_WhenCommandLocationProvided()
     {
+        Guid breweryPostId = Guid.NewGuid();
+        Guid requestingUserId = Guid.NewGuid();
+        SetUpExistingBrewery(breweryPostId, requestingUserId);
+
         UpdateBreweryLocation locationCommand = new(
             Guid.NewGuid(),
             Guid.NewGuid(),
@@ -83,9 +102,9 @@ public class UpdateBreweryHandlerTests
             null
         );
         UpdateBreweryCommand command = new(
-            Guid.NewGuid(),
+            breweryPostId,
+            requestingUserId,
             [0x01, 0x02],
-            Guid.NewGuid(),
             "Name",
             "Description",
             locationCommand
@@ -93,8 +112,8 @@ public class UpdateBreweryHandlerTests
 
         BreweryPost? persisted = null;
         _repoMock
-            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>()))
-            .Callback<BreweryPost>(b => persisted = b)
+            .Setup(r => r.UpdateAsync(It.IsAny<BreweryPost>(), It.IsAny<CancellationToken>()))
+            .Callback<BreweryPost, CancellationToken>((b, _) => persisted = b)
             .ReturnsAsync(() => persisted!);
 
         await _handler.Handle(command, CancellationToken.None);
@@ -108,5 +127,42 @@ public class UpdateBreweryHandlerTests
         persisted.Location.AddressLine1.Should().Be(locationCommand.AddressLine1);
         persisted.Location.AddressLine2.Should().Be(locationCommand.AddressLine2);
         persisted.Location.PostalCode.Should().Be(locationCommand.PostalCode);
+    }
+
+    [Fact]
+    public async Task Handle_ThrowsNotFoundException_WhenBreweryDoesNotExist()
+    {
+        UpdateBreweryCommand command = new(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            [0x01, 0x02],
+            "Name",
+            "Description",
+            null
+        );
+
+        Func<Task> act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task Handle_ThrowsForbiddenException_WhenRequestingUserIsNotThePoster()
+    {
+        Guid breweryPostId = Guid.NewGuid();
+        SetUpExistingBrewery(breweryPostId, Guid.NewGuid());
+
+        UpdateBreweryCommand command = new(
+            breweryPostId,
+            Guid.NewGuid(),
+            [0x01, 0x02],
+            "Name",
+            "Description",
+            null
+        );
+
+        Func<Task> act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<ForbiddenException>();
     }
 }

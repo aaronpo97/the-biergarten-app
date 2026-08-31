@@ -32,6 +32,9 @@ public class CreateBreweryHandlerTests
             .Setup(r => r.CreateAsync(It.IsAny<BreweryPost>()))
             .Callback<BreweryPost>(b => persisted = b)
             .Returns(Task.CompletedTask);
+        _repoMock
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => persisted);
 
         DateTime before = DateTime.UtcNow;
         BreweryDto result = await _handler.Handle(command, CancellationToken.None);
@@ -53,8 +56,27 @@ public class CreateBreweryHandlerTests
         persisted.Location.PostalCode.Should().Be(command.Location.PostalCode);
 
         _repoMock.Verify(r => r.CreateAsync(It.IsAny<BreweryPost>()), Times.Once);
+        _repoMock.Verify(
+            r => r.GetByIdAsync(persisted.BreweryPostId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
 
         result.BreweryName.Should().Be("MyBrew");
         result.Location.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Handle_ThrowsInvalidOperationException_WhenBreweryNotFoundAfterCreation()
+    {
+        CreateBreweryCommand command = new(Guid.NewGuid(), "MyBrew", "Desc", ValidLocation());
+
+        _repoMock.Setup(r => r.CreateAsync(It.IsAny<BreweryPost>())).Returns(Task.CompletedTask);
+        _repoMock
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((BreweryPost?)null);
+
+        Func<Task> act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
     }
 }

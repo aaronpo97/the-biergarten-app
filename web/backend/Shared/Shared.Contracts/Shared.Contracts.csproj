@@ -5,4 +5,12 @@
         <Nullable>enable</Nullable>
         <RootNamespace>Shared.Contracts</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
+    </ItemGroup>
 </Project>

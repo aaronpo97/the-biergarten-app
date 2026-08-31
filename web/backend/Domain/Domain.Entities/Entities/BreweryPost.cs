@@ -6,8 +6,8 @@ public sealed class BreweryPost
     public Guid BreweryPostId { get; set; }
 
     // FK References
+    // Note: An empty GUID signifies that this object is incomplete
     public Guid PostedById { get; set; }
-    public string PostedBy { get; set; } = string.Empty;
 
     // Attributes
     public string BreweryName { get; set; } = string.Empty;
@@ -21,6 +21,7 @@ public sealed class BreweryPost
     // Navigation Properties
     public BreweryPostLocation? Location { get; set; }
     public List<BeerPost> BeerPosts { get; set; } = [];
+    public string PostedBy { get; set; } = string.Empty;
 
     // Query-computed
     public DistanceInformation? Distance { get; set; }

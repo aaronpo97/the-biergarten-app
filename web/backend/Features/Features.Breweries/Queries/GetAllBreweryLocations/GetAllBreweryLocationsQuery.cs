@@ -7,4 +7,4 @@ namespace Features.Breweries.Queries.GetAllBreweryLocations;
 ///     Retrieves all brewery posts that have a set location. Bound directly from
 ///     <c>GET /api/brewery/locations</c>.
 /// </summary>
-public record GetAllBreweryLocationsQuery : IRequest<IEnumerable<SimplifiedBreweryDto>>;
+public record GetAllBreweryLocationsQuery : IRequest<IEnumerable<BreweryWithLocationDto>>;

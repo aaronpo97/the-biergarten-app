@@ -19,16 +19,25 @@ public record UpdateBreweryLocation(
 );
 
 /// <summary>
-///     Updates an existing brewery post. Bound directly from the request body of <c>PUT /api/brewery/{id}</c>.
-///     A <c>null</c> <see cref="Location" /> clears the brewery's location. <see cref="RowVersion" /> must be the
-///     row-version last read for this brewery (e.g. from a prior <c>GET</c>); the update is rejected with a
-///     <c>409 Conflict</c> if the brewery was modified since then.
+///     Updates an existing brewery post. A <c>null</c> <see cref="Location" /> clears the brewery's location.
+///     <see cref="RowVersion" /> must be the row-version last read for this brewery (e.g. from a prior
+///     <c>GET</c>); the update is rejected with a <c>409 Conflict</c> if the brewery was modified since then.
 /// </summary>
 public record UpdateBreweryCommand(
     Guid BreweryPostId,
+    Guid RequestingUserId,
     byte[] RowVersion,
-    Guid PostedById,
     string BreweryName,
     string Description,
     UpdateBreweryLocation? Location
 ) : IRequest<BreweryDto>;
+
+/// <summary>Request body for <c>PUT /api/brewery/{id}</c>.</summary>
+public record UpdateBreweryRequest(
+    Guid BreweryPostId,
+    byte[] RowVersion,
+    string BreweryName,
+    string Description,
+    UpdateBreweryLocation? Location
+);
+

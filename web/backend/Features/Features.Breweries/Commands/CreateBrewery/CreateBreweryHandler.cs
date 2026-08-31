@@ -37,6 +37,17 @@ public class CreateBreweryHandler(IBreweryRepository repository)
         };
 
         await repository.CreateAsync(entity);
-        return entity.ToDto();
+
+        // RowVersion is a DB-computed column, unset on the in-memory entity; re-fetch so callers
+        // get back the value needed for a subsequent optimistic-concurrency update. Uses
+        // CancellationToken.None since the write already committed: cancelling the caller's request
+        // at this point must not turn a successful creation into a thrown exception.
+        BreweryPost created =
+            await repository.GetByIdAsync(entity.BreweryPostId, CancellationToken.None)
+            ?? throw new InvalidOperationException(
+                $"Brewery '{entity.BreweryPostId}' was not found after a successful creation."
+            );
+
+        return created.ToDto();
     }
 }

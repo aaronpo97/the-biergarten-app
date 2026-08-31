@@ -28,7 +28,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
-    public async Task<BreweryPost?> GetByIdAsync(Guid id)
+    public async Task<BreweryPost?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await using DbConnection connection = await CreateConnection();
         IEnumerable<BreweryPost> results = await connection.QueryAsync<
@@ -39,41 +39,57 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             Country,
             BreweryPost
         >(
-            """
-            SELECT
-                bp.BreweryPostID,
-                bp.PostedByID,
-                bp.BreweryName,
-                bp.Description,
-                bp.CreatedAt,
-                bp.UpdatedAt,
-                bp.RowVersion,
-                bpl.BreweryPostLocationID,
-                bpl.AddressLine1,
-                bpl.AddressLine2,
-                bpl.PostalCode,
-                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
-                c.CityID,
-                c.CityName,
-                sp.StateProvinceID,
-                sp.StateProvinceName,
-                sp.ISO3166_2 AS Iso31662,
-                co.CountryID,
-                co.CountryName,
-                co.ISO3166_1 AS Iso31661
-            FROM dbo.BreweryPost bp
-            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
-            WHERE bp.BreweryPostID = @BreweryPostId
-            """,
+            new CommandDefinition(
+                """
+                SELECT
+                    bp.BreweryPostID,
+                    bp.PostedByID,
+                    bp.BreweryName,
+                    bp.Description,
+                    bp.CreatedAt,
+                    bp.UpdatedAt,
+                    bp.RowVersion,
+                    bpl.BreweryPostLocationID,
+                    bpl.AddressLine1,
+                    bpl.AddressLine2,
+                    bpl.PostalCode,
+                    CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                    c.CityID,
+                    c.CityName,
+                    sp.StateProvinceID,
+                    sp.StateProvinceName,
+                    sp.ISO3166_2 AS Iso31662,
+                    co.CountryID,
+                    co.CountryName,
+                    co.ISO3166_1 AS Iso31661
+                FROM dbo.BreweryPost bp
+                LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+                LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
+                LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+                LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+                WHERE bp.BreweryPostID = @BreweryPostId
+                """,
+                new { BreweryPostId = id },
+                cancellationToken: cancellationToken
+            ),
             MapBreweryRow,
-            new { BreweryPostId = id },
             splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
         );
 
         return results.SingleOrDefault();
+    }
+
+    /// <inheritdoc/>
+    public async Task<Guid?> GetPostedByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<Guid?>(
+            new CommandDefinition(
+                "SELECT PostedByID FROM dbo.BreweryPost WHERE BreweryPostID = @BreweryPostId",
+                new { BreweryPostId = id },
+                cancellationToken: cancellationToken
+            )
+        );
     }
 
     /// <inheritdoc/>
@@ -221,10 +237,10 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc/>
-    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery)
+    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery, CancellationToken cancellationToken = default)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -238,7 +254,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 BreweryPostID = @BreweryPostId
                             """,
                             new { brewery.BreweryPostId },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     )
                     is not null;
@@ -253,7 +270,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             new CommandDefinition(
                                 "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
                                 new { brewery.Location.CityId },
-                                transaction
+                                transaction,
+                                cancellationToken: cancellationToken
                             )
                         )
                         is not null;
@@ -280,7 +298,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         brewery.Description,
                         brewery.RowVersion,
                     },
-                    transaction
+                    transaction,
+                    cancellationToken: cancellationToken
                 )
             );
 
@@ -300,7 +319,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         WHERE BreweryPostID = @BreweryPostId
                         """,
                         new { brewery.BreweryPostId },
-                        transaction
+                        transaction,
+                        cancellationToken: cancellationToken
                     )
                 );
             }
@@ -315,7 +335,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 WHERE BreweryPostID = @BreweryPostId
                                 """,
                                 new { brewery.BreweryPostId },
-                                transaction
+                                transaction,
+                                cancellationToken: cancellationToken
                             )
                         )
                         is not null;
@@ -346,7 +367,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 Longitude = brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     );
                 else
@@ -385,12 +407,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 Longitude = brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
-                            transaction
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
                     );
             }
 
-            await transaction.CommitAsync();
+            await transaction.CommitAsync(cancellationToken);
         }
         catch
         {
@@ -398,7 +421,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             throw;
         }
 
-        return await GetByIdAsync(brewery.BreweryPostId)
+        return await GetByIdAsync(brewery.BreweryPostId, cancellationToken)
                ?? throw new InvalidOperationException(
                    $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
                );
@@ -542,25 +565,27 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     ///     Composes a joined row's <see cref="BreweryPost" />, <see cref="BreweryPostLocation" />,
     ///     <see cref="City" />, <see cref="StateProvince" /> and <see cref="Country" /> fragments into a
     ///     single populated <see cref="BreweryPost" />. When the row has no location (a left-joined
-    ///     brewery with no address on file), <paramref name="location" /> is a blank instance produced
-    ///     from all-<c>NULL</c> columns; the schema guarantees that whenever a location row was joined
-    ///     in, its City/StateProvince/Country chain was too.
+    ///     brewery with no address on file), Dapper passes <see langword="null" /> for
+    ///     <paramref name="location" /> rather than a blank instance, since its identity column
+    ///     (<c>BreweryPostLocationID</c>) is <c>NULL</c>; the schema guarantees that whenever a location
+    ///     row was joined in, its City/StateProvince/Country chain was too.
     /// </summary>
     private static BreweryPost MapBreweryRow(
         BreweryPost post,
-        BreweryPostLocation location,
-        City city,
-        StateProvince stateProvince,
-        Country country
+        BreweryPostLocation? location,
+        City? city,
+        StateProvince? stateProvince,
+        Country? country
     )
     {
-        if (location.BreweryPostLocationId == Guid.Empty)
+        if (location is null)
             return post;
 
-        stateProvince.CountryId = country.CountryId;
+        // The schema guarantees that whenever a location row was joined in, its City/StateProvince/
+        // Country chain was too, so these are never null alongside a non-null location.
+        city!.StateProvinceId = stateProvince!.StateProvinceId;
+        stateProvince.CountryId = country!.CountryId;
         stateProvince.Country = country;
-
-        city.StateProvinceId = stateProvince.StateProvinceId;
         city.StateProvince = stateProvince;
 
         location.BreweryPostId = post.BreweryPostId;
