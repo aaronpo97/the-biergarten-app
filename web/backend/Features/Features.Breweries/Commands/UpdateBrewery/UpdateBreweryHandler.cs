@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Exceptions;
 using Features.Breweries.Dtos;
 using Features.Breweries.Repository;
 using MediatR;
@@ -26,13 +27,18 @@ public class UpdateBreweryHandler(IBreweryRepository repository)
         CancellationToken cancellationToken
     )
     {
+        var brewery = await repository.GetByIdAsync(request.BreweryPostId, cancellationToken)
+                          ?? throw new NotFoundException($"Brewery with ID {request.BreweryPostId} not found.");
+
+        if (brewery.PostedById != request.RequestingUserId)
+            throw new ForbiddenException("You are not authorized to update this brewery.");
+        
         BreweryPost entity = new()
         {
             BreweryPostId = request.BreweryPostId,
-            PostedById = request.PostedById,
+            RowVersion = request.RowVersion,
             BreweryName = request.BreweryName,
             Description = request.Description,
-            RowVersion = request.RowVersion,
             UpdatedAt = DateTime.UtcNow,
             Location = request.Location is null
                 ? null

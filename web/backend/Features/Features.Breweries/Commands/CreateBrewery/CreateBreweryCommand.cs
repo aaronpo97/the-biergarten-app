@@ -23,3 +23,10 @@ public record CreateBreweryCommand(
     string Description,
     CreateBreweryLocation Location
 ) : IRequest<BreweryDto>;
+
+/// <summary>Request body for <c>POST /api/brewery</c>. <c>PostedById</c> comes from the caller's JWT.</summary>
+public record CreateBreweryRequest(
+    string BreweryName,
+    string Description,
+    CreateBreweryLocation Location
+);
