@@ -7,12 +7,12 @@ deterministic mock.
 
 > **This pipeline produces AI-generated data.** It is not a source of truth for
 > brewing techniques, cultural representation, or local-language accuracy. See
-> [ETHICS-AND-KNOWN-ISSUES.md](./ETHICS-AND-KNOWN-ISSUES.md) for a full
+> [ETHICS-AND-KNOWN-ISSUES.md](./ETHICS-AND-KNOWN-ISSUES.md) for full
 > documentation of limitations, hallucination patterns, and bias.
 
 ---
 
-## Table of Contents
+## Table of contents
 
 - [How it fits the main app](#how-it-fits-the-main-app)
 - [Quick start](#quick-start)
@@ -176,7 +176,7 @@ output to confirm the fast path was taken.
 ### Run the container
 
 The container always runs the model-backed path; there is no `--mocked`
-container mode (use a native build for that — see [Quick start](#quick-start)).
+container mode (use a native build for that; see [Quick start](#quick-start)).
 The entrypoint, `runpod/start.sh`, downloads the GGUF model automatically if it
 is not already present at the configured path.
 
@@ -191,7 +191,7 @@ docker run --rm \
 
 By default this downloads `google_gemma-4-E4B-it-Q6_K.gguf` to `./models/` on
 first run if it isn't already there. To use a pre-downloaded model, place it at
-that path first — see [Model](#model) above.
+that path first; see [Model](#model).
 
 #### Environment variables
 
@@ -211,8 +211,9 @@ configurable via environment variable.
 
 Use a GPU pod template. Mount persistent storage for `/workspace/models`,
 `/workspace/output`, and `/workspace/logs`. See
-`tooling/pipeline/runpod/pod-template.yaml` for a starter template — set the
-environment variables listed above to match your run.
+`tooling/pipeline/runpod/pod-template.yaml` for a starter template; set the
+environment variables listed in [Environment variables](#environment-variables)
+to match your run.
 
 ---
 
@@ -236,24 +237,24 @@ skipped and the pipeline continues. `GenerateUsers()` runs before
 
 ### Key components
 
-- `src/main.cc` — argument parsing and Boost.DI composition root.
-- `CuratedJsonDataService` — implements `ICuratedDataService`; takes a
+- `src/main.cc`: argument parsing and Boost.DI composition root.
+- `CuratedJsonDataService`: implements `ICuratedDataService`; takes a
   `CuratedDataFilePaths` DTO (locations/personas/forenames/surnames paths) in
   its constructor, then parses and validates curated location, persona, and
   forename/surname JSON, memoizing each result after its first load on a given
   instance. `MockCuratedDataService` is the in-memory substitute (4 fixed
   locations, 3 personas, and name data for `US`/`DE`/`FR`/`BE`) used in
   `--mocked` runs.
-- `WikipediaEnrichmentService` — queries Wikipedia extracts, caches results,
+- `WikipediaEnrichmentService`: queries Wikipedia extracts, caches results,
   returns empty context on failure. `MockEnrichmentService` is the no-op
   substitute used in `--mocked` runs.
-- `LlamaGenerator` — formats prompts for Gemma 4, validates JSON output for both
+- `LlamaGenerator`: formats prompts for Gemma 4, validates JSON output for both
   `GenerateBrewery` and `GenerateUser`, retries malformed responses up to three
   times with corrective feedback in the retry prompt. The token budget is fixed
   across attempts; it is not raised automatically on truncation.
-- `MockGenerator` — stable hash-based output so the same city/persona/name input
+- `MockGenerator`: stable hash-based output so the same city/persona/name input
   always produces the same brewery or user.
-- `SqliteExportService` — creates a dated SQLite file per run and persists each
+- `SqliteExportService`: creates a dated SQLite file per run and persists each
   successful user and brewery into normalized tables.
 - Brewery payloads include English and local-language name and description
   fields. User payloads carry a sampled first/last name and gender, an
@@ -281,13 +282,13 @@ runs.
 `CuratedJsonDataService` memoizes each of `LoadLocations()`, `LoadPersonas()`,
 `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
 first time each is called, since `BiergartenPipelineOrchestrator` owns a single
-`ICuratedDataService` instance for the whole run — later calls return the cached
+`ICuratedDataService` instance for the whole run; later calls return the cached
 result instead of re-parsing.
 
 `GenerateUsers()` samples a forename/surname pair per city via `SampleName()`,
 keyed by the city's ISO 3166-1 code. Countries present in `locations.json` but
 absent from either name fixture (currently `KE`, `SE`, `SG`, `TH`, `VN`, `ZA`)
-are skipped, the same way a failed enrichment or generation call skips a city —
+are skipped, the same way a failed enrichment or generation call skips a city;
 see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section.
 
 ### Process flow - activity diagram
@@ -357,15 +358,14 @@ The build fetches Boost.DI, spdlog, and SQLite via CMake. llama.cpp is fetched
 only when a system installation is not detected. Metal is enabled on Apple
 Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
-> **Code Style:** Code style generally follows the Google Style Guide and
-> features modern C++20 throughout. Formatting follows the Google C++ Style
-> Guide, with the exception of indentation width (3 spaces vs. Google's 2).
+> **Code style:** The code follows the Google C++ Style Guide, except that
+> indentation is 3 spaces instead of Google's 2, and uses C++20 throughout.
 
 ---
 
 ## Tested hardware
 
-### ARM macOS — M1 Pro
+### ARM macOS (M1 Pro)
 
 |           |                                   |
 | --------- | --------------------------------- |
@@ -376,7 +376,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 | Model     | Gemma 4 E4B                       |
 | Inference | llama.cpp with Metal              |
 
-### x86_64 Linux — NVIDIA RTX 2000
+### x86_64 Linux (NVIDIA RTX 2000)
 
 |           |                                |
 | --------- | ------------------------------ |
@@ -387,7 +387,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 | Model     | Gemma 4 E4B                    |
 | Inference | llama.cpp with CUDA 12.x       |
 
-### x86_64 Linux — Docker / RunPod (NVIDIA CUDA)
+### x86_64 Linux (Docker / RunPod, NVIDIA CUDA)
 
 |           |                                             |
 | --------- | ------------------------------------------- |
@@ -407,7 +407,7 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 - Keep `locations.json` structured enough to support discovery and future
   filtering.
 - `personas.json`, `forenames-by-country.json`, and `surnames-by-country.json`
-  are curated/vendored fixture data, not LLM-generated — see
+  are curated/vendored fixture data, not LLM-generated; see
   ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section for provenance.
 - Treat SQLite output as seed material for the app's brewery and user domains,
   not production data.
@@ -435,18 +435,18 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 Paths below are relative to `tooling/pipeline/`.
 
-- `src/main.cc` — argument parsing and DI composition root.
-- `src/biergarten_pipeline_orchestrator/` — orchestration, sampling, logging,
+- `src/main.cc`: argument parsing and DI composition root.
+- `src/biergarten_pipeline_orchestrator/`: orchestration, sampling, logging,
   and export.
-- `src/services/curated_data/` — `CuratedJsonDataService`, the file-backed
+- `src/services/curated_data/`: `CuratedJsonDataService`, the file-backed
   `ICuratedDataService`, and `MockCuratedDataService`, the in-memory
   `ICuratedDataService` used in `--mocked` runs.
-- `src/services/enrichment/wikipedia/` — enrichment service and cache.
-- `src/services/sqlite/` — SQLite export implementation.
-- `src/data_generation/llama/` — local inference, prompt loading, output
+- `src/services/enrichment/wikipedia/`: enrichment service and cache.
+- `src/services/sqlite/`: SQLite export implementation.
+- `src/data_generation/llama/`: local inference, prompt loading, output
   validation.
-- `src/data_generation/mock/` — deterministic fallback.
-- `runpod/` — container build and runtime launcher.
+- `src/data_generation/mock/`: deterministic fallback.
+- `runpod/`: container build and runtime launcher.
 
 ---
 
@@ -458,7 +458,7 @@ exercise the full brewery and social domains without live data. For the detailed
 engineering breakdown of what's needed to reach the architecture in
 [`diagrams/planned/`](./diagrams/planned/), see [ROADMAP.md](./ROADMAP.md).
 
-### Testing — very high priority
+### Testing (very high priority)
 
 - Unit test JSON validation and retry logic against malformed, truncated, and
   empty model outputs.
@@ -481,7 +481,7 @@ enough to exercise search, sort, and category filters.
 ### Check-in system
 
 Produce timestamped check-in events between users and breweries. Use a J-curve
-activity profile — a small set of users accounts for most check-ins, the rest
+activity profile: a small set of users accounts for most check-ins, the rest
 appear occasionally. Add bursty behaviour around weekends and travel periods.
 
 ### Beer ratings

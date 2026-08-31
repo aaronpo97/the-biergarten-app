@@ -21,8 +21,8 @@ The project uses a multi-layered testing approach across backend and frontend:
 
 ## Running tests with Docker (recommended)
 
-The easiest way to run all tests is using Docker Compose, which sets up an
-isolated test environment:
+To run all tests, use Docker Compose, which sets up an isolated test
+environment:
 
 ```bash
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up -d
@@ -43,7 +43,7 @@ This command:
 stopped, regardless of which one finishes first. Long-running services
 (`sqlserver`, `seaweedfs`) and the one-shot `database.migrations` /
 `database.seed` jobs keep running in the background alongside them and are
-torn down separately (see below) — `wait` doesn't touch them.
+torn down separately (see below); `wait` doesn't touch them.
 
 ### View test results
 
@@ -355,15 +355,12 @@ The workflow inspects the exit code of each test container
 after `wait` returns and fails the job if any of them is non-zero.
 `./test-results/` is uploaded as a build artifact regardless of outcome.
 
-Earlier versions of this workflow used
-`up --abort-on-container-exit`, which stops the entire stack the instant
-*any* watched container exits. That's wrong here: the one-shot
-`database.migrations`/`database.seed` jobs are expected to exit 0 partway
-through, and even scoping the flag to just the three test services doesn't
-help, since `frontend.tests` (no database dependency) reliably finishes
-before `api.specs`/`unit.tests` even start, aborting them prematurely.
-`up -d` + `wait` avoids both races by not tying container teardown to any
-single container's exit.
+`up -d` + `wait` keeps container teardown independent of any single
+container's exit. The one-shot `database.migrations`/`database.seed` jobs
+exit 0 partway through the run, and `frontend.tests` (which has no database
+dependency) reliably finishes before `api.specs`/`unit.tests` start; because
+`wait` blocks on all three test containers, neither early exit ends the run
+prematurely.
 
 Exit codes:
 
@@ -414,13 +411,13 @@ act push \
   `sqlserver` service's image is amd64-only, and act needs to know to
   emulate that platform for the whole job container, not just that one
   service.
-- No secrets or `.actrc` are needed — `generate-env.sh` creates its own
+- No secrets or `.actrc` are needed: `generate-env.sh` creates its own
   `.env.test` with freshly randomized values, same as in real CI.
 
 **Known act-only limitation**: the "Upload test results" step
 (`actions/upload-artifact@v4`) fails locally with `Unable to get the
 ACTIONS_RUNTIME_TOKEN env variable`. act doesn't provide a real Actions
-artifact backend, so this step — and only this step — is expected to fail
+artifact backend, so this step, and only this step, is expected to fail
 under act even when everything else passes. It works normally on
 GitHub-hosted runners.
 
@@ -429,7 +426,7 @@ names and named volumes (`sqlserverdata-test`, `seaweedfsdata-test`) scoped
 to the `web` compose project. If a previous local run (via `act` or a
 manual `docker compose` invocation) didn't get torn down, its SQL Server
 volume can persist with an old `SA_PASSWORD` baked in, while a fresh
-`.env.test` generates a new one each run — causing `Login failed for user
+`.env.test` generates a new one each run, causing `Login failed for user
 'sa'` errors that look like a test bug but are really a leftover volume.
 Clear it before re-running:
 

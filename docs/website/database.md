@@ -59,8 +59,8 @@ Scripts live under `scripts/`, applied in order and tracked so a script never
 re-runs once it has succeeded. Today that's `01-schema/`, with one script per
 table, numbered so a table's foreign keys always point at an earlier-numbered
 script. When the schema needs to change, add a new numbered script rather than
-editing an existing one in place — DbUp's tracking is per-script, so editing
-an already-applied script means it won't re-run against existing databases.
+editing an existing one in place: DbUp's tracking is per-script, so an edited
+already-applied script never re-runs against existing databases.
 
 ## Data seeding
 
@@ -68,7 +68,7 @@ an already-applied script means it won't re-run against existing databases.
 pipeline (see [Pipeline README](../pipeline/README.md)): countries,
 state/provinces, and cities (created on demand while resolving each brewery's
 location), user accounts, and brewery posts with locations. It doesn't call
-every feature slice that has a write path — `Photo`, for example, has a
+every feature slice that has a write path: `Photo`, for example, has a
 repository (`Features.PhotoUpload`) but no seed data.
 
 ## Database error handling
@@ -78,10 +78,10 @@ repository (`Features.PhotoUpload`) but no seed data.
 - On failure, the repository throws a `Domain.Exceptions` type directly
   (`NotFoundException`, `ConflictException`, `ArgumentException`, ...).
   `API.Core`'s `GlobalExceptionFilter` maps these to HTTP status codes (404,
-  409, 400, ...); an unmapped `SqlException` (e.g. a genuine connectivity or
-  constraint-violation failure) maps to 503.
+  409, 400, ...); an unmapped `SqlException` (for example, a genuine
+  connectivity or constraint-violation failure) maps to 503.
 
   - One exception: `Features.Users`' `DapperUserStore` does catch
     `SqlException` directly, to detect a duplicate-key race (SQL Server error
     2601 or 2627) when two requests try to verify the same account
-    concurrently — see `DapperUserStore.IsDuplicateKeyViolation`.
+    concurrently; see `DapperUserStore.IsDuplicateKeyViolation`.

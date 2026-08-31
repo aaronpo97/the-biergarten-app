@@ -1,7 +1,7 @@
 # Getting started
 
-This guide covers local setup for the current Biergarten stack: the .NET backend
-in `web/backend` and the active React Router frontend in `web/frontend`.
+This guide covers local setup for the Biergarten stack: the .NET backend in
+`web/backend` and the React Router frontend in `web/frontend`.
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ Available endpoints:
 - Mailpit UI: http://localhost:8025
 - SeaweedFS S3 API: http://localhost:8333
 
-### 4. Start the active frontend
+### 4. Start the frontend
 
 ```bash
 cd web/frontend
@@ -146,10 +146,10 @@ dotnet run --project Database/Database.Seed/Database.Seed.csproj
 dotnet run --project API/API.Core/API.Core.csproj
 ```
 
-## Legacy frontend note
+## Archived frontend
 
-The previous Next.js frontend lives in `archive/next-js-web-app/` for reference
-only and is not the active website.
+`archive/next-js-web-app/` contains an archived Next.js frontend, kept for
+reference; it is not part of the running stack.
 
 ## Next steps
 

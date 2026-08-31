@@ -100,7 +100,8 @@ frontend.tests     # Storybook Vitest + Playwright suites (own Playwright image)
 
 ```bash
 # Run all tests
-docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up -d
+docker compose --env-file web/.env.test -f web/docker-compose.test.yaml wait api.specs unit.tests frontend.tests
 
 # View results
 ls -la test-results/
@@ -110,6 +111,13 @@ cat test-results/Features.Users.Tests.trx
 # Clean up
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 ```
+
+`wait` blocks until `api.specs`, `unit.tests`, and `frontend.tests` have all
+stopped, regardless of which one finishes first; `up --abort-on-container-exit`
+isn't used here because the one-shot `database.migrations`/`database.seed`
+jobs and `frontend.tests` (no database dependency) can exit before the other
+test containers, which would end the run prematurely. See
+[Testing](testing.md#running-tests-with-docker-recommended) for details.
 
 ### 3. Production (`docker-compose.prod.yaml`)
 

@@ -34,8 +34,7 @@ Low-level JWT operations.
 
 #### [ITokenService](../../web/backend/Features/Features.Users/Services/ITokenService.cs)
 
-Both token generation and validation live on the same slice-internal service
-(there is no separate validation service/class).
+Token generation and validation live on the same slice-internal service.
 
 **Generation methods:**
 
@@ -79,8 +78,16 @@ directly.
 1. Receives confirmation token from user via `ConfirmUserCommand`
 2. Calls `ITokenService.ValidateConfirmationTokenAsync()`
 3. Extracts user ID from validated token and looks it up via `UserManager<ApplicationUser>`
-4. Marks the account confirmed via `IUserEmailStore<ApplicationUser>.SetEmailConfirmedAsync()`
+4. Marks the account confirmed via `IUserEmailStore<ApplicationUser>.SetEmailConfirmedAsync()`,
+   then persists it via `UserManager<ApplicationUser>.UpdateAsync()`
 5. Returns confirmation result
+
+`UserManager<ApplicationUser>` and `IUserEmailStore<ApplicationUser>` are
+ASP.NET Core Identity's abstractions, not EF Core's default Identity store:
+the app backs them with its own `DapperUserStore` (see
+[Database](database.md#database-error-handling)), which persists against the
+existing `UserAccount`/`UserCredential`/`UserVerification` tables via Dapper,
+consistent with the rest of the app's repository pattern.
 
 #### [ResendConfirmationEmailHandler](../../web/backend/Features/Features.Users/Commands/Authentication/ResendConfirmationEmail/ResendConfirmationEmailHandler.cs)
 

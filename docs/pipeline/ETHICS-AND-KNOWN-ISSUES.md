@@ -47,7 +47,7 @@ as a source of truth for brewing techniques or cultural representation.**
 
 **Natural language processing is a powerful tool for data analysis and
 generation, but its output should be treated with scrutiny. Human language is
-not simply data points to be analyzed — it carries cultural and human meaning
+not simply data points to be analyzed: it carries cultural and human meaning
 that artificial intelligence cannot capture.**
 
 ---
@@ -102,7 +102,7 @@ vendored verbatim, unmodified, from
 (the `common-forenames-by-country.json` / `common-surnames-by-country.json`
 release assets), released under **CC0** (public domain). That dataset's own
 forename/surname lists are pulled from Wikipedia's "Lists of most common
-surnames" and "List of most popular given names" as of the week of 2023-07-08 —
+surnames" and "List of most popular given names" as of the week of 2023-07-08;
 see that project's README for full provenance. Names are not LLM-generated; this
 is curated fixture data per ROADMAP.md §2. Per-forename gender from the source
 data is preserved through to the sampled `Name` (rather than discarded during
@@ -113,7 +113,7 @@ for surnames) rather than trimmed to `locations.json`'s current country list, so
 it doesn't need re-sourcing if more countries are added later. `SampleName()` (a
 free helper in `generate_users.cc`) returns no result for a country present in
 neither file; of the countries in `locations.json`, that's currently `KE`, `SE`,
-`SG`, `TH`, `VN`, and `ZA` — `GenerateUsers` skips cities in those countries the
+`SG`, `TH`, `VN`, and `ZA`; `GenerateUsers` skips cities in those countries the
 same way brewery generation skips cities whose enrichment lookup fails.
 
 ---
@@ -290,8 +290,8 @@ Each brewery and user address carries a longitude/latitude pair, sampled
 uniformly at random within a 5 km disc centred on the city's curated
 `latitude`/`longitude` from `locations.json`.
 
-The resulting point is **plausible by construction** — it always falls within
-the city's vicinity — but it is not looked up from any real address registry.
+The resulting point is **plausible by construction**, always falling within
+the city's vicinity, but it is not looked up from any real address registry.
 It does not correspond to a real address, business, or resident, and should
 not be treated as accurate geocoding data. This is consistent with the rest of
 the dataset: fixture data for a proof-of-concept, not a source of truth.

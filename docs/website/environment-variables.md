@@ -1,7 +1,6 @@
 # Environment variables
 
-This document covers the active environment variables used by the current
-Biergarten stack.
+This document covers the environment variables used by the Biergarten stack.
 
 ## Overview
 
@@ -19,10 +18,10 @@ Direct environment variable access via `Environment.GetEnvironmentVariable()`.
 
 ### Frontend (`web/frontend`)
 
-The active website reads runtime values from the server environment for its auth
-and API integration. In Docker, the `frontend` service is wired into the same
+The website reads runtime values from the server environment for its auth and
+API integration. In Docker, the `frontend` service is wired into the same
 `web/.env.dev` / `.env.test` / `.env.prod` files as the backend; running it
-locally with `npm run dev` still reads from the shell environment.
+locally with `npm run dev` reads from the shell environment.
 
 ### Docker
 
@@ -104,7 +103,8 @@ WEBSITE_BASE_URL=https://thebiergarten.app          # Base URL for the website
 **Security Requirements**:
 
 - Use at least 32 characters per secret
-- Use 127 or more characters in production
+- Use secrets generated from 127 or more random bytes in production (base64
+  encoding turns 127 bytes into a longer string, well over 127 characters)
 - Generate secrets with a cryptographically secure random function
 - Never reuse secrets across token types or environments
 - Rotate secrets periodically in production
@@ -170,10 +170,17 @@ ASPNETCORE_URLS=http://0.0.0.0:8080  # Binding address and port
 DOTNET_RUNNING_IN_CONTAINER=true     # Flag for container execution
 ```
 
+`ASPNETCORE_URLS` is hardcoded directly in `docker-compose.dev.yaml` and
+`docker-compose.prod.yaml` (not sourced from the `.env` file), so it's
+required only for Docker. Outside Docker, `dotnet run` falls back to the
+`http` profile in `API.Core/Properties/launchSettings.json`
+(`http://localhost:5069`), so manual backend setup (see
+[Getting Started](getting-started.md#manual-backend-setup)) doesn't need to
+set it.
+
 ## Frontend variables (`web/frontend`)
 
-The active website does not use the old Next.js/Prisma environment model. Its
-core runtime variables are:
+The website's core runtime variables are:
 
 ```bash
 API_BASE_URL=http://api.core:8080        # Base URL for the .NET API (container DNS name in Docker)
@@ -291,12 +298,6 @@ cp web/.env.example web/.env.dev
 # Edit web/.env.dev with your values
 ```
 
-## Legacy frontend variables
-
-Variables for the archived Next.js frontend (`archive/next-js-web-app/`) have
-been removed from this active reference, since that app is retained for
-reference only and is not run as part of the active stack.
-
 **Docker Compose Mapping**:
 
 - `web/docker-compose.dev.yaml` → `web/.env.dev`
@@ -334,7 +335,7 @@ reference only and is not run as part of the active stack.
 | `PORT`                        |         |    ✓     |   ✓    |    No    | Frontend server port         |
 | `CLEAR_DATABASE`              |    ✓    |          |   ✓    |    No    | Dev/test reset flag          |
 | `ASPNETCORE_ENVIRONMENT`      |    ✓    |          |   ✓    |   Yes    | ASP.NET environment          |
-| `ASPNETCORE_URLS`             |    ✓    |          |   ✓    |   Yes    | API binding address          |
+| `ASPNETCORE_URLS`             |    ✓    |          |   ✓    | Yes\*\*  | API binding address          |
 | `SA_PASSWORD`                 |         |          |   ✓    |   Yes    | SQL Server container         |
 | `ACCEPT_EULA`                 |         |          |   ✓    |   Yes    | SQL Server EULA              |
 | `MSSQL_PID`                   |         |          |   ✓    |    No    | SQL Server edition           |
@@ -342,6 +343,10 @@ reference only and is not run as part of the active stack.
 
 \* Either `DB_CONNECTION_STRING` OR the component variables (`DB_SERVER`,
 `DB_NAME`, `DB_USER`, `DB_PASSWORD`) must be provided.
+
+\*\* Required for Docker, where it's hardcoded in the compose files. Outside
+Docker, `dotnet run` falls back to the `applicationUrl` in
+`launchSettings.json`.
 
 ## Validation
 
@@ -359,8 +364,8 @@ Variables are validated at startup:
 
 ### Frontend validation
 
-The active website relies on runtime defaults for local development and the
-surrounding server environment in deployed environments.
+The website relies on runtime defaults for local development and on the server
+environment when deployed.
 
 - `API_BASE_URL` defaults to `http://localhost:8080`
 - `SESSION_SECRET` falls back to a development-only local secret

@@ -1,11 +1,10 @@
 # Architecture
 
-This document describes the active architecture of The Biergarten App.
+This document describes the architecture of The Biergarten App.
 
 ## High-level overview
 
-The Biergarten App is a monorepo with a clear split between the backend and the
-active website:
+The Biergarten App is a monorepo split between the backend and the website:
 
 - **Backend**: .NET 10 Web API with SQL Server, organized as vertical feature
   slices with MediatR
@@ -13,8 +12,8 @@ active website:
 - **Architecture Style**: Vertical-slice backend plus server-rendered React
   frontend
 
-The legacy Next.js frontend has been retained in `archive/next-js-web-app/` for
-reference only.
+`archive/next-js-web-app/` contains an archived Next.js frontend, kept for
+reference.
 
 ## Diagrams
 
@@ -24,10 +23,24 @@ For visual representations, see:
   architecture diagram
 - [deployment.svg](website/diagrams-out/deployment.svg) - Docker deployment
   diagram
-- [authentication-flow.svg](website/diagrams-out/authentication-flow.svg) -
-  Authentication workflow
 - [database-schema.svg](website/diagrams-out/database-schema.svg) - Database
   relationships
+
+Authentication workflow diagrams, one per flow, under
+`website/diagrams-out/auth/`:
+
+- [registration.svg](website/diagrams-out/auth/registration.svg)
+- [login.svg](website/diagrams-out/auth/login.svg)
+- [refresh-token.svg](website/diagrams-out/auth/refresh-token.svg)
+- [confirm-user.svg](website/diagrams-out/auth/confirm-user.svg)
+- [resend-confirmation.svg](website/diagrams-out/auth/resend-confirmation.svg)
+- [update-username.svg](website/diagrams-out/auth/update-username.svg)
+- [update-email.svg](website/diagrams-out/auth/update-email.svg)
+- [update-password.svg](website/diagrams-out/auth/update-password.svg)
+- [update-profile.svg](website/diagrams-out/auth/update-profile.svg)
+- [delete-account.svg](website/diagrams-out/auth/delete-account.svg)
+- [error-handling.svg](website/diagrams-out/auth/error-handling.svg) - shared
+  `GlobalExceptionFilter` mapping used by all flows above
 
 ## Backend architecture
 
@@ -38,7 +51,7 @@ technical layers. Each feature (`Features.Users`, `Features.Breweries`,
 `Features.Emails`, `Features.Locations`, `Features.PhotoUpload`) is a single
 project that owns its own MediatR commands/queries/handlers, validators, and
 repository end to end. `Features.Emails`, `Features.Locations`, and
-`Features.PhotoUpload` have no `Controllers/` folder — all three are invoked
+`Features.PhotoUpload` have no `Controllers/` folder; all three are invoked
 internally by other slices via MediatR/DI, never over HTTP:
 
 ```
@@ -128,12 +141,12 @@ own
 
 `Features.Emails` has no `Controllers/` folder. It's invoked only via MediatR
 commands sent from other slices, never over HTTP. `Features.Locations` also has
-no `Controllers/` folder and no MediatR handlers — it exposes
+no `Controllers/` folder and no MediatR handlers; it exposes
 `ILocationRepository` directly as a plain service, currently consumed only by
 `Database.Seed` to look up cities while seeding brewery locations. Other slices
 (for example, `Features.Breweries`) do not yet depend on it; they run their own
 `CityID` existence checks inline. `Features.PhotoUpload` also has no
-`Controllers/` folder — its `UploadPhotoCommand` is sent by other features'
+`Controllers/` folder; its `UploadPhotoCommand` is sent by other features'
 handlers (for example, a future brewery photo upload command) rather than
 bound to an HTTP route directly. The one exception today is the `/upload-test`
 minimal API endpoint wired directly in `API.Core/Program.cs`, a temporary route
@@ -320,12 +333,12 @@ method that registers its repository and slice-internal services
 #### Direct SQL via Dapper/ADO.NET
 
 **Purpose**: Keep data access explicit and colocated with the slice that owns
-it, without an ORM's change-tracking or mapping magic
+it
 
 **Strategy**:
 
-- No ORM (Entity Framework not used); each repository issues inline SQL
-  through Dapper, with no manual `IDbCommand` parameter binding. The one
+- No ORM; each repository issues inline SQL through Dapper, which handles
+  parameter binding. The one
   wrinkle is the `GEOGRAPHY` column on `BreweryPostLocation`, which Dapper
   can't deserialize as a UDT: reads select `CONVERT(varbinary(max),
   Coordinates)` so the value comes back as a plain `byte[]` Dapper can bind.
@@ -334,26 +347,25 @@ it, without an ORM's change-tracking or mapping magic
   avoiding a client-side distance calculation over every row. No spatial
   index backs the query yet; `schema.sql` sketches one, commented out, for
   when the table grows large enough to need it
-- Referential checks that a stored procedure used to perform (e.g. "does this
-  `CityId` exist?") are now explicit `SELECT 1 ...` existence checks in the
-  repository method, run inside the same transaction as the write
+- Referential checks (for example, "does this `CityId` exist?") are explicit
+  `SELECT 1 ...` existence checks in the repository method, run inside the
+  same transaction as the write
 - Optimistic concurrency uses each table's `RowVersion` (`ROWVERSION`) column,
   checked in the `UPDATE ... WHERE ... AND RowVersion = @RowVersion` clause
 - Repositories throw `Domain.Exceptions` types (`NotFoundException`,
-  `ConflictException`, ...) directly when a check fails, rather than relying on
-  a database-side `THROW`; `API.Core`'s `GlobalExceptionFilter` maps those
-  exception types to HTTP status codes
+  `ConflictException`, ...) directly when a check fails; `API.Core`'s
+  `GlobalExceptionFilter` maps those exception types to HTTP status codes
 - Application focuses on orchestration; the database enforces integrity via
   keys, `CHECK` constraints, and cascades
 
-See [Database](website/database.md) for the schema and the app's current SQL
+See [Database](website/database.md) for the schema and the app's SQL
 error-handling approach in more detail.
 
 ## Frontend architecture
 
-### Active website (`web/frontend`)
+### Website (`web/frontend`)
 
-The current website is a React Router 7 application with server-side rendering
+The website is a React Router 7 application with server-side rendering
 enabled.
 
 ```text
@@ -397,7 +409,7 @@ web/frontend/
 
 ### Theme system
 
-The active website uses semantic DaisyUI theme tokens backed by four Biergarten
+The website uses semantic DaisyUI theme tokens backed by four Biergarten
 themes:
 
 - Biergarten Lager
@@ -408,11 +420,10 @@ themes:
 All component styling should prefer semantic tokens such as `primary`,
 `success`, `surface`, and `highlight` instead of hard-coded color values.
 
-### Legacy frontend
+### Archived frontend
 
-The previous Next.js frontend has been archived at `archive/next-js-web-app/`
-for reference only. Active product and engineering documentation should point to
-`web/frontend`.
+`archive/next-js-web-app/` contains an archived Next.js frontend, kept for
+reference. Product and engineering documentation points to `web/frontend`.
 
 ## Security architecture
 
@@ -431,8 +442,8 @@ for reference only. Active product and engineering documentation should point to
 3. **Login**:
    - User submits credentials
    - Password verified against hash
-   - Access and refresh JWTs are issued; the refresh token is stored server-side
-     against the user's credential row
+   - Access and refresh JWTs are issued and returned to the client; neither is
+     stored server-side
 
 4. **Token refresh**:
    - Client exchanges a valid, unexpired refresh token for a new access/refresh
