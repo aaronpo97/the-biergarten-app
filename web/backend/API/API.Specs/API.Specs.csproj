@@ -41,5 +41,7 @@
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
         <ProjectReference Include="..\..\Features\Features.Emails\Features.Emails.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
+        <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
     </ItemGroup>
 </Project>
