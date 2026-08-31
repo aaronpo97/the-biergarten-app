@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using Domain.Exceptions;
 using Features.Breweries.Commands.CreateBrewery;
 using Features.Breweries.Commands.DeleteBrewery;
 using Features.Breweries.Commands.UpdateBrewery;
@@ -25,14 +23,6 @@ namespace Features.Breweries.Controllers;
 [Authorize(AuthenticationSchemes = "JWT")]
 public class BreweryController(IMediator mediator) : ControllerBase
 {
-    private Guid GetAuthenticatedUserId()
-    {
-        string? userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (!Guid.TryParse(userIdClaim, out Guid userId))
-            throw new UnauthorizedException("Access token is missing a valid user ID claim");
-        return userId;
-    }
-
     /// <summary>Retrieves a single brewery post by ID.</summary>
     /// <remarks>Allows anonymous access.</remarks>
     /// <returns><c>200 OK</c> with the brewery if found; otherwise <c>404 Not Found</c>.</returns>
@@ -128,7 +118,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
     {
         BreweryDto brewery = await mediator.Send(
             new CreateBreweryCommand(
-                GetAuthenticatedUserId(),
+                User.GetAuthenticatedUserId(),
                 request.BreweryName,
                 request.Description,
                 request.Location
@@ -163,7 +153,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
         BreweryDto breweryUpdated = await mediator.Send(
             new UpdateBreweryCommand(
                 request.BreweryPostId,
-                GetAuthenticatedUserId(),
+                User.GetAuthenticatedUserId(),
                 request.RowVersion,
                 request.BreweryName,
                 request.Description,
@@ -185,7 +175,7 @@ public class BreweryController(IMediator mediator) : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ResponseBody>> Delete(Guid id)
     {
-        await mediator.Send(new DeleteBreweryCommand(id, GetAuthenticatedUserId()));
+        await mediator.Send(new DeleteBreweryCommand(id, User.GetAuthenticatedUserId()));
         return Ok(new ResponseBody { Message = "Brewery deleted successfully." });
     }
 }

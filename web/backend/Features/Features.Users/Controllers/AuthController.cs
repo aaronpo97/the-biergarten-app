@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using Domain.Exceptions;
 using Features.Auth.Commands.Account.DeleteAccount;
 using Features.Auth.Commands.Account.UpdateEmail;
 using Features.Auth.Commands.Account.UpdatePassword;
@@ -31,18 +29,6 @@ namespace Features.Auth.Controllers;
 [Authorize(AuthenticationSchemes = "JWT")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
-    /// <summary>
-    ///     Extracts the authenticated caller's user ID from the validated access token's <c>sub</c> claim.
-    /// </summary>
-    /// <exception cref="UnauthorizedException">Thrown when the claim is missing or malformed.</exception>
-    private Guid GetAuthenticatedUserId()
-    {
-        string? userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (!Guid.TryParse(userIdClaim, out Guid userId))
-            throw new UnauthorizedException("Access token is missing a valid user ID claim");
-        return userId;
-    }
-
     /// <summary>Registers a new user account.</summary>
     /// <remarks>
     ///     Anonymous access. Returns 201 Created with the new account's ID, username, and issued tokens.
@@ -150,7 +136,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     )
     {
         UpdateUsernamePayload payload = await mediator.Send(
-            new UpdateUsernameCommand(GetAuthenticatedUserId(), request.NewUsername)
+            new UpdateUsernameCommand(User.GetAuthenticatedUserId(), request.NewUsername)
         );
         return Ok(
             new ResponseBody<UpdateUsernamePayload>
@@ -172,7 +158,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     )
     {
         UpdateEmailPayload payload = await mediator.Send(
-            new UpdateEmailCommand(GetAuthenticatedUserId(), request.NewEmail)
+            new UpdateEmailCommand(User.GetAuthenticatedUserId(), request.NewEmail)
         );
         return Ok(
             new ResponseBody<UpdateEmailPayload>
@@ -195,7 +181,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     {
         UpdatePasswordPayload payload = await mediator.Send(
             new UpdatePasswordCommand(
-                GetAuthenticatedUserId(),
+                User.GetAuthenticatedUserId(),
                 request.CurrentPassword,
                 request.NewPassword
             )
@@ -218,7 +204,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     {
         UpdateProfilePayload payload = await mediator.Send(
             new UpdateProfileCommand(
-                GetAuthenticatedUserId(),
+                User.GetAuthenticatedUserId(),
                 request.FirstName,
                 request.LastName,
                 request.DateOfBirth
@@ -241,7 +227,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     [HttpDelete("account")]
     public async Task<ActionResult<ResponseBody>> DeleteAccount()
     {
-        await mediator.Send(new DeleteAccountCommand(GetAuthenticatedUserId()));
+        await mediator.Send(new DeleteAccountCommand(User.GetAuthenticatedUserId()));
         return Ok(new ResponseBody { Message = "Account deleted successfully." });
     }
 }
