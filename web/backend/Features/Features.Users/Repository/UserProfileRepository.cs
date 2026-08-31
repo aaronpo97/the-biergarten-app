@@ -36,7 +36,10 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
     }
 
     /// <inheritdoc />
-    public async Task<Guid> GetProfileIdAsync(Guid userAccountId, CancellationToken cancellationToken)
+    public async Task<Guid> GetProfileIdAsync(
+        Guid userAccountId,
+        CancellationToken cancellationToken
+    )
     {
         await using DbConnection connection = await CreateConnection();
 
@@ -53,7 +56,9 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
         );
 
         return userProfileId
-            ?? throw new NotFoundException($"No user profile found for user account ID {userAccountId}");
+            ?? throw new NotFoundException(
+                $"No user profile found for user account ID {userAccountId}"
+            );
     }
 
     /// <inheritdoc />
@@ -78,14 +83,18 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
         );
 
         if (updatedRows == 0)
-            throw new NotFoundException($"No user profile found for user account ID {userAccountId}");
+            throw new NotFoundException(
+                $"No user profile found for user account ID {userAccountId}"
+            );
     }
 
     /// <inheritdoc />
     public async Task SaveAvatarAsync(UserAvatar avatar, CancellationToken cancellationToken)
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(
+            cancellationToken
+        );
 
         try
         {
@@ -107,7 +116,12 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
                     INSERT INTO dbo.UserAvatar (UserAvatarID, UserProfileID, PhotoID)
                     VALUES (@UserAvatarId, @UserProfileId, @PhotoId)
                     """,
-                    new { avatar.UserAvatarId, avatar.UserProfileId, avatar.PhotoId },
+                    new
+                    {
+                        avatar.UserAvatarId,
+                        avatar.UserProfileId,
+                        avatar.PhotoId,
+                    },
                     transaction
                 )
             );

@@ -28,7 +28,11 @@ public interface IUserProfileRepository
     /// <exception cref="Domain.Exceptions.NotFoundException">
     ///     Thrown when no user profile exists for <paramref name="userAccountId" />.
     /// </exception>
-    Task UpdateBiographyAsync(Guid userAccountId, string biography, CancellationToken cancellationToken);
+    Task UpdateBiographyAsync(
+        Guid userAccountId,
+        string biography,
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     ///     Persists <paramref name="avatar" />, replacing any existing avatar for the same user profile.

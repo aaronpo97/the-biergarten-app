@@ -7,7 +7,10 @@ namespace Features.Auth.Commands.Profile.CreateUserProfile;
 public class CreateUserProfileHandler(IUserProfileRepository userProfileRepository)
     : IRequestHandler<CreateUserProfileCommand, Guid>
 {
-    public Task<Guid> Handle(CreateUserProfileCommand request, CancellationToken cancellationToken) =>
+    public Task<Guid> Handle(
+        CreateUserProfileCommand request,
+        CancellationToken cancellationToken
+    ) =>
         userProfileRepository.CreateProfileAsync(
             request.UserAccountId,
             request.Biography,
