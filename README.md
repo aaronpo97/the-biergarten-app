@@ -84,7 +84,7 @@ prerequisite list, including the pipeline's C++ toolchain.
 For full setup details, use [Getting Started](docs/website/getting-started.md).
 This section is the shortest path to a working dev environment.
 
-### Backend (Docker)
+### Full stack (Docker)
 
 ```bash
 git clone https://github.com/aaronpo97/the-biergarten-app
@@ -94,14 +94,15 @@ cp web/.env.example web/.env.dev
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up --build -d
 ```
 
-Backend access:
+Access:
 
+- Website: http://localhost:3000
 - API Swagger: http://localhost:8080/swagger
 - Health Check: http://localhost:8080/health
 - Mailpit UI (dev SMTP): http://localhost:8025
 - SeaweedFS S3 API (dev object storage): http://localhost:8333
 
-### Frontend (Node)
+### Frontend (Node, outside Docker)
 
 ```bash
 cd web/frontend
@@ -140,14 +141,18 @@ archive/
 
 ## Testing
 
-Create a test environment file, then run the backend test stack with Docker:
+Create a test environment file, then run the full test stack (backend and
+frontend) with Docker:
 
 ```bash
 cp web/.env.example web/.env.test
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
-See [Testing](docs/website/testing.md) for the full command list.
+The same command runs in CI via
+[`.github/workflows/tests.yml`](.github/workflows/tests.yml) on every push
+and pull request to `main`. See [Testing](docs/website/testing.md) for the
+full command list.
 
 ## Configuration
 

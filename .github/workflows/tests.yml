@@ -1,0 +1,55 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  containerized-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Generate test environment file
+        run: ./generate-env.sh .env.test
+
+      - name: Build test images
+        run: docker compose --env-file .env.test -f docker-compose.test.yaml build
+
+      - name: Run tests
+        run: docker compose --env-file .env.test -f docker-compose.test.yaml up --abort-on-container-exit
+
+      - name: Check test container exit codes
+        if: always()
+        run: |
+          status=0
+          for name in test-env-api-specs test-env-unit-tests test-env-frontend-tests; do
+            code="$(docker inspect -f '{{.State.ExitCode}}' "$name" 2>/dev/null || echo 1)"
+            echo "$name exited with $code"
+            if [ "$code" != "0" ]; then
+              status=1
+            fi
+          done
+          exit $status
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose --env-file .env.test -f docker-compose.test.yaml logs
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: web/test-results
+
+      - name: Tear down
+        if: always()
+        run: docker compose --env-file .env.test -f docker-compose.test.yaml down -v

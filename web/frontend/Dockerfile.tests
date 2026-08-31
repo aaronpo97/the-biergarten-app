@@ -1,0 +1,10 @@
+# Ships Playwright's own browsers preinstalled, matching the @playwright/test
+# version pinned in package.json, so the Storybook Vitest and Playwright
+# suites (both browser-driven) don't need a separate browser-install step.
+FROM mcr.microsoft.com/playwright:v1.62.1-jammy AS test
+WORKDIR /src
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN mkdir -p /app/test-results/frontend
+ENTRYPOINT ["sh", "-c", "set -e; npx vitest run --project storybook --reporter=junit --outputFile=/app/test-results/frontend/vitest-storybook.xml; PLAYWRIGHT_JUNIT_OUTPUT_NAME=/app/test-results/frontend/playwright-storybook.xml npx playwright test -c playwright.storybook.config.ts --reporter=junit"]

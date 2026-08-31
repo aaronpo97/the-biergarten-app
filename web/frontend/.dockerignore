@@ -1,0 +1,15 @@
+**/.dockerignore
+**/.env
+**/.env.*
+**/.git
+**/.gitignore
+**/.vscode
+**/.idea
+**/node_modules
+**/build
+**/.react-router
+**/storybook-static
+**/coverage
+**/test-results
+**/docker-compose*
+**/Dockerfile*
