@@ -57,6 +57,8 @@ services:
     depends_on:
       database.migrations:
         condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     build:
       context: ./backend
       dockerfile: Database/Database.Seed/Dockerfile
@@ -69,6 +71,10 @@ services:
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     restart: "no"
     networks:
       - devnet

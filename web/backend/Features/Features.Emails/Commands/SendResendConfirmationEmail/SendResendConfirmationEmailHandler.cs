@@ -5,7 +5,7 @@ using Shared.Application.Emails;
 namespace Features.Emails.Commands.SendResendConfirmationEmail;
 
 /// <summary>
-///     Handles <see cref="SendResendConfirmationEmailCommand" />, the cross-slice command sent by Features.Auth
+///     Handles <see cref="SendResendConfirmationEmailCommand" />, the cross-slice command sent by Features.Users
 ///     when a user requests a fresh confirmation link.
 /// </summary>
 public class SendResendConfirmationEmailHandler(IEmailDispatcher emailDispatcher)

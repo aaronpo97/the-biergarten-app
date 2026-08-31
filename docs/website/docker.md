@@ -101,7 +101,7 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abo
 # View results
 ls -la test-results/
 cat test-results/api-specs/results.trx
-cat test-results/Features.Auth.Tests.trx
+cat test-results/Features.Users.Tests.trx
 
 # Clean up
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v

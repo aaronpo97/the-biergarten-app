@@ -25,7 +25,12 @@ public class UploadPhotoHandler(
             cancellationToken
         );
 
-        Photo photo = new() { Hyperlink = key, UploadedById = request.UploadedById };
+        Photo photo = new()
+        {
+            PhotoId = photoId,
+            Hyperlink = key,
+            UploadedById = request.UploadedById,
+        };
 
         await photoUploadRepository.CreateAsync(photo, cancellationToken);
 

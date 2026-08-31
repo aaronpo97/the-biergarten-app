@@ -2,15 +2,13 @@ using API.Core;
 using API.Core.Authentication;
 using Database.Connection.DependencyInjection;
 using Features.Auth.Controllers;
-using Features.Auth.DependencyInjection;
+using Features.Users.DependencyInjection;
 using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
 using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
-using Features.UserManagement.Controllers;
-using Features.UserManagement.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.FileUpload;
@@ -25,12 +23,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add current controllers to the exception filter
 builder
-    .Services.AddControllers(options =>
-    {
-        options.Filters.Add<GlobalExceptionFilter>();
-    })
+    .Services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); })
     .AddApplicationPart(typeof(BreweryController).Assembly)
-    .AddApplicationPart(typeof(UserController).Assembly)
     .AddApplicationPart(typeof(AuthController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -69,7 +63,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
-builder.Services.AddValidatorsFromAssembly(typeof(UserController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(UploadPhotoCommand).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
@@ -80,7 +73,6 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<Program>();
     cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(UserController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
@@ -98,8 +90,7 @@ if (!builder.Environment.IsProduction())
 builder.Services.AddDatabaseConnection();
 
 builder.Services.AddFeaturesBreweries();
-builder.Services.AddFeaturesUserManagement();
-builder.Services.AddFeaturesAuth();
+builder.Services.AddFeaturesUsers();
 builder.Services.AddFeaturesEmails();
 builder.Services.AddFeaturesPhotoUpload();
 
@@ -129,20 +120,6 @@ app.UseAuthorization();
 app.MapHealthChecks("/health");
 
 app.MapControllers();
-
-app.MapPost(
-        "/upload-test",
-        async (IFormFile file, ClaimsPrincipal user, IMediator mediator) =>
-        {
-            Guid uploadedById = Guid.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)!.Value);
-            Guid photoId = await mediator.Send(
-                new UploadPhotoCommand(uploadedById, "upload-test", file)
-            );
-            return Results.Ok(photoId);
-        }
-    )
-    .RequireAuthorization()
-    .DisableAntiforgery();
 
 app.MapFallbackToController("Handle404", "NotFound");
 

@@ -31,8 +31,24 @@ Table Photo {
 
 Table UserAvatar {
   UserAvatarID uniqueidentifier [pk, default: `newid()`]
-  UserAccountID uniqueidentifier [not null, unique]
+  UserProfileID uniqueidentifier [not null]
   PhotoID uniqueidentifier [not null]
+  ValidFrom "datetime2(3)" [not null, default: `sysutcdatetime()`]
+  ValidTo "datetime2(3)" [note: 'NULL = currently active']
+  RowVersion rowversion
+
+  Note: 'Deleted when the user profile is deleted. At most one row per profile has ValidTo = NULL.'
+
+  Indexes {
+    UserProfileID [unique, name: 'UX_UserAvatar_ActiveOne', note: 'filtered: WHERE ValidTo IS NULL']
+    PhotoID [name: 'IX_UserAvatar_Photo']
+  }
+}
+
+Table UserProfile {
+  UserProfileID uniqueidentifier [pk, default: `newid()`]
+  Biography "nvarchar(max)" [not null]
+  UserAccountID uniqueidentifier [not null, unique]
   RowVersion rowversion
 
   Note: 'Deleted when the user account is deleted'
@@ -216,8 +232,9 @@ Table BeerPostComment {
 }
 
 Ref: Photo.UploadedByID > UserAccount.UserAccountID [delete: no action]
-Ref: UserAvatar.UserAccountID - UserAccount.UserAccountID [delete: cascade]
-Ref: UserAvatar.PhotoID > Photo.PhotoID
+Ref: UserAvatar.PhotoID > Photo.PhotoID [delete: no action]
+Ref: UserAvatar.UserProfileID > UserProfile.UserProfileID [delete: cascade]
+Ref: UserProfile.UserAccountID - UserAccount.UserAccountID [delete: cascade]
 Ref: UserVerification.UserAccountID - UserAccount.UserAccountID [delete: cascade]
 Ref: UserCredential.UserAccountID > UserAccount.UserAccountID [delete: cascade]
 Ref: UserFollow.UserAccountID > UserAccount.UserAccountID [delete: no action]

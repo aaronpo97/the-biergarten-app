@@ -10,10 +10,10 @@ The project uses a multi-layered testing approach across backend and frontend:
 - **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against a
   live, seeded database
 - **Features.\*.Tests** - One unit test project per backend feature slice
-  (`Features.Auth.Tests`, `Features.Breweries.Tests`,
-  `Features.UserManagement.Tests`, `Features.Emails.Tests`,
-  `Features.PhotoUpload.Tests`), covering that slice's command/query
-  handlers, with dependencies mocked via Moq (no real database required)
+  (`Features.Users.Tests`, `Features.Breweries.Tests`,
+  `Features.Emails.Tests`, `Features.PhotoUpload.Tests`), covering that
+  slice's command/query handlers, with dependencies mocked via Moq (no real
+  database required)
 - **Storybook Vitest project** - Browser-based interaction tests for shared
   website stories
 - **Storybook Playwright suite** - Browser checks against Storybook-rendered
@@ -45,9 +45,8 @@ ls -la test-results/
 
 # View specific test results
 cat test-results/api-specs/results.trx
-cat test-results/Features.Auth.Tests.trx
+cat test-results/Features.Users.Tests.trx
 cat test-results/Features.Breweries.Tests.trx
-cat test-results/Features.UserManagement.Tests.trx
 cat test-results/Features.Emails.Tests.trx
 cat test-results/Features.PhotoUpload.Tests.trx
 ```
@@ -83,9 +82,8 @@ handlers:
 
 ```bash
 cd web/backend
-dotnet test Features/Features.Auth.Tests/Features.Auth.Tests.csproj
+dotnet test Features/Features.Users.Tests/Features.Users.Tests.csproj
 dotnet test Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj
-dotnet test Features/Features.UserManagement.Tests/Features.UserManagement.Tests.csproj
 dotnet test Features/Features.Emails.Tests/Features.Emails.Tests.csproj
 dotnet test Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj
 
@@ -150,7 +148,7 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 ### Current coverage
 
-**Features.Auth.Tests**:
+**Features.Users.Tests**:
 
 - User registration with validation
 - User login with JWT token generation
@@ -162,16 +160,13 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 - Account management: username, email, password, and profile updates, and
   account deletion (blocked while dependent posts, comments, photos, or follows
   exist)
+- User get-by-id/get-all queries
 
 **Features.Breweries.Tests**:
 
 - Brewery create/update/delete commands and get-by-id/get-all queries
 - Brewery location queries: all locations, and locations within a given range
   of a coordinate
-
-**Features.UserManagement.Tests**:
-
-- User get-by-id/get-all queries and the (currently unrouted) update command
 
 **Features.Emails.Tests**:
 
@@ -264,10 +259,10 @@ Scenario: Successful user registration
   And my account should be created
 ```
 
-### Features.Auth.Tests
+### Features.Users.Tests
 
 ```
-Features.Auth.Tests/
+Features.Users.Tests/
 ├── Commands/
 │   ├── RegisterUserHandlerTests.cs
 │   ├── ConfirmUserHandlerTests.cs
@@ -279,14 +274,16 @@ Features.Auth.Tests/
 │   ├── UpdateProfileHandlerTests.cs
 │   └── DeleteAccountHandlerTests.cs
 ├── Queries/
-│   └── LoginHandlerTests.cs            # tests LoginCommand, despite the folder name
-└── Services/
-    ├── TokenServiceRefreshTests.cs
-    └── TokenServiceValidationTests.cs
+│   ├── LoginHandlerTests.cs            # tests LoginCommand, despite the folder name
+│   ├── GetAllUsersHandlerTests.cs
+│   └── GetUserByIdHandlerTests.cs
+├── Services/
+│   ├── TokenServiceRefreshTests.cs
+│   └── TokenServiceValidationTests.cs
+└── TestSupport/                        # shared test fixtures/helpers
 ```
 
-Each of the other slices (`Features.Breweries.Tests`,
-`Features.UserManagement.Tests`, `Features.Emails.Tests`,
+Each of the other slices (`Features.Breweries.Tests`, `Features.Emails.Tests`,
 `Features.PhotoUpload.Tests`) follows the same shape: a `Commands/`/`Queries/`
 folder with one test file per handler (`Features.PhotoUpload.Tests` also adds
 a validator test file alongside its handler test).

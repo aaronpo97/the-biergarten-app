@@ -130,9 +130,8 @@ package "Test Environment\n(docker-compose.test.yaml)" #FFF3E0 {
       restores/builds against Core.slnx
       then runs `dotnet test` for every
       Features/*.Tests project in turn:
-      - Features.Auth.Tests
+      - Features.Users.Tests
       - Features.Breweries.Tests
-      - Features.UserManagement.Tests
       - Features.Emails.Tests
 
       Uses: Moq to mock each handler's
@@ -261,9 +260,8 @@ package "Minimal Environment\n(docker-compose.min.yaml)" #FFF9C4 {
 
 folder "test-results/\n(mounted volume)" as Results {
   file "api-specs/\n  results.trx" as Result1
-  file "Features.Auth.Tests.trx" as Result2
+  file "Features.Users.Tests.trx" as Result2
   file "Features.Breweries.Tests.trx" as Result3
-  file "Features.UserManagement.Tests.trx" as Result4
   file "Features.Emails.Tests.trx" as Result5
 
   note bottom
