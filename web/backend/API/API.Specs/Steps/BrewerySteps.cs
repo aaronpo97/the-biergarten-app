@@ -10,12 +10,8 @@ using Reqnroll;
 namespace API.Specs.Steps;
 
 [Binding]
-public class BrewerySteps(ScenarioContext scenario)
+public class BrewerySteps(ScenarioContext scenario) : ApiStepsBase(scenario)
 {
-    private const string ClientKey = "client";
-    private const string FactoryKey = "factory";
-    private const string ResponseKey = "response";
-    private const string ResponseBodyKey = "responseBody";
     private const string AccessTokenKey = "accessToken";
     private const string CityIdKey = "cityId";
     private const string BreweryPostIdKey = "breweryPostId";
@@ -32,32 +28,10 @@ public class BrewerySteps(ScenarioContext scenario)
     // the shared fixture city is serialized the same way AuthSteps serializes its fixture account.
     private static readonly SemaphoreSlim CityProvisioningLock = new(1, 1);
 
-    private TestApiFactory GetFactory()
-    {
-        TestApiFactory? factory = scenario.TryGetValue<TestApiFactory>(
-            FactoryKey,
-            out TestApiFactory? f
-        )
-            ? f
-            : new TestApiFactory();
-        scenario[FactoryKey] = factory;
-        return factory;
-    }
-
-    private HttpClient GetClient()
-    {
-        if (scenario.TryGetValue<HttpClient>(ClientKey, out HttpClient? client))
-            return client;
-
-        client = GetFactory().CreateClient();
-        scenario[ClientKey] = client;
-        return client;
-    }
-
     private HttpRequestMessage NewAuthenticatedRequest(HttpMethod method, string url)
     {
         HttpRequestMessage requestMessage = new(method, url);
-        if (scenario.TryGetValue<string>(AccessTokenKey, out string? accessToken))
+        if (Scenario.TryGetValue<string>(AccessTokenKey, out string? accessToken))
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
         return requestMessage;
     }
@@ -68,8 +42,8 @@ public class BrewerySteps(ScenarioContext scenario)
         HttpResponseMessage response = await client.SendAsync(requestMessage);
         string responseBody = await response.Content.ReadAsStringAsync();
 
-        scenario[ResponseKey] = response;
-        scenario[ResponseBodyKey] = responseBody;
+        Scenario[ResponseKey] = response;
+        Scenario[ResponseBodyKey] = responseBody;
     }
 
     [Given("a city exists")]
@@ -98,7 +72,7 @@ public class BrewerySteps(ScenarioContext scenario)
             CityProvisioningLock.Release();
         }
 
-        scenario[CityIdKey] = cityId;
+        Scenario[CityIdKey] = cityId;
     }
 
     private async Task CreateBreweryAsync(
@@ -140,7 +114,7 @@ public class BrewerySteps(ScenarioContext scenario)
     public async Task WhenICreateABreweryWithValues(Table table)
     {
         DataTableRow row = table.Rows[0];
-        Guid cityId = scenario.TryGetValue(CityIdKey, out Guid id) ? id : Guid.NewGuid();
+        Guid cityId = Scenario.TryGetValue(CityIdKey, out Guid id) ? id : Guid.NewGuid();
 
         await CreateBreweryAsync(
             row["BreweryName"] ?? "",
@@ -166,7 +140,7 @@ public class BrewerySteps(ScenarioContext scenario)
     [Given("I have created a brewery")]
     public async Task GivenIHaveCreatedABrewery()
     {
-        Guid cityId = scenario.TryGetValue(CityIdKey, out Guid id)
+        Guid cityId = Scenario.TryGetValue(CityIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("city ID not found in scenario");
 
@@ -178,24 +152,24 @@ public class BrewerySteps(ScenarioContext scenario)
             cityId
         );
 
-        scenario
+        Scenario
             .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
         ((int)response!.StatusCode).Should().Be(201, "fixture brewery creation must succeed");
 
-        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+        Scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
         using JsonDocument doc = JsonDocument.Parse(responseBody!);
         JsonElement payload = doc.RootElement.GetProperty("payload");
 
-        scenario[BreweryPostIdKey] = payload.GetProperty("breweryPostId").GetGuid();
-        scenario[BreweryRowVersionKey] = payload.GetProperty("rowVersion").GetString()
+        Scenario[BreweryPostIdKey] = payload.GetProperty("breweryPostId").GetGuid();
+        Scenario[BreweryRowVersionKey] = payload.GetProperty("rowVersion").GetString()
             ?? throw new InvalidOperationException("rowVersion missing from created brewery");
     }
 
     private Guid GetCreatedBreweryPostId()
     {
-        return scenario.TryGetValue(BreweryPostIdKey, out Guid id)
+        return Scenario.TryGetValue(BreweryPostIdKey, out Guid id)
             ? id
             : throw new InvalidOperationException("brewery post ID not found in scenario");
     }
@@ -225,7 +199,7 @@ public class BrewerySteps(ScenarioContext scenario)
     {
         DataTableRow row = table.Rows[0];
         Guid breweryPostId = GetCreatedBreweryPostId();
-        string rowVersion = scenario.TryGetValue<string>(BreweryRowVersionKey, out string? rv)
+        string rowVersion = Scenario.TryGetValue<string>(BreweryRowVersionKey, out string? rv)
             ? rv
             : throw new InvalidOperationException("row version not found in scenario");
 
@@ -334,7 +308,7 @@ public class BrewerySteps(ScenarioContext scenario)
                     : null
             ) ?? throw new InvalidOperationException("accessToken missing from registration payload");
 
-        scenario[AccessTokenKey] = accessToken;
+        Scenario[AccessTokenKey] = accessToken;
     }
 
     [Then("retrieving the brewery by ID should now return HTTP status {int}")]
@@ -346,7 +320,7 @@ public class BrewerySteps(ScenarioContext scenario)
         );
         await SendAsync(requestMessage);
 
-        scenario
+        Scenario
             .TryGetValue<HttpResponseMessage>(ResponseKey, out HttpResponseMessage? response)
             .Should()
             .BeTrue();
