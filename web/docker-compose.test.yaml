@@ -139,6 +139,18 @@ services:
     networks:
       - testnet
 
+  frontend.tests:
+    image: frontend.tests
+    container_name: test-env-frontend-tests
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.tests
+    volumes:
+      - ./test-results:/app/test-results
+    restart: "no"
+    networks:
+      - testnet
+
 volumes:
   sqlserverdata-test:
     driver: local

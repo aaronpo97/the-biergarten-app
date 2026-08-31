@@ -59,9 +59,8 @@ services:
       args:
         BUILD_CONFIGURATION: Release
         APP_UID: 1000
-    ports:
-      - "8080:8080"
-      - "8081:8081"
+    # No published ports: only the frontend service is reachable from outside
+    # the Docker network in production. api.core stays internal to prodnet.
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
@@ -79,6 +78,27 @@ services:
       - prodnet
     volumes:
       - nuget-cache-prod:/root/.nuget/packages
+
+  frontend:
+    env_file: ".env.prod"
+    image: frontend
+    container_name: prod-env-frontend
+    depends_on:
+      api.core:
+        condition: service_started
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      PORT: "3000"
+      API_BASE_URL: "http://api.core:8080"
+      SESSION_SECRET: "${SESSION_SECRET}"
+    restart: unless-stopped
+    networks:
+      - prodnet
 
 volumes:
   sqlserverdata-prod:
