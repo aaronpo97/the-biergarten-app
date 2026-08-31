@@ -5,10 +5,10 @@ using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Features.Auth.DependencyInjection;
+namespace Features.Users.DependencyInjection;
 
 /// <summary>Registers the services required by Features.Users with the dependency injection container.</summary>
-public static class FeaturesAuthServiceCollectionExtensions
+public static class FeaturesUsersServiceCollectionExtensions
 {
     /// <summary>
     ///     Adds <see cref="ITokenService" />, <see cref="IUserListRepository" />,
@@ -16,7 +16,7 @@ public static class FeaturesAuthServiceCollectionExtensions
     ///     (<see cref="UserManager{TUser}" /> backed by <see cref="DapperUserStore" /> and
     ///     <see cref="Argon2PasswordHasher" />) as scoped services.
     /// </summary>
-    public static IServiceCollection AddFeaturesAuth(this IServiceCollection services)
+    public static IServiceCollection AddFeaturesUsers(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();

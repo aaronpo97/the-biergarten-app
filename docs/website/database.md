@@ -25,9 +25,11 @@ updates (`UPDATE ... WHERE ... AND RowVersion = @RowVersion`).
 
 | Table                 | Backed by                                                                | Notes                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `UserAccount`         | `Domain.Entities.UserAccount`, `Features.Auth`/`Features.UserManagement` | `Username` and `Email` are unique                                                                                                                                      |
-| `UserCredential`      | `Domain.Entities.UserCredential`, `Features.Auth`                        | Argon2id password hash; `IsRevoked`/`RevokedAt` track credential rotation, not JWTs                                                                                    |
-| `UserVerification`    | `Domain.Entities.UserVerification`, `Features.Auth`                      | Written when a user confirms their email                                                                                                                               |
+| `UserAccount`         | `Domain.Entities.UserAccount`, `Features.Users`                          | `Username` and `Email` are unique                                                                                                                                      |
+| `UserCredential`      | `Domain.Entities.UserCredential`, `Features.Users`                       | Argon2id password hash; `IsRevoked`/`RevokedAt` track credential rotation, not JWTs                                                                                    |
+| `UserVerification`    | `Domain.Entities.UserVerification`, `Features.Users`                     | Written when a user confirms their email                                                                                                                               |
+| `UserProfile`         | `Domain.Entities.UserProfile`, `Features.Users`                          | 1:1 with `UserAccount`; holds the user's biography; written via `IUserProfileRepository`                                                                              |
+| `UserAvatar`          | `Domain.Entities.UserAvatar`, `Features.Users`                           | Links a `UserProfile` to a `Photo` as its avatar; written via `IUserProfileRepository.SaveAvatarAsync`                                                                 |
 | `BreweryPost`         | `Domain.Entities.BreweryPost`, `Features.Breweries`                      | A user-submitted brewery listing                                                                                                                                       |
 | `BreweryPostLocation` | `Domain.Entities.BreweryPostLocation`, `Features.Breweries`              | 1:1 with `BreweryPost`; `Coordinates` is a `GEOGRAPHY` column, read via a plain Dapper query that selects `CONVERT(varbinary(max), Coordinates)`, since Dapper can't deserialize SQL Server UDTs directly |
 | `City`                | `Domain.Entities.City`, `Features.Locations`                             | Referenced by `BreweryPostLocation.CityID`; written via `ILocationRepository`, read via `ILocationRepository` and `IBreweryRepository`'s location joins, currently written only by `Database.Seed` |
@@ -42,7 +44,6 @@ repository or seed data yet:
 
 | Table              | Purpose (from schema)                                                                                    |
 | ------------------ | -------------------------------------------------------------------------------------------------------- |
-| `UserAvatar`       | Links a `UserAccount` to a `Photo` as its avatar                                                         |
 | `UserFollow`       | One user following another (`CannotFollowOwnAccount` check constraint)                                   |
 | `BeerStyle`        | A beer style/category; has a `Domain.Entities.BeerStyle` type, but no repository yet                     |
 | `BeerPost`         | A beer listing, linked to a `BreweryPost` and `BeerStyle`; `ABV`/`IBU` are constrained (`0-67`, `0-120`); has a `Domain.Entities.BeerPost` type, but no repository yet |
@@ -80,7 +81,7 @@ repository (`Features.PhotoUpload`) but no seed data.
   409, 400, ...); an unmapped `SqlException` (e.g. a genuine connectivity or
   constraint-violation failure) maps to 503.
 
-  - One repository-level exception: `Features.Auth`'s `AuthRepository` does
-    catch `SqlException` directly, to detect a duplicate-key race (SQL Server
-    error 2601 or 2627) when two requests try to verify the same account
-    concurrently — see `Auth Repository.IsDuplicateVerificationViolation`.
+  - One exception: `Features.Users`' `DapperUserStore` does catch
+    `SqlException` directly, to detect a duplicate-key race (SQL Server error
+    2601 or 2627) when two requests try to verify the same account
+    concurrently — see `DapperUserStore.IsDuplicateKeyViolation`.

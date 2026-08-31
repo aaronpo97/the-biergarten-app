@@ -39,11 +39,23 @@ package "User & Auth" {
     * VerificationDateTime: DATETIME
   }
 
-  entity "UserAvatar (*)" as Avatar {
-    * UserAvatarID: UNIQUEIDENTIFIER <<PK>>
+  entity "UserProfile" as Profile {
+    * UserProfileID: UNIQUEIDENTIFIER <<PK>>
     --
     * UserAccountID: UNIQUEIDENTIFIER <<FK, UNIQUE>>
+    * Biography: NVARCHAR(MAX)
+  }
+
+  entity "UserAvatar" as Avatar {
+    * UserAvatarID: UNIQUEIDENTIFIER <<PK>>
+    --
+    * UserProfileID: UNIQUEIDENTIFIER <<FK>>
     * PhotoID: UNIQUEIDENTIFIER <<FK>>
+    * ValidFrom: DATETIME2(3)
+    ValidTo: DATETIME2(3)
+    ..
+    At most one row per UserProfileID
+    has ValidTo IS NULL (active avatar)
   }
 
   entity "UserFollow (*)" as Follow {
@@ -163,7 +175,8 @@ package "Beer (*)" {
 ' Relationships: User & Auth
 User ||--o{ Cred : "has"
 User ||--o| Verify : "has"
-User ||--o| Avatar : "has"
+User ||--o| Profile : "has"
+Profile ||--o{ Avatar : "has (history)"
 Avatar }o--|| Photo : "refers to"
 User ||--o{ Follow : "follows (UserAccountID)"
 User ||--o{ Follow : "followed by (FollowingID)"
@@ -193,9 +206,9 @@ note bottom of User
   Auth reads/writes (registration, login, credential
   rotation, verification) go through ASP.NET Core
   Identity's UserManager<ApplicationUser>, backed by
-  Features.Auth's DapperUserStore - inline SQL, no
-  stored procedures. Profile data still goes through
-  Features.UserManagement's UserAccountRepository.
+  Features.Users' DapperUserStore - inline SQL, no
+  stored procedures. Profile/avatar data goes through
+  Features.Users' UserProfileRepository.
 end note
 
 note bottom of Brewery

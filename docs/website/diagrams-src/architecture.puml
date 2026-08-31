@@ -19,17 +19,22 @@ package "API.Core (thin host)" #E3F2FD {
 }
 
 package "Feature Slices" #F3E5F5 {
-  [Features.Auth] as AuthSlice
+  [Features.Users] as UsersSlice
   [Features.Breweries] as BrewerySlice
-  [Features.UserManagement] as UserSlice
   [Features.Emails] as EmailsSlice
   [Features.Locations] as LocationsSlice
-  note right of AuthSlice
+  note right of UsersSlice
     Each slice owns its own:
     - Controller (HTTP endpoints)
     - Commands/Queries + Handlers
     - Validators
     - Repository (Dapper)
+
+    Features.Users covers auth
+    (Commands/Authentication),
+    account management
+    (Commands/Account), and
+    profile/avatar (Commands/Profile)
   end note
   note right of EmailsSlice
     No controller - invoked only
@@ -70,6 +75,7 @@ package "Domain Layer" #E8F5E9 {
   [Domain.Exceptions] as DomainExceptions
   note right of Domain
     - UserAccount, UserCredential, UserVerification
+    - UserProfile, UserAvatar
     - BreweryPost, BreweryPostLocation
     - City, StateProvince, Country
     - BeerPost, BeerStyle
@@ -84,28 +90,23 @@ database "SQL Server" {
 node "Database.Seed\n(separate console app)" as Seed
 
 ' Relationships
-API ..> AuthSlice : AddApplicationPart\n+ MediatR scan
+API ..> UsersSlice : AddApplicationPart\n+ MediatR scan
 API ..> BrewerySlice : AddApplicationPart\n+ MediatR scan
-API ..> UserSlice : AddApplicationPart\n+ MediatR scan
 API ..> EmailsSlice : MediatR scan only\n(no controller)
 
-Seed ..> AuthSlice : AddFeaturesAuth()\n(DI only, no API/MediatR)
+Seed ..> UsersSlice : AddFeaturesUsers()\n(DI only, no API/MediatR)
 Seed ..> BrewerySlice : AddFeaturesBreweries()
 Seed ..> LocationsSlice : AddFeaturesLocations()
 
-AuthSlice --> Sql
-AuthSlice --> JWT
-AuthSlice --> PwdHash
-AuthSlice --> SharedContracts
-AuthSlice --> SharedApp
+UsersSlice --> Sql
+UsersSlice --> JWT
+UsersSlice --> PwdHash
+UsersSlice --> SharedContracts
+UsersSlice --> SharedApp
 
 BrewerySlice --> Sql
 BrewerySlice --> SharedContracts
 BrewerySlice --> SharedApp
-
-UserSlice --> Sql
-UserSlice --> SharedContracts
-UserSlice --> SharedApp
 
 LocationsSlice --> Sql
 
@@ -114,21 +115,19 @@ EmailsSlice --> EmailTemplates
 EmailsSlice --> SharedApp
 
 ' The one cross-slice interaction: a MediatR command contract, not a project reference
-AuthSlice ..> SharedApp : sends\nSendRegistrationEmailCommand
+UsersSlice ..> SharedApp : sends\nSendRegistrationEmailCommand
 EmailsSlice ..> SharedApp : handles\nSendRegistrationEmailCommand
 
 Sql --> Domain
 
-AuthSlice --> Tables : Dapper SQL
+UsersSlice --> Tables : Dapper SQL
 BrewerySlice --> Tables : Dapper SQL
-UserSlice --> Tables : Dapper SQL
 LocationsSlice --> Tables : Dapper SQL
 
-AuthSlice --> Domain
+UsersSlice --> Domain
 BrewerySlice --> Domain
-UserSlice --> Domain
 LocationsSlice --> Domain
-AuthSlice --> DomainExceptions
+UsersSlice --> DomainExceptions
 
 ' Notes
 note left of Sql
@@ -138,7 +137,7 @@ note left of Sql
   no stored procedures
 end note
 
-note bottom of AuthSlice
+note bottom of UsersSlice
   No Features.* project
   ever references another
   Features.* project directly

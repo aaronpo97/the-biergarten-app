@@ -30,9 +30,9 @@ Low-level JWT operations.
 - Algorithm: HS256 (HMAC-SHA256)
 - Validates token lifetime, signature, and well-formedness
 
-### Features.Auth slice
+### Features.Users slice
 
-#### [ITokenService](../../web/backend/Features/Features.Auth/Services/ITokenService.cs)
+#### [ITokenService](../../web/backend/Features/Features.Users/Services/ITokenService.cs)
 
 Both token generation and validation live on the same slice-internal service
 (there is no separate validation service/class).
@@ -57,31 +57,32 @@ Both token generation and validation live on the same slice-internal service
 - `Principal` (ClaimsPrincipal) - Full JWT claims
 
 **Implementation:**
-[TokenService.cs](../../web/backend/Features/Features.Auth/Services/TokenService.cs)
+[TokenService.cs](../../web/backend/Features/Features.Users/Services/TokenService.cs)
 
 - Reads token secrets from environment variables
 - Extracts and validates claims (Sub, UniqueName)
 - Throws `UnauthorizedException` on validation failure
 
-`TokenService` is registered by `Features.Auth`'s own `AddFeaturesAuth()`
+`TokenService` is registered by `Features.Users`' own `AddFeaturesUsers()`
 extension method, except for the lower-level `ITokenInfrastructure` (JWT
-signing/verification) it depends on, which is registered by the host
-(`API.Core/Program.cs`) since `JwtAuthenticationHandler` (host-level auth
-middleware) also depends on it directly.
+signing/verification) it
+depends on, which is registered by the host (`API.Core/Program.cs`) since
+`JwtAuthenticationHandler` (host-level auth middleware) also depends on it
+directly.
 
 ### Integration points
 
-#### [ConfirmUserHandler](../../web/backend/Features/Features.Auth/Commands/ConfirmUser/ConfirmUserHandler.cs)
+#### [ConfirmUserHandler](../../web/backend/Features/Features.Users/Commands/Authentication/ConfirmUser/ConfirmUserHandler.cs)
 
 **Flow:**
 
 1. Receives confirmation token from user via `ConfirmUserCommand`
 2. Calls `ITokenService.ValidateConfirmationTokenAsync()`
-3. Extracts user ID from validated token
-4. Calls `IAuthRepository.ConfirmUserAccountAsync()` to update database
+3. Extracts user ID from validated token and looks it up via `UserManager<ApplicationUser>`
+4. Marks the account confirmed via `IUserEmailStore<ApplicationUser>.SetEmailConfirmedAsync()`
 5. Returns confirmation result
 
-#### [ResendConfirmationEmailHandler](../../web/backend/Features/Features.Auth/Commands/ResendConfirmationEmail/ResendConfirmationEmailHandler.cs)
+#### [ResendConfirmationEmailHandler](../../web/backend/Features/Features.Users/Commands/Authentication/ResendConfirmationEmail/ResendConfirmationEmailHandler.cs)
 
 **Flow:**
 
@@ -92,17 +93,16 @@ middleware) also depends on it directly.
    `Features.Emails` slice, with no direct project reference between the two
    slices
 
-#### [RefreshTokenHandler](../../web/backend/Features/Features.Auth/Commands/RefreshToken/RefreshTokenHandler.cs)
+#### [RefreshTokenHandler](../../web/backend/Features/Features.Users/Commands/Authentication/RefreshToken/RefreshTokenHandler.cs)
 
 **Flow:**
 
 1. Receives a refresh token via `RefreshTokenCommand`
 2. Delegates to `ITokenService.RefreshTokenAsync()`, which validates the token,
-   retrieves the user account via `IAuthRepository.GetUserByIdAsync()`, and
-   issues a new access/refresh token pair
+   retrieves the user account, and issues a new access/refresh token pair
 3. Maps the result onto `LoginPayload`
 
-#### [AuthController](../../web/backend/Features/Features.Auth/Controllers/AuthController.cs)
+#### [AuthController](../../web/backend/Features/Features.Users/Controllers/AuthController.cs)
 
 **Endpoints:**
 
@@ -193,7 +193,7 @@ Validation failures return HTTP 401 Unauthorized:
 
 ## Testing
 
-All of the following live in `Features.Auth.Tests`.
+All of the following live in `Features.Users.Tests`.
 
 ### Unit tests
 

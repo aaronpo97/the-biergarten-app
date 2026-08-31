@@ -6,7 +6,7 @@ using Domain.Entities;
 using Features.Auth.Commands.Authentication.RegisterUser;
 using Features.Auth.Commands.Profile.UpdateBiography;
 using Features.Auth.Commands.Profile.UploadAvatar;
-using Features.Auth.DependencyInjection;
+using Features.Users.DependencyInjection;
 using Features.Auth.Dtos;
 using Features.Auth.Services;
 using Features.Breweries.Commands.CreateBrewery;
@@ -37,7 +37,7 @@ static async Task<int> RunAsync()
             .AddDatabaseConnection()
             .AddFeaturesBreweries()
             .AddFeaturesLocations()
-            .AddFeaturesAuth()
+            .AddFeaturesUsers()
             .AddFeaturesPhotoUpload()
             .AddSingleton<IFileStorageProvider, S3FileStorageProvider>()
             .AddScoped<ITokenService, NoOpTokenService>()

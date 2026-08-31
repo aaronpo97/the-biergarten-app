@@ -34,13 +34,12 @@ For visual representations, see:
 ### Vertical-slice architecture pattern
 
 The backend organizes business capabilities as feature slices instead of
-technical layers. Each feature (`Features.Auth`, `Features.Breweries`,
-`Features.UserManagement`, `Features.Emails`, `Features.Locations`,
-`Features.PhotoUpload`) is a single project that owns its own MediatR
-commands/queries/handlers, validators, and repository end to end.
-`Features.Emails`, `Features.Locations`, and `Features.PhotoUpload` have no
-`Controllers/` folder — all three are invoked internally by other slices via
-MediatR/DI, never over HTTP:
+technical layers. Each feature (`Features.Users`, `Features.Breweries`,
+`Features.Emails`, `Features.Locations`, `Features.PhotoUpload`) is a single
+project that owns its own MediatR commands/queries/handlers, validators, and
+repository end to end. `Features.Emails`, `Features.Locations`, and
+`Features.PhotoUpload` have no `Controllers/` folder — all three are invoked
+internally by other slices via MediatR/DI, never over HTTP:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
@@ -49,15 +48,15 @@ MediatR/DI, never over HTTP:
 │   - Swagger/OpenAPI, JWT auth middleware, global exception filter     │
 └───────────────────────────────────────────────────────────────────────┘
                   ↓ discovers controllers via AddApplicationPart
-┌───────────────┬───────────────┬───────────────────┬──────────────────┬──────────────────┬──────────────────┐
-│ Features.Auth │Features.      │ Features.          │ Features.Emails  │ Features.        │ Features.        │
-│               │Breweries      │ UserManagement      │ (no controller,  │ Locations        │ PhotoUpload      │
-│ Controller    │ Controller    │ Controller          │  internal only)  │ (no controller,  │ (no controller,  │
-│ Commands/     │ Commands/     │ Commands/           │ Commands/        │  internal only)  │  internal only)  │
-│  Queries +    │  Queries +    │  Queries +          │  Handlers        │ Repository       │ Commands/        │
-│  Handlers     │  Handlers     │  Handlers           │                  │                  │  Handlers        │
-│ Repository    │ Repository    │ Repository          │ EmailDispatcher  │                  │ Repository       │
-└───────────────┴───────────────┴───────────────────┴──────────────────┴──────────────────┴──────────────────┘
+┌────────────────┬───────────────┬──────────────────┬──────────────────┬──────────────────┐
+│ Features.Users  │Features.      │ Features.Emails  │ Features.        │ Features.        │
+│                 │Breweries      │ (no controller,  │ Locations        │ PhotoUpload      │
+│ Controllers     │ Controller    │  internal only)  │ (no controller,  │ (no controller,  │
+│ Commands/       │ Commands/     │ Commands/        │  internal only)  │  internal only)  │
+│  Queries +      │  Queries +    │  Handlers        │ Repository       │ Commands/        │
+│  Handlers       │  Handlers     │                  │                  │  Handlers        │
+│ Repository      │ Repository    │ EmailDispatcher  │                  │ Repository       │
+└────────────────┴───────────────┴──────────────────┴──────────────────┴──────────────────┘
        ↓ each slice depends only on shared/domain/infra, never on another slice
 ┌─────────────────────────┬─────────────────────────┬────────────────────┐
 │ Shared.Contracts        │ Shared.Application        │ Domain.Entities /  │
@@ -77,7 +76,7 @@ MediatR/DI, never over HTTP:
 ```
 
 Slices never reference each other's project. The one cross-slice interaction
-(`Features.Auth` triggering a confirmation email handled by `Features.Emails`)
+(`Features.Users` triggering a confirmation email handled by `Features.Emails`)
 goes through a MediatR command (`SendRegistrationEmailCommand`) whose contract
 lives in `Shared.Application`, so neither slice takes a project reference on the
 other.
@@ -110,7 +109,7 @@ own
 - No controllers, no business logic, no feature-specific contracts
 - Exists purely to host and wire up the feature slices
 
-#### Feature slices (`Features.Auth`, `Features.Breweries`, `Features.UserManagement`, `Features.Emails`, `Features.Locations`, `Features.PhotoUpload`)
+#### Feature slices (`Features.Users`, `Features.Breweries`, `Features.Emails`, `Features.Locations`, `Features.PhotoUpload`)
 
 **Purpose**: Each slice is the complete vertical for one business capability
 
@@ -145,7 +144,7 @@ for exercising the upload path end to end.
 - `Domain.Entities`, `Domain.Exceptions`
 - `Infrastructure.Sql` (generic ADO.NET plumbing) plus whichever infrastructure
   project the slice needs (`Infrastructure.Jwt`/
-  `Infrastructure.PasswordHashing` for Auth, `Infrastructure.Email`/
+  `Infrastructure.PasswordHashing` for Users, `Infrastructure.Email`/
   `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
   PhotoUpload)
 - `Shared.Contracts`, `Shared.Application`
@@ -277,9 +276,9 @@ public class CreateBreweryHandler(IBreweryRepository repository) : IRequestHandl
 **Implementation**: each slice owns its own repository, scoped to that feature
 only:
 
-- `Features.Auth/Repository/IAuthRepository.cs`
+- `Features.Users/Repository/IUserListRepository.cs`,
+  `Features.Users/Repository/IUserProfileRepository.cs`
 - `Features.Breweries/Repository/IBreweryRepository.cs`
-- `Features.UserManagement/Repository/IUserAccountRepository.cs`
 - `Features.PhotoUpload/Repository/IPhotoUploadRepository.cs`
 - `Database.Connection/DefaultSqlConnectionFactory.cs`: the generic connection
   factory every slice's repository builds on
@@ -297,10 +296,10 @@ only:
 **Example**:
 
 ```csharp
-public interface IAuthRepository
+public interface IUserListRepository
 {
-    Task<UserCredential> GetUserCredentialAsync(string username);
-    Task<int> CreateUserAccountAsync(UserAccount user, UserCredential credential);
+    Task<UserAccount?> GetByIdAsync(Guid id);
+    Task<IEnumerable<UserAccount>> GetAllAsync(int? limit, int? offset);
 }
 ```
 
@@ -427,7 +426,7 @@ for reference only. Active product and engineering documentation should point to
 
 2. **Email confirmation**:
    - User follows the confirmation link/token from the email
-   - `Features.Auth`'s `ConfirmUser` command marks the account verified
+   - `Features.Users`' `ConfirmUser` command marks the account verified
 
 3. **Login**:
    - User submits credentials
@@ -437,7 +436,7 @@ for reference only. Active product and engineering documentation should point to
 
 4. **Token refresh**:
    - Client exchanges a valid, unexpired refresh token for a new access/refresh
-     pair via `Features.Auth`'s `RefreshToken` command
+     pair via `Features.Users`' `RefreshToken` command
    - Refresh tokens are stateless JWTs, not tracked server-side: the previous
      refresh token is not invalidated and remains usable until its own
      expiration
@@ -521,7 +520,8 @@ scripts/
     ├── 01-UserAccount.sql
     ├── 02-Photo.sql
     ├── ...
-    └── 16-BeerPostComment.sql   # one script per CREATE TABLE
+    ├── 16-UserProfile.sql
+    └── 17-UserAvatar.sql        # one script per CREATE TABLE
 ```
 
 Each table has its own script, numbered so a table's foreign keys always point
@@ -541,7 +541,7 @@ pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
 - Countries, state/provinces, and cities (via `Features.Locations`'
   `ILocationRepository`, which creates `Country`/`StateProvince` rows on
   demand while resolving a city)
-- User accounts (via `Features.Auth`'s repository)
+- User accounts (via `Features.Users`' repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
 `Photo` rows are written via `Features.PhotoUpload`'s `IPhotoUploadRepository`,
@@ -595,10 +595,10 @@ healthcheck:
     │  Integration │  ← API.Specs (Reqnroll)
     │    Tests     │
     ├──────────────┤
-    │  Unit Tests  │  ← Features.Auth.Tests, Features.Breweries.Tests,
-    │ (per slice,  │     Features.UserManagement.Tests, Features.Emails.Tests,
-    │   handler    │     Features.PhotoUpload.Tests (commands/queries/handlers,
-    │   tests)     │     with repository/service dependencies mocked via Moq)
+    │  Unit Tests  │  ← Features.Users.Tests, Features.Breweries.Tests,
+    │ (per slice,  │     Features.Emails.Tests, Features.PhotoUpload.Tests
+    │   handler    │     (commands/queries/handlers, with repository/service
+    │   tests)     │     dependencies mocked via Moq)
     └──────────────┘
 ```
 

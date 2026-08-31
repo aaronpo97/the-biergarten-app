@@ -2,7 +2,7 @@ using API.Core;
 using API.Core.Authentication;
 using Database.Connection.DependencyInjection;
 using Features.Auth.Controllers;
-using Features.Auth.DependencyInjection;
+using Features.Users.DependencyInjection;
 using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
 using Features.Emails.DependencyInjection;
@@ -90,7 +90,7 @@ if (!builder.Environment.IsProduction())
 builder.Services.AddDatabaseConnection();
 
 builder.Services.AddFeaturesBreweries();
-builder.Services.AddFeaturesAuth();
+builder.Services.AddFeaturesUsers();
 builder.Services.AddFeaturesEmails();
 builder.Services.AddFeaturesPhotoUpload();
 
