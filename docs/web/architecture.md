@@ -8,7 +8,7 @@ The Biergarten App is a monorepo split between the backend and the website:
 
 - **Backend**: .NET 10 Web API with SQL Server, organized as vertical feature
   slices with MediatR
-- **Frontend**: React 19 + React Router 7 website in `web/frontend`
+- **Frontend**: React 19 + React Router 8 website in `web/frontend`
 - **Architecture Style**: Vertical-slice backend plus server-rendered React
   frontend
 
@@ -96,6 +96,7 @@ flowchart TB
 
     HOST -- "discovers controllers via<br/>AddApplicationPart" --> SLICES
     S1 -- "SendRegistrationEmailCommand<br/>(via Shared.Application contract)" --> S3
+    S1 -- "ProjectReference<br/>(avatar upload)" --> S5
 
     SLICES --> SHARED
     SLICES --> DOMAIN
@@ -108,11 +109,13 @@ flowchart TB
     style S5 stroke-dasharray: 4 3
 ```
 
-Slices never reference each other's project. The one cross-slice interaction
-(`Features.Users` triggering a confirmation email handled by `Features.Emails`)
-goes through a MediatR command (`SendRegistrationEmailCommand`) whose contract
-lives in `Shared.Application`, so neither slice takes a project reference on the
-other.
+Slices generally don't reference each other's project. Most cross-slice
+interactions go through a MediatR command instead — for example,
+`Features.Users` triggering a confirmation email handled by `Features.Emails`
+via a `SendRegistrationEmailCommand` whose contract lives in
+`Shared.Application`, so neither slice takes a project reference on the other.
+The one exception is `Features.Users`, which takes a direct `ProjectReference`
+on `Features.PhotoUpload` to send `UploadPhotoCommand` for avatar uploads.
 
 ### Layer responsibilities
 
@@ -173,13 +176,14 @@ brewery photo upload command) rather than bound to an HTTP route directly.
 **Dependencies**:
 
 - `Domain.Entities`, `Domain.Exceptions`
-- `Infrastructure.Sql` (generic ADO.NET plumbing) plus whichever infrastructure
-  project the slice needs (`Infrastructure.Jwt`/
+- `Database.Connection` (generic ADO.NET connection/command plumbing) plus
+  whichever infrastructure project the slice needs (`Infrastructure.Jwt`/
   `Infrastructure.PasswordHashing` for Users, `Infrastructure.Email`/
   `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
   PhotoUpload)
 - `Shared.Contracts`, `Shared.Application`
-- **Never** another `Features.*` project
+- No other `Features.*` project, with one exception: `Features.Users`
+  references `Features.PhotoUpload` directly for avatar uploads
 
 **Rules**:
 
@@ -375,7 +379,7 @@ error-handling approach in more detail.
 
 ### Website (`web/frontend`)
 
-The website is a React Router 7 application with server-side rendering enabled.
+The website is a React Router 8 application with server-side rendering enabled.
 
 ```text
 web/frontend/
@@ -395,7 +399,7 @@ web/frontend/
 │   │                      - home       landing page
 │   │                      - theme      theme switcher/guide
 │   ├── hooks/            Shared hooks not tied to one feature, for example useMediaQuery
-│   ├── routes.ts         Route table (React Router 7 config-based routing)
+│   ├── routes.ts         Route table (React Router 8 config-based routing)
 │   ├── root.tsx          App shell and global providers
 │   └── app.css           Theme tokens and global styling
 ├── .storybook/          Storybook config and preview setup
@@ -471,7 +475,7 @@ reference. Product and engineering documentation points to `web/frontend`.
 
 - Memory: 64MB
 - Iterations: 4
-- Parallelism: CPU core count
+- Parallelism: 2 (hardcoded, to avoid thread-pool exhaustion)
 - Salt: 128-bit (16 bytes)
 - Hash: 256-bit (32 bytes)
 
@@ -498,6 +502,12 @@ reference. Product and engineering documentation points to `web/frontend`.
   }
 }
 ```
+
+This block exists in `appsettings.json`, but nothing in the code currently
+reads it: actual token lifetimes come from the hardcoded
+`TokenServiceExpirationHours` constants, and `JwtInfrastructure` hardcodes
+`ValidateIssuer`/`ValidateAudience` to `false`, so `Issuer`/`Audience` are not
+enforced.
 
 ## Database architecture
 

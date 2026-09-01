@@ -13,7 +13,7 @@ This guide covers local setup for the Biergarten stack: the .NET backend in
 ## Prerequisites
 
 - **.NET SDK 10+**
-- **Node.js 18+**
+- **Node.js 22+**
 - **Docker Desktop** or equivalent Docker Engine setup
 - **Java 8+** if you want to regenerate PlantUML diagrams
 

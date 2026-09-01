@@ -40,7 +40,7 @@ Data generation pipeline (C++):
 Active areas in the repository:
 
 - .NET 10 backend (vertical-slice architecture with MediatR) + SQL Server
-- React 19 website (React Router 7 + Vite)
+- React 19 website (React Router 8 + Vite)
 - Shared Biergarten theme system + Storybook coverage
 - Auth flows and account/email integration (local Mailpit in dev compose)
 - Photo upload to S3-compatible object storage (local SeaweedFS in dev compose)
@@ -54,7 +54,7 @@ Archived/reference areas:
 ## Tech stack
 
 - **Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp
-- **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5,
+- **Frontend**: React 19, React Router 8, Vite 7, Tailwind CSS 4, DaisyUI 5,
   Leaflet/React Leaflet (brewery maps)
 - **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
 - **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
@@ -66,7 +66,7 @@ Archived/reference areas:
 ## Requirements
 
 - .NET SDK 10 or later
-- Node.js 18 or later
+- Node.js 22 or later
 - Docker Desktop, or an equivalent Docker Engine setup
 
 See [Getting Started](docs/web/getting-started.md) for the full
@@ -83,9 +83,14 @@ This section is the shortest path to a working dev environment.
 git clone https://github.com/aaronpo97/the-biergarten-app
 cd the-biergarten-app
 
-cp web/.env.example web/.env.dev
+cd web && ./generate-env.sh .env.dev && cd ..
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up --build -d
 ```
+
+`generate-env.sh` copies `.env.example` and replaces the secret-bearing values
+with freshly randomized ones; a plain `cp` leaves placeholder secrets in
+place. See [Environment Variables](docs/web/environment-variables.md#generating-an-env-file)
+for details.
 
 Access:
 
@@ -137,7 +142,7 @@ Create a test environment file, then run the full test stack (backend and
 frontend) with Docker:
 
 ```bash
-cp web/.env.example web/.env.test
+cd web && ./generate-env.sh .env.test && cd ..
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
