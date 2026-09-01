@@ -41,7 +41,7 @@ sequenceDiagram
         UserMgr->>Argon2: HashPassword(user, password)
         activate Argon2
         Note right of Argon2: Argon2id — salt 16 bytes, memory 64MB, iterations 4, parallelism 2 (fixed, to avoid thread-pool exhaustion), hash output 32 bytes
-        Argon2-->>UserMgr: "$argon2id$v=19$m=65536,t=4,p=2$&lt;salt&gt;$&lt;hash&gt;" (PHC string)
+        Argon2-->>UserMgr: PHC string in Argon2id format (algorithm, version, memory/time/parallelism params, salt, hash)
         deactivate Argon2
 
         UserMgr->>UserStore: SetPasswordHashAsync(user, hash)
