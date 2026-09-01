@@ -70,10 +70,12 @@ and SeaweedFS (local dev S3-compatible object storage for photo uploads).
 
 Available endpoints:
 
-- API Swagger: http://localhost:8080/swagger
-- Health Check: http://localhost:8080/health
-- Mailpit UI: http://localhost:8025
-- SeaweedFS S3 API: http://localhost:8333
+| Service          | URL                           |
+| ---------------- | ----------------------------- |
+| API Swagger      | http://localhost:8080/swagger |
+| Health Check     | http://localhost:8080/health  |
+| Mailpit UI       | http://localhost:8025         |
+| SeaweedFS S3 API | http://localhost:8333         |
 
 ### 4. Start the frontend
 

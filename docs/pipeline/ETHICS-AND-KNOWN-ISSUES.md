@@ -306,13 +306,13 @@ consistent with the rest of the dataset: fixture data for a proof-of-concept,
 not a source of truth.
 
 For brewery addresses specifically (not user addresses, which carry no street
-address at all), `address_line1`/`postal_code` *are* looked up from a real
+address at all), `address_line1`/`postal_code` _are_ looked up from a real
 address registry — `NominatimAddressService` reverse-geocodes the synthetic
-coordinate pair against the live OpenStreetMap/Nominatim database, so the
-street address is a genuine nearby address, just not the address of an actual
-brewery. This lookup only happens for non-`--mocked` runs; `--mocked` runs use
-`MockAddressService`'s fixed placeholder address instead, which is not looked
-up from any real registry.
+coordinate pair against the live OpenStreetMap/Nominatim database, so the street
+address is a genuine nearby address, just not the address of an actual brewery.
+This lookup only happens for non-`--mocked` runs; `--mocked` runs use
+`MockAddressService`'s fixed placeholder address instead, which is not looked up
+from any real registry.
 
 ---
 

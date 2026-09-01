@@ -12,11 +12,11 @@ tags:
 
 The Biergarten API validates JSON Web Tokens (JWTs) across three token types:
 
-| Token Type | Lifetime | Purpose |
-| --- | --- | --- |
-| **Access Tokens** | 1 hour | API authentication |
-| **Refresh Tokens** | 21 days | Obtaining new access tokens |
-| **Confirmation Tokens** | 30 minutes | Email confirmation |
+| Token Type              | Lifetime   | Purpose                     |
+| ----------------------- | ---------- | --------------------------- |
+| **Access Tokens**       | 1 hour     | API authentication          |
+| **Refresh Tokens**      | 21 days    | Obtaining new access tokens |
+| **Confirmation Tokens** | 30 minutes | Email confirmation          |
 
 ## Components
 
@@ -48,16 +48,15 @@ Token generation and validation live on the same slice-internal service.
 
 - `GenerateAccessToken(Guid userId, string username)` - Creates 1-hour access
   token
-- `GenerateRefreshToken(Guid userId, string username)` - Creates 21-day
-  refresh token
-- `GenerateConfirmationToken(Guid userId, string username)` - Creates
-  30-minute confirmation token
+- `GenerateRefreshToken(Guid userId, string username)` - Creates 21-day refresh
+  token
+- `GenerateConfirmationToken(Guid userId, string username)` - Creates 30-minute
+  confirmation token
 
 **Validation methods:**
 
 - `ValidateRefreshTokenAsync(string token)` - Validates refresh tokens
-- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation
-  tokens
+- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation tokens
 
 There is no `ValidateAccessTokenAsync` on `ITokenService`. Access-token
 validation doesn't go through `ITokenService` at all: `JwtAuthenticationHandler`
@@ -181,43 +180,43 @@ Each token is validated for:
 
 Validation failures return HTTP 401 Unauthorized. Regardless of the specific
 cause (invalid signature, expired token, missing header, malformed claims),
-`JwtAuthenticationHandler.HandleChallengeAsync` always returns the same
-generic message: `"Unauthorized: Invalid or missing authentication token"` —
-it doesn't distinguish failure reasons in the response.
+`JwtAuthenticationHandler.HandleChallengeAsync` always returns the same generic
+message: `"Unauthorized: Invalid or missing authentication token"` — it doesn't
+distinguish failure reasons in the response.
 
 ## Token lifecycle
 
 ### Access token lifecycle
 
-| Step | Description |
-| --- | --- |
-| Generation | During login (1-hour validity) |
-| Usage | Included in Authorization header on API requests |
-| Validation | Validated on protected endpoints |
-| Expiration | Token becomes invalid after 1 hour |
-| Refresh | Use refresh token to obtain new access token |
+| Step       | Description                                      |
+| ---------- | ------------------------------------------------ |
+| Generation | During login (1-hour validity)                   |
+| Usage      | Included in Authorization header on API requests |
+| Validation | Validated on protected endpoints                 |
+| Expiration | Token becomes invalid after 1 hour               |
+| Refresh    | Use refresh token to obtain new access token     |
 
 ### Refresh token lifecycle
 
-| Step | Description |
-| --- | --- |
-| Generation | During login (21-day validity) |
-| Storage | Client-side (secure storage) |
-| Usage | Posted to `/api/auth/refresh` endpoint |
+| Step       | Description                                      |
+| ---------- | ------------------------------------------------ |
+| Generation | During login (21-day validity)                   |
+| Storage    | Client-side (secure storage)                     |
+| Usage      | Posted to `/api/auth/refresh` endpoint           |
 | Validation | Validated by `ITokenService.RefreshTokenAsync()` |
-| Rotation | New refresh token issued on successful refresh |
-| Expiration | Token becomes invalid after 21 days |
+| Rotation   | New refresh token issued on successful refresh   |
+| Expiration | Token becomes invalid after 21 days              |
 
 ### Confirmation token lifecycle
 
-| Step | Description |
-| --- | --- |
-| Generation | During user registration (30-minute validity) |
-| Delivery | Emailed to user in confirmation link |
-| Usage | User clicks link, token posted to `/api/auth/confirm` |
-| Validation | Validated by `ConfirmUserHandler` |
-| Completion | User account marked as confirmed |
-| Expiration | Token becomes invalid after 30 minutes |
+| Step       | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| Generation | During user registration (30-minute validity)         |
+| Delivery   | Emailed to user in confirmation link                  |
+| Usage      | User clicks link, token posted to `/api/auth/confirm` |
+| Validation | Validated by `ConfirmUserHandler`                     |
+| Completion | User account marked as confirmed                      |
+| Expiration | Token becomes invalid after 30 minutes                |
 
 ## Testing
 
@@ -277,22 +276,18 @@ All of the following live in `Features.Users.Tests`.
 
 ### Stretch goals
 
-1. **Middleware for Access Token Validation**
-	   - Automatically validate access tokens on protected routes
-	   - Populate HttpContext.User from token claims
-	   - Return 401 for invalid/missing tokens
+1. **Middleware for Access Token Validation** - Automatically validate access
+   tokens on protected routes - Populate HttpContext.User from token claims -
+   Return 401 for invalid/missing tokens
 
-2. **Token Denylisting**
-	   - Implement token revocation (for example, on logout)
-	   - Store denylisted tokens in cache/database
-	   - Check the denylist during validation
+2. **Token Denylisting** - Implement token revocation (for example, on logout) -
+   Store denylisted tokens in cache/database - Check the denylist during
+   validation
 
-3. **Refresh Token Rotation Strategy**
-	   - Detect token reuse (replay attacks)
-	   - Automatically invalidate entire token chain on reuse
-	   - Log suspicious activity
+3. **Refresh Token Rotation Strategy** - Detect token reuse (replay attacks) -
+   Automatically invalidate entire token chain on reuse - Log suspicious
+   activity
 
-4. **Structured Logging**
-	   - Log token validation attempts
-	   - Track failed validation reasons
-	   - Alert on repeated validation failures (brute force detection)
+4. **Structured Logging** - Log token validation attempts - Track failed
+   validation reasons - Alert on repeated validation failures (brute force
+   detection)

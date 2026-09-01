@@ -12,4 +12,4 @@ Welcome to the documentation for The Biergarten App.
 
 - **[Architecture](web/architecture.md)** — System design and components
 - **[Website](web/getting-started.md)** — Backend and frontend documentation
-- **[Pipeline](pipeline/README.md)** — Data pipeline and ETL processes
+- **[Pipeline](pipeline/README.md)** — Data generation pipeline

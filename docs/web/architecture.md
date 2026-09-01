@@ -45,12 +45,15 @@ Authentication workflow diagrams, one per flow, under
 ### Vertical-slice architecture pattern
 
 The backend organizes business capabilities as feature slices instead of
-technical layers. Each feature (`Features.Users`, `Features.Breweries`,
-`Features.Emails`, `Features.Locations`, `Features.PhotoUpload`) is a single
-project that owns its own MediatR commands/queries/handlers, validators, and
-repository end to end. `Features.Emails`, `Features.Locations`, and
-`Features.PhotoUpload` have no `Controllers/` folder; all three are invoked
-internally by other slices via MediatR/DI, never over HTTP:
+technical layers.
+
+Each feature (`Features.Users`, `Features.Breweries`, `Features.Emails`,
+`Features.Locations`, `Features.PhotoUpload`) is a single project that owns its
+own MediatR commands/queries/handlers, validators, and repository end to end.
+
+`Features.Emails`, `Features.Locations`, and `Features.PhotoUpload` have no
+`Controllers/` folder; all three are invoked internally by other slices via
+MediatR/DI, never over HTTP:
 
 ```mermaid
 flowchart TB
@@ -109,14 +112,6 @@ flowchart TB
     style S5 stroke-dasharray: 4 3
 ```
 
-Slices generally don't reference each other's project. Most cross-slice
-interactions go through a MediatR command instead — for example,
-`Features.Users` triggering a confirmation email handled by `Features.Emails`
-via a `SendRegistrationEmailCommand` whose contract lives in
-`Shared.Application`, so neither slice takes a project reference on the other.
-The one exception is `Features.Users`, which takes a direct `ProjectReference`
-on `Features.PhotoUpload` to send `UploadPhotoCommand` for avatar uploads.
-
 ### Layer responsibilities
 
 #### API layer (`API.Core`)
@@ -163,12 +158,6 @@ own
 `Features.Emails` has no `Controllers/` folder. It's invoked only via MediatR
 commands sent from other slices, never over HTTP.
 
-`Features.Locations` also has no `Controllers/` folder and no MediatR handlers;
-it exposes `ILocationRepository` directly as a plain service, currently consumed
-only by `Database.Seed` to look up cities while seeding brewery locations. Other
-slices (for example, `Features.Breweries`) do not yet depend on it; they run
-their own `CityID` existence checks inline.
-
 `Features.PhotoUpload` also has no `Controllers/` folder; its
 `UploadPhotoCommand` is sent by other features' handlers (for example, a future
 brewery photo upload command) rather than bound to an HTTP route directly.
@@ -182,8 +171,8 @@ brewery photo upload command) rather than bound to an HTTP route directly.
   `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
   PhotoUpload)
 - `Shared.Contracts`, `Shared.Application`
-- No other `Features.*` project, with one exception: `Features.Users`
-  references `Features.PhotoUpload` directly for avatar uploads
+- No other `Features.*` project, with one exception: `Features.Users` references
+  `Features.PhotoUpload` directly for avatar uploads
 
 **Rules**:
 
@@ -277,13 +266,15 @@ everything needed to understand or change one capability lives in one project
 - Each HTTP write operation is a `Command` (for example, `CreateBreweryCommand`
   in `Features.Breweries/Commands/CreateBrewery/`); each read operation is a
   `Query` (for example, `GetBreweryByIdQuery`)
-- Controllers bind directly to the Command/Query as the request body; there is
-  no separate request DTO + mapping step for writes
+- Controllers generally bind directly to the Command/Query as the request body;
+  there is no separate request DTO + mapping step for writes
+  - The exception to this is for authenticated routes, when the current user id
+    needs to be extracted from the authentication token to be used in a command.
 - A single shared `ValidationBehavior<TRequest,TResponse>`
   (`Shared.Application/Behaviors/`) runs FluentValidation validators in the
   MediatR pipeline before any handler executes
 - Query handlers map to a dedicated response `Dto`, so domain entities never
-  leak over the wire
+  leak
 
 **Example**:
 
@@ -351,16 +342,11 @@ method that registers its repository and slice-internal services
 
 **Strategy**:
 
-- No ORM; each repository issues inline SQL through Dapper, which handles
-  parameter binding. The one wrinkle is the `GEOGRAPHY` column on
-  `BreweryPostLocation`, which Dapper can't deserialize as a UDT: reads select
-  `CONVERT(varbinary(max), Coordinates)` so the value comes back as a plain
-  `byte[]` Dapper can bind. Proximity search
-  (`GET /api/brewery/locations/nearby`) filters and orders rows server-side with
-  `Coordinates.STDistance(@Origin) <= @RangeInMetres`, avoiding a client-side
-  distance calculation over every row. No spatial index backs the query yet;
-  `schema.sql` sketches one, commented out, for when the table grows large
-  enough to need it
+- Each repository issues inline SQL through Dapper, which handles parameter
+  binding.
+- Proximity search (`GET /api/brewery/locations/nearby`) filters and orders rows
+  server-side with `Coordinates.STDistance(@Origin) <= @RangeInMetres`, avoiding
+  a client-side distance calculation over every row.
 - Referential checks (for example, "does this `CityId` exist?") are explicit
   `SELECT 1 ...` existence checks in the repository method, run inside the same
   transaction as the write
@@ -372,8 +358,8 @@ method that registers its repository and slice-internal services
 - Application focuses on orchestration; the database enforces integrity via
   keys, `CHECK` constraints, and cascades
 
-See [Database](database.md) for the schema and the app's SQL
-error-handling approach in more detail.
+See [Database](database.md) for the schema and the app's SQL error-handling
+approach in more detail.
 
 ## Frontend architecture
 
@@ -441,43 +427,25 @@ reference. Product and engineering documentation points to `web/frontend`.
 
 ### Authentication flow
 
-1. **Registration**:
-   - User submits credentials
-   - Password hashed with Argon2id
-   - User account created (unverified) and a confirmation email is dispatched
-     via `Features.Emails`
-
-2. **Email confirmation**:
-   - User follows the confirmation link/token from the email
-   - `Features.Users`' `ConfirmUser` command marks the account verified
-
-3. **Login**:
-   - User submits credentials
-   - Password verified against hash
-   - Access and refresh JWTs are issued and returned to the client; neither is
-     stored server-side
-
-4. **Token refresh**:
-   - Client exchanges a valid, unexpired refresh token for a new access/refresh
-     pair via `Features.Users`' `RefreshToken` command
-   - Refresh tokens are stateless JWTs, not tracked server-side: the previous
-     refresh token is not invalidated and remains usable until its own
-     expiration
-
-5. **API Requests**:
-   - Client sends the access JWT in the `Authorization` header
-   - `JwtAuthenticationHandler` validates the token
-   - Request proceeds if valid
+| Flow                   | Details                                                                                                                                                                                                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Registration**       | User submits credentials; password is hashed with Argon2id; user account is created as unverified and a confirmation email is dispatched via `Features.Emails`.                                                                                                   |
+| **Email confirmation** | User follows the confirmation link/token from the email; `Features.Users`' `ConfirmUser` command marks the account as verified.                                                                                                                                   |
+| **Login**              | User submits credentials; password is verified against the hash; access and refresh JWTs are issued and returned to the client; neither is stored server-side.                                                                                                    |
+| **Token refresh**      | Client exchanges a valid, unexpired refresh token for a new access/refresh pair via `Features.Users`' `RefreshToken` command; refresh tokens are stateless JWTs, not tracked server-side, and the previous refresh token remains usable until its own expiration. |
+| **API requests**       | Client sends the access JWT in the `Authorization` header; `JwtAuthenticationHandler` validates the token; request proceeds if valid.                                                                                                                             |
 
 ### Password security
 
 **Algorithm**: Argon2id
 
-- Memory: 64MB
-- Iterations: 4
-- Parallelism: 2 (hardcoded, to avoid thread-pool exhaustion)
-- Salt: 128-bit (16 bytes)
-- Hash: 256-bit (32 bytes)
+| Setting     | Value                                          |
+| ----------- | ---------------------------------------------- |
+| Memory      | 64MB                                           |
+| Iterations  | 4                                              |
+| Parallelism | 2 (hardcoded, to avoid thread-pool exhaustion) |
+| Salt        | 128-bit (16 bytes)                             |
+| Hash        | 256-bit (32 bytes)                             |
 
 ### JWT tokens
 
@@ -485,11 +453,13 @@ reference. Product and engineering documentation points to `web/frontend`.
 
 **Claims**:
 
-- `sub` - User ID
-- `unique_name` - Username
-- `jti` - Unique token ID
-- `iat` - Issued at timestamp
-- `exp` - Expiration timestamp
+| Claim         | Meaning              |
+| ------------- | -------------------- |
+| `sub`         | User ID              |
+| `unique_name` | Username             |
+| `jti`         | Unique token ID      |
+| `iat`         | Issued at timestamp  |
+| `exp`         | Expiration timestamp |
 
 **Configuration** (appsettings.json):
 
@@ -503,11 +473,10 @@ reference. Product and engineering documentation points to `web/frontend`.
 }
 ```
 
-This block exists in `appsettings.json`, but nothing in the code currently
-reads it: actual token lifetimes come from the hardcoded
-`TokenServiceExpirationHours` constants, and `JwtInfrastructure` hardcodes
-`ValidateIssuer`/`ValidateAudience` to `false`, so `Issuer`/`Audience` are not
-enforced.
+This block exists in `appsettings.json`, but nothing in the code currently reads
+it: actual token lifetimes come from the hardcoded `TokenServiceExpirationHours`
+constants, and `JwtInfrastructure` hardcodes `ValidateIssuer`/`ValidateAudience`
+to `false`, so `Issuer`/`Audience` are not enforced.
 
 ## Database architecture
 
@@ -563,7 +532,8 @@ tracking stays valid.
 **Purpose**: Populate development/test databases with realistic data
 
 **Implementation**: `Database.Seed` project, using data produced by the C++
-pipeline under `tooling/pipeline/` (see [Pipeline README](../pipeline/README.md))
+pipeline under `tooling/pipeline/` (see
+[Pipeline README](../pipeline/README.md))
 
 **Seed Data**:
 
@@ -573,11 +543,9 @@ pipeline under `tooling/pipeline/` (see [Pipeline README](../pipeline/README.md)
 - User accounts (via `Features.Users`' repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
-`Photo` rows are written via `Features.PhotoUpload`'s `IPhotoUploadRepository`,
-but `Database.Seed` doesn't call it, so photos aren't part of the seed data.
-Tables that exist in the schema but have no repository yet (`UserAvatar`,
-`UserFollow`, `BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`,
-`BreweryPostPhoto`) are not seeded either.
+Tables that exist in the schema but have no repository yet ( `UserFollow`,
+`BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`, `BreweryPostPhoto`)
+are not seeded either.
 
 ## Deployment architecture
 
@@ -585,18 +553,22 @@ Tables that exist in the schema but have no repository yet (`UserAvatar`,
 
 **Container Structure**:
 
-- `sqlserver` - SQL Server 2022
-- `database.migrations` - Schema migration runner
-- `database.seed` - Data seeder
-- `api.core` - ASP.NET Core Web API
-- `mailpit` - Local dev/test SMTP server + web UI (not used in production)
-- `seaweedfs` - S3-compatible object storage for uploaded photos (dev only)
+| Container             | Purpose                                                      |
+| --------------------- | ------------------------------------------------------------ |
+| `sqlserver`           | SQL Server 2022                                              |
+| `database.migrations` | Schema migration runner                                      |
+| `database.seed`       | Data seeder                                                  |
+| `api.core`            | ASP.NET Core Web API                                         |
+| `mailpit`             | Local dev/test SMTP server + web UI (not used in production) |
+| `seaweedfs`           | S3-compatible object storage for uploaded photos (dev only)  |
 
 **Environments**:
 
-- Development (`docker-compose.dev.yaml`)
-- Testing (`docker-compose.test.yaml`)
-- Production (`docker-compose.prod.yaml`)
+| Environment | Compose file               |
+| ----------- | -------------------------- |
+| Development | `docker-compose.dev.yaml`  |
+| Testing     | `docker-compose.test.yaml` |
+| Production  | `docker-compose.prod.yaml` |
 
 For details, see [Docker Guide](docker.md).
 

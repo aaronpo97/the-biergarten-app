@@ -20,24 +20,24 @@ The full schema lives under
 script per table.
 
 ```
-└── 01-schema
-    ├── 01-UserAccount.sql
-    ├── 02-Photo.sql
-    ├── 03-UserVerification.sql
-    ├── 04-UserCredential.sql
-    ├── 05-UserFollow.sql
-    ├── 06-Country.sql
-    ├── 07-StateProvince.sql
-    ├── 08-City.sql
-    ├── 09-BreweryPost.sql
-    ├── 10-BreweryPostLocation.sql
-    ├── 11-BreweryPostPhoto.sql
-    ├── 12-BeerStyle.sql
-    ├── 13-BeerPost.sql
-    ├── 14-BeerPostPhoto.sql
-    ├── 15-BeerPostComment.sql
-    ├── 16-UserProfile.sql
-    └── 17-UserAvatar.sql
+01-schema
+  ├── 01-UserAccount.sql
+  ├── 02-Photo.sql
+  ├── 03-UserVerification.sql
+  ├── 04-UserCredential.sql
+  ├── 05-UserFollow.sql
+  ├── 06-Country.sql
+  ├── 07-StateProvince.sql
+  ├── 08-City.sql
+  ├── 09-BreweryPost.sql
+  ├── 10-BreweryPostLocation.sql
+  ├── 11-BreweryPostPhoto.sql
+  ├── 12-BeerStyle.sql
+  ├── 13-BeerPost.sql
+  ├── 14-BeerPostPhoto.sql
+  ├── 15-BeerPostComment.sql
+  ├── 16-UserProfile.sql
+  └── 17-UserAvatar.sql
 ```
 
 Each script is run in order by `Database.Migrations` (DbUp) on startup. Each

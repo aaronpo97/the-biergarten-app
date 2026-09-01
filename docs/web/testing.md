@@ -16,16 +16,12 @@ Biergarten App.
 
 The project uses a multi-layered testing approach across backend and frontend:
 
-- **API.Specs** - BDD integration tests using Reqnroll (Gherkin), run against a
-  live, seeded database
-- **Features.\*.Tests** - One unit test project per backend feature slice
-  (`Features.Users.Tests`, `Features.Breweries.Tests`, `Features.Emails.Tests`,
-  `Features.PhotoUpload.Tests`), covering that slice's command/query handlers,
-  with dependencies mocked via Moq (no real database required)
-- **Storybook Vitest project** - Browser-based interaction tests for shared
-  website stories
-- **Storybook Playwright suite** - Browser checks against Storybook-rendered
-  components
+| Suite                          | Purpose                                                                                                                                                                                                                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **API.Specs**                  | BDD integration tests using Reqnroll (Gherkin), run against a live, seeded database                                                                                                                                                                                     |
+| **Features.\*.Tests**          | One unit test project per backend feature slice (`Features.Users.Tests`, `Features.Breweries.Tests`, `Features.Emails.Tests`, `Features.PhotoUpload.Tests`), covering that slice's command/query handlers, with dependencies mocked via Moq (no real database required) |
+| **Storybook Vitest project**   | Browser-based interaction tests for shared website stories                                                                                                                                                                                                              |
+| **Storybook Playwright suite** | Browser checks against Storybook-rendered components                                                                                                                                                                                                                    |
 
 ## Running tests with Docker (recommended)
 
@@ -80,19 +76,6 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 
 You can run individual test projects locally without Docker:
 
-### Integration tests (API.Specs)
-
-```bash
-cd web/backend
-dotnet test API/API.Specs/API.Specs.csproj
-```
-
-**Requirements**:
-
-- SQL Server instance running
-- Database migrated and seeded
-- Environment variables set (DB connection, JWT secret)
-
 ### Feature slice unit tests
 
 Each feature slice has its own test project, covering its command/query
@@ -121,6 +104,19 @@ cd web/frontend
 npm install
 npm run test:storybook
 ```
+
+### Integration tests (API.Specs)
+
+```bash
+cd web/backend
+dotnet test API/API.Specs/API.Specs.csproj
+```
+
+**Requirements**:
+
+- SQL Server instance running
+- Database migrated and seeded
+- Environment variables set (DB connection, JWT secret)
 
 **Purpose**:
 

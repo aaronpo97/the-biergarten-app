@@ -155,8 +155,8 @@ Entirely new — no `includes/policy/` (or equivalent) directory exists today.
       `MockGenerator`/`LlamaGenerator`) that calls the OpenAI Chat Completions
       API with Structured Outputs (`json_schema`, `strict`) to guarantee
       schema-valid JSON without needing `IPromptFormatter` or a GBNF grammar —
-      selected via `--openai`/`GeneratorMode::kOpenAI`. This landed ahead of
-      the planned architecture in §3/§4 and isn't reflected there yet.
+      selected via `--openai`/`GeneratorMode::kOpenAI`. This landed ahead of the
+      planned architecture in §3/§4 and isn't reflected there yet.
 - [x] Implement `LlamaGenerator::GenerateUser` for real, with a retry loop
       mirroring `GenerateBrewery` (GBNF grammar, `ValidateUserJson`, up to 3
       attempts with corrective feedback) and a new `prompts/USER_GENERATION.md`.
@@ -195,8 +195,8 @@ Entirely new — no `includes/policy/` (or equivalent) directory exists today.
       `kCreateUserAddressesTableSql` in
       `includes/services/database/sqlite_statement_helpers.h` for the existing
       pattern to follow.
-- [ ] Add a `brewery_cache_` alongside the existing `city_cache_`, and move
-      from one open transaction for the whole run to per-phase batched commits
+- [ ] Add a `brewery_cache_` alongside the existing `city_cache_`, and move from
+      one open transaction for the whole run to per-phase batched commits
       (`BEGIN` / `COMMIT & BEGIN` on a batch-size threshold), as shown in the
       planned activity diagram.
 

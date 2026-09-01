@@ -308,9 +308,9 @@ cd web
 
 See [Generating an env file](#generating-an-env-file) above — `generate-env.sh`
 randomizes the secret-bearing values, so it's the preferred way to create any
-`.env.dev`/`.env.test`/`.env.prod` file. A plain `cp web/.env.example
-web/.env.dev` works too, but leaves the placeholder secrets from the template
-in place; edit them manually if you go that route.
+`.env.dev`/`.env.test`/`.env.prod` file. A plain
+`cp web/.env.example web/.env.dev` works too, but leaves the placeholder secrets
+from the template in place; edit them manually if you go that route.
 
 **Docker Compose Mapping**:
 

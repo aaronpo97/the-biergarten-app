@@ -110,27 +110,27 @@ Each run writes a fresh dated SQLite file such as
 
 #### CLI flags
 
-| Flag               | Purpose                                                                                                      |
-| ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `--mocked`         | Deterministic mock generator, no model required.                                                             |
-| `--model, -m`      | Path to a GGUF file. Selects the local Llama.cpp generator.                                                  |
+| Flag               | Purpose                                                                                                          |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `--mocked`         | Deterministic mock generator, no model required.                                                                 |
+| `--model, -m`      | Path to a GGUF file. Selects the local Llama.cpp generator.                                                      |
 | `--openai`         | Use the OpenAI API (Chat Completions) for brewery/user data. Requires the `OPENAI_API_KEY` environment variable. |
-| `--openai-model`   | OpenAI model ID used when `--openai` is set. Default: `gpt-4o-mini`.                                         |
-| `--prompt-dir`     | Directory containing prompt files (for example, `BREWERY_GENERATION.md`). Required unless `--mocked` is set. |
-| `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                                 |
-| `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                          |
-| `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                                     |
-| `--temperature`    | Sampling temperature. Default: `1.0`.                                                                        |
-| `--top-p`          | Nucleus sampling. Default: `0.95`.                                                                           |
-| `--top-k`          | Top-k sampling. Default: `64`.                                                                               |
-| `--n-ctx`          | Context window size. Default: `8192`.                                                                        |
-| `--seed`           | Random seed. Default: `-1` (random at runtime).                                                              |
-| `--n-gpu-layers`   | Number of model layers to offload to GPU. Default: `0`.                                                      |
-| `--help, -h`       | Print usage and exit.                                                                                        |
+| `--openai-model`   | OpenAI model ID used when `--openai` is set. Default: `gpt-4o-mini`.                                             |
+| `--prompt-dir`     | Directory containing prompt files (for example, `BREWERY_GENERATION.md`). Required unless `--mocked` is set.     |
+| `--output, -o`     | Directory for generated SQLite artifacts. Default: `output`.                                                     |
+| `--log-path`       | Path for application logs. Default: `pipeline.log`.                                                              |
+| `--location-count` | Number of cities to sample from `locations.json` per run. Default: `10`.                                         |
+| `--temperature`    | Sampling temperature. Default: `1.0`.                                                                            |
+| `--top-p`          | Nucleus sampling. Default: `0.95`.                                                                               |
+| `--top-k`          | Top-k sampling. Default: `64`.                                                                                   |
+| `--n-ctx`          | Context window size. Default: `8192`.                                                                            |
+| `--seed`           | Random seed. Default: `-1` (random at runtime).                                                                  |
+| `--n-gpu-layers`   | Number of model layers to offload to GPU. Default: `0`.                                                          |
+| `--help, -h`       | Print usage and exit.                                                                                            |
 
-`--mocked`, `--model`, and `--openai` are mutually exclusive. Omitting all
-three exits with an error before the pipeline starts. Sampling flags are
-ignored unless `--model` is set (Llama).
+`--mocked`, `--model`, and `--openai` are mutually exclusive. Omitting all three
+exits with an error before the pipeline starts. Sampling flags are ignored
+unless `--model` is set (Llama).
 
 The post-build step copies `prompts/` into `build/prompts/`. Rebuild after
 editing any prompt file.
@@ -238,8 +238,8 @@ to match your run.
 | Sample             | `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()` samples `--location-count` locations per run (default `10`).                                                                                                                                                                                                                                      |
 | Enrich             | `WikipediaEnrichmentService` fetches brewing and beer-related context. Keeps going when a lookup fails. `--mocked` runs use `MockEnrichmentService` instead and skip Wikipedia entirely.                                                                                                                                                                       |
 | Generate Users     | `GenerateUsers()` samples a persona and a forename/surname pair per enriched city (skipping countries with no name data), then `MockGenerator` or `LlamaGenerator` produces a username, bio, and activity weight around the sampled name.                                                                                                                      |
-| Generate Breweries | `MockGenerator`, `LlamaGenerator`, or `OpenAIGenerator` produces brewery names and descriptions in English and the local language, then `IAddressService::ReverseGeocode()` resolves a street address for the brewery's jittered coordinates.                                                                                                               |
-| Store              | `SqliteExportService` writes each successful user and brewery into a fresh dated `.sqlite` database with normalized `cities`, `breweries`, `brewery_addresses`, `users`, and `user_addresses` tables.                                                                                                                                                        |
+| Generate Breweries | `MockGenerator`, `LlamaGenerator`, or `OpenAIGenerator` produces brewery names and descriptions in English and the local language, then `IAddressService::ReverseGeocode()` resolves a street address for the brewery's jittered coordinates.                                                                                                                  |
+| Store              | `SqliteExportService` writes each successful user and brewery into a fresh dated `.sqlite` database with normalized `cities`, `breweries`, `brewery_addresses`, `users`, and `user_addresses` tables.                                                                                                                                                          |
 | Log                | `spdlog` writes results and warnings to the console.                                                                                                                                                                                                                                                                                                           |
 
 If name sampling, enrichment, or generation fails for a city, that city is
@@ -270,10 +270,10 @@ skipped and the pipeline continues. `GenerateUsers()` runs before
   public [Nominatim API](https://nominatim.openstreetmap.org), respecting its
   one-request-per-second usage policy. Falls back to a placeholder
   `address_line1` ("Address unavailable") and empty `postal_code` when the
-  lookup fails or returns no usable street address. `MockAddressService` is
-  the no-network substitute (`"123 Mock Street"`, `"00000"`) used in
-  `--mocked` runs. Only breweries get a resolved street address; generated
-  users carry a coordinate pair with no address fields.
+  lookup fails or returns no usable street address. `MockAddressService` is the
+  no-network substitute (`"123 Mock Street"`, `"00000"`) used in `--mocked`
+  runs. Only breweries get a resolved street address; generated users carry a
+  coordinate pair with no address fields.
 - `SqliteExportService`: creates a dated SQLite file per run and persists each
   successful user and brewery into normalized tables.
 - Brewery payloads include English and local-language name and description
@@ -299,11 +299,11 @@ valid output on the first pass; the retry path is kept for resilience.
 `MockGenerator` uses stable hashes for repeatable output in demos and Storybook
 runs.
 
-`NominatimAddressService.ReverseGeocode()` sleeps one second after every
-request to respect Nominatim's usage policy, and returns `std::nullopt` (logged
-as a warning, not a skipped city) if the request fails, the response has no
-`address` object, or neither `house_number` nor `road` is present — the
-brewery is still generated and exported, just with a placeholder address.
+`NominatimAddressService.ReverseGeocode()` sleeps one second after every request
+to respect Nominatim's usage policy, and returns `std::nullopt` (logged as a
+warning, not a skipped city) if the request fails, the response has no `address`
+object, or neither `house_number` nor `road` is present — the brewery is still
+generated and exported, just with a placeholder address.
 
 `CuratedJsonDataService` memoizes each of `LoadLocations()`, `LoadPersonas()`,
 `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
@@ -334,14 +334,14 @@ Each successful run stores a `BreweryRecord` pair with the source location and a
 `UserResult` payload. The same generated records are also written to a fresh
 SQLite export file named with the current UTC timestamp.
 
-| Field               | Meaning                                    |
-| ------------------- | ------------------------------------------ |
-| `name_en`           | Brewery name in English.                   |
-| `description_en`    | Brewery description in English.            |
-| `name_local`        | Brewery name in the local language.        |
-| `description_local` | Brewery description in the local language. |
+| Field               | Meaning                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| `name_en`           | Brewery name in English.                                                              |
+| `description_en`    | Brewery description in English.                                                       |
+| `name_local`        | Brewery name in the local language.                                                   |
+| `description_local` | Brewery description in the local language.                                            |
 | `address_line1`     | Street address resolved via reverse geocoding, or a placeholder if resolution failed. |
-| `postal_code`       | Postal code resolved via reverse geocoding, or empty if resolution failed. |
+| `postal_code`       | Postal code resolved via reverse geocoding, or empty if resolution failed.            |
 
 | Field             | Meaning                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------- |
