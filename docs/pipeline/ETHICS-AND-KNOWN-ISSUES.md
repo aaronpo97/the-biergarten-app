@@ -299,11 +299,20 @@ Each brewery and user address carries a longitude/latitude pair, sampled
 uniformly at random within a 5 km disc centred on the city's curated
 `latitude`/`longitude` from `locations.json`.
 
-The resulting point is **plausible by construction**, always falling within the
-city's vicinity, but it is not looked up from any real address registry. It does
-not correspond to a real address, business, or resident, and should not be
-treated as accurate geocoding data. This is consistent with the rest of the
-dataset: fixture data for a proof-of-concept, not a source of truth.
+The coordinate pair itself is **plausible by construction**, always falling
+within the city's vicinity, but does not correspond to a real business or
+resident, and should not be treated as accurate geocoding data. This is
+consistent with the rest of the dataset: fixture data for a proof-of-concept,
+not a source of truth.
+
+For brewery addresses specifically (not user addresses, which carry no street
+address at all), `address_line1`/`postal_code` *are* looked up from a real
+address registry — `NominatimAddressService` reverse-geocodes the synthetic
+coordinate pair against the live OpenStreetMap/Nominatim database, so the
+street address is a genuine nearby address, just not the address of an actual
+brewery. This lookup only happens for non-`--mocked` runs; `--mocked` runs use
+`MockAddressService`'s fixed placeholder address instead, which is not looked
+up from any real registry.
 
 ---
 

@@ -10,8 +10,8 @@ tags:
 
 This is the engineering breakdown for closing the gap between the **current**
 pipeline and the **planned** architecture documented in
-[`diagrams/planned/class.puml`](./diagrams/planned/class.puml) and
-[`diagrams/planned/activity.puml`](./diagrams/planned/activity.puml). Nothing in
+[`diagrams/planned/class.md`](./diagrams/planned/class.md) and
+[`diagrams/planned/activity.md`](./diagrams/planned/activity.md). Nothing in
 `diagrams/planned/` is implemented yet — this file tracks what it would take to
 get there. For the current implementation, see [README.md](./README.md).
 
@@ -105,7 +105,8 @@ architecture needs.
       is already copied into the Docker image (`runpod/Dockerfile`), but no
       loader reads it yet, and the native CMake build doesn't copy it into
       `build/` at all — `CMakeLists.txt`'s "Runtime Assets" step only copies
-      `locations.json` and `prompts/`.
+      `locations.json`, `personas.json`, `forenames-by-country.json`,
+      `surnames-by-country.json`, and `prompts/`.
 - [x] Add `LoadPersonas()` and author `personas.json` (doesn't exist yet).
 - [x] Add name-by-country loading, parsing
       `tooling/pipeline/forenames-by-country.json` and
@@ -150,6 +151,12 @@ Entirely new — no `includes/policy/` (or equivalent) directory exists today.
 - [ ] Extend the `DataGenerator` interface with `GenerateBeer`,
       `GenerateCheckin`, `GenerateRating` (today: only `GenerateBrewery` and
       `GenerateUser`).
+- [x] Add `OpenAIGenerator`, a third `DataGenerator` backend (alongside
+      `MockGenerator`/`LlamaGenerator`) that calls the OpenAI Chat Completions
+      API with Structured Outputs (`json_schema`, `strict`) to guarantee
+      schema-valid JSON without needing `IPromptFormatter` or a GBNF grammar —
+      selected via `--openai`/`GeneratorMode::kOpenAI`. This landed ahead of
+      the planned architecture in §3/§4 and isn't reflected there yet.
 - [x] Implement `LlamaGenerator::GenerateUser` for real, with a retry loop
       mirroring `GenerateBrewery` (GBNF grammar, `ValidateUserJson`, up to 3
       attempts with corrective feedback) and a new `prompts/USER_GENERATION.md`.
@@ -181,12 +188,14 @@ Entirely new — no `includes/policy/` (or equivalent) directory exists today.
       `ProcessRecord(const     BreweryRecord&)` and
       `ProcessRecord(const UserRecord&)` exist).
 - [ ] Add `beers`, `checkins`, `ratings`, `follows` tables to
-      `SqliteExportService::InitializeSchema()` (`locations`, `breweries`, and
-      `users` already exist) — see `kCreateLocationsTableSql` /
-      `kCreateBreweriesTableSql` / `kCreateUsersTableSql` in
+      `SqliteExportService::InitializeSchema()` (`cities`, `breweries`,
+      `brewery_addresses`, `users`, and `user_addresses` already exist) — see
+      `kCreateCitiesTableSql` / `kCreateBreweriesTableSql` /
+      `kCreateBreweryAddressesTableSql` / `kCreateUsersTableSql` /
+      `kCreateUserAddressesTableSql` in
       `includes/services/database/sqlite_statement_helpers.h` for the existing
       pattern to follow.
-- [ ] Add a `brewery_cache_` alongside the existing `location_cache_`, and move
+- [ ] Add a `brewery_cache_` alongside the existing `city_cache_`, and move
       from one open transaction for the whole run to per-phase batched commits
       (`BEGIN` / `COMMIT & BEGIN` on a batch-size threshold), as shown in the
       planned activity diagram.
