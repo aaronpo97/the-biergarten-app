@@ -10,7 +10,7 @@ flowchart TD
 
     Run --> SqliteInit["SqliteExportService.Initialize()<br/>builds biergarten_seed_&lt;UTC datetime&gt;.sqlite (numeric suffix if it exists), opens DB connection, executes schema DDL, begins transaction"]
     SqliteInit --> QueryLoc[Orchestrator: QueryLocations]
-    QueryLoc --> LoadLoc["JsonLoader.LoadLocations(locations.json)"]
+    QueryLoc --> LoadLoc["CuratedJsonDataService.LoadLocations()"]
     LoadLoc --> SampleLoc["std::ranges::sample(all_locations, --location-count) — defaults to 10"]
 
     SampleLoc --> EnrichLoop{For each sampled Location}
@@ -20,7 +20,7 @@ flowchart TD
     LookupFailed -- no --> StoreEnriched["Store EnrichedCity{Location, region_context}"] --> EnrichLoop
     EnrichLoop -- done --> GenUsers[Orchestrator: GenerateUsers enriched_cities]
 
-    GenUsers --> LoadUserData["JsonLoader: LoadPersonas / LoadForenamesByCountry / LoadSurnamesByCountry<br/>each memoized after first parse; MockCuratedDataService (--mocked) returns a fixed in-memory dataset instead, skipping these JSON files"]
+    GenUsers --> LoadUserData["CuratedJsonDataService: LoadPersonas / LoadForenamesByCountry / LoadSurnamesByCountry<br/>each memoized after first parse; MockCuratedDataService (--mocked) returns a fixed in-memory dataset instead, skipping these JSON files"]
 
     LoadUserData --> UserLoop{For each EnrichedCity}
     UserLoop --> SampleName["SampleName(forenames_by_country, surnames_by_country, location.iso3166_1)"]
@@ -42,7 +42,7 @@ flowchart TD
     UserGenDone -- yes --> UserPostProc["GetRandomCoordsWithinRange (5km jitter), BuildEmail, GenerateDateOfBirth<br/>email and date_of_birth are generated programmatically, never LLM-authored; generation + coordinate jitter run inside one try/catch per record"]
     UserGenDone -- no --> UserGenFail["Log warning: generation failed, skipping"] --> UserLoop
 
-    UserPostProc --> UserExport["SqliteExportService.ProcessRecord(UserRecord)<br/>reuse cached location_id or insert Location and cache its id; insert User (FK location_id)"]
+    UserPostProc --> UserExport["SqliteExportService.ProcessRecord(UserRecord)<br/>reuse cached city_id or insert City and cache its id; insert User + UserAddress (FK city_id)"]
     UserExport --> UserExportFail{Exception during insert?}
     UserExportFail -- yes --> UserExportWarn["Log warning: SQLite export failed"] --> UserLoop
     UserExportFail -- no --> UserLoop
@@ -64,7 +64,10 @@ flowchart TD
     BrewGenDone -- yes --> BrewPostProc["GetRandomCoordsWithinRange (5km jitter)<br/>generation + jitter run inside one try/catch per record"]
     BrewGenDone -- no --> BrewGenFail["Log warning: generation failed, skipping"] --> BrewLoop
 
-    BrewPostProc --> BrewExport["SqliteExportService.ProcessRecord(GeneratedBrewery)<br/>reuse cached location_id or insert Location and cache its id; insert Brewery (FK location_id)"]
+    BrewPostProc --> BrewGeocode["IAddressService.ReverseGeocode(longitude, latitude)<br/>NominatimAddressService hits the live Nominatim API (1 req/sec) and returns nullopt on failure; MockAddressService (--mocked) returns a fixed placeholder address instead"]
+    BrewGeocode --> BrewGeocodeFailed{Geocode resolved?}
+    BrewGeocodeFailed -- no --> BrewPlaceholder["Log warning: could not reverse geocode; use placeholder address_line1, empty postal_code"] --> BrewExport
+    BrewGeocodeFailed -- yes --> BrewExport["SqliteExportService.ProcessRecord(BreweryRecord)<br/>reuse cached city_id or insert City and cache its id; insert Brewery + BreweryAddress (FK city_id)"]
     BrewExport --> BrewExportFail{Exception during insert?}
     BrewExportFail -- yes --> BrewExportWarn["Log warning: SQLite export failed (data loss prevented per-record; pipeline continues)"] --> BrewLoop
     BrewExportFail -- no --> BrewLoop

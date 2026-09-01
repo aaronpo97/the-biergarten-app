@@ -161,10 +161,19 @@ classDiagram
             +int seed
         }
 
+        class GeneratorMode {
+            <<enumeration>>
+            kMock
+            kLlama
+            kOpenAI
+        }
+
         class GeneratorOptions {
             +path model_path
-            +bool use_mocked
+            +GeneratorMode mode
             +optional~SamplingOptions~ sampling
+            +string openai_api_key
+            +string openai_model
         }
 
         class PipelineOptions {
@@ -177,8 +186,10 @@ classDiagram
             +PipelineOptions pipeline
         }
     }
+    note for GeneratorOptions "Already implemented (models.h), not planned: the three-way GeneratorMode split (kMock/kLlama/kOpenAI) and the openai_api_key/openai_model fields ship today, ahead of the rest of this diagram."
     ApplicationOptions *-- GeneratorOptions
     ApplicationOptions *-- PipelineOptions
+    GeneratorOptions *-- GeneratorMode
     GeneratorOptions o-- SamplingOptions
 
     namespace DomainPolicy {

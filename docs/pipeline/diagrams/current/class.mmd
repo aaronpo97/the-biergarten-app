@@ -5,6 +5,7 @@ classDiagram
         -unique_ptr~DataGenerator~ generator_
         -unique_ptr~IExportService~ exporter_
         -unique_ptr~ICuratedDataService~ curated_data_service_
+        -unique_ptr~IAddressService~ address_service_
         -ApplicationOptions application_options_
         -vector~BreweryRecord~ generated_breweries_
         -vector~UserRecord~ generated_users_
@@ -14,7 +15,7 @@ classDiagram
         -GenerateUsers(cities) void
         -LogResults() void
     }
-    note for BiergartenPipelineOrchestrator "GenerateBreweries/GenerateUsers jitter each address via GetRandomCoordsWithinRange(), uniformly within 5km of the city centre"
+    note for BiergartenPipelineOrchestrator "GenerateBreweries/GenerateUsers jitter each address via GetRandomCoordsWithinRange(), uniformly within 5km of the city centre. GenerateBreweries additionally reverse-geocodes the jittered coordinates via address_service_."
 
     class LogLevel {
         <<enumeration>>
@@ -157,32 +158,50 @@ classDiagram
 
     class ICuratedDataService {
         <<interface>>
-        +LoadLocations(filepath) vector~Location~
-        +LoadPersonas(filepath) vector~UserPersona~
-        +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
-        +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        +LoadLocations() vector~Location~
+        +LoadPersonas() vector~UserPersona~
+        +LoadForenamesByCountry() unordered_map~string, forename_list~
+        +LoadSurnamesByCountry() unordered_map~string, surname_list~
     }
 
-    class JsonLoader {
+    class CuratedJsonDataService {
+        -CuratedDataFilePaths filepaths_
         -cache cache_
-        +LoadLocations(filepath) vector~Location~
-        +LoadPersonas(filepath) vector~UserPersona~
-        +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
-        +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        +LoadLocations() vector~Location~
+        +LoadPersonas() vector~UserPersona~
+        +LoadForenamesByCountry() unordered_map~string, forename_list~
+        +LoadSurnamesByCountry() unordered_map~string, surname_list~
     }
-    note for JsonLoader "Each Load* method memoizes its result in cache_ after its first call"
+    note for CuratedJsonDataService "Takes a CuratedDataFilePaths DTO (locations/personas/forenames/surnames paths) once at construction, not per Load* call. Each Load* method memoizes its result in cache_ after its first call."
 
     class MockCuratedDataService {
         -vector~Location~ locations_
         -vector~UserPersona~ personas_
         -unordered_map~string, forename_list~ forenames_by_country_
         -unordered_map~string, surname_list~ surnames_by_country_
-        +LoadLocations(filepath) vector~Location~
-        +LoadPersonas(filepath) vector~UserPersona~
-        +LoadForenamesByCountry(filepath) unordered_map~string, forename_list~
-        +LoadSurnamesByCountry(filepath) unordered_map~string, surname_list~
+        +LoadLocations() vector~Location~
+        +LoadPersonas() vector~UserPersona~
+        +LoadForenamesByCountry() unordered_map~string, forename_list~
+        +LoadSurnamesByCountry() unordered_map~string, surname_list~
     }
-    note for MockCuratedDataService "Fixed 4-location/3-persona dataset (US, DE, FR, BE) for --mocked runs; filepath arguments are ignored"
+    note for MockCuratedDataService "Fixed 4-location/3-persona dataset (US, DE, FR, BE) for --mocked runs"
+
+    class IAddressService {
+        <<interface>>
+        +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+    }
+
+    class NominatimAddressService {
+        -unique_ptr~WebClient~ client_
+        -shared_ptr~ILogger~ logger_
+        +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+    }
+    note for NominatimAddressService "Queries the public Nominatim API; sleeps 1s per request per its usage policy; returns nullopt on failure or when no usable street address is found"
+
+    class MockAddressService {
+        +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+    }
+    note for MockAddressService "Returns a fixed placeholder address ('123 Mock Street', '00000') for --mocked runs, no network call"
 
     class IExportService {
         <<interface>>
@@ -197,17 +216,19 @@ classDiagram
         -string run_timestamp_utc_
         -path database_path_
         -SqliteDatabaseHandle db_handle_
-        -SqliteStatementHandle insert_location_stmt_
+        -SqliteStatementHandle insert_city_stmt_
         -SqliteStatementHandle insert_brewery_stmt_
+        -SqliteStatementHandle insert_brewery_address_stmt_
         -SqliteStatementHandle insert_user_stmt_
+        -SqliteStatementHandle insert_user_address_stmt_
         -bool transaction_open_
-        -unordered_map~string, sqlite3_int64~ location_cache_
+        -unordered_map~string, sqlite3_int64~ city_cache_
         +Initialize() void
         +ProcessRecord(brewery) uint64_t
         +ProcessRecord(user) uint64_t
         +Finalize() void
         -InitializeSchema() void
-        -ResolveLocationId(location) sqlite3_int64
+        -ResolveCityId(city) sqlite3_int64
     }
 
     class IDateTimeProvider {
@@ -224,6 +245,7 @@ classDiagram
     BiergartenPipelineOrchestrator *-- DataGenerator : owns
     BiergartenPipelineOrchestrator *-- IExportService : owns
     BiergartenPipelineOrchestrator *-- ICuratedDataService : owns
+    BiergartenPipelineOrchestrator *-- IAddressService : owns
 
     LogEntry *-- LogLevel
     LogEntry *-- PipelinePhase
@@ -252,8 +274,11 @@ classDiagram
     IPromptFormatter <|.. Gemma4JinjaPromptFormatter : implements
     IPromptDirectory <|.. PromptDirectory : implements
 
-    ICuratedDataService <|.. JsonLoader : implements
+    ICuratedDataService <|.. CuratedJsonDataService : implements
     ICuratedDataService <|.. MockCuratedDataService : implements
+
+    IAddressService <|.. NominatimAddressService : implements
+    IAddressService <|.. MockAddressService : implements
 
     IExportService <|.. SqliteExportService : implements
     SqliteExportService *-- IDateTimeProvider : owns
