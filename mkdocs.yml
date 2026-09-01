@@ -10,28 +10,28 @@ nav:
   - Architecture: architecture.md
   - Diagrams:
       - Website:
-          - Architecture: website/diagrams-md/architecture.md
-          - Database Schema: website/diagrams-md/database-schema.md
-          - Deployment: website/diagrams-md/deployment.md
+          - Architecture: website/diagrams/architecture.md
+          - Database Schema: website/diagrams/database-schema.md
+          - Deployment: website/diagrams/deployment.md
           - Auth Flows:
-              - Registration: website/diagrams-md/auth/registration.md
-              - Login: website/diagrams-md/auth/login.md
-              - Refresh Token: website/diagrams-md/auth/refresh-token.md
-              - Confirm User: website/diagrams-md/auth/confirm-user.md
-              - Resend Confirmation: website/diagrams-md/auth/resend-confirmation.md
-              - Update Username: website/diagrams-md/auth/update-username.md
-              - Update Email: website/diagrams-md/auth/update-email.md
-              - Update Password: website/diagrams-md/auth/update-password.md
-              - Update Profile: website/diagrams-md/auth/update-profile.md
-              - Delete Account: website/diagrams-md/auth/delete-account.md
-              - Error Handling: website/diagrams-md/auth/error-handling.md
+              - Registration: website/diagrams/auth/registration.md
+              - Login: website/diagrams/auth/login.md
+              - Refresh Token: website/diagrams/auth/refresh-token.md
+              - Confirm User: website/diagrams/auth/confirm-user.md
+              - Resend Confirmation: website/diagrams/auth/resend-confirmation.md
+              - Update Username: website/diagrams/auth/update-username.md
+              - Update Email: website/diagrams/auth/update-email.md
+              - Update Password: website/diagrams/auth/update-password.md
+              - Update Profile: website/diagrams/auth/update-profile.md
+              - Delete Account: website/diagrams/auth/delete-account.md
+              - Error Handling: website/diagrams/auth/error-handling.md
       - Pipeline:
           - Current:
-              - Activity: pipeline/diagrams-md/current/activity.md
-              - Class: pipeline/diagrams-md/current/class.md
+              - Activity: pipeline/diagrams/current/activity.md
+              - Class: pipeline/diagrams/current/class.md
           - Planned:
-              - Activity: pipeline/diagrams-md/planned/activity.md
-              - Class: pipeline/diagrams-md/planned/class.md
+              - Activity: pipeline/diagrams/planned/activity.md
+              - Class: pipeline/diagrams/planned/class.md
   - Website:
       - Getting Started: website/getting-started.md
       - Database: website/database.md
@@ -56,3 +56,6 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.snippets:
+      base_path: [docs]
+      check_paths: true

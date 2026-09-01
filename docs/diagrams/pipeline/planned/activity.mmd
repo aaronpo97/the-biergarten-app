@@ -1,0 +1,194 @@
+flowchart TD
+    Start([start]) --> ParseArgs["Main: ParseArguments(argc, argv)"]
+    ParseArgs --> InvalidArgs{Invalid args?}
+    InvalidArgs -- yes --> LogErr["spdlog::error"] --> Stop1([stop])
+    InvalidArgs -- no --> InitOpenSSL["Main: Init OpenSSL global state and LlamaBackendState"]
+    InitOpenSSL --> BuildDI["Main: Build DI injector"]
+    BuildDI --> InitSqlite["Main: Initialize SqliteExportService<br/>opens SQLite connection; transactions now managed per-phase via batching"]
+    InitSqlite --> LogSetup["Main: create BoundedChannel log_ch, spawn Log Worker thread<br/>drains log_ch for the pipeline lifetime; all workers emit LogEntry via PipelineLogger, never spdlog directly"]
+    LogSetup --> OrchRun["BiergartenPipelineOrchestrator::Run()"]
+
+    OrchRun --> PL1["JsonLoader.LoadBeerStyles → EnrichmentService.PreWarmBeerStyleCache"]
+    OrchRun --> PL2["JsonLoader.LoadLocations → EnrichmentService.PreWarmLocationCache"]
+    OrchRun --> PL3["JsonLoader.LoadForenamesByCountry"]
+    OrchRun --> PL4["JsonLoader.LoadSurnamesByCountry"]
+    OrchRun --> PL5["JsonLoader.LoadPersonas"]
+    PL1 & PL2 & PL3 & PL4 & PL5 --> UserPhase["Orchestrator: RunUserPhase(sampled_locations)<br/>each Load* call memoized after first parse; MockCuratedDataService (--mocked) returns a fixed in-memory dataset instead, skipping these JSON files"]
+
+    UserPhase --> UCreate["Create BoundedChannels (loc_ch, exp_ch)"]
+
+    subgraph USERGEN["Phase 0 — User Generation (concurrent)"]
+        direction LR
+        subgraph U_PROD["Orchestrator (producer)"]
+            UP1["Loop: send Location → loc_ch"]
+            UP1 --> UP2["Close loc_ch"]
+        end
+        subgraph U_LLM["LLM Worker"]
+            UL1{"loc_ch has items?"}
+            UL1 -- yes --> UL2["Receive Location"]
+            UL2 --> UL3["GetLocationContextFromCache(location) — guaranteed cache hit from startup"]
+            UL3 --> UL4["IPersonaSelectionStrategy.SelectPersona(personas_palette_) — guaranteed cache hit; returns Persona{style_affinities, abv_range, ibu_preference, checkin_weight}"]
+            UL4 --> UL5["SampleName(forenames_by_country, surnames_by_country, iso3166_1, rng)<br/>deterministic, no LLM; free function; skips the city if either map has no entry for iso3166_1"]
+            UL5 --> UL6["GenerateUser(enriched_city, persona, sampled_name) via DataGenerator<br/>LLM receives EnrichedCity context + persona description + sampled name"]
+            UL6 --> UL7["PipelineLogger.Log(Info, UserGeneration, city, user_id, llm)"]
+            UL7 --> UL8["Send GeneratedUser → exp_ch"]
+            UL8 --> UL1
+            UL1 -- no --> UL9["Close exp_ch"]
+        end
+        subgraph U_SQL["SQLite Worker"]
+            US1["BEGIN TRANSACTION"] --> US2{"exp_ch has items?"}
+            US2 -- yes --> US3["Receive GeneratedUser"]
+            US3 --> US4["ProcessUser(user)"]
+            US4 --> US5["PipelineLogger.Log(Info, UserGeneration, city, user_id, sqlite)"]
+            US5 --> US6["Append → user_pool_"]
+            US6 --> US7{"Batch size reached?"}
+            US7 -- yes --> US8["COMMIT and BEGIN"] --> US2
+            US7 -- no --> US2
+            US2 -- no --> US9["COMMIT (Final)"]
+        end
+    end
+
+    UCreate --> UP1
+    UP2 -.->|loc_ch| UL1
+    UL9 -.->|exp_ch| US2
+    UL9 & US9 --> UserJoin["Orchestrator: Join LLM Worker, SQLite Worker"]
+
+    UserJoin --> BreweryPhase["Orchestrator: RunBreweryPhase(sampled_locations)"]
+    BreweryPhase --> BCreate["Create BoundedChannels (loc_ch, exp_ch)"]
+
+    subgraph BREWGEN["Phase 1a — Brewery Generation (concurrent)"]
+        direction LR
+        subgraph B_PROD["Orchestrator (producer)"]
+            BP1["Loop: sample User from user_pool_, pair with Location"]
+            BP1 --> BP2["Send BreweryTask(Location, User) → loc_ch"]
+            BP2 --> BP3["Close loc_ch"]
+        end
+        subgraph B_LLM["LLM Worker"]
+            BL1{"loc_ch has items?"}
+            BL1 -- yes --> BL2["Receive BreweryTask(Location, User)"]
+            BL2 --> BL3["GetLocationContextFromCache(task.location) — guaranteed cache hit"]
+            BL3 --> BL4["GenerateBrewery(enriched_city, context, task.user) via DataGenerator<br/>KV cache stays warm; brewery linked to sampled owner_user_id"]
+            BL4 --> BL5["PipelineLogger.Log(Info, BreweryGeneration, city, brewery_id, llm)"]
+            BL5 --> BL6["Send GeneratedBrewery → exp_ch"]
+            BL6 --> BL1
+            BL1 -- no --> BL7["Close exp_ch"]
+        end
+        subgraph B_SQL["SQLite Worker"]
+            BS1["BEGIN TRANSACTION"] --> BS2{"exp_ch has items?"}
+            BS2 -- yes --> BS3["Receive GeneratedBrewery"]
+            BS3 --> BS4["ProcessBrewery(brewery)"]
+            BS4 --> BS5["PipelineLogger.Log(Info, BreweryGeneration, city, brewery_id, sqlite)"]
+            BS5 --> BS6["Append → brewery_pool_"]
+            BS6 --> BS7{"Batch size reached?"}
+            BS7 -- yes --> BS8["COMMIT and BEGIN"] --> BS2
+            BS7 -- no --> BS2
+            BS2 -- no --> BS9["COMMIT (Final)"]
+        end
+    end
+
+    BCreate --> BP1
+    BP3 -.->|loc_ch| BL1
+    BL7 -.->|exp_ch| BS2
+    BL7 & BS9 --> BrewJoin["Orchestrator: Join LLM Worker, SQLite Worker<br/>brewery_pool_ is now fully populated"]
+
+    BrewJoin --> BeerPhase["Orchestrator: RunBeerPhase()"]
+    BeerPhase --> BeCreate["Create BoundedChannels (brew_ch, exp_ch)"]
+
+    subgraph BEERGEN["Phase 1b — Beer Generation (concurrent)"]
+        direction LR
+        subgraph BE_PROD["Orchestrator (producer)"]
+            BeP1["Loop: send Breweries → brew_ch"]
+            BeP1 --> BeP2["Close brew_ch"]
+        end
+        subgraph BE_LLM["LLM Worker"]
+            BeL1{"brew_ch has items?"}
+            BeL1 -- yes --> BeL2["Receive GeneratedBrewery"]
+            BeL2 --> BeL3["IBeerSelectionStrategy.SelectStyles(brewery, beer_style_palette_)"]
+            BeL3 --> BeL4{"For each selected BeerStyle"}
+            BeL4 -- remaining --> BeL5["GetStyleContextFromCache(style) — guaranteed cache hit; KV cache stays warm across all beer generations in this phase"]
+            BeL5 --> BeL6["GenerateBeer(brewery, style_context) via DataGenerator"]
+            BeL6 --> BeL7["Attach GeneratedBeer to bundle"] --> BeL4
+            BeL4 -- done --> BeL8["PipelineLogger.Log(Info, BeerGeneration, city, brewery_id, llm)"]
+            BeL8 --> BeL9["Send BeersBundle → exp_ch"]
+            BeL9 --> BeL1
+            BeL1 -- no --> BeL10["Close exp_ch"]
+        end
+        subgraph BE_SQL["SQLite Worker"]
+            BeS1["BEGIN TRANSACTION"] --> BeS2{"exp_ch has items?"}
+            BeS2 -- yes --> BeS3["Receive BeersBundle"]
+            BeS3 --> BeS4{"For each beer in bundle"}
+            BeS4 -- remaining --> BeS5["Set beer.brewery_id from bundle"]
+            BeS5 --> BeS6["ProcessBeer(beer)"]
+            BeS6 --> BeS7["Append → beer_pool_"] --> BeS4
+            BeS4 -- done --> BeS8["PipelineLogger.Log(Info, BeerGeneration, city, brewery_id, sqlite)"]
+            BeS8 --> BeS9{"Batch size reached?"}
+            BeS9 -- yes --> BeS10["COMMIT and BEGIN"] --> BeS2
+            BeS9 -- no --> BeS2
+            BeS2 -- no --> BeS11["COMMIT (Final)"]
+        end
+    end
+
+    BeCreate --> BeP1
+    BeP2 -.->|brew_ch| BeL1
+    BeL10 -.->|exp_ch| BeS2
+    BeL10 & BeS11 --> BeerJoin["Orchestrator: Join LLM Worker, SQLite Worker<br/>brewery_pool_ and beer_pool_ are now completely populated — Checkin and Follow phases may run in parallel"]
+
+    BeerJoin --> CheckinPhase["Orchestrator: RunCheckinPhase()"]
+    BeerJoin --> FollowPhase["Orchestrator: RunFollowPhase()"]
+
+    subgraph CHECKIN["Checkin Generation"]
+        CK1["ICheckinDistributionStrategy.AssignActivityWeights(user_pool_)<br/>weights seeded from persona.checkin_weight; J-curve profile emerges from persona distribution"]
+        CK1 --> CK2["BEGIN TRANSACTION"]
+        CK2 --> CK3{"For each GeneratedUser in user_pool_"}
+        CK3 -- remaining --> CK4["CheckinsForUser(user, brewery_pool_.size())"]
+        CK4 --> CK5{"For each checkin index"}
+        CK5 -- remaining --> CK6["TimestampFor(user, index)"]
+        CK6 --> CK7["Select brewery from brewery_pool_"]
+        CK7 --> CK8["GenerateCheckin(user, brewery, timestamp) via DataGenerator"]
+        CK8 --> CK9["ProcessCheckin(checkin)"]
+        CK9 --> CK10["PipelineLogger.Log(Info, CheckinGeneration, nullopt, checkin_id, sqlite)"]
+        CK10 --> CK11["Append → checkin_pool_"]
+        CK11 --> CK12{"Batch size reached?"}
+        CK12 -- yes --> CK13["COMMIT and BEGIN"] --> CK5
+        CK12 -- no --> CK5
+        CK5 -- done --> CK3
+        CK3 -- done --> CK14["COMMIT (Final)"]
+    end
+
+    subgraph FOLLOW["Follow Generation"]
+        FL1["IFollowGenerationStrategy.AssignFollowWeights(user_pool_)<br/>RandomFollowStrategy: uniform weights; ActivityWeightedFollowStrategy: derived from user.activity_weight so high-activity users attract more followers"]
+        FL1 --> FL2["BEGIN TRANSACTION"]
+        FL2 --> FL3["IFollowGenerationStrategy.GenerateFollows(user_pool_)<br/>self-follow constraint (follower_id != followed_id) enforced here and at the DB schema level"]
+        FL3 --> FL4{"For each GeneratedFollow"}
+        FL4 -- remaining --> FL5["ProcessFollow(follow)"]
+        FL5 --> FL6["PipelineLogger.Log(Info, FollowGeneration, nullopt, follower_id, sqlite)"]
+        FL6 --> FL7["Append → follow_pool_"]
+        FL7 --> FL8{"Batch size reached?"}
+        FL8 -- yes --> FL9["COMMIT and BEGIN"] --> FL4
+        FL8 -- no --> FL4
+        FL4 -- done --> FL10["COMMIT (Final)"]
+    end
+
+    CheckinPhase --> CK1
+    FollowPhase --> FL1
+    CK14 & FL10 --> PhaseJoin["Orchestrator: Join CheckinPhase, FollowPhase<br/>checkin_pool_ and follow_pool_ are now fully populated"]
+
+    PhaseJoin --> RatingPhase["Orchestrator: RunRatingPhase()<br/>beer selection biased by user.persona.style_affinities and abv_range; rating skew modulated per persona"]
+    RatingPhase --> RT1["BEGIN TRANSACTION"]
+    RT1 --> RT2{"For each GeneratedCheckin in checkin_pool_"}
+    RT2 -- remaining --> RT3["Match brewery_id, select beer from beer_pool_ (same brewery_id, biased by persona affinities)"]
+    RT3 --> RT4{"Beer exists for brewery?"}
+    RT4 -- yes --> RT5["GenerateRating(user, beer, checkin_id) via DataGenerator"]
+    RT5 --> RT6["ProcessRating(rating)"]
+    RT6 --> RT7["PipelineLogger.Log(Info, RatingGeneration, nullopt, rating_id, sqlite)"]
+    RT7 --> RT8{"Batch size reached?"}
+    RT8 -- yes --> RT9["COMMIT and BEGIN"] --> RT2
+    RT8 -- no --> RT2
+    RT4 -- no --> RT10["Log warning; skip — brewery has no beers"] --> RT2
+    RT2 -- done --> RT11["COMMIT (Final)"]
+
+    RT11 --> Teardown["Orchestrator: Finalize SqliteExportService — safely closes the DB connection"]
+    Teardown --> CloseLogCh["Orchestrator: close log_ch"]
+    CloseLogCh --> MainDone["Main: spdlog::info 'Pipeline complete in X ms'"]
+    MainDone --> JoinLog["Main: Join Log Worker — drain guarantees no LogEntry is dropped at shutdown"]
+    JoinLog --> Stop2([stop])

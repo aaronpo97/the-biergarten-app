@@ -1,0 +1,70 @@
+sequenceDiagram
+    actor User
+    participant API as API Controller
+    participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
+    box rgb(241,243,234) Handler Layer
+        participant UpdateUsernameHandler
+        participant UserMgr as UserManager(ApplicationUser)
+    end
+    box rgb(219,238,221) Repository / Cross-slice
+        participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+    end
+    participant DB as SQL Server
+
+    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
+
+    User->>API: PATCH /api/auth/username {newUsername} (requires Bearer access token)
+    activate API
+    API->>Mediator: Send(UpdateUsernameCommand(GetAuthenticatedUserId(), newUsername))
+    activate Mediator
+    Note right of Mediator: ValidationBehavior runs UpdateUsernameValidator (same format rules as registration)
+
+    alt Validation fails
+        Mediator->>API: throws FluentValidation.ValidationException
+        API->>User: 400 Bad Request
+    else Validation succeeds
+        Mediator->>UpdateUsernameHandler: Handle(command)
+        activate UpdateUsernameHandler
+
+        UpdateUsernameHandler->>UserMgr: FindByIdAsync(userAccountId)
+        activate UserMgr
+        UserMgr->>UserStore: FindByIdAsync(userAccountId)
+        activate UserStore
+        UserStore->>DB: SELECT ... FROM UserAccount WHERE UserAccountID = @Id
+        activate DB
+        DB-->>UserStore: row or null
+        deactivate DB
+        UserStore-->>UserMgr: ApplicationUser or null
+        deactivate UserStore
+        UserMgr-->>UpdateUsernameHandler: ApplicationUser or null
+        deactivate UserMgr
+
+        alt Account not found
+            UpdateUsernameHandler->>Mediator: throw NotFoundException
+            Mediator->>API: propagate
+            API->>User: 404 Not Found
+        else Account found
+            UpdateUsernameHandler->>UserMgr: SetUserNameAsync(user, newUsername)
+            activate UserMgr
+            UserMgr->>UserStore: FindByNameAsync(newUsername)
+            Note right of UserMgr: Uniqueness check before the UPDATE
+            UserMgr->>UserStore: UpdateAsync(user)
+            UserStore->>DB: UPDATE UserAccount SET Username = @UserName, ...
+            UserStore-->>UserMgr: IdentityResult
+            UserMgr-->>UpdateUsernameHandler: IdentityResult
+            deactivate UserMgr
+
+            alt !result.Succeeded
+                UpdateUsernameHandler->>Mediator: throw ConflictException (DuplicateUserName → "Username already exists")
+                Mediator->>API: propagate
+                API->>User: 409 Conflict
+            else result.Succeeded
+                UpdateUsernameHandler-->>Mediator: UpdateUsernamePayload(user.Id, user.UserName)
+                deactivate UpdateUsernameHandler
+                Mediator-->>API: UpdateUsernamePayload
+                deactivate Mediator
+                API->>User: 200 OK {message: "Username updated successfully.", payload: {...}}
+            end
+        end
+    end
+    deactivate API

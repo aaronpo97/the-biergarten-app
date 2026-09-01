@@ -1,0 +1,81 @@
+sequenceDiagram
+    actor User
+    participant API as API Controller
+    participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
+    box rgb(241,243,234) Handler Layer
+        participant ConfirmHandler as ConfirmUserHandler
+        participant UserMgr as UserManager(ApplicationUser)
+        participant TokenSvc as TokenService
+    end
+    box rgb(235,236,227) Infrastructure Layer
+        participant JWT as JWT Infrastructure
+    end
+    box rgb(219,238,221) Repository / Cross-slice
+        participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+    end
+    participant DB as SQL Server
+
+    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
+
+    User->>API: POST /api/auth/confirm?token={token} (requires Bearer access token)
+    activate API
+    API->>Mediator: Send(ConfirmUserCommand(token))
+    activate Mediator
+    Mediator->>ConfirmHandler: Handle(command)
+    activate ConfirmHandler
+
+    ConfirmHandler->>TokenSvc: ValidateConfirmationTokenAsync(token)
+    activate TokenSvc
+    TokenSvc->>JWT: Validate against confirmation token secret, extract userId
+    activate JWT
+    JWT-->>TokenSvc: ValidatedToken or throws
+    deactivate JWT
+    TokenSvc-->>ConfirmHandler: ValidatedToken
+    deactivate TokenSvc
+
+    alt Token invalid or expired
+        ConfirmHandler->>Mediator: throw UnauthorizedException
+        Mediator->>API: propagate
+        API->>User: 401 Unauthorized
+    else Token valid
+        ConfirmHandler->>UserMgr: FindByIdAsync(validatedToken.UserId)
+        activate UserMgr
+        UserMgr->>UserStore: FindByIdAsync(userId)
+        activate UserStore
+        UserStore->>DB: SELECT ... FROM UserAccount WHERE UserAccountID = @Id
+        activate DB
+        DB-->>UserStore: row or null
+        deactivate DB
+        UserStore-->>UserMgr: ApplicationUser or null
+        deactivate UserStore
+        UserMgr-->>ConfirmHandler: ApplicationUser or null
+        deactivate UserMgr
+
+        alt User not found
+            ConfirmHandler->>Mediator: throw UnauthorizedException "User account not found"
+            Mediator->>API: propagate
+            API->>User: 401 Unauthorized
+        else User found
+            ConfirmHandler->>UserStore: SetEmailConfirmedAsync(user, true)
+            Note right of UserStore: IUserEmailStore(ApplicationUser) is injected directly into the handler (not via UserManager), setting the confirmed flag in-memory here
+
+            ConfirmHandler->>UserMgr: UpdateAsync(user)
+            activate UserMgr
+            UserMgr->>UserStore: UpdateAsync(user)
+            activate UserStore
+            UserStore->>DB: UPDATE UserAccount SET ...
+            UserStore->>DB: INSERT INTO UserVerification (UserAccountId, VerificationDateTime)
+            Note right of UserStore: Idempotent — skipped (duplicate-key exception swallowed) if a verification row already exists
+            UserStore-->>UserMgr: IdentityResult.Success
+            deactivate UserStore
+            UserMgr-->>ConfirmHandler: IdentityResult
+            deactivate UserMgr
+
+            ConfirmHandler-->>Mediator: ConfirmationPayload(user.Id, DateTime.UtcNow)
+            deactivate ConfirmHandler
+            Mediator-->>API: ConfirmationPayload
+            deactivate Mediator
+            API->>User: 200 OK {message: "User with ID {id} is confirmed.", payload: {...}}
+        end
+    end
+    deactivate API

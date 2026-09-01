@@ -1,0 +1,153 @@
+sequenceDiagram
+    actor User
+    participant API as API Controller
+    participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
+    box rgb(241,243,234) Handler Layer
+        participant RegHandler as RegisterUserHandler
+        participant UserMgr as UserManager(ApplicationUser)
+        participant TokenSvc as TokenService
+    end
+    box rgb(235,236,227) Infrastructure Layer
+        participant Argon2 as Argon2PasswordHasher
+        participant JWT as JWT Infrastructure
+        participant SMTP as Email Provider
+        participant Template as Template Provider
+    end
+    box rgb(219,238,221) Repository / Cross-slice
+        participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+        participant EmailDispatcher as EmailDispatcher<br/>(Features.Emails)
+    end
+    participant DB as SQL Server
+
+    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
+
+    User->>API: POST /api/auth/register {username, firstName, lastName, email, dateOfBirth, password}
+    activate API
+    API->>Mediator: Send(RegisterUserCommand)
+    activate Mediator
+    Note right of Mediator: ValidationBehavior runs RegisterUserValidator — username 3-64 chars alphanumeric+[._-], valid email ≤128 chars, password min 8 chars with upper/lower/number/special, DateOfBirth 19+ years old
+
+    alt Validation fails
+        Mediator->>API: throws FluentValidation.ValidationException
+        API->>User: 400 Bad Request {message, errors}
+    else Validation succeeds
+        Mediator->>RegHandler: Handle(command)
+        activate RegHandler
+        RegHandler->>RegHandler: user = new UserAccount{...}.ToApplicationUser()
+
+        RegHandler->>UserMgr: CreateAsync(user, password)
+        activate UserMgr
+        UserMgr->>Argon2: HashPassword(user, password)
+        activate Argon2
+        Note right of Argon2: Argon2id — salt 16 bytes, memory 64MB, iterations 4, parallelism = CPU count, hash output 32 bytes
+        Argon2-->>UserMgr: "base64(salt):base64(hash)"
+        deactivate Argon2
+
+        UserMgr->>UserStore: SetPasswordHashAsync(user, hash)
+        Note right of UserStore: user.Id is still empty here — only sets the in-memory hash — CreateAsync writes it to UserCredential itself
+
+        UserMgr->>UserStore: FindByNameAsync(username)
+        activate UserStore
+        UserStore->>DB: SELECT ... FROM UserAccount WHERE Username = @Username
+        activate DB
+        DB-->>UserStore: null (user doesn't exist)
+        deactivate DB
+        deactivate UserStore
+
+        UserMgr->>UserStore: FindByEmailAsync(email)
+        activate UserStore
+        UserStore->>DB: SELECT ... FROM UserAccount WHERE Email = @Email
+        activate DB
+        DB-->>UserStore: null (email doesn't exist)
+        deactivate DB
+        deactivate UserStore
+        Note right of UserMgr: Default UserManager validators check uniqueness before CreateAsync — DapperUserStore.CreateAsync also guards a genuine race via a caught duplicate-key SqlException (2601/2627)
+
+        UserMgr->>UserStore: CreateAsync(user)
+        activate UserStore
+        UserStore->>DB: BEGIN TRANSACTION
+        activate DB
+        UserStore->>DB: INSERT INTO UserAccount (...) OUTPUT INSERTED.UserAccountID
+        DB-->>UserStore: UserAccountId (GUID)
+        UserStore->>DB: INSERT INTO UserCredential (UserAccountId, Hash)
+        UserStore->>DB: COMMIT TRANSACTION
+        deactivate DB
+        Note right of UserStore: Both statements run via Dapper against a single DbTransaction, not a stored procedure
+
+        UserStore-->>UserMgr: IdentityResult.Success (user.Id set)
+        deactivate UserStore
+        UserMgr-->>RegHandler: IdentityResult
+        deactivate UserMgr
+
+        alt !result.Succeeded
+            RegHandler->>Mediator: throw ConflictException (DuplicateUserName/DuplicateEmail → "Username or email already exists", otherwise joined error descriptions)
+            Mediator->>API: propagate
+            API->>User: 409 Conflict "Username or email already exists"
+        else result.Succeeded
+            RegHandler->>TokenSvc: GenerateAccessToken(user)
+            activate TokenSvc
+            TokenSvc->>JWT: GenerateJwt(userId, username, expiry)
+            activate JWT
+            Note right of JWT: HS256, expires 1 hour, claims sub/unique_name/iat/jti
+            JWT->>JWT: Create JWT with claims, sign with secret key
+            JWT-->>TokenSvc: Access Token
+            deactivate JWT
+            TokenSvc-->>RegHandler: Access Token
+            deactivate TokenSvc
+
+            RegHandler->>TokenSvc: GenerateRefreshToken(user)
+            activate TokenSvc
+            TokenSvc->>JWT: GenerateJwt(userId, username, expiry)
+            activate JWT
+            Note right of JWT: Expires 21 days (504h), same structure as access token, signed with a separate secret
+            JWT-->>TokenSvc: Refresh Token
+            deactivate JWT
+            TokenSvc-->>RegHandler: Refresh Token
+            deactivate TokenSvc
+
+            RegHandler->>TokenSvc: GenerateConfirmationToken(user)
+            activate TokenSvc
+            TokenSvc->>JWT: GenerateJwt(userId, username, expiry)
+            activate JWT
+            Note right of JWT: Expires 30 minutes, signed with a third, separate secret
+            JWT-->>TokenSvc: Confirmation Token
+            deactivate JWT
+            TokenSvc-->>RegHandler: Confirmation Token
+            deactivate TokenSvc
+
+            RegHandler->>Mediator: Send(SendRegistrationEmailCommand) (Shared.Application cross-slice contract)
+            activate Mediator
+            Note right of Mediator: Routed to Features.Emails' SendRegistrationEmailHandler — the only cross-slice call in the backend
+            Mediator->>EmailDispatcher: SendRegistrationEmailAsync(firstName, email, confirmationToken)
+            activate EmailDispatcher
+
+            EmailDispatcher->>Template: RenderUserRegisteredEmailAsync(firstName, confirmationLink)
+            activate Template
+            Note right of Template: Razor component — header/branding, welcome message, confirmation button, footer
+            Template->>Template: Render Razor component to HTML
+            Template-->>EmailDispatcher: HTML email content
+            deactivate Template
+
+            EmailDispatcher->>SMTP: SendAsync(email, subject, body)
+            activate SMTP
+            Note right of SMTP: MailKit — host/port from SMTP_HOST/SMTP_PORT, StartTLS when SMTP_USE_SSL=true, optional username/password auth
+            SMTP->>SMTP: Build MIME message, connect, authenticate, send, disconnect
+            SMTP-->>EmailDispatcher: Success / throws
+            deactivate SMTP
+            deactivate EmailDispatcher
+            deactivate Mediator
+
+            alt Email sent successfully
+                RegHandler->>RegHandler: emailSent = true
+            else mediator.Send throws
+                RegHandler->>RegHandler: catch(Exception), log to stderr, emailSent = false
+            end
+
+            RegHandler-->>Mediator: RegistrationPayload(userAccountId, username, refreshToken, accessToken, confirmationEmailSent)
+            deactivate RegHandler
+            Mediator-->>API: RegistrationPayload
+            deactivate Mediator
+            API->>User: 201 Created {message: "User registered successfully.", payload: {...}}
+        end
+    end
+    deactivate API

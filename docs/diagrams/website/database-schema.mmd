@@ -1,0 +1,162 @@
+erDiagram
+    User ||--o{ Cred : "has credentials"
+    User ||--o| Verify : "has verification"
+    User ||--o| Profile : "has profile"
+    Profile ||--o{ Avatar : "has avatar history"
+    Avatar }o--|| Photo : "uses photo"
+    User ||--o{ Follow : "follows"
+    User ||--o{ Follow : "followed by"
+    User ||--o{ Photo : "uploads"
+
+    Country ||--o{ StateProvince : "has"
+    StateProvince ||--o{ City : "has"
+
+    User ||--o{ Brewery : "posts"
+    Brewery ||--o| BreweryLoc : "has location"
+    City ||--o{ BreweryLoc : "located in"
+    Brewery ||--o{ BreweryPhoto : "has photos"
+    Photo ||--o{ BreweryPhoto : "used in"
+
+    User ||--o{ Beer : "posts"
+    BeerStyle ||--o{ Beer : "categorizes"
+    Brewery ||--o{ Beer : "brews"
+    Beer ||--o{ BeerPhoto : "has photos"
+    Photo ||--o{ BeerPhoto : "used in"
+    Beer ||--o{ BeerComment : "has comments"
+    User ||--o{ BeerComment : "comments"
+
+    User {
+        uniqueidentifier UserAccountID PK
+        varchar Username UK
+        nvarchar FirstName
+        nvarchar LastName
+        varchar Email UK
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+        date DateOfBirth
+    }
+
+    Cred {
+        uniqueidentifier UserCredentialID PK
+        uniqueidentifier UserAccountID FK
+        datetime CreatedAt
+        datetime Expiry
+        nvarchar Hash
+        bit IsRevoked
+        datetime RevokedAt "nullable"
+    }
+
+    Verify {
+        uniqueidentifier UserVerificationID PK
+        uniqueidentifier UserAccountID "FK, UK"
+        datetime VerificationDateTime
+    }
+
+    Profile {
+        uniqueidentifier UserProfileID PK
+        uniqueidentifier UserAccountID "FK, UK"
+        nvarchar Biography
+    }
+
+    Avatar {
+        uniqueidentifier UserAvatarID PK
+        uniqueidentifier UserProfileID FK
+        uniqueidentifier PhotoID FK
+        datetime2 ValidFrom
+        datetime2 ValidTo "nullable; at most one row per UserProfileID has ValidTo IS NULL (active avatar)"
+    }
+
+    Follow {
+        uniqueidentifier UserFollowID PK
+        uniqueidentifier UserAccountID FK
+        uniqueidentifier FollowingID FK
+        datetime CreatedAt
+    }
+
+    Photo {
+        uniqueidentifier PhotoID PK
+        nvarchar Hyperlink "nullable"
+        uniqueidentifier UploadedByID FK
+        datetime UploadedAt
+    }
+
+    Country {
+        uniqueidentifier CountryID PK
+        nvarchar CountryName
+        char ISO3166_1 UK
+    }
+
+    StateProvince {
+        uniqueidentifier StateProvinceID PK
+        nvarchar StateProvinceName
+        char ISO3166_2 UK
+        uniqueidentifier CountryID FK
+    }
+
+    City {
+        uniqueidentifier CityID PK
+        nvarchar CityName
+        uniqueidentifier StateProvinceID FK
+    }
+
+    Brewery {
+        uniqueidentifier BreweryPostID PK
+        nvarchar BreweryName
+        uniqueidentifier PostedByID FK
+        nvarchar Description
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }
+
+    BreweryLoc {
+        uniqueidentifier BreweryPostLocationID PK
+        uniqueidentifier BreweryPostID "FK, UK"
+        nvarchar AddressLine1
+        nvarchar AddressLine2 "nullable"
+        nvarchar PostalCode
+        uniqueidentifier CityID FK
+        geography Coordinates "nullable"
+    }
+
+    BreweryPhoto {
+        uniqueidentifier BreweryPostPhotoID PK
+        uniqueidentifier BreweryPostID FK
+        uniqueidentifier PhotoID FK
+        datetime LinkedAt
+    }
+
+    BeerStyle {
+        uniqueidentifier BeerStyleID PK
+        nvarchar StyleName UK
+        nvarchar Description "nullable"
+    }
+
+    Beer {
+        uniqueidentifier BeerPostID PK
+        nvarchar Name
+        nvarchar Description
+        decimal ABV
+        int IBU
+        uniqueidentifier PostedByID FK
+        uniqueidentifier BeerStyleID FK
+        uniqueidentifier BrewedByID FK
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }
+
+    BeerPhoto {
+        uniqueidentifier BeerPostPhotoID PK
+        uniqueidentifier BeerPostID FK
+        uniqueidentifier PhotoID FK
+        datetime LinkedAt
+    }
+
+    BeerComment {
+        uniqueidentifier BeerPostCommentID PK
+        nvarchar Comment
+        uniqueidentifier BeerPostID FK
+        uniqueidentifier CommentedByID FK
+        int Rating
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }
