@@ -2,16 +2,14 @@ sequenceDiagram
     actor User
     participant API as API Controller
     participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
-    box rgb(241,243,234) Handler Layer
+    box Handler Layer
         participant UpdateUsernameHandler
         participant UserMgr as UserManager(ApplicationUser)
     end
-    box rgb(219,238,221) Repository / Cross-slice
+    box Repository / Cross-slice
         participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
     end
     participant DB as SQL Server
-
-    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
 
     User->>API: PATCH /api/auth/username {newUsername} (requires Bearer access token)
     activate API

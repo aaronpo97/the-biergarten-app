@@ -2,16 +2,14 @@ sequenceDiagram
     actor User
     participant API as API Controller
     participant Mediator as MediatR pipeline<br/>(ValidationBehavior)
-    box rgb(241,243,234) Handler Layer
+    box Handler Layer
         participant DeleteAccountHandler
         participant UserMgr as UserManager(ApplicationUser)
     end
-    box rgb(219,238,221) Repository / Cross-slice
+    box Repository / Cross-slice
         participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
     end
     participant DB as SQL Server
-
-    Note over UserMgr: ASP.NET Core Identity's UserManager replaces the deleted AuthRepository — handlers delegate to UserManager, which calls DapperUserStore (persistence) and Argon2PasswordHasher.
 
     User->>API: DELETE /api/auth/account (requires Bearer access token)
     activate API
@@ -37,7 +35,7 @@ sequenceDiagram
         UserMgr->>UserStore: DeleteAsync(user)
         activate UserStore
         UserStore->>DB: DELETE FROM UserAccount WHERE UserAccountID = @Id
-        Note right of UserStore: UserCredential, UserVerification, and UserProfile cascade on delete (UserAvatar cascades transitively through UserProfile). Posts, comments, photos, and follows use ON DELETE NO ACTION — if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
+        Note right of UserStore: UserCredential, UserVerification, and UserProfile cascade on delete<br/>(UserAvatar cascades transitively through UserProfile).<br/>Posts, comments, photos, and follows use ON DELETE NO ACTION<br/>if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
 
         alt Foreign key violation (dependent records exist)
             UserStore-->>UserMgr: IdentityResult.Failed (AccountHasDependentRecords)
@@ -49,7 +47,7 @@ sequenceDiagram
         deactivate UserMgr
 
         alt Account has dependent records
-            DeleteAccountHandler->>Mediator: throw ConflictException "Account cannot be deleted while it still has associated posts, comments, photos, or follows."
+            DeleteAccountHandler->>Mediator: throw ConflictException<br>"Account cannot be deleted while it still has associated posts, comments, photos, or follows."
             Mediator->>API: propagate
             API->>User: 409 Conflict
         else !result.Succeeded (other failure)
