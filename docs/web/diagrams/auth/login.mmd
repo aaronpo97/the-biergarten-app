@@ -55,7 +55,7 @@ sequenceDiagram
             Note right of UserMgr: HasPasswordAsync short-circuits to false (no active credential hydrated) without calling the hasher — otherwise delegates to Argon2PasswordHasher
             UserMgr->>Argon2: VerifyHashedPassword(user, user.PasswordHash, password)
             activate Argon2
-            Note right of Argon2: Split stored "salt:hash", rehash password with same salt, constant-time compare (CryptographicOperations.FixedTimeEquals)
+            Note right of Argon2: Parse stored PHC string ($argon2id$v=19$m=...,t=...,p=...$salt$hash), rehash password with the embedded salt/parameters, constant-time compare (CryptographicOperations.FixedTimeEquals)
             Argon2-->>UserMgr: Success/Failed
             deactivate Argon2
             UserMgr-->>LoginHandler: true/false

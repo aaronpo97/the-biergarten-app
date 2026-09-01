@@ -15,6 +15,7 @@ sequenceDiagram
     end
     box rgb(219,238,221) Repository / Cross-slice
         participant UserStore as DapperUserStore<br/>(IUserStore/IUserPasswordStore/IUserEmailStore)
+        participant ProfileHandler as CreateUserProfileHandler<br/>(Profile slice)
         participant EmailDispatcher as EmailDispatcher<br/>(Features.Emails)
     end
     participant DB as SQL Server
@@ -39,8 +40,8 @@ sequenceDiagram
         activate UserMgr
         UserMgr->>Argon2: HashPassword(user, password)
         activate Argon2
-        Note right of Argon2: Argon2id — salt 16 bytes, memory 64MB, iterations 4, parallelism = CPU count, hash output 32 bytes
-        Argon2-->>UserMgr: "base64(salt):base64(hash)"
+        Note right of Argon2: Argon2id — salt 16 bytes, memory 64MB, iterations 4, parallelism 2 (fixed, to avoid thread-pool exhaustion), hash output 32 bytes
+        Argon2-->>UserMgr: "$argon2id$v=19$m=65536,t=4,p=2$&lt;salt&gt;$&lt;hash&gt;" (PHC string)
         deactivate Argon2
 
         UserMgr->>UserStore: SetPasswordHashAsync(user, hash)
@@ -84,6 +85,19 @@ sequenceDiagram
             Mediator->>API: propagate
             API->>User: 409 Conflict "Username or email already exists"
         else result.Succeeded
+            RegHandler->>Mediator: Send(CreateUserProfileCommand(user.Id, ""))
+            activate Mediator
+            Mediator->>ProfileHandler: Handle(command)
+            activate ProfileHandler
+            ProfileHandler->>DB: INSERT INTO UserProfile (UserAccountId, Biography)
+            activate DB
+            DB-->>ProfileHandler: UserProfileId
+            deactivate DB
+            ProfileHandler-->>Mediator: UserProfileId
+            deactivate ProfileHandler
+            Mediator-->>RegHandler: UserProfileId
+            deactivate Mediator
+
             RegHandler->>TokenSvc: GenerateAccessToken(user)
             activate TokenSvc
             TokenSvc->>JWT: GenerateJwt(userId, username, expiry)
@@ -117,7 +131,7 @@ sequenceDiagram
 
             RegHandler->>Mediator: Send(SendRegistrationEmailCommand) (Shared.Application cross-slice contract)
             activate Mediator
-            Note right of Mediator: Routed to Features.Emails' SendRegistrationEmailHandler — the only cross-slice call in the backend
+            Note right of Mediator: Routed to Features.Emails' SendRegistrationEmailHandler — the second of two cross-slice dispatches in this flow (profile creation is the first)
             Mediator->>EmailDispatcher: SendRegistrationEmailAsync(firstName, email, confirmationToken)
             activate EmailDispatcher
 

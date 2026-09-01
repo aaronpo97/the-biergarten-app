@@ -37,7 +37,7 @@ sequenceDiagram
         UserMgr->>UserStore: DeleteAsync(user)
         activate UserStore
         UserStore->>DB: DELETE FROM UserAccount WHERE UserAccountID = @Id
-        Note right of UserStore: UserCredential/UserVerification/UserAvatar cascade on delete. Posts, comments, photos, and follows use ON DELETE NO ACTION — if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
+        Note right of UserStore: UserCredential, UserVerification, and UserProfile cascade on delete (UserAvatar cascades transitively through UserProfile). Posts, comments, photos, and follows use ON DELETE NO ACTION — if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
 
         alt Foreign key violation (dependent records exist)
             UserStore-->>UserMgr: IdentityResult.Failed (AccountHasDependentRecords)
