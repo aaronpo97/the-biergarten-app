@@ -1,5 +1,5 @@
 # User Authentication Flow — Resend Confirmation Email
 
 ```mermaid
---8<-- "diagrams/website/auth/resend-confirmation.mmd"
+--8<-- "web/diagrams/auth/resend-confirmation.mmd"
 ```

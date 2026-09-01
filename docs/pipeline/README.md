@@ -302,11 +302,11 @@ see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section.
 
 ### Process flow - activity diagram
 
-![An activity diagram](./diagrams/current/output/activity.svg)
+See [Activity diagram](./diagrams/current/activity.md).
 
 ### Architectural overview - class diagram
 
-![A class diagram](./diagrams/current/output/class.svg)
+See [Class diagram](./diagrams/current/class.md).
 
 ---
 

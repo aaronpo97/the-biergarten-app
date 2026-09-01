@@ -1,5 +1,5 @@
 # User Authentication Flow — Registration
 
 ```mermaid
---8<-- "diagrams/website/auth/registration.mmd"
+--8<-- "web/diagrams/auth/registration.mmd"
 ```

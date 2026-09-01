@@ -159,6 +159,6 @@ reference; it is not part of the running stack.
 
 ## Next steps
 
-- Review [Architecture](../architecture.md)
+- Review [Architecture](architecture.md)
 - Run backend and frontend checks from [Testing](testing.md)
 - Use [Docker Guide](docker.md) for container troubleshooting

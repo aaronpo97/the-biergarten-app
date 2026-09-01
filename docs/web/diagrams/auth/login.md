@@ -1,5 +1,5 @@
 # User Authentication Flow — Login
 
 ```mermaid
---8<-- "diagrams/website/auth/login.mmd"
+--8<-- "web/diagrams/auth/login.mmd"
 ```

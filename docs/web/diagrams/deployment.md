@@ -1,7 +1,7 @@
 # Docker Deployment Architecture
 
 ```mermaid
---8<-- "diagrams/website/deployment.mmd"
+--8<-- "web/diagrams/deployment.mmd"
 ```
 
 ## Notes

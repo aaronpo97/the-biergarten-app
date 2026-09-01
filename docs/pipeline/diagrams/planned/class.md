@@ -1,7 +1,7 @@
 # Biergarten Data Pipeline — Class Diagram (Planned)
 
 ```mermaid
---8<-- "diagrams/pipeline/planned/class.mmd"
+--8<-- "pipeline/diagrams/planned/class.mmd"
 ```
 
 ## Notes

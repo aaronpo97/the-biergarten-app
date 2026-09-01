@@ -7,48 +7,54 @@ theme:
   name: material
 nav:
   - Home: index.md
-  - Architecture: architecture.md
-  - Diagrams:
-      - Website:
-          - Architecture: website/diagrams/architecture.md
-          - Database Schema: website/diagrams/database-schema.md
-          - Deployment: website/diagrams/deployment.md
+  - Web:
+      - Architecture: web/architecture.md
+      - Getting Started: web/getting-started.md
+      - Database: web/database.md
+      - Docker: web/docker.md
+      - Environment Variables: web/environment-variables.md
+      - Testing: web/testing.md
+      - Token Validation: web/token-validation.md
+      - Diagrams:
+          - Vertical Slice: web/diagrams/vertical-slice.md
+          - Database Schema: web/diagrams/database-schema.md
+          - Deployment: web/diagrams/deployment.md
           - Auth Flows:
-              - Registration: website/diagrams/auth/registration.md
-              - Login: website/diagrams/auth/login.md
-              - Refresh Token: website/diagrams/auth/refresh-token.md
-              - Confirm User: website/diagrams/auth/confirm-user.md
-              - Resend Confirmation: website/diagrams/auth/resend-confirmation.md
-              - Update Username: website/diagrams/auth/update-username.md
-              - Update Email: website/diagrams/auth/update-email.md
-              - Update Password: website/diagrams/auth/update-password.md
-              - Update Profile: website/diagrams/auth/update-profile.md
-              - Delete Account: website/diagrams/auth/delete-account.md
-              - Error Handling: website/diagrams/auth/error-handling.md
-      - Pipeline:
+              - Registration: web/diagrams/auth/registration.md
+              - Login: web/diagrams/auth/login.md
+              - Refresh Token: web/diagrams/auth/refresh-token.md
+              - Confirm User: web/diagrams/auth/confirm-user.md
+              - Resend Confirmation: web/diagrams/auth/resend-confirmation.md
+              - Update Username: web/diagrams/auth/update-username.md
+              - Update Email: web/diagrams/auth/update-email.md
+              - Update Password: web/diagrams/auth/update-password.md
+              - Update Profile: web/diagrams/auth/update-profile.md
+              - Delete Account: web/diagrams/auth/delete-account.md
+              - Error Handling: web/diagrams/auth/error-handling.md
+  - Pipeline:
+      - Overview: pipeline/README.md
+      - Roadmap: pipeline/ROADMAP.md
+      - Ethics & Known Issues: pipeline/ETHICS-AND-KNOWN-ISSUES.md
+      - Diagrams:
           - Current:
               - Activity: pipeline/diagrams/current/activity.md
               - Class: pipeline/diagrams/current/class.md
           - Planned:
               - Activity: pipeline/diagrams/planned/activity.md
               - Class: pipeline/diagrams/planned/class.md
-  - Website:
-      - Getting Started: website/getting-started.md
-      - Database: website/database.md
-      - Docker: website/docker.md
-      - Environment Variables: website/environment-variables.md
-      - Testing: website/testing.md
-      - Token Validation: website/token-validation.md
-  - Pipeline:
-      - Overview: pipeline/README.md
-      - Roadmap: pipeline/ROADMAP.md
-      - Ethics & Known Issues: pipeline/ETHICS-AND-KNOWN-ISSUES.md
 
 plugins:
   - search
   - glightbox
   - panzoom:
       mermaid: true
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
 
 markdown_extensions:
   - pymdownx.superfences:

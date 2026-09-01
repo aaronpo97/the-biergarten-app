@@ -11,7 +11,7 @@ tags:
 
 SQL Server 2022 schema, migration approach, and the app's SQL error-handling
 convention. For the vertical-slice code that talks to this schema, see
-[Architecture](../architecture.md).
+[Architecture](architecture.md).
 
 ## Schema
 
@@ -42,7 +42,7 @@ script per table.
 
 Each script is run in order by `Database.Migrations` (DbUp) on startup. Each
 table is queried directly by the owning feature slice's repository (see
-[Direct SQL via Dapper/ADO.NET](../architecture.md#direct-sql-via-dapperadonet)).
+[Direct SQL via Dapper/ADO.NET](architecture.md#direct-sql-via-dapperadonet)).
 
 A generated DBML copy of the schema (for import into a diagramming tool such as
 dbdiagram.io) lives at `web/backend/Database/Database.Migrations/schema.dbml`.

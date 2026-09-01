@@ -11,7 +11,7 @@ assemblies to register — there's no shared bootstrap. `Database.Migrations`
 doesn't wire up any slice; it applies schema directly.
 
 ```mermaid
---8<-- "diagrams/website/architecture/host-wiring.mmd"
+--8<-- "web/diagrams/vertical-slice/host-wiring.mmd"
 ```
 
 ## Project reference dependencies
@@ -25,7 +25,7 @@ foundation projects (`Shared.Contracts`, `Domain.Entities`,
 see the notes for what else each of those foundation projects pulls in.
 
 ```mermaid
---8<-- "diagrams/website/architecture/project-references.mmd"
+--8<-- "web/diagrams/vertical-slice/project-references.mmd"
 ```
 
 ## Notes

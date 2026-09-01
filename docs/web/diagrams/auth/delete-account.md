@@ -1,5 +1,5 @@
 # User Authentication Flow — Delete Account
 
 ```mermaid
---8<-- "diagrams/website/auth/delete-account.mmd"
+--8<-- "web/diagrams/auth/delete-account.mmd"
 ```

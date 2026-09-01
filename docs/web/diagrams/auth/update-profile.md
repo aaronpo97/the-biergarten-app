@@ -1,5 +1,5 @@
 # User Authentication Flow — Update Profile
 
 ```mermaid
---8<-- "diagrams/website/auth/update-profile.mmd"
+--8<-- "web/diagrams/auth/update-profile.mmd"
 ```

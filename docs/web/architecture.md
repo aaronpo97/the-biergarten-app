@@ -19,27 +19,25 @@ reference.
 
 For visual representations, see:
 
-- [architecture.svg](website/diagrams-out/architecture.svg) - Vertical-slice
-  architecture diagram
-- [deployment.svg](website/diagrams-out/deployment.svg) - Docker deployment
-  diagram
-- [database-schema.svg](website/diagrams-out/database-schema.svg) - Database
-  relationships
+- [Vertical Slice](diagrams/vertical-slice.md) - host wiring and project
+  reference diagrams
+- [Deployment](diagrams/deployment.md) - Docker deployment diagram
+- [Database Schema](diagrams/database-schema.md) - database relationships
 
 Authentication workflow diagrams, one per flow, under
-`website/diagrams-out/auth/`:
+[`diagrams/auth/`](diagrams/auth/):
 
-- [registration.svg](website/diagrams-out/auth/registration.svg)
-- [login.svg](website/diagrams-out/auth/login.svg)
-- [refresh-token.svg](website/diagrams-out/auth/refresh-token.svg)
-- [confirm-user.svg](website/diagrams-out/auth/confirm-user.svg)
-- [resend-confirmation.svg](website/diagrams-out/auth/resend-confirmation.svg)
-- [update-username.svg](website/diagrams-out/auth/update-username.svg)
-- [update-email.svg](website/diagrams-out/auth/update-email.svg)
-- [update-password.svg](website/diagrams-out/auth/update-password.svg)
-- [update-profile.svg](website/diagrams-out/auth/update-profile.svg)
-- [delete-account.svg](website/diagrams-out/auth/delete-account.svg)
-- [error-handling.svg](website/diagrams-out/auth/error-handling.svg) - shared
+- [Registration](diagrams/auth/registration.md)
+- [Login](diagrams/auth/login.md)
+- [Refresh Token](diagrams/auth/refresh-token.md)
+- [Confirm User](diagrams/auth/confirm-user.md)
+- [Resend Confirmation](diagrams/auth/resend-confirmation.md)
+- [Update Username](diagrams/auth/update-username.md)
+- [Update Email](diagrams/auth/update-email.md)
+- [Update Password](diagrams/auth/update-password.md)
+- [Update Profile](diagrams/auth/update-profile.md)
+- [Delete Account](diagrams/auth/delete-account.md)
+- [Error Handling](diagrams/auth/error-handling.md) - shared
   `GlobalExceptionFilter` mapping used by all flows above
 
 ## Backend architecture
@@ -370,7 +368,7 @@ method that registers its repository and slice-internal services
 - Application focuses on orchestration; the database enforces integrity via
   keys, `CHECK` constraints, and cascades
 
-See [Database](website/database.md) for the schema and the app's SQL
+See [Database](database.md) for the schema and the app's SQL
 error-handling approach in more detail.
 
 ## Frontend architecture
@@ -504,7 +502,7 @@ reference. Product and engineering documentation points to `web/frontend`.
 ## Database architecture
 
 For the table-by-table schema and the custom SQL error code scheme, see
-[Database](website/database.md).
+[Database](database.md).
 
 ### SQL-first philosophy
 
@@ -555,7 +553,7 @@ tracking stays valid.
 **Purpose**: Populate development/test databases with realistic data
 
 **Implementation**: `Database.Seed` project, using data produced by the C++
-pipeline under `tooling/pipeline/` (see [Pipeline README](pipeline/README.md))
+pipeline under `tooling/pipeline/` (see [Pipeline README](../pipeline/README.md))
 
 **Seed Data**:
 
@@ -590,7 +588,7 @@ Tables that exist in the schema but have no repository yet (`UserAvatar`,
 - Testing (`docker-compose.test.yaml`)
 - Production (`docker-compose.prod.yaml`)
 
-For details, see [Docker Guide](website/docker.md).
+For details, see [Docker Guide](docker.md).
 
 ### Health checks
 
@@ -626,4 +624,4 @@ flowchart TB
 - Mock external dependencies
 - Test database for integration tests
 
-For details, see [Testing Guide](website/testing.md).
+For details, see [Testing Guide](testing.md).

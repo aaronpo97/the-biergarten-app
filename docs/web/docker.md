@@ -21,7 +21,7 @@ The project uses Docker Compose to orchestrate multiple services:
 - React Router website (SSR frontend)
 - Test runners
 
-See the [deployment diagram](diagrams-out/deployment.svg) for visual
+See the [deployment diagram](diagrams/deployment.md) for visual
 representation.
 
 ## Docker Compose environments
