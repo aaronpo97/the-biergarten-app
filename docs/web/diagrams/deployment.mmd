@@ -5,7 +5,7 @@ flowchart TB
     Host -->|http://localhost:8080| DevAPI
 
     subgraph DEV["Development Environment (docker-compose.dev.yaml)"]
-        DevDB[("SQL Server 2022<br/>Biergarten Database<br/>:1433")]
+        DevDB[("SQL Server 2022<br/>Biergarten Database<br/>:1434")]
         DevAPI["API Container<br/>ASP.NET Core 10<br/>:8080 HTTP / :8081 HTTPS"]
         DevMig["Migrations (run-once)<br/>Database.Migrations"]
         DevSeed["Seed (run-once)<br/>Database.Seed"]
@@ -21,11 +21,13 @@ flowchart TB
     DevAPI -.->|depends_on| DevSeed
 
     subgraph TEST["Test Environment (docker-compose.test.yaml)"]
-        TestDB[("SQL Server, isolated instance<br/>Biergarten Test Database<br/>:1434")]
+        TestDB[("SQL Server, isolated instance<br/>Biergarten Test Database<br/>no host port published")]
         TestMig["Migrations (test)"]
         TestSeed["Seed (test)<br/>minimal: test.user only"]
+        TestSeaweedFS["seaweedfs<br/>S3-compatible object storage"]
         Specs["API.Specs<br/>Reqnroll + xUnit<br/>(integration tests)"]
         UnitTests["unit.tests<br/>xUnit + Moq<br/>Features.*.Tests, one container"]
+        FrontendTests["frontend.tests<br/>Playwright/Vitest"]
     end
 
     TestMig -->|1. Migrate| TestDB
@@ -34,12 +36,14 @@ flowchart TB
     UnitTests -.->|depends_on for startup ordering only, no real connection| TestDB
     TestMig -.->|depends_on| TestDB
     TestSeed -.->|depends_on| TestMig
+    TestSeed -.->|depends_on| TestSeaweedFS
     Specs -.->|depends_on| TestSeed
     UnitTests -.->|depends_on| TestSeed
 
-    Results[["test-results/ (mounted volume)<br/>api-specs/results.trx<br/>Features.Users.Tests.trx<br/>Features.Breweries.Tests.trx<br/>Features.Emails.Tests.trx"]]
+    Results[["test-results/ (mounted volume)<br/>api-specs/results.trx<br/>Features.Users.Tests.trx<br/>Features.Breweries.Tests.trx<br/>Features.Emails.Tests.trx<br/>Features.PhotoUpload.Tests.trx"]]
     Specs -->|Export TRX| Results
     UnitTests -->|Export TRX, one per slice| Results
+    FrontendTests -->|Export results| Results
 
     subgraph PROD["Production Environment (docker-compose.prod.yaml)"]
         ProdDB[("SQL Server 2022<br/>Biergarten Database<br/>no host port published")]
@@ -56,21 +60,25 @@ flowchart TB
         DbOnlyDB[("SQL Server<br/>:1434")]
         DbOnlyMig["Migrations (run-once)"]
         DbOnlySeed["Seed (run-once)"]
+        DbOnlySeaweedFS["seaweedfs<br/>S3-compatible object storage"]
     end
 
     DbOnlyMig -->|1. Run migrations| DbOnlyDB
     DbOnlySeed -->|2. Seed data| DbOnlyDB
     DbOnlyMig -.->|depends_on| DbOnlyDB
     DbOnlySeed -.->|depends_on| DbOnlyMig
+    DbOnlySeed -.->|depends_on| DbOnlySeaweedFS
 
     subgraph MIN["Minimal Environment (docker-compose.min.yaml)"]
         MinDB[("SQL Server<br/>:1433")]
         MinMig["Migrations (run-once)"]
         MinMailpit["Mailpit<br/>:8025 / :1025"]
         MinSeed["Seed (run-once)"]
+        MinSeaweedFS["seaweedfs<br/>S3-compatible object storage"]
     end
 
     MinMig -->|1. Run migrations| MinDB
     MinSeed -->|2. Seed data| MinDB
     MinMig -.->|depends_on| MinDB
     MinSeed -.->|depends_on| MinMig
+    MinSeed -.->|depends_on| MinSeaweedFS
