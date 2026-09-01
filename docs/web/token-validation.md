@@ -46,16 +46,23 @@ Token generation and validation live on the same slice-internal service.
 
 **Generation methods:**
 
-- `GenerateAccessToken(UserAccount)` - Creates 1-hour access token
-- `GenerateRefreshToken(UserAccount)` - Creates 21-day refresh token
-- `GenerateConfirmationToken(UserAccount)` - Creates 30-minute confirmation
+- `GenerateAccessToken(Guid userId, string username)` - Creates 1-hour access
   token
+- `GenerateRefreshToken(Guid userId, string username)` - Creates 21-day
+  refresh token
+- `GenerateConfirmationToken(Guid userId, string username)` - Creates
+  30-minute confirmation token
 
 **Validation methods:**
 
-- `ValidateAccessTokenAsync(string token)` - Validates access tokens
 - `ValidateRefreshTokenAsync(string token)` - Validates refresh tokens
-- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation tokens
+- `ValidateConfirmationTokenAsync(string token)` - Validates confirmation
+  tokens
+
+There is no `ValidateAccessTokenAsync` on `ITokenService`. Access-token
+validation doesn't go through `ITokenService` at all: `JwtAuthenticationHandler`
+(the host-level auth middleware) calls `ITokenInfrastructure.ValidateJwtAsync()`
+directly, bypassing the `Features.Users` slice entirely.
 
 **Returns (validation):** `ValidatedToken` record containing:
 
@@ -172,12 +179,11 @@ Each token is validated for:
 
 ### Error handling
 
-Validation failures return HTTP 401 Unauthorized:
-
-- Invalid signature → "Invalid token"
-- Expired token → "Invalid token" (message doesn't reveal reason for security)
-- Missing claims → "Invalid token"
-- Malformed claims → "Invalid token"
+Validation failures return HTTP 401 Unauthorized. Regardless of the specific
+cause (invalid signature, expired token, missing header, malformed claims),
+`JwtAuthenticationHandler.HandleChallengeAsync` always returns the same
+generic message: `"Unauthorized: Invalid or missing authentication token"` —
+it doesn't distinguish failure reasons in the response.
 
 ## Token lifecycle
 
