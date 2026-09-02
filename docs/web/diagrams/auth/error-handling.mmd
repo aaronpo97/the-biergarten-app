@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant API as API Controller
+
+    Note over API: GlobalExceptionFilter catches:
+    Note over API: FluentValidation.ValidationException → 400 Bad Request {message, errors} (grouped by property)
+    Note over API: ConflictException → 409 Conflict
+    Note over API: NotFoundException → 404 Not Found
+    Note over API: UnauthorizedException → 401 Unauthorized
+    Note over API: ForbiddenException → 403 Forbidden
+    Note over API: Domain.Exceptions.ValidationException → 400 Bad Request
+    Note over API: Microsoft.Data.SqlClient.SqlException → 503 Service Unavailable
+    Note over API: All others → 500 Internal Server Error

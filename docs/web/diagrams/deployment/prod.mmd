@@ -1,0 +1,11 @@
+sequenceDiagram
+    box Production Environment (docker-compose.prod.yaml)
+    participant ProdDB as SQL Server 2022<br/>Biergarten Database<br/>no host port published
+    participant ProdMig as Migrations (run-once)
+    participant ProdAPI as API Container<br/>ASP.NET Core 10<br/>:8080 HTTP / :8081 HTTPS
+    end
+
+    ProdMig-->>ProdDB: depends_on
+    ProdMig->>ProdDB: Run migrations
+    ProdAPI-->>ProdDB: depends_on: sql-server healthy (not migrations/seed)
+    ProdAPI->>ProdDB: Connect and serve

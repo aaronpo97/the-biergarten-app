@@ -1,0 +1,20 @@
+sequenceDiagram
+    actor Developer
+    participant Host as Docker Host
+    box Development Environment (docker-compose.dev.yaml)
+    participant DevDB as SQL Server 2022<br/>Biergarten Database<br/>:1434
+    participant DevMig as Migrations (run-once)<br/>Database.Migrations
+    participant DevSeed as Seed (run-once)<br/>Database.Seed
+    participant DevAPI as API Container<br/>ASP.NET Core 10<br/>:8080 HTTP / :8081 HTTPS
+    participant DevMailpit as Mailpit<br/>:8025 Web UI / :1025 SMTP
+    end
+
+    Developer->>Host: docker compose up
+    DevMig-->>DevDB: depends_on (healthy)
+    DevMig->>DevDB: Run migrations
+    DevSeed-->>DevMig: depends_on
+    DevSeed->>DevDB: Seed data
+    DevAPI-->>DevSeed: depends_on
+    DevAPI->>DevDB: Connect and serve
+    DevAPI-->>DevMailpit: SMTP_HOST/PORT
+    Host->>DevAPI: http://localhost:8080

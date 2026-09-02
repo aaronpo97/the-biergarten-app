@@ -22,32 +22,25 @@ pipeline notes) lives under `docs/`.
 
 Website + backend (active stack):
 
-- [Getting Started](docs/website/getting-started.md)
-- [Architecture](docs/architecture.md)
-- [Database](docs/website/database.md)
-- [Docker Guide](docs/website/docker.md)
-- [Testing](docs/website/testing.md)
-- [Environment Variables](docs/website/environment-variables.md)
-- [Token Validation](docs/website/token-validation.md)
+- [Getting Started](docs/web/getting-started.md)
+- [Architecture](docs/web/architecture.md)
+- [Database](docs/web/database.md)
+- [Docker Guide](docs/web/docker.md)
+- [Testing](docs/web/testing.md)
+- [Environment Variables](docs/web/environment-variables.md)
+- [Token Validation](docs/web/token-validation.md)
 
 Data generation pipeline (C++):
 
 - [Pipeline README](docs/pipeline/README.md)
 - [Ethics & Known Issues](docs/pipeline/ETHICS-AND-KNOWN-ISSUES.md)
 
-## Diagrams
-
-- [Architecture](docs/website/diagrams-out/architecture.svg)
-- [Deployment](docs/website/diagrams-out/deployment.svg)
-- [Authentication Flow](docs/website/diagrams-out/authentication-flow.svg)
-- [Database Schema](docs/website/diagrams-out/database-schema.svg)
-
 ## Current status
 
 Active areas in the repository:
 
 - .NET 10 backend (vertical-slice architecture with MediatR) + SQL Server
-- React 19 website (React Router 7 + Vite)
+- React 19 website (React Router 8 + Vite)
 - Shared Biergarten theme system + Storybook coverage
 - Auth flows and account/email integration (local Mailpit in dev compose)
 - Photo upload to S3-compatible object storage (local SeaweedFS in dev compose)
@@ -61,7 +54,7 @@ Archived/reference areas:
 ## Tech stack
 
 - **Backend**: .NET 10, ASP.NET Core, SQL Server 2022, DbUp
-- **Frontend**: React 19, React Router 7, Vite 7, Tailwind CSS 4, DaisyUI 5,
+- **Frontend**: React 19, React Router 8, Vite 7, Tailwind CSS 4, DaisyUI 5,
   Leaflet/React Leaflet (brewery maps)
 - **UI Documentation**: Storybook 10, Vitest browser mode, Playwright
 - **Testing**: xUnit, Reqnroll (BDD), FluentAssertions, Moq
@@ -73,15 +66,15 @@ Archived/reference areas:
 ## Requirements
 
 - .NET SDK 10 or later
-- Node.js 18 or later
+- Node.js 22 or later
 - Docker Desktop, or an equivalent Docker Engine setup
 
-See [Getting Started](docs/website/getting-started.md) for the full
+See [Getting Started](docs/web/getting-started.md) for the full
 prerequisite list, including the pipeline's C++ toolchain.
 
 ## Quick start
 
-For full setup details, use [Getting Started](docs/website/getting-started.md).
+For full setup details, use [Getting Started](docs/web/getting-started.md).
 This section is the shortest path to a working dev environment.
 
 ### Full stack (Docker)
@@ -90,9 +83,14 @@ This section is the shortest path to a working dev environment.
 git clone https://github.com/aaronpo97/the-biergarten-app
 cd the-biergarten-app
 
-cp web/.env.example web/.env.dev
+cd web && ./generate-env.sh .env.dev && cd ..
 docker compose --env-file web/.env.dev -f web/docker-compose.dev.yaml up --build -d
 ```
+
+`generate-env.sh` copies `.env.example` and replaces the secret-bearing values
+with freshly randomized ones; a plain `cp` leaves placeholder secrets in
+place. See [Environment Variables](docs/web/environment-variables.md#generating-an-env-file)
+for details.
 
 Access:
 
@@ -131,9 +129,8 @@ tooling/
   pipeline/         C++20 seed-data generation CLI (CMake)
 
 docs/
-  architecture.md   High-level architecture overview
-  website/          Backend/frontend setup, docker, testing, diagrams
-  pipeline/         Pipeline docs, ethics notes, PlantUML diagrams
+  web/              Architecture, setup, docker, testing, diagrams
+  pipeline/         Pipeline docs, ethics notes, diagrams
 
 archive/
   next-js-web-app/  Older Next.js frontend (reference only)
@@ -145,13 +142,13 @@ Create a test environment file, then run the full test stack (backend and
 frontend) with Docker:
 
 ```bash
-cp web/.env.example web/.env.test
+cd web && ./generate-env.sh .env.test && cd ..
 docker compose --env-file web/.env.test -f web/docker-compose.test.yaml up --abort-on-container-exit
 ```
 
 The same command runs in CI via
 [`.github/workflows/tests.yml`](.github/workflows/tests.yml) on every push
-and pull request to `main`. See [Testing](docs/website/testing.md) for the
+and pull request to `main`. See [Testing](docs/web/testing.md) for the
 full command list.
 
 ## Configuration
@@ -163,14 +160,14 @@ Common active variables:
   `WEBSITE_BASE_URL`
 - Frontend runtime: `API_BASE_URL`, `SESSION_SECRET`, `NODE_ENV`
 
-See [Environment Variables](docs/website/environment-variables.md) for details.
+See [Environment Variables](docs/web/environment-variables.md) for details.
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Run the checks in [Testing](docs/website/testing.md) (backend tests,
+4. Run the checks in [Testing](docs/web/testing.md) (backend tests,
    `npm run lint`, `npm run typecheck`)
 5. Push to the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request

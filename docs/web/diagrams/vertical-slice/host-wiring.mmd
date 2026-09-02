@@ -1,0 +1,31 @@
+---
+config:
+flowchart:
+curve: stepAfter
+layout: elk
+---
+
+flowchart TB
+API["API.Core<br/>(ASP.NET Core Web API)"]
+Seed["Database.Seed<br/>(console app)"]
+Migrations["Database.Migrations<br/>(console app)"]
+
+subgraph SLICES["Feature Slices"]
+direction LR
+UsersSlice["Features.Users<br/>(controller)"]
+BrewerySlice["Features.Breweries<br/>(controller)"]
+PhotoSlice["Features.PhotoUpload<br/>(MediatR only)"]
+EmailsSlice["Features.Emails<br/>(MediatR only)"]
+LocationsSlice["Features.Locations<br/>(plain DI service)"]
+BeersSlice["Features.Beers<br/>(scaffolded, no code yet)"]
+end
+
+API -->|AddApplicationPart + MediatR scan| UsersSlice
+API -->|AddApplicationPart + MediatR scan| BrewerySlice
+API -->|MediatR scan only| PhotoSlice
+API -->|MediatR scan only| EmailsSlice
+
+Seed -->|AddFeaturesUsers| UsersSlice
+Seed -->|AddFeaturesBreweries| BrewerySlice
+Seed -->|AddFeaturesPhotoUpload| PhotoSlice
+Seed -->|AddFeaturesLocations| LocationsSlice

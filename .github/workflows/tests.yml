@@ -21,7 +21,8 @@ jobs:
         run: ./generate-env.sh .env.test
 
       - name: Build test images
-        run: docker compose --env-file .env.test -f docker-compose.test.yaml build
+        run:
+          docker compose --env-file .env.test -f docker-compose.test.yaml build
 
       - name: Run tests
         run: |
@@ -43,7 +44,8 @@ jobs:
 
       - name: Show service logs on failure
         if: failure()
-        run: docker compose --env-file .env.test -f docker-compose.test.yaml logs
+        run:
+          docker compose --env-file .env.test -f docker-compose.test.yaml logs
 
       - name: Upload test results
         if: always()
@@ -54,4 +56,6 @@ jobs:
 
       - name: Tear down
         if: always()
-        run: docker compose --env-file .env.test -f docker-compose.test.yaml down -v
+        run:
+          docker compose --env-file .env.test -f docker-compose.test.yaml down
+          -v

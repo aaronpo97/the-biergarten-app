@@ -1,0 +1,13 @@
+sequenceDiagram
+    box Database-only Environment (docker-compose.db.yaml)
+    participant DbOnlyDB as SQL Server<br/>:1434
+    participant DbOnlySeaweedFS as seaweedfs<br/>S3-compatible object storage
+    participant DbOnlyMig as Migrations (run-once)
+    participant DbOnlySeed as Seed (run-once)
+    end
+
+    DbOnlyMig-->>DbOnlyDB: depends_on
+    DbOnlyMig->>DbOnlyDB: Run migrations
+    DbOnlySeed-->>DbOnlyMig: depends_on
+    DbOnlySeed-->>DbOnlySeaweedFS: depends_on
+    DbOnlySeed->>DbOnlyDB: Seed data

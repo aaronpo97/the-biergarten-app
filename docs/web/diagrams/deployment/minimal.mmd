@@ -1,0 +1,15 @@
+sequenceDiagram
+    box Minimal Environment (docker-compose.min.yaml)
+    participant MinDB as SQL Server<br/>:1433
+    participant MinSeaweedFS as seaweedfs<br/>S3-compatible object storage
+    participant MinMig as Migrations (run-once)
+    participant MinSeed as Seed (run-once)
+    participant MinMailpit as Mailpit<br/>:8025 / :1025
+    end
+
+    MinMig-->>MinDB: depends_on
+    MinMig->>MinDB: Run migrations
+    MinSeed-->>MinMig: depends_on
+    MinSeed-->>MinSeaweedFS: depends_on
+    MinSeed->>MinDB: Seed data
+    Note over MinDB,MinMailpit: consumed by an externally run API.Core process (not shown)
