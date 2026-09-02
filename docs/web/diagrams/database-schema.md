@@ -5,9 +5,9 @@ Five diagrams, one per schema category — mirrors the `identity` / `media` /
 `RowVersion ROWVERSION` column (optimistic concurrency), omitted below for
 brevity. Tables marked `(*)` have no repository/feature slice yet.
 
-Boxes with no attribute list (e.g. `Photo` in the identity diagram) are owned
-by a different schema and shown only to keep the relationship visible; see
-the diagram named after that schema for its full definition.
+Boxes with no attribute list (e.g. `Photo` in the identity diagram) are owned by
+a different schema and shown only to keep the relationship visible; see the
+diagram named after that schema for its full definition.
 
 ## Identity (`identity`)
 

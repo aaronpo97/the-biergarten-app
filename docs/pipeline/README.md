@@ -1,6 +1,6 @@
 ---
 title: Biergarten Pipeline — C++ CLI for generating seed data
-last-updated: 2026-08-31
+last-updated: 2026-09-02
 tags:
   - pipeline
   - cpp
@@ -248,74 +248,28 @@ skipped and the pipeline continues. `GenerateUsers()` runs before
 
 ### Key components
 
-- `src/main.cc`: argument parsing and Boost.DI composition root.
-- `CuratedJsonDataService`: implements `ICuratedDataService`; takes a
-  `CuratedDataFilePaths` DTO (locations/personas/forenames/surnames paths) in
-  its constructor, then parses and validates curated location, persona, and
-  forename/surname JSON, memoizing each result after its first load on a given
-  instance. `MockCuratedDataService` is the in-memory substitute (4 fixed
-  locations, 3 personas, and name data for `US`/`DE`/`FR`/`BE`) used in
-  `--mocked` runs.
-- `WikipediaEnrichmentService`: queries Wikipedia extracts, caches results,
-  returns empty context on failure. `MockEnrichmentService` is the no-op
-  substitute used in `--mocked` runs.
-- `LlamaGenerator`: formats prompts for Gemma 4, validates JSON output for both
-  `GenerateBrewery` and `GenerateUser`, retries malformed responses up to three
-  times with corrective feedback in the retry prompt. The token budget is fixed
-  across attempts; it is not raised automatically on truncation.
-- `MockGenerator`: stable hash-based output so the same city/persona/name input
-  always produces the same brewery or user.
-- `NominatimAddressService`: reverse-geocodes each brewery's jittered
-  coordinates into a street address (`address_line1`, `postal_code`) via the
-  public [Nominatim API](https://nominatim.openstreetmap.org), respecting its
-  one-request-per-second usage policy. Falls back to a placeholder
-  `address_line1` ("Address unavailable") and empty `postal_code` when the
-  lookup fails or returns no usable street address. `MockAddressService` is the
-  no-network substitute (`"123 Mock Street"`, `"00000"`) used in `--mocked`
-  runs. Only breweries get a resolved street address; generated users carry a
-  coordinate pair with no address fields.
-- `SqliteExportService`: creates a dated SQLite file per run and persists each
-  successful user and brewery into normalized tables.
-- Brewery payloads include English and local-language name and description
-  fields. User payloads carry a sampled first/last name and gender, an
-  LLM-generated username/bio/activity weight, and a programmatically generated
-  (not LLM-authored) unique email and date of birth.
+| Component                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/main.cc`                | Argument parsing and the Boost.DI composition root.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `CuratedJsonDataService`     | Implements `ICuratedDataService`; takes a `CuratedDataFilePaths` DTO (locations/personas/forenames/surnames paths) in its constructor, parses and validates curated location, persona, and forename/surname JSON, and memoizes each result after its first load on a given instance. `MockCuratedDataService` is the in-memory substitute (4 fixed locations, 3 personas, and name data for `US`/`DE`/`FR`/`BE`) used in `--mocked` runs.                                                                                                                                                                             |
+| `WikipediaEnrichmentService` | Queries Wikipedia extracts, caches results, and returns empty context on failure. `MockEnrichmentService` is the no-op substitute used in `--mocked` runs.                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `LlamaGenerator`             | Formats prompts for Gemma 4, validates JSON output for both `GenerateBrewery` and `GenerateUser`, and retries malformed responses up to three times with corrective feedback in the retry prompt. The token budget is fixed across attempts; it is not raised automatically on truncation.                                                                                                                                                                                                                                                                                                                            |
+| `MockGenerator`              | Uses stable hash-based output so the same city/persona/name input always produces the same brewery or user.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `NominatimAddressService`    | Reverse-geocodes each brewery's jittered coordinates into a street address (`address_line1`, `postal_code`) via the public [Nominatim API](https://nominatim.openstreetmap.org), respecting its one-request-per-second usage policy. Falls back to a placeholder `address_line1` ("Address unavailable") and empty `postal_code` when the lookup fails or returns no usable street address. `MockAddressService` is the no-network substitute (`"123 Mock Street"`, `"00000"`) used in `--mocked` runs. Only breweries get a resolved street address; generated users carry a coordinate pair with no address fields. |
+| `SqliteExportService`        | Creates a dated SQLite file per run and persists each successful user and brewery into normalized tables.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Brewery/user payloads        | Brewery payloads include English and local-language name and description fields. User payloads carry a sampled first/last name and gender, an LLM-generated username/bio/activity weight, and a programmatically generated (not LLM-authored) unique email and date of birth.                                                                                                                                                                                                                                                                                                                                         |
 
 ### Runtime behaviour
 
-`WikipediaEnrichmentService` fetches two Wikipedia extracts per city: a generic
-"brewing" extract and a "beer in `{country}`" extract. It does not currently
-query a city- or region-specific page. Each query string is cached after its
-first successful (or empty) lookup.
-
-`GetLocationContext()` returns an empty string when the web client is
-unavailable or when lookup/parsing fails.
-
-`LlamaGenerator` validates model output as structured JSON. On validation
-failure it retries up to three times, replaying the previous error message in
-the next prompt so the model can self-correct. All runs to date have produced
-valid output on the first pass; the retry path is kept for resilience.
-
-`MockGenerator` uses stable hashes for repeatable output in demos and Storybook
-runs.
-
-`NominatimAddressService.ReverseGeocode()` sleeps one second after every request
-to respect Nominatim's usage policy, and returns `std::nullopt` (logged as a
-warning, not a skipped city) if the request fails, the response has no `address`
-object, or neither `house_number` nor `road` is present — the brewery is still
-generated and exported, just with a placeholder address.
-
-`CuratedJsonDataService` memoizes each of `LoadLocations()`, `LoadPersonas()`,
-`LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the
-first time each is called, since `BiergartenPipelineOrchestrator` owns a single
-`ICuratedDataService` instance for the whole run; later calls return the cached
-result instead of re-parsing.
-
-`GenerateUsers()` samples a forename/surname pair per city via `SampleName()`,
-keyed by the city's ISO 3166-1 code. Countries present in `locations.json` but
-absent from either name fixture (currently `KE`, `SE`, `SG`, `TH`, `VN`, `ZA`)
-are skipped, the same way a failed enrichment or generation call skips a city;
-see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section.
+| Component / behavior                       | Details                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WikipediaEnrichmentService`               | Fetches two Wikipedia extracts per city: a generic "brewing" extract and a "beer in `{country}`" extract. It does not currently query a city- or region-specific page. Each query string is cached after its first successful (or empty) lookup.                                                                                                                             |
+| `GetLocationContext()`                     | Returns an empty string when the web client is unavailable or when lookup/parsing fails.                                                                                                                                                                                                                                                                                     |
+| `LlamaGenerator`                           | Validates model output as structured JSON. On validation failure it retries up to three times, replaying the previous error message in the next prompt so the model can self-correct. All runs to date have produced valid output on the first pass; the retry path is kept for resilience.                                                                                  |
+| `MockGenerator`                            | Uses stable hashes for repeatable output in demos and Storybook runs.                                                                                                                                                                                                                                                                                                        |
+| `NominatimAddressService.ReverseGeocode()` | Sleeps one second after every request to respect Nominatim's usage policy, and returns `std::nullopt` (logged as a warning, not a skipped city) if the request fails, the response has no `address` object, or neither `house_number` nor `road` is present — the brewery is still generated and exported, just with a placeholder address.                                  |
+| `CuratedJsonDataService`                   | Memoizes each of `LoadLocations()`, `LoadPersonas()`, `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` independently the first time each is called, since `BiergartenPipelineOrchestrator` owns a single `ICuratedDataService` instance for the whole run; later calls return the cached result instead of re-parsing.                                              |
+| `GenerateUsers()`                          | Samples a forename/surname pair per city via `SampleName()`, keyed by the city's ISO 3166-1 code. Countries present in `locations.json` but absent from either name fixture (currently `KE`, `SE`, `SG`, `TH`, `VN`, `ZA`) are skipped, the same way a failed enrichment or generation call skips a city; see ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section. |
 
 ### Process flow - activity diagram
 
@@ -463,30 +417,32 @@ Silicon; CUDA or HIP/ROCm is detected on Linux when the toolkit is present.
 
 Paths below are relative to `tooling/pipeline/`.
 
-- `src/main.cc`: argument parsing and DI composition root.
-- `src/biergarten_pipeline_orchestrator/`: orchestration, sampling, logging, and
-  export.
-- `src/services/curated_data/`: `CuratedJsonDataService`, the file-backed
-  `ICuratedDataService`, and `MockCuratedDataService`, the in-memory
-  `ICuratedDataService` used in `--mocked` runs.
-- `src/services/enrichment/wikipedia/`: enrichment service and cache.
-- `src/services/sqlite/`: SQLite export implementation.
-- `src/data_generation/llama/`: local inference, prompt loading, output
-  validation.
-- `src/data_generation/mock/`: deterministic fallback.
-- `runpod/`: container build and runtime launcher.
+| Path                                    | Purpose                                                                                                                                                     |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/main.cc`                           | Argument parsing and DI composition root.                                                                                                                   |
+| `src/biergarten_pipeline_orchestrator/` | Orchestration, sampling, logging, and export.                                                                                                               |
+| `src/services/curated_data/`            | `CuratedJsonDataService`, the file-backed `ICuratedDataService`, and `MockCuratedDataService`, the in-memory `ICuratedDataService` used in `--mocked` runs. |
+| `src/services/enrichment/wikipedia/`    | Enrichment service and cache.                                                                                                                               |
+| `src/services/sqlite/`                  | SQLite export implementation.                                                                                                                               |
+| `src/data_generation/llama/`            | Local inference, prompt loading, and output validation.                                                                                                     |
+| `src/data_generation/mock/`             | Deterministic fallback.                                                                                                                                     |
+| `runpod/`                               | Container build and runtime launcher.                                                                                                                       |
 
 ---
 
 ## Next steps
 
 The pipeline currently produces city-aware brewery and user records and dated
-SQLite exports. The next passes add additional fixture types so the app can
-exercise the full brewery and social domains without live data. For the detailed
-engineering breakdown of what's needed to reach the architecture in
-[`diagrams/planned/`](./diagrams/planned/), see [ROADMAP.md](./ROADMAP.md).
+SQLite exports.
 
-### Testing (very high priority)
+The next passes add additional fixture types so the app can exercise the full
+brewery and social domains without live data.
+
+For the detailed engineering breakdown of what's needed to reach the
+architecture in [`diagrams/planned/`](./diagrams/planned/), see
+[ROADMAP.md](./ROADMAP.md).
+
+### Testing
 
 - Unit test JSON validation and retry logic against malformed, truncated, and
   empty model outputs.

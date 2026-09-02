@@ -1,9 +1,9 @@
 # Docker Deployment Architecture
 
-Five diagrams, one per Compose file — mixing all five networks in one graph
-made it impossible to tell which containers actually talk to each other.
-Solid arrows are real container traffic; dashed arrows are `depends_on`
-startup gating with no data flowing over them.
+Five diagrams, one per Compose file — mixing all five networks in one graph made
+it impossible to tell which containers actually talk to each other. Solid arrows
+are real container traffic; dashed arrows are `depends_on` startup gating with
+no data flowing over them.
 
 ## Development (`docker-compose.dev.yaml`)
 
