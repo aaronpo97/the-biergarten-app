@@ -1,6 +1,6 @@
 ---
 title: Pipeline roadmap — reaching the planned architecture
-last-updated: 2026-08-31
+last-updated: 2026-09-01
 tags:
   - pipeline
   - roadmap
@@ -8,22 +8,17 @@ tags:
   - concurrency
 ---
 
-This is the engineering breakdown for closing the gap between the **current**
-pipeline and the **planned** architecture documented in
-[`diagrams/planned/class.md`](./diagrams/planned/class.md) and
-[`diagrams/planned/activity.md`](./diagrams/planned/activity.md). Nothing in
-`diagrams/planned/` is implemented yet — this file tracks what it would take to
-get there. For the current implementation, see [README.md](./README.md).
+Engineering breakdown for closing the gap between the **current** pipeline and
+the **planned** architecture in
+[`diagrams/planned/class.md`](./diagrams/planned/class.md) /
+[`diagrams/planned/activity.md`](./diagrams/planned/activity.md). Items are
+grouped by layer, roughly by dependency order. For the current implementation,
+see [README.md](./README.md).
 
-Items are grouped by layer and roughly ordered by dependency: later groups build
-on types and services introduced earlier.
-
-The only concurrency in the current pipeline is the log dispatcher thread
-(`main.cc` spawns it to drain a `BoundedChannel<LogEntry>` into spdlog for the
-whole run). Sampling, enrichment, generation, and export all happen
-synchronously on the main thread inside `BiergartenPipelineOrchestrator::Run()`
-— §6 below is what introduces the additional worker threads the planned
-architecture needs.
+The only concurrency today is a log dispatcher thread draining a
+`BoundedChannel<LogEntry>` into spdlog; sampling, enrichment, generation, and
+export run synchronously on the main thread — §6 introduces the planned
+worker threads.
 
 ---
 
@@ -31,231 +26,186 @@ architecture needs.
 
 `tooling/pipeline/includes/data_model/generated_models.h` and `models.h`.
 
-- [ ] Add `Completeness` enum (`Full`, `Partial`, `Absent`) and a
-      `LocationContext` struct (`text`, `completeness`, `char_count`). Replace
-      `EnrichedCity::region_context` (currently a plain `std::string`) with
-      `context : LocationContext`.
+- [ ] Add `Completeness` enum (`Full`/`Partial`/`Absent`) and a
+      `LocationContext` struct (`text`, `completeness`, `char_count`); replace
+      `EnrichedCity::region_context` (a plain `string` today) with it.
 - [ ] Add `BeerStyle` (`name`, `description`, `min_abv`, `max_abv`, `min_ibu`,
       `max_ibu`).
-- [ ] Add `BeerResult`, `CheckinResult`, `RatingResult` result payloads.
+- [ ] Add `BeerResult`, `CheckinResult`, `RatingResult` payloads.
 - [ ] Add `GenerationMetadata` (`generation_id`, `generated_time`,
       `context_provided`, `generated_with`).
-- [x] Add `first_name`, `last_name`, `gender`, and `activity_weight` to
-      `UserResult` (currently just `username`, `bio`). `first_name`/
-      `last_name`/`gender` are copied from the sampled `Name` (see below), not
+- [x] `UserResult` gained `first_name`/`last_name`/`gender`/`activity_weight`
+      (was just `username`/`bio`), copied from the sampled `Name`, not
       LLM-invented.
-- [x] Add `Name` (`first_name`, `last_name`, `gender`) — the sampled result
-      handed to `DataGenerator::GenerateUser`. Add `ForenameEntry` (`name`,
-      `gender`). Landed as a flatter shape than originally planned here: no
-      `NamesByCountry` wrapper class. `curated_data_service.h` instead declares
-      `ForenameList = std::vector<ForenameEntry>` and
-      `SurnameList = std::vector<std::string>`, and `ICuratedDataService`
-      exposes two maps keyed by ISO 3166-1 code —
-      `ForenamesByCountryMap = unordered_map<string, ForenameList>` and
-      `SurnamesByCountryMap = unordered_map<string, SurnameList>` — directly
-      (see §2). Sampling is a free function,
-      `SampleName(forenames_by_country,     surnames_by_country, iso3166_1, rng)`,
-      in `generate_users.cc`'s anonymous namespace, not a method on a class.
-      Pairing a forename with a surname happens at sample time so gender
-      (present per-forename in the source data) is never discarded the way a
-      pre-flattened `{first_name, last_name}` list would lose it; see §2.
+- [x] Added `Name` (`first_name`, `last_name`, `gender`) and `ForenameEntry`
+      (`name`, `gender`). Flatter than planned: no `NamesByCountry` wrapper —
+      `ICuratedDataService` exposes `ForenamesByCountryMap`/
+      `SurnamesByCountryMap` (keyed by ISO 3166-1) directly, and sampling is a
+      free function, `SampleName(forenames, surnames, iso3166_1, rng)`, not a
+      class method.
 - [ ] Extend `GeneratedBrewery` with `brewery_id`, `context_completeness`,
       `metadata` (currently just `{location, brewery}`).
 - [ ] Add `GeneratedBeer`, `GeneratedCheckin`, `GeneratedRating`,
       `GeneratedFollow` aggregate structs.
-- [x] Add `UserRecord` (`location`, `user : UserResult`, `email`,
-      `date_of_birth`) as the current stand-in for the planned `GeneratedUser` —
-      `email` and `date_of_birth` are programmatically generated by the
-      orchestrator, never LLM-authored, so a downstream auth-account seeding
-      consumer can register real accounts from the pipeline's SQLite export. No
-      `password`, `user_id`, or `metadata` field yet, matching `BreweryRecord`'s
-      equally pre-`metadata` shape. Already wired into
-      `IExportService`/`SqliteExportService`: a `users` table exists and
-      `GenerateUsers()` exports each successful record via
-      `ProcessRecord(const UserRecord&)` (see §5) in addition to logging and
-      holding `generated_users_` in memory. Still missing vs. the planned
-      `GeneratedUser`: `user_id`, `password`, and `metadata`.
-- [x] Add `UserPersona` (`name`, `description`, `style_affinities`).
+- [x] Added `UserRecord` (`location`, `user`, `email`, `date_of_birth`), the
+      current stand-in for the planned `GeneratedUser`. `email`/
+      `date_of_birth` are programmatic (never LLM-authored), for downstream
+      auth-account seeding. Missing `user_id`/`password`/`metadata`; already
+      exported via `ProcessRecord(const UserRecord&)` (§5).
+- [x] Added `UserPersona` (`name`, `description`, `style_affinities`).
 
 ## 2. Data Preloading
 
 `tooling/pipeline/includes/services/curated_data/`, fixture files.
 
-- [x] Extract an interface; have `CuratedJsonDataService` implement it. Landed
-      as `ICuratedDataService` (`services/curated_data/curated_data_service.h`),
-      not `DataPreloader` — `LoadLocations()`, `LoadPersonas()`,
-      `LoadForenamesByCountry()`, and `LoadSurnamesByCountry()` are all virtual
-      methods returning `const&` and take no arguments. `CuratedJsonDataService`
-      (`services/curated_data/curated_json_data_service.h`, originally landed as
-      `JsonLoader` under `json_handling/` before being renamed and moved) takes
-      a `CuratedDataFilePaths` DTO (`locations_path`, `personas_path`,
-      `forenames_path`, `surnames_path`) in its constructor rather than a path
-      per `Load*()` call, and memoizes each result in a private `cache` struct
-      (`locations`, `personas`, `forenames_by_country`, `surnames_by_country`),
-      so a second call on the same instance returns the cached result instead of
-      re-parsing — safe because `CuratedJsonDataService` outlives every call
-      site (owned by `BiergartenPipelineOrchestrator` via
-      `unique_ptr<ICuratedDataService>` for the whole run). `main.cc`'s DI
-      injector also gained a `MockCuratedDataService` (fixed in-memory data: 4
-      locations across `US`/`DE`/`FR`/`BE`, 3 personas, and matching
-      forename/surname sets for those four countries), bound in place of
-      `CuratedJsonDataService` under `--mocked`, mirroring the existing
-      `MockEnrichmentService`/`MockGenerator` pattern.
-- [ ] Add `LoadBeerStyles()`. `beer-styles.json` already exists in the repo and
-      is already copied into the Docker image (`runpod/Dockerfile`), but no
-      loader reads it yet, and the native CMake build doesn't copy it into
-      `build/` at all — `CMakeLists.txt`'s "Runtime Assets" step only copies
-      `locations.json`, `personas.json`, `forenames-by-country.json`,
-      `surnames-by-country.json`, and `prompts/`.
-- [x] Add `LoadPersonas()` and author `personas.json` (doesn't exist yet).
-- [x] Add name-by-country loading, parsing
-      `tooling/pipeline/forenames-by-country.json` and
-      `surnames-by-country.json`. Landed as two separate methods —
-      `LoadForenamesByCountry()` and `LoadSurnamesByCountry()` — each returning
-      a flat `ForenamesByCountryMap` / `SurnamesByCountryMap` (aliases for
-      `unordered_map<string, ForenameList>` /
-      `unordered_map<string, SurnameList>`) keyed by ISO 3166-1 code, rather
-      than one combined `LoadNamesByCountry() : NamesByCountry` call. Both files
-      are vendored verbatim (unmodified, full multinational coverage) from
-      `sigpwned/popular-names-by-country-dataset` (CC0) — see
-      ETHICS-AND-KNOWN-ISSUES.md's Names-by-Country Dataset section for
-      provenance. Deliberately not pre-paired or filtered down to just the
-      countries in `locations.json`: keeping the source shape (including
-      per-forename gender) intact means the loader can support more countries
-      later, or gender-aware persona/bio generation, without re-sourcing data.
+- [x] Extracted `ICuratedDataService` (not `DataPreloader`); `Load*()` methods
+      take no arguments, return `const&`. `CuratedJsonDataService` (renamed
+      from `JsonLoader`) takes a `CuratedDataFilePaths` DTO at construction
+      and memoizes each `Load*()` result. `MockCuratedDataService` (fixed data
+      for `US`/`DE`/`FR`/`BE`) binds in its place under `--mocked`.
+- [ ] Add `LoadBeerStyles()`. `beer-styles.json` exists and is copied into the
+      Docker image, but no loader reads it and the native CMake build doesn't
+      copy it into `build/` at all.
+- [x] Added `LoadPersonas()` and authored `personas.json`.
+- [x] Added `LoadForenamesByCountry()` / `LoadSurnamesByCountry()` (two
+      methods, not one combined `LoadNamesByCountry()`), parsing vendored CC0
+      data from `sigpwned/popular-names-by-country-dataset` — see
+      ETHICS-AND-KNOWN-ISSUES.md for provenance. Deliberately not pre-paired
+      or filtered to `locations.json`'s countries, to keep per-forename gender
+      and support more countries later without re-sourcing.
 
 ## 3. Policy / Strategy Layer
 
-Entirely new — no `includes/policy/` (or equivalent) directory exists today.
+Entirely new — no `includes/policy/` (or equivalent) exists today.
 
-- [ ] `ContextStrategy` interface + `BreweryContextStrategy` /
-      `BeerContextStrategy`. Today
-      `WikipediaEnrichmentService::GetLocationContext` hardcodes a generic
-      `"brewing"` query and a `"beer in {country}"` query directly — no
-      per-phase strategy selection.
-- [ ] `SamplingStrategy` interface + `UniformSamplingStrategy`, replacing the
-      inline `std::ranges::sample(...)` call in
-      `BiergartenPipelineOrchestrator::QueryCitiesWithCountries()`.
-- [ ] `BeerSelectionStrategy` interface + `RandomBeerSelectionStrategy`, to pick
-      styles per brewery from the `BeerStyle` palette (depends on §1 and §2).
-- [ ] `CheckinDistributionStrategy` interface + `JCurveCheckinStrategy` /
-      `RandomCheckinStrategy` — this is the "Check-In System" item already
-      called out in README.md's Next Steps, made concrete.
-- [ ] `FollowGenerationStrategy` interface + `RandomFollowStrategy` /
+- [ ] `ContextStrategy` + `BreweryContextStrategy`/`BeerContextStrategy`.
+      Today `WikipediaEnrichmentService::GetLocationContext` hardcodes a
+      `"brewing"` query and a `"beer in {country}"` query directly.
+- [ ] `SamplingStrategy` + `UniformSamplingStrategy`, replacing the inline
+      `std::ranges::sample(...)` in `QueryCitiesWithCountries()`.
+- [ ] `BeerSelectionStrategy` + `RandomBeerSelectionStrategy` (depends on §1,
+      §2).
+- [ ] `CheckinDistributionStrategy` + `JCurveCheckinStrategy` /
+      `RandomCheckinStrategy` — the "Check-In System" README next step, made
+      concrete.
+- [ ] `FollowGenerationStrategy` + `RandomFollowStrategy` /
       `ActivityWeightedFollowStrategy`.
 
 ## 4. Data Generation
 
 `tooling/pipeline/includes/data_generation/`, `src/data_generation/`.
 
-- [ ] Extend the `DataGenerator` interface with `GenerateBeer`,
-      `GenerateCheckin`, `GenerateRating` (today: only `GenerateBrewery` and
-      `GenerateUser`).
-- [x] Add `OpenAIGenerator`, a third `DataGenerator` backend (alongside
-      `MockGenerator`/`LlamaGenerator`) that calls the OpenAI Chat Completions
-      API with Structured Outputs (`json_schema`, `strict`) to guarantee
-      schema-valid JSON without needing `IPromptFormatter` or a GBNF grammar —
-      selected via `--openai`/`GeneratorMode::kOpenAI`. This landed ahead of the
-      planned architecture in §3/§4 and isn't reflected there yet.
-- [x] Implement `LlamaGenerator::GenerateUser` for real, with a retry loop
-      mirroring `GenerateBrewery` (GBNF grammar, `ValidateUserJson`, up to 3
-      attempts with corrective feedback) and a new `prompts/USER_GENERATION.md`.
-      Changed the `DataGenerator::GenerateUser` signature to
-      `(city : const EnrichedCity&, persona : const UserPersona&, name : const Name&) : UserResult`,
-      matching what the activity diagram actually passes.
-      `MockGenerator::GenerateUser` updated to match the new signature too.
-- [ ] Implement `MockGenerator::GenerateBeer` / `GenerateCheckin` /
-      `GenerateRating`.
+- [ ] Extend `DataGenerator` with `GenerateBeer`, `GenerateCheckin`,
+      `GenerateRating` (today: only `GenerateBrewery`/`GenerateUser`).
+- [x] Added `OpenAIGenerator`, a third backend calling the OpenAI Chat
+      Completions API with Structured Outputs (`json_schema`, `strict`) —
+      schema-valid JSON with no `IPromptFormatter`/GBNF grammar needed.
+      Selected via `--openai`/`GeneratorMode::kOpenAI`; landed ahead of §3/§4.
+      Now shown in `diagrams/planned/class.md` alongside
+      `MockGenerator`/`LlamaGenerator`, noting only
+      `GenerateBrewery`/`GenerateUser` are implemented so far.
+- [x] Implemented `LlamaGenerator::GenerateUser` for real (GBNF grammar,
+      `ValidateUserJson`, 3 retries with corrective feedback,
+      `prompts/USER_GENERATION.md`). Signature is
+      `(city, persona, name) : UserResult`, matching the activity diagram.
+- [ ] Implement `MockGenerator::GenerateBeer`/`GenerateCheckin`/`GenerateRating`.
 - [ ] Add `IPromptFormatter::ExpectedArchitecture()` and
-      `LlamaGenerator::ValidateModelArchitecture()` so loading a GGUF that
-      doesn't match the configured chat template fails fast instead of silently
-      producing degraded output.
-- [ ] Add prompt template files for beer/checkin/rating generation next to the
-      existing `prompts/BREWERY_GENERATION.md`.
+      `LlamaGenerator::ValidateModelArchitecture()` so a mismatched GGUF chat
+      template fails fast instead of degrading silently.
+- [ ] Add prompt templates for beer/checkin/rating, next to
+      `prompts/BREWERY_GENERATION.md`.
 
 ## 5. Export Service
 
 `tooling/pipeline/includes/services/database/`, `src/services/sqlite/`.
 
-- [x] `IExportService::ProcessRecord(const UserRecord&)` and
-      `SqliteExportService`'s `users` table (see `kCreateUsersTableSql` /
-      `kInsertUserSql` in
-      `includes/services/database/sqlite_statement_helpers.h`) are implemented —
-      `GenerateUsers()` exports every successful user alongside its resolved
-      `location_id`.
+- [x] `IExportService::ProcessRecord(const UserRecord&)` and the `users`
+      table are implemented — every successful user is exported with its
+      resolved `location_id`.
 - [ ] Extend `IExportService` with `ProcessBeer`, `ProcessCheckin`,
-      `ProcessRating`, `ProcessFollow` (today
-      `ProcessRecord(const     BreweryRecord&)` and
-      `ProcessRecord(const UserRecord&)` exist).
+      `ProcessRating`, `ProcessFollow`.
 - [ ] Add `beers`, `checkins`, `ratings`, `follows` tables to
-      `SqliteExportService::InitializeSchema()` (`cities`, `breweries`,
-      `brewery_addresses`, `users`, and `user_addresses` already exist) — see
-      `kCreateCitiesTableSql` / `kCreateBreweriesTableSql` /
-      `kCreateBreweryAddressesTableSql` / `kCreateUsersTableSql` /
-      `kCreateUserAddressesTableSql` in
-      `includes/services/database/sqlite_statement_helpers.h` for the existing
-      pattern to follow.
-- [ ] Add a `brewery_cache_` alongside the existing `city_cache_`, and move from
-      one open transaction for the whole run to per-phase batched commits
-      (`BEGIN` / `COMMIT & BEGIN` on a batch-size threshold), as shown in the
-      planned activity diagram.
+      `InitializeSchema()` (`cities`/`breweries`/`brewery_addresses`/`users`/
+      `user_addresses` already exist — see `sqlite_statement_helpers.h` for
+      the pattern).
+- [ ] Add a `brewery_cache_` alongside `city_cache_`, and move from one open
+      transaction for the whole run to per-phase batched commits (`BEGIN` /
+      `COMMIT & BEGIN` on a batch threshold), per the planned activity
+      diagram.
 
 ## 6. Concurrency & Orchestration
 
 `tooling/pipeline/includes/concurrency/`,
 `src/biergarten_pipeline_orchestrator/`.
 
-- [ ] `BoundedChannel<T>` already exists and is production-tested — but it's
-      only wired to the single log channel today. Stand up the per-phase
-      producer/consumer channels (`loc_ch`, `exp_ch`, etc.) the planned activity
-      diagram describes, each with a dedicated LLM worker thread and SQLite
-      worker thread.
-- [ ] Rewrite `BiergartenPipelineOrchestrator::Run()` from one synchronous pass
-      over `generated_breweries_` into phased methods — `RunUserPhase` →
-      `RunBreweryAndBeerPhase` (with a `RunBeerPhase` sub-step once
-      `brewery_pool_` is populated) → `RunCheckinPhase` / `RunFollowPhase`
-      (these two can run in parallel) → `RunRatingPhase` — backed by
-      `user_pool_`, `brewery_pool_`, `beer_pool_`, `checkin_pool_`,
-      `follow_pool_`.
-- [ ] Honor the structural-concurrency requirement already called out in a
-      comment on `BiergartenPipelineOrchestrator::Run()` in
-      `biergarten_pipeline_orchestrator.h`: once real worker threads exist, they
-      must be structurally joined (e.g. via `std::jthread`) before `Run()`
-      returns, so no worker logs to a closed channel during teardown.
+- [ ] `BoundedChannel<T>` exists and is production-tested but only wired to
+      the log channel. Stand up the per-phase producer/consumer channels
+      (`loc_ch`, `exp_ch`, etc.) with a dedicated LLM worker thread and SQLite
+      worker thread each; the brewery phase needs a third, a Geocode Worker
+      between them on its own `geo_ch` (§9).
+- [ ] Rewrite `Run()` from one synchronous pass into phased methods —
+      `RunUserPhase` → `RunBreweryAndBeerPhase` (`RunBeerPhase` sub-step once
+      `brewery_pool_` fills) → `RunCheckinPhase`/`RunFollowPhase` (parallel) →
+      `RunRatingPhase` — backed by `user_pool_`, `brewery_pool_`,
+      `beer_pool_`, `checkin_pool_`, `follow_pool_`.
+- [ ] Structurally join worker threads (e.g. `std::jthread`) before `Run()`
+      returns, per the existing comment in
+      `biergarten_pipeline_orchestrator.h`, so nothing logs to a closed
+      channel during teardown.
 
 ## 7. Enrichment
 
-- [ ] Decide whether to restore the city/region-specific Wikipedia query that's
-      currently commented out in
-      `src/services/enrichment/wikipedia/get_summary.cc` (`GetLocationContext`).
-      The `ContextStrategy` work in §3 is a natural place to reintroduce it via
-      `BreweryContextStrategy::QueriesFor()`.
+- [ ] Decide whether to restore the city/region-specific Wikipedia query
+      currently commented out in `get_summary.cc` — the §3 `ContextStrategy`
+      work is a natural place to reintroduce it.
 - [ ] Pre-warm caches at startup (`PreWarmBeerStyleCache`,
-      `PreWarmLocationCache` in the planned activity diagram) instead of
-      fetching lazily per record, so the streaming phases never block on a cold
-      cache mid-run.
+      `PreWarmLocationCache`) instead of fetching lazily per record.
 
 ## 8. Fixtures / Build
 
-- [x] Author `personas.json`, `forenames-by-country.json`, and
-      `surnames-by-country.json` (see §2).
-- [ ] Fix the `beer-styles.json` build-tree gap: add it to the "Runtime Assets"
-      `configure_file` step in `CMakeLists.txt` so native builds and the Docker
-      image agree on what's available at runtime.
+- [x] Authored `personas.json`, `forenames-by-country.json`,
+      `surnames-by-country.json` (§2).
+- [ ] Fix the `beer-styles.json` build-tree gap: add it to the "Runtime
+      Assets" `configure_file` step in `CMakeLists.txt`.
+
+## 9. Geocoding
+
+`tooling/pipeline/includes/services/address/`, `src/services/address/` —
+added entirely after `diagrams/planned/` was authored; wasn't tracked here
+until now.
+
+- [x] Added `IAddressService` (`ReverseGeocode(lon, lat) :
+      optional<AddressLookupResult>`), `NominatimAddressService` (public
+      Nominatim API, 1s sleep per request, `nullopt` on failure or no usable
+      address), and `MockAddressService` (fixed placeholder for `--mocked`).
+      Called once per brewery, after `GenerateBrewery` and before export, to
+      resolve `BreweryAddress::address_line1`/`postal_code` — users aren't
+      geocoded. `diagrams/planned/class.md` now models this as an
+      `InfrastructureGeocoding` namespace owned by the orchestrator.
+- [ ] Give the brewery phase its own **Geocode Worker** thread, between the
+      LLM worker and the SQLite worker (`loc_ch` → LLM Worker → `geo_ch` →
+      Geocode Worker → `exp_ch` → SQLite Worker), rather than calling
+      `ReverseGeocode` inline — Nominatim's rate limit is unrelated to
+      inference speed, so coupling them stalls whichever side is slower and
+      needlessly cools the LLM's KV cache. It never skips a record on lookup
+      failure, only attaches a placeholder; shown as its own subgraph
+      (`B_GEO`) in `diagrams/planned/activity.md`. One worker per phase is
+      safe today since `RunUserPhase` joins before `RunBreweryPhase` starts;
+      concurrent phases plus user-geocoding would need a shared rate-limited
+      client instead, since the throttle is global, not per-thread.
 
 ---
 
 ## Suggested build order
 
-The planned activity diagram's own phase notes ("brewery*pool* is now fully
-populated. Phase 1b may begin.", etc.) imply a dependency order. Roughly:
+The planned activity diagram's phase notes imply a dependency order:
 
-1. Domain models (§1) and data preloading (§2) — nothing else compiles without
-   these.
-2. Export schema (§5) — so every later generation phase has somewhere to land
-   its output.
+1. Domain models (§1) and data preloading (§2) — nothing else compiles
+   without these.
+2. Export schema (§5) — so every generation phase has somewhere to land
+   output.
 3. Policy/strategy layer (§3) and generator interface (§4).
-4. Concurrency/orchestration rewrite (§6), which is the only piece that actually
-   wires §1–§5 into the phased, parallel pipeline shown in the planned diagrams.
-5. Enrichment cache pre-warming and the city/region query decision (§7) — useful
-   at any point, but most valuable once phases run concurrently.
+4. Concurrency/orchestration rewrite (§6) — wires §1–§5 into the phased,
+   parallel pipeline the planned diagrams show.
+5. Enrichment cache pre-warming and the city/region query decision (§7) —
+   most valuable once phases run concurrently.

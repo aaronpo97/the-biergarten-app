@@ -54,7 +54,7 @@ flowchart TD
     UL9 & US9 --> UserJoin["Orchestrator: Join LLM Worker, SQLite Worker"]
 
     UserJoin --> BreweryPhase["Orchestrator: RunBreweryPhase(sampled_locations)"]
-    BreweryPhase --> BCreate["Create BoundedChannels (loc_ch, exp_ch)"]
+    BreweryPhase --> BCreate["Create BoundedChannels (loc_ch, geo_ch, exp_ch)"]
 
     subgraph BREWGEN["Phase 1a — Brewery Generation (concurrent)"]
         direction LR
@@ -69,9 +69,22 @@ flowchart TD
             BL2 --> BL3["GetLocationContextFromCache(task.location) — guaranteed cache hit"]
             BL3 --> BL4["GenerateBrewery(enriched_city, context, task.user) via DataGenerator<br/>KV cache stays warm; brewery linked to sampled owner_user_id"]
             BL4 --> BL5["PipelineLogger.Log(Info, BreweryGeneration, city, brewery_id, llm)"]
-            BL5 --> BL6["Send GeneratedBrewery → exp_ch"]
+            BL5 --> BL6["Send GeneratedBrewery → geo_ch"]
             BL6 --> BL1
-            BL1 -- no --> BL7["Close exp_ch"]
+            BL1 -- no --> BL7["Close geo_ch"]
+        end
+        subgraph B_GEO["Geocode Worker"]
+            BG1{"geo_ch has items?"}
+            BG1 -- yes --> BG2["Receive GeneratedBrewery"]
+            BG2 --> BG3["AddressService.ReverseGeocode(brewery.longitude, brewery.latitude)<br/>rate-limited independently of LLM throughput — NominatimAddressService sleeps 1s per request; MockAddressService (--mocked) returns a fixed placeholder, no network call"]
+            BG3 --> BG4{"Address resolved?"}
+            BG4 -- yes --> BG5["Attach resolved AddressLookupResult to brewery"]
+            BG4 -- no --> BG6["Log warning: could not reverse geocode; attach placeholder address_line1, empty postal_code — brewery is never dropped"]
+            BG5 --> BG7["PipelineLogger.Log(Info, BreweryGeneration, city, brewery_id, geocode)"]
+            BG6 --> BG7
+            BG7 --> BG8["Send GeneratedBrewery → exp_ch"]
+            BG8 --> BG1
+            BG1 -- no --> BG9["Close exp_ch"]
         end
         subgraph B_SQL["SQLite Worker"]
             BS1["BEGIN TRANSACTION"] --> BS2{"exp_ch has items?"}
@@ -88,8 +101,9 @@ flowchart TD
 
     BCreate --> BP1
     BP3 -.->|loc_ch| BL1
-    BL7 -.->|exp_ch| BS2
-    BL7 & BS9 --> BrewJoin["Orchestrator: Join LLM Worker, SQLite Worker<br/>brewery_pool_ is now fully populated"]
+    BL7 -.->|geo_ch| BG1
+    BG9 -.->|exp_ch| BS2
+    BL7 & BG9 & BS9 --> BrewJoin["Orchestrator: Join LLM Worker, Geocode Worker, SQLite Worker<br/>brewery_pool_ is now fully populated"]
 
     BrewJoin --> BeerPhase["Orchestrator: RunBeerPhase()"]
     BeerPhase --> BeCreate["Create BoundedChannels (brew_ch, exp_ch)"]

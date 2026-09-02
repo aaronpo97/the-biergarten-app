@@ -392,6 +392,34 @@ classDiagram
         }
     }
 
+    namespace InfrastructureGeocoding {
+        class AddressLookupResult {
+            +string address_line1
+            +string postal_code
+        }
+
+        class AddressService {
+            <<interface>>
+            +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+        }
+
+        class NominatimAddressService {
+            -unique_ptr~WebClient~ client_
+            -Logger logger_
+            +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+        }
+
+        class MockAddressService {
+            +ReverseGeocode(longitude, latitude) optional~AddressLookupResult~
+        }
+    }
+    note for NominatimAddressService "Already implemented (services/address/), not planned: queries the public Nominatim API, sleeping 1s per request per its usage policy; returns nullopt on failure or when no usable street address is found. Ships today, ahead of the rest of this diagram."
+    note for MockAddressService "Already implemented, not planned: returns a fixed placeholder address ('123 Mock Street', '00000') for --mocked runs, no network call."
+    AddressService <|.. NominatimAddressService
+    AddressService <|.. MockAddressService
+    AddressService ..> AddressLookupResult : returns
+    NominatimAddressService *-- WebClient
+
     namespace InfrastructurePrompting {
         class IPromptDirectory {
             <<interface>>
@@ -452,7 +480,22 @@ classDiagram
             +Format(system_prompt, user_prompt) string
             +ExpectedArchitecture() string_view
         }
+
+        class OpenAIGenerator {
+            -string api_key_
+            -string model_
+            -Logger logger_
+            -unique_ptr~IPromptDirectory~ prompt_directory_
+            -unique_ptr~WebClient~ web_client_
+            +GenerateBrewery(location, context) BreweryResult
+            +GenerateBeer(brewery_id, location, context, style) BeerResult
+            +GenerateUser(city, persona, name) UserResult
+            +GenerateCheckin(user, brewery, timestamp) CheckinResult
+            +GenerateRating(user, beer, checkin_id) RatingResult
+            -CallChatCompletionsApi(...) string
+        }
     }
+    note for OpenAIGenerator "Already implemented (data_generation/openai/), not planned: calls the OpenAI Chat Completions API with Structured Outputs (json_schema, strict) to guarantee schema-valid JSON, needing no IPromptFormatter or GBNF grammar. Ships today for GenerateBrewery/GenerateUser only, ahead of the rest of this diagram — GenerateBeer/GenerateCheckin/GenerateRating are shown here for interface completeness but not yet implemented on any backend."
 
     namespace InfrastructureDataExport {
         class ExportService {
@@ -510,6 +553,7 @@ classDiagram
         -unique_ptr~DataGenerator~ generator_
         -unique_ptr~Logger~ logger_
         -unique_ptr~ExportService~ exporter_
+        -unique_ptr~AddressService~ address_service_
         -unique_ptr~ContextStrategy~ brewery_context_strategy_
         -unique_ptr~SamplingStrategy~ sampling_strategy_
         -unique_ptr~BeerSelectionStrategy~ beer_selection_strategy_
@@ -534,6 +578,7 @@ classDiagram
     BiergartenPipelineOrchestrator *-- EnrichmentService
     BiergartenPipelineOrchestrator *-- DataGenerator
     BiergartenPipelineOrchestrator *-- ExportService
+    BiergartenPipelineOrchestrator *-- AddressService
     BiergartenPipelineOrchestrator *-- CheckinDistributionStrategy
     BiergartenPipelineOrchestrator *-- FollowGenerationStrategy
     BiergartenPipelineOrchestrator *-- SamplingStrategy
@@ -562,6 +607,7 @@ classDiagram
     WebClient <|.. HttpWebClient
     DataGenerator <|.. MockGenerator
     DataGenerator <|.. LlamaGenerator
+    DataGenerator <|.. OpenAIGenerator
     PromptFormatter <|.. Gemma4JinjaPromptFormatter
     ExportService <|.. SqliteExportService
     DateTimeProvider <|.. SystemDateTimeProvider
@@ -571,6 +617,8 @@ classDiagram
     LlamaGenerator *-- PromptFormatter
     LlamaGenerator *-- IPromptDirectory
     LlamaGenerator ..> GeneratorOptions
+    OpenAIGenerator *-- IPromptDirectory
+    OpenAIGenerator *-- WebClient
     SqliteExportService *-- DateTimeProvider
 
     PipelineLogger o-- BoundedChannel : logs to
