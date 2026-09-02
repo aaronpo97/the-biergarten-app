@@ -19,6 +19,8 @@ flowchart TD
     LookupFailed -- yes --> SkipCity1[Log warning, skip city] --> EnrichLoop
     LookupFailed -- no --> StoreEnriched["Store EnrichedCity{Location, region_context}"] --> EnrichLoop
     EnrichLoop -- done --> GenUsers[Orchestrator: GenerateUsers enriched_cities]
+    SkipCity1 ~~~ GenUsers
+    StoreEnriched ~~~ GenUsers
 
     GenUsers --> LoadUserData["CuratedJsonDataService: LoadPersonas / LoadForenamesByCountry / LoadSurnamesByCountry<br/>each memoized after first parse; MockCuratedDataService (--mocked) returns a fixed in-memory dataset instead, skipping these JSON files"]
 
@@ -47,6 +49,10 @@ flowchart TD
     UserExportFail -- yes --> UserExportWarn["Log warning: SQLite export failed"] --> UserLoop
     UserExportFail -- no --> UserLoop
     UserLoop -- done --> GenBrew[Orchestrator: GenerateBreweries enriched_cities]
+    SkipCity2 ~~~ GenBrew
+    UserGenFail ~~~ GenBrew
+    UserExportWarn ~~~ GenBrew
+    UserExportFail ~~~ GenBrew
 
     GenBrew --> BrewLoop{For each EnrichedCity}
     BrewLoop --> BrewGenMode{Generator mode}
@@ -72,6 +78,9 @@ flowchart TD
     BrewExportFail -- yes --> BrewExportWarn["Log warning: SQLite export failed (data loss prevented per-record; pipeline continues)"] --> BrewLoop
     BrewExportFail -- no --> BrewLoop
     BrewLoop -- done --> Finalize["SqliteExportService.Finalize()<br/>commits transaction, closes database connection"]
+    BrewGenFail ~~~ Finalize
+    BrewExportWarn ~~~ Finalize
+    BrewExportFail ~~~ Finalize
 
     Finalize --> CloseLog["main.cc: close log_channel, join log dispatcher thread"]
     CloseLog --> Stop2(["return 0 / stop"])
