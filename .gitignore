@@ -22,6 +22,7 @@ scratchpad.txt
 /web/frontend/playwright-report/
 /web/frontend/test-results/
 /test-results/
+/docs/rendered-diagrams/
 
 # misc
 .DS_Store
