@@ -1,77 +1,43 @@
 ---
-
 config:
-
 flowchart: {}
-
 layout: fixed
-
 ---
 
 flowchart TB
-
 subgraph SLICES["Feature Slices"]
-
 direction LR
-
 BrewerySlice["Features.Breweries"]
-
 LocationsSlice["Features.Locations"]
-
 BeersSlice["Features.Beers<br>(scaffolded)"]
-
 PhotoSlice["Features.PhotoUpload"]
-
 UsersSlice["Features.Users"]
-
 EmailsSlice["Features.Emails"]
-
 end
 
 subgraph FOUNDATION["Foundation (every DB-backed slice depends on all three)"]
-
 direction LR
-
 SharedContracts["Shared.Contracts"]
-
 Domain["Domain.Entities"]
-
 DBConn["Database.Connection"]
-
 end
 
 subgraph INFRA["Slice-specific Infrastructure"]
-
 direction LR
-
 JWT["Infrastructure.Jwt"]
-
 PwdHash["Infrastructure.PasswordHashing"]
-
 FileUpload["Infrastructure.FileUpload"]
-
 Email["Infrastructure.Email"]
-
 EmailTemplates["Infrastructure.Email.Templates"]
-
 end
 
 UsersSlice == project ref, sends UploadPhotoCommand ==> PhotoSlice
-
 UsersSlice -. sends email commands .-> SharedApp["Shared.Application<br>(email command contract)"]
-
 EmailsSlice -. handles email commands .-> SharedApp
-
 BrewerySlice --> FOUNDATION
-
 LocationsSlice --> FOUNDATION
-
 BeersSlice --> FOUNDATION
-
 PhotoSlice --> FOUNDATION & FileUpload
-
 UsersSlice --> FOUNDATION & JWT & PwdHash
-
 EmailsSlice --> Email & EmailTemplates
-
 DBConn -- Dapper SQL, no ORM --> Tables[("SQL Server<br>Tables")]

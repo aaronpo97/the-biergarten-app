@@ -1,0 +1,29 @@
+sequenceDiagram
+    box Test Environment (docker-compose.test.yaml)
+    participant TestDB as SQL Server, isolated instance<br/>Biergarten Test Database<br/>no host port published
+    participant TestSeaweedFS as seaweedfs<br/>S3-compatible object storage
+    participant TestMig as Migrations (test)
+    participant TestSeed as Seed (test)<br/>minimal: test.user only
+    participant Specs as API.Specs<br/>Reqnroll + xUnit<br/>(integration tests)
+    participant UnitTests as unit.tests<br/>xUnit + Moq<br/>Features.*.Tests, one container
+    participant FrontendTests as frontend.tests<br/>Playwright/Vitest
+    end
+    participant Results as test-results/ (mounted volume)
+
+    TestMig-->>TestDB: depends_on
+    TestMig->>TestDB: Migrate
+    TestSeed-->>TestMig: depends_on
+    TestSeed-->>TestSeaweedFS: depends_on
+    TestSeed->>TestDB: Seed
+
+    par Specs
+        Specs-->>TestSeed: depends_on
+        Specs->>TestDB: Integration test
+        Specs->>Results: Export TRX
+    and unit.tests
+        UnitTests-->>TestSeed: depends_on
+        UnitTests-->>TestDB: depends_on (startup ordering only, no real connection)
+        UnitTests->>Results: Export TRX, one per slice
+    and frontend.tests
+        FrontendTests->>Results: Export results
+    end
