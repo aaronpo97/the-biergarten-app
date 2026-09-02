@@ -71,7 +71,7 @@ sequenceDiagram
         UserStore->>DB: INSERT INTO UserCredential (UserAccountId, Hash)
         UserStore->>DB: COMMIT TRANSACTION
         deactivate DB
-        Note right of UserStore: Both statements run via Dapper against a single DbTransaction, not a stored procedure
+        Note right of UserStore: Both statements run via Dapper against a single DbTransaction
 
         UserStore-->>UserMgr: IdentityResult.Success (user.Id set)
         deactivate UserStore

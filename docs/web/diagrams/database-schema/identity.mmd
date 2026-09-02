@@ -1,0 +1,53 @@
+erDiagram
+    User ||--o{ Cred : "has credentials"
+    User ||--o| Verify : "has verification"
+    User ||--o| Profile : "has profile"
+    User ||--o{ Follow : "follows"
+    User ||--o{ Follow : "followed by"
+
+    %% Cross-schema: defined in full in media.mmd / brewery.mmd / beer.mmd
+    Profile ||--o{ Avatar : "has avatar history"
+    User ||--o{ Photo : "uploads"
+    User ||--o{ Brewery : "posts"
+    User ||--o{ Beer : "posts"
+    User ||--o{ BeerComment : "comments"
+
+    User {
+        uniqueidentifier UserAccountID PK
+        varchar Username UK
+        nvarchar FirstName
+        nvarchar LastName
+        varchar Email UK
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+        date DateOfBirth
+    }
+
+    Cred {
+        uniqueidentifier UserCredentialID PK
+        uniqueidentifier UserAccountID FK
+        datetime CreatedAt
+        datetime Expiry
+        nvarchar Hash
+        bit IsRevoked
+        datetime RevokedAt "nullable"
+    }
+
+    Verify {
+        uniqueidentifier UserVerificationID PK
+        uniqueidentifier UserAccountID "FK, UK"
+        datetime VerificationDateTime
+    }
+
+    Profile {
+        uniqueidentifier UserProfileID PK
+        uniqueidentifier UserAccountID "FK, UK"
+        nvarchar Biography
+    }
+
+    Follow {
+        uniqueidentifier UserFollowID PK
+        uniqueidentifier UserAccountID FK
+        uniqueidentifier FollowingID FK
+        datetime CreatedAt
+    }

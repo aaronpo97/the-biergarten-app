@@ -1,0 +1,16 @@
+erDiagram
+    Brewery ||--o| BreweryLoc : "has location"
+    Brewery ||--o{ BreweryPhoto : "has photos"
+    Brewery ||--o{ Beer : "brews"
+
+    %% Cross-schema: defined in full in identity.mmd / location.mmd / media.mmd / beer.mmd
+    User ||--o{ Brewery : "posts"
+
+    Brewery {
+        uniqueidentifier BreweryPostID PK
+        nvarchar BreweryName
+        uniqueidentifier PostedByID FK
+        nvarchar Description
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }

@@ -1,0 +1,38 @@
+erDiagram
+    BeerStyle ||--o{ Beer : "categorizes"
+    Beer ||--o{ BeerPhoto : "has photos"
+    Beer ||--o{ BeerComment : "has comments"
+
+    %% Cross-schema: defined in full in identity.mmd / brewery.mmd / media.mmd
+    User ||--o{ Beer : "posts"
+    Brewery ||--o{ Beer : "brews"
+    User ||--o{ BeerComment : "comments"
+
+    BeerStyle {
+        uniqueidentifier BeerStyleID PK
+        nvarchar StyleName UK
+        nvarchar Description "nullable"
+    }
+
+    Beer {
+        uniqueidentifier BeerPostID PK
+        nvarchar Name
+        nvarchar Description
+        decimal ABV
+        int IBU
+        uniqueidentifier PostedByID FK
+        uniqueidentifier BeerStyleID FK
+        uniqueidentifier BrewedByID FK
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }
+
+    BeerComment {
+        uniqueidentifier BeerPostCommentID PK
+        nvarchar Comment
+        uniqueidentifier BeerPostID FK
+        uniqueidentifier CommentedByID FK
+        int Rating
+        datetime CreatedAt
+        datetime UpdatedAt "nullable"
+    }

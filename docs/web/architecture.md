@@ -195,7 +195,7 @@ needs it, or because duplicating it four times would be worse than sharing it
 **Rules**:
 
 - Kept deliberately small: this is the exception to "no slice depends on another
-  slice," not a general-purpose dumping ground
+  slice".
 
 #### Infrastructure layer
 
