@@ -123,7 +123,8 @@ own
 
 | Component                                             | Description                                                                                                                                                  |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Program.cs`                                          | Registers MediatR (scanning every `Features.*` assembly), FluentValidation, and uses `AddApplicationPart` so each slice's controllers are discovered by MVC. |
+| `Program.cs`                                          | Thin composition root: builds the host and calls the `ServiceCollectionExtensions` methods below.                                                            |
+| `ServiceCollectionExtensions.cs`                      | Registers MediatR (scanning every `Features.*` assembly), FluentValidation, and uses `AddApplicationPart` so each slice's controllers are discovered by MVC. |
 | `GlobalException.cs`                                  | Global exception filter (host-level cross-cutting concern).                                                                                                  |
 | `Authentication/JwtAuthenticationHandler.cs`          | JWT auth scheme middleware.                                                                                                                                  |
 | Swagger/OpenAPI documentation, health check endpoints | Host-level documentation and health endpoints.                                                                                                               |

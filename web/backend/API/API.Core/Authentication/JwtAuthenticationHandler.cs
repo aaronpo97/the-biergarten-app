@@ -25,17 +25,13 @@ public class JwtAuthenticationHandler(
     ///     Validates the incoming request's bearer JWT access token and produces an authentication result.
     /// </summary>
     /// <remarks>
-    ///     The signing secret is resolved first from the <c>ACCESS_TOKEN_SECRET</c> environment variable, falling
-    ///     back to the <c>Jwt:SecretKey</c> configuration value, to stay consistent with the secret source used
-    ///     when tokens are issued. Fails if the secret is not configured, the <c>Authorization</c> header is
+    ///     The signing secret is resolved first from the <c>ACCESS_TOKEN_SECRET</c> environment variable.
+    ///     Fails if the secret is not configured, the <c>Authorization</c> header is
     ///     missing or not <c>Bearer</c>-scheme, or the token fails validation.
     /// </remarks>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // Use the same access-token secret source as TokenService to avoid mismatched validation.
         string? secret = configuration[ConfigurationKeys.AccessTokenSecret];
-        if (string.IsNullOrWhiteSpace(secret))
-            secret = configuration[ConfigurationKeys.JwtSecretKeyFallback];
 
         if (string.IsNullOrWhiteSpace(secret))
             return AuthenticateResult.Fail("JWT secret is not configured");

@@ -1,3 +1,4 @@
+using API.Core;
 using API.Specs.Mocks;
 using Features.Emails.Services;
 using Infrastructure.Email;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace API.Specs;
 
-public class TestApiFactory : WebApplicationFactory<Program>
+internal class TestApiFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

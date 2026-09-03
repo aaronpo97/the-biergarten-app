@@ -79,7 +79,8 @@ directly, bypassing the `Features.Users` slice entirely.
 `TokenService` is registered by `Features.Users`' own `AddFeaturesUsers()`
 extension method, except for the lower-level `ITokenInfrastructure` (JWT
 signing/verification) it depends on, which is registered by the host
-(`API.Core/Program.cs`) since `JwtAuthenticationHandler` (host-level auth
+(`API.Core/ServiceCollectionExtensions.cs`, via `AddCoreInfrastructure()`,
+called from `Program.cs`) since `JwtAuthenticationHandler` (host-level auth
 middleware) also depends on it directly.
 
 ### Integration points
