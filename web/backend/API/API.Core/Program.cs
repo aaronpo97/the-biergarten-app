@@ -1,132 +1,86 @@
-using API.Core;
-using API.Core.Authentication;
-using Database.Connection.DependencyInjection;
-using Features.Auth.Controllers;
-using Features.Users.DependencyInjection;
-using Features.Breweries.Controllers;
-using Features.Breweries.DependencyInjection;
-using Features.Emails.DependencyInjection;
-using Features.Emails.Services;
-using Features.ImageUploads.Commands.UploadPhoto;
-using Features.ImageUploads.DependencyInjection;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Infrastructure.FileUpload;
-using Infrastructure.Jwt;
-using MediatR;
-using Microsoft.OpenApi.Models;
-using Shared.Application.Behaviors;
 using System.Security.Claims;
+using Shared.Contracts;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+namespace API.Core;
 
-// Add current controllers to the exception filter
-builder
-    .Services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); })
-    .AddApplicationPart(typeof(BreweryController).Assembly)
-    .AddApplicationPart(typeof(AuthController).Assembly);
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+internal class Program
 {
-    options.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
-        {
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            Scheme = "Bearer",
-            BearerFormat = "JWT",
-            In = ParameterLocation.Header,
-            Description = "Enter a JWT access token.",
-        }
-    );
-    options.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
+    public static void Main(string[] args)
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        builder.Logging.ClearProviders().AddConsole();
+
+        if (!builder.Environment.IsProduction())
+            builder.Logging.AddDebug();
+
+        builder
+            .Services.AddApiControllers()
+            .AddValidationAndMediatR()
+            .AddApplicationServices()
+            .AddFeatureModules()
+            .AddCoreInfrastructure()
+            .AddJwtAuthentication();
+
+        WebApplication app = builder.Build();
+
+        app.UseSwagger()
+            .UseSwaggerUI()
+            .UseHttpsRedirection()
+            .UseAuthentication()
+            .UseAuthorization();
+
+        app.MapOpenApi();
+        app.MapHealthChecks("/health");
+        app.MapControllers();
+        
+        if (app.Environment.IsEnvironment("Testing"))
+            app.MapGet(
+                "/api/protected",
+                (ClaimsPrincipal user) =>
                 {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    },
-                },
-                []
-            },
-        }
-    );
-});
-builder.Services.AddOpenApi();
+                    string? userId = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                    string? username = user.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
 
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddValidatorsFromAssembly(typeof(BreweryController).Assembly);
-builder.Services.AddValidatorsFromAssembly(typeof(AuthController).Assembly);
-builder.Services.AddValidatorsFromAssembly(typeof(UploadPhotoCommand).Assembly);
-builder.Services.AddFluentValidationAutoValidation();
+                    return Results.Ok(
+                        new ResponseBody<object>
+                        {
+                            Message = "Protected endpoint accessed successfully",
+                            Payload = new { userId, username },
+                        }
+                    );
+                }
+            ).RequireAuthorization(policy => policy.AddAuthenticationSchemes("JWT").RequireAuthenticatedUser());
 
-// Add MediatR.
-// ValidationBehavior runs FluentValidation validators in the MediatR pipeline for command/query handlers.
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssemblyContaining<Program>();
-    cfg.RegisterServicesFromAssembly(typeof(BreweryController).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
-    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-});
+        // Easter egg, as per tradition with the previous versions of the Biergarten App.
+        app.Map(
+                "/teapot",
+                () =>
+                    Results.Json(
+                        new ResponseBody
+                        {
+                            Message =
+                                "I'm a little teapot, short and stout. Here is my handle, here is my spout!",
+                        },
+                        statusCode: 418
+                    )
+            )
+            .ExcludeFromDescription();
 
-builder.Services.AddHealthChecks();
+        app.MapFallback(() =>
+                Results.NotFound(
+                    new ResponseBody { Message = "Are you lost? That route does not exist." }
+                )
+            )
+            .ExcludeFromDescription();
 
-// Configure logging for container output
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-if (!builder.Environment.IsProduction())
-    builder.Logging.AddDebug();
+        app.Services.GetRequiredService<IHostApplicationLifetime>()
+            .ApplicationStopping.Register(() =>
+            {
+                app.Logger.LogInformation("Application is shutting down gracefully...");
+            });
 
-builder.Services.AddDatabaseConnection();
-
-builder.Services.AddFeaturesBreweries();
-builder.Services.AddFeaturesUsers();
-builder.Services.AddFeaturesEmails();
-builder.Services.AddFeaturesPhotoUpload();
-
-// ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
-builder.Services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
-
-builder.Services.AddSingleton<IFileStorageProvider, S3FileStorageProvider>();
-
-builder.Services.AddScoped<GlobalExceptionFilter>();
-
-builder
-    .Services.AddAuthentication("JWT")
-    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>("JWT", options => { });
-
-builder.Services.AddAuthorization();
-
-WebApplication app = builder.Build();
-
-app.UseSwagger();
-app.UseSwaggerUI();
-app.MapOpenApi();
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapHealthChecks("/health");
-
-app.MapControllers();
-
-app.MapFallbackToController("Handle404", "NotFound");
-
-IHostApplicationLifetime lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-lifetime.ApplicationStopping.Register(() =>
-{
-    app.Logger.LogInformation("Application is shutting down gracefully...");
-});
-
-app.Run();
+        app.Run();
+    }
+}

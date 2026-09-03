@@ -15,7 +15,7 @@ public abstract class ApiStepsBase(ScenarioContext scenario)
     protected const string ResponseKey = "response";
     protected const string ResponseBodyKey = "responseBody";
 
-    protected TestApiFactory GetFactory()
+    internal TestApiFactory GetFactory()
     {
         TestApiFactory? factory = Scenario.TryGetValue<TestApiFactory>(
             FactoryKey,
