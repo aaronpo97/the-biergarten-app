@@ -1,4 +1,4 @@
-CREATE TABLE BeerPostComment
+CREATE TABLE Beer.BeerPostComment
 (
     BeerPostCommentID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerPostComment DEFAULT NEWID(),
@@ -23,11 +23,11 @@ CREATE TABLE BeerPostComment
 
     CONSTRAINT FK_BeerPostComment_BeerPost
         FOREIGN KEY (BeerPostID)
-            REFERENCES BeerPost (BeerPostID),
+            REFERENCES Beer.BeerPost (BeerPostID),
 
     CONSTRAINT FK_BeerPostComment_UserAccount
         FOREIGN KEY (CommentedByID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION,
 
     CONSTRAINT CHK_BeerPostComment_Rating
@@ -36,8 +36,8 @@ CREATE TABLE BeerPostComment
 
 CREATE
 NONCLUSTERED INDEX IX_BeerPostComment_BeerPost
-    ON BeerPostComment(BeerPostID);
+    ON Beer.BeerPostComment(BeerPostID);
 
 CREATE
 NONCLUSTERED INDEX IX_BeerPostComment_CommentedBy
-    ON BeerPostComment(CommentedByID);
+    ON Beer.BeerPostComment(CommentedByID);

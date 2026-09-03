@@ -1,4 +1,4 @@
-CREATE TABLE UserVerification -- delete verification data when user account is deleted
+CREATE TABLE Auth.UserVerification -- delete verification data when user account is deleted
 (
     UserVerificationID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserVerificationID DEFAULT NEWID(),
@@ -15,7 +15,7 @@ CREATE TABLE UserVerification -- delete verification data when user account is d
 
     CONSTRAINT FK_UserVerification_UserAccount
         FOREIGN KEY (UserAccountID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE CASCADE,
 
     CONSTRAINT AK_UserVerification_UserAccountID
@@ -24,4 +24,4 @@ CREATE TABLE UserVerification -- delete verification data when user account is d
 
 CREATE
 NONCLUSTERED INDEX IX_UserVerification_UserAccount
-    ON UserVerification(UserAccountID);
+    ON Auth.UserVerification(UserAccountID);

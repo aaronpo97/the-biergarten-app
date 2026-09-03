@@ -1,4 +1,4 @@
-CREATE TABLE UserFollow
+CREATE TABLE Social.UserFollow
 (
     UserFollowID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserFollowID DEFAULT NEWID(),
@@ -17,12 +17,12 @@ CREATE TABLE UserFollow
 
     CONSTRAINT FK_UserFollow_UserAccount
         FOREIGN KEY (UserAccountID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION,
 
     CONSTRAINT FK_UserFollow_UserAccountFollowing
         FOREIGN KEY (FollowingID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION,
 
     CONSTRAINT CK_CannotFollowOwnAccount
@@ -32,8 +32,8 @@ CREATE TABLE UserFollow
 
 CREATE
 NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
-    ON UserFollow(UserAccountID, FollowingID);
+    ON Social.UserFollow(UserAccountID, FollowingID);
 
 CREATE
 NONCLUSTERED INDEX IX_UserFollow_FollowingID_UserAccount
-    ON UserFollow(FollowingID, UserAccountID);
+    ON Social.UserFollow(FollowingID, UserAccountID);

@@ -8,8 +8,8 @@ namespace Features.Auth.Identity;
 
 /// <summary>
 ///     Dapper-based implementation of the ASP.NET Core Identity store interfaces consumed by
-///     <see cref="UserManager{TUser}" />, persisting against the existing <c>dbo.UserAccount</c>,
-///     <c>dbo.UserCredential</c>, and <c>dbo.UserVerification</c> tables. No EF Core is used, and no schema
+///     <see cref="UserManager{TUser}" />, persisting against the existing <c>Auth.UserAccount</c>,
+///     <c>Auth.UserCredential</c>, and <c>Auth.UserVerification</c> tables. No EF Core is used, and no schema
 ///     changes were required: normalized name/email are computed on the fly rather than persisted (the
 ///     existing unique indexes are already case-insensitive under SQL Server's default collation).
 /// </summary>
@@ -21,7 +21,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
 {
     private const string SelectUserSql = """
         SELECT UserAccountID AS Id, Username AS UserName, FirstName, LastName, Email, DateOfBirth
-        FROM dbo.UserAccount
+        FROM Auth.UserAccount
         """;
 
     /// <remarks>No unmanaged resources to release; each method opens and disposes its own connection.</remarks>
@@ -87,7 +87,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             Guid userAccountId = await connection.ExecuteScalarAsync<Guid>(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.UserAccount (Username, FirstName, LastName, DateOfBirth, Email)
+                    INSERT INTO Auth.UserAccount (Username, FirstName, LastName, DateOfBirth, Email)
                     OUTPUT INSERTED.UserAccountID
                     VALUES (@UserName, @FirstName, @LastName, @DateOfBirth, @Email);
                     """,
@@ -107,7 +107,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.UserCredential (UserAccountId, Hash)
+                    INSERT INTO Auth.UserCredential (UserAccountId, Hash)
                     VALUES (@UserAccountId, @Hash);
                     """,
                     new { UserAccountId = userAccountId, Hash = user.PasswordHash },
@@ -141,7 +141,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
 
     /// <inheritdoc />
     /// <remarks>
-    ///     Persists profile field changes and keeps <c>dbo.UserVerification</c> in sync with
+    ///     Persists profile field changes and keeps <c>Auth.UserVerification</c> in sync with
     ///     <see cref="ApplicationUser.EmailConfirmed" />: a row is inserted (idempotently, matching the
     ///     previous <c>AuthRepository.ConfirmUserAccountAsync</c> behavior) when
     ///     <see langword="true" />, and removed when <see langword="false" /> -- notably after
@@ -157,7 +157,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
         await connection.ExecuteAsync(
             new CommandDefinition(
                 """
-                UPDATE dbo.UserAccount
+                UPDATE Auth.UserAccount
                 SET Username = @UserName, FirstName = @FirstName, LastName = @LastName,
                     Email = @Email, DateOfBirth = @DateOfBirth, UpdatedAt = GETDATE()
                 WHERE UserAccountID = @Id
@@ -185,9 +185,9 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
 
     /// <inheritdoc />
     /// <remarks>
-    ///     A plain <c>DELETE</c> against <c>dbo.UserAccount</c>: its foreign keys from
-    ///     <c>dbo.UserCredential</c>, <c>dbo.UserVerification</c>, and <c>dbo.UserProfile</c> cascade
-    ///     (<c>dbo.UserAvatar</c> cascades transitively through <c>dbo.UserProfile</c>), so no manual
+    ///     A plain <c>DELETE</c> against <c>Auth.UserAccount</c>: its foreign keys from
+    ///     <c>Auth.UserCredential</c>, <c>Auth.UserVerification</c>, and <c>Social.UserProfile</c> cascade
+    ///     (<c>Social.UserAvatar</c> cascades transitively through <c>Social.UserProfile</c>), so no manual
     ///     child cleanup is needed. Other tables (posts, comments, photos, follows) reference the
     ///     account with <c>ON DELETE NO ACTION</c> by design; deleting an account that still has any of
     ///     those fails with a foreign key violation, which is surfaced as a failed
@@ -204,7 +204,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
         {
             await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "DELETE FROM dbo.UserAccount WHERE UserAccountID = @Id",
+                    "DELETE FROM Auth.UserAccount WHERE UserAccountID = @Id",
                     new { user.Id },
                     cancellationToken: cancellationToken
                 )
@@ -273,7 +273,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
     /// <inheritdoc />
     /// <remarks>
     ///     For an existing account (<see cref="ApplicationUser.Id" /> already assigned), rotates the
-    ///     credential transactionally -- revoking the previous <c>dbo.UserCredential</c> row(s) and inserting
+    ///     credential transactionally -- revoking the previous <c>Auth.UserCredential</c> row(s) and inserting
     ///     the new hash -- mirroring the previous <c>AuthRepository.RotateCredentialAsync</c> behavior. During
     ///     registration <see cref="UserManager{TUser}" /> calls this before the account has an ID (i.e. before
     ///     <see cref="CreateAsync" /> runs); in that case only the in-memory hash is set, and
@@ -301,7 +301,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    UPDATE dbo.UserCredential
+                    UPDATE Auth.UserCredential
                     SET IsRevoked = 1, RevokedAt = GETDATE()
                     WHERE UserAccountId = @UserAccountId AND IsRevoked = 0
                     """,
@@ -314,7 +314,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.UserCredential (UserAccountId, Hash)
+                    INSERT INTO Auth.UserCredential (UserAccountId, Hash)
                     VALUES (@UserAccountId, @Hash);
                     """,
                     new { UserAccountId = user.Id, Hash = passwordHash },
@@ -423,7 +423,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             new CommandDefinition(
                 """
                 SELECT Hash
-                FROM dbo.UserCredential
+                FROM Auth.UserCredential
                 WHERE UserAccountId = @UserAccountId AND IsRevoked = 0
                 """,
                 new { UserAccountId = user.Id },
@@ -435,7 +435,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             new CommandDefinition(
                 """
                 SELECT TOP 1 1
-                FROM dbo.UserVerification
+                FROM Auth.UserVerification
                 WHERE UserAccountID = @UserAccountId
                 """,
                 new { UserAccountId = user.Id },
@@ -459,7 +459,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             new CommandDefinition(
                 """
                 SELECT TOP 1 1
-                FROM dbo.UserVerification
+                FROM Auth.UserVerification
                 WHERE UserAccountID = @UserAccountId
                 """,
                 new { UserAccountId = userAccountId },
@@ -475,7 +475,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.UserVerification (UserAccountId, VerificationDateTime)
+                    INSERT INTO Auth.UserVerification (UserAccountId, VerificationDateTime)
                     VALUES (@UserAccountId, GETDATE())
                     """,
                     new { UserAccountId = userAccountId },
@@ -489,7 +489,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
         }
     }
 
-    /// <summary>Removes the <c>dbo.UserVerification</c> row for a user, if one exists.</summary>
+    /// <summary>Removes the <c>Auth.UserVerification</c> row for a user, if one exists.</summary>
     private static Task RemoveVerificationRowAsync(
         DbConnection connection,
         Guid userAccountId,
@@ -497,7 +497,7 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
     ) =>
         connection.ExecuteAsync(
             new CommandDefinition(
-                "DELETE FROM dbo.UserVerification WHERE UserAccountID = @UserAccountId",
+                "DELETE FROM Auth.UserVerification WHERE UserAccountID = @UserAccountId",
                 new { UserAccountId = userAccountId },
                 cancellationToken: cancellationToken
             )

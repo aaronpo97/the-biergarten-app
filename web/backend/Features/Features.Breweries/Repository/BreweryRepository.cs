@@ -62,11 +62,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     co.CountryID,
                     co.CountryName,
                     co.ISO3166_1 AS Iso31661
-                FROM dbo.BreweryPost bp
-                LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-                LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+                FROM Brewery.BreweryPost bp
+                LEFT JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+                LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+                LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+                LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
                 WHERE bp.BreweryPostID = @BreweryPostId
                 """,
                 new { BreweryPostId = id },
@@ -85,7 +85,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
             new CommandDefinition(
-                "SELECT PostedByID FROM dbo.BreweryPost WHERE BreweryPostID = @BreweryPostId",
+                "SELECT PostedByID FROM Brewery.BreweryPost WHERE BreweryPostID = @BreweryPostId",
                 new { BreweryPostId = id },
                 cancellationToken: cancellationToken
             )
@@ -126,11 +126,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 co.CountryID,
                 co.CountryName,
                 co.ISO3166_1 AS Iso31661
-            FROM dbo.BreweryPost bp
-            LEFT JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-            LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-            LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-            LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+            FROM Brewery.BreweryPost bp
+            LEFT JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+            LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
             ORDER BY bp.CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             """,
@@ -173,11 +173,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     co.CountryName,
                     co.ISO3166_1 AS Iso31661,
                     bpl.Coordinates.STDistance(@Origin) AS DistanceMetres
-                FROM dbo.BreweryPost bp
-                INNER JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-                LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+                FROM Brewery.BreweryPost bp
+                INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+                LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+                LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+                LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
                 WHERE bpl.Coordinates IS NOT NULL
                   AND bpl.Coordinates.STDistance(@Origin) <= @RangeInMetres
                 ORDER BY bpl.Coordinates.STDistance(@Origin) ASC
@@ -223,11 +223,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     co.CountryID,
                     co.CountryName,
                     co.ISO3166_1 AS Iso31661
-                FROM dbo.BreweryPost bp
-                INNER JOIN dbo.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                LEFT JOIN dbo.City c ON bpl.CityID = c.CityID
-                LEFT JOIN dbo.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                LEFT JOIN dbo.Country co ON sp.CountryID = co.CountryID
+                FROM Brewery.BreweryPost bp
+                INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+                LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+                LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+                LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
                 WHERE bpl.Coordinates IS NOT NULL
                 ORDER BY bp.BreweryPostID ASC
                 """,
@@ -249,7 +249,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         new CommandDefinition(
                             """
                             SELECT 1 FROM
-                                dbo.BreweryPost
+                                Brewery.BreweryPost
                             WHERE
                                 BreweryPostID = @BreweryPostId
                             """,
@@ -268,7 +268,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 bool cityExists =
                     await connection.ExecuteScalarAsync<int?>(
                             new CommandDefinition(
-                                "SELECT 1 FROM dbo.City WHERE CityID = @CityId",
+                                "SELECT 1 FROM Geolocation.City WHERE CityID = @CityId",
                                 new { brewery.Location.CityId },
                                 transaction,
                                 cancellationToken: cancellationToken
@@ -283,7 +283,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             int updatedRows = await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    UPDATE dbo.BreweryPost
+                    UPDATE Brewery.BreweryPost
                     SET BreweryName = @BreweryName,
                         Description = @Description,
                         UpdatedAt = GETDATE()
@@ -315,7 +315,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     new CommandDefinition(
                         """
                         DELETE FROM
-                            dbo.BreweryPostLocation
+                            Brewery.BreweryPostLocation
                         WHERE BreweryPostID = @BreweryPostId
                         """,
                         new { brewery.BreweryPostId },
@@ -331,7 +331,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             new CommandDefinition(
                                 """
                                 SELECT 1
-                                FROM dbo.BreweryPostLocation
+                                FROM Brewery.BreweryPostLocation
                                 WHERE BreweryPostID = @BreweryPostId
                                 """,
                                 new { brewery.BreweryPostId },
@@ -345,7 +345,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     await connection.ExecuteAsync(
                         new CommandDefinition(
                             """
-                            UPDATE dbo.BreweryPostLocation
+                            UPDATE Brewery.BreweryPostLocation
                             SET CityID = @CityId,
                                 AddressLine1 = @AddressLine1,
                                 AddressLine2 = @AddressLine2,
@@ -375,7 +375,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                     await connection.ExecuteAsync(
                         new CommandDefinition(
                             """
-                            INSERT INTO dbo.BreweryPostLocation
+                            INSERT INTO Brewery.BreweryPostLocation
                                 (BreweryPostLocationID,
                                  BreweryPostID,
                                  CityID,
@@ -434,7 +434,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         int rows = await connection.ExecuteAsync(
             """
             DELETE FROM
-                dbo.BreweryPost
+                Brewery.BreweryPost
             WHERE
                 BreweryPostID = @BreweryPostId
             """,
@@ -462,7 +462,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             """
                                         SELECT 1
                                         FROM
-                                            dbo.UserAccount
+                                            Auth.UserAccount
                                         WHERE
                                             UserAccountID = @PostedById
                             """,
@@ -481,7 +481,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                             """
                                         SELECT 1
                                         FROM
-                                            dbo.City
+                                            Geolocation.City
                                         WHERE
                                             CityID = @CityId
                             """,
@@ -497,7 +497,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.BreweryPost
+                    INSERT INTO Brewery.BreweryPost
                         (BreweryPostID, BreweryName, Description, PostedByID)
                     VALUES
                         (@BreweryPostId, @BreweryName, @Description, @PostedById)
@@ -516,7 +516,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.BreweryPostLocation
+                    INSERT INTO Brewery.BreweryPostLocation
                         (BreweryPostLocationID,
                          BreweryPostID,
                          CityID,

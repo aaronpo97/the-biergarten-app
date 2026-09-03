@@ -8,10 +8,11 @@ erDiagram
     Beer ||--o{ BeerPhoto : "has photos"
     Beer ||--o{ BeerComment : "has comments"
 
-    %% Cross-schema: defined in full in identity.mmd / brewery.mmd / media.mmd
+    %% Cross-schema: defined in full in auth.mmd / brewery.mmd / media.mmd
     User ||--o{ Beer : "posts"
     Brewery ||--o{ Beer : "brews"
     User ||--o{ BeerComment : "comments"
+    BeerPhoto }o--|| Photo : "uses photo"
 
     BeerStyle {
         uniqueidentifier BeerStyleID PK
@@ -40,4 +41,11 @@ erDiagram
         int Rating
         datetime CreatedAt
         datetime UpdatedAt "nullable"
+    }
+
+    BeerPhoto {
+        uniqueidentifier BeerPostPhotoID PK
+        uniqueidentifier BeerPostID FK
+        uniqueidentifier PhotoID FK
+        datetime LinkedAt
     }

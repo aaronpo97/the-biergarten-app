@@ -46,7 +46,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteScalarAsync<int?>(
                 """
                 SELECT 1
-                FROM dbo.City
+                FROM Geolocation.City
                 WHERE CityName = @CityName AND StateProvinceID = @StateProvinceId
                 """,
                 new { location.CityName, StateProvinceId = stateProvinceId }
@@ -56,7 +56,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         if (!cityExists)
             await connection.ExecuteAsync(
                 """
-                INSERT INTO dbo.City (StateProvinceID, CityName)
+                INSERT INTO Geolocation.City (StateProvinceID, CityName)
                 VALUES (@StateProvinceId, @CityName)
                 """,
                 new { StateProvinceId = stateProvinceId, location.CityName }
@@ -79,7 +79,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteScalarAsync<int?>(
                 """
                 SELECT 1
-                FROM dbo.Country
+                FROM Geolocation.Country
                 WHERE ISO3166_1 = @ISO3166_1
                 """,
                 new { ISO3166_1 = isoCode }
@@ -91,7 +91,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             // race is tolerated (the resulting duplicate row, if any, is out of scope for this method).
             await connection.ExecuteAsync(
                 """
-                INSERT INTO dbo.Country (CountryName, ISO3166_1)
+                INSERT INTO Geolocation.Country (CountryName, ISO3166_1)
                 VALUES (@CountryName, @ISO3166_1)
                 """,
                 new { CountryName = countryName, ISO3166_1 = isoCode }
@@ -125,7 +125,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteScalarAsync<int?>(
                 """
                 SELECT 1
-                FROM dbo.StateProvince
+                FROM Geolocation.StateProvince
                 WHERE ISO3166_2 = @ISO3166_2
                 """,
                 new { ISO3166_2 = isoCode }
@@ -135,7 +135,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         if (!exists)
             await connection.ExecuteAsync(
                 """
-                INSERT INTO dbo.StateProvince (StateProvinceName, ISO3166_2, CountryID)
+                INSERT INTO Geolocation.StateProvince (StateProvinceName, ISO3166_2, CountryID)
                 VALUES (@StateProvinceName, @ISO3166_2, @CountryId)
                 """,
                 new
@@ -153,7 +153,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         return await connection.ExecuteScalarAsync<Guid?>(
             """
             SELECT CountryID
-            FROM dbo.Country
+            FROM Geolocation.Country
             WHERE ISO3166_1 = @ISO3166_1
             """,
             new { ISO3166_1 = isoCode }
@@ -166,7 +166,7 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         return await connection.ExecuteScalarAsync<Guid?>(
             """
             SELECT StateProvinceID
-            FROM dbo.StateProvince
+            FROM Geolocation.StateProvince
             WHERE ISO3166_2 = @ISO3166_2
             """,
             new { ISO3166_2 = isoCode }
@@ -179,8 +179,8 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         return await connection.ExecuteScalarAsync<Guid?>(
             """
             SELECT c.CityID
-            FROM dbo.City c
-            INNER JOIN dbo.StateProvince sp ON sp.StateProvinceID = c.StateProvinceID
+            FROM Geolocation.City c
+            INNER JOIN Geolocation.StateProvince sp ON sp.StateProvinceID = c.StateProvinceID
             WHERE c.CityName = @CityName AND sp.ISO3166_2 = @StateProvinceCode
             """,
             new { CityName = cityName, StateProvinceCode = stateProvinceIsoCode }

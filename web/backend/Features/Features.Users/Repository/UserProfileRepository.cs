@@ -25,7 +25,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
         return await connection.ExecuteScalarAsync<Guid>(
             new CommandDefinition(
                 """
-                INSERT INTO dbo.UserProfile (UserAccountID, Biography)
+                INSERT INTO Social.UserProfile (UserAccountID, Biography)
                 OUTPUT INSERTED.UserProfileID
                 VALUES (@UserAccountId, @Biography)
                 """,
@@ -47,7 +47,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
             new CommandDefinition(
                 """
                 SELECT UserProfileID
-                FROM dbo.UserProfile
+                FROM Social.UserProfile
                 WHERE UserAccountID = @UserAccountId
                 """,
                 new { UserAccountId = userAccountId },
@@ -73,7 +73,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
         int updatedRows = await connection.ExecuteAsync(
             new CommandDefinition(
                 """
-                UPDATE dbo.UserProfile
+                UPDATE Social.UserProfile
                 SET Biography = @Biography
                 WHERE UserAccountID = @UserAccountId
                 """,
@@ -101,7 +101,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    UPDATE dbo.UserAvatar
+                    UPDATE Social.UserAvatar
                     SET ValidTo = SYSUTCDATETIME()
                     WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL
                     """,
@@ -114,7 +114,7 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.UserAvatar (UserAvatarID, UserProfileID, PhotoID)
+                    INSERT INTO Social.UserAvatar (UserAvatarID, UserProfileID, PhotoID)
                     VALUES (@UserAvatarId, @UserProfileId, @PhotoId)
                     """,
                     new

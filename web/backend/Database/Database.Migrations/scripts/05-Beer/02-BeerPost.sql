@@ -1,4 +1,4 @@
-CREATE TABLE BeerPost
+CREATE TABLE Beer.BeerPost
 (
     BeerPostID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerPostID DEFAULT NEWID(),
@@ -31,16 +31,16 @@ CREATE TABLE BeerPost
 
     CONSTRAINT FK_BeerPost_PostedBy
         FOREIGN KEY (PostedByID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION,
 
     CONSTRAINT FK_BeerPost_BeerStyle
         FOREIGN KEY (BeerStyleID)
-            REFERENCES BeerStyle (BeerStyleID),
+            REFERENCES Beer.BeerStyle (BeerStyleID),
 
     CONSTRAINT FK_BeerPost_Brewery
         FOREIGN KEY (BrewedByID)
-            REFERENCES BreweryPost (BreweryPostID),
+            REFERENCES Brewery.BreweryPost (BreweryPostID),
 
     CONSTRAINT CHK_BeerPost_ABV
         CHECK (ABV >= 0 AND ABV <= 67),
@@ -51,12 +51,12 @@ CREATE TABLE BeerPost
 
 CREATE
 NONCLUSTERED INDEX IX_BeerPost_PostedBy
-    ON BeerPost(PostedByID);
+    ON Beer.BeerPost(PostedByID);
 
 CREATE
 NONCLUSTERED INDEX IX_BeerPost_BeerStyle
-    ON BeerPost(BeerStyleID);
+    ON Beer.BeerPost(BeerStyleID);
 
 CREATE
 NONCLUSTERED INDEX IX_BeerPost_BrewedBy
-    ON BeerPost(BrewedByID);
+    ON Beer.BeerPost(BrewedByID);

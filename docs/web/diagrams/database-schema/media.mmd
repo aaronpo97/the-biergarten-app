@@ -4,41 +4,16 @@ config:
 ---
 
 erDiagram
+    User ||--o{ Photo : "uploads"
+
+    %% Cross-schema: defined in full in auth.mmd / social.mmd / brewery.mmd / beer.mmd
     Avatar }o--|| Photo : "uses photo"
     Photo ||--o{ BreweryPhoto : "used in"
     Photo ||--o{ BeerPhoto : "used in"
-
-    %% Cross-schema: defined in full in identity.mmd / brewery.mmd / beer.mmd
-    Profile ||--o{ Avatar : "has avatar history"
-    User ||--o{ Photo : "uploads"
-    Brewery ||--o{ BreweryPhoto : "has photos"
-    Beer ||--o{ BeerPhoto : "has photos"
 
     Photo {
         uniqueidentifier PhotoID PK
         nvarchar Hyperlink "nullable"
         uniqueidentifier UploadedByID FK
         datetime UploadedAt
-    }
-
-    Avatar {
-        uniqueidentifier UserAvatarID PK
-        uniqueidentifier UserProfileID FK
-        uniqueidentifier PhotoID FK
-        datetime2 ValidFrom
-        datetime2 ValidTo "nullable; at most one row per UserProfileID has ValidTo IS NULL (active avatar)"
-    }
-
-    BreweryPhoto {
-        uniqueidentifier BreweryPostPhotoID PK
-        uniqueidentifier BreweryPostID FK
-        uniqueidentifier PhotoID FK
-        datetime LinkedAt
-    }
-
-    BeerPhoto {
-        uniqueidentifier BeerPostPhotoID PK
-        uniqueidentifier BeerPostID FK
-        uniqueidentifier PhotoID FK
-        datetime LinkedAt
     }

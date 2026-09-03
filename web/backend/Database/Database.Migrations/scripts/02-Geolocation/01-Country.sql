@@ -1,4 +1,4 @@
-CREATE TABLE Country
+CREATE TABLE Geolocation.Country
 (
     CountryID UNIQUEIDENTIFIER
         CONSTRAINT DF_CountryID DEFAULT NEWID(),

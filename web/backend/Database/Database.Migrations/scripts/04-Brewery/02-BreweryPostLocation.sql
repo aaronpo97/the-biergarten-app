@@ -1,4 +1,4 @@
-CREATE TABLE BreweryPostLocation
+CREATE TABLE Brewery.BreweryPostLocation
 (
     BreweryPostLocationID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostLocationID DEFAULT NEWID(),
@@ -25,24 +25,24 @@ CREATE TABLE BreweryPostLocation
 
     CONSTRAINT FK_BreweryPostLocation_BreweryPost
         FOREIGN KEY (BreweryPostID)
-            REFERENCES BreweryPost (BreweryPostID)
+            REFERENCES Brewery.BreweryPost (BreweryPostID)
             ON DELETE CASCADE,
 
     CONSTRAINT FK_BreweryPostLocation_City
         FOREIGN KEY (CityID)
-            REFERENCES City (CityID)
+            REFERENCES Geolocation.City (CityID)
 );
 
 CREATE
 NONCLUSTERED INDEX IX_BreweryPostLocation_BreweryPost
-    ON BreweryPostLocation(BreweryPostID);
+    ON Brewery.BreweryPostLocation(BreweryPostID);
 
 CREATE
 NONCLUSTERED INDEX IX_BreweryPostLocation_City
-    ON BreweryPostLocation(CityID);
+    ON Brewery.BreweryPostLocation(CityID);
 
 CREATE SPATIAL INDEX SIDX_BreweryPostLocation_Coordinates
-    ON BreweryPostLocation(Coordinates)
+    ON Brewery.BreweryPostLocation(Coordinates)
     USING GEOGRAPHY_GRID
     WITH (
         GRIDS = (LEVEL_1 = MEDIUM, LEVEL_2 = MEDIUM, LEVEL_3 = MEDIUM, LEVEL_4 = MEDIUM),

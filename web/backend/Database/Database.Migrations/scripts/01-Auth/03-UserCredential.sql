@@ -1,4 +1,4 @@
-CREATE TABLE UserCredential -- delete credentials when user account is deleted
+CREATE TABLE Auth.UserCredential -- delete credentials when user account is deleted
 (
     UserCredentialID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserCredentialID DEFAULT NEWID(),
@@ -26,15 +26,15 @@ CREATE TABLE UserCredential -- delete credentials when user account is deleted
 
     CONSTRAINT FK_UserCredential_UserAccount
         FOREIGN KEY (UserAccountID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE CASCADE
 );
 
 CREATE
 NONCLUSTERED INDEX IX_UserCredential_UserAccount
-    ON UserCredential(UserAccountID);
+    ON Auth.UserCredential(UserAccountID);
 
 CREATE
 NONCLUSTERED INDEX IX_UserCredential_Account_Active
-    ON UserCredential(UserAccountID, IsRevoked, Expiry)
+    ON Auth.UserCredential(UserAccountID, IsRevoked, Expiry)
     INCLUDE (Hash);
