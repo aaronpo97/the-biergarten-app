@@ -1,4 +1,8 @@
-flowchart TD
+---
+config:
+    layout: elk
+---
+flowchart LR
     Start([start]) --> ParseArgs["main.cc: ParseArguments(argc, argv)"]
     ParseArgs --> ArgsValid{Arguments valid?}
     ArgsValid -- no --> LogErr[Log error / usage info] --> Stop1([stop])
