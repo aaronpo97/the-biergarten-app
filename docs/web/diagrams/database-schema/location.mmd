@@ -1,10 +1,10 @@
 erDiagram
     Country ||--o{ StateProvince : "has"
     StateProvince ||--o{ City : "has"
-    City ||--o{ BreweryLoc : "located in"
+    City ||--o{ BreweryLocation : "located in"
 
     %% Cross-schema: defined in full in brewery.mmd
-    Brewery ||--o| BreweryLoc : "has location"
+    Brewery ||--o| BreweryLocation : "has location"
 
     Country {
         uniqueidentifier CountryID PK
@@ -25,7 +25,7 @@ erDiagram
         uniqueidentifier StateProvinceID FK
     }
 
-    BreweryLoc {
+    BreweryLocation {
         uniqueidentifier BreweryPostLocationID PK
         uniqueidentifier BreweryPostID "FK, UK"
         nvarchar AddressLine1

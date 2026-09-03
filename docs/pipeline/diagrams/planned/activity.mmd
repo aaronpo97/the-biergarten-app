@@ -1,4 +1,9 @@
-flowchart TD
+---
+config:
+    layout: elk
+---
+
+flowchart LR
     Start([start]) --> ParseArgs["Main: ParseArguments(argc, argv)"]
     ParseArgs --> InvalidArgs{Invalid args?}
     InvalidArgs -- yes --> LogErr["spdlog::error"] --> Stop1([stop])
