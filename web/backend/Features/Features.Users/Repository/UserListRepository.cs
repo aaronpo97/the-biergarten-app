@@ -22,7 +22,7 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
                 UserAccountID, 
                 Username, 
                 FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
-            FROM dbo.UserAccount
+            FROM Auth.UserAccount
             WHERE UserAccountID = @UserAccountId
             """,
             new { UserAccountId = id }
@@ -40,7 +40,7 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
         return await connection.QueryAsync<UserAccount>(
             """
             SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
-            FROM dbo.UserAccount
+            FROM Auth.UserAccount
             ORDER BY CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             """,

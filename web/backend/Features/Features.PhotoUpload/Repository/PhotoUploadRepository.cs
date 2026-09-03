@@ -28,7 +28,7 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
                         """
                                     SELECT 1
                                     FROM
-                                        dbo.UserAccount
+                                        Auth.UserAccount
                                     WHERE
                                         UserAccountID = @UploadedById
                         """,
@@ -44,7 +44,7 @@ public class PhotoUploadRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    INSERT INTO dbo.Photo (PhotoID, Hyperlink, UploadedByID)
+                    INSERT INTO Media.Photo (PhotoID, Hyperlink, UploadedByID)
                     VALUES (@PhotoId, @Hyperlink, @UploadedById)
                     """,
                     new { photo.PhotoId, photo.Hyperlink, photo.UploadedById },
