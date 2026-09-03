@@ -6,12 +6,11 @@ config:
 erDiagram
     User ||--o{ Cred : "has credentials"
     User ||--o| Verify : "has verification"
+
+    %% Cross-schema: defined in full in social.mmd / media.mmd / brewery.mmd / beer.mmd
     User ||--o| Profile : "has profile"
     User ||--o{ Follow : "follows"
     User ||--o{ Follow : "followed by"
-
-    %% Cross-schema: defined in full in media.mmd / brewery.mmd / beer.mmd
-    Profile ||--o{ Avatar : "has avatar history"
     User ||--o{ Photo : "uploads"
     User ||--o{ Brewery : "posts"
     User ||--o{ Beer : "posts"
@@ -42,17 +41,4 @@ erDiagram
         uniqueidentifier UserVerificationID PK
         uniqueidentifier UserAccountID "FK, UK"
         datetime VerificationDateTime
-    }
-
-    Profile {
-        uniqueidentifier UserProfileID PK
-        uniqueidentifier UserAccountID "FK, UK"
-        nvarchar Biography
-    }
-
-    Follow {
-        uniqueidentifier UserFollowID PK
-        uniqueidentifier UserAccountID FK
-        uniqueidentifier FollowingID FK
-        datetime CreatedAt
     }

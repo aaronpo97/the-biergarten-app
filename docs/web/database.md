@@ -15,33 +15,51 @@ convention. For the vertical-slice code that talks to this schema, see
 
 ## Schema
 
-The full schema lives under
-`web/backend/Database/Database.Migrations/scripts/01-schema/` with one numbered
-script per table.
+The schema is split into six SQL Server schemas, one per feature area, each
+living in its own numbered folder under
+`web/backend/Database/Database.Migrations/scripts/`. The folder numbers
+(`01`-`06`) fix the load order so foreign-key dependencies resolve — DbUp runs
+embedded scripts in alphabetical-by-resource-name order, so e.g. `04-Brewery`
+(which references `Auth`, `Geolocation`, and `Media`) runs after all three.
+Each folder's `00-Schema.sql` creates its SQL schema before its tables run:
 
 ```
-01-schema
-  ├── 01-UserAccount.sql
-  ├── 02-Photo.sql
-  ├── 03-UserVerification.sql
-  ├── 04-UserCredential.sql
-  ├── 05-UserFollow.sql
-  ├── 06-Country.sql
-  ├── 07-StateProvince.sql
-  ├── 08-City.sql
-  ├── 09-BreweryPost.sql
-  ├── 10-BreweryPostLocation.sql
-  ├── 11-BreweryPostPhoto.sql
-  ├── 12-BeerStyle.sql
-  ├── 13-BeerPost.sql
-  ├── 14-BeerPostPhoto.sql
-  ├── 15-BeerPostComment.sql
-  ├── 16-UserProfile.sql
-  └── 17-UserAvatar.sql
+scripts
+  ├── 01-Auth          (UserAccount, UserVerification, UserCredential)
+  │     ├── 00-Schema.sql
+  │     ├── 01-UserAccount.sql
+  │     ├── 02-UserVerification.sql
+  │     └── 03-UserCredential.sql
+  ├── 02-Geolocation   (Country, StateProvince, City)
+  │     ├── 00-Schema.sql
+  │     ├── 01-Country.sql
+  │     ├── 02-StateProvince.sql
+  │     └── 03-City.sql
+  ├── 03-Media         (Photo)
+  │     ├── 00-Schema.sql
+  │     └── 01-Photo.sql
+  ├── 04-Brewery       (BreweryPost, BreweryPostLocation, BreweryPostPhoto)
+  │     ├── 00-Schema.sql
+  │     ├── 01-BreweryPost.sql
+  │     ├── 02-BreweryPostLocation.sql
+  │     └── 03-BreweryPostPhoto.sql
+  ├── 05-Beer          (BeerStyle, BeerPost, BeerPostPhoto, BeerPostComment)
+  │     ├── 00-Schema.sql
+  │     ├── 01-BeerStyle.sql
+  │     ├── 02-BeerPost.sql
+  │     ├── 03-BeerPostPhoto.sql
+  │     └── 04-BeerPostComment.sql
+  └── 06-Social        (UserFollow, UserProfile, UserAvatar)
+        ├── 00-Schema.sql
+        ├── 01-UserFollow.sql
+        ├── 02-UserProfile.sql
+        └── 03-UserAvatar.sql
 ```
 
-Each script is run in order by `Database.Migrations` (DbUp) on startup. Each
-table is queried directly by the owning feature slice's repository (see
+Each script is run in order by `Database.Migrations` (DbUp) on startup. Tables
+are referenced schema-qualified in code (e.g. `Auth.UserAccount`), not under
+the default `dbo` schema. Each table is queried directly by the owning
+feature slice's repository (see
 [Direct SQL via Dapper/ADO.NET](architecture.md#direct-sql-via-dapperadonet)).
 
 A generated DBML copy of the schema (for import into a diagramming tool such as

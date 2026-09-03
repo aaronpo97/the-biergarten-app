@@ -1,0 +1,34 @@
+---
+config:
+    layout: elk
+---
+
+erDiagram
+    User ||--o| Profile : "has profile"
+    User ||--o{ Follow : "follows"
+    User ||--o{ Follow : "followed by"
+    Profile ||--o{ Avatar : "has avatar history"
+
+    %% Cross-schema: defined in full in auth.mmd / media.mmd
+    Avatar }o--|| Photo : "uses photo"
+
+    Profile {
+        uniqueidentifier UserProfileID PK
+        uniqueidentifier UserAccountID "FK, UK"
+        nvarchar Biography
+    }
+
+    Follow {
+        uniqueidentifier UserFollowID PK
+        uniqueidentifier UserAccountID FK
+        uniqueidentifier FollowingID FK
+        datetime CreatedAt
+    }
+
+    Avatar {
+        uniqueidentifier UserAvatarID PK
+        uniqueidentifier UserProfileID FK
+        uniqueidentifier PhotoID FK
+        datetime2 ValidFrom
+        datetime2 ValidTo "nullable; at most one row per UserProfileID has ValidTo IS NULL (active avatar)"
+    }

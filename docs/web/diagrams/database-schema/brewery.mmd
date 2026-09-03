@@ -9,8 +9,10 @@ erDiagram
     Brewery ||--o{ BreweryPhoto : "has photos"
     Brewery ||--o{ Beer : "brews"
 
-    %% Cross-schema: defined in full in identity.mmd / location.mmd / media.mmd / beer.mmd
+    %% Cross-schema: defined in full in auth.mmd / geolocation.mmd / media.mmd / beer.mmd
     User ||--o{ Brewery : "posts"
+    BreweryLocation }o--|| City : "located in"
+    BreweryPhoto }o--|| Photo : "uses photo"
 
     Brewery {
         uniqueidentifier BreweryPostID PK
@@ -19,4 +21,21 @@ erDiagram
         nvarchar Description
         datetime CreatedAt
         datetime UpdatedAt "nullable"
+    }
+
+    BreweryLocation {
+        uniqueidentifier BreweryPostLocationID PK
+        uniqueidentifier BreweryPostID "FK, UK"
+        nvarchar AddressLine1
+        nvarchar AddressLine2 "nullable"
+        nvarchar PostalCode
+        uniqueidentifier CityID FK
+        geography Coordinates "nullable"
+    }
+
+    BreweryPhoto {
+        uniqueidentifier BreweryPostPhotoID PK
+        uniqueidentifier BreweryPostID FK
+        uniqueidentifier PhotoID FK
+        datetime LinkedAt
     }

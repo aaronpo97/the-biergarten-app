@@ -1,0 +1,25 @@
+erDiagram
+    Country ||--o{ StateProvince : "has"
+    StateProvince ||--o{ City : "has"
+
+    %% Cross-schema: defined in full in brewery.mmd
+    City ||--o{ BreweryLocation : "located in"
+
+    Country {
+        uniqueidentifier CountryID PK
+        nvarchar CountryName
+        char ISO3166_1 UK
+    }
+
+    StateProvince {
+        uniqueidentifier StateProvinceID PK
+        nvarchar StateProvinceName
+        char ISO3166_2 UK
+        uniqueidentifier CountryID FK
+    }
+
+    City {
+        uniqueidentifier CityID PK
+        nvarchar CityName
+        uniqueidentifier StateProvinceID FK
+    }

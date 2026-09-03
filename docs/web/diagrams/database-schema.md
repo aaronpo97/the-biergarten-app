@@ -1,39 +1,46 @@
 # Database Schema
 
-Five diagrams, one per schema category — mirrors the `identity` / `media` /
-`location` / `brewery` / `beer` schema split. Every table also has a
+Six diagrams, one per SQL Server schema — mirrors the `Auth` / `Geolocation` /
+`Media` / `Brewery` / `Beer` / `Social` schema split under
+`web/backend/Database/Database.Migrations/scripts/`. Every table also has a
 `RowVersion ROWVERSION` column (optimistic concurrency), omitted below for
 brevity. Tables marked `(*)` have no repository/feature slice yet.
 
-Boxes with no attribute list (e.g. `Photo` in the identity diagram) are owned by
-a different schema and shown only to keep the relationship visible; see the
+Boxes with no attribute list (e.g. `Photo` in the auth diagram) are owned by a
+different schema and shown only to keep the relationship visible; see the
 diagram named after that schema for its full definition.
 
-## Identity (`identity`)
+## Auth (`Auth`)
 
 ```mermaid
---8<-- "web/diagrams/database-schema/identity.mmd"
+--8<-- "web/diagrams/database-schema/auth.mmd"
 ```
 
-## Media (`media`)
+## Social (`Social`)
+
+```mermaid
+--8<-- "web/diagrams/database-schema/social.mmd"
+```
+
+## Media (`Media`)
 
 ```mermaid
 --8<-- "web/diagrams/database-schema/media.mmd"
 ```
 
-## Location (`location`)
+## Geolocation (`Geolocation`)
 
 ```mermaid
---8<-- "web/diagrams/database-schema/location.mmd"
+--8<-- "web/diagrams/database-schema/geolocation.mmd"
 ```
 
-## Brewery (`brewery`)
+## Brewery (`Brewery`)
 
 ```mermaid
 --8<-- "web/diagrams/database-schema/brewery.mmd"
 ```
 
-## Beer (`beer`)
+## Beer (`Beer`)
 
 ```mermaid
 --8<-- "web/diagrams/database-schema/beer.mmd"
