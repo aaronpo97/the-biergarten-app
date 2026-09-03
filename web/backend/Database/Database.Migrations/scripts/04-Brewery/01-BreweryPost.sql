@@ -1,4 +1,4 @@
-CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
+CREATE TABLE Brewery.BreweryPost -- A user cannot be deleted if they have a post
 (
     BreweryPostID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostID DEFAULT NEWID(),
@@ -21,10 +21,10 @@ CREATE TABLE BreweryPost -- A user cannot be deleted if they have a post
 
     CONSTRAINT FK_BreweryPost_UserAccount
         FOREIGN KEY (PostedByID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION
 );
 
 CREATE
 NONCLUSTERED INDEX IX_BreweryPost_PostedByID
-    ON BreweryPost(PostedByID);
+    ON Brewery.BreweryPost(PostedByID);

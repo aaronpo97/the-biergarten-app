@@ -1,4 +1,4 @@
-CREATE TABLE dbo.UserProfile
+CREATE TABLE Social.UserProfile
 (
     UserProfileID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserProfileID DEFAULT NEWID(),
@@ -17,6 +17,6 @@ CREATE TABLE dbo.UserProfile
 
     CONSTRAINT FK_UserProfile_UserAccount
         FOREIGN KEY (UserAccountID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE CASCADE
 );

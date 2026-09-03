@@ -1,4 +1,4 @@
-CREATE TABLE BeerStyle
+CREATE TABLE Beer.BeerStyle
 (
     BeerStyleID UNIQUEIDENTIFIER
         CONSTRAINT DF_BeerStyleID DEFAULT NEWID(),

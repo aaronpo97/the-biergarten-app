@@ -1,4 +1,4 @@
-CREATE TABLE BreweryPostPhoto -- All photos linked to a post are deleted if the post is deleted
+CREATE TABLE Brewery.BreweryPostPhoto -- All photos linked to a post are deleted if the post is deleted
 (
     BreweryPostPhotoID UNIQUEIDENTIFIER
         CONSTRAINT DF_BreweryPostPhotoID DEFAULT NEWID(),
@@ -17,19 +17,19 @@ CREATE TABLE BreweryPostPhoto -- All photos linked to a post are deleted if the 
 
     CONSTRAINT FK_BreweryPostPhoto_BreweryPost
         FOREIGN KEY (BreweryPostID)
-            REFERENCES BreweryPost (BreweryPostID)
+            REFERENCES Brewery.BreweryPost (BreweryPostID)
             ON DELETE CASCADE,
 
     CONSTRAINT FK_BreweryPostPhoto_Photo
         FOREIGN KEY (PhotoID)
-            REFERENCES Photo (PhotoID)
+            REFERENCES Media.Photo (PhotoID)
             ON DELETE CASCADE
 );
 
 CREATE
 NONCLUSTERED INDEX IX_BreweryPostPhoto_Photo_BreweryPost
-    ON BreweryPostPhoto(PhotoID, BreweryPostID);
+    ON Brewery.BreweryPostPhoto(PhotoID, BreweryPostID);
 
 CREATE
 NONCLUSTERED INDEX IX_BreweryPostPhoto_BreweryPost_Photo
-    ON BreweryPostPhoto(BreweryPostID, PhotoID);
+    ON Brewery.BreweryPostPhoto(BreweryPostID, PhotoID);

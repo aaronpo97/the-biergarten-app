@@ -1,4 +1,4 @@
-CREATE TABLE Photo -- All photos must be linked to a user account, you cannot delete a user account if they have uploaded photos
+CREATE TABLE Media.Photo -- All photos must be linked to a user account, you cannot delete a user account if they have uploaded photos
 (
     PhotoID UNIQUEIDENTIFIER
         CONSTRAINT DF_PhotoID DEFAULT NEWID(),
@@ -18,10 +18,10 @@ CREATE TABLE Photo -- All photos must be linked to a user account, you cannot de
 
     CONSTRAINT FK_Photo_UploadedBy
         FOREIGN KEY (UploadedByID)
-            REFERENCES UserAccount (UserAccountID)
+            REFERENCES Auth.UserAccount (UserAccountID)
             ON DELETE NO ACTION
 );
 
 CREATE
 NONCLUSTERED INDEX IX_Photo_UploadedByID
-    ON Photo(UploadedByID);
+    ON Media.Photo(UploadedByID);

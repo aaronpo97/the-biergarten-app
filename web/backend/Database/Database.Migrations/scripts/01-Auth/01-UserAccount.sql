@@ -1,4 +1,4 @@
-CREATE TABLE dbo.UserAccount
+CREATE TABLE Auth.UserAccount
 (
     UserAccountID UNIQUEIDENTIFIER
         CONSTRAINT DF_UserAccountID DEFAULT NEWID(),

@@ -1,4 +1,4 @@
-CREATE TABLE StateProvince
+CREATE TABLE Geolocation.StateProvince
 (
     StateProvinceID UNIQUEIDENTIFIER
         CONSTRAINT DF_StateProvinceID DEFAULT NEWID(),
@@ -20,9 +20,9 @@ CREATE TABLE StateProvince
 
     CONSTRAINT FK_StateProvince_Country
         FOREIGN KEY (CountryID)
-            REFERENCES Country (CountryID)
+            REFERENCES Geolocation.Country (CountryID)
 );
 
 CREATE
 NONCLUSTERED INDEX IX_StateProvince_Country
-    ON StateProvince(CountryID);
+    ON Geolocation.StateProvince(CountryID);

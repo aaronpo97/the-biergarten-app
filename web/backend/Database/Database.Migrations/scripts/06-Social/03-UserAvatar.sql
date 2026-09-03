@@ -1,4 +1,4 @@
-CREATE TABLE dbo.UserAvatar
+CREATE TABLE Social.UserAvatar
 (
     UserAvatarID  UNIQUEIDENTIFIER
         CONSTRAINT DF_UserAvatarID DEFAULT NEWID(),
@@ -18,12 +18,12 @@ CREATE TABLE dbo.UserAvatar
 
     CONSTRAINT FK_UserAvatar_UserProfile
         FOREIGN KEY (UserProfileID)
-            REFERENCES dbo.UserProfile (UserProfileID)
+            REFERENCES Social.UserProfile (UserProfileID)
             ON DELETE CASCADE,
 
     CONSTRAINT FK_UserAvatar_Photo
         FOREIGN KEY (PhotoID)
-            REFERENCES dbo.Photo (PhotoID)
+            REFERENCES Media.Photo (PhotoID)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
 
@@ -33,11 +33,11 @@ CREATE TABLE dbo.UserAvatar
 
 -- At most one active avatar per profile
 CREATE UNIQUE NONCLUSTERED INDEX UX_UserAvatar_ActiveOne
-    ON dbo.UserAvatar (UserProfileID)
+    ON Social.UserAvatar (UserProfileID)
     WHERE ValidTo IS NULL;
 
 CREATE NONCLUSTERED INDEX IX_UserAvatar_Photo
-    ON dbo.UserAvatar (PhotoID);
+    ON Social.UserAvatar (PhotoID);
 
 CREATE NONCLUSTERED INDEX ix_UserAvatar_Profile
-    ON dbo.UserAvatar (UserProfileID)
+    ON Social.UserAvatar (UserProfileID)
