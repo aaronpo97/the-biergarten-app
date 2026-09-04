@@ -29,6 +29,7 @@
         <ProjectReference Include="..\..\Features\Features.Users\Features.Users.csproj" />
         <ProjectReference Include="..\..\Features\Features.Emails\Features.Emails.csproj" />
         <ProjectReference Include="..\..\Features\Features.PhotoUpload\Features.PhotoUpload.csproj" />
+        <ProjectReference Include="..\..\Features\Features.Locations\Features.Locations.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>

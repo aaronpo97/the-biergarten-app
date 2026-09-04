@@ -14,7 +14,9 @@ CREATE TABLE Geolocation.City
 
     CONSTRAINT FK_City_StateProvince
         FOREIGN KEY (StateProvinceID)
-            REFERENCES Geolocation.StateProvince (StateProvinceID)
+            REFERENCES Geolocation.StateProvince (StateProvinceID),
+
+    CONSTRAINT AK_CityStateProvince UNIQUE (CityName, StateProvinceID)
 );
 
 CREATE

@@ -7,6 +7,8 @@ using Features.Emails.DependencyInjection;
 using Features.Emails.Services;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
+using Features.Locations.Controllers;
+using Features.Locations.DependencyInjection;
 using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -26,6 +28,7 @@ internal static class ServiceCollectionExtensions
                 .AddControllers(options => options.Filters.Add<GlobalExceptionFilter>())
                 .AddApplicationPart(typeof(BreweryController).Assembly)
                 .AddApplicationPart(typeof(AuthController).Assembly)
+                .AddApplicationPart(typeof(CityController).Assembly)
                 .Services;
 
         public IServiceCollection AddValidationAndMediatR()
@@ -44,6 +47,7 @@ internal static class ServiceCollectionExtensions
                     cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
                     cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
                     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
+                    cfg.RegisterServicesFromAssembly(typeof(CityController).Assembly);
                     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 });
 
@@ -96,7 +100,8 @@ internal static class ServiceCollectionExtensions
                 .AddFeaturesBreweries()
                 .AddFeaturesUsers()
                 .AddFeaturesEmails()
-                .AddFeaturesPhotoUpload();
+                .AddFeaturesPhotoUpload()
+                .AddFeaturesLocations();
 
         public IServiceCollection AddCoreInfrastructure() =>
             services

@@ -13,9 +13,13 @@ using Features.Breweries.Commands.CreateBrewery;
 using Features.Breweries.DependencyInjection;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
-using Features.Locations.Commands.GetOrCreateCity;
+using Features.Locations.Commands.CreateCity;
+using Features.Locations.Commands.CreateCountry;
+using Features.Locations.Commands.CreateStateProvince;
 using Features.Locations.DependencyInjection;
-using Features.Locations.Dtos;
+using Features.Locations.Queries.GetCity;
+using Features.Locations.Queries.GetCountry;
+using Features.Locations.Queries.GetStateProvince;
 using idunno.Password;
 using Infrastructure.FileUpload;
 using MediatR;
@@ -43,7 +47,7 @@ static async Task<int> RunAsync()
             .AddScoped<ITokenService, NoOpTokenService>()
             .AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblyContaining<CreateBreweryCommand>()
-                    .RegisterServicesFromAssemblyContaining<GetOrCreateCityCommand>()
+                    .RegisterServicesFromAssemblyContaining<GetCountryQuery>()
                     .RegisterServicesFromAssemblyContaining<UploadAvatarCommand>()
                     .RegisterServicesFromAssemblyContaining<UploadPhotoCommand>()
             );
@@ -78,11 +82,11 @@ static async Task<int> RunAsync()
         AnsiConsole.MarkupLine(
             $"[green]✓[/] Loaded [bold]{seedData.Breweries.Count}[/] breweries."
         );
-        AnsiConsole.Write(BuildBreweryTable(seedData.Breweries));
+        AnsiConsole.Write(BuildBreweryDisplayTable(seedData.Breweries));
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine($"[green]✓[/] Loaded [bold]{seedData.Users.Count}[/] users.");
-        AnsiConsole.Write(BuildUserTable(seedData.Users));
+        AnsiConsole.Write(BuildUserDisplayTable(seedData.Users));
         AnsiConsole.WriteLine();
 
         AnsiConsole.WriteLine("Seed data loaded successfully.");
@@ -219,17 +223,35 @@ static async Task LoadBreweriesIntoDatabaseAsync(
 
         ctx.Status($"Loading brewery {i + 1}/{breweries.Count} into target database...");
 
-        Guid cityId = await mediator.Send(
-            new GetOrCreateCityCommand(
-                new CityLocation(
-                    breweryRecord.Address.City.CityName,
-                    breweryRecord.Address.City.StateProvince,
-                    breweryRecord.Address.City.Iso31662,
+        Guid countryId =
+            await mediator.Send(new GetCountryQuery(breweryRecord.Address.City.Iso31661))
+            ?? await mediator.Send(
+                new CreateCountryCommand(
                     breweryRecord.Address.City.Country,
                     breweryRecord.Address.City.Iso31661
                 )
+            );
+
+        Guid stateProvinceId =
+            await mediator.Send(new GetStateProvinceQuery(breweryRecord.Address.City.Iso31662))
+            ?? await mediator.Send(
+                new CreateStateProvinceCommand(
+                    breweryRecord.Address.City.StateProvince,
+                    breweryRecord.Address.City.Iso31662,
+                    countryId
+                )
+            );
+
+        Guid cityId =
+            await mediator.Send(
+                new GetCityQuery(
+                    breweryRecord.Address.City.CityName,
+                    breweryRecord.Address.City.Iso31662
+                )
             )
-        );
+            ?? await mediator.Send(
+                new CreateCityCommand(breweryRecord.Address.City.CityName, stateProvinceId)
+            );
 
         await mediator.Send(
             new CreateBreweryCommand(
@@ -251,7 +273,7 @@ static async Task LoadBreweriesIntoDatabaseAsync(
     }
 }
 
-static Table BuildBreweryTable(IReadOnlyList<BreweryRecord> breweries)
+static Table BuildBreweryDisplayTable(IReadOnlyList<BreweryRecord> breweries)
 {
     Table table = new Table()
         .AddColumn("Brewery Name (EN)")
@@ -278,7 +300,7 @@ static Table BuildBreweryTable(IReadOnlyList<BreweryRecord> breweries)
     return table;
 }
 
-static Table BuildUserTable(IReadOnlyList<UserRecord> users)
+static Table BuildUserDisplayTable(IReadOnlyList<UserRecord> users)
 {
     Table table = new Table()
         .AddColumn("Username")
