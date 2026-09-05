@@ -24,9 +24,9 @@ namespace Database.Seed;
 public class BiergartenDataSeeder
 {
     private readonly IMediator _mediator;
-    private readonly PipelineSeedDataReader _reader;
+    private readonly SeedRepository _reader;
 
-    public BiergartenDataSeeder(IMediator mediator, PipelineSeedDataReader reader)
+    public BiergartenDataSeeder(IMediator mediator, SeedRepository reader)
     {
         _mediator = mediator;
         _reader = reader;

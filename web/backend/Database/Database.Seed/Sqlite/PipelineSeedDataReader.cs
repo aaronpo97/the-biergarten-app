@@ -14,14 +14,18 @@ public sealed record SeedData(
     IReadOnlyList<UserRecord> Users
 );
 
-public sealed class PipelineSeedDataReader
+public sealed class SeedRepository : IDisposable
 {
-    private readonly string _connectionString;
-
-    public PipelineSeedDataReader(string connectionString)
+    private readonly SqliteConnection connection;
+    public SeedRepository(string connectionString)
     {
-        _connectionString = connectionString;
+        connection = new(connectionString);
     }
+
+   public void Dispose()
+   {
+        connection.Dispose();
+   }
 
     /// <summary>
     /// Reads breweries and users in a single connection, loading the cities
@@ -31,7 +35,6 @@ public sealed class PipelineSeedDataReader
         CancellationToken cancellationToken = default
     )
     {
-        await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync(cancellationToken);
 
         IReadOnlyDictionary<int, City> cities = await ReadCitiesAsync(
@@ -252,4 +255,5 @@ public sealed class PipelineSeedDataReader
     {
         return JsonSerializer.Deserialize<List<string>>(json) ?? [];
     }
+
 }

@@ -57,7 +57,7 @@ internal class Program
         try
         {
             IMediator mediator = CreateMediator();
-            PipelineSeedDataReader reader = new PipelineSeedDataReader(
+            SeedRepository reader = new SeedRepository(
                 connectionString: "Data Source=SeedData/biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite"
             );
             await new BiergartenDataSeeder(mediator, reader).Run(cts.Token);
