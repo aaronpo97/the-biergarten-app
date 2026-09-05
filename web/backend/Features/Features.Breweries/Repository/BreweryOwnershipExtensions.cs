@@ -2,11 +2,20 @@ using Domain.Exceptions;
 
 namespace Features.Breweries.Repository;
 
-/// <summary>Shared ownership check for commands that mutate a specific brewery post.</summary>
+/// <summary>
+///     Provides authorization checks for brewery-post mutations.
+/// </summary>
 public static class BreweryOwnershipExtensions
 {
-    /// <exception cref="Domain.Exceptions.NotFoundException">Thrown when no brewery exists with the given ID.</exception>
-    /// <exception cref="Domain.Exceptions.ForbiddenException">Thrown when <paramref name="requestingUserId" /> did not post the brewery.</exception>
+    /// <summary>
+    ///     Verifies that the specified user created the brewery post.
+    /// </summary>
+    /// <exception cref="Domain.Exceptions.NotFoundException">
+    ///     Thrown if the brewery post cannot be found.
+    /// </exception>
+    /// <exception cref="Domain.Exceptions.ForbiddenException">
+    ///     Thrown if the specified user does not own the brewery post.
+    /// </exception>
     public static async Task EnsureCallerOwnsBreweryAsync(
         this IBreweryRepository repository,
         Guid breweryPostId,

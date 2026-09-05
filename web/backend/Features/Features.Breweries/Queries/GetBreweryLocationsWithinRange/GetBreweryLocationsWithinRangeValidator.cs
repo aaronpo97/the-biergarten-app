@@ -2,7 +2,9 @@ using FluentValidation;
 
 namespace Features.Breweries.Queries.GetBreweryLocationsWithinRange;
 
-/// <summary>Validates <see cref="GetBreweryLocationsWithinRangeQuery" />.</summary>
+/// <summary>
+///     Validates coordinates and radius values for proximity searches.
+/// </summary>
 public class GetBreweryLocationsWithinRangeValidator
     : AbstractValidator<GetBreweryLocationsWithinRangeQuery>
 {

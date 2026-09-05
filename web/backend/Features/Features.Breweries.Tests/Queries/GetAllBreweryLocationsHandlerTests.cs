@@ -36,8 +36,10 @@ public class GetAllBreweryLocationsHandlerTests
     {
         BreweryPost[] breweries =
         [
-            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "A" },
-            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "B" },
+            new()
+                { BreweryPostId = Guid.NewGuid(), BreweryName = "A" },
+            new()
+                { BreweryPostId = Guid.NewGuid(), BreweryName = "B" },
         ];
         _repoMock.Setup(r => r.GetAllLocations()).ReturnsAsync(breweries);
 

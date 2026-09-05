@@ -3,7 +3,13 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetAllBreweries;
 
-/// <summary>Retrieves brewery posts, newest first. Bound directly from the query string of <c>GET /api/brewery</c>.</summary>
-/// <param name="Limit">Maximum number of breweries to return. Unbounded if <see langword="null"/>.</param>
-/// <param name="Offset">Number of breweries to skip. Treated as zero if <see langword="null"/>.</param>
+/// <summary>
+///     Requests brewery posts ordered from newest to oldest.
+/// </summary>
+/// <param name="Limit">
+///     Caps the result count; <see langword="null" /> disables the cap.
+/// </param>
+/// <param name="Offset">
+///     Specifies the number of results to skip; <see langword="null" /> means zero.
+/// </param>
 public record GetAllBreweriesQuery(int? Limit, int? Offset) : IRequest<IEnumerable<BreweryDto>>;

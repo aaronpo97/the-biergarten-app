@@ -5,17 +5,24 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetBreweryById;
 
-/// <summary>Handles <see cref="GetBreweryByIdQuery" /> by retrieving the matching brewery post.</summary>
+/// <summary>
+///     Handles lookup requests for individual brewery posts.
+/// </summary>
 public class GetBreweryByIdHandler(IBreweryRepository repository)
     : IRequestHandler<GetBreweryByIdQuery, BreweryDto?>
 {
-    /// <summary>Retrieves the brewery post, or <see langword="null"/> if none exists with the given ID.</summary>
+    /// <summary>
+    ///     Retrieves and maps the post, if it exists.
+    /// </summary>
     public async Task<BreweryDto?> Handle(
         GetBreweryByIdQuery request,
         CancellationToken cancellationToken
     )
     {
-        BreweryPost? brewery = await repository.GetByIdAsync(request.BreweryPostId, cancellationToken);
+        BreweryPost? brewery = await repository.GetByIdAsync(
+            request.BreweryPostId,
+            cancellationToken
+        );
         return brewery?.ToDto();
     }
 }

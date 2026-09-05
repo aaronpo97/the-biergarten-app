@@ -7,14 +7,11 @@ using Domain.Exceptions;
 namespace Features.Breweries.Repository;
 
 /// <summary>
-///     Dapper-based implementation of <see cref="IBreweryRepository" />.
+///     Implements brewery persistence with Dapper.
 /// </summary>
 /// <remarks>
-///     <c>BreweryPostLocation.Coordinates</c> is a SQL Server <c>GEOGRAPHY</c> column. Dapper's generic
-///     <c>Query&lt;T&gt;</c> deserializer reads columns via <c>IDataRecord.GetValue</c>, which for a UDT
-///     column returns a CLR UDT instance rather than raw bytes and cannot be coerced to <c>byte[]</c>.
-///     The read queries below therefore select <c>CONVERT(varbinary(max), bpl.Coordinates)</c>, which
-///     yields the UDT's serialized bytes as a plain <c>varbinary</c> value that Dapper can bind directly.
+///     Coordinate queries convert SQL Server <c>GEOGRAPHY</c> values to <c>varbinary(max)</c>
+///     so Dapper can deserialize them as binary coordinate data.
 /// </remarks>
 public class BreweryRepository(ISqlConnectionFactory connectionFactory)
     : DapperRepository(connectionFactory),
@@ -27,8 +24,11 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         SqlMapper.AddTypeHandler(new CoordinateDataTypeHandler());
     }
 
-    /// <inheritdoc/>
-    public async Task<BreweryPost?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    /// <summary>Gets a brewery post with its location data.</summary>
+    public async Task<BreweryPost?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         await using DbConnection connection = await CreateConnection();
         IEnumerable<BreweryPost> results = await connection.QueryAsync<
@@ -73,14 +73,17 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                 cancellationToken: cancellationToken
             ),
             MapBreweryRow,
-            splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
+            "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
         );
 
         return results.SingleOrDefault();
     }
 
-    /// <inheritdoc/>
-    public async Task<Guid?> GetPostedByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    /// <summary>Gets the identifier of the user who created a brewery post.</summary>
+    public async Task<Guid?> GetPostedByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
@@ -92,7 +95,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <inheritdoc/>
+    /// <summary>Gets brewery posts in reverse chronological order.</summary>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
@@ -140,125 +143,141 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    /// <inheritdoc/>
-    public async Task<IEnumerable<BreweryPost>> GetAllLocationsWithinRange(CoordinateData coords, double rangeInMetres)
+    /// <summary>Gets brewery posts within the requested distance from an origin.</summary>
+    public async Task<IEnumerable<BreweryPost>> GetAllLocationsWithinRange(
+        CoordinateData coords,
+        double rangeInMetres
+    )
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryAsync<
-        BreweryPost,
-        BreweryPostLocation,
-        City,
-        StateProvince,
-        Country,
-        DistanceRow,
-        BreweryPost
-            > (
-                """
-                DECLARE @Origin geography = geography::Point(@Latitude, @Longitude, 4326);
+            BreweryPost,
+            BreweryPostLocation,
+            City,
+            StateProvince,
+            Country,
+            DistanceRow,
+            BreweryPost
+        >(
+            """
+            DECLARE @Origin geography = geography::Point(@Latitude, @Longitude, 4326);
 
-                SELECT
-                    bp.BreweryPostID,
-                    bp.BreweryName,
-                    bpl.BreweryPostLocationID,
-                    bpl.AddressLine1,
-                    bpl.AddressLine2,
-                    bpl.PostalCode,
-                    CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
-                    c.CityID,
-                    c.CityName,
-                    sp.StateProvinceID,
-                    sp.StateProvinceName,
-                    sp.ISO3166_2 AS Iso31662,
-                    co.CountryID,
-                    co.CountryName,
-                    co.ISO3166_1 AS Iso31661,
-                    bpl.Coordinates.STDistance(@Origin) AS DistanceMetres
-                FROM Brewery.BreweryPost bp
-                INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
-                LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
-                WHERE bpl.Coordinates IS NOT NULL
-                  AND bpl.Coordinates.STDistance(@Origin) <= @RangeInMetres
-                ORDER BY bpl.Coordinates.STDistance(@Origin) ASC
-                """,
-                (post, location, city, stateProvince, country, distance) =>
-                    MapBreweryRowWithDistance(post, location, city, stateProvince, country, distance, coords),
-                param: new
-                {
-                    coords.Latitude,
-                    coords.Longitude,
-                    RangeInMetres = rangeInMetres
-                },
-                splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID,DistanceMetres"
-            );
+            SELECT
+                bp.BreweryPostID,
+                bp.BreweryName,
+                bpl.BreweryPostLocationID,
+                bpl.AddressLine1,
+                bpl.AddressLine2,
+                bpl.PostalCode,
+                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                c.CityID,
+                c.CityName,
+                sp.StateProvinceID,
+                sp.StateProvinceName,
+                sp.ISO3166_2 AS Iso31662,
+                co.CountryID,
+                co.CountryName,
+                co.ISO3166_1 AS Iso31661,
+                bpl.Coordinates.STDistance(@Origin) AS DistanceMetres
+            FROM Brewery.BreweryPost bp
+            INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+            LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
+            WHERE bpl.Coordinates IS NOT NULL
+              AND bpl.Coordinates.STDistance(@Origin) <= @RangeInMetres
+            ORDER BY bpl.Coordinates.STDistance(@Origin) ASC
+            """,
+            (post, location, city, stateProvince, country, distance) =>
+                MapBreweryRowWithDistance(
+                    post,
+                    location,
+                    city,
+                    stateProvince,
+                    country,
+                    distance,
+                    coords
+                ),
+            new
+            {
+                coords.Latitude,
+                coords.Longitude,
+                RangeInMetres = rangeInMetres,
+            },
+            splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID,DistanceMetres"
+        );
     }
 
-    /// <inheritdoc/>
+    /// <summary>Gets brewery posts that have location data.</summary>
     public async Task<IEnumerable<BreweryPost>> GetAllLocations()
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryAsync<
-        BreweryPost,
-        BreweryPostLocation,
-        City,
-        StateProvince,
-        Country,
-        BreweryPost
-            > (
-                """
-                SELECT
-                    bp.BreweryPostID,
-                    bp.BreweryName,
-                    bpl.BreweryPostLocationID,
-                    bpl.AddressLine1,
-                    bpl.AddressLine2,
-                    bpl.PostalCode,
-                    CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
-                    c.CityID,
-                    c.CityName,
-                    sp.StateProvinceID,
-                    sp.StateProvinceName,
-                    sp.ISO3166_2 AS Iso31662,
-                    co.CountryID,
-                    co.CountryName,
-                    co.ISO3166_1 AS Iso31661
-                FROM Brewery.BreweryPost bp
-                INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
-                LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
-                LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
-                LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
-                WHERE bpl.Coordinates IS NOT NULL
-                ORDER BY bp.BreweryPostID ASC
-                """,
-                MapBreweryRow,
-                splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
-            );
+            BreweryPost,
+            BreweryPostLocation,
+            City,
+            StateProvince,
+            Country,
+            BreweryPost
+        >(
+            """
+            SELECT
+                bp.BreweryPostID,
+                bp.BreweryName,
+                bpl.BreweryPostLocationID,
+                bpl.AddressLine1,
+                bpl.AddressLine2,
+                bpl.PostalCode,
+                CONVERT(varbinary(max), bpl.Coordinates) AS Coordinates,
+                c.CityID,
+                c.CityName,
+                sp.StateProvinceID,
+                sp.StateProvinceName,
+                sp.ISO3166_2 AS Iso31662,
+                co.CountryID,
+                co.CountryName,
+                co.ISO3166_1 AS Iso31661
+            FROM Brewery.BreweryPost bp
+            INNER JOIN Brewery.BreweryPostLocation bpl ON bp.BreweryPostID = bpl.BreweryPostID
+            LEFT JOIN Geolocation.City c ON bpl.CityID = c.CityID
+            LEFT JOIN Geolocation.StateProvince sp ON c.StateProvinceID = sp.StateProvinceID
+            LEFT JOIN Geolocation.Country co ON sp.CountryID = co.CountryID
+            WHERE bpl.Coordinates IS NOT NULL
+            ORDER BY bp.BreweryPostID ASC
+            """,
+            MapBreweryRow,
+            splitOn: "BreweryPostLocationID,CityID,StateProvinceID,CountryID"
+        );
     }
 
-    /// <inheritdoc/>
-    public async Task<BreweryPost> UpdateAsync(BreweryPost brewery, CancellationToken cancellationToken = default)
+    /// <summary>Updates a brewery post and its location in a transaction.</summary>
+    public async Task<BreweryPost> UpdateAsync(
+        BreweryPost brewery,
+        CancellationToken cancellationToken = default
+    )
     {
         await using DbConnection connection = await CreateConnection();
-        await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(
+            cancellationToken
+        );
 
         try
         {
             bool breweryExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                            SELECT 1 FROM
-                                Brewery.BreweryPost
-                            WHERE
-                                BreweryPostID = @BreweryPostId
-                            """,
-                            new { brewery.BreweryPostId },
-                            transaction,
-                            cancellationToken: cancellationToken
-                        )
+                    new CommandDefinition(
+                        """
+                        SELECT 1 FROM
+                            Brewery.BreweryPost
+                        WHERE
+                            BreweryPostID = @BreweryPostId
+                        """,
+                        new { brewery.BreweryPostId },
+                        transaction,
+                        cancellationToken: cancellationToken
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!breweryExists)
                 throw new NotFoundException("Brewery not found.");
@@ -267,14 +286,14 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             {
                 bool cityExists =
                     await connection.ExecuteScalarAsync<int?>(
-                            new CommandDefinition(
-                                "SELECT 1 FROM Geolocation.City WHERE CityID = @CityId",
-                                new { brewery.Location.CityId },
-                                transaction,
-                                cancellationToken: cancellationToken
-                            )
+                        new CommandDefinition(
+                            "SELECT 1 FROM Geolocation.City WHERE CityID = @CityId",
+                            new { brewery.Location.CityId },
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
-                        is not null;
+                    )
+                    is not null;
 
                 if (!cityExists)
                     throw new NotFoundException("City not found.");
@@ -328,18 +347,18 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             {
                 bool locationExists =
                     await connection.ExecuteScalarAsync<int?>(
-                            new CommandDefinition(
-                                """
-                                SELECT 1
-                                FROM Brewery.BreweryPostLocation
-                                WHERE BreweryPostID = @BreweryPostId
-                                """,
-                                new { brewery.BreweryPostId },
-                                transaction,
-                                cancellationToken: cancellationToken
-                            )
+                        new CommandDefinition(
+                            """
+                            SELECT 1
+                            FROM Brewery.BreweryPostLocation
+                            WHERE BreweryPostID = @BreweryPostId
+                            """,
+                            new { brewery.BreweryPostId },
+                            transaction,
+                            cancellationToken: cancellationToken
                         )
-                        is not null;
+                    )
+                    is not null;
 
                 if (locationExists)
                     await connection.ExecuteAsync(
@@ -363,8 +382,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 brewery.Location.AddressLine1,
                                 brewery.Location.AddressLine2,
                                 brewery.Location.PostalCode,
-                                Latitude = brewery.Location.Coordinates?.Latitude,
-                                Longitude = brewery.Location.Coordinates?.Longitude,
+                                brewery.Location.Coordinates?.Latitude,
+                                brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
                             transaction,
@@ -403,8 +422,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                                 brewery.Location.AddressLine1,
                                 brewery.Location.AddressLine2,
                                 brewery.Location.PostalCode,
-                                Latitude = brewery.Location.Coordinates?.Latitude,
-                                Longitude = brewery.Location.Coordinates?.Longitude,
+                                brewery.Location.Coordinates?.Latitude,
+                                brewery.Location.Coordinates?.Longitude,
                                 Srid = GeographySrid,
                             },
                             transaction,
@@ -422,12 +441,12 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
 
         return await GetByIdAsync(brewery.BreweryPostId, cancellationToken)
-               ?? throw new InvalidOperationException(
-                   $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
-               );
+            ?? throw new InvalidOperationException(
+                $"Brewery '{brewery.BreweryPostId}' was not found after a successful update."
+            );
     }
 
-    /// <inheritdoc/>
+    /// <summary>Deletes the brewery post identified by <paramref name="id" />.</summary>
     public async Task DeleteAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
@@ -445,7 +464,7 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
             throw new NotFoundException("Brewery not found.");
     }
 
-    /// <inheritdoc/>
+    /// <summary>Creates a brewery post and its location in a transaction.</summary>
     public async Task CreateAsync(BreweryPost brewery)
     {
         if (brewery.Location is null)
@@ -458,38 +477,38 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         {
             bool userExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                                        SELECT 1
-                                        FROM
-                                            Auth.UserAccount
-                                        WHERE
-                                            UserAccountID = @PostedById
-                            """,
-                            new { brewery.PostedById },
-                            transaction
-                        )
+                    new CommandDefinition(
+                        """
+                                    SELECT 1
+                                    FROM
+                                        Auth.UserAccount
+                                    WHERE
+                                        UserAccountID = @PostedById
+                        """,
+                        new { brewery.PostedById },
+                        transaction
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!userExists)
                 throw new NotFoundException("User not found.");
 
             bool cityExists =
                 await connection.ExecuteScalarAsync<int?>(
-                        new CommandDefinition(
-                            """
-                                        SELECT 1
-                                        FROM
-                                            Geolocation.City
-                                        WHERE
-                                            CityID = @CityId
-                            """,
-                            new { brewery.Location.CityId },
-                            transaction
-                        )
+                    new CommandDefinition(
+                        """
+                                    SELECT 1
+                                    FROM
+                                        Geolocation.City
+                                    WHERE
+                                        CityID = @CityId
+                        """,
+                        new { brewery.Location.CityId },
+                        transaction
                     )
-                    is not null;
+                )
+                is not null;
 
             if (!cityExists)
                 throw new NotFoundException("City not found.");
@@ -543,8 +562,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
                         brewery.Location.AddressLine1,
                         brewery.Location.AddressLine2,
                         brewery.Location.PostalCode,
-                        Latitude = brewery.Location.Coordinates?.Latitude,
-                        Longitude = brewery.Location.Coordinates?.Longitude,
+                        brewery.Location.Coordinates?.Latitude,
+                        brewery.Location.Coordinates?.Longitude,
                         Srid = GeographySrid,
                     },
                     transaction
@@ -560,15 +579,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         }
     }
 
-
     /// <summary>
-    ///     Composes a joined row's <see cref="BreweryPost" />, <see cref="BreweryPostLocation" />,
-    ///     <see cref="City" />, <see cref="StateProvince" /> and <see cref="Country" /> fragments into a
-    ///     single populated <see cref="BreweryPost" />. When the row has no location (a left-joined
-    ///     brewery with no address on file), Dapper passes <see langword="null" /> for
-    ///     <paramref name="location" /> rather than a blank instance, since its identity column
-    ///     (<c>BreweryPostLocationID</c>) is <c>NULL</c>; the schema guarantees that whenever a location
-    ///     row was joined in, its City/StateProvince/Country chain was too.
+    ///     Reconstructs a brewery post and its optional location hierarchy from a joined row.
     /// </summary>
     private static BreweryPost MapBreweryRow(
         BreweryPost post,
@@ -596,15 +608,8 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         return post;
     }
 
-    /// <summary>Dapper multi-mapping row for the <c>DistanceMetres</c> column computed by a range query.</summary>
-    private sealed class DistanceRow
-    {
-        public double DistanceMetres { get; set; }
-    }
-
     /// <summary>
-    ///     Composes a joined row via <see cref="MapBreweryRow" />, then attaches the DB-computed distance
-    ///     from <paramref name="origin" /> as the result's <see cref="BreweryPost.Distance" />.
+    ///     Reconstructs a brewery row and attaches its database-calculated distance.
     /// </summary>
     private static BreweryPost MapBreweryRowWithDistance(
         BreweryPost post,
@@ -619,5 +624,13 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         BreweryPost mapped = MapBreweryRow(post, location, city, stateProvince, country);
         mapped.Distance = new DistanceInformation(origin, distance.DistanceMetres);
         return mapped;
+    }
+
+    /// <summary>
+    ///     Holds the distance calculated by a proximity query.
+    /// </summary>
+    private sealed class DistanceRow
+    {
+        public double DistanceMetres { get; set; }
     }
 }

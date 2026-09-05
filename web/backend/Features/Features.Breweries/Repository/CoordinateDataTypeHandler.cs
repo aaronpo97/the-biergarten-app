@@ -7,9 +7,7 @@ using NetTopologySuite.IO;
 namespace Features.Breweries.Repository;
 
 /// <summary>
-///     Dapper <see cref="SqlMapper.TypeHandler{T}" /> that deserializes a SQL Server <c>GEOGRAPHY</c>
-///     column (read as <c>varbinary(max)</c>, see <see cref="BreweryRepository" />) into a
-///     <see cref="CoordinateData" />.
+///     Converts SQL Server geography values read as binary data into <see cref="CoordinateData" />.
 /// </summary>
 public sealed class CoordinateDataTypeHandler : SqlMapper.TypeHandler<CoordinateData>
 {

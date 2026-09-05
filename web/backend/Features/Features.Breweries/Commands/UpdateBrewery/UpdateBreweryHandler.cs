@@ -5,21 +5,20 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
-/// <summary>Handles <see cref="UpdateBreweryCommand" /> by persisting changes to an existing brewery post.</summary>
+/// <summary>
+///     Persists changes requested through <see cref="UpdateBreweryCommand" />.
+/// </summary>
 public class UpdateBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<UpdateBreweryCommand, BreweryDto>
 {
     /// <summary>
-    ///     Updates an existing brewery post. If <paramref name="request" /> has no <c>Location</c>,
-    ///     the brewery's location is cleared.
+    ///     Updates the post after confirming that the caller owns it.
     /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
-    ///     Thrown when no brewery exists with <paramref name="request" />'s <c>BreweryPostId</c>, or its
-    ///     location's <c>CityId</c> does not exist.
+    ///     Thrown if the brewery post or its requested city cannot be found.
     /// </exception>
     /// <exception cref="Domain.Exceptions.ConflictException">
-    ///     Thrown when the brewery was modified by another request since <paramref name="request" />.
-    ///     <c>RowVersion</c> was read.
+    ///     Thrown if the post has changed since its supplied row version was read.
     /// </exception>
     public async Task<BreweryDto> Handle(
         UpdateBreweryCommand request,

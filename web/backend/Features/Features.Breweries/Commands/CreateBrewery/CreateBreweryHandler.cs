@@ -5,13 +5,17 @@ using MediatR;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
-/// <summary>Handles <see cref="CreateBreweryCommand" /> by persisting a new brewery post.</summary>
+/// <summary>
+///     Persists brewery posts created through <see cref="CreateBreweryCommand" />.
+/// </summary>
 public class CreateBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<CreateBreweryCommand, BreweryDto>
 {
-    /// <summary>Creates a new brewery post, generating new identifiers for the post and its location.</summary>
+    /// <summary>
+    ///     Creates the post and its associated location with new identifiers.
+    /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
-    ///     Thrown when <paramref name="request" />'s <c>PostedById</c> or <c>Location.CityId</c> does not exist.
+    ///     Thrown if the posting user or the selected city cannot be found.
     /// </exception>
     public async Task<BreweryDto> Handle(
         CreateBreweryCommand request,
@@ -38,10 +42,6 @@ public class CreateBreweryHandler(IBreweryRepository repository)
 
         await repository.CreateAsync(entity);
 
-        // RowVersion is a DB-computed column, unset on the in-memory entity; re-fetch so callers
-        // get back the value needed for a subsequent optimistic-concurrency update. Uses
-        // CancellationToken.None since the write already committed: cancelling the caller's request
-        // at this point must not turn a successful creation into a thrown exception.
         BreweryPost created =
             await repository.GetByIdAsync(entity.BreweryPostId, CancellationToken.None)
             ?? throw new InvalidOperationException(
