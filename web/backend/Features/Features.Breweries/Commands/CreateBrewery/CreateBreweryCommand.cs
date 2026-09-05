@@ -4,8 +4,12 @@ using MediatR;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
-/// <summary>Location details for a brewery being created.</summary>
-/// <param name="Coordinates">Raw binary representation of the brewery's geographic coordinates.</param>
+/// <summary>
+///     Describes the location supplied when creating a brewery.
+/// </summary>
+/// <param name="Coordinates">
+///     Serialized geographic coordinates for the brewery.
+/// </param>
 public record CreateBreweryLocation(
     Guid CityId,
     string AddressLine1,
@@ -15,7 +19,7 @@ public record CreateBreweryLocation(
 );
 
 /// <summary>
-///     Creates a new brewery post. Bound directly from the request body of <c>POST /api/brewery</c>.
+///     Represents the application request used to create a brewery post.
 /// </summary>
 public record CreateBreweryCommand(
     Guid PostedById,
@@ -24,7 +28,9 @@ public record CreateBreweryCommand(
     CreateBreweryLocation Location
 ) : IRequest<BreweryDto>;
 
-/// <summary>Request body for <c>POST /api/brewery</c>. <c>PostedById</c> comes from the caller's JWT.</summary>
+/// <summary>
+///     Defines the client-supplied body for creating a brewery post.
+/// </summary>
 public record CreateBreweryRequest(
     string BreweryName,
     string Description,

@@ -5,11 +5,15 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetAllBreweryLocations;
 
-/// <summary>Handles <see cref="GetAllBreweryLocationsQuery" /> by retrieving all located brewery posts.</summary>
+/// <summary>
+///     Handles queries for brewery posts with locations.
+/// </summary>
 public class GetAllBreweryLocationsHandler(IBreweryRepository repository)
     : IRequestHandler<GetAllBreweryLocationsQuery, IEnumerable<BreweryWithLocationDto>>
 {
-    /// <summary>Retrieves every brewery post that has a set location.</summary>
+    /// <summary>
+    ///     Retrieves and maps every brewery post that has a location.
+    /// </summary>
     public async Task<IEnumerable<BreweryWithLocationDto>> Handle(
         GetAllBreweryLocationsQuery request,
         CancellationToken cancellationToken

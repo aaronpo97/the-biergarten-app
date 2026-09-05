@@ -3,15 +3,20 @@ using MediatR;
 
 namespace Features.Breweries.Commands.DeleteBrewery;
 
-/// <summary>Handles <see cref="DeleteBreweryCommand" /> by deleting the corresponding brewery post.</summary>
+/// <summary>
+///     Processes <see cref="DeleteBreweryCommand" /> requests.
+/// </summary>
 public class DeleteBreweryHandler(IBreweryRepository repository)
     : IRequestHandler<DeleteBreweryCommand>
 {
+    /// <summary>
+    ///     Confirms that the caller owns the post before deleting it.
+    /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
-    ///     Thrown when no brewery exists with <paramref name="request" />'s <c>BreweryPostId</c>.
+    ///     Thrown if the brewery post does not exist.
     /// </exception>
     /// <exception cref="Domain.Exceptions.ForbiddenException">
-    ///     Thrown when <paramref name="request" />'s <c>RequestingUserId</c> did not post the brewery.
+    ///     Thrown if the caller did not create the brewery post.
     /// </exception>
     public async Task Handle(DeleteBreweryCommand request, CancellationToken cancellationToken)
     {

@@ -5,11 +5,15 @@ using MediatR;
 
 namespace Features.Breweries.Queries.GetAllBreweries;
 
-/// <summary>Handles <see cref="GetAllBreweriesQuery" /> by retrieving brewery posts, newest first.</summary>
+/// <summary>
+///     Handles ordered, paged brewery-post queries.
+/// </summary>
 public class GetAllBreweriesHandler(IBreweryRepository repository)
     : IRequestHandler<GetAllBreweriesQuery, IEnumerable<BreweryDto>>
 {
-    /// <summary>Retrieves brewery posts, newest first, applying <see cref="GetAllBreweriesQuery" />'s paging.</summary>
+    /// <summary>
+    ///     Retrieves and maps the requested page of brewery posts.
+    /// </summary>
     public async Task<IEnumerable<BreweryDto>> Handle(
         GetAllBreweriesQuery request,
         CancellationToken cancellationToken

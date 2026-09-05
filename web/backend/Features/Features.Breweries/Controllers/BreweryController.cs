@@ -13,19 +13,25 @@ using Shared.Contracts;
 
 namespace Features.Breweries.Controllers;
 
-/// <summary>Exposes CRUD operations for brewery posts.</summary>
+/// <summary>
+///     Provides HTTP endpoints for reading and managing brewery posts.
+/// </summary>
 /// <remarks>
-///     Requires JWT authentication by default; <see cref="GetById" /> and <see cref="GetAll" /> opt out via
-///     <c>[AllowAnonymous]</c>.
+///     Requests require JWT authentication unless the endpoint allows anonymous access.
 /// </remarks>
+///
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = "JWT")]
 public class BreweryController(IMediator mediator) : ControllerBase
 {
-    /// <summary>Retrieves a single brewery post by ID.</summary>
-    /// <remarks>Allows anonymous access.</remarks>
-    /// <returns><c>200 OK</c> with the brewery if found; otherwise <c>404 Not Found</c>.</returns>
+    /// <summary>
+    ///     Returns the brewery post identified by <paramref name="id" />.
+    /// </summary>
+    /// <remarks>This endpoint permits anonymous access.</remarks>
+    /// <returns>
+    ///     A successful response containing the post, or <c>404 Not Found</c> when it is absent.
+    /// </returns>
     [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> GetById(Guid id)
@@ -43,10 +49,16 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Retrieves brewery posts, newest first.</summary>
-    /// <param name="limit">Maximum number of breweries to return. Unbounded if <see langword="null"/>.</param>
-    /// <param name="offset">Number of breweries to skip. Treated as zero if <see langword="null"/>.</param>
-    /// <remarks>Allows anonymous access.</remarks>
+    /// <summary>
+    ///     Returns brewery posts in reverse chronological order.
+    /// </summary>
+    /// <param name="limit">
+    ///     Limits the number of returned posts; <see langword="null" /> leaves it unlimited.
+    /// </param>
+    /// <param name="offset">
+    ///     Skips this many posts; <see langword="null" /> means none.
+    /// </param>
+    /// <remarks>This endpoint permits anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<ResponseBody<IEnumerable<BreweryDto>>>> GetAll(
@@ -66,11 +78,15 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Retrieves all brewery posts that have a set location.</summary>
-    /// <remarks>Allows anonymous access.</remarks>
+    /// <summary>
+    ///     Returns all brewery posts with an associated location.
+    /// </summary>
+    /// <remarks>This endpoint permits anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetAllLocations()
+    public async Task<
+        ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>
+    > GetAllLocations()
     {
         IEnumerable<BreweryWithLocationDto> breweries = await mediator.Send(
             new GetAllBreweryLocationsQuery()
@@ -84,14 +100,24 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Retrieves brewery posts with a set location within range of the given coordinates, nearest first.</summary>
-    /// <param name="latitude">The origin latitude, in decimal degrees.</param>
-    /// <param name="longitude">The origin longitude, in decimal degrees.</param>
-    /// <param name="rangeInMetres">The maximum distance, in metres, from the origin coordinates.</param>
-    /// <remarks>Allows anonymous access.</remarks>
+    /// <summary>
+    ///     Returns located brewery posts within the requested radius, ordered by proximity.
+    /// </summary>
+    /// <param name="latitude">
+    ///     Identifies the origin latitude in decimal degrees.
+    /// </param>
+    /// <param name="longitude">
+    ///     Identifies the origin longitude in decimal degrees.
+    /// </param>
+    /// <param name="rangeInMetres">
+    ///     Sets the maximum distance from the origin in metres.
+    /// </param>
+    /// <remarks>This endpoint permits anonymous access.</remarks>
     [AllowAnonymous]
     [HttpGet("locations/nearby")]
-    public async Task<ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>> GetLocationsWithinRange(
+    public async Task<
+        ActionResult<ResponseBody<IEnumerable<BreweryWithLocationDto>>>
+    > GetLocationsWithinRange(
         [FromQuery] double latitude,
         [FromQuery] double longitude,
         [FromQuery] double rangeInMetres
@@ -109,8 +135,10 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Creates a new brewery post.</summary>
-    /// <returns><c>201 Created</c> with the newly created brewery.</returns>
+    /// <summary>
+    ///     Creates a brewery post for the authenticated user.
+    /// </summary>
+    /// <returns>A <c>201 Created</c> response containing the new post.</returns>
     [HttpPost]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Create(
         [FromBody] CreateBreweryRequest request
@@ -134,12 +162,15 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Updates an existing brewery post.</summary>
-    /// <param name="id">Must match <paramref name="request" />'s <c>BreweryPostId</c>.</param>
+    /// <summary>
+    ///     Updates a brewery post owned by the authenticated user.
+    /// </summary>
+    /// <param name="id">
+    ///     Must equal the brewery post identifier in <paramref name="request" />.
+    /// </param>
     /// <returns>
-    ///     <c>200 OK</c> with the updated brewery; <c>400 Bad Request</c> if the route ID does not match the
-    ///     payload ID; <c>404 Not Found</c> if the brewery or its <c>CityId</c> does not exist; or
-    ///     <c>409 Conflict</c> if the brewery was modified since <c>request.RowVersion</c> was read.
+    ///     A successful response containing the updated post, or an error for an invalid ID,
+    ///     missing resource, or stale row version.
     /// </returns>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ResponseBody<BreweryDto>>> Update(
@@ -170,8 +201,12 @@ public class BreweryController(IMediator mediator) : ControllerBase
         );
     }
 
-    /// <summary>Deletes a brewery post.</summary>
-    /// <returns><c>200 OK</c> confirming the deletion; <c>404 Not Found</c> if no brewery exists with <paramref name="id" />.</returns>
+    /// <summary>
+    ///     Deletes a brewery post owned by the authenticated user.
+    /// </summary>
+    /// <returns>
+    ///     A confirmation response, or <c>404 Not Found</c> if the post is absent.
+    /// </returns>
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ResponseBody>> Delete(Guid id)
     {

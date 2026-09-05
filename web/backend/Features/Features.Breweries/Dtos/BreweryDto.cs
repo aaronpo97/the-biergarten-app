@@ -2,8 +2,12 @@ using Domain.Entities;
 
 namespace Features.Breweries.Dtos;
 
-/// <summary>Location details of a brewery, as returned by the API.</summary>
-/// <param name="Coordinates">The brewery's geographic coordinates, in a raw binary representation.</param>
+/// <summary>
+///     Represents location data returned for a brewery post.
+/// </summary>
+/// <param name="Coordinates">
+///     Contains the serialized geographic coordinates, when available.
+/// </param>
 public record BreweryLocationDto(
     Guid BreweryPostLocationId,
     Guid CityId,
@@ -18,10 +22,18 @@ public record BreweryLocationDto(
     CoordinateData? Coordinates
 );
 
-/// <summary>A brewery post, as returned by the API.</summary>
-/// <param name="UpdatedAt">The date and time of the last edit, or <see langword="null"/> if never edited.</param>
-/// <param name="RowVersion">The row-version/concurrency token used to detect conflicting concurrent updates.</param>
-/// <param name="Location">The brewery's location, or <see langword="null"/> if none has been set.</param>
+/// <summary>
+///     Represents a brewery post returned by the API.
+/// </summary>
+/// <param name="UpdatedAt">
+///     Records the most recent update time, if the post has been updated.
+/// </param>
+/// <param name="RowVersion">
+///     Provides the concurrency token required for updates.
+/// </param>
+/// <param name="Location">
+///     Contains the post's location, when one is available.
+/// </param>
 public record BreweryDto(
     Guid BreweryPostId,
     Guid PostedById,
@@ -32,9 +44,12 @@ public record BreweryDto(
     byte[]? RowVersion,
     BreweryLocationDto? Location
 );
+
+/// <summary>
+///     Represents the location-focused result returned by brewery searches.
+/// </summary>
 /// <param name="DistanceMetres">
-///     The distance, in metres, from a query's origin point, or <see langword="null"/> for queries with no
-///     origin point (e.g. <c>GET /api/brewery/locations</c>).
+///     Contains the distance from the search origin in metres, when applicable.
 /// </param>
 public record BreweryWithLocationDto(
     Guid BreweryPostId,

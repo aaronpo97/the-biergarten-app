@@ -3,69 +3,80 @@ using Domain.Entities;
 namespace Features.Breweries.Repository;
 
 /// <summary>
-///     Repository for CRUD operations on brewery post records.
+///     Defines persistence operations for brewery posts.
 /// </summary>
 public interface IBreweryRepository
 {
     /// <summary>
-    ///     Retrieves a brewery post by ID, joined to its location. Returns <c>null</c> if no brewery post
-    ///     exists with the given ID, or if it has no associated location.
+    ///     Gets a brewery post and its location data by identifier.
     /// </summary>
     Task<BreweryPost?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Retrieves the <c>PostedById</c> of the brewery post with the given ID, without joining its
-    ///     location. Returns <c>null</c> if no brewery post exists with the given ID.
+    ///     Gets the identifier of the user who created a brewery post.
     /// </summary>
     Task<Guid?> GetPostedByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Retrieves all brewery posts, optionally paginated, ordered by creation date descending. Posts
-    ///     without a location are included, with <see cref="BreweryPost.Location" /> left <c>null</c>.
+    ///     Gets brewery posts ordered by creation time, with optional paging.
     /// </summary>
-    /// <param name="limit">Maximum number of rows to return. Unbounded if <see langword="null" />.</param>
-    /// <param name="offset">Number of rows to skip. Treated as zero if <see langword="null" />.</param>
+    /// <param name="limit">
+    ///     Limits returned posts; <see langword="null" /> applies no limit.
+    /// </param>
+    /// <param name="offset">
+    ///     Skips returned posts; <see langword="null" /> skips none.
+    /// </param>
     Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset);
 
     /// <summary>
-    ///     Retrieves brewery posts with a set location within <paramref name="rangeInMetres" /> of
-    ///     <paramref name="coords" />, nearest first. Posts without coordinates are excluded.
+    ///     Gets located brewery posts within a radius, ordered by distance.
     /// </summary>
-    /// <param name="coords">The origin point to measure distance from.</param>
-    /// <param name="rangeInMetres">The maximum distance, in metres, from <paramref name="coords" />.</param>
-    Task<IEnumerable<BreweryPost>> GetAllLocationsWithinRange(CoordinateData coords, double rangeInMetres);
+    /// <param name="coords">
+    ///     Sets the point from which distance is measured.
+    /// </param>
+    /// <param name="rangeInMetres">
+    ///     Sets the maximum search distance in metres.
+    /// </param>
+    Task<IEnumerable<BreweryPost>> GetAllLocationsWithinRange(
+        CoordinateData coords,
+        double rangeInMetres
+    );
 
     /// <summary>
-    ///     Retrieves all brewery posts that have a set location, ordered by <c>BreweryPostId</c>. Posts
-    ///     without coordinates are excluded.
+    ///     Gets brewery posts with location data.
     /// </summary>
     Task<IEnumerable<BreweryPost>> GetAllLocations();
 
     /// <summary>
-    ///     Updates a brewery post's name and description, and upserts or clears its location, enforcing
-    ///     optimistic concurrency via <paramref name="brewery" />'s <c>RowVersion</c>: the update is rejected
-    ///     if the row was modified since <c>RowVersion</c> was read. When <paramref name="brewery" />'s
-    ///     <c>Location</c> is <c>null</c>, any existing location for the brewery is removed.
-    ///     Returns the freshly persisted brewery, including its new <c>RowVersion</c>.
+    ///     Saves a brewery post and its location using optimistic concurrency.
     /// </summary>
     /// <exception cref="Domain.Exceptions.NotFoundException">
-    ///     Thrown when no brewery exists with the given ID, or the given location's <c>CityId</c> does not
-    ///     exist.
+    ///     Thrown if the brewery post or its requested city cannot be found.
     /// </exception>
     /// <exception cref="Domain.Exceptions.ConflictException">
-    ///     Thrown when <paramref name="brewery" />'s <c>RowVersion</c> no longer matches the stored row (it was
-    ///     modified by another request since it was last read).
+    ///     Thrown if the supplied row version is no longer current.
     /// </exception>
-    Task<BreweryPost> UpdateAsync(BreweryPost brewery, CancellationToken cancellationToken = default);
+    Task<BreweryPost> UpdateAsync(
+        BreweryPost brewery,
+        CancellationToken cancellationToken = default
+    );
 
-    /// <summary>Deletes a brewery post by ID. Its location and photos are removed via cascading foreign keys.</summary>
-    /// <exception cref="Domain.Exceptions.NotFoundException">Thrown when no brewery exists with the given <paramref name="id" />.</exception>
+    /// <summary>
+    ///     Deletes a brewery post and its dependent records.
+    /// </summary>
+    /// <exception cref="Domain.Exceptions.NotFoundException">
+    ///     Thrown if the brewery post cannot be found.
+    /// </exception>
     Task DeleteAsync(Guid id);
 
-    /// <summary>Creates a new brewery post, including its location details.</summary>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="brewery" /> has no <c>Location</c>.</exception>
+    /// <summary>
+    ///     Creates a brewery post and its required location.
+    /// </summary>
+    /// <exception cref="ArgumentException">
+    ///     Thrown if <paramref name="brewery" /> has no location.
+    /// </exception>
     /// <exception cref="Domain.Exceptions.NotFoundException">
-    ///     Thrown when <paramref name="brewery" />'s <c>PostedById</c> or <c>Location.CityId</c> does not exist.
+    ///     Thrown if the posting user or location city cannot be found.
     /// </exception>
     Task CreateAsync(BreweryPost brewery);
 }

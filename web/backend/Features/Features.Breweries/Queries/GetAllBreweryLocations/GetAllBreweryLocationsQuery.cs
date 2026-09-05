@@ -4,7 +4,6 @@ using MediatR;
 namespace Features.Breweries.Queries.GetAllBreweryLocations;
 
 /// <summary>
-///     Retrieves all brewery posts that have a set location. Bound directly from
-///     <c>GET /api/brewery/locations</c>.
+///     Requests brewery posts that include a location.
 /// </summary>
 public record GetAllBreweryLocationsQuery : IRequest<IEnumerable<BreweryWithLocationDto>>;

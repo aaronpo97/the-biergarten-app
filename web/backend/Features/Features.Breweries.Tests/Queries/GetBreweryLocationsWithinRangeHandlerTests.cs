@@ -50,8 +50,10 @@ public class GetBreweryLocationsWithinRangeHandlerTests
     {
         BreweryPost[] breweries =
         [
-            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "Nearby A" },
-            new BreweryPost { BreweryPostId = Guid.NewGuid(), BreweryName = "Nearby B" },
+            new()
+                { BreweryPostId = Guid.NewGuid(), BreweryName = "Nearby A" },
+            new()
+                { BreweryPostId = Guid.NewGuid(), BreweryName = "Nearby B" },
         ];
         _repoMock
             .Setup(r => r.GetAllLocationsWithinRange(It.IsAny<CoordinateData>(), It.IsAny<double>()))

@@ -2,7 +2,9 @@ using FluentValidation;
 
 namespace Features.Breweries.Commands.CreateBrewery;
 
-/// <summary>Validates <see cref="CreateBreweryCommand" />.</summary>
+/// <summary>
+///     Applies creation rules to <see cref="CreateBreweryCommand" />.
+/// </summary>
 public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 {
     public CreateBreweryValidator()
@@ -27,7 +29,6 @@ public class CreateBreweryValidator : AbstractValidator<CreateBreweryCommand>
 
         RuleFor(x => x.Location.AddressLine1)
             .NotEmpty()
-            .When(x => x.Location is not null)
             .WithMessage("Address line 1 is required.")
             .MaximumLength(256)
             .WithMessage("Address line 1 cannot exceed 256 characters.");

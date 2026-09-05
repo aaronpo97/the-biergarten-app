@@ -17,10 +17,8 @@ public class CreateBreweryHandlerTests
         _handler = new CreateBreweryHandler(_repoMock.Object);
     }
 
-    private static CreateBreweryLocation ValidLocation()
-    {
-        return new CreateBreweryLocation(Guid.NewGuid(), "123 Main St", null, "12345", null);
-    }
+    private static CreateBreweryLocation ValidLocation() =>
+        new(Guid.NewGuid(), "123 Main St", null, "12345", null);
 
     [Fact]
     public async Task Handle_PersistsEntity_WithNewIdsAndCreatedAt()

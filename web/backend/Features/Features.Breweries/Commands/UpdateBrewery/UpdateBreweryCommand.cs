@@ -4,11 +4,15 @@ using MediatR;
 
 namespace Features.Breweries.Commands.UpdateBrewery;
 
-/// <summary>Location details for a brewery being updated.</summary>
+/// <summary>
+///     Describes the location supplied when updating a brewery.
+/// </summary>
 /// <param name="BreweryPostLocationId">
-///     Identifier of the existing location row, if any; a new row is created if none exists yet.
+///     Identifies the existing location; a new location is created when needed.
 /// </param>
-/// <param name="Coordinates">Raw binary representation of the brewery's geographic coordinates.</param>
+/// <param name="Coordinates">
+///     Serialized geographic coordinates for the brewery.
+/// </param>
 public record UpdateBreweryLocation(
     Guid BreweryPostLocationId,
     Guid CityId,
@@ -19,9 +23,8 @@ public record UpdateBreweryLocation(
 );
 
 /// <summary>
-///     Updates an existing brewery post. A <c>null</c> <see cref="Location" /> clears the brewery's location.
-///     <see cref="RowVersion" /> must be the row-version last read for this brewery (e.g. from a prior
-///     <c>GET</c>); the update is rejected with a <c>409 Conflict</c> if the brewery was modified since then.
+///     Represents a concurrency-protected change to an existing brewery post.
+///     A <see langword="null" /> <see cref="Location" /> removes the existing location.
 /// </summary>
 public record UpdateBreweryCommand(
     Guid BreweryPostId,
@@ -32,7 +35,9 @@ public record UpdateBreweryCommand(
     UpdateBreweryLocation? Location
 ) : IRequest<BreweryDto>;
 
-/// <summary>Request body for <c>PUT /api/brewery/{id}</c>.</summary>
+/// <summary>
+///     Defines the client-supplied body for updating a brewery post.
+/// </summary>
 public record UpdateBreweryRequest(
     Guid BreweryPostId,
     byte[] RowVersion,
@@ -40,4 +45,3 @@ public record UpdateBreweryRequest(
     string Description,
     UpdateBreweryLocation? Location
 );
-
