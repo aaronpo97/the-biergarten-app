@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using Database.Connection;
-using Features.Locations.Dtos;
 using Features.Locations.Repository;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,11 +21,6 @@ public class BrewerySteps(ScenarioContext scenario) : ApiStepsBase(scenario)
     private const string FixtureStateProvinceName = "Fixture State";
     private const string FixtureStateProvinceIsoCode = "FX-TS";
     private const string FixtureCityName = "Fixture City";
-
-    // GetOrCreateCityIdAsync is not fully race-safe under concurrent callers creating the same
-    // city (see its remarks); scenarios run in parallel across feature classes, so provisioning
-    // the shared fixture city is serialized the same way AuthSteps serializes its fixture account.
-    private static readonly SemaphoreSlim CityProvisioningLock = new(1, 1);
 
     private HttpRequestMessage NewAuthenticatedRequest(HttpMethod method, string url)
     {
@@ -53,24 +47,21 @@ public class BrewerySteps(ScenarioContext scenario) : ApiStepsBase(scenario)
             .Services.GetRequiredService<ISqlConnectionFactory>();
         LocationRepository repository = new(connectionFactory);
 
-        CityLocation fixtureCity = new(
-            FixtureCityName,
-            FixtureStateProvinceName,
-            FixtureStateProvinceIsoCode,
-            FixtureCountryName,
-            FixtureCountryIsoCode
-        );
+        Guid countryId =
+            await repository.GetCountryIdAsync(FixtureCountryIsoCode)
+            ?? await repository.CreateCountryAsync(FixtureCountryName, FixtureCountryIsoCode);
 
-        await CityProvisioningLock.WaitAsync();
-        Guid cityId;
-        try
-        {
-            cityId = await repository.GetOrCreateCityIdAsync(fixtureCity);
-        }
-        finally
-        {
-            CityProvisioningLock.Release();
-        }
+        Guid stateProvinceId =
+            await repository.GetStateProvinceIdAsync(FixtureStateProvinceIsoCode)
+            ?? await repository.CreateStateProvinceAsync(
+                FixtureStateProvinceName,
+                FixtureStateProvinceIsoCode,
+                countryId
+            );
+
+        Guid cityId =
+            await repository.GetCityIdAsync(FixtureCityName, FixtureStateProvinceIsoCode)
+            ?? await repository.CreateCityAsync(FixtureCityName, stateProvinceId);
 
         Scenario[CityIdKey] = cityId;
     }

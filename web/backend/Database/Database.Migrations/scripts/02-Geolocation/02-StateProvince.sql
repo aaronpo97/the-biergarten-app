@@ -5,10 +5,10 @@ CREATE TABLE Geolocation.StateProvince
 
     StateProvinceName NVARCHAR(100) NOT NULL,
 
-    ISO3166_2 CHAR(6) NOT NULL,
-    -- eg 'US-CA' for California, 'CA-ON' for Ontario
-
     CountryID UNIQUEIDENTIFIER NOT NULL,
+    
+    -- eg 'US-CA' for California, 'CA-ON' for Ontario
+    ISO3166_2 CHAR(6) NOT NULL,
 
     RowVersion ROWVERSION,
 
@@ -17,6 +17,9 @@ CREATE TABLE Geolocation.StateProvince
 
     CONSTRAINT AK_StateProvince_ISO3166_2
         UNIQUE (ISO3166_2),
+
+    CONSTRAINT AK_StateProvince_Country
+        UNIQUE (StateProvinceName, CountryID),
 
     CONSTRAINT FK_StateProvince_Country
         FOREIGN KEY (CountryID)

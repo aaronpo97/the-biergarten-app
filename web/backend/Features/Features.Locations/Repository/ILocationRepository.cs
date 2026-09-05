@@ -2,15 +2,21 @@ using Features.Locations.Dtos;
 
 namespace Features.Locations.Repository;
 
-/// <summary>
-///     Resolves the Country/StateProvince/City location hierarchy shared by features that attach a
-///     location to a record (e.g. brewery posts, and eventually user accounts).
-/// </summary>
 public interface ILocationRepository
 {
-    /// <summary>
-    ///     Resolves <paramref name="location" /> to a City ID, creating the Country, StateProvince,
-    ///     and/or City rows if any part of the chain doesn't exist yet.
-    /// </summary>
-    Task<Guid> GetOrCreateCityIdAsync(CityLocation location);
+    Task<CityDto?> GetCityByIdAsync(Guid cityId);
+
+    Task<IEnumerable<CityDto>> GetAllCitiesAsync(int? limit, int? offset);
+
+    Task<Guid?> GetCountryIdAsync(string isoCode);
+
+    Task<Guid> CreateCountryAsync(string countryName, string isoCode);
+
+    Task<Guid?> GetStateProvinceIdAsync(string isoCode);
+
+    Task<Guid> CreateStateProvinceAsync(string stateProvinceName, string isoCode, Guid countryId);
+
+    Task<Guid?> GetCityIdAsync(string cityName, string stateProvinceIsoCode);
+
+    Task<Guid> CreateCityAsync(string cityName, Guid stateProvinceId);
 }

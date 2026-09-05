@@ -1,153 +1,61 @@
 using System.Data.Common;
 using Dapper;
 using Database.Connection;
-using Domain.Exceptions;
 using Features.Locations.Dtos;
 
 namespace Features.Locations.Repository;
 
-/// <summary>
-///     Dapper-based implementation of <see cref="ILocationRepository" />.
-/// </summary>
 public class LocationRepository(ISqlConnectionFactory connectionFactory)
     : DapperRepository(connectionFactory),
         ILocationRepository
 {
-    /// <inheritdoc />
-    /// <remarks>
-    ///     Not fully race-safe under concurrent callers for the same new city (neither was the stored
-    ///     procedure this replaces, since <c>City</c> has no unique constraint on name+state): a
-    ///     concurrent duplicate insert can succeed rather than being rejected. Country/StateProvince
-    ///     creation guards against this the same way the original stored procedures did, via an
-    ///     existence pre-check immediately before the insert.
-    /// </remarks>
-    public async Task<Guid> GetOrCreateCityIdAsync(CityLocation location)
+    private const string CityDtoSelect = """
+        SELECT
+            c.CityID AS CityId,
+            c.CityName,
+            sp.StateProvinceName,
+            sp.ISO3166_2 AS StateProvinceCode,
+            co.CountryName,
+            co.ISO3166_1 AS CountryCode,
+            COUNT(bpl.BreweryPostLocationID) AS BreweryCount
+        FROM Geolocation.City c
+        INNER JOIN Geolocation.StateProvince sp ON sp.StateProvinceID = c.StateProvinceID
+        INNER JOIN Geolocation.Country co ON co.CountryID = sp.CountryID
+        LEFT JOIN Brewery.BreweryPostLocation bpl ON bpl.CityID = c.CityID
+        """;
+
+    private const string CityDtoGroupBy = """
+        GROUP BY c.CityID, c.CityName, sp.StateProvinceName, sp.ISO3166_2, co.CountryName, co.ISO3166_1
+        """;
+
+    public async Task<CityDto?> GetCityByIdAsync(Guid cityId)
     {
-        await EnsureCountryExistsAsync(location.CountryName, location.CountryIsoCode);
-        await EnsureStateProvinceExistsAsync(
-            location.StateProvinceName,
-            location.StateProvinceIsoCode,
-            location.CountryIsoCode
+        await using DbConnection connection = await CreateConnection();
+        return await connection.QuerySingleOrDefaultAsync<CityDto>(
+            $"""
+            {CityDtoSelect}
+            WHERE c.CityID = @CityId
+            {CityDtoGroupBy}
+            """,
+            new { CityId = cityId }
         );
-
-        Guid? cityId = await GetCityIdAsync(location.CityName, location.StateProvinceIsoCode);
-        if (cityId is not null)
-            return cityId.Value;
-
-        Guid stateProvinceId =
-            await GetStateProvinceIdAsync(location.StateProvinceIsoCode)
-            ?? throw new NotFoundException(
-                $"State/province '{location.StateProvinceIsoCode}' not found."
-            );
-
-        await using DbConnection connection = await CreateConnection();
-
-        bool cityExists =
-            await connection.ExecuteScalarAsync<int?>(
-                """
-                SELECT 1
-                FROM Geolocation.City
-                WHERE CityName = @CityName AND StateProvinceID = @StateProvinceId
-                """,
-                new { location.CityName, StateProvinceId = stateProvinceId }
-            )
-            is not null;
-
-        if (!cityExists)
-            await connection.ExecuteAsync(
-                """
-                INSERT INTO Geolocation.City (StateProvinceID, CityName)
-                VALUES (@StateProvinceId, @CityName)
-                """,
-                new { StateProvinceId = stateProvinceId, location.CityName }
-            );
-
-        return await GetCityIdAsync(location.CityName, location.StateProvinceIsoCode)
-            ?? throw new InvalidOperationException(
-                $"City '{location.CityName}' was not found after creation."
-            );
     }
 
-    private async Task EnsureCountryExistsAsync(string countryName, string isoCode)
+    public async Task<IEnumerable<CityDto>> GetAllCitiesAsync(int? limit, int? offset)
     {
-        if (await GetCountryIdAsync(isoCode) is not null)
-            return;
-
         await using DbConnection connection = await CreateConnection();
-
-        bool exists =
-            await connection.ExecuteScalarAsync<int?>(
-                """
-                SELECT 1
-                FROM Geolocation.Country
-                WHERE ISO3166_1 = @ISO3166_1
-                """,
-                new { ISO3166_1 = isoCode }
-            )
-            is not null;
-
-        if (!exists)
-            // A concurrent caller may create this country between the check above and here; that
-            // race is tolerated (the resulting duplicate row, if any, is out of scope for this method).
-            await connection.ExecuteAsync(
-                """
-                INSERT INTO Geolocation.Country (CountryName, ISO3166_1)
-                VALUES (@CountryName, @ISO3166_1)
-                """,
-                new { CountryName = countryName, ISO3166_1 = isoCode }
-            );
+        return await connection.QueryAsync<CityDto>(
+            $"""
+            {CityDtoSelect}
+            {CityDtoGroupBy}
+            ORDER BY c.CityName
+            OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            """,
+            new { Offset = offset ?? 0, Limit = limit ?? int.MaxValue }
+        );
     }
 
-    /// <summary>
-    ///     Ensures a StateProvince row exists for <paramref name="isoCode" />.
-    /// </summary>
-    /// <exception cref="NotFoundException">
-    ///     Thrown when no Country exists for <paramref name="countryIsoCode" />. Not expected in normal
-    ///     operation, since callers ensure the Country exists first — retained as a defensive translation
-    ///     in case of a race between concurrent callers.
-    /// </exception>
-    private async Task EnsureStateProvinceExistsAsync(
-        string stateProvinceName,
-        string isoCode,
-        string countryIsoCode
-    )
-    {
-        if (await GetStateProvinceIdAsync(isoCode) is not null)
-            return;
-
-        Guid countryId =
-            await GetCountryIdAsync(countryIsoCode)
-            ?? throw new NotFoundException($"Country '{countryIsoCode}' not found.");
-
-        await using DbConnection connection = await CreateConnection();
-
-        bool exists =
-            await connection.ExecuteScalarAsync<int?>(
-                """
-                SELECT 1
-                FROM Geolocation.StateProvince
-                WHERE ISO3166_2 = @ISO3166_2
-                """,
-                new { ISO3166_2 = isoCode }
-            )
-            is not null;
-
-        if (!exists)
-            await connection.ExecuteAsync(
-                """
-                INSERT INTO Geolocation.StateProvince (StateProvinceName, ISO3166_2, CountryID)
-                VALUES (@StateProvinceName, @ISO3166_2, @CountryId)
-                """,
-                new
-                {
-                    StateProvinceName = stateProvinceName,
-                    ISO3166_2 = isoCode,
-                    CountryId = countryId,
-                }
-            );
-    }
-
-    private async Task<Guid?> GetCountryIdAsync(string isoCode)
+    public async Task<Guid?> GetCountryIdAsync(string isoCode)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
@@ -160,7 +68,20 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    private async Task<Guid?> GetStateProvinceIdAsync(string isoCode)
+    public async Task<Guid> CreateCountryAsync(string countryName, string isoCode)
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<Guid>(
+            """
+            INSERT INTO Geolocation.Country (CountryName, ISO3166_1)
+            OUTPUT INSERTED.CountryID
+            VALUES (@CountryName, @ISO3166_1)
+            """,
+            new { CountryName = countryName, ISO3166_1 = isoCode }
+        );
+    }
+
+    public async Task<Guid?> GetStateProvinceIdAsync(string isoCode)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
@@ -173,7 +94,29 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
-    private async Task<Guid?> GetCityIdAsync(string cityName, string stateProvinceIsoCode)
+    public async Task<Guid> CreateStateProvinceAsync(
+        string stateProvinceName,
+        string isoCode,
+        Guid countryId
+    )
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<Guid>(
+            """
+            INSERT INTO Geolocation.StateProvince (StateProvinceName, ISO3166_2, CountryID)
+            OUTPUT INSERTED.StateProvinceID
+            VALUES (@StateProvinceName, @ISO3166_2, @CountryId)
+            """,
+            new
+            {
+                StateProvinceName = stateProvinceName,
+                ISO3166_2 = isoCode,
+                CountryId = countryId,
+            }
+        );
+    }
+
+    public async Task<Guid?> GetCityIdAsync(string cityName, string stateProvinceIsoCode)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.ExecuteScalarAsync<Guid?>(
@@ -184,6 +127,19 @@ public class LocationRepository(ISqlConnectionFactory connectionFactory)
             WHERE c.CityName = @CityName AND sp.ISO3166_2 = @StateProvinceCode
             """,
             new { CityName = cityName, StateProvinceCode = stateProvinceIsoCode }
+        );
+    }
+
+    public async Task<Guid> CreateCityAsync(string cityName, Guid stateProvinceId)
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<Guid>(
+            """
+            INSERT INTO Geolocation.City (StateProvinceID, CityName)
+            OUTPUT INSERTED.CityID
+            VALUES (@StateProvinceId, @CityName)
+            """,
+            new { StateProvinceId = stateProvinceId, CityName = cityName }
         );
     }
 }
