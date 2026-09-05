@@ -18,8 +18,9 @@ erDiagram
         uniqueidentifier CountryID FK
     }
 
+    %% CityName + StateProvinceID form a composite unique constraint (AK_CityStateProvince)
     City {
         uniqueidentifier CityID PK
-        nvarchar CityName
-        uniqueidentifier StateProvinceID FK
+        nvarchar CityName UK
+        uniqueidentifier StateProvinceID FK,UK
     }
