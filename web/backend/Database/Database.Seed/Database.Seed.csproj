@@ -27,6 +27,9 @@
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.FileUpload\Infrastructure.FileUpload.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None CopyToOutputDirectory="PreserveNewest" Include="SeedData\biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite" />
+        <None
+            CopyToOutputDirectory="PreserveNewest"
+            Include="SeedData\biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite"
+        />
     </ItemGroup>
 </Project>

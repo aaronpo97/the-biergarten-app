@@ -1,11 +1,16 @@
 using System.Text.Json;
-using Database.Seed.PipelineData;
+
+using Dapper;
+
+using Database.Seed.SourceDataModels;
+
 using Microsoft.Data.Sqlite;
 
 namespace Database.Seed.Sqlite;
 
 public sealed record SeedData(
-    IReadOnlyList<BreweryRecord> Breweries,
+    IReadOnlyList<City> Cities,
+    IReadOnlyList<BreweryResult> Breweries,
     IReadOnlyList<UserRecord> Users
 );
 
@@ -22,190 +27,225 @@ public sealed class PipelineSeedDataReader
     /// Reads breweries and users in a single connection, loading the cities
     /// lookup only once and sharing it between both reads.
     /// </summary>
-    public async Task<SeedData> ReadSeedDataAsync(CancellationToken cancellationToken = default)
+    public async Task<SeedData> ReadSeedDataAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync(cancellationToken);
 
-        IReadOnlyDictionary<long, City> cities = await ReadCitiesAsync(
+        IReadOnlyDictionary<int, City> cities = await ReadCitiesAsync(
             connection,
             cancellationToken
         );
 
-        IReadOnlyList<BreweryRecord> breweries = await ReadBreweryRecordsAsync(
+        IReadOnlyList<BreweryResult> breweries = await ReadBreweryRecordsAsync(
             connection,
             cities,
             cancellationToken
         );
+
         IReadOnlyList<UserRecord> users = await ReadUserRecordsAsync(
             connection,
             cities,
             cancellationToken
         );
 
-        return new SeedData(breweries, users);
+        return new SeedData([.. cities.Values], breweries, users);
     }
 
-    private static async Task<IReadOnlyList<BreweryRecord>> ReadBreweryRecordsAsync(
+    private sealed record BreweryRow(
+        int Id,
+        string NameEn,
+        string DescriptionEn,
+        string NameLocal,
+        string DescriptionLocal,
+        int AddressId,
+        int CityId,
+        double Longitude,
+        double Latitude,
+        string AddressLine1,
+        string PostalCode
+    );
+
+    private static async Task<IReadOnlyList<BreweryResult>> ReadBreweryRecordsAsync(
         SqliteConnection connection,
-        IReadOnlyDictionary<long, City> cities,
+        IReadOnlyDictionary<int, City> cities,
         CancellationToken cancellationToken
     )
     {
         const string sql = """
-            SELECT b.name_en, b.description_en, b.name_local, b.description_local,
-                   ba.city_id, ba.longitude, ba.latitude, ba.address_line1, ba.postal_code
-            FROM breweries b
-            JOIN brewery_addresses ba ON ba.brewery_id = b.id;
+            SELECT
+                b.id                 AS Id,
+                b.name_en            AS NameEn,
+                b.description_en     AS DescriptionEn,
+                b.name_local         AS NameLocal,
+                b.description_local  AS DescriptionLocal,
+                ba.id                AS AddressId,
+                ba.city_id           AS CityId,
+                ba.longitude         AS Longitude,
+                ba.latitude          AS Latitude,
+                ba.address_line1     AS AddressLine1,
+                ba.postal_code       AS PostalCode
+            FROM
+                breweries b
+            INNER JOIN
+                brewery_addresses ba ON ba.brewery_id = b.id;
             """;
 
-        await using SqliteCommand command = new(sql, connection);
-        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
+        CommandDefinition command = new(sql, cancellationToken: cancellationToken);
+        IEnumerable<BreweryRow> rows = await connection.QueryAsync<BreweryRow>(command);
 
-        const int nameEnIndex = 0;
-        const int descriptionEnIndex = 1;
-        const int nameLocalIndex = 2;
-        const int descriptionLocalIndex = 3;
-        const int cityIdIndex = 4;
-        const int longitudeIndex = 5;
-        const int latitudeIndex = 6;
-        const int addressLine1Index = 7;
-        const int postalCodeIndex = 8;
-
-        List<BreweryRecord> records = [];
-        while (await reader.ReadAsync(cancellationToken))
-            records.Add(
-                new BreweryRecord
+        return [.. rows.Select(row => new BreweryResult
+            {
+                Id = row.Id,
+                NameEn = row.NameEn,
+                DescriptionEn = row.DescriptionEn,
+                NameLocal = row.NameLocal,
+                DescriptionLocal = row.DescriptionLocal,
+                Address = new BreweryAddress
                 {
-                    Brewery = new BreweryResult
-                    {
-                        NameEn = reader.GetString(nameEnIndex),
-                        DescriptionEn = reader.GetString(descriptionEnIndex),
-                        NameLocal = reader.GetString(nameLocalIndex),
-                        DescriptionLocal = reader.GetString(descriptionLocalIndex),
-                    },
-                    Address = new BreweryAddress
-                    {
-                        City = cities[reader.GetInt64(cityIdIndex)],
-                        Longitude = reader.GetDouble(longitudeIndex),
-                        Latitude = reader.GetDouble(latitudeIndex),
-                        AddressLine1 = reader.GetString(addressLine1Index),
-                        PostalCode = reader.GetString(postalCodeIndex),
-                    },
-                }
-            );
-
-        return records;
+                    Id = row.AddressId,
+                    CityId = row.CityId,
+                    BreweryId = row.Id,
+                    Longitude = row.Longitude,
+                    Latitude = row.Latitude,
+                    AddressLine1 = row.AddressLine1,
+                    PostalCode = row.PostalCode,
+                    City = cities[row.CityId],
+                },
+            })];
     }
+
+    private sealed record UserRow(
+        int Id,
+        string FirstName,
+        string LastName,
+        string Gender,
+        string Username,
+        string Bio,
+        double ActivityWeight,
+        string Email,
+        string DateOfBirth,
+        int AddressId,
+        int CityId,
+        double Longitude,
+        double Latitude
+    );
 
     private static async Task<IReadOnlyList<UserRecord>> ReadUserRecordsAsync(
         SqliteConnection connection,
-        IReadOnlyDictionary<long, City> cities,
+        IReadOnlyDictionary<int, City> cities,
         CancellationToken cancellationToken
     )
     {
         const string sql = """
-            SELECT u.first_name, u.last_name, u.gender, u.username, u.bio,
-                   u.activity_weight, u.email, u.date_of_birth,
-                   ua.city_id, ua.longitude, ua.latitude
-            FROM users u
-            JOIN user_addresses ua ON ua.user_id = u.id;
+            SELECT
+               u.id               AS Id,
+               u.first_name       AS FirstName,
+               u.last_name        AS LastName,
+               u.gender           AS Gender,
+               u.username         AS Username,
+               u.bio              AS Bio,
+               u.activity_weight  AS ActivityWeight,
+               u.email            AS Email,
+               u.date_of_birth    AS DateOfBirth,
+               ua.id              AS AddressId,
+               ua.city_id         AS CityId,
+               ua.longitude       AS Longitude,
+               ua.latitude        AS Latitude
+            FROM
+                users u
+            INNER JOIN
+                user_addresses ua ON ua.user_id = u.id;
             """;
 
-        await using SqliteCommand command = new(sql, connection);
-        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
+        CommandDefinition command = new(sql, cancellationToken: cancellationToken);
+        IEnumerable<UserRow> rows = await connection.QueryAsync<UserRow>(command);
 
-        const int firstNameIndex = 0;
-        const int lastNameIndex = 1;
-        const int genderIndex = 2;
-        const int usernameIndex = 3;
-        const int bioIndex = 4;
-        const int activityWeightIndex = 5;
-        const int emailIndex = 6;
-        const int dateOfBirthIndex = 7;
-        const int cityIdIndex = 8;
-        const int longitudeIndex = 9;
-        const int latitudeIndex = 10;
-
-        List<UserRecord> records = [];
-        while (await reader.ReadAsync(cancellationToken))
-            records.Add(
-                new UserRecord
+        return [.. rows.Select(row => new UserRecord
+            {
+                Email = row.Email,
+                DateOfBirth = row.DateOfBirth,
+                Address = new UserAddress
                 {
-                    User = new UserResult
-                    {
-                        FirstName = reader.GetString(firstNameIndex),
-                        LastName = reader.GetString(lastNameIndex),
-                        Gender = reader.GetString(genderIndex),
-                        Username = reader.GetString(usernameIndex),
-                        Bio = reader.GetString(bioIndex),
-                        ActivityWeight = (float)reader.GetDouble(activityWeightIndex),
-                    },
-                    Email = reader.GetString(emailIndex),
-                    DateOfBirth = reader.GetString(dateOfBirthIndex),
-                    Address = new UserAddress
-                    {
-                        City = cities[reader.GetInt64(cityIdIndex)],
-                        Longitude = reader.GetDouble(longitudeIndex),
-                        Latitude = reader.GetDouble(latitudeIndex),
-                    },
-                }
-            );
-
-        return records;
+                    Id = row.AddressId,
+                    CityId = row.CityId,
+                    UserId = row.Id,
+                    Longitude = row.Longitude,
+                    Latitude = row.Latitude,
+                    City = cities[row.CityId],
+                },
+                User = new UserResult
+                {
+                    Id = row.Id,
+                    FirstName = row.FirstName,
+                    LastName = row.LastName,
+                    Gender = row.Gender,
+                    Username = row.Username,
+                    Bio = row.Bio,
+                    ActivityWeight = (float)row.ActivityWeight,
+                },
+            })];
     }
 
-    private static async Task<IReadOnlyDictionary<long, City>> ReadCitiesAsync(
+    private sealed record CityRow(
+        int Id,
+        string CityName,
+        string StateProvince,
+        string Iso31662,
+        string Country,
+        string Iso31661,
+        double Longitude,
+        double Latitude,
+        string LocalLanguagesJson,
+        string PostalCodeCountryFormatRegex,
+        string PostalCodeCityRegexesJson
+    );
+
+    private static async Task<IReadOnlyDictionary<int, City>> ReadCitiesAsync(
         SqliteConnection connection,
         CancellationToken cancellationToken
     )
     {
         const string sql = """
             SELECT
-                 id,
-                 city,
-                 state_province,
-                 iso3166_2,
-                 country,
-                 iso3166_1,
-                 local_languages_json,
-                 postal_code_country_format_regex,
-                 postal_code_city_regex_json
+                 id                                 AS Id,
+                 city                               AS CityName,
+                 state_province                     AS StateProvince,
+                 iso3166_2                          AS Iso31662,
+                 country                            AS Country,
+                 iso3166_1                          AS Iso31661,
+                 longitude                          AS Longitude,
+                 latitude                           AS Latitude,
+                 local_languages_json               AS LocalLanguagesJson,
+                 postal_code_country_format_regex   AS PostalCodeCountryFormatRegex,
+                 postal_code_city_regex_json        AS PostalCodeCityRegexesJson
             FROM cities;
             """;
 
-        await using SqliteCommand command = new(sql, connection);
-        await using SqliteDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
+        CommandDefinition command = new(sql, cancellationToken: cancellationToken);
+        IEnumerable<CityRow> rows = await connection.QueryAsync<CityRow>(command);
 
-        Dictionary<long, City> cities = [];
-
-        const int idIndex = 0;
-        const int cityNameIndex = 1;
-        const int stateProvinceIndex = 2;
-        const int iso31662Index = 3;
-        const int countryIndex = 4;
-        const int iso31661Index = 5;
-        const int localLanguagesIndex = 6;
-        const int countryFormatRegexIndex = 7;
-        const int cityRegexesIndex = 8;
-
-        while (await reader.ReadAsync(cancellationToken))
-            cities[reader.GetInt64(idIndex)] = new City
+        return rows.ToDictionary(
+            row => row.Id,
+            row => new City
             {
-                CityName = reader.GetString(cityNameIndex),
-                StateProvince = reader.GetString(stateProvinceIndex),
-                Iso31662 = reader.GetString(iso31662Index),
-                Country = reader.GetString(countryIndex),
-                Iso31661 = reader.GetString(iso31661Index),
-                LocalLanguages = DeserializeStringArray(reader.GetString(localLanguagesIndex)),
-                PostalCode = new PostalCodeSpec
-                {
-                    CountryFormatRegex = reader.GetString(countryFormatRegexIndex),
-                    CityRegexes = DeserializeStringArray(reader.GetString(cityRegexesIndex)),
-                },
-            };
-
-        return cities;
+                Id = row.Id,
+                CityName = row.CityName,
+                StateProvinceName = row.StateProvince,
+                ISO_3166_2 = row.Iso31662,
+                CountryName = row.Country,
+                ISO_3166_1 = row.Iso31661,
+                Longitude = row.Longitude,
+                Latitude = row.Latitude,
+                LocalLanguages = DeserializeStringArray(row.LocalLanguagesJson),
+                PostalCode = new PostalCodeSpec(
+                    CountryFormatRegex: row.PostalCodeCountryFormatRegex,
+                    CityRegexes: DeserializeStringArray(row.PostalCodeCityRegexesJson)
+                ),
+            }
+        );
     }
 
     private static IReadOnlyList<string> DeserializeStringArray(string json)
