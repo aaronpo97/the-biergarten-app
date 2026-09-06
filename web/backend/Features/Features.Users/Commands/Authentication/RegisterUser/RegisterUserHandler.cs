@@ -3,17 +3,17 @@ using Domain.Exceptions;
 using Features.Auth.Commands.Profile.CreateUserProfile;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
+using Features.Auth.Notifications;
 using Features.Auth.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Shared.Application.Emails;
 
 namespace Features.Auth.Commands.Authentication.RegisterUser;
 
 /// <summary>
 ///     Handles <see cref="RegisterUserCommand" />: creates the user via <see cref="UserManager{TUser}" />
 ///     (which validates uniqueness and hashes the password), issues access/refresh/confirmation tokens, and
-///     attempts to send the registration confirmation email via Features.Emails.
+///     publishes <see cref="UserRegisteredNotification" /> for Features.Emails to send the confirmation email.
 /// </summary>
 public class RegisterUserHandler(
     UserManager<ApplicationUser> userManager,
@@ -60,31 +60,19 @@ public class RegisterUserHandler(
                 user.Id,
                 user.UserName,
                 string.Empty,
-                string.Empty,
-                false
+                string.Empty
             );
 
-        bool emailSent = false;
-        try
-        {
-            await mediator.Send(
-                new SendRegistrationEmailCommand(user.FirstName, user.Email, confirmationToken),
-                cancellationToken
-            );
-            emailSent = true;
-        }
-        catch (Exception ex)
-        {
-            await Console.Error.WriteLineAsync(ex.Message);
-            Console.WriteLine("Could not send email.");
-        }
+        await mediator.Publish(
+            new UserRegisteredNotification(user.Id, request.FirstName, user.Email, confirmationToken),
+            cancellationToken
+        );
 
         return new RegistrationPayload(
             user.Id,
             user.UserName,
             refreshToken,
-            accessToken,
-            emailSent
+            accessToken
         );
     }
 }
