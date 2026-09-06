@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Authentication.RefreshToken;
+namespace Features.Users.Commands.Authentication.RefreshToken;
 
 /// <summary>
 ///     Exchanges a valid refresh token for a new access/refresh token pair. Constructed from the

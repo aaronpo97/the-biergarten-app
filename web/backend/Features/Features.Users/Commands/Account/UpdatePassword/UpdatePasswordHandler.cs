@@ -1,10 +1,10 @@
 using Domain.Exceptions;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
+using Features.Users.Dtos;
+using Features.Users.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Account.UpdatePassword;
+namespace Features.Users.Commands.Account.UpdatePassword;
 
 /// <summary>
 ///     Handles <see cref="UpdatePasswordCommand" /> via <see cref="UserManager{TUser}.ChangePasswordAsync" />,

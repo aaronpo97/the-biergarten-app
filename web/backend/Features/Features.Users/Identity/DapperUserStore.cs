@@ -4,7 +4,7 @@ using Database.Connection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 
-namespace Features.Auth.Identity;
+namespace Features.Users.Identity;
 
 /// <summary>
 ///     Dapper-based implementation of the ASP.NET Core Identity store interfaces consumed by

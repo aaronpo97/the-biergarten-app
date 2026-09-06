@@ -1,15 +1,15 @@
 using Database.Connection.DependencyInjection;
 using Database.Seed.DatabaseHelpers;
 using Database.Seed.Sqlite;
-using Features.Auth.Commands.Profile.UploadAvatar;
-using Features.Auth.Services;
 using Features.Breweries.Commands.CreateBrewery;
 using Features.Breweries.DependencyInjection;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
 using Features.Locations.DependencyInjection;
 using Features.Locations.Queries.GetCountry;
+using Features.Users.Commands.Profile.UploadAvatar;
 using Features.Users.DependencyInjection;
+using Features.Users.Services;
 using Infrastructure.FileUpload;
 using MediatR;
 using Microsoft.Extensions.Configuration;

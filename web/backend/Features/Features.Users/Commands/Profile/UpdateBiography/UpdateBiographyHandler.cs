@@ -1,7 +1,7 @@
-using Features.Auth.Repository;
+using Features.Users.Repository;
 using MediatR;
 
-namespace Features.Auth.Commands.Profile.UpdateBiography;
+namespace Features.Users.Commands.Profile.UpdateBiography;
 
 /// <summary>Handles <see cref="UpdateBiographyCommand" /> by updating the stored biography.</summary>
 public class UpdateBiographyHandler(IUserProfileRepository userProfileRepository)

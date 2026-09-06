@@ -1,11 +1,11 @@
 using Domain.Exceptions;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
-using Features.Auth.Services;
+using Features.Users.Dtos;
+using Features.Users.Identity;
+using Features.Users.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Authentication.Login;
+namespace Features.Users.Commands.Authentication.Login;
 
 /// <summary>
 ///     Handles <see cref="LoginCommand" /> by verifying credentials via

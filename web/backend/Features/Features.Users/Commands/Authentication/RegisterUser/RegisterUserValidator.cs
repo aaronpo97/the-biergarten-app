@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Authentication.RegisterUser;
+namespace Features.Users.Commands.Authentication.RegisterUser;
 
 /// <summary>
 ///     Validates the field-level constraints on <see cref="RegisterUserCommand" />: username format and

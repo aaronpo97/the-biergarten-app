@@ -1,14 +1,14 @@
 using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Commands.Profile.CreateUserProfile;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
-using Features.Auth.Notifications;
-using Features.Auth.Services;
+using Features.Users.Commands.Profile.CreateUserProfile;
+using Features.Users.Dtos;
+using Features.Users.Identity;
+using Features.Users.Notifications;
+using Features.Users.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Authentication.RegisterUser;
+namespace Features.Users.Commands.Authentication.RegisterUser;
 
 /// <summary>
 ///     Handles <see cref="RegisterUserCommand" />: creates the user via <see cref="UserManager{TUser}" />

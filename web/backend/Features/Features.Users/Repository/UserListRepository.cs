@@ -3,7 +3,7 @@ using Dapper;
 using Database.Connection;
 using Domain.Entities;
 
-namespace Features.Auth.Repository;
+namespace Features.Users.Repository;
 
 /// <summary>
 ///     Dapper-based implementation of <see cref="IUserListRepository" />.

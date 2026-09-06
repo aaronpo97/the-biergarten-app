@@ -1,7 +1,7 @@
 using Domain.Entities;
 using MediatR;
 
-namespace Features.Auth.Queries.GetAllUsers;
+namespace Features.Users.Queries.GetAllUsers;
 
 /// <summary>
 ///     Requests a page of user accounts, ordered by creation date descending.

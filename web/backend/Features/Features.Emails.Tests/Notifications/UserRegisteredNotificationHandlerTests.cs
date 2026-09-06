@@ -1,6 +1,6 @@
-using Features.Auth.Notifications;
 using Features.Emails.Notifications;
 using Features.Emails.Services;
+using Features.Users.Notifications;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;

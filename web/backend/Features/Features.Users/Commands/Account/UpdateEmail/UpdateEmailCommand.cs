@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Account.UpdateEmail;
+namespace Features.Users.Commands.Account.UpdateEmail;
 
 /// <summary>
 ///     Changes the email address of the given user account. The account's <c>EmailConfirmed</c> status

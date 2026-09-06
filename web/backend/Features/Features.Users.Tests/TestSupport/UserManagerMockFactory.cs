@@ -1,8 +1,8 @@
-using Features.Auth.Identity;
+using Features.Users.Identity;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Features.Auth.Tests.TestSupport;
+namespace Features.Users.Tests.TestSupport;
 
 public static class UserManagerMockFactory
 {

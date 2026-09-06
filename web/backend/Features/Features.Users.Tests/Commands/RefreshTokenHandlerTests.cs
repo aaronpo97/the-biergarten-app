@@ -1,10 +1,10 @@
-using Features.Auth.Commands.Authentication.RefreshToken;
-using Features.Auth.Dtos;
-using Features.Auth.Services;
+using Features.Users.Commands.Authentication.RefreshToken;
+using Features.Users.Dtos;
+using Features.Users.Services;
 using FluentAssertions;
 using Moq;
 
-namespace Features.Auth.Tests.Commands;
+namespace Features.Users.Tests.Commands;
 
 public class RefreshTokenHandlerTests
 {

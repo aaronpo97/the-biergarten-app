@@ -1,20 +1,20 @@
-using Features.Auth.Commands.Account.DeleteAccount;
-using Features.Auth.Commands.Account.UpdateEmail;
-using Features.Auth.Commands.Account.UpdatePassword;
-using Features.Auth.Commands.Account.UpdateUsername;
-using Features.Auth.Commands.Authentication.ConfirmUser;
-using Features.Auth.Commands.Authentication.Login;
-using Features.Auth.Commands.Authentication.RefreshToken;
-using Features.Auth.Commands.Authentication.RegisterUser;
-using Features.Auth.Commands.Authentication.ResendConfirmationEmail;
-using Features.Auth.Commands.Profile.UpdateProfile;
-using Features.Auth.Dtos;
+using Features.Users.Commands.Account.DeleteAccount;
+using Features.Users.Commands.Account.UpdateEmail;
+using Features.Users.Commands.Account.UpdatePassword;
+using Features.Users.Commands.Account.UpdateUsername;
+using Features.Users.Commands.Authentication.ConfirmUser;
+using Features.Users.Commands.Authentication.Login;
+using Features.Users.Commands.Authentication.RefreshToken;
+using Features.Users.Commands.Authentication.RegisterUser;
+using Features.Users.Commands.Authentication.ResendConfirmationEmail;
+using Features.Users.Commands.Profile.UpdateProfile;
+using Features.Users.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Contracts;
 
-namespace Features.Auth.Controllers;
+namespace Features.Users.Controllers;
 
 /// <summary>
 ///     Handles user authentication concerns: registration, login, email confirmation, token refresh, and

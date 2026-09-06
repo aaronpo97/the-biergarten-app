@@ -1,11 +1,11 @@
 using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Queries.GetAllUsers;
-using Features.Auth.Queries.GetUserById;
+using Features.Users.Queries.GetAllUsers;
+using Features.Users.Queries.GetUserById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Features.Auth.Controllers;
+namespace Features.Users.Controllers;
 
 /// <summary>
 ///     Exposes read endpoints for user accounts.

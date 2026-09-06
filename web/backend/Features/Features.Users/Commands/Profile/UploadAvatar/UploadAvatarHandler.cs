@@ -1,9 +1,9 @@
 using Domain.Entities;
-using Features.Auth.Repository;
 using Features.ImageUploads.Commands.UploadPhoto;
+using Features.Users.Repository;
 using MediatR;
 
-namespace Features.Auth.Commands.Profile.UploadAvatar;
+namespace Features.Users.Commands.Profile.UploadAvatar;
 
 /// <summary>
 ///     Handles <see cref="UploadAvatarCommand" />: uploads the photo via <see cref="UploadPhotoCommand" />,

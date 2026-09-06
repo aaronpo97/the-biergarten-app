@@ -1,14 +1,14 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.Authentication.Login;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
-using Features.Auth.Services;
-using Features.Auth.Tests.TestSupport;
+using Features.Users.Commands.Authentication.Login;
+using Features.Users.Dtos;
+using Features.Users.Identity;
+using Features.Users.Services;
+using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Features.Auth.Tests.Queries;
+namespace Features.Users.Tests.Queries;
 
 public class LoginHandlerTests
 {

@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Features.Auth.Commands.Profile.UpdateBiography;
+namespace Features.Users.Commands.Profile.UpdateBiography;
 
 /// <summary>Updates the biography of the given user account's profile.</summary>
 /// <param name="UserAccountId">

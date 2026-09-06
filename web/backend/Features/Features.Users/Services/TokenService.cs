@@ -1,13 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
-using Features.Auth.Identity;
+using Features.Users.Identity;
 using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
-namespace Features.Auth.Services;
+namespace Features.Users.Services;
 
 /// <summary>
 ///     Default implementation of <see cref="ITokenService" /> that generates and validates JWTs

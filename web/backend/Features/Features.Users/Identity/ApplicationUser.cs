@@ -1,4 +1,4 @@
-namespace Features.Auth.Identity;
+namespace Features.Users.Identity;
 
 /// <summary>
 ///     The user type driving <see cref="Microsoft.AspNetCore.Identity.UserManager{TUser}" /> for

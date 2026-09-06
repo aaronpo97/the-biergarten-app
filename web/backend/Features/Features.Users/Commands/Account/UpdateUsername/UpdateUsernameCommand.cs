@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Account.UpdateUsername;
+namespace Features.Users.Commands.Account.UpdateUsername;
 
 /// <summary>Changes the username of the given user account.</summary>
 /// <param name="UserAccountId">

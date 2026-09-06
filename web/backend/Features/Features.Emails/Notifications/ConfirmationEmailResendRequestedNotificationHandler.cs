@@ -1,5 +1,5 @@
-using Features.Auth.Notifications;
 using Features.Emails.Services;
+using Features.Users.Notifications;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
