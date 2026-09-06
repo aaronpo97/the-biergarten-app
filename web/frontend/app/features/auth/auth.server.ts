@@ -21,9 +21,7 @@ interface LoginPayload {
     accessToken: string;
 }
 
-interface RegistrationPayload extends LoginPayload {
-    confirmationEmailSent: boolean;
-}
+type RegistrationPayload = LoginPayload;
 
 interface UpdateUsernamePayload {
     userAccountId: string;

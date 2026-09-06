@@ -77,7 +77,7 @@ flowchart TB
     subgraph SHARED["Shared Projects"]
         direction LR
         SH1["Shared.Contracts<br/>ResponseBody envelope"]
-        SH2["Shared.Application<br/>ValidationBehavior,<br/>cross-slice email commands"]
+        SH2["Shared.Application<br/>ValidationBehavior"]
     end
 
     subgraph DOMAIN["Domain Layer"]
@@ -98,7 +98,7 @@ flowchart TB
     DB[("Database (SQL Server)")]
 
     HOST -- "discovers controllers via<br/>AddApplicationPart" --> SLICES
-    S1 -- "SendRegistrationEmailCommand<br/>(via Shared.Application contract)" --> S3
+    S3 == "ProjectReference<br/>(handles UserRegisteredNotification & ConfirmationEmailResendRequestedNotification)" ==> S1
     S1 -- "ProjectReference<br/>(avatar upload)" --> S5
 
     SLICES --> SHARED
@@ -172,8 +172,10 @@ brewery photo upload command) rather than bound to an HTTP route directly.
   `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
   PhotoUpload)
 - `Shared.Contracts`, `Shared.Application`
-- No other `Features.*` project, with one exception: `Features.Users` references
-  `Features.PhotoUpload` directly for avatar uploads
+- No other `Features.*` project, with two exceptions: `Features.Users`
+  references `Features.PhotoUpload` directly for avatar uploads, and
+  `Features.Emails` references `Features.Users` directly to handle
+  `UserRegisteredNotification` and `ConfirmationEmailResendRequestedNotification`
 
 **Rules**:
 
@@ -191,7 +193,7 @@ needs it, or because duplicating it four times would be worse than sharing it
 | Project              | Purpose                                                                                                                                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope every controller returns                                                                                                                                                    |
-| `Shared.Application` | `ValidationBehavior<TRequest,TResponse>` (the MediatR pipeline behavior that runs FluentValidation before a handler executes) and the cross-slice email commands (`SendRegistrationEmailCommand`, `SendResendConfirmationEmailCommand`) |
+| `Shared.Application` | `ValidationBehavior<TRequest,TResponse>`, the MediatR pipeline behavior that runs FluentValidation before a handler executes |
 
 **Rules**:
 

@@ -2,13 +2,13 @@ using Domain.Exceptions;
 using Features.Auth.Commands.Authentication.RegisterUser;
 using Features.Auth.Dtos;
 using Features.Auth.Identity;
+using Features.Auth.Notifications;
 using Features.Auth.Services;
 using Features.Auth.Tests.TestSupport;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Moq;
-using Shared.Application.Emails;
 
 namespace Features.Auth.Tests.Commands;
 
@@ -86,10 +86,18 @@ public class RegisterUserHandlerTests
         result.Username.Should().Be(command.Username);
         result.AccessToken.Should().Be("access-token");
         result.RefreshToken.Should().Be("refresh-token");
-        result.ConfirmationEmailSent.Should().BeTrue();
 
         _mediatorMock.Verify(
-            x => x.Send(It.IsAny<SendRegistrationEmailCommand>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.Publish(
+                    It.Is<UserRegisteredNotification>(n =>
+                        n.UserId == expectedUserId
+                        && n.FirstName == command.FirstName
+                        && n.Email == command.Email
+                        && n.ConfirmationToken == "confirmation-token"
+                    ),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
     }
@@ -177,31 +185,4 @@ public class RegisterUserHandlerTests
         );
     }
 
-    [Fact]
-    public async Task Handle_SwallowsEmailFailure_AndReportsEmailNotSent()
-    {
-        RegisterUserCommand command = ValidCommand();
-
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), command.Password))
-            .Callback<ApplicationUser, string>((u, _) => u.Id = Guid.NewGuid())
-            .ReturnsAsync(IdentityResult.Success);
-
-        _tokenServiceMock
-            .Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<string>()))
-            .Returns("access-token");
-        _tokenServiceMock
-            .Setup(x => x.GenerateRefreshToken(It.IsAny<Guid>(), It.IsAny<string>()))
-            .Returns("refresh-token");
-        _mediatorMock
-            .Setup(x =>
-                x.Send(It.IsAny<SendRegistrationEmailCommand>(), It.IsAny<CancellationToken>())
-            )
-            .ThrowsAsync(new Exception("smtp down"));
-
-        RegistrationPayload result = await _handler.Handle(command, CancellationToken.None);
-
-        result.ConfirmationEmailSent.Should().BeFalse();
-        result.AccessToken.Should().Be("access-token");
-    }
 }

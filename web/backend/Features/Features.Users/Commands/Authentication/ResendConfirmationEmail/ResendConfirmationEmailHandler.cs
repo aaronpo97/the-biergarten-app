@@ -1,14 +1,14 @@
 using Features.Auth.Identity;
+using Features.Auth.Notifications;
 using Features.Auth.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Shared.Application.Emails;
 
 namespace Features.Auth.Commands.Authentication.ResendConfirmationEmail;
 
 /// <summary>
 ///     Handles <see cref="ResendConfirmationEmailCommand" /> by generating a fresh confirmation token and
-///     sending it via Features.Emails.
+///     publishing <see cref="ConfirmationEmailResendRequestedNotification" /> for Features.Emails to send it.
 /// </summary>
 /// <remarks>
 ///     Returns silently without sending an email if the user does not exist (to prevent user enumeration)
@@ -33,8 +33,13 @@ public class ResendConfirmationEmailHandler(
             return; // Already confirmed, no-op
 
         string confirmationToken = tokenService.GenerateConfirmationToken(user.Id, user.UserName);
-        await mediator.Send(
-            new SendResendConfirmationEmailCommand(user.FirstName, user.Email, confirmationToken),
+        await mediator.Publish(
+            new ConfirmationEmailResendRequestedNotification(
+                user.Id,
+                user.FirstName,
+                user.Email,
+                confirmationToken
+            ),
             cancellationToken
         );
     }
