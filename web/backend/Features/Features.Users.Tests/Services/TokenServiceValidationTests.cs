@@ -1,15 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
-using Features.Auth.Services;
-using Features.Auth.Tests.TestSupport;
+using Features.Users.Services;
+using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Configuration;
 using Infrastructure.Jwt;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
-namespace Features.Auth.Tests.Services;
+namespace Features.Users.Tests.Services;
 
 public class TokenServiceValidationTests
 {

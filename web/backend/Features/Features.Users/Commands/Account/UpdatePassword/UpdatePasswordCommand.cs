@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Account.UpdatePassword;
+namespace Features.Users.Commands.Account.UpdatePassword;
 
 /// <summary>Changes the password of the given user account, verifying the current password first.</summary>
 /// <param name="UserAccountId">

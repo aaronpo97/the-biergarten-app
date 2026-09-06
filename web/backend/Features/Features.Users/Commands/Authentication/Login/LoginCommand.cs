@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Authentication.Login;
+namespace Features.Users.Commands.Authentication.Login;
 
 /// <summary>
 ///     Authenticates a user using their username and password and issues new tokens. Bound directly

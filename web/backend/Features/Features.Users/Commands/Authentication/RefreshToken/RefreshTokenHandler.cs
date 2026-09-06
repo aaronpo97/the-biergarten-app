@@ -1,8 +1,8 @@
-using Features.Auth.Dtos;
-using Features.Auth.Services;
+using Features.Users.Dtos;
+using Features.Users.Services;
 using MediatR;
 
-namespace Features.Auth.Commands.Authentication.RefreshToken;
+namespace Features.Users.Commands.Authentication.RefreshToken;
 
 /// <summary>
 ///     Handles <see cref="RefreshTokenCommand" /> by validating the refresh token and issuing a new

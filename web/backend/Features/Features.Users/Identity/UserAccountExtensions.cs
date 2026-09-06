@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Features.Auth.Identity;
+namespace Features.Users.Identity;
 
 /// <summary>
 ///     Converts the persistence-agnostic <see cref="UserAccount" /> domain entity into the

@@ -1,10 +1,10 @@
-using Features.Auth.Identity;
-using Features.Auth.Notifications;
-using Features.Auth.Services;
+using Features.Users.Identity;
+using Features.Users.Notifications;
+using Features.Users.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Authentication.ResendConfirmationEmail;
+namespace Features.Users.Commands.Authentication.ResendConfirmationEmail;
 
 /// <summary>
 ///     Handles <see cref="ResendConfirmationEmailCommand" /> by generating a fresh confirmation token and

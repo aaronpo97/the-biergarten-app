@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Features.Auth.Repository;
+namespace Features.Users.Repository;
 
 /// <summary>
 ///     Read access for user account listing. Everything else on user accounts (lookup by

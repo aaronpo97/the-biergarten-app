@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Features.Auth.Commands.Account.DeleteAccount;
+namespace Features.Users.Commands.Account.DeleteAccount;
 
 /// <summary>Permanently deletes the given user account.</summary>
 /// <param name="UserAccountId">

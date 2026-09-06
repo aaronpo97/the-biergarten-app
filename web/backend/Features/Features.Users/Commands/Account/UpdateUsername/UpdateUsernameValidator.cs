@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Account.UpdateUsername;
+namespace Features.Users.Commands.Account.UpdateUsername;
 
 /// <summary>Validates <see cref="UpdateUsernameCommand" />, mirroring the username rules in <c>RegisterUserValidator</c>.</summary>
 public class UpdateUsernameValidator : AbstractValidator<UpdateUsernameCommand>

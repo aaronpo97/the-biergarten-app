@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Account.UpdatePassword;
+namespace Features.Users.Commands.Account.UpdatePassword;
 
 /// <summary>Validates <see cref="UpdatePasswordCommand" />, mirroring the password rules in <c>RegisterUserValidator</c>.</summary>
 public class UpdatePasswordValidator : AbstractValidator<UpdatePasswordCommand>

@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Features.Auth.Repository;
+namespace Features.Users.Repository;
 
 /// <summary>
 ///     Repository for user profile records and their avatars.

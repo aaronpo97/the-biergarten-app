@@ -1,16 +1,16 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Domain.Exceptions;
-using Features.Auth.Commands.Authentication.ConfirmUser;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
-using Features.Auth.Services;
-using Features.Auth.Tests.TestSupport;
+using Features.Users.Commands.Authentication.ConfirmUser;
+using Features.Users.Dtos;
+using Features.Users.Identity;
+using Features.Users.Services;
+using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Features.Auth.Tests.Commands;
+namespace Features.Users.Tests.Commands;
 
 public class ConfirmUserHandlerTests
 {

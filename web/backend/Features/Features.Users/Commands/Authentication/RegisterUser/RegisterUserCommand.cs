@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Authentication.RegisterUser;
+namespace Features.Users.Commands.Authentication.RegisterUser;
 
 /// <summary>
 ///     Registers a new user account. Bound directly from the request body of <c>POST /api/auth/register</c>.

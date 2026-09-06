@@ -45,8 +45,6 @@ see the notes for what else each of those foundation projects pulls in.
   commands/queries + handlers, validators, and Dapper repository
   - `Features.Users` covers auth (`Commands/Authentication`), account management
     (`Commands/Account`), and profile/avatar (`Commands/Profile`)
-    - internally namespaced `Features.Auth`, despite project name
-      `Features.Users`
   - `Features.Emails` and `Features.PhotoUpload` have no controller — invoked
     only via MediatR commands sent from other slices
   - `Features.Locations` has no controller; one MediatR handler
@@ -65,7 +63,7 @@ see the notes for what else each of those foundation projects pulls in.
       `RegisterUserHandler`) and `ConfirmationEmailResendRequestedNotification`
       (published from `ResendConfirmationEmailHandler`)
     - both notification types live in `Features.Users`
-      (`Features.Auth.Notifications`), not in `Shared.Application`
+      (`Features.Users.Notifications`), not in `Shared.Application`
 
 - **Shared.Application**:
   - `ValidationBehavior` (MediatR pipeline)

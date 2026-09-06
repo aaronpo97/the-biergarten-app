@@ -1,12 +1,12 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.Account.DeleteAccount;
-using Features.Auth.Identity;
-using Features.Auth.Tests.TestSupport;
+using Features.Users.Commands.Account.DeleteAccount;
+using Features.Users.Identity;
+using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Features.Auth.Tests.Commands;
+namespace Features.Users.Tests.Commands;
 
 public class DeleteAccountHandlerTests
 {

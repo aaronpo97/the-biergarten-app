@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Features.Auth.Notifications;
+namespace Features.Users.Notifications;
 
 /// <summary>
 ///     Published after a user requests a fresh confirmation link. Handled by Features.Emails to send the

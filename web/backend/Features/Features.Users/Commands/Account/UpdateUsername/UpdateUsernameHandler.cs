@@ -1,10 +1,10 @@
 using Domain.Exceptions;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
+using Features.Users.Dtos;
+using Features.Users.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Account.UpdateUsername;
+namespace Features.Users.Commands.Account.UpdateUsername;
 
 /// <summary>Handles <see cref="UpdateUsernameCommand" /> via <see cref="UserManager{TUser}" />.</summary>
 public class UpdateUsernameHandler(UserManager<ApplicationUser> userManager)

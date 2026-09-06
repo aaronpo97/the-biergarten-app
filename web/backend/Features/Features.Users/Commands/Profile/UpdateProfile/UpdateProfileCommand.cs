@@ -1,7 +1,7 @@
-using Features.Auth.Dtos;
+using Features.Users.Dtos;
 using MediatR;
 
-namespace Features.Auth.Commands.Profile.UpdateProfile;
+namespace Features.Users.Commands.Profile.UpdateProfile;
 
 /// <summary>
 ///     Updates the non-credential profile fields (first name, last name, date of birth) of the given

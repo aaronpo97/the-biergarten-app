@@ -1,4 +1,4 @@
-using Features.Auth.Services;
+using Features.Users.Services;
 
 namespace Database.Seed.DatabaseHelpers;
 

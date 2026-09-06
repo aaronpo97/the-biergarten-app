@@ -1,6 +1,6 @@
-using Features.Auth.Identity;
-using Features.Auth.Repository;
-using Features.Auth.Services;
+using Features.Users.Identity;
+using Features.Users.Repository;
+using Features.Users.Services;
 using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

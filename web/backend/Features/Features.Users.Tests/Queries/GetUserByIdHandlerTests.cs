@@ -1,11 +1,11 @@
 using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Queries.GetUserById;
-using Features.Auth.Repository;
+using Features.Users.Queries.GetUserById;
+using Features.Users.Repository;
 using FluentAssertions;
 using Moq;
 
-namespace Features.Auth.Tests.Queries;
+namespace Features.Users.Tests.Queries;
 
 public class GetUserByIdHandlerTests
 {

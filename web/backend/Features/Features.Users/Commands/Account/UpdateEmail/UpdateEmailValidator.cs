@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Account.UpdateEmail;
+namespace Features.Users.Commands.Account.UpdateEmail;
 
 /// <summary>Validates <see cref="UpdateEmailCommand" />, mirroring the email rules in <c>RegisterUserValidator</c>.</summary>
 public class UpdateEmailValidator : AbstractValidator<UpdateEmailCommand>

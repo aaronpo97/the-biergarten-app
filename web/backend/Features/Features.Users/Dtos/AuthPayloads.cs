@@ -1,4 +1,4 @@
-namespace Features.Auth.Dtos;
+namespace Features.Users.Dtos;
 
 /// <summary>Payload returned to the client after a successful login or token refresh.</summary>
 public record LoginPayload(

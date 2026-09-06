@@ -1,7 +1,7 @@
-using Features.Auth.Repository;
+using Features.Users.Repository;
 using MediatR;
 
-namespace Features.Auth.Commands.Profile.CreateUserProfile;
+namespace Features.Users.Commands.Profile.CreateUserProfile;
 
 /// <summary>Handles <see cref="CreateUserProfileCommand" /> by inserting the new profile record.</summary>
 public class CreateUserProfileHandler(IUserProfileRepository userProfileRepository)

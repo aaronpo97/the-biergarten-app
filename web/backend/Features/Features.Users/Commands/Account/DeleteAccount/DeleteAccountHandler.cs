@@ -1,9 +1,9 @@
 using Domain.Exceptions;
-using Features.Auth.Identity;
+using Features.Users.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Commands.Account.DeleteAccount;
+namespace Features.Users.Commands.Account.DeleteAccount;
 
 /// <summary>Handles <see cref="DeleteAccountCommand" /> by deleting the user via <see cref="UserManager{TUser}" />.</summary>
 public class DeleteAccountHandler(UserManager<ApplicationUser> userManager)

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Authentication.RefreshToken;
+namespace Features.Users.Commands.Authentication.RefreshToken;
 
 /// <summary>Validates that <see cref="RefreshTokenCommand.RefreshToken" /> is present.</summary>
 public class RefreshTokenValidator : AbstractValidator<RefreshTokenCommand>

@@ -1,7 +1,7 @@
 using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Identity;
 
-namespace Features.Auth.Identity;
+namespace Features.Users.Identity;
 
 /// <summary>Adapts <see cref="IPasswordInfrastructure" />'s Argon2 hashing to <see cref="IPasswordHasher{TUser}" />.</summary>
 public sealed class Argon2PasswordHasher(IPasswordInfrastructure passwordInfrastructure)

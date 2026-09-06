@@ -1,10 +1,10 @@
 using Domain.Entities;
-using Features.Auth.Queries.GetAllUsers;
-using Features.Auth.Repository;
+using Features.Users.Queries.GetAllUsers;
+using Features.Users.Repository;
 using FluentAssertions;
 using Moq;
 
-namespace Features.Auth.Tests.Queries;
+namespace Features.Users.Tests.Queries;
 
 public class GetAllUsersHandlerTests
 {

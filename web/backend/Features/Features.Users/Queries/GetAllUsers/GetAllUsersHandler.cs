@@ -1,8 +1,8 @@
 using Domain.Entities;
-using Features.Auth.Repository;
+using Features.Users.Repository;
 using MediatR;
 
-namespace Features.Auth.Queries.GetAllUsers;
+namespace Features.Users.Queries.GetAllUsers;
 
 public class GetAllUsersHandler(IUserListRepository repository)
     : IRequestHandler<GetAllUsersQuery, IEnumerable<UserAccount>>

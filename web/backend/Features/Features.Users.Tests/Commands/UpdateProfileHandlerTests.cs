@@ -1,13 +1,13 @@
 using Domain.Exceptions;
-using Features.Auth.Commands.Profile.UpdateProfile;
-using Features.Auth.Dtos;
-using Features.Auth.Identity;
-using Features.Auth.Tests.TestSupport;
+using Features.Users.Commands.Profile.UpdateProfile;
+using Features.Users.Dtos;
+using Features.Users.Identity;
+using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Features.Auth.Tests.Commands;
+namespace Features.Users.Tests.Commands;
 
 public class UpdateProfileHandlerTests
 {

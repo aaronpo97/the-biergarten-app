@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Features.Auth.Services;
+namespace Features.Users.Services;
 
 /// <summary>
 ///     Identifies the kind of token being generated or validated.

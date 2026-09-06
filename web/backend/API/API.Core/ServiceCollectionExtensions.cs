@@ -1,6 +1,5 @@
 using API.Core.Authentication;
 using Database.Connection.DependencyInjection;
-using Features.Auth.Controllers;
 using Features.Breweries.Controllers;
 using Features.Breweries.DependencyInjection;
 using Features.Emails.DependencyInjection;
@@ -9,6 +8,7 @@ using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.DependencyInjection;
 using Features.Locations.Controllers;
 using Features.Locations.DependencyInjection;
+using Features.Users.Controllers;
 using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;

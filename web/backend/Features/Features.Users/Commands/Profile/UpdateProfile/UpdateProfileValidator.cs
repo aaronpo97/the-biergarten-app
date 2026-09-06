@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Features.Auth.Commands.Profile.UpdateProfile;
+namespace Features.Users.Commands.Profile.UpdateProfile;
 
 /// <summary>Validates <see cref="UpdateProfileCommand" />, mirroring the profile rules in <c>RegisterUserValidator</c>.</summary>
 public class UpdateProfileValidator : AbstractValidator<UpdateProfileCommand>

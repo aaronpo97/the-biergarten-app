@@ -1,9 +1,9 @@
 using Domain.Entities;
 using Domain.Exceptions;
-using Features.Auth.Repository;
+using Features.Users.Repository;
 using MediatR;
 
-namespace Features.Auth.Queries.GetUserById;
+namespace Features.Users.Queries.GetUserById;
 
 public class GetUserByIdHandler(IUserListRepository repository)
     : IRequestHandler<GetUserByIdQuery, UserAccount>
