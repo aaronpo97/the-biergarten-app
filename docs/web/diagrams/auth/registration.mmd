@@ -127,9 +127,9 @@ sequenceDiagram
             TokenSvc-->>RegHandler: Confirmation Token
             deactivate TokenSvc
 
-            RegHandler->>Mediator: Send(SendRegistrationEmailCommand) (Shared.Application cross-slice contract)
+            RegHandler->>Mediator: Publish(UserRegisteredNotification)
             activate Mediator
-            Note right of Mediator: Routed to Features.Emails' SendRegistrationEmailHandler — the second of two cross-slice dispatches in this flow (profile creation is the first)
+            Note right of Mediator: Features.Emails has a direct ProjectReference on Features.Users and handles the notification via UserRegisteredNotificationHandler — the second of two cross-slice dispatches in this flow (profile creation is the first)
             Mediator->>EmailDispatcher: SendRegistrationEmailAsync(firstName, email, confirmationToken)
             activate EmailDispatcher
 
@@ -147,15 +147,15 @@ sequenceDiagram
             SMTP-->>EmailDispatcher: Success / throws
             deactivate SMTP
             deactivate EmailDispatcher
-            deactivate Mediator
 
             alt Email sent successfully
-                RegHandler->>RegHandler: emailSent = true
-            else mediator.Send throws
-                RegHandler->>RegHandler: catch(Exception), log to stderr, emailSent = false
+                Note right of Mediator: UserRegisteredNotificationHandler completes normally
+            else EmailDispatcher throws
+                Note right of Mediator: UserRegisteredNotificationHandler catches and logs the exception — registration is unaffected
             end
+            deactivate Mediator
 
-            RegHandler-->>Mediator: RegistrationPayload(userAccountId, username, refreshToken, accessToken, confirmationEmailSent)
+            RegHandler-->>Mediator: RegistrationPayload(userAccountId, username, refreshToken, accessToken)
             deactivate RegHandler
             Mediator-->>API: RegistrationPayload
             deactivate Mediator

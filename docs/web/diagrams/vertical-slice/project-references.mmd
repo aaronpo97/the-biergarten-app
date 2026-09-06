@@ -31,8 +31,7 @@ EmailTemplates["Infrastructure.Email.Templates"]
 end
 
 UsersSlice == project ref, sends UploadPhotoCommand ==> PhotoSlice
-UsersSlice -. sends email commands .-> SharedApp["Shared.Application<br>(email command contract)"]
-EmailsSlice -. handles email commands .-> SharedApp
+EmailsSlice == project ref, handles UserRegisteredNotification & ConfirmationEmailResendRequestedNotification ==> UsersSlice
 BrewerySlice --> FOUNDATION
 LocationsSlice --> FOUNDATION
 BeersSlice --> FOUNDATION

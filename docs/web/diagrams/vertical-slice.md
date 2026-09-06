@@ -16,13 +16,14 @@ doesn't wire up any slice; it applies schema directly.
 
 ## Project reference dependencies
 
-Solid arrows are compile-time project references. Dashed arrows are the two
-places slices talk to each other without a direct reference: the email MediatR
-contract routed through `Shared.Application`, and the one place that pattern is
-broken outright. Every DB-backed slice depends on the same three foundation
-projects (`Shared.Contracts`, `Domain.Entities`, `Database.Connection`) — drawn
-as one box instead of fifteen separate arrows; see the notes for what else each
-of those foundation projects pulls in.
+Solid arrows are compile-time project references — every slice-to-slice
+dependency is one now that the email MediatR contract has moved off
+`Shared.Application`: `Features.Users` on `Features.PhotoUpload` for avatar
+uploads, and `Features.Emails` on `Features.Users` for the registration and
+resend-confirmation notifications. Every DB-backed slice depends on the same
+three foundation projects (`Shared.Contracts`, `Domain.Entities`,
+`Database.Connection`) — drawn as one box instead of fifteen separate arrows;
+see the notes for what else each of those foundation projects pulls in.
 
 ```mermaid
 --8<-- "web/diagrams/vertical-slice/project-references.mmd"
@@ -54,17 +55,20 @@ of those foundation projects pulls in.
   - `Features.Beers` is scaffolded (project + references only, no source files
     yet)
 
-- **The one exception to slice isolation**: `Features.Users` takes a direct
-  project reference to `Features.PhotoUpload`
-  - sends its `UploadPhotoCommand` via MediatR from `UploadAvatarHandler`
-  - unlike the email flow, the command type lives in the target slice itself,
-    not in `Shared.Application`
+- **The exceptions to slice isolation**:
+  - `Features.Users` takes a direct project reference to `Features.PhotoUpload`
+    - sends its `UploadPhotoCommand` via MediatR from `UploadAvatarHandler`
+    - the command type lives in the target slice itself, not in
+      `Shared.Application`
+  - `Features.Emails` takes a direct project reference to `Features.Users`
+    - handles `UserRegisteredNotification` (published from
+      `RegisterUserHandler`) and `ConfirmationEmailResendRequestedNotification`
+      (published from `ResendConfirmationEmailHandler`)
+    - both notification types live in `Features.Users`
+      (`Features.Auth.Notifications`), not in `Shared.Application`
 
 - **Shared.Application**:
   - `ValidationBehavior` (MediatR pipeline)
-  - Cross-slice email commands (`SendRegistrationEmailCommand`,
-    `SendResendConfirmationEmailCommand`)
-  - MediatR command contract (not project reference)
   - Every slice (including `Features.Emails`) references it for the pipeline
     behavior alone
 

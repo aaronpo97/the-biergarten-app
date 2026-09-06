@@ -51,13 +51,20 @@ sequenceDiagram
             TokenSvc-->>ResendHandler: confirmation token
             deactivate TokenSvc
 
-            ResendHandler->>Mediator: Send(SendResendConfirmationEmailCommand)
+            ResendHandler->>Mediator: Publish(ConfirmationEmailResendRequestedNotification)
             activate Mediator
+            Note right of Mediator: Features.Emails has a direct ProjectReference on Features.Users and handles the notification via ConfirmationEmailResendRequestedNotificationHandler
             Mediator->>EmailDispatcher: SendResendConfirmationEmailAsync(firstName, email, confirmationToken)
             activate EmailDispatcher
             EmailDispatcher->>Template: Render email (same Razor pipeline as registration)
             EmailDispatcher->>SMTP: SendAsync(email, subject, body)
             deactivate EmailDispatcher
+
+            alt Email sent successfully
+                Note right of Mediator: ConfirmationEmailResendRequestedNotificationHandler completes normally
+            else EmailDispatcher throws
+                Note right of Mediator: ConfirmationEmailResendRequestedNotificationHandler catches and logs the exception — the resend request is unaffected
+            end
             deactivate Mediator
         end
     end
