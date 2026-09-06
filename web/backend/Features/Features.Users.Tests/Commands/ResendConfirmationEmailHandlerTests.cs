@@ -1,11 +1,11 @@
 using Features.Auth.Commands.Authentication.ResendConfirmationEmail;
 using Features.Auth.Identity;
+using Features.Auth.Notifications;
 using Features.Auth.Services;
 using Features.Auth.Tests.TestSupport;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Moq;
-using Shared.Application.Emails;
 
 namespace Features.Auth.Tests.Commands;
 
@@ -47,11 +47,12 @@ public class ResendConfirmationEmailHandlerTests
 
         _mediatorMock.Verify(
             x =>
-                x.Send(
-                    It.Is<SendResendConfirmationEmailCommand>(c =>
-                        c.FirstName == "Aaron"
-                        && c.Email == "aaron@example.com"
-                        && c.ConfirmationToken == "fresh-token"
+                x.Publish(
+                    It.Is<ConfirmationEmailResendRequestedNotification>(n =>
+                        n.UserId == userId
+                        && n.FirstName == "Aaron"
+                        && n.Email == "aaron@example.com"
+                        && n.ConfirmationToken == "fresh-token"
                     ),
                     It.IsAny<CancellationToken>()
                 ),
@@ -71,8 +72,8 @@ public class ResendConfirmationEmailHandlerTests
 
         _mediatorMock.Verify(
             x =>
-                x.Send(
-                    It.IsAny<SendResendConfirmationEmailCommand>(),
+                x.Publish(
+                    It.IsAny<ConfirmationEmailResendRequestedNotification>(),
                     It.IsAny<CancellationToken>()
                 ),
             Times.Never
@@ -92,8 +93,8 @@ public class ResendConfirmationEmailHandlerTests
 
         _mediatorMock.Verify(
             x =>
-                x.Send(
-                    It.IsAny<SendResendConfirmationEmailCommand>(),
+                x.Publish(
+                    It.IsAny<ConfirmationEmailResendRequestedNotification>(),
                     It.IsAny<CancellationToken>()
                 ),
             Times.Never
