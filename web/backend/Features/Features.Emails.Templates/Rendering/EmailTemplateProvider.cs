@@ -1,10 +1,10 @@
-using Infrastructure.Email.Templates.Mail;
+using Features.Emails.Templates.Mail;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.HtmlRendering;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Email.Templates.Rendering;
+namespace Features.Emails.Templates.Rendering;
 
 /// <summary>
 ///     Service for rendering Razor email templates to HTML using HtmlRenderer.
