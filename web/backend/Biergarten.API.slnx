@@ -44,5 +44,6 @@
     <Folder Name="/Shared/">
         <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
         <Project Path="Shared/Shared.Application/Shared.Application.csproj" />
+        <Project Path="Shared/Shared.Application.Tests/Shared.Application.Tests.csproj" />
     </Folder>
 </Solution>
