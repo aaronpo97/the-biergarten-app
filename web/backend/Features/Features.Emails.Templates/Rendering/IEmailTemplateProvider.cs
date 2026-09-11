@@ -1,4 +1,4 @@
-namespace Infrastructure.Email.Templates.Rendering;
+namespace Features.Emails.Templates.Rendering;
 
 /// <summary>
 ///     Service for rendering Razor email templates to HTML.
