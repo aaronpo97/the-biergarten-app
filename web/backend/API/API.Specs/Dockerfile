@@ -27,7 +27,6 @@ COPY ["Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.
 COPY ["Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj", "Infrastructure/Infrastructure.Email/"]
 COPY ["Infrastructure/Infrastructure.FileUpload/Infrastructure.FileUpload.csproj", "Infrastructure/Infrastructure.FileUpload/"]
 COPY ["Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj", "Infrastructure/Infrastructure.Jwt/"]
-COPY ["Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj", "Infrastructure/Infrastructure.PasswordHashing/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
 RUN dotnet restore "Biergarten.API.slnx"
