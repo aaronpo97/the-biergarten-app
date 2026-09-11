@@ -24,7 +24,6 @@
         <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
         <Project Path="Infrastructure/Infrastructure.FileUpload/Infrastructure.FileUpload.csproj" />
         <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
-        <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
     </Folder>
     <Folder Name="/Features/" />
     <Folder Name="/Features/Users/">

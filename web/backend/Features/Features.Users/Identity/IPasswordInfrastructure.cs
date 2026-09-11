@@ -1,4 +1,4 @@
-namespace Infrastructure.PasswordHashing;
+namespace Features.Users.Identity;
 
 /// <summary>
 ///     Service for hashing and verifying user passwords.
