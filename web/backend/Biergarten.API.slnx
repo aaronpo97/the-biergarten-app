@@ -19,8 +19,8 @@
         <Project Path="Domain/Domain.Entities/Domain.Entities.csproj" />
         <Project Path="Domain/Domain.Exceptions/Domain.Exceptions.csproj" />
     </Folder>
-    <Folder Name="/Infrastructure/">
-        <Project Path="Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.csproj" />
+    <Folder Name="/Configuration/">
+        <Project Path="Configuration/Configuration.csproj" />
     </Folder>
     <Folder Name="/Features/" />
     <Folder Name="/Features/Users/">

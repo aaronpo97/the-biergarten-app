@@ -14,7 +14,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Domain\Domain.Entities\Domain.Entities.csproj" />
         <ProjectReference Include="..\..\Domain\Domain.Exceptions\Domain.Exceptions.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
+        <ProjectReference Include="..\..\Configuration\Configuration.csproj" />
         <ProjectReference Include="..\..\Database\Database.Connection\Database.Connection.csproj" />
         <ProjectReference Include="..\Features.PhotoUpload\Features.PhotoUpload.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
