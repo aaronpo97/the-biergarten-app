@@ -233,7 +233,7 @@ file (`development` in dev, `production` in prod).
 
 ### SMTP configuration (backend)
 
-Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation and
+Read by `Features.Emails/Services/SmtpEmailProvider.cs` for sending confirmation and
 account emails.
 
 ```bash
@@ -246,7 +246,7 @@ SMTP_FROM_EMAIL=noreply@thebiergarten.app # Required, no default
 SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten"
 ```
 
-- **Implementation**: `Infrastructure.Email/SmtpEmailProvider.cs` throws on
+- **Implementation**: `Features.Emails/Services/SmtpEmailProvider.cs` throws on
   startup if `SMTP_HOST` or `SMTP_FROM_EMAIL` is missing
 - **Local dev**: point at the `mailpit` Docker service (SMTP on port 1025, web
   UI on http://localhost:8025)

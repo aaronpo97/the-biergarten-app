@@ -253,7 +253,7 @@ API.Specs/
 │   └── ApiGeneralSteps.cs              # Shared/general step definitions
 ├── Mocks/
 │   ├── MockEmailDispatcher.cs          # Substitutes Features.Emails' IEmailDispatcher
-│   └── MockEmailProvider.cs            # Substitutes Infrastructure.Email's IEmailProvider
+│   └── MockEmailProvider.cs            # Substitutes Features.Emails' IEmailProvider
 └── TestApiFactory.cs                   # Test server setup (swaps in the mocks above)
 ```
 
