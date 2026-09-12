@@ -47,6 +47,7 @@ export const Authenticated: Story = {
         const userButton = canvas.getByRole('button', { name: /hans/i });
         await expect(userButton).toBeInTheDocument();
         await userEvent.click(userButton);
+        await expect(canvas.getByRole('menuitem', { name: /my profile/i })).toBeInTheDocument();
         await expect(canvas.getByRole('menuitem', { name: /dashboard/i })).toBeInTheDocument();
         await expect(canvas.getByRole('menuitem', { name: /logout/i })).toBeInTheDocument();
     },
