@@ -98,7 +98,7 @@ see the notes for what else each of those foundation projects pulls in.
 - **Omitted from the diagram**:
   - `Domain.Exceptions` (referenced by nearly every project directly, including
     all of `Shared.Contracts` and each feature slice)
-  - `Infrastructure.Configuration` (the shared options-binding project
+  - `Configuration` (the shared options-binding project
     referenced by `Database.Connection`, `Features.PhotoUpload`,
     and `Features.Emails` directly)
   - both are plumbing-level dependencies of nearly everything above, and drawing
