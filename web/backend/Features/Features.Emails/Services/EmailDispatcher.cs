@@ -1,6 +1,5 @@
 using Features.Emails.Templates.Rendering;
 using Infrastructure.Configuration;
-using Infrastructure.Email;
 using Microsoft.Extensions.Configuration;
 
 namespace Features.Emails.Services;
