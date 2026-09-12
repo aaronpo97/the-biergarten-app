@@ -25,7 +25,6 @@ subgraph INFRA["Slice-specific Infrastructure"]
 direction LR
 PwdHash["Infrastructure.PasswordHashing"]
 FileUpload["Infrastructure.FileUpload"]
-Email["Infrastructure.Email"]
 EmailTemplates["Infrastructure.Email.Templates"]
 end
 
@@ -36,5 +35,5 @@ LocationsSlice --> FOUNDATION
 BeersSlice --> FOUNDATION
 PhotoSlice --> FOUNDATION & FileUpload
 UsersSlice --> FOUNDATION & PwdHash
-EmailsSlice --> Email & EmailTemplates
+EmailsSlice --> EmailTemplates
 DBConn -- Dapper SQL, no ORM --> Tables[("SQL Server<br>Tables")]
