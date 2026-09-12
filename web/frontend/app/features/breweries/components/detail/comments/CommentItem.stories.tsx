@@ -8,6 +8,7 @@ const commentItemDescription = `A single comment row on the brewery detail page:
 const comment: FillerComment = {
     id: '1',
     user: 'malt_kettle',
+    userAccountId: 'malt_kettle',
     initials: 'MK',
     rating: 5,
     time: '2 days ago',

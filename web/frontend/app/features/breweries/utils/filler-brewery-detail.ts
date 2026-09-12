@@ -88,6 +88,7 @@ export const FILLER_BEERS: FillerBeer[] = [
 export interface FillerComment {
     id: string;
     user: string;
+    userAccountId: string;
     initials: string;
     rating: number;
     time: string;
@@ -100,6 +101,7 @@ export const FILLER_COMMENTS: FillerComment[] = [
     {
         id: '1',
         user: 'malt_kettle',
+        userAccountId: 'malt_kettle',
         initials: 'MK',
         rating: 5,
         time: '2 days ago',
@@ -110,6 +112,7 @@ export const FILLER_COMMENTS: FillerComment[] = [
     {
         id: '2',
         user: 'stoutfan_88',
+        userAccountId: 'stoutfan_88',
         initials: 'SB',
         rating: 4,
         time: '1 week ago',
@@ -120,6 +123,7 @@ export const FILLER_COMMENTS: FillerComment[] = [
     {
         id: '3',
         user: 'ale_annie',
+        userAccountId: 'ale_annie',
         initials: 'AL',
         rating: 4,
         time: '3 weeks ago',

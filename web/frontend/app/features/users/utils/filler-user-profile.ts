@@ -74,13 +74,14 @@ export interface FillerFollowing {
     id: string;
     name: string;
     meta: string;
+    userAccountId?: string;
 }
 
 export const FILLER_FOLLOWING: FillerFollowing[] = [
     { id: '1', name: 'Breakside Brewery', meta: 'Portland, OR · Brewery' },
-    { id: '2', name: 'Jonah Weckstein', meta: '@jweck · 142 ratings' },
+    { id: '2', name: 'Jonah Weckstein', meta: '@jweck · 142 ratings', userAccountId: 'jweck' },
     { id: '3', name: 'Wayfinder Beer', meta: 'Portland, OR · Brewery' },
-    { id: '4', name: 'Casey Blume', meta: '@caseyb · 88 ratings' },
+    { id: '4', name: 'Casey Blume', meta: '@caseyb · 88 ratings', userAccountId: 'caseyb' },
 ];
 
 export interface FillerLiked {

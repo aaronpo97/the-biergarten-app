@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import EmptyState from '../EmptyState';
 import type { FillerFollowing } from '../../../utils/filler-user-profile';
 
@@ -31,7 +32,16 @@ const FollowingTab = ({ following, onToggleFollow }: FollowingTabProps) => {
                             </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm m-0 truncate">{f.name}</p>
+                            {f.userAccountId ? (
+                                <Link
+                                    to={`/users/${f.userAccountId}`}
+                                    className="font-semibold text-sm truncate link link-hover block"
+                                >
+                                    {f.name}
+                                </Link>
+                            ) : (
+                                <p className="font-semibold text-sm m-0 truncate">{f.name}</p>
+                            )}
                             <p className="text-xs text-base-content/60 m-0 truncate">{f.meta}</p>
                         </div>
                         <button
