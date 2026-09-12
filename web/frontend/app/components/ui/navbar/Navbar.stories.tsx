@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, screen, userEvent, within } from 'storybook/test';
 import Navbar from './Navbar';
 
 const navbarDescription = `Top-level navigation for the Biergarten website. These stories cover guest, authenticated, and mobile states so you can review branding, route visibility, account menu behavior, and responsive collapse without leaving Storybook.`;
@@ -47,9 +47,10 @@ export const Authenticated: Story = {
         const userButton = canvas.getByRole('button', { name: /hans/i });
         await expect(userButton).toBeInTheDocument();
         await userEvent.click(userButton);
-        await expect(canvas.getByRole('menuitem', { name: /my profile/i })).toBeInTheDocument();
-        await expect(canvas.getByRole('menuitem', { name: /dashboard/i })).toBeInTheDocument();
-        await expect(canvas.getByRole('menuitem', { name: /logout/i })).toBeInTheDocument();
+        // MenuItems is anchor-positioned, which portals it outside canvasElement.
+        await expect(screen.getByRole('menuitem', { name: /my profile/i })).toBeInTheDocument();
+        await expect(screen.getByRole('menuitem', { name: /dashboard/i })).toBeInTheDocument();
+        await expect(screen.getByRole('menuitem', { name: /logout/i })).toBeInTheDocument();
     },
 };
 
