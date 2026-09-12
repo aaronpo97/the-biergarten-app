@@ -19,7 +19,7 @@ namespace Database.Seed;
 
 internal class Program
 {
-    private static IMediator CreateMediator()
+    private static ServiceProvider BuildServiceProvider()
     {
         IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
 
@@ -38,11 +38,10 @@ internal class Program
                     .RegisterServicesFromAssemblyContaining<UploadPhotoCommand>()
             );
 
-        using ServiceProvider provider = services.BuildServiceProvider();
-        return provider.GetRequiredService<IMediator>();
+        return services.BuildServiceProvider();
     }
 
-    public static async Task Main()
+    public static async Task<int> Main()
     {
         using CancellationTokenSource cts = new();
         Console.CancelKeyPress += (_, e) =>
@@ -54,20 +53,24 @@ internal class Program
 
         try
         {
-            IMediator mediator = CreateMediator();
+            await using ServiceProvider provider = BuildServiceProvider();
+            IMediator mediator = provider.GetRequiredService<IMediator>();
             SeedRepository reader = new SeedRepository(
                 connectionString: "Data Source=SeedData/biergarten_seed_2026-08-25T20-45-50.697244Z.sqlite"
             );
             await new BiergartenDataSeeder(mediator, reader).Run(cts.Token);
+            return 0;
         }
         catch (OperationCanceledException)
         {
             AnsiConsole.MarkupLine("[yellow]Seeding cancelled.[/]");
+            return 1;
         }
         catch (Exception ex)
         {
             AnsiConsole.MarkupLine("[red]Seeding failed.[/]");
             AnsiConsole.WriteException(ex);
+            return 1;
         }
     }
 }

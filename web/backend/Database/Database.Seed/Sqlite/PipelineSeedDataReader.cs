@@ -58,13 +58,13 @@ public sealed class SeedRepository : IDisposable
     }
 
     private sealed record BreweryRow(
-        int Id,
+        long Id,
         string NameEn,
         string DescriptionEn,
         string NameLocal,
         string DescriptionLocal,
-        int AddressId,
-        int CityId,
+        long AddressId,
+        long CityId,
         double Longitude,
         double Latitude,
         string AddressLine1,
@@ -101,27 +101,27 @@ public sealed class SeedRepository : IDisposable
 
         return [.. rows.Select(row => new BreweryResult
             {
-                Id = row.Id,
+                Id = (int)row.Id,
                 NameEn = row.NameEn,
                 DescriptionEn = row.DescriptionEn,
                 NameLocal = row.NameLocal,
                 DescriptionLocal = row.DescriptionLocal,
                 Address = new BreweryAddress
                 {
-                    Id = row.AddressId,
-                    CityId = row.CityId,
-                    BreweryId = row.Id,
+                    Id = (int)row.AddressId,
+                    CityId = (int)row.CityId,
+                    BreweryId = (int)row.Id,
                     Longitude = row.Longitude,
                     Latitude = row.Latitude,
                     AddressLine1 = row.AddressLine1,
                     PostalCode = row.PostalCode,
-                    City = cities[row.CityId],
+                    City = cities[(int)row.CityId],
                 },
             })];
     }
 
     private sealed record UserRow(
-        int Id,
+        long Id,
         string FirstName,
         string LastName,
         string Gender,
@@ -130,8 +130,8 @@ public sealed class SeedRepository : IDisposable
         double ActivityWeight,
         string Email,
         string DateOfBirth,
-        int AddressId,
-        int CityId,
+        long AddressId,
+        long CityId,
         double Longitude,
         double Latitude
     );
@@ -172,16 +172,16 @@ public sealed class SeedRepository : IDisposable
                 DateOfBirth = row.DateOfBirth,
                 Address = new UserAddress
                 {
-                    Id = row.AddressId,
-                    CityId = row.CityId,
-                    UserId = row.Id,
+                    Id = (int)row.AddressId,
+                    CityId = (int)row.CityId,
+                    UserId = (int)row.Id,
                     Longitude = row.Longitude,
                     Latitude = row.Latitude,
-                    City = cities[row.CityId],
+                    City = cities[(int)row.CityId],
                 },
                 User = new UserResult
                 {
-                    Id = row.Id,
+                    Id = (int)row.Id,
                     FirstName = row.FirstName,
                     LastName = row.LastName,
                     Gender = row.Gender,
@@ -193,7 +193,7 @@ public sealed class SeedRepository : IDisposable
     }
 
     private sealed record CityRow(
-        int Id,
+        long Id,
         string CityName,
         string StateProvince,
         string Iso31662,
@@ -231,10 +231,10 @@ public sealed class SeedRepository : IDisposable
         IEnumerable<CityRow> rows = await connection.QueryAsync<CityRow>(command);
 
         return rows.ToDictionary(
-            row => row.Id,
+            row => (int)row.Id,
             row => new City
             {
-                Id = row.Id,
+                Id = (int)row.Id,
                 CityName = row.CityName,
                 StateProvinceName = row.StateProvince,
                 ISO_3166_2 = row.Iso31662,
