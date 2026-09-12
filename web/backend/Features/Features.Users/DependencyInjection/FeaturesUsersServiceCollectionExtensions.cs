@@ -1,7 +1,6 @@
 using Features.Users.Identity;
 using Features.Users.Repository;
 using Features.Users.Services;
-using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +18,7 @@ public static class FeaturesUsersServiceCollectionExtensions
     public static IServiceCollection AddFeaturesUsers(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenInfrastructure, JwtInfrastructure>();
         services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
         services.AddScoped<IUserListRepository, UserListRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();

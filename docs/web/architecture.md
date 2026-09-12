@@ -89,10 +89,8 @@ flowchart TB
     subgraph INFRA["Infrastructure Layer"]
         direction LR
         I1["Database.Connection"]
-        I2["Infrastructure.Jwt"]
         I3["Infrastructure.PasswordHashing"]
-        I4["Infrastructure.Email /<br/>Email.Templates"]
-        I5["Infrastructure.FileUpload"]
+        I4["Email.Templates"]
     end
 
     DB[("Database (SQL Server)")]
@@ -133,7 +131,6 @@ own
 
 - Every `Features.*` project (for controller/MediatR discovery)
 - `Shared.Contracts`, `Shared.Application`
-- `Infrastructure.Jwt` (for the auth middleware)
 
 **Rules**:
 
@@ -167,10 +164,8 @@ brewery photo upload command) rather than bound to an HTTP route directly.
 
 - `Domain.Entities`, `Domain.Exceptions`
 - `Database.Connection` (generic ADO.NET connection/command plumbing) plus
-  whichever infrastructure project the slice needs (`Infrastructure.Jwt`/
-  `Infrastructure.PasswordHashing` for Users, `Infrastructure.Email`/
-  `Infrastructure.Email.Templates` for Emails, `Infrastructure.FileUpload` for
-  PhotoUpload)
+  whichever infrastructure project the slice needs (`Infrastructure.PasswordHashing`
+  for Users, `Infrastructure.Email.Templates` for Emails)
 - `Shared.Contracts`, `Shared.Application`
 - No other `Features.*` project, with two exceptions: `Features.Users`
   references `Features.PhotoUpload` directly for avatar uploads, and
@@ -210,11 +205,8 @@ whichever slices need them
 | Project                          | Description                                                                                                                                                                                                                                                                |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Database.Connection`            | Generic ADO.NET connection/command plumbing (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not domain-specific; each slice's own `Repository/` folder builds on this.                                                                        |
-| `Infrastructure.Jwt`             | JWT token generation and validation.                                                                                                                                                                                                                                       |
 | `Infrastructure.PasswordHashing` | Argon2id password hashing.                                                                                                                                                                                                                                                 |
-| `Infrastructure.Email`           | Email sending capabilities (SMTP/MailKit).                                                                                                                                                                                                                                 |
 | `Infrastructure.Email.Templates` | Email template rendering (Razor components).                                                                                                                                                                                                                               |
-| `Infrastructure.FileUpload`      | `IFileStorageProvider` abstraction over S3-compatible object storage, implemented by `S3FileStorageProvider` (targets the SeaweedFS container in dev; any S3-compatible endpoint in other environments) using the AWS SDK's `AmazonS3Client` with `ForcePathStyle = true`. |
 
 **Dependencies**:
 

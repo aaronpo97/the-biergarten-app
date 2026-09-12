@@ -1,4 +1,4 @@
-using Infrastructure.Email;
+using Features.Emails.Services;
 
 namespace API.Specs.Mocks;
 

@@ -1,4 +1,11 @@
 <Solution>
+    <Folder Name="/Docker/">
+       <File Path="../docker-compose.db.yaml"/>
+       <File Path="../docker-compose.min.yaml"/>
+       <File Path="../docker-compose.dev.yaml"/>
+       <File Path="../docker-compose.prod.yaml"/>
+       <File Path="../docker-compose.test.yaml"/>
+    </Folder>
     <Folder Name="/API/">
         <Project Path="API/API.Core/API.Core.csproj" />
         <Project Path="API/API.Specs/API.Specs.csproj" />
@@ -12,25 +19,21 @@
         <Project Path="Domain/Domain.Entities/Domain.Entities.csproj" />
         <Project Path="Domain/Domain.Exceptions/Domain.Exceptions.csproj" />
     </Folder>
-    <Folder Name="/Features/Users/">
-        <Project Path="Features\Features.Users.Tests\Features.Users.Tests.csproj" />
-        <Project Path="Features\Features.Users\Features.Users.csproj" />
-    </Folder>
-    <Folder Name="/Infrastructure/">
-        <Project Path="Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Email/Infrastructure.Email.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Email.Templates/Infrastructure.Email.Templates.csproj" />
-        <Project Path="Infrastructure/Infrastructure.FileUpload/Infrastructure.FileUpload.csproj" />
-        <Project Path="Infrastructure/Infrastructure.Jwt/Infrastructure.Jwt.csproj" />
-        <Project Path="Infrastructure/Infrastructure.PasswordHashing/Infrastructure.PasswordHashing.csproj" />
+    <Folder Name="/Configuration/">
+        <Project Path="Configuration/Configuration.csproj" />
     </Folder>
     <Folder Name="/Features/" />
+    <Folder Name="/Features/Users/">
+        <Project Path="Features/Features.Users.Tests/Features.Users.Tests.csproj" />
+        <Project Path="Features/Features.Users/Features.Users.csproj" />
+    </Folder>
     <Folder Name="/Features/Breweries/">
         <Project Path="Features/Features.Breweries/Features.Breweries.csproj" />
         <Project Path="Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj" />
     </Folder>
     <Folder Name="/Features/Emails/">
         <Project Path="Features/Features.Emails/Features.Emails.csproj" />
+        <Project Path="Features/Features.Emails.Templates/Features.Emails.Templates.csproj" />
         <Project Path="Features/Features.Emails.Tests/Features.Emails.Tests.csproj" />
     </Folder>
     <Folder Name="/Features/Locations/">

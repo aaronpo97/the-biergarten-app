@@ -1,6 +1,5 @@
-using Infrastructure.Configuration;
-using Infrastructure.Email;
-using Infrastructure.Email.Templates.Rendering;
+using Features.Emails.Templates.Rendering;
+using Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace Features.Emails.Services;

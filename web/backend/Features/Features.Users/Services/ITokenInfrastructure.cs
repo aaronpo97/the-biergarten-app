@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Infrastructure.Jwt;
+namespace Features.Users.Services;
 
 /// <summary>
 ///     Service for generating and validating JSON Web Tokens (JWTs) used for authentication.

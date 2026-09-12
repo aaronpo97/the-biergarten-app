@@ -1,4 +1,4 @@
-namespace Infrastructure.Email;
+namespace Features.Emails.Services;
 
 /// <summary>
 ///     Service for sending emails.

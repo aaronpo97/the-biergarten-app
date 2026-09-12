@@ -22,6 +22,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Features.Users\Features.Users.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
+        <ProjectReference Include="..\..\Configuration\Configuration.csproj" />
     </ItemGroup>
 </Project>

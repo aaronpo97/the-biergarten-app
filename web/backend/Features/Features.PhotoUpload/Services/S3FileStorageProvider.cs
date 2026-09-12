@@ -1,9 +1,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using Infrastructure.Configuration;
+using Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace Infrastructure.FileUpload;
+namespace Features.ImageUploads.Services;
 
 /// <summary>
 ///     File storage service backed by an S3-compatible object store (e.g. SeaweedFS, AWS S3).

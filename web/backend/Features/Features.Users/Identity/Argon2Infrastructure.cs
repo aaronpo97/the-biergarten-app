@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Konscious.Security.Cryptography;
 
-namespace Infrastructure.PasswordHashing;
+namespace Features.Users.Identity;
 
 /// <summary>
 ///     Hashes and verifies passwords using the Argon2id algorithm via Konscious.Security.Cryptography.

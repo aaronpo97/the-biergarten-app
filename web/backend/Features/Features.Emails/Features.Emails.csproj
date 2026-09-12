@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MailKit" Version="4.16.0" />
         <PackageReference
             Include="Microsoft.Extensions.Configuration.Abstractions"
             Version="10.0.1"
@@ -14,10 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Configuration\Infrastructure.Configuration.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email\Infrastructure.Email.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.Email.Templates\Infrastructure.Email.Templates.csproj" />
+        <ProjectReference Include="..\..\Configuration\Configuration.csproj" />
         <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
+        <ProjectReference Include="..\Features.Emails.Templates\Features.Emails.Templates.csproj" />
         <ProjectReference Include="..\Features.Users\Features.Users.csproj" />
     </ItemGroup>
 </Project>

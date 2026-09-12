@@ -233,7 +233,7 @@ file (`development` in dev, `production` in prod).
 
 ### SMTP configuration (backend)
 
-Read by `Infrastructure.Email/SmtpEmailProvider.cs` for sending confirmation and
+Read by `Features.Emails/Services/SmtpEmailProvider.cs` for sending confirmation and
 account emails.
 
 ```bash
@@ -246,7 +246,7 @@ SMTP_FROM_EMAIL=noreply@thebiergarten.app # Required, no default
 SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten"
 ```
 
-- **Implementation**: `Infrastructure.Email/SmtpEmailProvider.cs` throws on
+- **Implementation**: `Features.Emails/Services/SmtpEmailProvider.cs` throws on
   startup if `SMTP_HOST` or `SMTP_FROM_EMAIL` is missing
 - **Local dev**: point at the `mailpit` Docker service (SMTP on port 1025, web
   UI on http://localhost:8025)
@@ -255,8 +255,8 @@ SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten
 
 ### File storage configuration (backend)
 
-Read by `Infrastructure.FileUpload/S3FileStorageProvider.cs` for uploading and
-retrieving photos via an S3-compatible object store.
+Read by `Features.PhotoUpload/Services/S3FileStorageProvider.cs` for uploading
+and retrieving photos via an S3-compatible object store.
 
 ```bash
 SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333   # Required, no default
