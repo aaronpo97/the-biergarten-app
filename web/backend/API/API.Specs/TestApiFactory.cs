@@ -1,7 +1,6 @@
 using API.Core;
 using API.Specs.Mocks;
 using Features.Emails.Services;
-using Infrastructure.Email;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

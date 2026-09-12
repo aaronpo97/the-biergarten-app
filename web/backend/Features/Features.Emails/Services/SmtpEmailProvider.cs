@@ -4,7 +4,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 
-namespace Infrastructure.Email;
+namespace Features.Emails.Services;
 
 /// <summary>
 ///     SMTP email service implementation using MailKit.

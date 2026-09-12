@@ -1,6 +1,5 @@
 using Features.Emails.Services;
 using Features.Emails.Templates.Rendering;
-using Infrastructure.Email;
 
 using Microsoft.Extensions.DependencyInjection;
 
