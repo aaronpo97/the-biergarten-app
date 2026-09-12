@@ -255,8 +255,8 @@ SMTP_FROM_NAME=The Biergarten App        # Optional, defaults to "The Biergarten
 
 ### File storage configuration (backend)
 
-Read by `Infrastructure.FileUpload/S3FileStorageProvider.cs` for uploading and
-retrieving photos via an S3-compatible object store.
+Read by `Features.PhotoUpload/Services/S3FileStorageProvider.cs` for uploading
+and retrieving photos via an S3-compatible object store.
 
 ```bash
 SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333   # Required, no default

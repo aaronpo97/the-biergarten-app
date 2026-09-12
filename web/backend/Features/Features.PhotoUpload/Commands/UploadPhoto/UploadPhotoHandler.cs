@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Features.ImageUploads.Repository;
-using Infrastructure.FileUpload;
+using Features.ImageUploads.Services;
 using MediatR;
 
 namespace Features.ImageUploads.Commands.UploadPhoto;

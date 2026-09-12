@@ -12,7 +12,6 @@ using Features.Users.Controllers;
 using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Infrastructure.FileUpload;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
 
@@ -103,9 +102,7 @@ internal static class ServiceCollectionExtensions
                 .AddFeaturesLocations();
 
         public IServiceCollection AddCoreInfrastructure() =>
-            services
-                .AddSingleton<IFileStorageProvider, S3FileStorageProvider>()
-                .AddScoped<GlobalExceptionFilter>();
+            services.AddScoped<GlobalExceptionFilter>();
 
         public IServiceCollection AddJwtAuthentication()
         {
