@@ -22,7 +22,7 @@ The Biergarten API validates JSON Web Tokens (JWTs) across three token types:
 
 ### Infrastructure layer
 
-#### [ITokenInfrastructure](../../web/backend/Infrastructure/Infrastructure.Jwt/ITokenInfrastructure.cs)
+#### [ITokenInfrastructure](../../web/backend/Features/Features.Users/Services/ITokenInfrastructure.cs)
 
 Low-level JWT operations.
 
@@ -32,7 +32,7 @@ Low-level JWT operations.
 - `ValidateJwtAsync()` - Validates token signature, expiration, and format
 
 **Implementation:**
-[JwtInfrastructure.cs](../../web/backend/Infrastructure/Infrastructure.Jwt/JwtInfrastructure.cs)
+[JwtInfrastructure.cs](../../web/backend/Features/Features.Users/Services/JwtInfrastructure.cs)
 
 - Uses Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler
 - Algorithm: HS256 (HMAC-SHA256)
@@ -76,12 +76,11 @@ directly, bypassing the `Features.Users` slice entirely.
 - Extracts and validates claims (Sub, UniqueName)
 - Throws `UnauthorizedException` on validation failure
 
-`TokenService` is registered by `Features.Users`' own `AddFeaturesUsers()`
-extension method, except for the lower-level `ITokenInfrastructure` (JWT
-signing/verification) it depends on, which is registered by the host
-(`API.Core/ServiceCollectionExtensions.cs`, via `AddCoreInfrastructure()`,
-called from `Program.cs`) since `JwtAuthenticationHandler` (host-level auth
-middleware) also depends on it directly.
+`TokenService` and the lower-level `ITokenInfrastructure` (JWT
+signing/verification) it depends on are both registered by `Features.Users`'
+own `AddFeaturesUsers()` extension method. `JwtAuthenticationHandler`
+(host-level auth middleware) also depends on `ITokenInfrastructure` directly,
+resolving it from the same DI container.
 
 ### Integration points
 

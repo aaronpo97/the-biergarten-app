@@ -13,7 +13,6 @@ using Features.Users.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.FileUpload;
-using Infrastructure.Jwt;
 using Microsoft.OpenApi.Models;
 using Shared.Application.Behaviors;
 
@@ -105,8 +104,6 @@ internal static class ServiceCollectionExtensions
 
         public IServiceCollection AddCoreInfrastructure() =>
             services
-                // ITokenInfrastructure is registered here because JwtAuthenticationHandler depends on it directly.
-                .AddScoped<ITokenInfrastructure, JwtInfrastructure>()
                 .AddSingleton<IFileStorageProvider, S3FileStorageProvider>()
                 .AddScoped<GlobalExceptionFilter>();
 

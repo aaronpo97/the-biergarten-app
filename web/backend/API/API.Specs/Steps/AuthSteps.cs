@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
+using Features.Users.Services;
 using FluentAssertions;
 using Infrastructure.Configuration;
-using Infrastructure.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
