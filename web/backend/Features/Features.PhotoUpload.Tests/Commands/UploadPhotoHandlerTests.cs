@@ -1,8 +1,8 @@
 using Domain.Entities;
 using Features.ImageUploads.Commands.UploadPhoto;
 using Features.ImageUploads.Repository;
+using Features.ImageUploads.Services;
 using FluentAssertions;
-using Infrastructure.FileUpload;
 using Microsoft.AspNetCore.Http;
 using Moq;
 

@@ -1,4 +1,4 @@
-namespace Infrastructure.FileUpload;
+namespace Features.ImageUploads.Services;
 
 /// <summary>
 ///     Service for storing and retrieving uploaded files in S3-compatible object storage.

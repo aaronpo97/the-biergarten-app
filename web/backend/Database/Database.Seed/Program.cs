@@ -10,7 +10,6 @@ using Features.Locations.Queries.GetCountry;
 using Features.Users.Commands.Profile.UploadAvatar;
 using Features.Users.DependencyInjection;
 using Features.Users.Services;
-using Infrastructure.FileUpload;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +30,6 @@ internal class Program
             .AddFeaturesLocations()
             .AddFeaturesUsers()
             .AddFeaturesPhotoUpload()
-            .AddSingleton<IFileStorageProvider, S3FileStorageProvider>()
             .AddScoped<ITokenService, NoOpTokenService>()
             .AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblyContaining<CreateBreweryCommand>()

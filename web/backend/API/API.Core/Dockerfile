@@ -34,7 +34,6 @@ COPY ["Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj", "
 COPY ["Features/Features.Users/Features.Users.csproj", "Features/Features.Users/"]
 COPY ["Features/Features.Users.Tests/Features.Users.Tests.csproj", "Features/Features.Users.Tests/"]
 COPY ["Infrastructure/Infrastructure.Configuration/Infrastructure.Configuration.csproj", "Infrastructure/Infrastructure.Configuration/"]
-COPY ["Infrastructure/Infrastructure.FileUpload/Infrastructure.FileUpload.csproj", "Infrastructure/Infrastructure.FileUpload/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
 RUN dotnet restore "Biergarten.API.slnx"

@@ -99,7 +99,7 @@ see the notes for what else each of those foundation projects pulls in.
   - `Domain.Exceptions` (referenced by nearly every project directly, including
     all of `Shared.Contracts` and each feature slice)
   - `Infrastructure.Configuration` (the shared options-binding project
-    referenced by `Database.Connection`, `Infrastructure.FileUpload`,
+    referenced by `Database.Connection`, `Features.PhotoUpload`,
     and `Features.Emails` directly)
   - both are plumbing-level dependencies of nearly everything above, and drawing
     them would just add a second copy of the same fan-in
