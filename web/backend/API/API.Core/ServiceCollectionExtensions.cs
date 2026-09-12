@@ -46,6 +46,7 @@ internal static class ServiceCollectionExtensions
                     cfg.RegisterServicesFromAssembly(typeof(UploadPhotoCommand).Assembly);
                     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
                     cfg.RegisterServicesFromAssembly(typeof(CityController).Assembly);
+                    cfg.AddOpenBehavior(typeof(UnhandledExceptionLoggingBehavior<,>));
                     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 });
 

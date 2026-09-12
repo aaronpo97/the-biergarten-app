@@ -76,10 +76,11 @@ docker compose --env-file web/.env.test -f web/docker-compose.test.yaml down -v
 
 You can run individual test projects locally without Docker:
 
-### Feature slice unit tests
+### Feature slice and shared unit tests
 
 Each feature slice has its own test project, covering its command/query
-handlers:
+handlers. Shared cross-cutting code (e.g. MediatR pipeline behaviors) has
+its own test project under `Shared/`:
 
 ```bash
 cd web/backend
@@ -87,9 +88,10 @@ dotnet test Features/Features.Users.Tests/Features.Users.Tests.csproj
 dotnet test Features/Features.Breweries.Tests/Features.Breweries.Tests.csproj
 dotnet test Features/Features.Emails.Tests/Features.Emails.Tests.csproj
 dotnet test Features/Features.PhotoUpload.Tests/Features.PhotoUpload.Tests.csproj
+dotnet test Shared/Shared.Application.Tests/Shared.Application.Tests.csproj
 
 # Or run all of them at once via the solution:
-for proj in Features/*.Tests; do dotnet test "$proj"; done
+for proj in Features/*.Tests Shared/*.Tests; do dotnet test "$proj"; done
 ```
 
 **Requirements**:

@@ -1,6 +1,6 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using Infrastructure.Configuration;
+using Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace Features.ImageUploads.Services;

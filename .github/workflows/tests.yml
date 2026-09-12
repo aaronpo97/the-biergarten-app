@@ -33,7 +33,7 @@ jobs:
         if: always()
         run: |
           status=0
-          for name in test-env-api-specs test-env-unit-tests test-env-frontend-tests; do
+          for name in test-env-database-migrations test-env-database-seed test-env-api-specs test-env-unit-tests test-env-frontend-tests; do
             code="$(docker inspect -f '{{.State.ExitCode}}' "$name" 2>/dev/null || echo 1)"
             echo "$name exited with $code"
             if [ "$code" != "0" ]; then

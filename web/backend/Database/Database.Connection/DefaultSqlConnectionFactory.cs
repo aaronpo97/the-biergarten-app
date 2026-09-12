@@ -1,4 +1,4 @@
-using Infrastructure.Configuration;
+using Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
