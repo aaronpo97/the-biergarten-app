@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
-namespace Infrastructure.Jwt;
+namespace Features.Users.Services;
 
 /// <summary>
 ///     Generates and validates HMAC-SHA256 signed JWTs using <see cref="JsonWebTokenHandler" />.

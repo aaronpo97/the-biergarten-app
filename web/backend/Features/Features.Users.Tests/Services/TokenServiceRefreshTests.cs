@@ -6,7 +6,6 @@ using Features.Users.Services;
 using Features.Users.Tests.TestSupport;
 using FluentAssertions;
 using Infrastructure.Configuration;
-using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Moq;
