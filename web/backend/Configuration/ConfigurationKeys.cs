@@ -1,4 +1,4 @@
-namespace Infrastructure.Configuration;
+namespace Configuration;
 
 public static class ConfigurationKeys
 {
