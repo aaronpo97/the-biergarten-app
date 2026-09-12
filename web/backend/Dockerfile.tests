@@ -5,11 +5,11 @@ COPY . .
 RUN dotnet restore "Biergarten.API.slnx"
 RUN dotnet build "Biergarten.API.slnx" -c $BUILD_CONFIGURATION
 
-# Runs every Features.*.Tests project (unit + DbMocker-backed repository tests). API.Specs is
-# excluded here since it's a separate BDD/integration suite, run by its own compose service
-# against the live, seeded database.
+# Runs every Features.*.Tests and Shared.*.Tests project (unit + DbMocker-backed repository
+# tests). API.Specs is excluded here since it's a separate BDD/integration suite, run by its own
+# compose service against the live, seeded database.
 FROM build AS final
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 RUN mkdir -p /app/test-results
-ENTRYPOINT ["sh", "-c", "set -e; for proj in Features/*.Tests; do dotnet test \"$proj\" -c ${BUILD_CONFIGURATION:-Release} --logger \"trx;LogFileName=/app/test-results/$(basename \"$proj\").trx\"; done"]
+ENTRYPOINT ["sh", "-c", "set -e; for proj in Features/*.Tests Shared/*.Tests; do dotnet test \"$proj\" -c ${BUILD_CONFIGURATION:-Release} --logger \"trx;LogFileName=/app/test-results/$(basename \"$proj\").trx\"; done"]

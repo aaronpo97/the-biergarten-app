@@ -35,6 +35,7 @@ COPY ["Features/Features.Users/Features.Users.csproj", "Features/Features.Users/
 COPY ["Features/Features.Users.Tests/Features.Users.Tests.csproj", "Features/Features.Users.Tests/"]
 COPY ["Configuration/Configuration.csproj", "Configuration/"]
 COPY ["Shared/Shared.Application/Shared.Application.csproj", "Shared/Shared.Application/"]
+COPY ["Shared/Shared.Application.Tests/Shared.Application.Tests.csproj", "Shared/Shared.Application.Tests/"]
 COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
 RUN dotnet restore "Biergarten.API.slnx"
 COPY . .

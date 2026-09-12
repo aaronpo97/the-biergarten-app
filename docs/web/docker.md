@@ -98,7 +98,7 @@ sqlserver           # Test database
 database.migrations # Fresh schema
 database.seed      # Test data
 api.specs          # Reqnroll BDD tests
-unit.tests         # All Features.*.Tests unit test projects
+unit.tests         # All Features.*.Tests and Shared.*.Tests unit test projects
 frontend.tests     # Storybook Vitest + Playwright suites (own Playwright image)
 ```
 
