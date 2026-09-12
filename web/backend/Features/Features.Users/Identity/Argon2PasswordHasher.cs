@@ -1,4 +1,3 @@
-using Infrastructure.PasswordHashing;
 using Microsoft.AspNetCore.Identity;
 
 namespace Features.Users.Identity;
