@@ -3,25 +3,40 @@ import { Link } from 'react-router';
 
 interface UserMenuProps {
     username: string;
+    userAccountId: string;
 }
 
-const UserMenu = ({ username }: UserMenuProps) => (
-    <Menu as="div" className="relative">
+const UserMenu = ({ username, userAccountId }: UserMenuProps) => (
+    <Menu>
         <MenuButton className="btn btn-ghost btn-sm">{username}</MenuButton>
-        <MenuItems className="menu absolute right-0 z-60 mt-2 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl focus:outline-none">
+        <MenuItems
+            anchor="bottom end"
+            transition
+            className="menu z-60 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl [--anchor-gap:8px] focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+        >
             <MenuItem>
-                {({ focus }) => (
-                    <Link to="/dashboard" className={focus ? 'active' : ''}>
-                        Dashboard
-                    </Link>
-                )}
+                <Link
+                    to={`/users/${userAccountId}`}
+                    className="rounded-field block px-3 py-1.5 data-[focus]:bg-base-200"
+                >
+                    My profile
+                </Link>
             </MenuItem>
             <MenuItem>
-                {({ focus }) => (
-                    <Link to="/logout" className={focus ? 'active' : ''}>
-                        Logout
-                    </Link>
-                )}
+                <Link
+                    to="/dashboard"
+                    className="rounded-field block px-3 py-1.5 data-[focus]:bg-base-200"
+                >
+                    Dashboard
+                </Link>
+            </MenuItem>
+            <MenuItem>
+                <Link
+                    to="/logout"
+                    className="rounded-field block px-3 py-1.5 data-[focus]:bg-base-200"
+                >
+                    Logout
+                </Link>
             </MenuItem>
         </MenuItems>
     </Menu>

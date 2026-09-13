@@ -88,6 +88,7 @@ export const FILLER_BEERS: FillerBeer[] = [
 export interface FillerComment {
     id: string;
     user: string;
+    userAccountId?: string;
     initials: string;
     rating: number;
     time: string;
@@ -96,6 +97,8 @@ export interface FillerComment {
     liked: boolean;
 }
 
+// `userAccountId` is left unset below since these commenters aren't backed by real accounts
+// yet; CommentItem only links a commenter's name once a real account GUID is available.
 export const FILLER_COMMENTS: FillerComment[] = [
     {
         id: '1',

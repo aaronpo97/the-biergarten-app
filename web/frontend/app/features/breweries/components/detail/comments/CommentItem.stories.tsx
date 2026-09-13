@@ -54,3 +54,14 @@ export const Liked: Story = {
         await expect(canvas.getByRole('button', { name: /13 likes/i })).toBeInTheDocument();
     },
 };
+
+export const WithLinkedAccount: Story = {
+    args: { comment: { ...comment, userAccountId: '11111111-1111-1111-1111-111111111111' } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('link', { name: 'malt_kettle' })).toHaveAttribute(
+            'href',
+            '/users/11111111-1111-1111-1111-111111111111',
+        );
+    },
+};
