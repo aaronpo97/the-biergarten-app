@@ -2,6 +2,7 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Features.Users.Dtos;
 using Features.Users.Queries.GetAllUsers;
+using Features.Users.Queries.GetPublicUserProfileById;
 using Features.Users.Queries.GetUserById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,7 @@ public class UserController(IMediator mediator) : ControllerBase
     [HttpGet("{id:guid}/profile")]
     public async Task<ActionResult<PublicUserProfileDto>> GetPublicProfile(Guid id)
     {
-        UserAccount user = await mediator.Send(new GetUserByIdQuery(id));
-        return Ok(user.ToPublicProfileDto());
+        PublicUserProfileDto profile = await mediator.Send(new GetPublicUserProfileByIdQuery(id));
+        return Ok(profile);
     }
 }
