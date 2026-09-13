@@ -9,35 +9,35 @@ namespace Shared.Application.Tests.Behaviors;
 
 public class ValidationBehaviorTests
 {
-    private static ValidationBehavior<ValidationTestRequest, ValidationTestResponse> CreateBehavior(
-        params IValidator<ValidationTestRequest>[] validators
+    private static ValidationBehavior<TestRequest, TestResponse> CreateBehavior(
+        params IValidator<TestRequest>[] validators
     ) => new(validators);
 
     [Fact]
     public async Task Handle_WhenRequestPassesAllValidators_InvokesNextUnchanged()
     {
-        Mock<IValidator<ValidationTestRequest>> validatorMock = new();
+        Mock<IValidator<TestRequest>> validatorMock = new();
         validatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult());
-        ValidationBehavior<ValidationTestRequest, ValidationTestResponse> behavior = CreateBehavior(
+        ValidationBehavior<TestRequest, TestResponse> behavior = CreateBehavior(
             validatorMock.Object
         );
-        ValidationTestRequest request = new("aaron");
-        ValidationTestResponse response = new("ok");
+        TestRequest request = new("aaron", "pa$$word123");
+        TestResponse response = new("ok");
         bool nextInvoked = false;
-        RequestHandlerDelegate<ValidationTestResponse> next = () =>
+        RequestHandlerDelegate<TestResponse> next = () =>
         {
             nextInvoked = true;
             return Task.FromResult(response);
         };
 
-        ValidationTestResponse result = await behavior.Handle(
+        TestResponse result = await behavior.Handle(
             request,
             next,
             CancellationToken.None
@@ -50,30 +50,31 @@ public class ValidationBehaviorTests
     [Fact]
     public async Task Handle_WhenValidatorReportsFailures_ThrowsValidationExceptionAndNeverInvokesNext()
     {
-        ValidationFailure failure = new("Name", "is required");
-        Mock<IValidator<ValidationTestRequest>> validatorMock = new();
+        ValidationFailure failure = new("Username", "is required");
+        Mock<IValidator<TestRequest>> validatorMock = new();
         validatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult([failure]));
-        ValidationBehavior<ValidationTestRequest, ValidationTestResponse> behavior = CreateBehavior(
+        ValidationBehavior<TestRequest, TestResponse> behavior = CreateBehavior(
             validatorMock.Object
         );
-        ValidationTestRequest request = new("");
+        TestRequest request = new("", "pa$$word123");
         bool nextInvoked = false;
-        RequestHandlerDelegate<ValidationTestResponse> next = () =>
+        RequestHandlerDelegate<TestResponse> next = () =>
         {
             nextInvoked = true;
-            return Task.FromResult(new ValidationTestResponse("ok"));
+            return Task.FromResult(new TestResponse("ok"));
         };
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
 
-        (await act.Should().ThrowAsync<ValidationException>()).Which.Errors.Should()
+        (await act.Should().ThrowAsync<ValidationException>())
+            .Which.Errors.Should()
             .ContainSingle()
             .Which.Should()
             .BeSameAs(failure);
@@ -83,38 +84,38 @@ public class ValidationBehaviorTests
     [Fact]
     public async Task Handle_WhenMultipleValidatorsAreRegistered_RunsAllOfThem()
     {
-        Mock<IValidator<ValidationTestRequest>> firstValidatorMock = new();
+        Mock<IValidator<TestRequest>> firstValidatorMock = new();
         firstValidatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult());
-        Mock<IValidator<ValidationTestRequest>> secondValidatorMock = new();
+        Mock<IValidator<TestRequest>> secondValidatorMock = new();
         secondValidatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult());
-        ValidationBehavior<ValidationTestRequest, ValidationTestResponse> behavior = CreateBehavior(
+        ValidationBehavior<TestRequest, TestResponse> behavior = CreateBehavior(
             firstValidatorMock.Object,
             secondValidatorMock.Object
         );
-        ValidationTestRequest request = new("aaron");
-        RequestHandlerDelegate<ValidationTestResponse> next = () =>
-            Task.FromResult(new ValidationTestResponse("ok"));
+        TestRequest request = new("aaron", "pa$$word123");
+        RequestHandlerDelegate<TestResponse> next = () =>
+            Task.FromResult(new TestResponse("ok"));
 
         await behavior.Handle(request, next, CancellationToken.None);
 
         firstValidatorMock.Verify(
             v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 ),
             Times.Once()
@@ -122,7 +123,7 @@ public class ValidationBehaviorTests
         secondValidatorMock.Verify(
             v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 ),
             Times.Once()
@@ -132,49 +133,51 @@ public class ValidationBehaviorTests
     [Fact]
     public async Task Handle_WhenMultipleValidatorsReportFailures_AggregatesErrorsFromAll()
     {
-        ValidationFailure firstFailure = new("Name", "is required");
-        ValidationFailure secondFailure = new("Name", "must be at least 3 characters");
-        Mock<IValidator<ValidationTestRequest>> firstValidatorMock = new();
+        ValidationFailure firstFailure = new("Username", "is required");
+        ValidationFailure secondFailure = new("Username", "must be at least 3 characters");
+        Mock<IValidator<TestRequest>> firstValidatorMock = new();
         firstValidatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult([firstFailure]));
-        Mock<IValidator<ValidationTestRequest>> secondValidatorMock = new();
+        Mock<IValidator<TestRequest>> secondValidatorMock = new();
         secondValidatorMock
             .Setup(v =>
                 v.ValidateAsync(
-                    It.IsAny<ValidationContext<ValidationTestRequest>>(),
+                    It.IsAny<ValidationContext<TestRequest>>(),
                     It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new ValidationResult([secondFailure]));
-        ValidationBehavior<ValidationTestRequest, ValidationTestResponse> behavior = CreateBehavior(
+        ValidationBehavior<TestRequest, TestResponse> behavior = CreateBehavior(
             firstValidatorMock.Object,
             secondValidatorMock.Object
         );
-        ValidationTestRequest request = new("");
-        RequestHandlerDelegate<ValidationTestResponse> next = () =>
-            Task.FromResult(new ValidationTestResponse("ok"));
+        TestRequest request = new("", "pa$$word123");
+        RequestHandlerDelegate<TestResponse> next = () =>
+            Task.FromResult(new TestResponse("ok"));
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
 
-        (await act.Should().ThrowAsync<ValidationException>()).Which.Errors.Should()
+        (await act.Should().ThrowAsync<ValidationException>())
+            .Which.Errors.Should()
             .BeEquivalentTo([firstFailure, secondFailure]);
     }
 
     [Fact]
     public async Task Handle_WhenNoValidatorsAreRegistered_InvokesNext()
     {
-        ValidationBehavior<ValidationTestRequest, ValidationTestResponse> behavior = CreateBehavior();
-        ValidationTestRequest request = new("aaron");
-        ValidationTestResponse response = new("ok");
-        RequestHandlerDelegate<ValidationTestResponse> next = () => Task.FromResult(response);
+        ValidationBehavior<TestRequest, TestResponse> behavior =
+            CreateBehavior();
+        TestRequest request = new("aaron", "pa$$word123");
+        TestResponse response = new("ok");
+        RequestHandlerDelegate<TestResponse> next = () => Task.FromResult(response);
 
-        ValidationTestResponse result = await behavior.Handle(
+        TestResponse result = await behavior.Handle(
             request,
             next,
             CancellationToken.None
@@ -183,7 +186,3 @@ public class ValidationBehaviorTests
         result.Should().BeSameAs(response);
     }
 }
-
-public record ValidationTestRequest(string Name) : IRequest<ValidationTestResponse>;
-
-public record ValidationTestResponse(string Value);
