@@ -1,4 +1,5 @@
-import { Tab, TabGroup, TabList } from '@headlessui/react';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import type { ReactNode } from 'react';
 
 export type ProfileTab = 'activity' | 'following' | 'liked';
 
@@ -11,9 +12,10 @@ const TABS: { id: ProfileTab; label: string }[] = [
 interface ProfileTabsProps {
     activeTab: ProfileTab;
     onChange: (tab: ProfileTab) => void;
+    panels: Record<ProfileTab, ReactNode>;
 }
 
-const ProfileTabs = ({ activeTab, onChange }: ProfileTabsProps) => {
+const ProfileTabs = ({ activeTab, onChange, panels }: ProfileTabsProps) => {
     const selectedIndex = TABS.findIndex((tab) => tab.id === activeTab);
 
     return (
@@ -28,6 +30,11 @@ const ProfileTabs = ({ activeTab, onChange }: ProfileTabsProps) => {
                     </Tab>
                 ))}
             </TabList>
+            <TabPanels className="mt-5">
+                {TABS.map((tab) => (
+                    <TabPanel key={tab.id}>{panels[tab.id]}</TabPanel>
+                ))}
+            </TabPanels>
         </TabGroup>
     );
 };

@@ -20,9 +20,16 @@ const CommentItem = ({ comment, onToggleLike }: CommentItemProps) => {
             </div>
             <div className="flex-1 flex flex-col gap-1 min-w-0">
                 <div className="flex items-baseline gap-2 flex-wrap">
-                    <Link to={`/users/${comment.userAccountId}`} className="font-bold text-sm link link-hover">
-                        {comment.user}
-                    </Link>
+                    {comment.userAccountId ? (
+                        <Link
+                            to={`/users/${comment.userAccountId}`}
+                            className="font-bold text-sm link link-hover"
+                        >
+                            {comment.user}
+                        </Link>
+                    ) : (
+                        <span className="font-bold text-sm">{comment.user}</span>
+                    )}
                     <StarRating value={comment.rating} size="xs" />
                     <span className="text-xs text-base-content/60">{comment.time}</span>
                 </div>

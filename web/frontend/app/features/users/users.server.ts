@@ -11,15 +11,17 @@ export interface PublicUserProfile {
 }
 
 /**
- * Fetches the public-facing slice of a user account. `GET /api/user/{id}` also returns
- * `email` and `dateOfBirth`, but those stay out of anything rendered on a public profile.
+ * Fetches the public-facing slice of a user account from the dedicated public-profile
+ * endpoint, which never includes `email` or `dateOfBirth`.
  */
 export const getPublicUserProfile = async (
     userAccountId: string,
 ): Promise<PublicUserProfile | null> => {
     let res: Response;
     try {
-        res = await fetch(`${API_BASE_URL}/api/user/${encodeURIComponent(userAccountId)}`);
+        res = await fetch(
+            `${API_BASE_URL}/api/user/${encodeURIComponent(userAccountId)}/profile`,
+        );
     } catch {
         throw data('The user service is unreachable right now. Please try again in a moment.', {
             status: 503,

@@ -22,13 +22,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const panels = {
+    activity: <p>Activity panel</p>,
+    following: <p>Following panel</p>,
+    liked: <p>Liked panel</p>,
+};
+
 const ControlledTabs = () => {
     const [activeTab, setActiveTab] = useState<ProfileTab>('activity');
-    return <ProfileTabs activeTab={activeTab} onChange={setActiveTab} />;
+    return <ProfileTabs activeTab={activeTab} onChange={setActiveTab} panels={panels} />;
 };
 
 export const Default: Story = {
-    args: { activeTab: 'activity', onChange: fn() },
+    args: { activeTab: 'activity', onChange: fn(), panels },
     render: () => <ControlledTabs />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -36,5 +42,6 @@ export const Default: Story = {
         await expect(followingTab).toHaveAttribute('aria-selected', 'false');
         await userEvent.click(followingTab);
         await expect(followingTab).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByText('Following panel')).toBeInTheDocument();
     },
 };

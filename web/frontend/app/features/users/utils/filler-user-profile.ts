@@ -77,11 +77,13 @@ export interface FillerFollowing {
     userAccountId?: string;
 }
 
+// `userAccountId` is left unset for rows below since no backend account backs them yet;
+// FollowingTab only links a row once a real account GUID is available (see USER_PROFILE_HANDOFF.md).
 export const FILLER_FOLLOWING: FillerFollowing[] = [
     { id: '1', name: 'Breakside Brewery', meta: 'Portland, OR · Brewery' },
-    { id: '2', name: 'Jonah Weckstein', meta: '@jweck · 142 ratings', userAccountId: 'jweck' },
+    { id: '2', name: 'Jonah Weckstein', meta: '@jweck · 142 ratings' },
     { id: '3', name: 'Wayfinder Beer', meta: 'Portland, OR · Brewery' },
-    { id: '4', name: 'Casey Blume', meta: '@caseyb · 88 ratings', userAccountId: 'caseyb' },
+    { id: '4', name: 'Casey Blume', meta: '@caseyb · 88 ratings' },
 ];
 
 export interface FillerLiked {

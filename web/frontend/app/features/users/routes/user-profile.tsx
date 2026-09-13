@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { data } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import { getOptionalAuth } from '../../auth/auth.server';
-import { getPublicUserProfile } from '../users.server';
+import { getPublicUserProfile, type PublicUserProfile } from '../users.server';
 import ProfileSidebarCard from '../components/profile/ProfileSidebarCard';
 import ProfileTabs, { type ProfileTab } from '../components/profile/ProfileTabs';
 import ActivityTab from '../components/profile/tabs/ActivityTab';
@@ -37,9 +37,17 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
 const joinedLabel = (isoDate: string) =>
     `Joined ${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(isoDate))}`;
 
-const UserProfile = ({ loaderData }: Route.ComponentProps) => {
-    const { profile, isOwnProfile } = loaderData;
+interface ProfileContentProps {
+    profile: PublicUserProfile;
+    isOwnProfile: boolean;
+}
 
+/**
+ * Owns the profile-scoped interactive state. Keyed by `profile.userAccountId` in the
+ * parent so React remounts it (resetting follow/tab state) when the route's `:id` changes,
+ * since React Router reuses the route component itself across param-only navigations.
+ */
+const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
     const [activeTab, setActiveTab] = useState<ProfileTab>('activity');
     const [isFollowingProfile, setIsFollowingProfile] = useState(false);
     const [following, setFollowing] = useState(() =>
@@ -91,21 +99,37 @@ const UserProfile = ({ loaderData }: Route.ComponentProps) => {
                         />
                     </div>
 
-                    <div className="flex flex-col gap-5 mt-12">
-                        <ProfileTabs activeTab={activeTab} onChange={setActiveTab} />
-
-                        {activeTab === 'activity' && <ActivityTab activity={FILLER_ACTIVITY} />}
-                        {activeTab === 'following' && (
-                            <FollowingTab
-                                following={following}
-                                onToggleFollow={handleToggleFollowRow}
-                            />
-                        )}
-                        {activeTab === 'liked' && <LikedTab liked={FILLER_LIKED} />}
+                    <div className="mt-12">
+                        <ProfileTabs
+                            activeTab={activeTab}
+                            onChange={setActiveTab}
+                            panels={{
+                                activity: <ActivityTab activity={FILLER_ACTIVITY} />,
+                                following: (
+                                    <FollowingTab
+                                        following={following}
+                                        onToggleFollow={handleToggleFollowRow}
+                                    />
+                                ),
+                                liked: <LikedTab liked={FILLER_LIKED} />,
+                            }}
+                        />
                     </div>
                 </div>
             </div>
         </div>
+    );
+};
+
+const UserProfile = ({ loaderData }: Route.ComponentProps) => {
+    const { profile, isOwnProfile } = loaderData;
+
+    return (
+        <ProfileContent
+            key={profile.userAccountId}
+            profile={profile}
+            isOwnProfile={isOwnProfile}
+        />
     );
 };
 
