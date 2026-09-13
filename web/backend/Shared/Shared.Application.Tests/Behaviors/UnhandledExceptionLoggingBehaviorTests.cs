@@ -14,15 +14,18 @@ public class UnhandledExceptionLoggingBehaviorTests
         ILogger<UnhandledExceptionLoggingBehavior<TestRequest, TestResponse>>
     > _loggerMock = new();
 
-    private UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> CreateBehavior() =>
-        new(_loggerMock.Object);
+    private UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> CreateBehavior()
+    {
+        _loggerMock.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
+        return new(_loggerMock.Object);
+    }
 
     [Fact]
     public async Task Handle_WhenHandlerThrowsGenericException_LogsOnceAndRethrows()
     {
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
-        TestRequest request = new("aaron", "hunter2");
-        InvalidOperationException thrown = new("boom");
+        TestRequest request = new("aaron", "pa$$word123");
+        InvalidOperationException thrown = new("Something went wrong.");
         RequestHandlerDelegate<TestResponse> next = () => throw thrown;
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
@@ -37,7 +40,7 @@ public class UnhandledExceptionLoggingBehaviorTests
     public async Task Handle_WhenValidationExceptionThrown_DoesNotLogAndRethrows()
     {
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
-        TestRequest request = new("aaron", "hunter2");
+        TestRequest request = new("aaron", "pa$$word123");
         ValidationException thrown = new([new ValidationFailure("Username", "is required")]);
         RequestHandlerDelegate<TestResponse> next = () => throw thrown;
 
@@ -51,7 +54,7 @@ public class UnhandledExceptionLoggingBehaviorTests
     public async Task Handle_WhenHandlerSucceeds_DoesNotLogAndReturnsResponse()
     {
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
-        TestRequest request = new("aaron", "hunter2");
+        TestRequest request = new("aaron", "pa$$word123");
         TestResponse response = new("ok");
         RequestHandlerDelegate<TestResponse> next = () => Task.FromResult(response);
 
@@ -65,15 +68,15 @@ public class UnhandledExceptionLoggingBehaviorTests
     public async Task Handle_WhenHandlerThrows_RedactsSensitiveFieldsInLoggedPayload()
     {
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
-        TestRequest request = new("aaron", "hunter2");
+        TestRequest request = new("aaron", "pa$$word123");
         RequestHandlerDelegate<TestResponse> next = () =>
-            throw new InvalidOperationException("boom");
+            throw new InvalidOperationException("Something went wrong.");
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
         await act.Should().ThrowAsync<InvalidOperationException>();
 
         string loggedMessage = CaptureLoggedMessage();
-        loggedMessage.Should().Contain("aaron").And.NotContain("hunter2");
+        loggedMessage.Should().Contain("aaron").And.NotContain("pa$$word123");
     }
 
     private void VerifyLogError(Times times) =>
@@ -91,21 +94,17 @@ public class UnhandledExceptionLoggingBehaviorTests
 
     private string CaptureLoggedMessage()
     {
-        var invocation = _loggerMock
+        IInvocation? invocation = _loggerMock
             .Invocations.Where(i => i.Method.Name == nameof(ILogger.Log))
             .Should()
             .ContainSingle()
             .Subject;
 
         object state = invocation.Arguments[2];
-        object? exception = invocation.Arguments[3];
+        object exception = invocation.Arguments[3];
         object formatter = invocation.Arguments[4];
         System.Reflection.MethodInfo invokeMethod = formatter.GetType().GetMethod("Invoke")!;
 
         return (string)invokeMethod.Invoke(formatter, [state, exception])!;
     }
 }
-
-public record TestRequest(string Username, string Password) : IRequest<TestResponse>;
-
-public record TestResponse(string Value);

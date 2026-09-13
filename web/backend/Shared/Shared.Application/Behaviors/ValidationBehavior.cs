@@ -5,14 +5,15 @@ using MediatR;
 namespace Shared.Application.Behaviors;
 
 /// <summary>
-///     MediatR pipeline behavior that runs registered FluentValidation validators before the handler,
+///     MediatR pipeline behavior that runs registered FluentValidation validators
+///     before the handler,
 ///     throwing <see cref="ValidationException" /> if any report failures.
 /// </summary>
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
