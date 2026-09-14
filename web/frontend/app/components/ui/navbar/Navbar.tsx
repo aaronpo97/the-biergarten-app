@@ -72,7 +72,10 @@ const Navbar = ({ auth }: NavbarProps) => (
                                     Dashboard
                                 </Link>
 
-                                <UserMenu username={auth.username} />
+                                <UserMenu
+                                    username={auth.username}
+                                    userAccountId={auth.userAccountId}
+                                />
                             </>
                         ) : (
                             <Link to="/login" className="btn btn-primary btn-sm">
