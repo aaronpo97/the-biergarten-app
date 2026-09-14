@@ -28,13 +28,14 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
         brewery,
         loggedIn: auth !== null,
         username: auth?.username ?? null,
+        userAccountId: auth?.userAccountId ?? null,
     };
 };
 
 const initials = (username: string) => username.slice(0, 2).toUpperCase();
 
 const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
-    const { brewery, loggedIn, username } = loaderData;
+    const { brewery, loggedIn, username, userAccountId } = loaderData;
 
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(FILLER_BREWERY_META.likeCount);
@@ -57,6 +58,7 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
             {
                 id: crypto.randomUUID(),
                 user: username ?? 'you',
+                userAccountId: userAccountId ?? '',
                 initials: username ? initials(username) : 'YO',
                 rating: yourRating,
                 time: 'just now',
