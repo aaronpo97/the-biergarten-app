@@ -167,4 +167,24 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                 actualValue
             );
     }
+
+    [Then("the response JSON should not contain {string}")]
+    public void ThenTheResponseJsonShouldNotContainString(string field)
+    {
+        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
+
+        root.TryGetProperty(field, out _)
+            .Should()
+            .BeFalse("Expected field '{0}' to be absent from the response", field);
+
+        if (root.TryGetProperty("payload", out JsonElement payloadElem) &&
+            payloadElem.ValueKind == JsonValueKind.Object)
+            payloadElem
+                .TryGetProperty(field, out _)
+                .Should()
+                .BeFalse("Expected field '{0}' to be absent from 'payload'", field);
+    }
 }
