@@ -249,9 +249,11 @@ API.Specs/
 │   ├── ResendConfirmation.feature      # Resend-confirmation scenarios
 │   ├── TokenRefresh.feature            # Refresh token scenarios
 │   ├── AccessTokenValidation.feature   # Protected endpoint access scenarios
-│   └── NotFound.feature                # 404 handling
+│   ├── NotFound.feature                # 404 handling
+│   └── PublicUserProfile.feature       # Public profile & locked-down account scenarios
 ├── Steps/
 │   ├── AuthSteps.cs                    # Step definitions for the Auth features
+│   ├── UserSteps.cs                    # Step definitions for the public profile & user-account features
 │   └── ApiGeneralSteps.cs              # Shared/general step definitions
 ├── Mocks/
 │   ├── MockEmailDispatcher.cs          # Substitutes Features.Emails' IEmailDispatcher

@@ -264,7 +264,8 @@ everything needed to understand or change one capability lives in one project
 - Controllers generally bind directly to the Command/Query as the request body;
   there is no separate request DTO + mapping step for writes
   - The exception to this is for authenticated routes, when the current user id
-    needs to be extracted from the authentication token to be used in a command.
+    needs to be extracted from the authentication token to be used in a command
+    or query.
 - A single shared `ValidationBehavior<TRequest,TResponse>`
   (`Shared.Application/Behaviors/`) runs FluentValidation validators in the
   MediatR pipeline before any handler executes
