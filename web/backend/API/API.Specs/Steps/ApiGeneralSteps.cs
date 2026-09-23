@@ -167,4 +167,40 @@ public class ApiGeneralSteps(ScenarioContext scenario)
                 actualValue
             );
     }
+
+    [Then("the response JSON should not contain {string}")]
+    public void ThenTheResponseJsonShouldNotContainString(string field)
+    {
+        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
+
+        AssertFieldAbsent(root, field);
+
+        if (root.ValueKind == JsonValueKind.Object &&
+            root.TryGetProperty("payload", out JsonElement payloadElem))
+            AssertFieldAbsent(payloadElem, field);
+    }
+
+    /// <summary>
+    ///     Recurses into arrays so a listing endpoint's response can be asserted the same way as a
+    ///     single-resource response.
+    /// </summary>
+    private static void AssertFieldAbsent(JsonElement element, string field)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                element
+                    .TryGetProperty(field, out _)
+                    .Should()
+                    .BeFalse("Expected field '{0}' to be absent from the response", field);
+                break;
+            case JsonValueKind.Array:
+                foreach (JsonElement item in element.EnumerateArray())
+                    AssertFieldAbsent(item, field);
+                break;
+        }
+    }
 }

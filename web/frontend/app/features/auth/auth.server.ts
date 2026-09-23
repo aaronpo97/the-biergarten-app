@@ -162,8 +162,13 @@ export const refreshTokens = async (refreshToken: string) => {
     return data.payload;
 };
 
-export const getUserAccount = async (userAccountId: string): Promise<UserAccountDetails> => {
-    const res = await fetch(`${API_BASE_URL}/api/user/${userAccountId}`);
+export const getUserAccount = async (
+    accessToken: string,
+    userAccountId: string,
+): Promise<UserAccountDetails> => {
+    const res = await fetch(`${API_BASE_URL}/api/user/${userAccountId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
     if (!res.ok) {
         const text = await res.text();

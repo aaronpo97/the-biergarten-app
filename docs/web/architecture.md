@@ -264,7 +264,8 @@ everything needed to understand or change one capability lives in one project
 - Controllers generally bind directly to the Command/Query as the request body;
   there is no separate request DTO + mapping step for writes
   - The exception to this is for authenticated routes, when the current user id
-    needs to be extracted from the authentication token to be used in a command.
+    needs to be extracted from the authentication token to be used in a command
+    or query.
 - A single shared `ValidationBehavior<TRequest,TResponse>`
   (`Shared.Application/Behaviors/`) runs FluentValidation validators in the
   MediatR pipeline before any handler executes
@@ -379,6 +380,7 @@ web/frontend/
 │   │                      - catalog    beers, beer styles
 │   │                      - home       landing page
 │   │                      - theme      theme switcher/guide
+│   │                      - users      public user profile page (/users/:id)
 │   ├── hooks/            Shared hooks not tied to one feature, for example useMediaQuery
 │   ├── routes.ts         Route table (React Router 8 config-based routing)
 │   ├── root.tsx          App shell and global providers
@@ -395,6 +397,8 @@ web/frontend/
   `/breweries/:id`) with Leaflet-powered maps and geolocation-based "nearby"
   search
 - Render the auth demo, account dashboard, and theme guide routes
+- Render the public user profile route (`/users/:id`), including a user's
+  following list and (via brewery comments) links back to commenter profiles
 - Manage cookie-backed website session state
 - Call the .NET API for login, registration, token refresh, confirmation, and
   brewery/location data

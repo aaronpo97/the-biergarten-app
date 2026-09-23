@@ -262,46 +262,6 @@ public class BrewerySteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(requestMessage);
     }
 
-    [Given("I am logged in as a different user")]
-    public async Task GivenIAmLoggedInAsADifferentUser()
-    {
-        HttpClient client = GetClient();
-        string suffix = Guid.NewGuid().ToString("N")[..8];
-        var registrationData = new
-        {
-            username = $"otheruser-{suffix}",
-            firstName = "Other",
-            lastName = "User",
-            email = $"otheruser-{suffix}@example.com",
-            dateOfBirth = "1990-01-01",
-            password = "Password1!",
-        };
-
-        HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/auth/register")
-        {
-            Content = new StringContent(
-                JsonSerializer.Serialize(registrationData),
-                Encoding.UTF8,
-                "application/json"
-            ),
-        };
-
-        HttpResponseMessage response = await client.SendAsync(requestMessage);
-        response.EnsureSuccessStatusCode();
-        string responseBody = await response.Content.ReadAsStringAsync();
-
-        using JsonDocument doc = JsonDocument.Parse(responseBody);
-        JsonElement payload = doc.RootElement.GetProperty("payload");
-        string accessToken =
-            (
-                payload.TryGetProperty("accessToken", out JsonElement tokenElem)
-                    ? tokenElem.GetString()
-                    : null
-            ) ?? throw new InvalidOperationException("accessToken missing from registration payload");
-
-        Scenario[AccessTokenKey] = accessToken;
-    }
-
     [Then("retrieving the brewery by ID should now return HTTP status {int}")]
     public async Task ThenRetrievingTheBreweryByIdShouldNowReturnHttpStatus(int expectedCode)
     {
