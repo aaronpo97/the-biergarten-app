@@ -66,6 +66,12 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/api/user"));
     }
 
+    [When("I list user accounts")]
+    public async Task WhenIListUserAccounts()
+    {
+        await SendAsync(NewAuthenticatedRequest(HttpMethod.Get, "/api/user"));
+    }
+
     [When("I retrieve the registered account by ID")]
     public async Task WhenIRetrieveTheRegisteredAccountById()
     {

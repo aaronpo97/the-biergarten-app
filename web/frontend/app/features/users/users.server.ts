@@ -12,16 +12,17 @@ export interface PublicUserProfile {
 
 /**
  * Fetches the public-facing slice of a user account from the dedicated public-profile
- * endpoint, which never includes `email` or `dateOfBirth`.
+ * endpoint, which never includes `email` or `dateOfBirth`. The endpoint is anonymous-accessible,
+ * so `accessToken` is optional and only sent when the caller is signed in.
  */
 export const getPublicUserProfile = async (
-    accessToken: string,
     userAccountId: string,
+    accessToken?: string,
 ): Promise<PublicUserProfile | null> => {
     let res: Response;
     try {
         res = await fetch(`${API_BASE_URL}/api/user/${encodeURIComponent(userAccountId)}/profile`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
+            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
         });
     } catch {
         throw data('The user service is unreachable right now. Please try again in a moment.', {

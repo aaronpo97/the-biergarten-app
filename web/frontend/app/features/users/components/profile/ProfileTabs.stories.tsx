@@ -28,14 +28,14 @@ const panels = {
     liked: <p>Liked panel</p>,
 };
 
-const ControlledTabs = () => {
-    const [activeTab, setActiveTab] = useState<ProfileTab>('activity');
+const ControlledTabs = ({ initialTab }: { initialTab: ProfileTab }) => {
+    const [activeTab, setActiveTab] = useState<ProfileTab>(initialTab);
     return <ProfileTabs activeTab={activeTab} onChange={setActiveTab} panels={panels} />;
 };
 
 export const Default: Story = {
     args: { activeTab: 'activity', onChange: fn(), panels },
-    render: () => <ControlledTabs />,
+    render: (args) => <ControlledTabs initialTab={args.activeTab} />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const followingTab = canvas.getByRole('tab', { name: /following/i });

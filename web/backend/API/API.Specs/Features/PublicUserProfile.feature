@@ -21,10 +21,20 @@ Scenario: Public profile for a non-existent account returns not found
     When I retrieve the public profile by a non-existent ID
     Then the response has HTTP status 404
 
-Scenario: Fetching the public profile without authentication is rejected
+Scenario: Fetching the public profile without authentication succeeds
     Given I have registered a new account
     When I retrieve the public profile by ID without authentication
-    Then the response has HTTP status 401
+    Then the response has HTTP status 200
+    And the response JSON should not contain "email"
+    And the response JSON should not contain "dateOfBirth"
+
+Scenario: A different user can read someone else's public profile
+    Given I have registered a new account
+    And I am logged in as a different user
+    When I retrieve the public profile by ID
+    Then the response has HTTP status 200
+    And the response JSON should not contain "email"
+    And the response JSON should not contain "dateOfBirth"
 
 Scenario: Fetching a user account by ID without authentication is rejected
     When I retrieve the user account by a non-existent ID without authentication
@@ -33,6 +43,14 @@ Scenario: Fetching a user account by ID without authentication is rejected
 Scenario: Listing user accounts without authentication is rejected
     When I list user accounts without authentication
     Then the response has HTTP status 401
+
+Scenario: Listing user accounts as an authenticated user excludes private fields
+    Given I have registered a new account
+    And I have a valid access token for my account
+    When I list user accounts
+    Then the response has HTTP status 200
+    And the response JSON should not contain "email"
+    And the response JSON should not contain "dateOfBirth"
 
 Scenario: The owner can fetch their own account by ID
     Given I have registered a new account

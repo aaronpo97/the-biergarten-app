@@ -58,7 +58,7 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
             {
                 id: crypto.randomUUID(),
                 user: username ?? 'you',
-                userAccountId: userAccountId ?? '',
+                userAccountId: userAccountId ?? undefined,
                 initials: username ? initials(username) : 'YO',
                 rating: yourRating,
                 time: 'just now',

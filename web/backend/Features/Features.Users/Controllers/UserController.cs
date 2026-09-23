@@ -15,26 +15,29 @@ namespace Features.Users.Controllers;
 ///     Exposes read endpoints for user accounts.
 /// </summary>
 /// <remarks>
-///     Every endpoint requires <c>[Authorize(AuthenticationSchemes = "JWT")]</c>. Anonymous callers
-///     cannot use <see cref="GetPublicProfile" />, even though it returns an allowlisted DTO.
-///     <see cref="GetById" /> also restricts access to the caller's own account. A signed-in user
-///     must not see another user's <c>Email</c> or <c>DateOfBirth</c>.
+///     Every endpoint requires <c>[Authorize(AuthenticationSchemes = "JWT")]</c> except
+///     <see cref="GetPublicProfile" />, which is <see cref="AllowAnonymousAttribute" /> since it
+///     only returns an allowlisted DTO. <see cref="GetById" /> also restricts access to the
+///     caller's own account. Neither <see cref="GetAll" /> nor <see cref="GetById" /> may expose
+///     another user's <c>Email</c> or <c>DateOfBirth</c>.
 /// </remarks>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = "JWT")]
 public class UserController(IMediator mediator) : ControllerBase
 {
-    /// <summary>Gets a page of user accounts, ordered by creation date descending.</summary>
+    /// <summary>Gets a page of user accounts' public profiles, ordered by creation date descending.</summary>
     /// <param name="limit"><c>null</c> for no limit.</param>
     /// <param name="offset"><c>null</c> for no offset.</param>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserAccount>>> GetAll(
+    public async Task<ActionResult<IEnumerable<PublicUserProfileDto>>> GetAll(
         [FromQuery] int? limit,
         [FromQuery] int? offset
     )
     {
-        IEnumerable<UserAccount> users = await mediator.Send(new GetAllUsersQuery(limit, offset));
+        IEnumerable<PublicUserProfileDto> users = await mediator.Send(
+            new GetAllUsersQuery(limit, offset)
+        );
         return Ok(users);
     }
 
@@ -56,7 +59,7 @@ public class UserController(IMediator mediator) : ControllerBase
 
     /// <summary>Gets the public profile for the user account with the given ID.</summary>
     /// <remarks>
-    /// This endpoint requires authentication only, not ownership. Any signed-in caller can view any
+    /// This endpoint is anonymous-accessible and requires no ownership. Anyone can view any
     /// account's public profile. The response includes only fields that are safe to show publicly.
     /// Unlike <see cref="GetById"/>, it never includes <c>Email</c> or <c>DateOfBirth</c>.
     /// </remarks>
@@ -64,6 +67,7 @@ public class UserController(IMediator mediator) : ControllerBase
     /// Thrown when no user account exists with the given ID. The API returns HTTP status 404.
     /// </exception>
     [HttpGet("{id:guid}/profile")]
+    [AllowAnonymous]
     public async Task<ActionResult<PublicUserProfileDto>> GetPublicProfile(Guid id)
     {
         PublicUserProfileDto profile = await mediator.Send(new GetPublicUserProfileByIdQuery(id));

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { data, Link } from 'react-router';
+import { data } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import { getOptionalAuth } from '../../auth/auth.server';
 import { getPublicUserProfile, type PublicUserProfile } from '../users.server';
@@ -16,23 +16,25 @@ import {
 } from '../utils/filler-user-profile';
 import type { Route } from './+types/user-profile';
 
-export const meta = ({}: Route.MetaArgs) => [{ title: 'Profile | The Biergarten App' }];
+export const meta = ({ loaderData }: Route.MetaArgs) => [
+    {
+        title: loaderData
+            ? `${loaderData.profile.username} | The Biergarten App`
+            : 'Profile | The Biergarten App',
+    },
+];
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
     const auth = await getOptionalAuth(request);
-    if (!auth) {
-        return { authenticated: false as const };
-    }
 
-    const profile = await getPublicUserProfile(auth.accessToken, params.id);
+    const profile = await getPublicUserProfile(params.id, auth?.accessToken);
     if (!profile) {
         throw data('User not found.', { status: 404, statusText: 'Not Found' });
     }
 
     return {
-        authenticated: true as const,
         profile,
-        isOwnProfile: auth.userAccountId === profile.userAccountId,
+        isOwnProfile: auth?.userAccountId === profile.userAccountId,
     };
 };
 
@@ -124,19 +126,6 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
 };
 
 const UserProfile = ({ loaderData }: Route.ComponentProps) => {
-    if (!loaderData.authenticated) {
-        return (
-            <div className="min-h-screen bg-base-200 flex items-center justify-center px-6">
-                <div className="text-center space-y-4">
-                    <p className="text-lg">Please log in to view this profile.</p>
-                    <Link to="/login" className="btn btn-primary btn-sm">
-                        Log in
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     const { profile, isOwnProfile } = loaderData;
 
     return (

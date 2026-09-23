@@ -176,15 +176,31 @@ public class ApiGeneralSteps(ScenarioContext scenario)
         using JsonDocument doc = JsonDocument.Parse(responseBody!);
         JsonElement root = doc.RootElement;
 
-        root.TryGetProperty(field, out _)
-            .Should()
-            .BeFalse("Expected field '{0}' to be absent from the response", field);
+        AssertFieldAbsent(root, field);
 
-        if (root.TryGetProperty("payload", out JsonElement payloadElem) &&
-            payloadElem.ValueKind == JsonValueKind.Object)
-            payloadElem
-                .TryGetProperty(field, out _)
-                .Should()
-                .BeFalse("Expected field '{0}' to be absent from 'payload'", field);
+        if (root.ValueKind == JsonValueKind.Object &&
+            root.TryGetProperty("payload", out JsonElement payloadElem))
+            AssertFieldAbsent(payloadElem, field);
+    }
+
+    /// <summary>
+    ///     Recurses into arrays so a listing endpoint's response can be asserted the same way as a
+    ///     single-resource response.
+    /// </summary>
+    private static void AssertFieldAbsent(JsonElement element, string field)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                element
+                    .TryGetProperty(field, out _)
+                    .Should()
+                    .BeFalse("Expected field '{0}' to be absent from the response", field);
+                break;
+            case JsonValueKind.Array:
+                foreach (JsonElement item in element.EnumerateArray())
+                    AssertFieldAbsent(item, field);
+                break;
+        }
     }
 }

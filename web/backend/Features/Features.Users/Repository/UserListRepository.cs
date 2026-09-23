@@ -33,13 +33,15 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
     /// <remarks>
     ///     Always applies pagination via <c>OFFSET</c>/<c>FETCH</c>, ordered by creation date descending.
     ///     A <c>null</c> <paramref name="limit" />/<paramref name="offset" /> is treated as "no limit"/"no offset".
+    ///     Does not select <c>Email</c> or <c>DateOfBirth</c>: this listing is consumed only as public
+    ///     profiles, so those fields are left at their default rather than read from the database.
     /// </remarks>
     public async Task<IEnumerable<UserAccount>> GetAllAsync(int? limit, int? offset)
     {
         await using DbConnection connection = await CreateConnection();
         return await connection.QueryAsync<UserAccount>(
             """
-            SELECT UserAccountID, Username, FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
+            SELECT UserAccountID, Username, FirstName, LastName, CreatedAt, UpdatedAt, RowVersion
             FROM Auth.UserAccount
             ORDER BY CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY

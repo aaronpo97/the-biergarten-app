@@ -12,7 +12,7 @@ const LikedTab = ({ liked }: LikedTabProps) => {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {liked.map((item) => (
                 <div key={item.id} className="card bg-base-100 shadow overflow-hidden">
                     <div className="h-[120px] bg-base-300" />
