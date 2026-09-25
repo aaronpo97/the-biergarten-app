@@ -30,6 +30,7 @@ public class GetPublicUserProfileByIdHandlerTests
             Email = "jane@example.com",
             DateOfBirth = new DateTime(1990, 1, 1),
             CreatedAt = new DateTime(2024, 1, 1),
+            UserProfile = new UserProfile { Biography = "Drinks lagers." },
         };
         _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
 
@@ -46,9 +47,31 @@ public class GetPublicUserProfileByIdHandlerTests
                     user.Username,
                     user.FirstName,
                     user.LastName,
+                    "Drinks lagers.",
                     user.CreatedAt
                 )
             );
+    }
+
+    [Fact]
+    public async Task Handle_ReturnsEmptyBiography_WhenProfileMissing()
+    {
+        UserAccount user = new()
+        {
+            UserAccountId = Guid.NewGuid(),
+            Username = "test",
+            FirstName = "Jane",
+            LastName = "Doe",
+            CreatedAt = new DateTime(2024, 1, 1),
+        };
+        _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
+
+        PublicUserProfileDto result = await _handler.Handle(
+            new GetPublicUserProfileByIdQuery(user.UserAccountId),
+            CancellationToken.None
+        );
+
+        result.Biography.Should().BeEmpty();
     }
 
     [Fact]

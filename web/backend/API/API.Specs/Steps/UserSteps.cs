@@ -54,10 +54,10 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(NewAuthenticatedRequest(HttpMethod.Get, $"/api/user/{Guid.NewGuid()}/profile"));
     }
 
-    [When("I retrieve the user account by a non-existent ID without authentication")]
-    public async Task WhenIRetrieveTheUserAccountByANonExistentIdWithoutAuthentication()
+    [When("I retrieve my own account without authentication")]
+    public async Task WhenIRetrieveMyOwnAccountWithoutAuthentication()
     {
-        await SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/api/user/{Guid.NewGuid()}"));
+        await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/api/user/authenticated"));
     }
 
     [When("I list user accounts without authentication")]
@@ -72,10 +72,10 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(NewAuthenticatedRequest(HttpMethod.Get, "/api/user"));
     }
 
-    [When("I retrieve the registered account by ID")]
-    public async Task WhenIRetrieveTheRegisteredAccountById()
+    [When("I retrieve my own account")]
+    public async Task WhenIRetrieveMyOwnAccount()
     {
-        await SendAsync(NewAuthenticatedRequest(HttpMethod.Get, $"/api/user/{GetRegisteredUserId()}"));
+        await SendAsync(NewAuthenticatedRequest(HttpMethod.Get, "/api/user/authenticated"));
     }
 
     [Then("the public profile response should match the registered account")]
@@ -91,5 +91,17 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
 
         root.GetProperty("userAccountId").GetGuid().Should().Be(GetRegisteredUserId());
         root.GetProperty("username").GetString().Should().Be(username);
+    }
+
+    [Then("the account response should be for a different account than the registered one")]
+    public void ThenTheAccountResponseShouldBeForADifferentAccountThanTheRegisteredOne()
+    {
+        Scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        doc.RootElement.GetProperty("userAccountId")
+            .GetGuid()
+            .Should()
+            .NotBe(GetRegisteredUserId());
     }
 }

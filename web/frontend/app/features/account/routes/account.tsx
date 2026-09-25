@@ -37,7 +37,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
     let details = { firstName: '', lastName: '', email: '', dateOfBirth: '' };
     try {
-        const account = await getUserAccount(auth.accessToken, auth.userAccountId);
+        const account = await getUserAccount(auth.accessToken);
         details = {
             firstName: account.firstName,
             lastName: account.lastName,

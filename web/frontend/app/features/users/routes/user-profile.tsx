@@ -93,7 +93,7 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
                         <ProfileSidebarCard
                             displayName={displayName}
                             username={profile.username}
-                            bio={FILLER_PROFILE_META.bio}
+                            bio={profile.biography}
                             location={FILLER_PROFILE_META.location}
                             joinedLabel={joinedLabel(profile.createdAt)}
                             stats={stats}
@@ -129,11 +129,7 @@ const UserProfile = ({ loaderData }: Route.ComponentProps) => {
     const { profile, isOwnProfile } = loaderData;
 
     return (
-        <ProfileContent
-            key={profile.userAccountId}
-            profile={profile}
-            isOwnProfile={isOwnProfile}
-        />
+        <ProfileContent key={profile.userAccountId} profile={profile} isOwnProfile={isOwnProfile} />
     );
 };
 
