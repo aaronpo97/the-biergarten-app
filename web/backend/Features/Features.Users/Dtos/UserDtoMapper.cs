@@ -6,6 +6,15 @@ namespace Features.Users.Dtos;
 public static class UserDtoMapper
 {
     /// <summary>Converts a user account into its public-profile representation.</summary>
-    public static PublicUserProfileDto ToPublicProfileDto(this UserAccount user) =>
-        new(user.UserAccountId, user.Username, user.FirstName, user.LastName, user.CreatedAt);
+    public static PublicUserProfileDto ToPublicProfileDto(this UserAccount user)
+    {
+        return new PublicUserProfileDto(
+            UserAccountId : user.UserAccountId,
+            Username : user.Username,
+            FirstName : user.FirstName,
+            LastName : user.LastName,
+            Biography : user.UserProfile?.Biography ?? string.Empty,
+            CreatedAt : user.CreatedAt
+        );
+    }
 }

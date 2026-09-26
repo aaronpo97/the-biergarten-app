@@ -11,16 +11,16 @@ Covers `/users/:id` (`routes/user-profile.tsx`). Mirrors the format of
 
 ## Header & sidebar
 
-| Field                                    | Status | Source                                                    | Gap                                                                                                                                                                                                                   |
-| ---------------------------------------- | ------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Username, name, joined date              | ✅     | `GET /api/user/{id}/profile` (`PublicUserProfileDto`)      |                                                                                                                                                                                                                       |
-| `isOwnProfile`                           | ✅     | Compares the session's `userAccountId` to the route param |                                                                                                                                                                                                                       |
-| Bio                                      | ⚠️     | `FILLER_PROFILE_META.bio`                                 | `Social.UserProfile.Biography` exists (`IUserProfileRepository`, `UpdateBiographyHandler`) but there's no query/controller route to read another user's profile — only a write path for the authenticated user's own. |
-| Location                                 | ❌     | `FILLER_PROFILE_META.location`                            | No location field on `UserAccount` or `UserProfile`.                                                                                                                                                                  |
-| Avatar photo                             | ⚠️     | Initials placeholder (`avatar-placeholder`)               | `Social.UserAvatar` + `UploadAvatarHandler` exist but there's no GET endpoint to read a user's stored avatar back.                                                                                                    |
-| Cover photo                              | ❌     | Flat `bg-base-300` block                                  | No cover-photo concept anywhere in the schema.                                                                                                                                                                        |
-| Following / Followers counts             | ❌     | `FILLER_PROFILE_META.following` / `.followers`            | `Social.UserFollow` table exists but is unused by any query/controller — needs count queries (`WHERE UserAccountID = ?` / `WHERE FollowingID = ?`).                                                                   |
-| Breweries visited / Ratings given counts | ❌     | `FILLER_PROFILE_META.breweriesVisited` / `.ratingsGiven`  | Blocked on the same like/rating gaps called out in `BREWERY_HANDOFF.md`.                                                                                                                                              |
+| Field                                    | Status | Source                                                    | Gap                                                                                                                                                      |
+| ---------------------------------------- | ------ | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Username, name, joined date              | ✅     | `GET /api/user/{id}/profile` (`PublicUserProfileDto`)     |                                                                                                                                                          |
+| `isOwnProfile`                           | ✅     | Compares the session's `userAccountId` to the route param |                                                                                                                                                          |
+| Bio                                      | ✅     | `GET /api/user/{id}/profile` (`PublicUserProfileDto`)     | Reads `Social.UserProfile.Biography` via the left join in `UserListRepository.GetByIdAsync`; an account with no profile row yet returns an empty string. |
+| Location                                 | ❌     | `FILLER_PROFILE_META.location`                            | No location field on `UserAccount` or `UserProfile`.                                                                                                     |
+| Avatar photo                             | ⚠️     | Initials placeholder (`avatar-placeholder`)               | `Social.UserAvatar` + `UploadAvatarHandler` exist but there's no GET endpoint to read a user's stored avatar back.                                       |
+| Cover photo                              | ❌     | Flat `bg-base-300` block                                  | No cover-photo concept anywhere in the schema.                                                                                                           |
+| Following / Followers counts             | ❌     | `FILLER_PROFILE_META.following` / `.followers`            | `Social.UserFollow` table exists but is unused by any query/controller — needs count queries (`WHERE UserAccountID = ?` / `WHERE FollowingID = ?`).      |
+| Breweries visited / Ratings given counts | ❌     | `FILLER_PROFILE_META.breweriesVisited` / `.ratingsGiven`  | Blocked on the same like/rating gaps called out in `BREWERY_HANDOFF.md`.                                                                                 |
 
 ## Follow action
 
@@ -31,10 +31,10 @@ Covers `/users/:id` (`routes/user-profile.tsx`). Mirrors the format of
 
 ## Profile links from other pages
 
-| Field                                          | Status | Source                                             | Gap                                                                                                                                                                                                    |
-| ----------------------------------------------- | ------ | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Commenter name links (brewery detail comments)  | ⚠️     | `CommentItem` links only when `comment.userAccountId` is set | `FILLER_COMMENTS` has no backing accounts, so those rows render as plain text; a comment added during the session by a signed-in user does carry a real GUID and links correctly. |
-| Following-list person links (profile page)      | ⚠️     | `FollowingTab` links only when `f.userAccountId` is set | Same gap as above — `FILLER_FOLLOWING`'s two person rows have no backing accounts, so they render as plain text until real follow data exists. |
+| Field                                          | Status | Source                                                       | Gap                                                                                                                                                                               |
+| ---------------------------------------------- | ------ | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commenter name links (brewery detail comments) | ⚠️     | `CommentItem` links only when `comment.userAccountId` is set | `FILLER_COMMENTS` has no backing accounts, so those rows render as plain text; a comment added during the session by a signed-in user does carry a real GUID and links correctly. |
+| Following-list person links (profile page)     | ⚠️     | `FollowingTab` links only when `f.userAccountId` is set      | Same gap as above — `FILLER_FOLLOWING`'s two person rows have no backing accounts, so they render as plain text until real follow data exists.                                    |
 
 Both components already support linking (see `CommentItem.stories.tsx`'s `WithLinkedAccount` story); what's missing is real account IDs on the filler rows, which can't be faked without recreating the 404 this was fixed for. This resolves itself once (4) below closes and comments/follows are loader-backed.
 
@@ -49,9 +49,8 @@ Both components already support linking (see `CommentItem.stories.tsx`'s `WithLi
 
 ## Summary of backend work
 
-1. A public query + controller route to read a user's `Social.UserProfile.Biography` by `UserAccountId` (the write path already exists; only the public read is missing).
-2. A public query + controller route to read a user's stored `Social.UserAvatar`.
-3. A location field on `UserAccount` or `UserProfile`, and a cover-photo storage concept (mirrors the avatar gap).
-4. `Social.UserFollow` command/query/controller: follow, unfollow, "is following" check, and follower/following counts.
-5. An activity/timeline query unioning ratings, likes, and comments for a user, ordered by time — depends on the like/rating/comment tables called out in `BREWERY_HANDOFF.md` existing first.
-6. Once (4) and the like/rating gaps close, swap `FILLER_PROFILE_META` / `FILLER_ACTIVITY` / `FILLER_FOLLOWING` / `FILLER_LIKED` (`utils/filler-user-profile.ts`) and the local `useState` in `routes/user-profile.tsx` for loader data and `authorizedRequest`-based mutations (see `auth.server.ts`). Swapping in real (possibly empty) arrays is also what makes the Activity/Following `EmptyState`s reachable from the actual route — today they're only exercised by the `Empty` Storybook stories, since the filler arrays are never empty.
+1. A public query + controller route to read a user's stored `Social.UserAvatar`.
+2. A location field on `UserAccount` or `UserProfile`, and a cover-photo storage concept (mirrors the avatar gap).
+3. `Social.UserFollow` command/query/controller: follow, unfollow, "is following" check, and follower/following counts.
+4. An activity/timeline query unioning ratings, likes, and comments for a user, ordered by time — depends on the like/rating/comment tables called out in `BREWERY_HANDOFF.md` existing first.
+5. Once (3) and the like/rating gaps close, swap `FILLER_PROFILE_META` / `FILLER_ACTIVITY` / `FILLER_FOLLOWING` / `FILLER_LIKED` (`utils/filler-user-profile.ts`) and the local `useState` in `routes/user-profile.tsx` for loader data and `authorizedRequest`-based mutations (see `auth.server.ts`). Swapping in real (possibly empty) arrays is also what makes the Activity/Following `EmptyState`s reachable from the actual route — today they're only exercised by the `Empty` Storybook stories, since the filler arrays are never empty.

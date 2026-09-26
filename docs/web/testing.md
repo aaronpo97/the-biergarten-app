@@ -250,7 +250,7 @@ API.Specs/
 │   ├── TokenRefresh.feature            # Refresh token scenarios
 │   ├── AccessTokenValidation.feature   # Protected endpoint access scenarios
 │   ├── NotFound.feature                # 404 handling
-│   └── PublicUserProfile.feature       # Public profile & locked-down account scenarios
+│   └── PublicUserProfile.feature       # Public profile & authenticated account scenarios
 ├── Steps/
 │   ├── AuthSteps.cs                    # Step definitions for the Auth features
 │   ├── UserSteps.cs                    # Step definitions for the public profile & user-account features
@@ -282,17 +282,25 @@ Scenario: Successful user registration
 Features.Users.Tests/
 ├── Commands/
 │   ├── RegisterUserHandlerTests.cs
+│   ├── RegisterUserValidatorTests.cs
 │   ├── ConfirmUserHandlerTests.cs
 │   ├── ResendConfirmationEmailHandlerTests.cs
 │   ├── RefreshTokenHandlerTests.cs
+│   ├── RefreshTokenValidatorTests.cs
+│   ├── LoginValidatorTests.cs          # tests LoginCommand's validator
 │   ├── UpdateUsernameHandlerTests.cs
+│   ├── UpdateUsernameValidatorTests.cs
 │   ├── UpdateEmailHandlerTests.cs
+│   ├── UpdateEmailValidatorTests.cs
 │   ├── UpdatePasswordHandlerTests.cs
+│   ├── UpdatePasswordValidatorTests.cs
 │   ├── UpdateProfileHandlerTests.cs
+│   ├── UpdateProfileValidatorTests.cs
 │   └── DeleteAccountHandlerTests.cs
 ├── Queries/
 │   ├── LoginHandlerTests.cs            # tests LoginCommand, despite the folder name
 │   ├── GetAllUsersHandlerTests.cs
+│   ├── GetPublicUserProfileByIdHandlerTests.cs
 │   └── GetUserByIdHandlerTests.cs
 ├── Services/
 │   ├── TokenServiceRefreshTests.cs
@@ -300,10 +308,13 @@ Features.Users.Tests/
 └── TestSupport/                        # shared test fixtures/helpers
 ```
 
-Each of the other slices (`Features.Breweries.Tests`, `Features.Emails.Tests`,
-`Features.PhotoUpload.Tests`) follows the same shape: a `Commands/`/`Queries/`
-folder with one test file per handler (`Features.PhotoUpload.Tests` also adds a
-validator test file alongside its handler test).
+`Features.Breweries.Tests` and `Features.PhotoUpload.Tests` follow the same
+shape: a `Commands/`/`Queries/` folder with one test file per handler, plus a
+`*ValidatorTests.cs` file beside each handler whose command or query has a
+FluentValidation validator (`Features.Breweries.Tests` has one of these in
+`Queries/` as well, for the nearby-search query). `Features.Emails.Tests`
+differs: its handlers respond to MediatR notifications, so its test files live
+under `Notifications/`.
 
 ## Writing tests
 
