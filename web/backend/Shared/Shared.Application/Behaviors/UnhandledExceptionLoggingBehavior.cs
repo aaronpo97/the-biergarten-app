@@ -67,7 +67,7 @@ public partial class UnhandledExceptionLoggingBehavior<TRequest, TResponse>
     {
         try
         {
-            return await next();
+            return await next(cancellationToken);
         }
         catch (ValidationException)
         {
@@ -78,7 +78,7 @@ public partial class UnhandledExceptionLoggingBehavior<TRequest, TResponse>
         {
             if (_logger.IsEnabled(LogLevel.Error))
                 LogUnhandledException(ex, typeof(TRequest).Name, Serialize(request));
-            
+
             throw;
         }
     }

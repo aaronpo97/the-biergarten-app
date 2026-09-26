@@ -31,17 +31,13 @@ public class ValidationBehaviorTests
         TestRequest request = new("aaron", "pa$$word123");
         TestResponse response = new("ok");
         bool nextInvoked = false;
-        RequestHandlerDelegate<TestResponse> next = () =>
+        Task<TestResponse> next(CancellationToken _ = default)
         {
             nextInvoked = true;
             return Task.FromResult(response);
-        };
+        }
 
-        TestResponse result = await behavior.Handle(
-            request,
-            next,
-            CancellationToken.None
-        );
+        TestResponse result = await behavior.Handle(request, next, CancellationToken.None);
 
         nextInvoked.Should().BeTrue();
         result.Should().BeSameAs(response);
@@ -65,11 +61,11 @@ public class ValidationBehaviorTests
         );
         TestRequest request = new("", "pa$$word123");
         bool nextInvoked = false;
-        RequestHandlerDelegate<TestResponse> next = () =>
+        Task<TestResponse> next(CancellationToken _ = default)
         {
             nextInvoked = true;
             return Task.FromResult(new TestResponse("ok"));
-        };
+        }
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
 
@@ -107,7 +103,7 @@ public class ValidationBehaviorTests
             secondValidatorMock.Object
         );
         TestRequest request = new("aaron", "pa$$word123");
-        RequestHandlerDelegate<TestResponse> next = () =>
+        static Task<TestResponse> next(CancellationToken _ = default) =>
             Task.FromResult(new TestResponse("ok"));
 
         await behavior.Handle(request, next, CancellationToken.None);
@@ -158,7 +154,7 @@ public class ValidationBehaviorTests
             secondValidatorMock.Object
         );
         TestRequest request = new("", "pa$$word123");
-        RequestHandlerDelegate<TestResponse> next = () =>
+        Task<TestResponse> next(CancellationToken _ = default) =>
             Task.FromResult(new TestResponse("ok"));
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
@@ -171,17 +167,12 @@ public class ValidationBehaviorTests
     [Fact]
     public async Task Handle_WhenNoValidatorsAreRegistered_InvokesNext()
     {
-        ValidationBehavior<TestRequest, TestResponse> behavior =
-            CreateBehavior();
+        ValidationBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
         TestRequest request = new("aaron", "pa$$word123");
         TestResponse response = new("ok");
-        RequestHandlerDelegate<TestResponse> next = () => Task.FromResult(response);
+        Task<TestResponse> next(CancellationToken _ = default) => Task.FromResult(response);
 
-        TestResponse result = await behavior.Handle(
-            request,
-            next,
-            CancellationToken.None
-        );
+        TestResponse result = await behavior.Handle(request, next, CancellationToken.None);
 
         result.Should().BeSameAs(response);
     }
