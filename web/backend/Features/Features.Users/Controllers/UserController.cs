@@ -17,9 +17,10 @@ namespace Features.Users.Controllers;
 /// <remarks>
 ///     Every endpoint requires <c>[Authorize(AuthenticationSchemes = "JWT")]</c> except
 ///     <see cref="GetPublicProfile" />, which is <see cref="AllowAnonymousAttribute" /> since it
-///     only returns an allowlisted DTO. <see cref="GetById" /> also restricts access to the
-///     caller's own account. Neither <see cref="GetAll" /> nor <see cref="GetById" /> may expose
-///     another user's <c>Email</c> or <c>DateOfBirth</c>.
+///     only returns an allowlisted DTO. <see cref="GetAuthenticated" /> serves the caller's own
+///     account, taken from the access token. Neither <see cref="GetAll" /> nor
+///     <see cref="GetPublicProfile" /> may expose another user's <c>Email</c> or
+///     <c>DateOfBirth</c>.
 /// </remarks>
 [ApiController]
 [Route("api/[controller]")]
@@ -41,18 +42,15 @@ public class UserController(IMediator mediator) : ControllerBase
         return Ok(users);
     }
 
-    /// <summary>Gets the caller's own user account by ID.</summary>
-    /// <exception cref="ForbiddenException">
-    /// Thrown when <paramref name="id"/> is not the caller's own account. The API returns HTTP status 403.
-    /// </exception>
+    /// <summary>Gets the authenticated caller's own user account.</summary>
     /// <exception cref="NotFoundException">
-    /// Thrown when no user account exists with the given ID, resulting in a 404 response.
+    /// Thrown when no user account exists for the caller's ID, resulting in a 404 response.
     /// </exception>
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserAccount>> GetById(Guid id)
+    [HttpGet("authenticated")]
+    public async Task<ActionResult<UserAccount>> GetAuthenticated()
     {
         UserAccount user = await mediator.Send(
-            new GetUserByIdQuery(id, User.GetAuthenticatedUserId())
+            new GetUserByIdQuery(User.GetAuthenticatedUserId())
         );
         return Ok(user);
     }
@@ -61,7 +59,7 @@ public class UserController(IMediator mediator) : ControllerBase
     /// <remarks>
     /// This endpoint is anonymous-accessible and requires no ownership. Anyone can view any
     /// account's public profile. The response includes only fields that are safe to show publicly.
-    /// Unlike <see cref="GetById"/>, it never includes <c>Email</c> or <c>DateOfBirth</c>.
+    /// Unlike <see cref="GetAuthenticated"/>, it never includes <c>Email</c> or <c>DateOfBirth</c>.
     /// </remarks>
     /// <exception cref="NotFoundException">
     /// Thrown when no user account exists with the given ID. The API returns HTTP status 404.

@@ -162,11 +162,12 @@ export const refreshTokens = async (refreshToken: string) => {
     return data.payload;
 };
 
-export const getUserAccount = async (
-    accessToken: string,
-    userAccountId: string,
-): Promise<UserAccountDetails> => {
-    const res = await fetch(`${API_BASE_URL}/api/user/${userAccountId}`, {
+/**
+ * Fetches the signed-in caller's own account. The backend derives the account from the access
+ * token, so the caller passes no ID.
+ */
+export const getUserAccount = async (accessToken: string): Promise<UserAccountDetails> => {
+    const res = await fetch(`${API_BASE_URL}/api/user/authenticated`, {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
 

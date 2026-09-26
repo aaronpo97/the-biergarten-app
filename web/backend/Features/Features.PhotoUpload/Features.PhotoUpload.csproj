@@ -12,10 +12,6 @@
 
     <ItemGroup>
         <PackageReference Include="AWSSDK.S3" Version="4.0.102.4" />
-        <PackageReference
-            Include="Microsoft.Extensions.Configuration.Abstractions"
-            Version="10.0.1"
-        />
     </ItemGroup>
 
     <ItemGroup>

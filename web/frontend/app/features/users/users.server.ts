@@ -7,6 +7,7 @@ export interface PublicUserProfile {
     username: string;
     firstName: string;
     lastName: string;
+    biography: string;
     createdAt: string;
 }
 
@@ -47,6 +48,7 @@ export const getPublicUserProfile = async (
         username: string;
         firstName: string;
         lastName: string;
+        biography: string;
         createdAt: string;
     } = await res.json();
 
@@ -55,6 +57,7 @@ export const getPublicUserProfile = async (
         username: account.username,
         firstName: account.firstName,
         lastName: account.lastName,
+        biography: account.biography,
         createdAt: account.createdAt,
     };
 };

@@ -12,6 +12,7 @@ Scenario: Public profile exposes only allowlisted fields
     When I retrieve the public profile by ID
     Then the response has HTTP status 200
     And the public profile response should match the registered account
+    And the response JSON should have "biography" equal ""
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
 
@@ -36,8 +37,8 @@ Scenario: A different user can read someone else's public profile
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
 
-Scenario: Fetching a user account by ID without authentication is rejected
-    When I retrieve the user account by a non-existent ID without authentication
+Scenario: Fetching my own account without authentication is rejected
+    When I retrieve my own account without authentication
     Then the response has HTTP status 401
 
 Scenario: Listing user accounts without authentication is rejected
@@ -52,15 +53,16 @@ Scenario: Listing user accounts as an authenticated user excludes private fields
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
 
-Scenario: The owner can fetch their own account by ID
+Scenario: The caller can fetch their own account
     Given I have registered a new account
     And I have a valid access token for my account
-    When I retrieve the registered account by ID
+    When I retrieve my own account
     Then the response has HTTP status 200
     And the public profile response should match the registered account
 
-Scenario: A different user cannot fetch someone else's account by ID
+Scenario: The account endpoint serves the caller named by the access token
     Given I have registered a new account
     And I am logged in as a different user
-    When I retrieve the registered account by ID
-    Then the response has HTTP status 403
+    When I retrieve my own account
+    Then the response has HTTP status 200
+    And the account response should be for a different account than the registered one

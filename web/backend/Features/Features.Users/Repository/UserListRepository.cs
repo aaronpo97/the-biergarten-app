@@ -13,20 +13,41 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
         IUserListRepository
 {
     /// <inheritdoc />
+    /// <remarks>
+    ///     Left-joins <c>Social.UserProfile</c>, so <see cref="UserAccount.UserProfile" /> is
+    ///     <c>null</c> for an account whose profile has yet to be created.
+    /// </remarks>
     public async Task<UserAccount?> GetByIdAsync(Guid id)
     {
         await using DbConnection connection = await CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<UserAccount>(
+        IEnumerable<UserAccount> results = await connection.QueryAsync<
+            UserAccount,
+            UserProfile,
+            UserAccount
+        >(
             """
             SELECT 
-                UserAccountID, 
-                Username, 
-                FirstName, LastName, Email, CreatedAt, UpdatedAt, DateOfBirth, RowVersion
-            FROM Auth.UserAccount
-            WHERE UserAccountID = @UserAccountId
+                ua.UserAccountID, 
+                ua.Username, 
+                ua.FirstName, ua.LastName, ua.Email, ua.CreatedAt, ua.UpdatedAt,
+                ua.DateOfBirth, ua.RowVersion,
+                up.UserProfileID, up.UserAccountID, up.Biography, up.RowVersion
+            FROM Auth.UserAccount ua
+            LEFT JOIN Social.UserProfile up ON ua.UserAccountID = up.UserAccountID
+            WHERE ua.UserAccountID = @UserAccountId
             """,
-            new { UserAccountId = id }
+            MapUserRow,
+            new { UserAccountId = id },
+            splitOn: "UserProfileID"
         );
+
+        return results.SingleOrDefault();
+    }
+
+    private static UserAccount MapUserRow(UserAccount user, UserProfile? profile)
+    {
+        user.UserProfile = profile;
+        return user;
     }
 
     /// <inheritdoc />

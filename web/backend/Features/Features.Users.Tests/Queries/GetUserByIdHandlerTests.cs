@@ -24,7 +24,7 @@ public class GetUserByIdHandlerTests
         _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
 
         UserAccount result = await _handler.Handle(
-            new GetUserByIdQuery(user.UserAccountId, user.UserAccountId),
+            new GetUserByIdQuery(user.UserAccountId),
             CancellationToken.None
         );
 
@@ -38,21 +38,8 @@ public class GetUserByIdHandlerTests
         _repoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((UserAccount?)null);
 
         Func<Task<UserAccount>> act = async () =>
-            await _handler.Handle(new GetUserByIdQuery(id, id), CancellationToken.None);
+            await _handler.Handle(new GetUserByIdQuery(id), CancellationToken.None);
 
         await act.Should().ThrowAsync<NotFoundException>();
-    }
-
-    [Fact]
-    public async Task Handle_Throws_WhenRequestingSomeoneElsesAccount()
-    {
-        Guid id = Guid.NewGuid();
-        Guid requestingUserId = Guid.NewGuid();
-
-        Func<Task<UserAccount>> act = async () =>
-            await _handler.Handle(new GetUserByIdQuery(id, requestingUserId), CancellationToken.None);
-
-        await act.Should().ThrowAsync<ForbiddenException>();
-        _repoMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
     }
 }

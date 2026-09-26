@@ -176,7 +176,9 @@ brewery photo upload command) rather than bound to an HTTP route directly.
 
 - All business logic for that feature lives in its command/query handlers
 - No direct controller-to-repository calls; everything flows through MediatR
-- Read endpoints return a dedicated `Dto`, never the domain entity directly
+- Read endpoints return a dedicated `Dto` rather than the domain entity
+  directly. The one exception is `UserController.GetAuthenticated`, which
+  returns the caller's own `UserAccount` entity
 
 #### Shared projects (`Shared.Contracts`, `Shared.Application`)
 
@@ -187,7 +189,7 @@ needs it, or because duplicating it four times would be worse than sharing it
 
 | Project              | Purpose                                                                                                                                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope every controller returns                                                                                                                                                    |
+| `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope `AuthController`, `BreweryController`, and `CityController` return; `UserController`'s read endpoints return their DTOs unwrapped                                           |
 | `Shared.Application` | `ValidationBehavior<TRequest,TResponse>`, the MediatR pipeline behavior that runs FluentValidation before a handler executes |
 
 **Rules**:
