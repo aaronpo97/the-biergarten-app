@@ -26,7 +26,7 @@ public class UnhandledExceptionLoggingBehaviorTests
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
         TestRequest request = new("aaron", "pa$$word123");
         InvalidOperationException thrown = new("Something went wrong.");
-        RequestHandlerDelegate<TestResponse> next = () => throw thrown;
+        Task<TestResponse> next(CancellationToken _ = default) => throw thrown;
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
 
@@ -42,7 +42,7 @@ public class UnhandledExceptionLoggingBehaviorTests
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
         TestRequest request = new("aaron", "pa$$word123");
         ValidationException thrown = new([new ValidationFailure("Username", "is required")]);
-        RequestHandlerDelegate<TestResponse> next = () => throw thrown;
+        Task<TestResponse> next(CancellationToken _ = default) => throw thrown;
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
 
@@ -56,7 +56,7 @@ public class UnhandledExceptionLoggingBehaviorTests
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
         TestRequest request = new("aaron", "pa$$word123");
         TestResponse response = new("ok");
-        RequestHandlerDelegate<TestResponse> next = () => Task.FromResult(response);
+        Task<TestResponse> next(CancellationToken _ = default) => Task.FromResult(response);
 
         TestResponse result = await behavior.Handle(request, next, CancellationToken.None);
 
@@ -69,7 +69,7 @@ public class UnhandledExceptionLoggingBehaviorTests
     {
         UnhandledExceptionLoggingBehavior<TestRequest, TestResponse> behavior = CreateBehavior();
         TestRequest request = new("aaron", "pa$$word123");
-        RequestHandlerDelegate<TestResponse> next = () =>
+        Task<TestResponse> next(CancellationToken _ = default) =>
             throw new InvalidOperationException("Something went wrong.");
 
         Func<Task> act = async () => await behavior.Handle(request, next, CancellationToken.None);
