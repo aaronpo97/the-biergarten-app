@@ -7,5 +7,6 @@ public record PublicUserProfileDto(
     string FirstName,
     string LastName,
     string Biography,
+    string AvatarUrl,
     DateTime CreatedAt
 );

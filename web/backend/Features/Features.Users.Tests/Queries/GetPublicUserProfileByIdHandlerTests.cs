@@ -31,6 +31,10 @@ public class GetPublicUserProfileByIdHandlerTests
             DateOfBirth = new DateTime(1990, 1, 1),
             CreatedAt = new DateTime(2024, 1, 1),
             UserProfile = new UserProfile { Biography = "Drinks lagers." },
+            UserAvatar = new UserAvatar
+            {
+                Photo = new Photo { Hyperlink = "https://cdn.example.com/avatar.jpg" },
+            },
         };
         _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
 
@@ -48,13 +52,14 @@ public class GetPublicUserProfileByIdHandlerTests
                     user.FirstName,
                     user.LastName,
                     "Drinks lagers.",
+                    "https://cdn.example.com/avatar.jpg",
                     user.CreatedAt
                 )
             );
     }
 
     [Fact]
-    public async Task Handle_ReturnsEmptyBiography_WhenProfileMissing()
+    public async Task Handle_ReturnsEmptyBiographyAndAvatarUrl_WhenProfileMissing()
     {
         UserAccount user = new()
         {
@@ -72,6 +77,53 @@ public class GetPublicUserProfileByIdHandlerTests
         );
 
         result.Biography.Should().BeEmpty();
+        result.AvatarUrl.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_ReturnsEmptyAvatarUrl_WhenProfileHasNoAvatar()
+    {
+        UserAccount user = new()
+        {
+            UserAccountId = Guid.NewGuid(),
+            Username = "test",
+            FirstName = "Jane",
+            LastName = "Doe",
+            CreatedAt = new DateTime(2024, 1, 1),
+            UserProfile = new UserProfile { Biography = "Drinks lagers." },
+        };
+        _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
+
+        PublicUserProfileDto result = await _handler.Handle(
+            new GetPublicUserProfileByIdQuery(user.UserAccountId),
+            CancellationToken.None
+        );
+
+        result.Biography.Should().Be("Drinks lagers.");
+        result.AvatarUrl.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_ReturnsEmptyAvatarUrl_WhenAvatarHasNoPhoto()
+    {
+        UserAccount user = new()
+        {
+            UserAccountId = Guid.NewGuid(),
+            Username = "test",
+            FirstName = "Jane",
+            LastName = "Doe",
+            CreatedAt = new DateTime(2024, 1, 1),
+            UserProfile = new UserProfile { Biography = "Drinks lagers." },
+            UserAvatar = new UserAvatar(),
+        };
+        _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
+
+        PublicUserProfileDto result = await _handler.Handle(
+            new GetPublicUserProfileByIdQuery(user.UserAccountId),
+            CancellationToken.None
+        );
+
+        result.AvatarUrl.Should().BeEmpty();
     }
 
     [Fact]

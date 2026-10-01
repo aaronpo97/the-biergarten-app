@@ -14,6 +14,7 @@ public static class UserDtoMapper
             FirstName : user.FirstName,
             LastName : user.LastName,
             Biography : user.UserProfile?.Biography ?? string.Empty,
+            AvatarUrl : user.UserAvatar?.Photo?.Hyperlink ?? string.Empty,
             CreatedAt : user.CreatedAt
         );
     }

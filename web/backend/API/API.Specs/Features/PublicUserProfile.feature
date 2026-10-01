@@ -13,8 +13,52 @@ Scenario: Public profile exposes only allowlisted fields
     Then the response has HTTP status 200
     And the public profile response should match the registered account
     And the response JSON should have "biography" equal ""
+    And the response JSON should have "avatarUrl" equal ""
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
+
+Scenario: Public profile exposes the uploaded avatar
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    When I retrieve the public profile by ID
+    Then the response has HTTP status 200
+    And the public profile response should carry my current avatar
+
+Scenario: Public profile exposes the current avatar after it is replaced
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    And I have uploaded a new avatar, replacing the previous one
+    When I retrieve the public profile by ID
+    Then the response has HTTP status 200
+    And the public profile response should carry my current avatar
+    And the public profile response should not carry my previous avatar
+
+Scenario: Fetching the avatar without authentication succeeds
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    When I retrieve the public profile by ID without authentication
+    Then the response has HTTP status 200
+    And the public profile response should carry my current avatar
+
+Scenario: A different user can read someone else's avatar
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    And I am logged in as a different user
+    When I retrieve the public profile by ID
+    Then the response has HTTP status 200
+    And the public profile response should carry my current avatar
+
+Scenario: Listing user accounts exposes each account's avatar
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    When I list user accounts
+    Then the response has HTTP status 200
+    And my listed account should carry my current avatar
 
 Scenario: Public profile for a non-existent account returns not found
     Given I have registered a new account
@@ -26,6 +70,7 @@ Scenario: Fetching the public profile without authentication succeeds
     Given I have registered a new account
     When I retrieve the public profile by ID without authentication
     Then the response has HTTP status 200
+    And the response JSON should have "avatarUrl" equal ""
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
 
@@ -50,6 +95,7 @@ Scenario: Listing user accounts as an authenticated user excludes private fields
     And I have a valid access token for my account
     When I list user accounts
     Then the response has HTTP status 200
+    And the response JSON should contain "avatarUrl"
     And the response JSON should not contain "email"
     And the response JSON should not contain "dateOfBirth"
 

@@ -183,6 +183,25 @@ public class ApiGeneralSteps(ScenarioContext scenario)
             AssertFieldAbsent(payloadElem, field);
     }
 
+    [Then("the response JSON should contain {string}")]
+    public void ThenTheResponseJsonShouldContainString(string field)
+    {
+        scenario.TryGetValue<string>(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        JsonElement root = doc.RootElement;
+
+        if (root.ValueKind == JsonValueKind.Object &&
+            !root.TryGetProperty(field, out _) &&
+            root.TryGetProperty("payload", out JsonElement payloadElem))
+        {
+            AssertFieldPresent(payloadElem, field);
+            return;
+        }
+
+        AssertFieldPresent(root, field);
+    }
+
     /// <summary>
     ///     Recurses into arrays so a listing endpoint's response can be asserted the same way as a
     ///     single-resource response.
@@ -200,6 +219,33 @@ public class ApiGeneralSteps(ScenarioContext scenario)
             case JsonValueKind.Array:
                 foreach (JsonElement item in element.EnumerateArray())
                     AssertFieldAbsent(item, field);
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Recurses into arrays so every item of a listing endpoint's response must carry the field.
+    /// </summary>
+    private static void AssertFieldPresent(JsonElement element, string field)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                element
+                    .TryGetProperty(field, out _)
+                    .Should()
+                    .BeTrue("Expected field '{0}' to be present in the response", field);
+                break;
+            case JsonValueKind.Array:
+                element
+                    .EnumerateArray()
+                    .Should()
+                    .NotBeEmpty(
+                        "Expected at least one item to assert field '{0}' against",
+                        field
+                    );
+                foreach (JsonElement item in element.EnumerateArray())
+                    AssertFieldPresent(item, field);
                 break;
         }
     }

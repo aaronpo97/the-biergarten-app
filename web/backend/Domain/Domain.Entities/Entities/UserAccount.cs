@@ -20,4 +20,5 @@ public sealed class UserAccount
     // Navigation properties
     public UserCredential? UserCredential { get; set; }
     public UserProfile? UserProfile { get; set; }
+    public UserAvatar? UserAvatar { get; set; }
 }
