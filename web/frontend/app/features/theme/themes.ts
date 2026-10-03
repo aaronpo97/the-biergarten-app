@@ -4,6 +4,8 @@ export type ThemeName =
 export interface ThemeOption {
     value: ThemeName;
     label: string;
+    /** Used where the segmented control is narrow, such as the landing page. */
+    shortLabel: string;
     vibe: string;
 }
 
@@ -14,21 +16,25 @@ export const biergartenThemes: ThemeOption[] = [
     {
         value: 'biergarten-lager',
         label: 'Biergarten Lager',
+        shortLabel: 'Lager',
         vibe: 'Muted parchment, mellow amber, daytime beer garden',
     },
     {
         value: 'biergarten-stout',
         label: 'Biergarten Stout',
+        shortLabel: 'Stout',
         vibe: 'Charred barrel, deep roast, cozy evening cellar',
     },
     {
         value: 'biergarten-cassis',
         label: 'Biergarten Cassis',
+        shortLabel: 'Cassis',
         vibe: 'Blackberry barrel, sour berry dark, vivid night market',
     },
     {
         value: 'biergarten-weizen',
         label: 'Biergarten Weizen',
+        shortLabel: 'Weizen',
         vibe: 'Ultra-light young barley, green undertone, bright spring afternoon',
     },
 ];
