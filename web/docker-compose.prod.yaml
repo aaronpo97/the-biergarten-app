@@ -46,41 +46,12 @@ services:
     networks:
       - prodnet
 
-  database.seed:
-    env_file: ".env.prod"
-    image: database.seed
-    container_name: prod-env-database-seed
-    depends_on:
-      database.migrations:
-        condition: service_completed_successfully
-      seaweedfs:
-        condition: service_started
-    build:
-      context: ./backend
-      dockerfile: Database/Database.Seed/Dockerfile
-      args:
-        BUILD_CONFIGURATION: Release
-        APP_UID: 1000
-    environment:
-      DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_SERVER: "${DB_SERVER}"
-      DB_NAME: "${DB_NAME}"
-      DB_USER: "${DB_USER}"
-      DB_PASSWORD: "${DB_PASSWORD}"
-      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
-      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
-      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
-      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
-    restart: "no"
-    networks:
-      - prodnet
-
   api.core:
     env_file: ".env.prod"
     image: api.core
     container_name: prod-env-api-core
     depends_on:
-      database.seed:
+      database.migrations:
         condition: service_completed_successfully
       seaweedfs:
         condition: service_started
@@ -164,4 +135,7 @@ volumes:
 
 networks:
   prodnet:
+    # Fixed name so docker-compose.prod.seed.yaml, which runs as its own Compose
+    # project, can attach to this network as an external one.
+    name: biergarten-prodnet
     driver: bridge
