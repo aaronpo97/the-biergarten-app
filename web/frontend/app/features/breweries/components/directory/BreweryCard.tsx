@@ -24,7 +24,7 @@ const BreweryCard = ({ brewery }: BreweryCardProps) => (
                 </p>
             )}
             {brewery.location && (
-                <p className="text-sm text-base-content/50 mt-2">
+                <p className="text-sm text-base-content/70 mt-2">
                     {formatBreweryAddress(brewery.location)}
                 </p>
             )}

@@ -18,7 +18,7 @@ const LikedTab = ({ liked }: LikedTabProps) => {
                     <div className="h-[120px] bg-base-300" />
                     <div className="card-body p-4 gap-1">
                         <p className="font-serif font-bold m-0">{item.name}</p>
-                        <p className="text-sm text-base-content/60 m-0">{item.meta}</p>
+                        <p className="text-sm text-base-content/70 m-0">{item.meta}</p>
                         <div className="mt-1">
                             <StarRating value={item.rating} size="xs" />
                         </div>

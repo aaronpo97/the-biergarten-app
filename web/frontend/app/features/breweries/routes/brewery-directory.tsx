@@ -72,14 +72,14 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
 
     return (
         <div className="min-h-screen bg-base-200">
-            <div className="container mx-auto p-14">
+            <div className="mx-auto max-w-7xl px-5 pt-10">
                 <Link
                     to="/breweries"
-                    className="link link-hover text-sm text-base-content/60 mb-4 inline-block"
+                    className="link link-hover text-sm text-base-content/70 mb-4 inline-block"
                 >
                     &larr; Back to Breweries
                 </Link>
-                <h1 className="text-4xl font-bold mb-4">Full brewery directory</h1>
+                <h1 className="font-serif text-5xl font-bold leading-tight mb-4">Full brewery directory</h1>
                 <p className="text-base-content/70 mb-6">
                     All of our partner breweries, newest first.
                 </p>
@@ -93,7 +93,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
                 </ClientOnly>
 
                 {allBreweries.length === 0 ? (
-                    <p className="text-center text-base-content/60 mt-12">
+                    <p className="text-center text-base-content/70 mt-12">
                         No breweries found yet.
                     </p>
                 ) : (

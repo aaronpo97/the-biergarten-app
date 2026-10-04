@@ -23,7 +23,7 @@ const NearbyBreweryList = ({
     return (
         <>
             {withDistance.length === 0 && center && (
-                <p className="text-sm text-base-content/60">
+                <p className="text-sm text-base-content/70">
                     No partner breweries within {formatDistance(radiusKm * 1000, unit)}.
                 </p>
             )}

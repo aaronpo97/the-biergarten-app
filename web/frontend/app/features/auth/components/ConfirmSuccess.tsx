@@ -10,7 +10,7 @@ const ConfirmSuccess = ({ confirmedDate }: ConfirmSuccessProps) => (
         <h1 className="card-title text-2xl">Email Confirmed!</h1>
         <p className="text-base-content/70">Your email address has been successfully verified.</p>
         <div className="bg-base-200 rounded-box w-full p-3 text-sm text-left">
-            <span className="text-base-content/50 text-xs uppercase tracking-widest font-semibold">
+            <span className="text-base-content/70 text-xs uppercase tracking-widest font-semibold">
                 Confirmed at
             </span>
             <p className="font-mono mt-1">{new Date(confirmedDate).toLocaleString()}</p>

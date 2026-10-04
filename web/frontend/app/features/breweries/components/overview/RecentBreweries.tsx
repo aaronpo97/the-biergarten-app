@@ -17,7 +17,7 @@ const RecentBreweries = ({ breweries }: RecentBreweriesProps) => {
                         <div className="card-body gap-1.5">
                             <h3 className="card-title font-serif text-xl">{brewery.breweryName}</h3>
                             {brewery.location && (
-                                <div className="text-sm text-base-content/60">
+                                <div className="text-sm text-base-content/70">
                                     {brewery.location.cityName},{' '}
                                     {brewery.location.stateProvinceCode}
                                 </div>

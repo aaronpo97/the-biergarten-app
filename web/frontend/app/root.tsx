@@ -13,7 +13,7 @@ import './app.css';
 import Navbar from './components/ui/navbar/Navbar';
 import ToastProvider from './components/ui/toast/ToastProvider';
 import { getOptionalAuth } from './features/auth/auth.server';
-import AiDisclosureDialog from './features/disclosure/components/AiDisclosureDialog';
+import AiDisclosureDialog from './features/home/components/AiDisclosureDialog';
 import { defaultThemeName, parseThemeCookie } from './features/theme/themes';
 
 export const links: Route.LinksFunction = () => [
@@ -86,7 +86,7 @@ export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => {
     }
 
     return (
-        <main className="pt-16 p-4 container mx-auto">
+        <main className="mx-auto max-w-7xl px-5 pt-10">
             <h1>{message}</h1>
             <p>{details}</p>
             {stack && (

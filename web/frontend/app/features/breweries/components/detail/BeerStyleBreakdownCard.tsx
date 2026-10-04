@@ -17,7 +17,7 @@ const BeerStyleBreakdownCard = ({ beers }: BeerStyleBreakdownCardProps) => {
                 <div key={style} className="flex flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-2">
                         <span className="text-sm font-semibold">{style}</span>
-                        <span className="text-xs text-base-content/60 tabular-nums">{count}</span>
+                        <span className="text-xs text-base-content/70 tabular-nums">{count}</span>
                     </div>
                     <progress
                         className="progress progress-primary h-1.5"

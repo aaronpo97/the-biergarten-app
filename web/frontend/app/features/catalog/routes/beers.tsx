@@ -1,3 +1,4 @@
+import FeatureNotAvailable from '../components/FeatureNotAvailable';
 import type { Route } from './+types/beers';
 
 export const meta = ({}: Route.MetaArgs) => {
@@ -7,9 +8,12 @@ export const meta = ({}: Route.MetaArgs) => {
 const Beers = () => {
     return (
         <div className="min-h-screen bg-base-200">
-            <div className="container mx-auto p-4">
-                <h1 className="text-4xl font-bold mb-4">Beers</h1>
+            <div className="mx-auto max-w-7xl px-5 pt-10">
+                <h1 className="font-serif text-5xl font-bold leading-tight mb-4">Beers</h1>
                 <p className="text-base-content/70">Explore our collection of beers.</p>
+                <div className="mt-8">
+                    <FeatureNotAvailable />
+                </div>
             </div>
         </div>
     );

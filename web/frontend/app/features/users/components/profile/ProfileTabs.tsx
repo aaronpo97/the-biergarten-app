@@ -24,7 +24,7 @@ const ProfileTabs = ({ activeTab, onChange, panels }: ProfileTabsProps) => {
                 {TABS.map((tab) => (
                     <Tab
                         key={tab.id}
-                        className="-mb-px border-b-2 border-transparent py-3 text-sm font-semibold text-base-content/60 transition-colors hover:text-base-content focus:outline-none data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-primary data-[selected]:border-primary data-[selected]:text-primary"
+                        className="-mb-px border-b-2 border-transparent py-3 text-sm font-semibold text-base-content/70 transition-colors hover:text-base-content focus:outline-none data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-primary data-[selected]:border-primary data-[selected]:text-primary"
                     >
                         {tab.label}
                     </Tab>

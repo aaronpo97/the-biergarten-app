@@ -14,7 +14,7 @@ const SectionCard = ({ icon, title, description, open, onToggle, children }: Sec
         <div className="card-body">
             <div className="flex w-full items-center justify-between gap-5">
                 <div className="flex items-start gap-3">
-                    <span className="text-base-content/60 mt-1">{icon}</span>
+                    <span className="text-base-content/70 mt-1">{icon}</span>
                     <div>
                         <h2 className="card-title text-lg">{title}</h2>
                         <p className="text-sm text-base-content/70">{description}</p>
