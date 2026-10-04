@@ -6,10 +6,10 @@ services:
     container_name: prod-env-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "${DB_PASSWORD}"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
       MSSQL_PID: "Express"
     volumes:
-      - sqlserverdata-prod:/var/opt/mssql
+      - biergartendata-prod:/var/opt/mssql
     healthcheck:
       test:
         [
@@ -46,13 +46,44 @@ services:
     networks:
       - prodnet
 
+  database.seed:
+    env_file: ".env.prod"
+    image: database.seed
+    container_name: prod-env-database-seed
+    depends_on:
+      database.migrations:
+        condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
+    build:
+      context: ./backend
+      dockerfile: Database/Database.Seed/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
+    restart: "no"
+    networks:
+      - prodnet
+
   api.core:
     env_file: ".env.prod"
     image: api.core
     container_name: prod-env-api-core
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      database.seed:
+        condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     build:
       context: ./backend
       dockerfile: API/API.Core/Dockerfile
@@ -73,11 +104,31 @@ services:
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET}"
       WEBSITE_BASE_URL: "${WEBSITE_BASE_URL}"
+      SEAWEEDFS_SERVICE_URL: "${SEAWEEDFS_SERVICE_URL}"
+      SEAWEEDFS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     restart: unless-stopped
     networks:
       - prodnet
     volumes:
       - nuget-cache-prod:/root/.nuget/packages
+
+  seaweedfs:
+    env_file: ".env.prod"
+    image: chrislusf/seaweedfs
+    container_name: prod-env-seaweedfs
+    # No published ports: the S3 API, filer, master and admin UIs are reachable
+    # only from other containers on prodnet.
+    environment:
+      AWS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
+      S3_BUCKET: "${SEAWEEDFS_BUCKET}"
+    volumes:
+      - seaweedfsdata-prod:/data
+    restart: unless-stopped
+    networks:
+      - prodnet
 
   frontend:
     env_file: ".env.prod"
@@ -90,10 +141,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "127.0.0.1:5656:5656"
     environment:
       NODE_ENV: "production"
-      PORT: "3000"
+      PORT: "5656"
       API_BASE_URL: "http://api.core:8080"
       SESSION_SECRET: "${SESSION_SECRET}"
     restart: unless-stopped
@@ -101,8 +152,13 @@ services:
       - prodnet
 
 volumes:
-  sqlserverdata-prod:
-    driver: local
+  # Declared external so `docker compose down -v` leaves the data alone: Compose
+  # removes only the volumes it owns. Create them once with `docker volume
+  # create` before the first `up`.
+  biergartendata-prod:
+    external: true
+  seaweedfsdata-prod:
+    external: true
   nuget-cache-prod:
     driver: local
 
