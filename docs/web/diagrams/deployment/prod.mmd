@@ -5,7 +5,8 @@ sequenceDiagram
     participant ProdAPI as API Container<br/>ASP.NET Core 10<br/>:8080 HTTP / :8081 HTTPS
     end
 
-    ProdMig-->>ProdDB: depends_on
+    ProdMig-->>ProdDB: depends_on: sqlserver healthy
     ProdMig->>ProdDB: Run migrations
-    ProdAPI-->>ProdDB: depends_on: sql-server healthy (not migrations/seed)
+    ProdAPI-->>ProdMig: depends_on: migrations completed
     ProdAPI->>ProdDB: Connect and serve
+    Note over ProdDB: Seeding is a separate run-once job<br/>(docker-compose.prod.seed.yaml)

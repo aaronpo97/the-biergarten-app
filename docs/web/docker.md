@@ -139,16 +139,17 @@ containers, which would end the run prematurely. See
 - Security hardening
 - Only `frontend` publishes a port to the host, bound to `127.0.0.1` so a reverse
   proxy can sit in front of it; `sqlserver`, `api.core` and `seaweedfs` are
-  reachable only from other containers on `prodnet`
-- Seeded catalogue, with its AI-generated origin disclosed in the app. See
-  [Production data](#production-data) below.
+  reachable only from other containers on `prodnet` (named `biergarten-prodnet`
+  so the seed job can join it from its own Compose project)
+- Seeding is a separate, explicitly run compose file
+  (`docker-compose.prod.seed.yaml`), so an `up` or a restart leaves the existing
+  catalogue as it is. See [Production data](#production-data) below.
 
 **Services**:
 
 ```yaml
 sqlserver          # Production SQL Server (internal only)
 database.migrations # Schema updates only
-database.seed      # Loads the catalogue, runs once
 api.core          # Production API (internal only, no published ports)
 seaweedfs         # S3-compatible object storage (internal only)
 frontend          # Production website (127.0.0.1:5656, the only host binding)
@@ -169,10 +170,27 @@ Docker seeds each volume with the ownership the image expects and labels it for
 SELinux, so the host needs no `chown` and no `:z`/`:Z` mount options on
 enforcing distributions such as RHEL, AlmaLinux and Fedora.
 
+#### Seeding production (`docker-compose.prod.seed.yaml`)
+
+`database.seed` lives in its own compose file, run on demand once the prod stack
+is up and `sqlserver` is healthy:
+
+```bash
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.seed.yaml \
+  run --rm --build database.seed
+```
+
+The job runs as the `biergarten-prod-seed` Compose project and attaches to the
+external `biergarten-prodnet` network, which the main prod stack creates, so it
+reaches `sqlserver` and `seaweedfs` under the same hostnames the API uses. It
+exits when seeding finishes; `--rm` removes the container. Bring the prod stack
+up first — the seed project has no visibility into the other project's health
+checks, so a run started before SQL Server is accepting connections fails.
+
 #### Production data
 
-Production runs `database.seed`, so the catalogue it serves is the AI-generated
-fixture data produced by the pipeline. Per
+A production deployment seeded this way serves the AI-generated fixture data
+produced by the pipeline. Per
 [Pipeline ethics, bias, and known issues](../pipeline/ETHICS-AND-KNOWN-ISSUES.md),
 anyone interacting with an application seeded from it has to be told upfront that
 the content is AI-generated.
@@ -184,8 +202,9 @@ on. It is part of the server-rendered HTML rather than mounted after hydration, 
 the disclosure is on screen with the first paint. Acknowledging it hides the
 dialog for the remainder of that page load; a new load shows it again.
 
-Keep `database.seed` and the dialog together. A production deployment that seeds
-the catalogue without the disclosure does not satisfy the ethics documentation.
+Keep the seed job and the dialog together: any deployment that runs
+`docker-compose.prod.seed.yaml` needs the disclosure in place to satisfy the
+ethics documentation.
 
 ### 4. Database only (`docker-compose.db.yaml`)
 
