@@ -137,23 +137,55 @@ containers, which would end the run prematurely. See
 - Health checks enabled
 - Restart policies (unless-stopped)
 - Security hardening
-- Only `frontend` publishes a port to the host; `sqlserver` and `api.core` are
+- Only `frontend` publishes a port to the host, bound to `127.0.0.1` so a reverse
+  proxy can sit in front of it; `sqlserver`, `api.core` and `seaweedfs` are
   reachable only from other containers on `prodnet`
+- Seeded catalogue, with its AI-generated origin disclosed in the app. See
+  [Production data](#production-data) below.
 
 **Services**:
 
 ```yaml
 sqlserver          # Production SQL Server (internal only)
 database.migrations # Schema updates only
+database.seed      # Loads the catalogue, runs once
 api.core          # Production API (internal only, no published ports)
-frontend          # Production website (port 3000, the only public binding)
+seaweedfs         # S3-compatible object storage (internal only)
+frontend          # Production website (127.0.0.1:5656, the only host binding)
 ```
 
 **Deploy Production**:
 
 ```bash
+# One time, before the first `up`: the data volumes are external, so Compose
+# expects them to exist already.
+docker volume create biergartendata-prod
+docker volume create seaweedfsdata-prod
+
 docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d
 ```
+
+Docker seeds each volume with the ownership the image expects and labels it for
+SELinux, so the host needs no `chown` and no `:z`/`:Z` mount options on
+enforcing distributions such as RHEL, AlmaLinux and Fedora.
+
+#### Production data
+
+Production runs `database.seed`, so the catalogue it serves is the AI-generated
+fixture data produced by the pipeline. Per
+[Pipeline ethics, bias, and known issues](../pipeline/ETHICS-AND-KNOWN-ISSUES.md),
+anyone interacting with an application seeded from it has to be told upfront that
+the content is AI-generated.
+
+The website meets that obligation with `AiDisclosureDialog`
+(`web/frontend/app/features/disclosure/components/AiDisclosureDialog.tsx`), which
+the root route renders on every full page load, whichever route the visitor lands
+on. It is part of the server-rendered HTML rather than mounted after hydration, so
+the disclosure is on screen with the first paint. Acknowledging it hides the
+dialog for the remainder of that page load; a new load shows it again.
+
+Keep `database.seed` and the dialog together. A production deployment that seeds
+the catalogue without the disclosure does not satisfy the ethics documentation.
 
 ### 4. Database only (`docker-compose.db.yaml`)
 
@@ -255,8 +287,11 @@ api.core:
 
 **Production**:
 
-- `sqlserverdata-prod` - Production database files
+- `biergartendata-prod` - Database files, external; survives `down -v`
+- `seaweedfsdata-prod` - SeaweedFS object storage, external; survives `down -v`
 - `nuget-cache-prod` - Production NuGet cache
+
+See [Production data volumes](#production-data-volumes).
 
 ### Mounted volumes
 
@@ -268,6 +303,40 @@ volumes:
 ```
 
 Test results are written to host filesystem for CI/CD integration.
+
+### Production data volumes
+
+`biergartendata-prod` and `seaweedfsdata-prod` are declared `external: true`.
+Compose removes only the volumes it owns, so `docker compose down -v` tears the
+stack down and leaves the database and the uploaded photos in place. Deleting
+them takes an explicit `docker volume rm`.
+
+The trade-off is that Compose creates neither one, and `up` fails with a clear
+error until both exist — hence the `docker volume create` step in
+[Deploy Production](#3-production-docker-composeprodyaml). External volumes also
+carry their literal name rather than a `<project>_` prefix, which is why
+`docker volume ls` shows `biergartendata-prod` next to `web_nuget-cache-prod`.
+
+Both live under `/var/lib/docker/volumes`. To put them on a specific disk, point
+the daemon's `data-root` at it in `/etc/docker/daemon.json`, or mount the disk at
+`/var/lib/docker`.
+
+Back up the database through SQL Server rather than by copying its files, since a
+file copy taken while the engine is running can be torn:
+
+```bash
+docker exec prod-env-sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P '<db-password>' -C \
+  -Q "BACKUP DATABASE [<db-name>] TO DISK = '/var/opt/mssql/data/backup.bak'"
+docker cp prod-env-sqlserver:/var/opt/mssql/data/backup.bak .
+```
+
+Object storage can be archived directly, with the stack stopped:
+
+```bash
+docker run --rm -v seaweedfsdata-prod:/data -v "$PWD:/backup" \
+  alpine tar czf /backup/seaweedfs.tar.gz -C /data .
+```
 
 ## Networks
 
