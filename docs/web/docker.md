@@ -134,8 +134,9 @@ containers, which would end the run prematurely. See
 - Production logging levels
 - No database clearing
 - Optimized build configurations
-- Health checks enabled
-- Restart policies (unless-stopped)
+- Health checks on every long-running service
+- Restart policies that survive a reboot (see
+  [Restart tolerance](#restart-tolerance))
 - Security hardening
 - Only `frontend` publishes a port to the host, bound to `127.0.0.1` so a reverse
   proxy can sit in front of it; `sqlserver`, `api.core` and `seaweedfs` are
@@ -169,6 +170,41 @@ docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d
 Docker seeds each volume with the ownership the image expects and labels it for
 SELinux, so the host needs no `chown` and no `:z`/`:Z` mount options on
 enforcing distributions such as RHEL, AlmaLinux and Fedora.
+
+#### Restart tolerance
+
+`sqlserver`, `api.core`, `seaweedfs` and `frontend` run under
+`restart: unless-stopped`, so the stack returns on its own after a container
+crash, a Docker daemon restart or a host reboot, provided Docker itself starts at
+boot (`systemctl enable docker`). `database.migrations` keeps `restart: "no"`: it
+is a one-shot job that runs once per deploy and stays exited across a reboot, so
+the schema is migrated on deploy rather than on every boot.
+
+The daemon replays restart policies without replaying the `depends_on` graph, so
+after a reboot the containers come back in arbitrary order and each one tolerates
+a dependency that arrives late. `api.core` opens its database and S3 connections
+per request rather than at startup, and `frontend` answers with its own error
+states while `api.core` is still coming up.
+
+Health checks report when the stack has converged:
+
+| Service | Probe |
+| --- | --- |
+| `sqlserver` | `sqlcmd -Q 'SELECT 1'`, with a 30s start period and 12 retries |
+| `api.core` | `GET /health` spoken over bash's `/dev/tcp` — the .NET runtime image carries bash and no HTTP client |
+| `seaweedfs` | `curl http://localhost:8333/status`, the S3 gateway, which serves once the master, volume and filer servers are up |
+| `frontend` | `wget --spider http://127.0.0.1:5656/healthz`, answered by Express alone and so independent of the API |
+
+`sqlserver` also carries `stop_grace_period: 60s`, giving a checkpoint time to
+finish on shutdown instead of being recovered on the next start.
+
+Deploy and wait for the stack to report healthy, or check convergence after a
+reboot:
+
+```bash
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d --wait
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml ps
+```
 
 #### Seeding production (`docker-compose.prod.seed.yaml`)
 
@@ -265,6 +301,12 @@ graph TD
 
 In development, `api.core` also depends on `seaweedfs`
 (`condition: service_started`, not a health check) alongside `database.seed`.
+
+In production the chain is gated on health instead: `api.core` waits for
+`seaweedfs` to pass its health check and for `database.migrations` to exit
+successfully, and `frontend` waits for `api.core` to report healthy. This ordering
+applies to `docker compose up`; see
+[Restart tolerance](#restart-tolerance) for what happens on a host reboot.
 
 **Health Check Example** (SQL Server):
 
