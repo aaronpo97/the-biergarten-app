@@ -4,14 +4,18 @@ import { Link } from 'react-router';
 
 type Reason = 'soon' | 'maintenance' | 'auth';
 
-type Action = { to: string; label: string; className: string };
+interface Action {
+    to: string;
+    label: string;
+    className: string;
+}
 
-type Content = {
+interface Content {
     Icon: ComponentType<{ className?: string }>;
     title: string;
     description: string;
     actions: Action[];
-};
+}
 
 const CONTENT: Record<Reason, Content> = {
     soon: {
@@ -32,7 +36,8 @@ const CONTENT: Record<Reason, Content> = {
     auth: {
         Icon: Lock,
         title: 'Sign in to use this feature',
-        description: 'This feature requires a valid session. Log in or create an account to continue.',
+        description:
+            'This feature requires a valid session. Log in or create an account to continue.',
         actions: [
             { to: '/login', label: 'Login', className: 'btn-primary' },
             { to: '/register', label: 'Register', className: 'btn-outline' },
@@ -40,9 +45,9 @@ const CONTENT: Record<Reason, Content> = {
     },
 };
 
-type FeatureNotAvailableProps = {
+interface FeatureNotAvailableProps {
     reason?: Reason;
-};
+}
 
 const FeatureNotAvailable = ({ reason = 'soon' }: FeatureNotAvailableProps) => {
     const { Icon, title, description, actions } = CONTENT[reason];

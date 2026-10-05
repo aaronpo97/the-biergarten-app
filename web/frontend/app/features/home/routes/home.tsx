@@ -21,9 +21,10 @@ export const meta = ({}: Route.MetaArgs) => [
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await getOptionalAuth(request);
-    let recentBreweries: Brewery[] = [];
 
-    const randomOffset = Math.random() * 1.0 
+    // The rest of the landing page stands on its own, so a brewery service
+    // outage degrades to the empty state instead of an error page.
+    let recentBreweries: Brewery[] = [];
     try {
         recentBreweries = await getBreweries(PARTNER_BREWERY_COUNT, 0);
     } catch {
