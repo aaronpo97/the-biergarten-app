@@ -1,12 +1,4 @@
-# One-shot seed job for the production stack, kept out of
-# docker-compose.prod.yaml so that bringing production up, or restarting it,
-# never reloads the catalogue. Run it deliberately, once the prod stack is
-# healthy:
-#
 #   docker compose --env-file web/.env.prod -f web/docker-compose.prod.seed.yaml run --rm --build database.seed
-#
-# Its own project name keeps it from treating the prod stack's containers as
-# orphans; it joins the prod network to reach sqlserver and seaweedfs.
 name: biergarten-prod-seed
 
 services:

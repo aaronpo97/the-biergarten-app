@@ -25,36 +25,11 @@ services:
     networks:
       - prodnet
 
-  database.migrations:
-    env_file: ".env.prod"
-    image: database.migrations
-    container_name: prod-env-database-migrations
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-    build:
-      context: ./backend
-      dockerfile: Database/Database.Migrations/Dockerfile
-      args:
-        BUILD_CONFIGURATION: Release
-        APP_UID: 1000
-    environment:
-      DOTNET_RUNNING_IN_CONTAINER: "true"
-      DB_SERVER: "${DB_SERVER}"
-      DB_NAME: "${DB_NAME}"
-      DB_USER: "${DB_USER}"
-      DB_PASSWORD: "${DB_PASSWORD}"
-    restart: "no"
-    networks:
-      - prodnet
-
   api.core:
     env_file: ".env.prod"
     image: api.core
     container_name: prod-env-api-core
     depends_on:
-      database.migrations:
-        condition: service_completed_successfully
       seaweedfs:
         condition: service_healthy
     build:
@@ -63,8 +38,6 @@ services:
       args:
         BUILD_CONFIGURATION: Release
         APP_UID: 1000
-    # No published ports: only the frontend service is reachable from outside
-    # the Docker network in production. api.core stays internal to prodnet.
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
@@ -82,8 +55,6 @@ services:
       SEAWEEDFS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
       SEAWEEDFS_BUCKET: "${SEAWEEDFS_BUCKET}"
     healthcheck:
-      # The .NET runtime image carries bash but no HTTP client, so the probe speaks
-      # HTTP to /health over bash's /dev/tcp rather than adding curl to the image.
       test:
         [
           "CMD",
@@ -98,15 +69,11 @@ services:
     restart: unless-stopped
     networks:
       - prodnet
-    volumes:
-      - nuget-cache-prod:/root/.nuget/packages
 
   seaweedfs:
     env_file: ".env.prod"
     image: chrislusf/seaweedfs
     container_name: prod-env-seaweedfs
-    # No published ports: the S3 API, filer, master and admin UIs are reachable
-    # only from other containers on prodnet.
     environment:
       AWS_ACCESS_KEY_ID: "${SEAWEEDFS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${SEAWEEDFS_SECRET_ACCESS_KEY}"
@@ -114,8 +81,6 @@ services:
     volumes:
       - seaweedfsdata-prod:/data
     healthcheck:
-      # Probes the S3 gateway, the one component api.core talks to; it comes up
-      # last, after the master, volume and filer servers are serving.
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8333/status"]
       interval: 15s
       timeout: 5s
@@ -143,8 +108,6 @@ services:
       API_BASE_URL: "http://api.core:8080"
       SESSION_SECRET: "${SESSION_SECRET}"
     healthcheck:
-      # /healthz answers from the Express server alone, so the frontend stays
-      # healthy while api.core is still starting and serves its own error states.
       test: ["CMD", "wget", "--quiet", "--spider", "--tries=1", "http://127.0.0.1:5656/healthz"]
       interval: 15s
       timeout: 5s
@@ -155,9 +118,6 @@ services:
       - prodnet
 
 volumes:
-  # Declared external so `docker compose down -v` leaves the data alone: Compose
-  # removes only the volumes it owns. Create them once with `docker volume
-  # create` before the first `up`.
   biergartendata-prod:
     external: true
   seaweedfsdata-prod:
@@ -167,7 +127,5 @@ volumes:
 
 networks:
   prodnet:
-    # Fixed name so docker-compose.prod.seed.yaml, which runs as its own Compose
-    # project, can attach to this network as an external one.
     name: biergarten-prodnet
     driver: bridge
