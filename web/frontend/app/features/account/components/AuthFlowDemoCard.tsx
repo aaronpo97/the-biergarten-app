@@ -11,7 +11,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Login</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             POST to <code className="kbd kbd-sm">/api/auth/login</code> with
                             username &amp; password
                         </p>
@@ -20,7 +20,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Register</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             POST to <code className="kbd kbd-sm">/api/auth/register</code> with full
                             user details
                         </p>
@@ -29,7 +29,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Session</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             JWT access &amp; refresh tokens stored in an HTTP-only cookie
                         </p>
                     </div>
@@ -37,7 +37,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Protected Routes</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             This dashboard requires authentication via{' '}
                             <code className="kbd kbd-sm">requireAuth()</code>
                         </p>
@@ -46,7 +46,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Token Refresh</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             POST to <code className="kbd kbd-sm">/api/auth/refresh</code> with the
                             refresh token in an <code className="kbd kbd-sm">X-Refresh-Token</code>{' '}
                             header
@@ -56,7 +56,7 @@ const AuthFlowDemoCard = () => (
                 <li className="list-row">
                     <div>
                         <p className="font-semibold">Account Management</p>
-                        <p className="text-sm text-base-content/60">
+                        <p className="text-sm text-base-content/70">
                             PATCH <code className="kbd kbd-sm">/api/auth/username</code>,{' '}
                             <code className="kbd kbd-sm">/email</code>,{' '}
                             <code className="kbd kbd-sm">/password</code>,{' '}

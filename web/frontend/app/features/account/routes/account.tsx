@@ -208,11 +208,13 @@ const AccountPage = ({ loaderData, actionData }: Route.ComponentProps) => {
 
     return (
         <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-2xl px-6 py-10 space-y-6">
+            <div className="mx-auto max-w-7xl px-5 pt-10 pb-10 space-y-6">
                 <div className="flex items-center gap-3">
                     <Settings className="size-7" aria-hidden="true" />
                     <div>
-                        <h1 className="text-3xl font-bold">Account Settings</h1>
+                        <h1 className="font-serif text-5xl font-bold leading-tight">
+                            Account Settings
+                        </h1>
                         <p className="text-base-content/70">
                             Manage the account details for{' '}
                             <span className="font-mono">{username}</span>
@@ -257,7 +259,7 @@ const AccountPage = ({ loaderData, actionData }: Route.ComponentProps) => {
 
                 <Link
                     to="/dashboard"
-                    className="link link-hover text-sm text-base-content/60 inline-block"
+                    className="link link-hover text-sm text-base-content/70 inline-block"
                 >
                     ← Back to dashboard
                 </Link>

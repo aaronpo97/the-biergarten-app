@@ -8,7 +8,7 @@ const LoginCallout = () => (
             <Link to="/login" className="btn btn-outline btn-sm w-full">
                 Sign in
             </Link>
-            <Link to="/" className="link link-hover text-sm text-base-content/60">
+            <Link to="/" className="link link-hover text-sm text-base-content/70">
                 Back to home
             </Link>
         </div>
