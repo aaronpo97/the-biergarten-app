@@ -565,11 +565,12 @@ are not seeded either.
 
 **Environments**:
 
-| Environment | Compose file               |
-| ----------- | -------------------------- |
-| Development | `docker-compose.dev.yaml`  |
-| Testing     | `docker-compose.test.yaml` |
-| Production  | `docker-compose.prod.yaml` |
+| Environment     | Compose file                    |
+| --------------- | ------------------------------- |
+| Development     | `docker-compose.dev.yaml`       |
+| Testing         | `docker-compose.test.yaml`      |
+| Production      | `docker-compose.prod.yaml`      |
+| Production seed | `docker-compose.prod.seed.yaml` |
 
 For details, see [Docker Guide](docker.md).
 
