@@ -33,7 +33,7 @@ const ProfileSidebarCard = ({
         <div className="card-body gap-4 p-6">
             <div>
                 <h1 className="text-2xl font-bold m-0 leading-tight">{displayName}</h1>
-                <p className="text-sm text-base-content/60 m-0 mt-0.5">@{username}</p>
+                <p className="text-sm text-base-content/70 m-0 mt-0.5">@{username}</p>
             </div>
 
             {isOwnProfile ? (
@@ -52,7 +52,7 @@ const ProfileSidebarCard = ({
 
             <p className="text-sm leading-normal m-0">{bio}</p>
 
-            <div className="flex flex-col gap-1.5 text-sm text-base-content/60">
+            <div className="flex flex-col gap-1.5 text-sm text-base-content/70">
                 <div className="flex items-center gap-1.5">
                     <MapPin className="size-4 shrink-0" aria-hidden="true" />
                     {location}
@@ -68,7 +68,7 @@ const ProfileSidebarCard = ({
             <div className="flex flex-col gap-2">
                 {stats.map((stat) => (
                     <div key={stat.label} className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-base-content/60">{stat.label}</span>
+                        <span className="text-sm text-base-content/70">{stat.label}</span>
                         <span className="font-serif text-lg font-bold tabular-nums">
                             {stat.value}
                         </span>

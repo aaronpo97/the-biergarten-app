@@ -80,15 +80,15 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
 
     return (
         <div className="min-h-screen bg-base-200">
-            <div className="max-w-4xl mx-auto px-6 pt-8 pb-16">
+            <div className="mx-auto max-w-7xl px-5 pt-10 pb-16">
                 <Link
                     to="/breweries"
-                    className="link link-hover text-sm text-base-content/60 mb-4 inline-block"
+                    className="link link-hover text-sm text-base-content/70 mb-4 inline-block"
                 >
                     &larr; Back to breweries
                 </Link>
 
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_19rem] gap-5 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_23rem] gap-5 items-start">
                     <div className="flex flex-col gap-5">
                         <BreweryHeaderCard
                             brewery={brewery}

@@ -8,7 +8,7 @@ interface CommunityStatsCardProps {
 
 const StatRow = ({ label, value }: { label: string; value: number }) => (
     <div className="flex items-center justify-between gap-2 text-sm">
-        <span className="text-base-content/60">{label}</span>
+        <span className="text-base-content/70">{label}</span>
         <span className="font-semibold tabular-nums">{value}</span>
     </div>
 );

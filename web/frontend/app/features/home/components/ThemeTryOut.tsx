@@ -13,11 +13,17 @@ const ThemeTryOut = () => (
                 </p>
             </div>
 
-            <div className="rounded-box bg-base-100 p-3 text-base-content">
-                <ThemeSegmentedControl
-                    labels="short"
-                    className="join join-vertical w-full sm:join-horizontal"
-                />
+            <div className="rounded-box border border-neutral-content/15 bg-base-100 p-4 text-base-content shadow-xl sm:p-5">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                    <div>
+                        <p className="m-0 text-xs font-bold uppercase tracking-[0.18em] opacity-60">
+                            Set the mood
+                        </p>
+                        <p className="m-0 mt-1 text-sm opacity-75">Your theme follows your pour.</p>
+                    </div>
+                    <span className="badge badge-outline shrink-0">4 pours</span>
+                </div>
+                <ThemeSegmentedControl labels="short" />
             </div>
         </div>
     </section>

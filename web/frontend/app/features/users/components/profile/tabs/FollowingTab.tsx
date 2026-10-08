@@ -42,7 +42,7 @@ const FollowingTab = ({ following, onToggleFollow }: FollowingTabProps) => {
                             ) : (
                                 <p className="font-semibold text-sm m-0 truncate">{f.name}</p>
                             )}
-                            <p className="text-xs text-base-content/60 m-0 truncate">{f.meta}</p>
+                            <p className="text-xs text-base-content/70 m-0 truncate">{f.meta}</p>
                         </div>
                         <button
                             type="button"

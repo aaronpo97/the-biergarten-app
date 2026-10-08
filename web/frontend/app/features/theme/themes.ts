@@ -6,6 +6,8 @@ export interface ThemeOption {
     label: string;
     /** Used where the segmented control is narrow, such as the landing page. */
     shortLabel: string;
+    /** A compact mood descriptor for theme pickers. */
+    shortVibe: string;
     vibe: string;
 }
 
@@ -17,24 +19,28 @@ export const biergartenThemes: ThemeOption[] = [
         value: 'biergarten-lager',
         label: 'Biergarten Lager',
         shortLabel: 'Lager',
+        shortVibe: 'Muted parchment',
         vibe: 'Muted parchment, mellow amber, daytime beer garden',
     },
     {
         value: 'biergarten-stout',
         label: 'Biergarten Stout',
         shortLabel: 'Stout',
+        shortVibe: 'Charred barrel',
         vibe: 'Charred barrel, deep roast, cozy evening cellar',
     },
     {
         value: 'biergarten-cassis',
         label: 'Biergarten Cassis',
         shortLabel: 'Cassis',
+        shortVibe: 'Blackberry barrel',
         vibe: 'Blackberry barrel, sour berry dark, vivid night market',
     },
     {
         value: 'biergarten-weizen',
         label: 'Biergarten Weizen',
         shortLabel: 'Weizen',
+        shortVibe: 'Bright spring',
         vibe: 'Ultra-light young barley, green undertone, bright spring afternoon',
     },
 ];

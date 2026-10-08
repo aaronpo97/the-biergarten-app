@@ -26,16 +26,18 @@ const BreweryHeaderCard = ({
         <div className="card-body gap-4 p-7">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold uppercase tracking-widest text-base-content/50">
+                    <span className="text-xs font-bold uppercase tracking-widest text-base-content/70">
                         Brewery
                     </span>
                     <span className="badge bg-[var(--color-highlight)] text-[var(--color-highlight-content)]">
                         Est. {foundedYear}
                     </span>
                 </div>
-                <h1 className="text-4xl leading-tight m-0">{brewery.breweryName}</h1>
+                <h1 className="font-serif text-5xl font-bold leading-tight m-0">
+                    {brewery.breweryName}
+                </h1>
                 {brewery.location && (
-                    <p className="text-sm text-base-content/60 flex items-center gap-1 m-0">
+                    <p className="text-sm text-base-content/70 flex items-center gap-1 m-0">
                         <MapPin className="size-4" aria-hidden="true" />
                         {formatBreweryAddress(brewery.location)}
                     </p>
@@ -57,7 +59,7 @@ const BreweryHeaderCard = ({
                 <div className="flex items-baseline gap-1.5">
                     <StarRating value={avgRating} size="sm" />
                     <span className="font-bold">{avgRating.toFixed(1)}</span>
-                    <span className="text-sm text-base-content/60">({ratingsCount} ratings)</span>
+                    <span className="text-sm text-base-content/70">({ratingsCount} ratings)</span>
                 </div>
             </div>
             <p className="text-base-content/70 leading-relaxed text-pretty m-0">

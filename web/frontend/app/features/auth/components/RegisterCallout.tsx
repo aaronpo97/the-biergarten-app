@@ -11,7 +11,7 @@ const RegisterCallout = () => (
             </Link>
             <Link
                 to="/"
-                className="link link-hover text-sm text-base-content/60 inline-flex items-center gap-1"
+                className="link link-hover text-sm text-base-content/70 inline-flex items-center gap-1"
             >
                 <HomeSimpleDoor className="size-4" aria-hidden="true" />
                 Back to home

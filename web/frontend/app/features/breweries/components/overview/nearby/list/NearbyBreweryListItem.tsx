@@ -37,7 +37,7 @@ const NearbyBreweryListItem = ({
                 </span>
             </div>
             {brewery.location && (
-                <div className="text-sm text-base-content/60">
+                <div className="text-sm text-base-content/70">
                     {brewery.location.cityName}, {brewery.location.stateProvinceCode}
                 </div>
             )}
