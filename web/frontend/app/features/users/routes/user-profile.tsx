@@ -75,7 +75,7 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
 
     return (
         <div className="min-h-screen bg-base-200 pb-16">
-            <div className="max-w-[1080px] mx-auto px-6 pt-8">
+            <div className="mx-auto max-w-7xl px-5 pt-10">
                 <div className="rounded-box h-[190px] bg-base-300" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start -mt-12">

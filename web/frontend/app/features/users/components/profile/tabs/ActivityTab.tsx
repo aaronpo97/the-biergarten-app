@@ -36,11 +36,11 @@ const ActivityTab = ({ activity }: ActivityTabProps) => {
                                     </div>
                                 )}
                                 {item.comment && (
-                                    <p className="text-sm text-base-content/60 italic mt-1.5 mb-0">
+                                    <p className="text-sm text-base-content/70 italic mt-1.5 mb-0">
                                         &ldquo;{item.comment}&rdquo;
                                     </p>
                                 )}
-                                <p className="text-xs text-base-content/60 mt-1.5 mb-0">
+                                <p className="text-xs text-base-content/70 mt-1.5 mb-0">
                                     {item.time}
                                 </p>
                             </div>
