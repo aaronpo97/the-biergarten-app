@@ -31,7 +31,7 @@ const TextTokenSample = ({
 }) => {
     return (
         <div className="rounded-box p-3" style={{ backgroundColor: `var(${background})` }}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-base-content/50">
+            <p className="text-xs font-semibold uppercase tracking-wide text-base-content/70">
                 {label}
             </p>
             <p className="mt-1 text-sm font-medium" style={{ color: `var(${text})` }}>
@@ -54,7 +54,7 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                 </div>
 
                 <div>
-                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">
                         Core
                     </p>
                     <div className="grid gap-2 sm:grid-cols-2">
@@ -69,7 +69,7 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                 </div>
 
                 <div>
-                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">
                         Status
                     </p>
                     <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
@@ -81,7 +81,7 @@ const ThemePanel = ({ label, value, vibe }: { label: string; value: string; vibe
                 </div>
 
                 <div>
-                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/50">
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">
                         Content
                     </p>
                     <div className="grid gap-2 sm:grid-cols-3">
