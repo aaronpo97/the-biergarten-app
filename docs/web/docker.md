@@ -134,26 +134,135 @@ containers, which would end the run prematurely. See
 - Production logging levels
 - No database clearing
 - Optimized build configurations
-- Health checks enabled
-- Restart policies (unless-stopped)
+- Health checks on every long-running service
+- Restart policies that survive a reboot (see
+  [Restart tolerance](#restart-tolerance))
 - Security hardening
-- Only `frontend` publishes a port to the host; `sqlserver` and `api.core` are
-  reachable only from other containers on `prodnet`
+- Only `frontend` publishes a port to the host, bound to `127.0.0.1` so a reverse
+  proxy can sit in front of it; `sqlserver`, `api.core` and `seaweedfs` are
+  reachable only from other containers on `prodnet` (named `biergarten-prodnet`
+  so the seed job can join it from its own Compose project)
+- Seeding is a separate, explicitly run compose file
+  (`docker-compose.prod.seed.yaml`), so an `up` or a restart leaves the existing
+  catalogue as it is. See [Production data](#production-data) below.
 
 **Services**:
 
 ```yaml
-sqlserver          # Production SQL Server (internal only)
-database.migrations # Schema updates only
+sqlserver         # Production SQL Server (internal only)
 api.core          # Production API (internal only, no published ports)
-frontend          # Production website (port 3000, the only public binding)
+seaweedfs         # S3-compatible object storage (internal only)
+frontend          # Production website (127.0.0.1:5656, the only host binding)
 ```
+
+Migrating and seeding are run-once jobs kept outside this file, so an `up` or a
+restart touches neither the schema nor the catalogue. Run them explicitly at
+deploy time: see [Migrating production](#migrating-production) and
+[Seeding production](#seeding-production-docker-composeprodseedyaml).
 
 **Deploy Production**:
 
 ```bash
+# One time, before the first `up`: the data volumes are external, so Compose
+# expects them to exist already.
+docker volume create biergartendata-prod
+docker volume create seaweedfsdata-prod
+
 docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d
 ```
+
+Docker seeds each volume with the ownership the image expects and labels it for
+SELinux, so the host needs no `chown` and no `:z`/`:Z` mount options on
+enforcing distributions such as RHEL, AlmaLinux and Fedora.
+
+#### Migrating production
+
+`database.migrations` is a run-once job rather than a service in the prod stack,
+so the schema is migrated when an operator asks for it instead of on every boot.
+Build the image and run it against the network the prod stack creates:
+
+```bash
+docker build -t database.migrations \
+  -f web/backend/Database/Database.Migrations/Dockerfile \
+  --build-arg BUILD_CONFIGURATION=Release --build-arg APP_UID=1000 \
+  web/backend
+
+docker run --rm --env-file web/.env.prod --network biergarten-prodnet \
+  -e DOTNET_RUNNING_IN_CONTAINER=true database.migrations
+```
+
+DbUp records every script it has applied, so a re-run applies only what is new.
+Run this with `sqlserver` already up and healthy, and before the seed job.
+
+#### Restart tolerance
+
+`sqlserver`, `api.core`, `seaweedfs` and `frontend` run under
+`restart: unless-stopped`, so the stack returns on its own after a container
+crash, a Docker daemon restart or a host reboot, provided Docker itself starts at
+boot (`systemctl enable docker`). The migration and seed jobs stay out of the
+stack, so a reboot replays neither.
+
+The daemon replays restart policies without replaying the `depends_on` graph, so
+after a reboot the containers come back in arbitrary order and each one tolerates
+a dependency that arrives late. `api.core` opens its database and S3 connections
+per request rather than at startup, and `frontend` answers with its own error
+states while `api.core` is still coming up.
+
+Health checks report when the stack has converged:
+
+| Service | Probe |
+| --- | --- |
+| `sqlserver` | `sqlcmd -Q 'SELECT 1'`, with a 30s start period and 12 retries |
+| `api.core` | `GET /health` spoken over bash's `/dev/tcp` — the .NET runtime image carries bash and no HTTP client |
+| `seaweedfs` | `curl http://localhost:8333/status`, the S3 gateway, which serves once the master, volume and filer servers are up |
+| `frontend` | `wget --spider http://127.0.0.1:5656/healthz`, answered by Express alone and so independent of the API |
+
+`sqlserver` also carries `stop_grace_period: 60s`, giving a checkpoint time to
+finish on shutdown instead of being recovered on the next start.
+
+Deploy and wait for the stack to report healthy, or check convergence after a
+reboot:
+
+```bash
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d --wait
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml ps
+```
+
+#### Seeding production (`docker-compose.prod.seed.yaml`)
+
+`database.seed` lives in its own compose file, run on demand once the prod stack
+is up, `sqlserver` is healthy, and the schema is migrated:
+
+```bash
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.seed.yaml \
+  run --rm --build database.seed
+```
+
+The job runs as the `biergarten-prod-seed` Compose project and attaches to the
+external `biergarten-prodnet` network, which the main prod stack creates, so it
+reaches `sqlserver` and `seaweedfs` under the same hostnames the API uses. It
+exits when seeding finishes; `--rm` removes the container. Bring the prod stack
+up first, because the seed project has no visibility into the other project's
+health checks, so a run started before SQL Server is accepting connections fails.
+
+#### Production data
+
+A production deployment seeded this way serves the AI-generated fixture data
+produced by the pipeline. Per
+[Pipeline ethics, bias, and known issues](../pipeline/ETHICS-AND-KNOWN-ISSUES.md),
+anyone interacting with an application seeded from it has to be told upfront that
+the content is AI-generated.
+
+The website meets that obligation with `AiDisclosureDialog`
+(`web/frontend/app/features/home/components/AiDisclosureDialog.tsx`), which
+the root route renders on every full page load, whichever route the visitor lands
+on. It is part of the server-rendered HTML rather than mounted after hydration, so
+the disclosure is on screen with the first paint. Acknowledging it hides the
+dialog for the remainder of that page load; a new load shows it again.
+
+Keep the seed job and the dialog together: any deployment that runs
+`docker-compose.prod.seed.yaml` needs the disclosure in place to satisfy the
+ethics documentation.
 
 ### 4. Database only (`docker-compose.db.yaml`)
 
@@ -215,6 +324,12 @@ graph TD
 In development, `api.core` also depends on `seaweedfs`
 (`condition: service_started`, not a health check) alongside `database.seed`.
 
+Production has a shorter chain, because the migration and seed jobs run outside
+the stack: `api.core` waits for `seaweedfs` to pass its health check, and
+`frontend` waits for `api.core` to report healthy. This ordering applies to
+`docker compose up`; see [Restart tolerance](#restart-tolerance) for what happens
+on a host reboot.
+
 **Health Check Example** (SQL Server):
 
 ```yaml
@@ -255,8 +370,10 @@ api.core:
 
 **Production**:
 
-- `sqlserverdata-prod` - Production database files
-- `nuget-cache-prod` - Production NuGet cache
+- `biergartendata-prod` - Database files, external; survives `down -v`
+- `seaweedfsdata-prod` - SeaweedFS object storage, external; survives `down -v`
+
+See [Production data volumes](#production-data-volumes).
 
 ### Mounted volumes
 
@@ -268,6 +385,41 @@ volumes:
 ```
 
 Test results are written to host filesystem for CI/CD integration.
+
+### Production data volumes
+
+`biergartendata-prod` and `seaweedfsdata-prod` are declared `external: true`.
+Compose removes only the volumes it owns, so `docker compose down -v` tears the
+stack down and leaves the database and the uploaded photos in place. Deleting
+them takes an explicit `docker volume rm`.
+
+The trade-off is that Compose creates neither one, and `up` fails with a clear
+error until both exist, hence the `docker volume create` step in
+[Deploy Production](#3-production-docker-composeprodyaml). External volumes also
+carry their literal name rather than a `<project>_` prefix, so `docker volume ls`
+shows `biergartendata-prod` and `seaweedfsdata-prod` unprefixed, unlike the
+`web_`-prefixed volumes of the dev and test stacks.
+
+Both live under `/var/lib/docker/volumes`. To put them on a specific disk, point
+the daemon's `data-root` at it in `/etc/docker/daemon.json`, or mount the disk at
+`/var/lib/docker`.
+
+Back up the database through SQL Server rather than by copying its files, since a
+file copy taken while the engine is running can be torn:
+
+```bash
+docker exec prod-env-sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P '<db-password>' -C \
+  -Q "BACKUP DATABASE [<db-name>] TO DISK = '/var/opt/mssql/data/backup.bak'"
+docker cp prod-env-sqlserver:/var/opt/mssql/data/backup.bak .
+```
+
+Object storage can be archived directly, with the stack stopped:
+
+```bash
+docker run --rm -v seaweedfsdata-prod:/data -v "$PWD:/backup" \
+  alpine tar czf /backup/seaweedfs.tar.gz -C /data .
+```
 
 ## Networks
 

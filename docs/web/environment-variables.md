@@ -317,6 +317,7 @@ from the template in place; edit them manually if you go that route.
 - `web/docker-compose.dev.yaml` → `web/.env.dev`
 - `web/docker-compose.test.yaml` → `web/.env.test`
 - `web/docker-compose.prod.yaml` → `web/.env.prod`
+- `web/docker-compose.prod.seed.yaml` → `web/.env.prod`
 
 ## Variable reference table
 
