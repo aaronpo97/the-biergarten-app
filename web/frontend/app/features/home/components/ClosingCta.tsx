@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 const ClosingCta = () => (
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-5 py-20 text-center">
         <h2 className="m-0 font-serif text-[clamp(2rem,4vw,2.75rem)] leading-tight text-balance">
-            🍺 Your next favourite brewery is on the list.
+            Your next favourite brewery is on the list.
         </h2>
 
         <p className="m-0 text-lg leading-[1.55] text-[var(--color-muted)]">

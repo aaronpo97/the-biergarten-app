@@ -15,7 +15,7 @@ const SessionInfoCard = ({ username, userAccountId }: SessionInfoCardProps) => (
             </p>
 
             <div className="bg-base-200 rounded-box p-4 mt-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-base-content/50 mb-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-base-content/70 mb-3">
                     Session Info
                 </p>
                 <div className="stats stats-vertical w-full">

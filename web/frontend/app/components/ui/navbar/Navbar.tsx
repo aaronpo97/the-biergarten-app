@@ -49,8 +49,8 @@ const Navbar = ({ auth }: NavbarProps) => (
                             </svg>
                         </DisclosureButton>
 
-                        <Link to="/" className="text-xl font-bold">
-                            🍺 The Biergarten App
+                        <Link to="/" className="lg:text-xl text-lg font-bold">
+                            The Biergarten App
                         </Link>
                     </div>
 

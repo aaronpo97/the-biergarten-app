@@ -23,12 +23,12 @@ const BeerListCard = ({ beers }: BeerListCardProps) => (
                     >
                         <div className="flex flex-col gap-0.5 min-w-0">
                             <span className="font-bold text-sm">{beer.name}</span>
-                            <span className="text-xs text-base-content/60">{beer.description}</span>
+                            <span className="text-xs text-base-content/70">{beer.description}</span>
                         </div>
                         <span className="badge badge-ghost bg-base-300 text-xs font-semibold whitespace-nowrap">
                             {beer.style}
                         </span>
-                        <span className="text-xs text-base-content/60 tabular-nums whitespace-nowrap">
+                        <span className="text-xs text-base-content/70 tabular-nums whitespace-nowrap">
                             {beer.abv.toFixed(1)}% ABV
                         </span>
                         <StarRating value={beer.rating} size="xs" />

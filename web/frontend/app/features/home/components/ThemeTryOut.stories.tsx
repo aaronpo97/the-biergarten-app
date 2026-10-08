@@ -5,7 +5,7 @@ import { expect, within } from 'storybook/test';
 import { biergartenThemes, defaultThemeName } from '../../theme/themes';
 import ThemeTryOut from './ThemeTryOut';
 
-const themeTryOutDescription = `Landing page theme band. Hosts the shared \`ThemeSegmentedControl\` with short labels, so a visitor can switch the whole document theme from the marketing page. The control seeds its selection from the root route's loader data, so this story runs behind a memory data router whose \`root\` route supplies a theme.`;
+const themeTryOutDescription = `Landing page theme band. Frames the shared \`ThemeSegmentedControl\` in an elevated card with a "Set the mood" eyebrow and a pour count, and renders it with short labels so the four options fit the marketing page's narrower column. Each option carries its \`shortVibe\` mood line, and picking one switches the whole document theme. The control seeds its selection from the root route's loader data, so this story runs behind a memory data router whose \`root\` route supplies a theme. \`Themes/ThemeSegmentedControl\` covers the control itself.`;
 
 const ThemeTryOutHarness = () => {
     const [router] = useState(() =>
@@ -48,9 +48,15 @@ export const Default: Story = {
             canvas.getByRole('heading', { name: 'Pick a pour that suits you' }),
         ).toBeInTheDocument();
 
+        await expect(canvas.getByText('Set the mood')).toBeVisible();
+        await expect(canvas.getByText(`${biergartenThemes.length} pours`)).toBeVisible();
+
         const group = canvas.getByRole('radiogroup', { name: 'Theme selector' });
+        await expect(within(group).getAllByRole('radio')).toHaveLength(biergartenThemes.length);
+
         for (const theme of biergartenThemes) {
-            await expect(within(group).getByText(theme.shortLabel)).toBeInTheDocument();
+            await expect(within(group).getByText(theme.shortLabel)).toBeVisible();
+            await expect(within(group).getByText(theme.shortVibe)).toBeVisible();
         }
     },
 };

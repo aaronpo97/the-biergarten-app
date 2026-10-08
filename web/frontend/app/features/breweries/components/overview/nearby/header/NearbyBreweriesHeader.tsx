@@ -20,7 +20,7 @@ const NearbyBreweriesHeader = ({
     return (
         <div className="flex items-baseline justify-between gap-4 flex-wrap mb-3.5">
             <h2 className="font-serif text-2xl m-0">Breweries near you</h2>
-            <span className="text-sm text-base-content/60">
+            <span className="text-sm text-base-content/70">
                 {center
                     ? `${withDistance.length} within ${formatDistance(radiusKm * 1000, unit)} of ${centerLabel}`
                     : 'Finding breweries near you…'}

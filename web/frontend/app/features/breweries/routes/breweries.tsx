@@ -44,8 +44,8 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
     return (
         <div className="min-h-screen bg-base-200 text-base-content pb-16">
             <div className="max-w-7xl mx-auto px-5 pt-10">
-                <h1 className="font-serif text-5xl leading-tight mb-2">Breweries</h1>
-                <p className="text-lg text-base-content/60 max-w-xl m-0">
+                <h1 className="font-serif text-5xl font-bold leading-tight mb-2">Breweries</h1>
+                <p className="text-lg text-base-content/70 max-w-xl m-0">
                     Discover our partner breweries — start with this week&apos;s feature, then see
                     what&apos;s pouring near you.
                 </p>

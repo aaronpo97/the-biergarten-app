@@ -19,14 +19,14 @@ const FeaturedBreweryCard = ({ brewery, onShowOnMap }: FeaturedBreweryCardProps)
         <div className="card-body gap-3.5 p-8 md:grid md:grid-cols-[1.35fr_1fr] md:gap-10 md:items-start">
             <div className="flex flex-col gap-3.5">
                 {brewery.location && (
-                    <div className="text-sm font-semibold text-base-content/60">
+                    <div className="text-sm font-semibold text-base-content/70">
                         {brewery.location.cityName}, {brewery.location.stateProvinceCode}
                     </div>
                 )}
                 <h3 className="font-serif text-4xl leading-tight m-0">{brewery.breweryName}</h3>
                 <p className="text-lg leading-snug text-pretty m-0">{brewery.description}</p>
                 {brewery.location && (
-                    <p className="text-sm text-base-content/60 m-0">
+                    <p className="text-sm text-base-content/70 m-0">
                         {formatBreweryAddress(brewery.location)}
                     </p>
                 )}

@@ -31,14 +31,14 @@ const CommentItem = ({ comment, onToggleLike }: CommentItemProps) => {
                         <span className="font-bold text-sm">{comment.user}</span>
                     )}
                     <StarRating value={comment.rating} size="xs" />
-                    <span className="text-xs text-base-content/60">{comment.time}</span>
+                    <span className="text-xs text-base-content/70">{comment.time}</span>
                 </div>
                 <p className="text-sm leading-relaxed m-0">{comment.text}</p>
                 <button
                     type="button"
                     onClick={() => onToggleLike(comment.id)}
                     className={`self-start inline-flex items-center gap-1 text-xs font-semibold ${
-                        comment.liked ? 'text-primary' : 'text-base-content/60'
+                        comment.liked ? 'text-primary' : 'text-base-content/70'
                     }`}
                 >
                     {comment.liked ? (
