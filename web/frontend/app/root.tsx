@@ -63,12 +63,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 const App = ({ loaderData }: Route.ComponentProps) => {
     const { auth } = loaderData;
     return (
-        <>
+        <div className="flex min-h-screen flex-col">
             <Navbar auth={auth} />
             <ToastProvider />
             <AiDisclosureDialog />
-            <Outlet />
-        </>
+            <div className="flex flex-1 flex-col">
+                <Outlet />
+            </div>
+        </div>
     );
 };
 
