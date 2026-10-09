@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LogIn } from 'iconoir-react';
 import { useForm } from 'react-hook-form';
 import { redirect, useNavigation, useSubmit } from 'react-router';
 import { createAuthSession, getOptionalAuth, login } from '../auth.server';
+import AuthSplitLayout from '../components/AuthSplitLayout';
+import AuthSwitchPrompt from '../components/AuthSwitchPrompt';
 import LoginForm from '../components/LoginForm';
-import RegisterCallout from '../components/RegisterCallout';
 import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { loginSchema, type LoginSchema } from '../schemas';
 import type { Route } from './+types/login';
@@ -54,34 +54,36 @@ const Login = ({ actionData }: Route.ComponentProps) => {
     useActionErrorToast(actionData?.error);
 
     return (
-        <div className="hero min-h-screen bg-base-200">
-            <div className="card w-full max-w-md bg-base-100 shadow-xl">
-                <div className="card-body gap-4">
-                    <div className="text-center">
-                        <h1 className="card-title text-3xl justify-center gap-2">
-                            <LogIn className="size-7" aria-hidden="true" />
-                            Login
-                        </h1>
-                        <p className="text-base-content/70">Sign in to your Biergarten account</p>
-                    </div>
-
-                    {actionData?.error && (
-                        <div role="alert" className="alert alert-error alert-soft">
-                            <span>{actionData.error}</span>
-                        </div>
-                    )}
-
-                    <LoginForm
-                        onSubmit={onSubmit}
-                        formState={formState}
-                        register={register}
-                        submitting={isSubmitting}
-                    />
-
-                    <RegisterCallout />
+        <AuthSplitLayout
+            headline="Good to see you again."
+            blurb="Sign in to pick up where you left off with our partner breweries."
+        >
+            <div className="flex w-full max-w-[25rem] flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                    <h1 className="text-[2.125rem]">Sign in</h1>
+                    <p className="text-[var(--color-muted)]">Sign in to your Biergarten account</p>
                 </div>
+
+                {actionData?.error && (
+                    <div role="alert" className="alert alert-error alert-soft">
+                        <span>{actionData.error}</span>
+                    </div>
+                )}
+
+                <LoginForm
+                    onSubmit={onSubmit}
+                    formState={formState}
+                    register={register}
+                    submitting={isSubmitting}
+                />
+
+                <AuthSwitchPrompt
+                    lead="New to Biergarten?"
+                    to="/register"
+                    label="Create an account"
+                />
             </div>
-        </div>
+        </AuthSplitLayout>
     );
 };
 
