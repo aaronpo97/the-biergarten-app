@@ -3,6 +3,7 @@ import { data } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import { getOptionalAuth } from '../../auth/auth.server';
 import { getPublicUserProfile, type PublicUserProfile } from '../users.server';
+import ProfileAvatar from '../components/profile/ProfileAvatar';
 import ProfileSidebarCard from '../components/profile/ProfileSidebarCard';
 import ProfileTabs, { type ProfileTab } from '../components/profile/ProfileTabs';
 import ActivityTab from '../components/profile/tabs/ActivityTab';
@@ -80,15 +81,7 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start -mt-12">
                     <div className="lg:sticky lg:top-8 flex flex-col gap-5 px-2">
-                        <div className="w-[120px] h-[120px] rounded-full border-4 border-base-200 shadow-md overflow-hidden">
-                            <div className="avatar avatar-placeholder w-full h-full">
-                                <div className="bg-secondary text-secondary-content w-full h-full flex items-center justify-center">
-                                    <span className="text-2xl font-bold">
-                                        {displayName.slice(0, 2).toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        <ProfileAvatar avatarUrl={profile.avatarUrl} displayName={displayName} />
 
                         <ProfileSidebarCard
                             displayName={displayName}
