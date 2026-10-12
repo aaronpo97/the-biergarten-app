@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Domain.Entities;
 
 public sealed class UserAccount
@@ -20,4 +22,10 @@ public sealed class UserAccount
     // Navigation properties
     public UserCredential? UserCredential { get; set; }
     public UserProfile? UserProfile { get; set; }
+
+    // GET /api/user/authenticated serializes this entity directly, and the avatar graph carries the
+    // storage key and uploader of the underlying Photo. Clients read the avatar from
+    // PublicUserProfileDto.AvatarUrl, which is a signed URL, so keep this one out of the response.
+    [JsonIgnore]
+    public UserAvatar? UserAvatar { get; set; }
 }
