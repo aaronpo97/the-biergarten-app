@@ -14,6 +14,7 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
     private readonly string _bucket;
     private readonly IAmazonS3 _client;
     private readonly IAmazonS3 _presignClient;
+    private readonly Protocol _presignProtocol;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="S3FileStorageProvider" /> class, reading storage
@@ -64,6 +65,14 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
                     secretAccessKey,
                     new AmazonS3Config { ServiceURL = publicUrl, ForcePathStyle = true }
                 );
+
+        // GetPreSignedUrlRequest.Protocol defaults to HTTPS and ignores the ServiceURL scheme, so
+        // take the scheme from the endpoint the URL is signed against.
+        _presignProtocol =
+            Uri.TryCreate(publicUrl, UriKind.Absolute, out Uri? publicUri)
+            && publicUri.Scheme == Uri.UriSchemeHttp
+                ? Protocol.HTTP
+                : Protocol.HTTPS;
     }
 
     /// <inheritdoc/>
@@ -101,6 +110,7 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
             BucketName = _bucket,
             Key = key,
             Expires = DateTime.UtcNow.Add(expiresIn),
+            Protocol = _presignProtocol,
         };
 
         return _presignClient.GetPreSignedURL(request);
