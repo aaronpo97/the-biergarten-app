@@ -23,6 +23,14 @@ public static class ConfigurationKeys
     public const string SmtpFromName = "SMTP_FROM_NAME";
 
     public const string SeaweedFsServiceUrl = "SEAWEEDFS_SERVICE_URL";
+
+    /// <summary>
+    ///     The browser-reachable base URL of the object store, used to sign download URLs. Falls back to
+    ///     <see cref="SeaweedFsServiceUrl" /> when unset: SigV4 covers the host, so a URL signed against
+    ///     the container-internal endpoint is only usable by callers that can resolve that host.
+    /// </summary>
+    public const string SeaweedFsPublicUrl = "SEAWEEDFS_PUBLIC_URL";
+
     public const string SeaweedFsAccessKeyId = "SEAWEEDFS_ACCESS_KEY_ID";
     public const string SeaweedFsSecretAccessKey = "SEAWEEDFS_SECRET_ACCESS_KEY";
     public const string SeaweedFsBucket = "SEAWEEDFS_BUCKET";
