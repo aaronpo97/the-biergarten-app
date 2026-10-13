@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, type FieldErrors, type Resolver } from 'react-hook-form';
 import { earliestStepForFields, lastRegisterStepIndex, registerSteps } from '../registerSteps';
 import { registerSchema, type RegisterSchema } from '../schemas';
@@ -34,7 +34,7 @@ export const useRegisterWizard = (onValid: (values: RegisterSchema) => void) => 
         return Object.keys(errors).length ? { values: {}, errors } : { values, errors: {} };
     };
 
-    const { register, handleSubmit, formState } = useForm<RegisterSchema>({
+    const { register, handleSubmit, formState, setFocus } = useForm<RegisterSchema>({
         resolver,
         mode: 'onTouched',
     });
@@ -55,6 +55,19 @@ export const useRegisterWizard = (onValid: (values: RegisterSchema) => void) => 
             if (step !== null) setStepIndex(step);
         },
     );
+
+    // Move focus into each new step, which otherwise swaps out from under the
+    // keyboard while focus sits on the button that opened it.
+    const isInitialStep = useRef(true);
+    useEffect(() => {
+        if (isInitialStep.current) {
+            isInitialStep.current = false;
+            return;
+        }
+
+        const [firstField] = registerSteps[stepIndex].fields;
+        if (firstField) setFocus(firstField);
+    }, [stepIndex, setFocus]);
 
     return {
         step: stepIndex + 1,
