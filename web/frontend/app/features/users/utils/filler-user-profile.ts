@@ -1,5 +1,5 @@
 // see USER_PROFILE_HANDOFF.md — filler data pending backend support for
-// bio, location, avatar/cover photos, follower/following stats, and activity feeds.
+// location, cover photos, follower/following stats, and activity feeds.
 
 export interface FillerProfileMeta {
     bio: string;

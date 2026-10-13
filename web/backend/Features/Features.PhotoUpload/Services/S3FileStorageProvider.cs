@@ -13,11 +13,14 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
 {
     private readonly string _bucket;
     private readonly IAmazonS3 _client;
+    private readonly IAmazonS3 _presignClient;
+    private readonly Protocol _presignProtocol;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="S3FileStorageProvider" /> class, reading storage
     ///     configuration (<c>SEAWEEDFS_SERVICE_URL</c>, <c>SEAWEEDFS_ACCESS_KEY_ID</c>,
-    ///     <c>SEAWEEDFS_SECRET_ACCESS_KEY</c>, <c>SEAWEEDFS_BUCKET</c>) from <paramref name="configuration" />.
+    ///     <c>SEAWEEDFS_SECRET_ACCESS_KEY</c>, <c>SEAWEEDFS_BUCKET</c>, and the optional
+    ///     <c>SEAWEEDFS_PUBLIC_URL</c>) from <paramref name="configuration" />.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when any of the required configuration values is not set.
@@ -45,6 +48,31 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
         AmazonS3Config config = new() { ServiceURL = serviceUrl, ForcePathStyle = true };
 
         _client = new AmazonS3Client(accessKeyId, secretAccessKey, config);
+
+        // A presigned URL is signed over its host, so one signed against the container-internal
+        // endpoint is only usable from inside the network. Sign downloads against the public
+        // endpoint instead, so a browser can fetch the object.
+        string? configuredPublicUrl = configuration[ConfigurationKeys.SeaweedFsPublicUrl];
+        string publicUrl = string.IsNullOrWhiteSpace(configuredPublicUrl)
+            ? serviceUrl
+            : configuredPublicUrl;
+
+        _presignClient =
+            publicUrl == serviceUrl
+                ? _client
+                : new AmazonS3Client(
+                    accessKeyId,
+                    secretAccessKey,
+                    new AmazonS3Config { ServiceURL = publicUrl, ForcePathStyle = true }
+                );
+
+        // GetPreSignedUrlRequest.Protocol defaults to HTTPS and ignores the ServiceURL scheme, so
+        // take the scheme from the endpoint the URL is signed against.
+        _presignProtocol =
+            Uri.TryCreate(publicUrl, UriKind.Absolute, out Uri? publicUri)
+            && publicUri.Scheme == Uri.UriSchemeHttp
+                ? Protocol.HTTP
+                : Protocol.HTTPS;
     }
 
     /// <inheritdoc/>
@@ -82,14 +110,18 @@ public class S3FileStorageProvider : IFileStorageProvider, IDisposable
             BucketName = _bucket,
             Key = key,
             Expires = DateTime.UtcNow.Add(expiresIn),
+            Protocol = _presignProtocol,
         };
 
-        return _client.GetPreSignedURL(request);
+        return _presignClient.GetPreSignedURL(request);
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
+        if (!ReferenceEquals(_presignClient, _client))
+            _presignClient.Dispose();
+
         _client.Dispose();
         GC.SuppressFinalize(this);
     }

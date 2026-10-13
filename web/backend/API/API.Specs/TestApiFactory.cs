@@ -1,6 +1,7 @@
 using API.Core;
 using API.Specs.Mocks;
 using Features.Emails.Services;
+using Features.ImageUploads.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,15 @@ internal class TestApiFactory : WebApplicationFactory<Program>
                 services.Remove(emailDispatcherDescriptor);
 
             services.AddScoped<IEmailDispatcher, MockEmailDispatcher>();
+
+            ServiceDescriptor? fileStorageDescriptor = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(IFileStorageProvider)
+            );
+
+            if (fileStorageDescriptor != null)
+                services.Remove(fileStorageDescriptor);
+
+            services.AddSingleton<IFileStorageProvider, MockFileStorageProvider>();
         });
     }
 }

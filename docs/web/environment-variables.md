@@ -260,17 +260,25 @@ and retrieving photos via an S3-compatible object store.
 
 ```bash
 SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333   # Required, no default
+SEAWEEDFS_PUBLIC_URL=http://localhost:8333    # Optional, defaults to SEAWEEDFS_SERVICE_URL
 SEAWEEDFS_ACCESS_KEY_ID=admin                 # Required, no default
 SEAWEEDFS_SECRET_ACCESS_KEY=secret            # Required, no default
 SEAWEEDFS_BUCKET=my-bucket                    # Required, no default
 ```
 
 - **Implementation**: `S3FileStorageProvider` throws on construction if any of
-  these four values is missing
+  the four required values is missing
 - **Local dev**: point at the `seaweedfs` Docker service (S3 API on port 8333)
 - **Production**: point at any S3-compatible endpoint (AWS S3, a hosted
   SeaweedFS cluster, and so on); `ForcePathStyle` is always enabled, which
   SeaweedFS requires and AWS S3 also accepts
+- **`SEAWEEDFS_PUBLIC_URL`**: the endpoint download URLs are signed against,
+  used by `GetPresignedUrl` and reaching the API response as
+  `PublicUserProfileDto.AvatarUrl`. A presigned URL is signed over its host, so
+  this has to be the address the browser uses (`http://localhost:8333` with the
+  dev compose file, which publishes the S3 API port), separate from the
+  in-network `SEAWEEDFS_SERVICE_URL` the API uploads through. The two can be the
+  same value wherever one address serves both
 
 ## Docker-specific variables
 
@@ -341,6 +349,7 @@ from the template in place; edit them manually if you go that route.
 | `SMTP_FROM_EMAIL`             |    ✓    |          |   ✓    |   Yes    | Email sender address         |
 | `SMTP_FROM_NAME`              |    ✓    |          |   ✓    |    No    | Defaults to `The Biergarten` |
 | `SEAWEEDFS_SERVICE_URL`       |    ✓    |          |   ✓    |   Yes    | S3-compatible endpoint URL   |
+| `SEAWEEDFS_PUBLIC_URL`        |    ✓    |          |   ✓    |    No    | Endpoint download URLs are signed against; defaults to `SEAWEEDFS_SERVICE_URL` |
 | `SEAWEEDFS_ACCESS_KEY_ID`     |    ✓    |          |   ✓    |   Yes    | S3 access key                |
 | `SEAWEEDFS_SECRET_ACCESS_KEY` |    ✓    |          |   ✓    |   Yes    | S3 secret key                |
 | `SEAWEEDFS_BUCKET`            |    ✓    |          |   ✓    |   Yes    | S3 bucket name               |
@@ -415,6 +424,7 @@ SMTP_FROM_NAME=The Biergarten App
 
 # SeaweedFS (S3-compatible storage)
 SEAWEEDFS_SERVICE_URL=http://seaweedfs:8333
+SEAWEEDFS_PUBLIC_URL=http://localhost:8333
 SEAWEEDFS_ACCESS_KEY_ID=<generated-with-openssl>
 SEAWEEDFS_SECRET_ACCESS_KEY=<generated-with-openssl>
 SEAWEEDFS_BUCKET=my-bucket
