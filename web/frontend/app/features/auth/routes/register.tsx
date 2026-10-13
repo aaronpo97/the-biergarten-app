@@ -51,6 +51,12 @@ const Register = ({ actionData }: Route.ComponentProps) => {
         submit(data, { method: 'post' });
     });
 
+    // A request that reached the action without passing client validation, so the
+    // rejected fields may well sit on a step other than the one on screen.
+    const rejectedFields = Object.values(actionData?.fieldErrors ?? {}).flatMap(
+        (messages) => messages ?? [],
+    );
+
     useActionErrorToast(actionData?.error);
 
     return (
@@ -67,6 +73,13 @@ const Register = ({ actionData }: Route.ComponentProps) => {
             <AuthCardHeading title={wizard.title} subtitle={wizard.subtitle} />
 
             {actionData?.error && <AuthErrorAlert message={actionData.error} />}
+
+            {rejectedFields.length > 0 && (
+                <AuthErrorAlert
+                    message="Check these details before creating your account."
+                    details={rejectedFields}
+                />
+            )}
 
             <RegisterForm wizard={wizard} submitting={isSubmitting} />
 
