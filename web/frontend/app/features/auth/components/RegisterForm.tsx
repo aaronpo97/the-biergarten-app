@@ -1,97 +1,129 @@
-import { BaseSyntheticEvent } from 'react';
-import { FormState, UseFormRegister } from 'react-hook-form';
+import { Button } from '@headlessui/react';
+import { useState } from 'react';
 import FormField from '../../../components/ui/forms/FormField';
 import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import type { RegisterSchema } from '../schemas';
+import type { RegisterWizard } from '../hooks/useRegisterWizard';
+import { minimumAgeYears } from '../schemas';
+import ShowPasswordToggle from './ShowPasswordToggle';
 
 interface RegisterFormProps {
-    onSubmit: (e?: BaseSyntheticEvent) => Promise<Awaited<void> | undefined>;
-    formState: FormState<RegisterSchema>;
-    register: UseFormRegister<RegisterSchema>;
+    wizard: RegisterWizard;
     submitting: boolean;
 }
 
-const RegisterForm = (props: RegisterFormProps) => (
-    <form onSubmit={props.onSubmit} className="space-y-3">
-        <FormField
-            id="username"
-            type="text"
-            autoComplete="username"
-            placeholder="your_username"
-            label="Username"
-            hint="3-64 characters, alphanumeric and . _ -"
-            error={props.formState.errors.username?.message}
-            {...props.register('username')}
-        />
+const RegisterForm = ({ wizard, submitting }: RegisterFormProps) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const { step, isLastStep, canGoBack, register, formState } = wizard;
+    const { errors } = formState;
 
-        <div className="grid grid-cols-2 gap-3">
-            <FormField
-                id="firstName"
-                type="text"
-                autoComplete="given-name"
-                placeholder="Jane"
-                label="First Name"
-                error={props.formState.errors.firstName?.message}
-                {...props.register('firstName')}
-            />
+    return (
+        <form onSubmit={wizard.onSubmit} className="flex flex-col gap-4" noValidate>
+            {step === 1 && (
+                <div className="flex flex-col gap-4">
+                    <FormField
+                        id="username"
+                        type="text"
+                        autoComplete="username"
+                        label="Username"
+                        hint="3-64 characters, alphanumeric and . _ -"
+                        error={errors.username?.message}
+                        {...register('username')}
+                    />
 
-            <FormField
-                id="lastName"
-                type="text"
-                autoComplete="family-name"
-                placeholder="Doe"
-                label="Last Name"
-                error={props.formState.errors.lastName?.message}
-                {...props.register('lastName')}
-            />
-        </div>
+                    <FormField
+                        id="email"
+                        type="email"
+                        autoComplete="email"
+                        label="Email"
+                        error={errors.email?.message}
+                        {...register('email')}
+                    />
+                </div>
+            )}
 
-        <FormField
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="jane@example.com"
-            label="Email"
-            error={props.formState.errors.email?.message}
-            {...props.register('email')}
-        />
+            {step === 2 && (
+                <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2">
+                        <FormField
+                            id="firstName"
+                            type="text"
+                            autoComplete="given-name"
+                            label="First name"
+                            error={errors.firstName?.message}
+                            {...register('firstName')}
+                        />
 
-        <FormField
-            id="dateOfBirth"
-            type="date"
-            label="Date of Birth"
-            hint="Must be 19 years or older"
-            error={props.formState.errors.dateOfBirth?.message}
-            {...props.register('dateOfBirth')}
-        />
+                        <FormField
+                            id="lastName"
+                            type="text"
+                            autoComplete="family-name"
+                            label="Last name"
+                            error={errors.lastName?.message}
+                            {...register('lastName')}
+                        />
+                    </div>
 
-        <FormField
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="••••••••"
-            label="Password"
-            hint="8+ chars: uppercase, lowercase, digit, special character"
-            error={props.formState.errors.password?.message}
-            {...props.register('password')}
-        />
+                    <FormField
+                        id="dateOfBirth"
+                        type="date"
+                        label="Date of birth"
+                        hint={`Must be ${minimumAgeYears} years or older.`}
+                        error={errors.dateOfBirth?.message}
+                        {...register('dateOfBirth')}
+                    />
+                </div>
+            )}
 
-        <FormField
-            id="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            placeholder="••••••••"
-            label="Confirm Password"
-            error={props.formState.errors.confirmPassword?.message}
-            {...props.register('confirmPassword')}
-        />
+            {step === 3 && (
+                <div className="flex flex-col gap-4">
+                    <FormField
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        label="Password"
+                        hint="8+ chars: uppercase, lowercase, digit, special character"
+                        error={errors.password?.message}
+                        {...register('password')}
+                    />
 
-        <SubmitButton
-            isSubmitting={props.submitting}
-            idleText="Create Account"
-            submittingText="Creating account..."
-        />
-    </form>
-);
+                    <FormField
+                        id="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        label="Confirm password"
+                        error={errors.confirmPassword?.message}
+                        {...register('confirmPassword')}
+                    />
+
+                    <ShowPasswordToggle
+                        shown={showPassword}
+                        onToggle={() => setShowPassword((shown) => !shown)}
+                    />
+                </div>
+            )}
+
+            <div className="flex gap-3">
+                {canGoBack && (
+                    <Button
+                        type="button"
+                        onClick={wizard.back}
+                        className="btn btn-outline min-h-12"
+                    >
+                        Back
+                    </Button>
+                )}
+
+                <div className="flex-1">
+                    <SubmitButton
+                        isSubmitting={submitting}
+                        idleText={isLastStep ? 'Create account' : 'Continue'}
+                        submittingText="Creating account…"
+                        className="btn btn-primary min-h-12 w-full"
+                    />
+                </div>
+            </div>
+        </form>
+    );
+};
 
 export default RegisterForm;

@@ -21,19 +21,26 @@ const FormField = ({
 }: FormFieldProps) => {
     return (
         <Field className={className ?? 'space-y-1'}>
-            <Label htmlFor={inputProps.id} className={labelClassName ?? 'label font-medium'}>
+            <Label
+                htmlFor={inputProps.id}
+                className={labelClassName ?? 'label text-sm font-semibold text-base-content'}
+            >
                 {label}
             </Label>
 
             <input
                 {...inputProps}
-                className={inputClassName ?? `input w-full ${error ? 'input-error' : ''}`}
+                className={
+                    inputClassName ?? `input h-11 w-full text-base ${error ? 'input-error' : ''}`
+                }
             />
 
             {error ? (
-                <Description className={hintClassName ?? 'label text-error'}>{error}</Description>
+                <Description className={hintClassName ?? 'text-xs text-error'}>{error}</Description>
             ) : hint ? (
-                <Description className={hintClassName ?? 'label'}>{hint}</Description>
+                <Description className={hintClassName ?? 'text-xs text-[var(--color-muted)]'}>
+                    {hint}
+                </Description>
             ) : null}
         </Field>
     );
