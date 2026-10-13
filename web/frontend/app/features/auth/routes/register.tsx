@@ -1,11 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { redirect, useNavigation, useSubmit } from 'react-router';
+import { z } from 'zod';
 import { createAuthSession, getOptionalAuth, register } from '../auth.server';
-import LoginCallout from '../components/LoginCallout';
+import AuthCardHeading from '../components/AuthCardHeading';
+import AuthErrorAlert from '../components/AuthErrorAlert';
+import AuthSplitLayout from '../components/AuthSplitLayout';
+import AuthSwitchPrompt from '../components/AuthSwitchPrompt';
 import RegisterForm from '../components/RegisterForm';
+import RegisterStepProgress from '../components/RegisterStepProgress';
 import { useActionErrorToast } from '../hooks/useActionErrorToast';
-import { registerSchema, type RegisterSchema } from '../schemas';
+import { useRegisterWizard } from '../hooks/useRegisterWizard';
+import { registerSchema } from '../schemas';
 import type { Route } from './+types/register';
 
 export const meta = ({}: Route.MetaArgs) => {
@@ -20,33 +24,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export const action = async ({ request }: Route.ActionArgs) => {
     const formData = await request.formData();
-    const result = registerSchema.safeParse({
-        username: formData.get('username'),
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        dateOfBirth: formData.get('dateOfBirth'),
-        password: formData.get('password'),
-        confirmPassword: formData.get('confirmPassword'),
-    });
+    const result = registerSchema.safeParse(Object.fromEntries(formData));
 
     if (!result.success) {
-        const fieldErrors = result.error.flatten().fieldErrors as Record<
-            keyof RegisterSchema,
-            string[] | undefined
-        >;
-        return { error: null, fieldErrors };
+        return { error: null, fieldErrors: z.flattenError(result.error).fieldErrors };
     }
 
     try {
-        const body = {
-            username: result.data.username,
-            firstName: result.data.firstName,
-            lastName: result.data.lastName,
-            email: result.data.email,
-            dateOfBirth: result.data.dateOfBirth,
-            password: result.data.password,
-        };
+        const { confirmPassword: _confirmPassword, ...body } = result.data;
         const payload = await register(body);
         return createAuthSession(payload, '/dashboard');
     } catch (err) {
@@ -62,44 +47,31 @@ const Register = ({ actionData }: Route.ComponentProps) => {
     const submit = useSubmit();
     const isSubmitting = navigation.state === 'submitting';
 
-    const {
-        register: field,
-        handleSubmit,
-        formState,
-    } = useForm<RegisterSchema>({ resolver: zodResolver(registerSchema) });
-
-    const onSubmit = handleSubmit((data) => {
+    const wizard = useRegisterWizard((data) => {
         submit(data, { method: 'post' });
     });
 
     useActionErrorToast(actionData?.error);
 
     return (
-        <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
-            <div className="card w-full max-w-lg bg-base-100 shadow-xl">
-                <div className="card-body gap-4">
-                    <div className="text-center">
-                        <h1 className="card-title text-3xl justify-center">Register</h1>
-                        <p className="text-base-content/70">Create your Biergarten account</p>
-                    </div>
+        <AuthSplitLayout
+            headline="Pull up a chair."
+            blurb="Create an account to explore partner breweries and their beers."
+        >
+            <RegisterStepProgress
+                step={wizard.step}
+                totalSteps={wizard.totalSteps}
+                name={wizard.name}
+            />
 
-                    {actionData?.error && (
-                        <div role="alert" className="alert alert-error alert-soft">
-                            <span>{actionData.error}</span>
-                        </div>
-                    )}
+            <AuthCardHeading title={wizard.title} subtitle={wizard.subtitle} />
 
-                    <RegisterForm
-                        onSubmit={onSubmit}
-                        formState={formState}
-                        register={field}
-                        submitting={isSubmitting}
-                    />
+            {actionData?.error && <AuthErrorAlert message={actionData.error} />}
 
-                    <LoginCallout />
-                </div>
-            </div>
-        </div>
+            <RegisterForm wizard={wizard} submitting={isSubmitting} />
+
+            <AuthSwitchPrompt lead="Already have an account?" to="/login" label="Sign in" />
+        </AuthSplitLayout>
     );
 };
 
