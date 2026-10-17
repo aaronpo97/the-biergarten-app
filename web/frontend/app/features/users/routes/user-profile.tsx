@@ -23,6 +23,12 @@ export const meta = ({ loaderData }: Route.MetaArgs) => [
             ? `${loaderData.profile.username} | The Biergarten App`
             : 'Profile | The Biergarten App',
     },
+    {
+        name: 'description',
+        content: loaderData
+            ? `See ${loaderData.profile.username}'s profile on The Biergarten App.`
+            : 'View a member profile on The Biergarten App.',
+    },
 ];
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {

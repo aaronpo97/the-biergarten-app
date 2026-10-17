@@ -13,7 +13,14 @@ import { registerSchema } from '../schemas';
 import type { Route } from './+types/register';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Register | The Biergarten App' }];
+    return [
+        { title: 'Register | The Biergarten App' },
+        {
+            name: 'description',
+            content:
+                'Create a Biergarten account to rate breweries, track the beers you have tried, and join the community.',
+        },
+    ];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

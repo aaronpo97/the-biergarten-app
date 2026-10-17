@@ -12,7 +12,14 @@ const PAGE_SIZE = 12;
 const MAP_PLACEHOLDER_CLASS = 'skeleton h-[28rem] md:h-[34rem] w-full rounded-box';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Brewery Directory | The Biergarten App' }];
+    return [
+        { title: 'Brewery Directory | The Biergarten App' },
+        {
+            name: 'description',
+            content:
+                'Browse the full directory of breweries on The Biergarten App, with a map of where to find them.',
+        },
+    ];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
