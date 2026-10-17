@@ -4,7 +4,13 @@ import ConfirmSuccess from '../components/ConfirmSuccess';
 import type { Route } from './+types/confirm';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Confirm Email | The Biergarten App' }];
+    return [
+        { title: 'Confirm Email | The Biergarten App' },
+        {
+            name: 'description',
+            content: 'Confirm your email address to finish setting up your Biergarten account.',
+        },
+    ];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

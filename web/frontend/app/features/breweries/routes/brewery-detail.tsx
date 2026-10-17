@@ -14,6 +14,14 @@ import CommunityStatsCard from '../components/detail/CommunityStatsCard';
 import { FILLER_BEERS, FILLER_BREWERY_META, FILLER_COMMENTS } from '../utils/filler-brewery-detail';
 import type { Route } from './+types/brewery-detail';
 
+export const meta = ({}: Route.MetaArgs) => [
+    { title: 'Brewery | The Biergarten App' },
+    {
+        name: 'description',
+        content: "See a brewery's beers, location, and community ratings on The Biergarten App.",
+    },
+];
+
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
     const [brewery, auth] = await Promise.all([
         getBreweryById(params.id),

@@ -12,7 +12,14 @@ import { loginSchema, type LoginSchema } from '../schemas';
 import type { Route } from './+types/login';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Login | The Biergarten App' }];
+    return [
+        { title: 'Login | The Biergarten App' },
+        {
+            name: 'description',
+            content:
+                'Log in to The Biergarten App to rate breweries and keep track of the beers you have tried.',
+        },
+    ];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

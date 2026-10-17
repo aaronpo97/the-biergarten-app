@@ -4,7 +4,13 @@ import SessionInfoCard from '../components/SessionInfoCard';
 import type { Route } from './+types/dashboard';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Dashboard | The Biergarten App' }];
+    return [
+        { title: 'Dashboard | The Biergarten App' },
+        {
+            name: 'description',
+            content: 'Your Biergarten dashboard with your activity and quick links.',
+        },
+    ];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

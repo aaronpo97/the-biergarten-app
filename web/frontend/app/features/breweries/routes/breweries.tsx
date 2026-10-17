@@ -11,7 +11,13 @@ import type { Route } from './+types/breweries';
 const FILLER_TOTAL_BREWERY_COUNT = 128;
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Breweries | The Biergarten App' }];
+    return [
+        { title: 'Breweries | The Biergarten App' },
+        {
+            name: 'description',
+            content: 'Discover featured and recently added breweries on The Biergarten App.',
+        },
+    ];
 };
 
 export const loader = async () => {

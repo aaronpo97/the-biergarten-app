@@ -30,7 +30,13 @@ import type { ActionResult } from '../types';
 
 import type { Route } from './+types/account';
 
-export const meta = ({}: Route.MetaArgs) => [{ title: 'Account Settings | The Biergarten App' }];
+export const meta = ({}: Route.MetaArgs) => [
+    { title: 'Account Settings | The Biergarten App' },
+    {
+        name: 'description',
+        content: 'Manage your Biergarten account details, username, and password.',
+    },
+];
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
     const auth = await requireAuth(request);

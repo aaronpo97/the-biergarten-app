@@ -2,7 +2,13 @@ import FeatureNotAvailable from '../components/FeatureNotAvailable';
 import type { Route } from './+types/beers';
 
 export const meta = ({}: Route.MetaArgs) => {
-    return [{ title: 'Beers | The Biergarten App' }];
+    return [
+        { title: 'Beers | The Biergarten App' },
+        {
+            name: 'description',
+            content: 'Explore the beers poured by Biergarten partner breweries.',
+        },
+    ];
 };
 
 const Beers = () => {
