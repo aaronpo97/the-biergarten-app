@@ -186,6 +186,22 @@ manual backend setup (see
 [Getting Started](getting-started.md#manual-backend-setup)) doesn't need to set
 it.
 
+### Slow request logging
+
+`PerformanceLoggingBehavior` reads its threshold from the `PerformanceLogging`
+section of `API.Core/appsettings.json`. Any request handled in at least this
+many milliseconds is logged as a warning.
+
+```json
+"PerformanceLogging": {
+  "SlowRequestThresholdMs": 500
+}
+```
+
+The value can be overridden with the environment variable
+`PerformanceLogging__SlowRequestThresholdMs`, and changes are picked up at
+runtime without a restart.
+
 ## Frontend variables (`web/frontend`)
 
 The website's core runtime variables are:
