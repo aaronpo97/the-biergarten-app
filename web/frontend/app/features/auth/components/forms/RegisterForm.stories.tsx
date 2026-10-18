@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
-import AuthCardHeading from './AuthCardHeading';
+import AuthCardHeading from '../layout/AuthCardHeading';
 import RegisterForm from './RegisterForm';
 import RegisterStepProgress from './RegisterStepProgress';
-import { useRegisterWizard } from '../hooks/useRegisterWizard';
-import { type RegisterSchema } from '../schemas';
+import { useRegisterWizard } from '../../hooks/useRegisterWizard';
+import { type RegisterSchema } from '../../schemas';
 
 const registerFormDescription = `Renders the real \`RegisterForm\` driven by the real \`useRegisterWizard\` hook, so these stories exercise the production three-step flow: each step validates its own fields through \`registerSchema\` (zod) before the next one opens, entered values survive going back, and only the final step submits.`;
 

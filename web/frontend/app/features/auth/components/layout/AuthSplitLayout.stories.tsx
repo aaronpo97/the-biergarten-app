@@ -3,14 +3,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useForm } from 'react-hook-form';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
 import AuthCardHeading from './AuthCardHeading';
-import AuthErrorAlert from './AuthErrorAlert';
+import AuthErrorAlert from '../feedback/AuthErrorAlert';
 import AuthSplitLayout from './AuthSplitLayout';
 import AuthSwitchPrompt from './AuthSwitchPrompt';
-import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
-import RegisterStepProgress from './RegisterStepProgress';
-import { useRegisterWizard } from '../hooks/useRegisterWizard';
-import { loginSchema, type LoginSchema } from '../schemas';
+import LoginForm from '../forms/LoginForm';
+import RegisterForm from '../forms/RegisterForm';
+import RegisterStepProgress from '../forms/RegisterStepProgress';
+import { useRegisterWizard } from '../../hooks/useRegisterWizard';
+import { loginSchema, type LoginSchema } from '../../schemas';
 
 const noop = () => undefined;
 

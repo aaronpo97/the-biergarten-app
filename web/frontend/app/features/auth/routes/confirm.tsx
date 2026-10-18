@@ -1,6 +1,6 @@
 import { confirmEmail, requireAuth } from '../auth.server';
-import ConfirmFailure from '../components/ConfirmFailure';
-import ConfirmSuccess from '../components/ConfirmSuccess';
+import ConfirmFailure from '../components/feedback/ConfirmFailure';
+import ConfirmSuccess from '../components/feedback/ConfirmSuccess';
 import type { Route } from './+types/confirm';
 
 export const meta = ({}: Route.MetaArgs) => {
