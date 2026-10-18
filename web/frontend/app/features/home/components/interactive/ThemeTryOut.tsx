@@ -1,4 +1,4 @@
-import ThemeSegmentedControl from '../../theme/components/ThemeSegmentedControl';
+import ThemeSegmentedControl from '../../../theme/components/ThemeSegmentedControl';
 
 const ThemeTryOut = () => (
     <section className="bg-neutral text-neutral-content">
