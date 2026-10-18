@@ -102,7 +102,12 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
                 new CommandDefinition(
                     """
                     UPDATE Social.UserAvatar
-                    SET ValidTo = SYSUTCDATETIME()
+                    -- CK_UserAvatar_ValidRange requires ValidTo > ValidFrom, even within the same millisecond
+                    SET ValidTo = CASE
+                        WHEN CAST(SYSUTCDATETIME() AS DATETIME2(3)) > ValidFrom
+                            THEN CAST(SYSUTCDATETIME() AS DATETIME2(3))
+                        ELSE DATEADD(MILLISECOND, 1, ValidFrom)
+                    END
                     WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL
                     """,
                     new { avatar.UserProfileId },
