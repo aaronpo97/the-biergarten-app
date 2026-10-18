@@ -40,10 +40,10 @@ lists what's real vs. filler, and what backend work closes each gap.
 
 ### Directory CTA
 
-| Field                                   | Status | Source                | Gap                                                                                                                            |
-| --------------------------------------- | ------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Total partner brewery count             | ❌     | Filler number (`128`) | No count endpoint. Needs `GET /api/brewery/count` rather than fetching the full list to measure it.                            |
-| Filter by country / region / beer style | ❌     | Copy only             | Describes the future directory page's capability, not a data need of this page. Implies the directory will need filter params. |
+| Field                                   | Status | Source                   | Gap                                                                                                                            |
+| --------------------------------------- | ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Total partner brewery count             | ✅     | `GET /api/brewery/count` |                                                                                                                                |
+| Filter by country / region / beer style | ❌     | Copy only                | Describes the future directory page's capability, not a data need of this page. Implies the directory will need filter params. |
 
 ## Brewery detail (`/breweries/:id`)
 
