@@ -101,21 +101,26 @@ public class UserProfileRepository(ISqlConnectionFactory connectionFactory)
             await connection.ExecuteAsync(
                 new CommandDefinition(
                     """
-                    UPDATE Social.UserAvatar
-                    SET ValidTo = SYSUTCDATETIME()
-                    WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL
-                    """,
-                    new { avatar.UserProfileId },
-                    transaction: transaction,
-                    cancellationToken: cancellationToken
-                )
-            );
+                    -- Serialises concurrent replacements for one profile, including the first avatar when no active row exists to lock
+                    SELECT 1 FROM Social.UserProfile WITH (UPDLOCK, HOLDLOCK)
+                    WHERE UserProfileID = @UserProfileId;
 
-            await connection.ExecuteAsync(
-                new CommandDefinition(
-                    """
-                    INSERT INTO Social.UserAvatar (UserAvatarID, UserProfileID, PhotoID)
-                    VALUES (@UserAvatarId, @UserProfileId, @PhotoId)
+                    -- CK_UserAvatar_ValidRange requires ValidTo > ValidFrom, even within the same millisecond
+                    DECLARE @ChangedAt DATETIME2(3) = CAST(SYSUTCDATETIME() AS DATETIME2(3));
+
+                    SELECT @ChangedAt = CASE
+                        WHEN @ChangedAt > ValidFrom THEN @ChangedAt
+                        ELSE DATEADD(MILLISECOND, 1, ValidFrom)
+                    END
+                    FROM Social.UserAvatar
+                    WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL;
+
+                    UPDATE Social.UserAvatar
+                    SET ValidTo = @ChangedAt
+                    WHERE UserProfileID = @UserProfileId AND ValidTo IS NULL;
+
+                    INSERT INTO Social.UserAvatar (UserAvatarID, UserProfileID, PhotoID, ValidFrom)
+                    VALUES (@UserAvatarId, @UserProfileId, @PhotoId, @ChangedAt);
                     """,
                     new
                     {

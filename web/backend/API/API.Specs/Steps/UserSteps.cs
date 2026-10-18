@@ -1,11 +1,13 @@
 using System.Text.Json;
 using API.Specs.Mocks;
+using Database.Connection;
 using Features.ImageUploads.Services;
 using Features.Users.Commands.Profile.UploadAvatar;
 using Features.Users.Repository;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
 
@@ -141,6 +143,69 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
     public async Task GivenIHaveUploadedANewAvatarReplacingThePreviousOne()
     {
         await UploadAvatarAsync();
+    }
+
+    [Given("I have uploaded {int} avatars at the same time")]
+    public async Task GivenIHaveUploadedAvatarsAtTheSameTime(int count)
+    {
+        Guid userId = GetRegisteredUserId();
+
+        await Task.WhenAll(
+            Enumerable
+                .Range(0, count)
+                .Select(async _ =>
+                {
+                    using IServiceScope scope = GetFactory().Services.CreateScope();
+                    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                    await mediator.Send(new UploadAvatarCommand(userId, CreateAvatarFile()));
+                })
+        );
+    }
+
+    [Then("my avatar history should contain {int} avatars with exactly one active")]
+    public async Task ThenMyAvatarHistoryShouldContainAvatarsWithExactlyOneActive(int count)
+    {
+        ISqlConnectionFactory factory = GetFactory().Services.GetRequiredService<ISqlConnectionFactory>();
+        await using SqlConnection connection = factory.CreateConnection();
+        await connection.OpenAsync();
+
+        await using SqlCommand command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT COUNT(*), COUNT(CASE WHEN av.ValidTo IS NULL THEN 1 END)
+            FROM Social.UserAvatar av
+            JOIN Social.UserProfile up ON up.UserProfileID = av.UserProfileID
+            WHERE up.UserAccountID = @UserAccountId
+            """;
+        command.Parameters.AddWithValue("@UserAccountId", GetRegisteredUserId());
+
+        await using SqlDataReader reader = await command.ExecuteReaderAsync();
+        (await reader.ReadAsync()).Should().BeTrue();
+        reader.GetInt32(0).Should().Be(count);
+        reader.GetInt32(1).Should().Be(1);
+    }
+
+    /// <summary>
+    ///     Pushes the active avatar's ValidFrom ahead of the clock so that closing it at the current
+    ///     time would land before ValidFrom, which the avatar range check rejects.
+    /// </summary>
+    [Given("my current avatar became active in the future")]
+    public async Task GivenMyCurrentAvatarBecameActiveInTheFuture()
+    {
+        ISqlConnectionFactory factory = GetFactory().Services.GetRequiredService<ISqlConnectionFactory>();
+        await using SqlConnection connection = factory.CreateConnection();
+        await connection.OpenAsync();
+
+        await using SqlCommand command = connection.CreateCommand();
+        command.CommandText = """
+            UPDATE av
+            SET ValidFrom = DATEADD(HOUR, 1, SYSUTCDATETIME())
+            FROM Social.UserAvatar av
+            JOIN Social.UserProfile up ON up.UserProfileID = av.UserProfileID
+            WHERE up.UserAccountID = @UserAccountId AND av.ValidTo IS NULL
+            """;
+        command.Parameters.AddWithValue("@UserAccountId", GetRegisteredUserId());
+
+        (await command.ExecuteNonQueryAsync()).Should().Be(1);
     }
 
     /// <summary>
