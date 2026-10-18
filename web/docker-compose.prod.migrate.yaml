@@ -1,0 +1,29 @@
+#   docker compose --env-file web/.env.prod -f web/docker-compose.prod.migrate.yaml run --rm --build database.migrations
+name: biergarten-prod-migrate
+
+services:
+  database.migrations:
+    env_file: ".env.prod"
+    image: database.migrations
+    container_name: prod-env-database-migrations
+    build:
+      context: ./backend
+      dockerfile: Database/Database.Migrations/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 1000
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DB_SERVER: "${DB_SERVER}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      CLEAR_DATABASE: "false"
+    restart: "no"
+    networks:
+      - prodnet
+
+networks:
+  prodnet:
+    name: biergarten-prodnet
+    external: true
