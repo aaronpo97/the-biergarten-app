@@ -35,6 +35,22 @@ Scenario: Public profile exposes the current avatar after it is replaced
     And the public profile response should carry my current avatar
     And the public profile response should not carry my previous avatar
 
+Scenario: Replacing an avatar that became active at or after the current time succeeds
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded an avatar
+    And my current avatar became active in the future
+    And I have uploaded a new avatar, replacing the previous one
+    When I retrieve the public profile by ID
+    Then the response has HTTP status 200
+    And the public profile response should carry my current avatar
+
+Scenario: Concurrent avatar uploads leave exactly one active avatar
+    Given I have registered a new account
+    And I have a valid access token for my account
+    And I have uploaded 5 avatars at the same time
+    Then my avatar history should contain 5 avatars with exactly one active
+
 Scenario: Fetching the avatar without authentication succeeds
     Given I have registered a new account
     And I have a valid access token for my account
