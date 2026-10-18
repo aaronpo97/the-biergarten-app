@@ -42,6 +42,15 @@ Scenario: Retrieving a non-existent brewery returns not found
     When I retrieve a brewery by a non-existent ID
     Then the response has HTTP status 404
 
+Scenario: Anonymous visitors can read the brewery count
+    Given I have an existing account
+    And I am logged in
+    And a city exists
+    And I have created a brewery
+    When I request the brewery count
+    Then the response has HTTP status 200
+    And the response payload should be a number of at least 1
+
 Scenario: Owner can update their brewery
     Given I have an existing account
     And I am logged in
