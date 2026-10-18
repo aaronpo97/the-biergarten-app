@@ -180,7 +180,7 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 **Features.Breweries.Tests**:
 
-- Brewery create/update/delete commands and get-by-id/get-all queries
+- Brewery create/update/delete commands and get-by-id/get-all/count queries
 - Brewery location queries: all locations, and locations within a given range of
   a coordinate
 
@@ -249,11 +249,13 @@ API.Specs/
 │   ├── ResendConfirmation.feature      # Resend-confirmation scenarios
 │   ├── TokenRefresh.feature            # Refresh token scenarios
 │   ├── AccessTokenValidation.feature   # Protected endpoint access scenarios
+│   ├── Breweries.feature               # Brewery create/read/update/delete and count scenarios
 │   ├── NotFound.feature                # 404 handling
 │   └── PublicUserProfile.feature       # Public profile & authenticated account scenarios
 ├── Steps/
 │   ├── AuthSteps.cs                    # Step definitions for the Auth features
 │   ├── UserSteps.cs                    # Step definitions for the public profile & user-account features
+│   ├── BrewerySteps.cs                 # Step definitions for the Breweries feature
 │   └── ApiGeneralSteps.cs              # Shared/general step definitions
 ├── Mocks/
 │   ├── MockEmailDispatcher.cs          # Substitutes Features.Emails' IEmailDispatcher
