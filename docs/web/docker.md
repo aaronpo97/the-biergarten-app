@@ -289,7 +289,7 @@ anyone interacting with an application seeded from it has to be told upfront tha
 the content is AI-generated.
 
 The website meets that obligation with `AiDisclosureDialog`
-(`web/frontend/app/features/home/components/interactive/AiDisclosureDialog.tsx`), which
+(`web/frontend/app/features/home/components/interactive/AiDisclosureDialog/AiDisclosureDialog.tsx`), which
 the root route renders on every full page load, whichever route the visitor lands
 on. It is part of the server-rendered HTML rather than mounted after hydration, so
 the disclosure is on screen with the first paint. Acknowledging it hides the

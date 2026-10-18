@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
-import type { Brewery } from '../../../breweries/breweries.server';
-import { FILLER_BEER_COUNTS } from '../../utils/filler-beer-counts';
+import type { Brewery } from '../../../../breweries/breweries.server';
+import { FILLER_BEER_COUNTS } from '../../../utils/filler-beer-counts';
 
 interface PartnerBreweriesProps {
     breweries: Brewery[];

@@ -1,11 +1,11 @@
 import { getBreweries, type Brewery } from '../../breweries/breweries.server';
 import { getOptionalAuth } from '../../auth/auth.server';
-import ClosingCta from '../components/sections/ClosingCta';
-import FeatureHighlights from '../components/sections/FeatureHighlights';
-import HeroSection from '../components/sections/HeroSection';
-import LandingFooter from '../components/sections/LandingFooter';
-import PartnerBreweries from '../components/sections/PartnerBreweries';
-import ThemeTryOut from '../components/interactive/ThemeTryOut';
+import ClosingCta from '../components/sections/ClosingCta/ClosingCta';
+import FeatureHighlights from '../components/sections/FeatureHighlights/FeatureHighlights';
+import HeroSection from '../components/sections/HeroSection/HeroSection';
+import LandingFooter from '../components/sections/LandingFooter/LandingFooter';
+import PartnerBreweries from '../components/sections/PartnerBreweries/PartnerBreweries';
+import ThemeTryOut from '../components/interactive/ThemeTryOut/ThemeTryOut';
 import type { Route } from './+types/home';
 
 const PARTNER_BREWERY_COUNT = 3;

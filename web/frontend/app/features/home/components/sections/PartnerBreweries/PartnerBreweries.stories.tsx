@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
-import type { Brewery, BreweryLocation } from '../../../breweries/breweries.server';
+import type { Brewery, BreweryLocation } from '../../../../breweries/breweries.server';
 import PartnerBreweries from './PartnerBreweries';
 
 const partnerBreweriesDescription = `Landing page preview of the three most recently added breweries. Falls back to the empty-state line when the directory is empty or the brewery service is unreachable.`;
