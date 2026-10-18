@@ -1,6 +1,6 @@
 import { requireAuth } from '../../auth/auth.server';
-import AuthFlowDemoCard from '../components/AuthFlowDemoCard';
-import SessionInfoCard from '../components/SessionInfoCard';
+import AuthFlowDemoCard from '../components/dashboard/AuthFlowDemoCard/AuthFlowDemoCard';
+import SessionInfoCard from '../components/dashboard/SessionInfoCard/SessionInfoCard';
 import type { Route } from './+types/dashboard';
 
 export const meta = ({}: Route.MetaArgs) => {

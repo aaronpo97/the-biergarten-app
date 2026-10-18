@@ -2,8 +2,8 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Trash, WarningTriangle } from 'iconoir-react';
 import { useState } from 'react';
 import { useNavigation, useSubmit } from 'react-router';
-import { useSectionError } from '../hooks/useSectionError';
-import type { ActionResult } from '../types';
+import { useSectionError } from '../../../hooks/useSectionError';
+import type { ActionResult } from '../../../types';
 
 interface DeleteAccountSectionProps {
     userAccountId: string;
