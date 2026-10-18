@@ -13,7 +13,7 @@ import './app.css';
 import Navbar from './components/ui/navbar/Navbar';
 import ToastProvider from './components/ui/toast/ToastProvider';
 import { getOptionalAuth } from './features/auth/auth.server';
-import AiDisclosureDialog from './features/home/components/AiDisclosureDialog';
+import AiDisclosureDialog from './features/home/components/interactive/AiDisclosureDialog/AiDisclosureDialog';
 import { defaultThemeName, parseThemeCookie } from './features/theme/themes';
 
 export const links: Route.LinksFunction = () => [

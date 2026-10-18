@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import barBackground from '../../../assets/bar-background.jpg';
+import barBackground from '../../../../../assets/bar-background.jpg';
 
 const HeroSection = () => (
     <section className="mx-auto max-w-7xl px-5 pt-18 pb-16">
