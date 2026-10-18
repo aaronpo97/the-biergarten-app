@@ -2,11 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { User } from 'iconoir-react';
 import { useForm } from 'react-hook-form';
 import { useNavigation, useSubmit } from 'react-router';
-import FormField from '../../../components/ui/forms/FormField';
-import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import { useSectionError } from '../hooks/useSectionError';
-import { updateUsernameSchema, type UpdateUsernameSchema } from '../schemas';
-import type { SectionProps } from '../types';
+import FormField from '../../../../components/ui/forms/FormField';
+import SubmitButton from '../../../../components/ui/forms/SubmitButton';
+import { useSectionError } from '../../hooks/useSectionError';
+import { updateUsernameSchema, type UpdateUsernameSchema } from '../../schemas';
+import type { SectionProps } from '../../types';
 import SectionCard from './SectionCard';
 
 const UsernameSection = ({
