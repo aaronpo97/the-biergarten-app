@@ -10,5 +10,6 @@
         <PackageReference Include="MediatR" Version="12.5.0" />
         <PackageReference Include="FluentValidation" Version="11.3.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.1" />
     </ItemGroup>
 </Project>

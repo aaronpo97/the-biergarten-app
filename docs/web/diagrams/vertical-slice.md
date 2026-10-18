@@ -66,7 +66,9 @@ see the notes for what else each of those foundation projects pulls in.
       (`Features.Users.Notifications`), not in `Shared.Application`
 
 - **Shared.Application**:
-  - `ValidationBehavior` (MediatR pipeline)
+  - `ValidationBehavior`, `PerformanceLoggingBehavior` (MediatR pipeline; the
+    latter logs a warning for requests slower than
+    `PerformanceLogging:SlowRequestThresholdMs`)
   - Every slice (including `Features.Emails`) references it for the pipeline
     behavior alone
 

@@ -32,6 +32,10 @@ internal static class ServiceCollectionExtensions
         public IServiceCollection AddValidationAndMediatR()
         {
             services
+                .AddOptions<PerformanceLoggingOptions>()
+                .BindConfiguration(PerformanceLoggingOptions.SectionName);
+
+            services
                 .AddOpenApi()
                 .AddValidatorsFromAssemblyContaining<Program>()
                 .AddValidatorsFromAssembly(typeof(BreweryController).Assembly)
@@ -47,6 +51,7 @@ internal static class ServiceCollectionExtensions
                     cfg.RegisterServicesFromAssembly(typeof(IEmailDispatcher).Assembly);
                     cfg.RegisterServicesFromAssembly(typeof(CityController).Assembly);
                     cfg.AddOpenBehavior(typeof(UnhandledExceptionLoggingBehavior<,>));
+                    cfg.AddOpenBehavior(typeof(PerformanceLoggingBehavior<,>));
                     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 });
 
