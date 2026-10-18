@@ -1,10 +1,10 @@
 import { Button } from '@headlessui/react';
 import { useState } from 'react';
-import FormField from '../../../components/ui/forms/FormField';
-import SubmitButton from '../../../components/ui/forms/SubmitButton';
-import type { RegisterWizard } from '../hooks/useRegisterWizard';
-import { minimumAgeYears } from '../schemas';
-import ShowPasswordToggle from './ShowPasswordToggle';
+import FormField from '../../../../../components/ui/forms/FormField';
+import SubmitButton from '../../../../../components/ui/forms/SubmitButton';
+import type { RegisterWizard } from '../../../hooks/useRegisterWizard';
+import { minimumAgeYears } from '../../../schemas';
+import ShowPasswordToggle from '../ShowPasswordToggle/ShowPasswordToggle';
 
 interface RegisterFormProps {
     wizard: RegisterWizard;

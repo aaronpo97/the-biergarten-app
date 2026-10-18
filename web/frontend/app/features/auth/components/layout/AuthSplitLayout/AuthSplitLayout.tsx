@@ -1,4 +1,4 @@
-import barBackground from '../../../assets/beer-flight-background.jpg';
+import barBackground from '../../../../../assets/beer-flight-background.jpg';
 
 interface AuthSplitLayoutProps {
     headline: string;
