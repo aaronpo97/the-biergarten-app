@@ -8,17 +8,31 @@ namespace API.Specs.Mocks;
 /// </summary>
 public class MockFileStorageProvider : IFileStorageProvider
 {
+    private readonly object _gate = new();
     private readonly List<string> _keys = [];
     private readonly Dictionary<string, byte[]> _objects = new();
 
-    public IReadOnlyCollection<string> UploadedKeys => _keys.ToList();
+    public IReadOnlyCollection<string> UploadedKeys
+    {
+        get
+        {
+            lock (_gate)
+                return _keys.ToList();
+        }
+    }
 
     /// <summary>The key of the most recent upload.</summary>
     /// <exception cref="InvalidOperationException">Thrown when nothing has been uploaded yet.</exception>
-    public string LastUploadedKey =>
-        _keys.Count > 0
-            ? _keys[^1]
-            : throw new InvalidOperationException("no file has been uploaded");
+    public string LastUploadedKey
+    {
+        get
+        {
+            lock (_gate)
+                return _keys.Count > 0
+                    ? _keys[^1]
+                    : throw new InvalidOperationException("no file has been uploaded");
+        }
+    }
 
     public Task UploadAsync(
         string key,
@@ -30,17 +44,25 @@ public class MockFileStorageProvider : IFileStorageProvider
         using MemoryStream buffer = new();
         content.CopyTo(buffer);
 
-        if (!_objects.ContainsKey(key))
-            _keys.Add(key);
+        lock (_gate)
+        {
+            if (!_objects.ContainsKey(key))
+                _keys.Add(key);
 
-        _objects[key] = buffer.ToArray();
+            _objects[key] = buffer.ToArray();
+        }
+
         return Task.CompletedTask;
     }
 
     public Task DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
-        _objects.Remove(key);
-        _keys.Remove(key);
+        lock (_gate)
+        {
+            _objects.Remove(key);
+            _keys.Remove(key);
+        }
+
         return Task.CompletedTask;
     }
 

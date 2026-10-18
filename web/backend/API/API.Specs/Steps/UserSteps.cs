@@ -145,6 +145,45 @@ public class UserSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await UploadAvatarAsync();
     }
 
+    [Given("I have uploaded {int} avatars at the same time")]
+    public async Task GivenIHaveUploadedAvatarsAtTheSameTime(int count)
+    {
+        Guid userId = GetRegisteredUserId();
+
+        await Task.WhenAll(
+            Enumerable
+                .Range(0, count)
+                .Select(async _ =>
+                {
+                    using IServiceScope scope = GetFactory().Services.CreateScope();
+                    IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                    await mediator.Send(new UploadAvatarCommand(userId, CreateAvatarFile()));
+                })
+        );
+    }
+
+    [Then("my avatar history should contain {int} avatars with exactly one active")]
+    public async Task ThenMyAvatarHistoryShouldContainAvatarsWithExactlyOneActive(int count)
+    {
+        ISqlConnectionFactory factory = GetFactory().Services.GetRequiredService<ISqlConnectionFactory>();
+        await using SqlConnection connection = factory.CreateConnection();
+        await connection.OpenAsync();
+
+        await using SqlCommand command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT COUNT(*), COUNT(CASE WHEN av.ValidTo IS NULL THEN 1 END)
+            FROM Social.UserAvatar av
+            JOIN Social.UserProfile up ON up.UserProfileID = av.UserProfileID
+            WHERE up.UserAccountID = @UserAccountId
+            """;
+        command.Parameters.AddWithValue("@UserAccountId", GetRegisteredUserId());
+
+        await using SqlDataReader reader = await command.ExecuteReaderAsync();
+        (await reader.ReadAsync()).Should().BeTrue();
+        reader.GetInt32(0).Should().Be(count);
+        reader.GetInt32(1).Should().Be(1);
+    }
+
     /// <summary>
     ///     Pushes the active avatar's ValidFrom ahead of the clock so that closing it at the current
     ///     time would land before ValidFrom, which the avatar range check rejects.
