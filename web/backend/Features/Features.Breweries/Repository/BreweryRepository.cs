@@ -95,6 +95,18 @@ public class BreweryRepository(ISqlConnectionFactory connectionFactory)
         );
     }
 
+    /// <summary>Gets the total number of brewery posts.</summary>
+    public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.ExecuteScalarAsync<int>(
+            new CommandDefinition(
+                "SELECT COUNT(*) FROM Brewery.BreweryPost",
+                cancellationToken: cancellationToken
+            )
+        );
+    }
+
     /// <summary>Gets brewery posts in reverse chronological order.</summary>
     public async Task<IEnumerable<BreweryPost>> GetAllAsync(int? limit, int? offset)
     {
