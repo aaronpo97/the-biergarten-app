@@ -18,6 +18,11 @@ public interface IBreweryRepository
     Task<Guid?> GetPostedByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Gets the total number of brewery posts.
+    /// </summary>
+    Task<int> GetCountAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Gets brewery posts ordered by creation time, with optional paging.
     /// </summary>
     /// <param name="limit">

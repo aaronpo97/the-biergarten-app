@@ -73,6 +73,20 @@ export const getBreweries = async (limit?: number, offset?: number): Promise<Bre
     return body.payload;
 };
 
+export const getBreweryCount = async (): Promise<number> => {
+    const res = await fetchApi('/api/brewery/count');
+
+    if (!res.ok) {
+        throw data(`Failed to load the brewery count (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const body: ApiResponse<number> = await res.json();
+    return body.payload;
+};
+
 export const getBreweryLocations = async (): Promise<SimplifiedBrewery[]> => {
     const res = await fetchApi('/api/brewery/locations');
 

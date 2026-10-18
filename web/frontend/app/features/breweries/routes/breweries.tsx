@@ -4,11 +4,8 @@ import RouteErrorState from '../../../components/ui/error/RouteErrorState';
 import FeaturedBreweryCard from '../components/overview/FeaturedBreweryCard';
 import NearbyBreweriesSection from '../components/overview/nearby/NearbyBreweriesSection';
 import RecentBreweries from '../components/overview/RecentBreweries';
-import { getBreweries } from '../breweries.server';
+import { getBreweries, getBreweryCount } from '../breweries.server';
 import type { Route } from './+types/breweries';
-
-// No count endpoint exists yet - see BREWERY_HANDOFF.md.
-const FILLER_TOTAL_BREWERY_COUNT = 128;
 
 export const meta = ({}: Route.MetaArgs) => {
     return [
@@ -22,12 +19,15 @@ export const meta = ({}: Route.MetaArgs) => {
 
 export const loader = async () => {
     // "Featured" is just the most recently posted brewery for now - see BREWERY_HANDOFF.md.
-    const [featured, ...recent] = await getBreweries(4, 0);
-    return { featured: featured ?? null, recent };
+    const [[featured, ...recent], totalCount] = await Promise.all([
+        getBreweries(4, 0),
+        getBreweryCount(),
+    ]);
+    return { featured: featured ?? null, recent, totalCount };
 };
 
 const Breweries = ({ loaderData }: Route.ComponentProps) => {
-    const { featured, recent } = loaderData;
+    const { featured, recent, totalCount } = loaderData;
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
     const featuredPin = featured?.location?.coordinates
@@ -93,8 +93,8 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
                             Looking for something specific?
                         </h2>
                         <p className="m-0">
-                            All {FILLER_TOTAL_BREWERY_COUNT} partner breweries, filterable by
-                            country, region, and beer style.
+                            All {totalCount} partner breweries, filterable by country, region, and
+                            beer style.
                         </p>
                     </div>
                     <Link to="/breweries/directory" className="btn btn-primary">

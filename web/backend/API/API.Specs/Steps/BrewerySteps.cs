@@ -175,6 +175,23 @@ public class BrewerySteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(requestMessage);
     }
 
+    [When("I request the brewery count")]
+    public async Task WhenIRequestTheBreweryCount()
+    {
+        await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/api/brewery/count"));
+    }
+
+    [Then("the response payload should be a number of at least {int}")]
+    public void ThenTheResponsePayloadShouldBeANumberOfAtLeast(int minimum)
+    {
+        Scenario.TryGetValue(ResponseBodyKey, out string? responseBody).Should().BeTrue();
+
+        using JsonDocument doc = JsonDocument.Parse(responseBody!);
+        doc.RootElement.TryGetProperty("payload", out JsonElement payload).Should().BeTrue();
+        payload.ValueKind.Should().Be(JsonValueKind.Number);
+        payload.GetInt32().Should().BeGreaterThanOrEqualTo(minimum);
+    }
+
     [When("I retrieve a brewery by a non-existent ID")]
     public async Task WhenIRetrieveABreweryByANonExistentId()
     {

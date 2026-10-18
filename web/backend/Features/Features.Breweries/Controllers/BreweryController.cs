@@ -5,6 +5,7 @@ using Features.Breweries.Dtos;
 using Features.Breweries.Queries.GetAllBreweries;
 using Features.Breweries.Queries.GetAllBreweryLocations;
 using Features.Breweries.Queries.GetBreweryById;
+using Features.Breweries.Queries.GetBreweryCount;
 using Features.Breweries.Queries.GetBreweryLocationsWithinRange;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -74,6 +75,24 @@ public class BreweryController(IMediator mediator) : ControllerBase
             {
                 Message = "Breweries retrieved successfully.",
                 Payload = breweries,
+            }
+        );
+    }
+
+    /// <summary>
+    ///     Returns the total number of brewery posts.
+    /// </summary>
+    /// <remarks>This endpoint permits anonymous access.</remarks>
+    [AllowAnonymous]
+    [HttpGet("count")]
+    public async Task<ActionResult<ResponseBody<int>>> GetCount()
+    {
+        int count = await mediator.Send(new GetBreweryCountQuery());
+        return Ok(
+            new ResponseBody<int>
+            {
+                Message = "Brewery count retrieved successfully.",
+                Payload = count,
             }
         );
     }
