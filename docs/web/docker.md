@@ -242,6 +242,44 @@ exits when seeding finishes; `--rm` removes the container. Bring the prod stack
 up first, because the seed project has no visibility into the other project's
 health checks, so a run started before SQL Server is accepting connections fails.
 
+#### First deploy and reset order
+
+On a fresh host, run the steps in this order:
+
+```bash
+docker volume create biergartendata-prod
+docker volume create seaweedfsdata-prod
+
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml up -d --wait
+
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.migrate.yaml \
+  run --rm --build database.migrations
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.seed.yaml \
+  run --rm --build database.seed
+
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml restart api.core
+```
+
+To reset the database, stop the stack and recreate the SQL Server volume before
+the `up`:
+
+```bash
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.yaml down
+docker volume rm biergartendata-prod
+docker volume create biergartendata-prod
+```
+
+SQL Server reads `MSSQL_SA_PASSWORD` only when it first initialises
+`/var/opt/mssql`, so a volume created under an earlier `DB_PASSWORD` keeps the
+old `sa` password and every login fails with `Login failed for user 'sa'`.
+Recreating the volume applies the current `DB_PASSWORD`. A seed run that stopped
+part-way leaves its users behind and the next run fails with
+`Username or email already exists`; the same reset clears it. `down` leaves
+`seaweedfsdata-prod` in place, so uploaded images survive.
+
+A `DB_PASSWORD` containing `$` is interpolated by Compose; double the character
+(`$$`) to keep it literal.
+
 #### Production data
 
 A production deployment seeded this way serves the AI-generated fixture data
