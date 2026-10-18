@@ -1,9 +1,9 @@
 import { BaseSyntheticEvent, useState } from 'react';
 import { FormState, UseFormRegister } from 'react-hook-form';
-import FormField from '../../../../components/ui/forms/FormField';
-import SubmitButton from '../../../../components/ui/forms/SubmitButton';
-import type { LoginSchema } from '../../schemas';
-import ShowPasswordToggle from './ShowPasswordToggle';
+import FormField from '../../../../../components/ui/forms/FormField';
+import SubmitButton from '../../../../../components/ui/forms/SubmitButton';
+import type { LoginSchema } from '../../../schemas';
+import ShowPasswordToggle from '../ShowPasswordToggle/ShowPasswordToggle';
 
 interface LoginFormProps {
     onSubmit: (e?: BaseSyntheticEvent) => Promise<Awaited<void> | undefined>;

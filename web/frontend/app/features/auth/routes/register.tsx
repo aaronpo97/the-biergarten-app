@@ -1,12 +1,12 @@
 import { redirect, useNavigation, useSubmit } from 'react-router';
 import { z } from 'zod';
 import { createAuthSession, getOptionalAuth, register } from '../auth.server';
-import AuthCardHeading from '../components/layout/AuthCardHeading';
-import AuthErrorAlert from '../components/feedback/AuthErrorAlert';
-import AuthSplitLayout from '../components/layout/AuthSplitLayout';
-import AuthSwitchPrompt from '../components/layout/AuthSwitchPrompt';
-import RegisterForm from '../components/forms/RegisterForm';
-import RegisterStepProgress from '../components/forms/RegisterStepProgress';
+import AuthCardHeading from '../components/layout/AuthCardHeading/AuthCardHeading';
+import AuthErrorAlert from '../components/feedback/AuthErrorAlert/AuthErrorAlert';
+import AuthSplitLayout from '../components/layout/AuthSplitLayout/AuthSplitLayout';
+import AuthSwitchPrompt from '../components/layout/AuthSwitchPrompt/AuthSwitchPrompt';
+import RegisterForm from '../components/forms/RegisterForm/RegisterForm';
+import RegisterStepProgress from '../components/forms/RegisterStepProgress/RegisterStepProgress';
 import { useActionErrorToast } from '../hooks/useActionErrorToast';
 import { useRegisterWizard } from '../hooks/useRegisterWizard';
 import { registerSchema } from '../schemas';

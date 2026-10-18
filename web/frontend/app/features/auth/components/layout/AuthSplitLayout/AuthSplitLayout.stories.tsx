@@ -2,15 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useForm } from 'react-hook-form';
 import { expect, fireEvent, userEvent, within } from 'storybook/test';
-import AuthCardHeading from './AuthCardHeading';
-import AuthErrorAlert from '../feedback/AuthErrorAlert';
+import AuthCardHeading from '../AuthCardHeading/AuthCardHeading';
+import AuthErrorAlert from '../../feedback/AuthErrorAlert/AuthErrorAlert';
 import AuthSplitLayout from './AuthSplitLayout';
-import AuthSwitchPrompt from './AuthSwitchPrompt';
-import LoginForm from '../forms/LoginForm';
-import RegisterForm from '../forms/RegisterForm';
-import RegisterStepProgress from '../forms/RegisterStepProgress';
-import { useRegisterWizard } from '../../hooks/useRegisterWizard';
-import { loginSchema, type LoginSchema } from '../../schemas';
+import AuthSwitchPrompt from '../AuthSwitchPrompt/AuthSwitchPrompt';
+import LoginForm from '../../forms/LoginForm/LoginForm';
+import RegisterForm from '../../forms/RegisterForm/RegisterForm';
+import RegisterStepProgress from '../../forms/RegisterStepProgress/RegisterStepProgress';
+import { useRegisterWizard } from '../../../hooks/useRegisterWizard';
+import { loginSchema, type LoginSchema } from '../../../schemas';
 
 const noop = () => undefined;
 
