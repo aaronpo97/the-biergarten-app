@@ -14,11 +14,11 @@ import {
     updateProfile,
     updateUsername,
 } from '../../auth/auth.server';
-import DeleteAccountSection from '../components/sections/DeleteAccountSection';
-import EmailSection from '../components/sections/EmailSection';
-import PasswordSection from '../components/sections/PasswordSection';
-import ProfileSection from '../components/sections/ProfileSection';
-import UsernameSection from '../components/sections/UsernameSection';
+import DeleteAccountSection from '../components/sections/DeleteAccountSection/DeleteAccountSection';
+import EmailSection from '../components/sections/EmailSection/EmailSection';
+import PasswordSection from '../components/sections/PasswordSection/PasswordSection';
+import ProfileSection from '../components/sections/ProfileSection/ProfileSection';
+import UsernameSection from '../components/sections/UsernameSection/UsernameSection';
 import {
     updateEmailSchema,
     updatePasswordSchema,
