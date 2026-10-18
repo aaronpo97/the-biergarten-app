@@ -157,7 +157,7 @@ frontend          # Production website (127.0.0.1:5656, the only host binding)
 
 Migrating and seeding are run-once jobs kept outside this file, so an `up` or a
 restart touches neither the schema nor the catalogue. Run them explicitly at
-deploy time: see [Migrating production](#migrating-production) and
+deploy time: see [Migrating production](#migrating-production-docker-composeprodmigrateyaml) and
 [Seeding production](#seeding-production-docker-composeprodseedyaml).
 
 **Deploy Production**:
@@ -175,20 +175,17 @@ Docker seeds each volume with the ownership the image expects and labels it for
 SELinux, so the host needs no `chown` and no `:z`/`:Z` mount options on
 enforcing distributions such as RHEL, AlmaLinux and Fedora.
 
-#### Migrating production
+#### Migrating production (`docker-compose.prod.migrate.yaml`)
 
-`database.migrations` is a run-once job rather than a service in the prod stack,
-so the schema is migrated when an operator asks for it instead of on every boot.
-Build the image and run it against the network the prod stack creates:
+`database.migrations` is a run-once job in its own compose file rather than a
+service in the prod stack, so the schema is migrated when an operator asks for
+it instead of on every boot. It attaches to the external `biergarten-prodnet`
+network, which the main prod stack creates, and sets `CLEAR_DATABASE=false` so a
+run never drops the database:
 
 ```bash
-docker build -t database.migrations \
-  -f web/backend/Database/Database.Migrations/Dockerfile \
-  --build-arg BUILD_CONFIGURATION=Release --build-arg APP_UID=1000 \
-  web/backend
-
-docker run --rm --env-file web/.env.prod --network biergarten-prodnet \
-  -e DOTNET_RUNNING_IN_CONTAINER=true database.migrations
+docker compose --env-file web/.env.prod -f web/docker-compose.prod.migrate.yaml \
+  run --rm --build database.migrations
 ```
 
 DbUp records every script it has applied, so a re-run applies only what is new.
