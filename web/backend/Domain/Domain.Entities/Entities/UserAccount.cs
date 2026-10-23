@@ -19,6 +19,12 @@ public sealed class UserAccount
     public DateTime? UpdatedAt { get; set; }
     public byte[]? RowVersion { get; set; }
 
+    [JsonIgnore]
+    public int FollowerCount { get; set; }
+
+    [JsonIgnore]
+    public int FollowingCount { get; set; }
+
     // Navigation properties
     public UserCredential? UserCredential { get; set; }
     public UserProfile? UserProfile { get; set; }
