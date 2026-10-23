@@ -4,6 +4,8 @@ using Features.Users.Commands.Follows.FollowUser;
 using Features.Users.Commands.Follows.UnfollowUser;
 using Features.Users.Dtos;
 using Features.Users.Queries.GetAllUsers;
+using Features.Users.Queries.GetFollowing;
+using Features.Users.Queries.GetFollowStatus;
 using Features.Users.Queries.GetPublicUserProfileById;
 using Features.Users.Queries.GetUserById;
 using MediatR;
@@ -86,5 +88,28 @@ public class UserController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(new UnfollowUserCommand(User.GetAuthenticatedUserId(), id));
         return NoContent();
+    }
+
+    [HttpGet("{id:guid}/follow-status")]
+    public async Task<ActionResult<FollowStatusDto>> GetFollowStatus(Guid id)
+    {
+        FollowStatusDto status = await mediator.Send(
+            new GetFollowStatusQuery(User.GetAuthenticatedUserId(), id)
+        );
+        return Ok(status);
+    }
+
+    [HttpGet("{id:guid}/following")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<FollowedUserDto>>> GetFollowing(
+        Guid id,
+        [FromQuery] int? limit,
+        [FromQuery] int? offset
+    )
+    {
+        IEnumerable<FollowedUserDto> following = await mediator.Send(
+            new GetFollowingQuery(id, limit, offset)
+        );
+        return Ok(following);
     }
 }
