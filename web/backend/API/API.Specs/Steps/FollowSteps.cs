@@ -12,7 +12,7 @@ namespace API.Specs.Steps;
 [Binding]
 public class FollowSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
 {
-    private sealed record Actor(Guid UserAccountId, string AccessToken);
+    private sealed record Actor(Guid UserAccountId, string Username, string AccessToken);
 
     private static string ActorKey(string name) => $"actor:{name}";
 
@@ -81,6 +81,7 @@ public class FollowSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
 
         Scenario[ActorKey(name)] = new Actor(
             payload.GetProperty("userAccountId").GetGuid(),
+            payload.GetProperty("username").GetString()!,
             payload.GetProperty("accessToken").GetString()!
         );
     }
@@ -160,5 +161,87 @@ public class FollowSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         (await CountFollowsAsync(GetActor(follower).UserAccountId, GetActor(target).UserAccountId))
             .Should()
             .Be(count);
+    }
+
+    private JsonDocument ParseResponseBody()
+    {
+        Scenario.TryGetValue<string>(ResponseBodyKey, out string? body).Should().BeTrue();
+        return JsonDocument.Parse(body!);
+    }
+
+    [When("an anonymous visitor views the profile of {string}")]
+    public async Task WhenAnAnonymousVisitorViewsTheProfileOf(string name)
+    {
+        await SendAsync(HttpMethod.Get, $"/api/user/{GetActor(name).UserAccountId}/profile", null);
+    }
+
+    [When("{string} checks whether they follow {string}")]
+    public async Task WhenChecksWhetherTheyFollow(string viewer, string target)
+    {
+        await SendAsync(
+            HttpMethod.Get,
+            $"/api/user/{GetActor(target).UserAccountId}/follow-status",
+            GetActor(viewer).AccessToken
+        );
+    }
+
+    [When("an anonymous visitor checks whether they follow {string}")]
+    public async Task WhenAnAnonymousVisitorChecksWhetherTheyFollow(string target)
+    {
+        await SendAsync(
+            HttpMethod.Get,
+            $"/api/user/{GetActor(target).UserAccountId}/follow-status",
+            null
+        );
+    }
+
+    [When("an anonymous visitor lists who {string} is following")]
+    public async Task WhenAnAnonymousVisitorListsWhoIsFollowing(string name)
+    {
+        await SendAsync(HttpMethod.Get, $"/api/user/{GetActor(name).UserAccountId}/following", null);
+    }
+
+    [When("an anonymous visitor lists who a user that does not exist is following")]
+    public async Task WhenAnAnonymousVisitorListsWhoAnUnknownUserIsFollowing()
+    {
+        await SendAsync(HttpMethod.Get, $"/api/user/{Guid.NewGuid()}/following", null);
+    }
+
+    [Then("the profile should show {int} followers and {int} following")]
+    public void ThenTheProfileShouldShowFollowersAndFollowing(int followers, int following)
+    {
+        using JsonDocument doc = ParseResponseBody();
+        doc.RootElement.GetProperty("followerCount").GetInt32().Should().Be(followers);
+        doc.RootElement.GetProperty("followingCount").GetInt32().Should().Be(following);
+    }
+
+    [Then("the follow status should be {word}")]
+    public void ThenTheFollowStatusShouldBe(string expected)
+    {
+        using JsonDocument doc = ParseResponseBody();
+        doc.RootElement.GetProperty("isFollowing").GetBoolean().Should().Be(bool.Parse(expected));
+    }
+
+    [Then("the following list should contain {string}")]
+    public void ThenTheFollowingListShouldContain(string name)
+    {
+        using JsonDocument doc = ParseResponseBody();
+        Actor actor = GetActor(name);
+        JsonElement entry = doc
+            .RootElement.EnumerateArray()
+            .Single(e => e.GetProperty("userAccountId").GetGuid() == actor.UserAccountId);
+
+        entry.GetProperty("username").GetString().Should().Be(actor.Username);
+        entry.GetProperty("firstName").GetString().Should().NotBeNull();
+        entry.GetProperty("lastName").GetString().Should().NotBeNull();
+        entry.GetProperty("avatarUrl").GetString().Should().NotBeNull();
+        entry.TryGetProperty("followedAt", out _).Should().BeTrue();
+    }
+
+    [Then("the following list should have {int} entries")]
+    public void ThenTheFollowingListShouldHaveEntries(int count)
+    {
+        using JsonDocument doc = ParseResponseBody();
+        doc.RootElement.GetArrayLength().Should().Be(count);
     }
 }
