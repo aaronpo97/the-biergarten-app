@@ -91,7 +91,7 @@ Table UserFollow {
   Note: 'CHECK: UserAccountID != FollowingID (cannot follow own account)'
 
   Indexes {
-    (UserAccountID, FollowingID)
+    (UserAccountID, FollowingID) [unique]
     (FollowingID, UserAccountID)
   }
 }
