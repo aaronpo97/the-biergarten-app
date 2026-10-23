@@ -30,7 +30,7 @@ CREATE TABLE Social.UserFollow
 )
 );
 
-CREATE
+CREATE UNIQUE
 NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
     ON Social.UserFollow(UserAccountID, FollowingID);
 
