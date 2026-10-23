@@ -1,6 +1,12 @@
 import { Link } from 'react-router';
 import EmptyState from '../EmptyState';
-import type { FillerFollowing } from '../../../utils/filler-user-profile';
+
+export interface FollowingEntry {
+    userAccountId: string;
+    name: string;
+    username: string;
+    avatarUrl: string;
+}
 
 const initials = (name: string) =>
     name
@@ -12,11 +18,11 @@ const initials = (name: string) =>
         .toUpperCase();
 
 interface FollowingTabProps {
-    following: (FillerFollowing & { isFollowing: boolean })[];
-    onToggleFollow: (id: string) => void;
+    following: FollowingEntry[];
+    onUnfollow?: (userAccountId: string) => void;
 }
 
-const FollowingTab = ({ following, onToggleFollow }: FollowingTabProps) => {
+const FollowingTab = ({ following, onUnfollow }: FollowingTabProps) => {
     if (following.length === 0) {
         return <EmptyState message="Not following anyone yet." />;
     }
@@ -24,33 +30,41 @@ const FollowingTab = ({ following, onToggleFollow }: FollowingTabProps) => {
     return (
         <div className="flex flex-col gap-3">
             {following.map((f) => (
-                <div key={f.id} className="card bg-base-100 shadow">
+                <div key={f.userAccountId} className="card bg-base-100 shadow">
                     <div className="card-body flex-row items-center gap-4 p-4">
-                        <div className="avatar avatar-placeholder shrink-0">
-                            <div className="bg-secondary text-secondary-content w-11 rounded-full">
-                                <span className="text-sm font-bold">{initials(f.name)}</span>
-                            </div>
+                        <div
+                            className={`avatar shrink-0 ${f.avatarUrl ? '' : 'avatar-placeholder'}`}
+                        >
+                            {f.avatarUrl ? (
+                                <div className="w-11 rounded-full">
+                                    <img src={f.avatarUrl} alt={`${f.name}'s avatar`} />
+                                </div>
+                            ) : (
+                                <div className="bg-secondary text-secondary-content w-11 rounded-full">
+                                    <span className="text-sm font-bold">{initials(f.name)}</span>
+                                </div>
+                            )}
                         </div>
                         <div className="flex-1 min-w-0">
-                            {f.userAccountId ? (
-                                <Link
-                                    to={`/users/${f.userAccountId}`}
-                                    className="font-semibold text-sm truncate link link-hover block"
-                                >
-                                    {f.name}
-                                </Link>
-                            ) : (
-                                <p className="font-semibold text-sm m-0 truncate">{f.name}</p>
-                            )}
-                            <p className="text-xs text-base-content/70 m-0 truncate">{f.meta}</p>
+                            <Link
+                                to={`/users/${f.userAccountId}`}
+                                className="font-semibold text-sm truncate link link-hover block"
+                            >
+                                {f.name}
+                            </Link>
+                            <p className="text-xs text-base-content/70 m-0 truncate">
+                                @{f.username}
+                            </p>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => onToggleFollow(f.id)}
-                            className={`btn btn-sm shrink-0 ${f.isFollowing ? 'btn-outline' : 'btn-primary'}`}
-                        >
-                            {f.isFollowing ? 'Following' : 'Follow'}
-                        </button>
+                        {onUnfollow && (
+                            <button
+                                type="button"
+                                onClick={() => onUnfollow(f.userAccountId)}
+                                className="btn btn-sm btn-outline shrink-0"
+                            >
+                                Following
+                            </button>
+                        )}
                     </div>
                 </div>
             ))}
