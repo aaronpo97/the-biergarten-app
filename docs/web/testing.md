@@ -176,6 +176,9 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 - Account management: username, email, password, and profile updates, and
   account deletion (blocked while dependent posts, comments, or photos exist)
 - User get-by-id/get-all queries
+- Follow and unfollow, follow status, and the following list (handler tests, plus
+  `UserFollow.feature` in API.Specs, which also covers follow cleanup on account
+  deletion)
 
 **Features.Breweries.Tests**:
 
@@ -206,7 +209,6 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 
 - [ ] Password reset functionality
 - [ ] Beer post operations
-- [ ] User follow/unfollow
 - [ ] Frontend route integration coverage beyond Storybook stories
 
 ## Testing frameworks and tools

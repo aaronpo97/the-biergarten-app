@@ -187,10 +187,10 @@ needs it, or because duplicating it four times would be worse than sharing it
 
 **Components**:
 
-| Project              | Purpose                                                                                                                                                                                                                                 |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope `AuthController`, `BreweryController`, and `CityController` return; `UserController`'s read endpoints return their DTOs unwrapped                                           |
-| `Shared.Application` | `ValidationBehavior<TRequest,TResponse>`, the MediatR pipeline behavior that runs FluentValidation before a handler executes |
+| Project              | Purpose                                                                                                                                                                                       |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Shared.Contracts`   | `ResponseBody<T>`/`ResponseBody`, the API response envelope `AuthController`, `BreweryController`, and `CityController` return; `UserController`'s read endpoints return their DTOs unwrapped |
+| `Shared.Application` | `ValidationBehavior<TRequest,TResponse>`, the MediatR pipeline behavior that runs FluentValidation before a handler executes                                                                  |
 
 **Rules**:
 
@@ -204,11 +204,11 @@ whichever slices need them
 
 **Components**:
 
-| Project                          | Description                                                                                                                                                                                                                                                                |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Database.Connection`            | Generic ADO.NET connection/command plumbing (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not domain-specific; each slice's own `Repository/` folder builds on this.                                                                        |
-| `Infrastructure.PasswordHashing` | Argon2id password hashing.                                                                                                                                                                                                                                                 |
-| `Infrastructure.Email.Templates` | Email template rendering (Razor components).                                                                                                                                                                                                                               |
+| Project                          | Description                                                                                                                                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Database.Connection`            | Generic ADO.NET connection/command plumbing (`DefaultSqlConnectionFactory`, the abstract `DapperRepository` base class), not domain-specific; each slice's own `Repository/` folder builds on this. |
+| `Infrastructure.PasswordHashing` | Argon2id password hashing.                                                                                                                                                                          |
+| `Infrastructure.Email.Templates` | Email template rendering (Razor components).                                                                                                                                                        |
 
 **Dependencies**:
 
@@ -544,8 +544,7 @@ pipeline under `tooling/pipeline/` (see
 - User accounts (via `Features.Users`' repository)
 - Brewery posts with locations (via `Features.Breweries`' repository)
 
-Tables that exist in the schema but have no repository yet ( `UserFollow`,
-`BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`, `BreweryPostPhoto`)
+Tables that exist in the schema but have no repository yet (`BeerStyle`, `BeerPost`, `BeerPostPhoto`, `BeerPostComment`, `BreweryPostPhoto`)
 are not seeded either.
 
 ## Deployment architecture
