@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Features.ImageUploads.Services;
+using Features.Users.Repository;
 
 namespace Features.Users.Dtos;
 
@@ -23,18 +24,34 @@ public static class UserDtoMapper
         IFileStorageProvider fileStorageProvider
     )
     {
-        string? avatarKey = user.UserAvatar?.Photo?.Hyperlink;
-
         return new PublicUserProfileDto(
             UserAccountId : user.UserAccountId,
             Username : user.Username,
             FirstName : user.FirstName,
             LastName : user.LastName,
             Biography : user.UserProfile?.Biography ?? string.Empty,
-            AvatarUrl : string.IsNullOrWhiteSpace(avatarKey)
-                ? string.Empty
-                : fileStorageProvider.GetPresignedUrl(avatarKey, AvatarUrlLifetime),
-            CreatedAt : user.CreatedAt
+            AvatarUrl : SignAvatarKey(user.UserAvatar?.Photo?.Hyperlink, fileStorageProvider),
+            CreatedAt : user.CreatedAt,
+            FollowerCount : user.FollowerCount,
+            FollowingCount : user.FollowingCount
         );
     }
+
+    public static FollowedUserDto ToFollowedUserDto(
+        this FollowedUser followed,
+        IFileStorageProvider fileStorageProvider
+    ) =>
+        new(
+            followed.UserAccountId,
+            followed.Username,
+            followed.FirstName,
+            followed.LastName,
+            SignAvatarKey(followed.AvatarKey, fileStorageProvider),
+            followed.FollowedAt
+        );
+
+    private static string SignAvatarKey(string? avatarKey, IFileStorageProvider fileStorageProvider) =>
+        string.IsNullOrWhiteSpace(avatarKey)
+            ? string.Empty
+            : fileStorageProvider.GetPresignedUrl(avatarKey, AvatarUrlLifetime);
 }

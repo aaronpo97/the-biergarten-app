@@ -30,11 +30,11 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
             UserAvatar,
             UserAccount
         >(
-            """
+            $"""
             SELECT 
                 ua.UserAccountID, ua.Username, ua.FirstName, ua.LastName,
                 ua.Email, ua.CreatedAt, ua.UpdatedAt, ua.DateOfBirth,
-                ua.RowVersion, up.UserProfileID, up.UserAccountID,
+                ua.RowVersion, {FollowCountColumns}, up.UserProfileID, up.UserAccountID,
                 up.Biography, up.RowVersion, p.PhotoID, p.UploadedByID, 
                 p.Hyperlink, p.UploadedAt, p.RowVersion, av.UserAvatarID, 
                 av.UserProfileID, av.PhotoID, av.ValidFrom, av.ValidTo,
@@ -42,10 +42,7 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
             FROM Auth.UserAccount ua
             LEFT JOIN Social.UserProfile up 
                 ON ua.UserAccountID = up.UserAccountID
-            LEFT JOIN Social.UserAvatar av
-                ON up.UserProfileID = av.UserProfileID 
-                       AND av.ValidTo IS NULL
-            LEFT JOIN Media.Photo p ON av.PhotoID = p.PhotoID
+            {ActiveAvatarJoins}
             WHERE ua.UserAccountID = @UserAccountId
             """,
             MapUserRow,
@@ -75,19 +72,17 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
             UserAvatar,
             UserAccount
         >(
-            """
+            $"""
             SELECT
                 ua.UserAccountID, ua.Username, ua.FirstName, ua.LastName,
-                ua.CreatedAt, ua.UpdatedAt, ua.RowVersion,
+                ua.CreatedAt, ua.UpdatedAt, ua.RowVersion, {FollowCountColumns},
                 up.UserProfileID, up.UserAccountID, up.Biography, up.RowVersion,
                 p.PhotoID, p.UploadedByID, p.Hyperlink, p.UploadedAt, p.RowVersion,
                 av.UserAvatarID, av.UserProfileID, av.PhotoID, av.ValidFrom, av.ValidTo,
                 av.RowVersion
             FROM Auth.UserAccount ua
             LEFT JOIN Social.UserProfile up ON ua.UserAccountID = up.UserAccountID
-            LEFT JOIN Social.UserAvatar av
-                ON up.UserProfileID = av.UserProfileID AND av.ValidTo IS NULL
-            LEFT JOIN Media.Photo p ON av.PhotoID = p.PhotoID
+            {ActiveAvatarJoins}
             ORDER BY ua.CreatedAt DESC
             OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             """,
@@ -96,6 +91,46 @@ public class UserListRepository(ISqlConnectionFactory connectionFactory)
             splitOn: AvatarSplitOn
         );
     }
+
+    public async Task<IEnumerable<FollowedUser>> GetFollowingAsync(
+        Guid userAccountId,
+        int limit,
+        int offset
+    )
+    {
+        await using DbConnection connection = await CreateConnection();
+        return await connection.QueryAsync<FollowedUser>(
+            $"""
+            SELECT
+                ua.UserAccountID, ua.Username, ua.FirstName, ua.LastName,
+                p.Hyperlink AS AvatarKey, f.CreatedAt AS FollowedAt
+            FROM Social.UserFollow f
+            JOIN Auth.UserAccount ua ON ua.UserAccountID = f.FollowingID
+            LEFT JOIN Social.UserProfile up ON ua.UserAccountID = up.UserAccountID
+            {ActiveAvatarJoins}
+            WHERE f.UserAccountID = @UserAccountId
+            ORDER BY f.CreatedAt DESC, ua.Username
+            OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            """,
+            new
+            {
+                UserAccountId = userAccountId,
+                Offset = offset,
+                Limit = limit,
+            }
+        );
+    }
+
+    private const string FollowCountColumns = """
+        (SELECT COUNT(*) FROM Social.UserFollow WHERE FollowingID = ua.UserAccountID) AS FollowerCount,
+        (SELECT COUNT(*) FROM Social.UserFollow WHERE UserAccountID = ua.UserAccountID) AS FollowingCount
+        """;
+
+    private const string ActiveAvatarJoins = """
+        LEFT JOIN Social.UserAvatar av
+            ON up.UserProfileID = av.UserProfileID AND av.ValidTo IS NULL
+        LEFT JOIN Media.Photo p ON av.PhotoID = p.PhotoID
+        """;
 
     private const string AvatarSplitOn = "UserProfileID,PhotoID,UserAvatarID";
 

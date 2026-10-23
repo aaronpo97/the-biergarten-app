@@ -18,4 +18,6 @@ public interface IUserListRepository
     /// <param name="limit"><c>null</c> for no limit.</param>
     /// <param name="offset"><c>null</c> for no offset.</param>
     Task<IEnumerable<UserAccount>> GetAllAsync(int? limit, int? offset);
+
+    Task<IEnumerable<FollowedUser>> GetFollowingAsync(Guid userAccountId, int limit, int offset);
 }
