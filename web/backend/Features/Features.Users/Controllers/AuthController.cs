@@ -222,7 +222,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     /// <summary>Permanently deletes the authenticated user's account.</summary>
     /// <remarks>
     ///     Returns 200 OK on success, or 409 Conflict if the account still has associated posts, comments,
-    ///     photos, or follows.
+    ///     or photos.
     /// </remarks>
     [HttpDelete("account")]
     public async Task<ActionResult<ResponseBody>> DeleteAccount()
