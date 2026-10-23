@@ -174,8 +174,7 @@ The default (`headless: true`) is set in `web/frontend/vite.config.ts`.
 - JWT token generation, validation, and claims handling
 - Invalid credentials and 404 error responses (via API.Specs)
 - Account management: username, email, password, and profile updates, and
-  account deletion (blocked while dependent posts, comments, photos, or follows
-  exist)
+  account deletion (blocked while dependent posts, comments, or photos exist)
 - User get-by-id/get-all queries
 
 **Features.Breweries.Tests**:
