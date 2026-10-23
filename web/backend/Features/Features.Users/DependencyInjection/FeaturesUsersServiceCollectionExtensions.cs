@@ -22,6 +22,7 @@ public static class FeaturesUsersServiceCollectionExtensions
         services.AddScoped<IPasswordInfrastructure, Argon2Infrastructure>();
         services.AddScoped<IUserListRepository, UserListRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IUserFollowRepository, UserFollowRepository>();
 
         // AddDefaultTokenProviders() is deliberately not called: it registers
         // DataProtectorTokenProvider<TUser>, which UserManager's constructor resolves eagerly and which
