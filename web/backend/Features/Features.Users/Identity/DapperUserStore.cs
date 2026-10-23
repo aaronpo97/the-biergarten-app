@@ -185,13 +185,14 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
 
     /// <inheritdoc />
     /// <remarks>
-    ///     A plain <c>DELETE</c> against <c>Auth.UserAccount</c>: its foreign keys from
+    ///     Removes the account's <c>Social.UserFollow</c> rows in both directions and then the
+    ///     <c>Auth.UserAccount</c> row in one transaction. The foreign keys from
     ///     <c>Auth.UserCredential</c>, <c>Auth.UserVerification</c>, and <c>Social.UserProfile</c> cascade
-    ///     (<c>Social.UserAvatar</c> cascades transitively through <c>Social.UserProfile</c>), so no manual
-    ///     child cleanup is needed. Other tables (posts, comments, photos, follows) reference the
-    ///     account with <c>ON DELETE NO ACTION</c> by design; deleting an account that still has any of
-    ///     those fails with a foreign key violation, which is surfaced as a failed
-    ///     <see cref="IdentityResult" /> rather than an unhandled <see cref="SqlException" />.
+    ///     (<c>Social.UserAvatar</c> cascades transitively through <c>Social.UserProfile</c>), so no other
+    ///     child cleanup is needed. Other tables (posts, comments, photos) reference the account with
+    ///     <c>ON DELETE NO ACTION</c> by design; deleting an account that still has any of those fails
+    ///     with a foreign key violation, which is surfaced as a failed <see cref="IdentityResult" />
+    ///     rather than an unhandled <see cref="SqlException" />.
     /// </remarks>
     public async Task<IdentityResult> DeleteAsync(
         ApplicationUser user,
@@ -199,19 +200,31 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
     )
     {
         await using DbConnection connection = await CreateConnection();
+        await using DbTransaction transaction = await connection.BeginTransactionAsync(
+            cancellationToken
+        );
 
         try
         {
             await connection.ExecuteAsync(
                 new CommandDefinition(
-                    "DELETE FROM Auth.UserAccount WHERE UserAccountID = @Id",
+                    """
+                    DELETE FROM Social.UserFollow
+                    WHERE UserAccountID = @Id OR FollowingID = @Id;
+
+                    DELETE FROM Auth.UserAccount WHERE UserAccountID = @Id;
+                    """,
                     new { user.Id },
+                    transaction: transaction,
                     cancellationToken: cancellationToken
                 )
             );
+
+            await transaction.CommitAsync(cancellationToken);
         }
         catch (SqlException ex) when (IsForeignKeyViolation(ex))
         {
+            await RollbackQuietlyAsync(transaction);
             return IdentityResult.Failed(
                 new IdentityError
                 {
@@ -220,6 +233,11 @@ public sealed class DapperUserStore(ISqlConnectionFactory connectionFactory)
                         "Account cannot be deleted because other records still reference it.",
                 }
             );
+        }
+        catch
+        {
+            await RollbackQuietlyAsync(transaction);
+            throw;
         }
 
         return IdentityResult.Success;
