@@ -138,6 +138,21 @@ Scenario: The caller's own account omits the avatar graph
     Then the response has HTTP status 200
     And the response JSON should not contain "userAvatar"
 
+Scenario: The caller's own account omits the follow counts
+    Given I have registered a new account
+    And I have a valid access token for my account
+    When I retrieve my own account
+    Then the response has HTTP status 200
+    And the response JSON should not contain "followerCount"
+    And the response JSON should not contain "followingCount"
+
+Scenario: Public profile exposes zero follow counts for a new account
+    Given I have registered a new account
+    When I retrieve the public profile by ID without authentication
+    Then the response has HTTP status 200
+    And the response JSON should contain "followerCount"
+    And the response JSON should contain "followingCount"
+
 Scenario: The account endpoint serves the caller named by the access token
     Given I have registered a new account
     And I am logged in as a different user
