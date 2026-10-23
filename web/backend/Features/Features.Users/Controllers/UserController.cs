@@ -1,5 +1,7 @@
 using Domain.Entities;
 using Domain.Exceptions;
+using Features.Users.Commands.Follows.FollowUser;
+using Features.Users.Commands.Follows.UnfollowUser;
 using Features.Users.Dtos;
 using Features.Users.Queries.GetAllUsers;
 using Features.Users.Queries.GetPublicUserProfileById;
@@ -70,5 +72,19 @@ public class UserController(IMediator mediator) : ControllerBase
     {
         PublicUserProfileDto profile = await mediator.Send(new GetPublicUserProfileByIdQuery(id));
         return Ok(profile);
+    }
+
+    [HttpPut("{id:guid}/follow")]
+    public async Task<IActionResult> Follow(Guid id)
+    {
+        await mediator.Send(new FollowUserCommand(User.GetAuthenticatedUserId(), id));
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/follow")]
+    public async Task<IActionResult> Unfollow(Guid id)
+    {
+        await mediator.Send(new UnfollowUserCommand(User.GetAuthenticatedUserId(), id));
+        return NoContent();
     }
 }
