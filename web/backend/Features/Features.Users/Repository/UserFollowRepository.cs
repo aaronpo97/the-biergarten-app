@@ -65,4 +65,26 @@ public class UserFollowRepository(ISqlConnectionFactory connectionFactory)
             )
         );
     }
+
+    public async Task<bool> IsFollowingAsync(
+        Guid followerId,
+        Guid followingId,
+        CancellationToken cancellationToken
+    )
+    {
+        await using DbConnection connection = await CreateConnection();
+
+        return await connection.ExecuteScalarAsync<bool>(
+            new CommandDefinition(
+                """
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1 FROM Social.UserFollow
+                    WHERE UserAccountID = @FollowerId AND FollowingID = @FollowingId
+                ) THEN 1 ELSE 0 END
+                """,
+                new { FollowerId = followerId, FollowingId = followingId },
+                cancellationToken: cancellationToken
+            )
+        );
+    }
 }
