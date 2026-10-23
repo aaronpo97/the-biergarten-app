@@ -35,7 +35,7 @@ sequenceDiagram
         UserMgr->>UserStore: DeleteAsync(user)
         activate UserStore
         UserStore->>DB: DELETE FROM UserAccount WHERE UserAccountID = @Id
-        Note right of UserStore: UserCredential, UserVerification, and UserProfile cascade on delete<br/>(UserAvatar cascades transitively through UserProfile).<br/>Posts, comments, photos, and follows use ON DELETE NO ACTION<br/>if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
+        Note right of UserStore: UserCredential, UserVerification, and UserProfile cascade on delete<br/>(UserAvatar cascades transitively through UserProfile).<br/>The account's follows are deleted in the same transaction.<br/>Posts, comments, and photos use ON DELETE NO ACTION<br/>if any reference this account, the DELETE throws a foreign key violation (SQL error 547)
 
         alt Foreign key violation (dependent records exist)
             UserStore-->>UserMgr: IdentityResult.Failed (AccountHasDependentRecords)
@@ -47,7 +47,7 @@ sequenceDiagram
         deactivate UserMgr
 
         alt Account has dependent records
-            DeleteAccountHandler->>Mediator: throw ConflictException<br>"Account cannot be deleted while it still has associated posts, comments, photos, or follows."
+            DeleteAccountHandler->>Mediator: throw ConflictException<br>"Account cannot be deleted while it still has associated posts, comments, or photos."
             Mediator->>API: propagate
             API->>User: 409 Conflict
         else !result.Succeeded (other failure)

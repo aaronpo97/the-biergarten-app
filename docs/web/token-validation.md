@@ -147,7 +147,7 @@ never the request body):
   name, last name, date of birth)
 - `DELETE /api/auth/account` - Permanently delete the authenticated user's
   account; blocked while the account still has associated posts, comments,
-  photos, or follows
+  or photos
 
 ## Validation security
 
