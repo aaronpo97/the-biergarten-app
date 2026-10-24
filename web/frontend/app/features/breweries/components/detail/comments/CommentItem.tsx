@@ -37,7 +37,7 @@ const CommentItem = ({ comment, onToggleLike }: CommentItemProps) => {
                 <button
                     type="button"
                     onClick={() => onToggleLike(comment.id)}
-                    className={`self-start inline-flex items-center gap-1 text-xs font-semibold ${
+                    className={`self-start -ml-1 inline-flex min-h-9 items-center gap-1 px-1 text-xs font-semibold ${
                         comment.liked ? 'text-primary' : 'text-base-content/70'
                     }`}
                 >

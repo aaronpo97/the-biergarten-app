@@ -78,15 +78,15 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
     const pins = toPins(loaderData.locations);
 
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-7xl px-5 pt-10">
+        <div className="min-h-dvh bg-base-200">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10">
                 <Link
                     to="/breweries"
-                    className="link link-hover text-sm text-base-content/70 mb-4 inline-block"
+                    className="link link-hover -ml-1 mb-2 inline-flex min-h-11 items-center px-1 text-sm text-base-content/70 sm:mb-4"
                 >
                     &larr; Back to Breweries
                 </Link>
-                <h1 className="font-serif text-5xl font-bold leading-tight mb-4">
+                <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight mb-4">
                     Full brewery directory
                 </h1>
                 <p className="text-base-content/70 mb-6">

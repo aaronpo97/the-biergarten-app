@@ -7,8 +7,8 @@ interface PartnerBreweriesProps {
 }
 
 const PartnerBreweries = ({ breweries }: PartnerBreweriesProps) => (
-    <section className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-16">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+    <section className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 sm:py-16">
+        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
             <div className="flex flex-col gap-1">
                 <h2 className="m-0 font-serif text-3xl leading-tight">
                     Discover our partner breweries
@@ -20,7 +20,7 @@ const PartnerBreweries = ({ breweries }: PartnerBreweriesProps) => (
 
             <Link
                 to="/breweries"
-                className="font-semibold text-primary hover:text-secondary hover:underline"
+                className="inline-flex min-h-11 items-center font-semibold text-primary hover:text-secondary hover:underline"
             >
                 View all breweries &rarr;
             </Link>

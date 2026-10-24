@@ -20,11 +20,11 @@ const ProfileTabs = ({ activeTab, onChange, panels }: ProfileTabsProps) => {
 
     return (
         <TabGroup selectedIndex={selectedIndex} onChange={(index) => onChange(TABS[index].id)}>
-            <TabList className="flex gap-6 border-b border-base-300">
+            <TabList className="flex gap-6 overflow-x-auto border-b border-base-300">
                 {TABS.map((tab) => (
                     <Tab
                         key={tab.id}
-                        className="-mb-px border-b-2 border-transparent py-3 text-sm font-semibold text-base-content/70 transition-colors hover:text-base-content focus:outline-none data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-primary data-[selected]:border-primary data-[selected]:text-primary"
+                        className="-mb-px border-b-2 border-transparent min-h-11 py-3 text-base sm:text-sm font-semibold text-base-content/70 transition-colors hover:text-base-content focus:outline-none data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-primary data-[selected]:border-primary data-[selected]:text-primary"
                     >
                         {tab.label}
                     </Tab>

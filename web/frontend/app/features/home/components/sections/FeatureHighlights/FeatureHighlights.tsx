@@ -20,7 +20,7 @@ const features = [
 
 const FeatureHighlights = () => (
     <section className="border-y border-base-300 bg-base-100">
-        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-16">
+        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 sm:py-16">
             <h2 className="m-0 max-w-[36rem] font-serif text-3xl leading-tight">
                 Everything you need to plan the next round
             </h2>

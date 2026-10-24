@@ -2,8 +2,8 @@ import { Link } from 'react-router';
 import barBackground from '../../../../../assets/bar-background.jpg';
 
 const HeroSection = () => (
-    <section className="mx-auto max-w-7xl px-5 pt-18 pb-16">
-        <div className="grid items-center gap-12 grid-cols-[repeat(auto-fit,minmax(min(100%,24rem),1fr))]">
+    <section className="mx-auto max-w-7xl px-5 pt-8 pb-12 sm:pt-18 sm:pb-16">
+        <div className="grid items-center gap-8 sm:gap-12 grid-cols-[repeat(auto-fit,minmax(min(100%,24rem),1fr))]">
             <div className="flex flex-col gap-6">
                 <p className="m-0 text-sm font-semibold uppercase tracking-widest text-[var(--color-muted)]">
                     Brewery discovery
@@ -35,7 +35,7 @@ const HeroSection = () => (
             <img
                 src={barBackground}
                 alt="A glass of lager on a bar counter"
-                className="w-full max-h-[34rem] aspect-[4/5] rounded-box bg-base-300 object-cover shadow-xl"
+                className="w-full max-h-[22rem] sm:max-h-[34rem] aspect-[4/3] sm:aspect-[4/5] rounded-box bg-base-300 object-cover shadow-xl"
             />
         </div>
     </section>

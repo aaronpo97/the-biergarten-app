@@ -8,6 +8,44 @@
         'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-serif: 'Volkhov', ui-serif, Georgia, serif;
+
+    /* 12px is hard to read on phones; secondary copy floors at 13px */
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.25rem;
+}
+
+/* daisyUI small controls default to 12px type; keep them legible on every screen */
+.btn-sm,
+.badge-sm,
+.badge-md {
+    font-size: 0.875rem;
+}
+
+.btn-xs,
+.badge-xs {
+    font-size: 0.8125rem;
+}
+
+/* Touch screens: bring compact controls up to a comfortable 40px tap target */
+@media (pointer: coarse) {
+    .btn-sm {
+        --size: 2.5rem;
+    }
+
+    .btn-xs {
+        --size: 2.25rem;
+    }
+
+    .range {
+        --range-thumb-size: 1.5rem;
+    }
+}
+
+/* Prevent iOS Safari zooming into focused fields (needs >= 16px) */
+@media (max-width: 639px) {
+    :is(.input, .select, .textarea) {
+        font-size: 1rem;
+    }
 }
 
 h1,

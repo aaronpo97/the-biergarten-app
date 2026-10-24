@@ -24,8 +24,8 @@ const Navbar = ({ auth }: NavbarProps) => {
         >
             {({ open }) => (
                 <>
-                    <div className="navbar mx-auto max-w-7xl px-2 sm:px-4">
-                        <div className="navbar-start gap-2">
+                    <div className="navbar mx-auto max-w-7xl gap-1 px-2 sm:px-4">
+                        <div className="navbar-start w-auto min-w-0 flex-1 gap-1 sm:gap-2">
                             <DisclosureButton
                                 className="btn btn-ghost btn-square lg:hidden"
                                 aria-label="Toggle navigation"
@@ -54,14 +54,17 @@ const Navbar = ({ auth }: NavbarProps) => {
                                 </svg>
                             </DisclosureButton>
 
-                            <Link to="/" className="lg:text-xl text-lg font-bold">
+                            <Link
+                                to="/"
+                                className="inline-flex min-h-11 items-center truncate text-base font-bold sm:text-lg lg:text-xl"
+                            >
                                 The Biergarten App
                             </Link>
                         </div>
 
                         <NavLinks variant="desktop" showRegister={showAuthActions} />
 
-                        <div className="navbar-end gap-2">
+                        <div className="navbar-end w-auto shrink-0 gap-2">
                             {showAuthActions && (
                                 <Link
                                     to="/register"
@@ -92,7 +95,7 @@ const Navbar = ({ auth }: NavbarProps) => {
                         </div>
                     </div>
 
-                    <DisclosurePanel className="border-t border-base-300 bg-base-100 px-4 py-3 lg:hidden">
+                    <DisclosurePanel className="border-t border-base-300 bg-base-100 px-4 py-3 shadow-lg lg:hidden">
                         <NavLinks variant="mobile" showRegister={showAuthActions} />
                     </DisclosurePanel>
                 </>

@@ -13,9 +13,11 @@ export const meta = ({}: Route.MetaArgs) => {
 
 const Beers = () => {
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-7xl px-5 pt-10">
-                <h1 className="font-serif text-5xl font-bold leading-tight mb-4">Beers</h1>
+        <div className="min-h-dvh bg-base-200">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10">
+                <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight mb-4">
+                    Beers
+                </h1>
                 <p className="text-base-content/70">Explore our collection of beers.</p>
                 <div className="mt-8">
                     <FeatureNotAvailable />

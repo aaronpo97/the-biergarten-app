@@ -2,7 +2,7 @@ import ThemeSegmentedControl from '../../../../theme/components/ThemeSegmentedCo
 
 const ThemeTryOut = () => (
     <section className="bg-neutral text-neutral-content">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-16 grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:py-16 grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]">
             <div className="flex flex-col gap-4">
                 <h2 className="m-0 font-serif text-3xl leading-tight">
                     Pick a pour that suits you

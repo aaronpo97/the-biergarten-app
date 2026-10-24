@@ -18,7 +18,7 @@ const NearbyBreweriesHeader = ({
     withDistance,
 }: NearbyBreweriesHeaderProps) => {
     return (
-        <div className="flex items-baseline justify-between gap-4 flex-wrap mb-3.5">
+        <div className="flex items-baseline justify-between gap-x-4 gap-y-1 flex-wrap mb-3.5">
             <h2 className="font-serif text-2xl m-0">Breweries near you</h2>
             <span className="text-sm text-base-content/70">
                 {center

@@ -30,7 +30,7 @@ const ProfileSidebarCard = ({
     onToggleFollow,
 }: ProfileSidebarCardProps) => (
     <div className="card bg-base-100 shadow">
-        <div className="card-body gap-4 p-6">
+        <div className="card-body gap-4 p-5 sm:p-6">
             <div>
                 <h1 className="text-2xl font-bold m-0 leading-tight">{displayName}</h1>
                 <p className="text-sm text-base-content/70 m-0 mt-0.5">@{username}</p>

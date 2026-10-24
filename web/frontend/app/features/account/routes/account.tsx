@@ -213,12 +213,12 @@ const AccountPage = ({ loaderData, actionData }: Route.ComponentProps) => {
     }, [toast, setSearchParams]);
 
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-7xl px-5 pt-10 pb-10 space-y-6">
+        <div className="min-h-dvh bg-base-200">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10 pb-10 space-y-6">
                 <div className="flex items-center gap-3">
                     <Settings className="size-7" aria-hidden="true" />
                     <div>
-                        <h1 className="font-serif text-5xl font-bold leading-tight">
+                        <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
                             Account Settings
                         </h1>
                         <p className="text-base-content/70">

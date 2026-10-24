@@ -5,7 +5,7 @@ interface ChangeLocationButtonProps {
 const ChangeLocationButton = ({ onClick }: ChangeLocationButtonProps) => {
     return (
         <div className="pt-1">
-            <button type="button" onClick={onClick} className="btn btn-ghost btn-sm">
+            <button type="button" onClick={onClick} className="btn btn-ghost btn-sm -ml-3">
                 Change location
             </button>
         </div>

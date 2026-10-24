@@ -41,7 +41,7 @@ const StarRating = ({ value, max = 5, size = 'sm', onChange, label }: StarRating
     }
 
     return (
-        <div className={`rating ${SIZE_CLASS[size]}`}>
+        <div className={`rating gap-1 ${SIZE_CLASS[size]}`}>
             <input
                 type="radio"
                 name={name}

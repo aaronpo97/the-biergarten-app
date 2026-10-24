@@ -17,18 +17,28 @@ const LandingFooter = ({ isAuthenticated }: LandingFooterProps) => (
                 <span className="font-bold text-base-content">🍺 The Biergarten App</span>
             </aside>
 
-            <nav className="flex flex-row flex-wrap gap-5">
+            <nav className="-mx-2 flex flex-row flex-wrap gap-x-3">
                 {footerLinks.map((link) => (
-                    <Link key={link.to} to={link.to} className="link link-hover hover:text-primary">
+                    <Link
+                        key={link.to}
+                        to={link.to}
+                        className="link link-hover inline-flex min-h-11 items-center px-2 hover:text-primary"
+                    >
                         {link.label}
                     </Link>
                 ))}
                 {isAuthenticated ? (
-                    <Link to="/dashboard" className="link link-hover hover:text-primary">
+                    <Link
+                        to="/dashboard"
+                        className="link link-hover inline-flex min-h-11 items-center px-2 hover:text-primary"
+                    >
                         Dashboard
                     </Link>
                 ) : (
-                    <Link to="/login" className="link link-hover hover:text-primary">
+                    <Link
+                        to="/login"
+                        className="link link-hover inline-flex min-h-11 items-center px-2 hover:text-primary"
+                    >
                         Login
                     </Link>
                 )}

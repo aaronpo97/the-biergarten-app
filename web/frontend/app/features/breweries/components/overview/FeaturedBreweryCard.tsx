@@ -16,21 +16,25 @@ const FILLER_STATS = [
 
 const FeaturedBreweryCard = ({ brewery, onShowOnMap }: FeaturedBreweryCardProps) => (
     <div className="card bg-base-100 shadow-md rounded-box">
-        <div className="card-body gap-3.5 p-8 md:grid md:grid-cols-[1.35fr_1fr] md:gap-10 md:items-start">
+        <div className="card-body gap-3.5 p-5 sm:p-8 md:grid md:grid-cols-[1.35fr_1fr] md:gap-10 md:items-start">
             <div className="flex flex-col gap-3.5">
                 {brewery.location && (
                     <div className="text-sm font-semibold text-base-content/70">
                         {brewery.location.cityName}, {brewery.location.stateProvinceCode}
                     </div>
                 )}
-                <h3 className="font-serif text-4xl leading-tight m-0">{brewery.breweryName}</h3>
-                <p className="text-lg leading-snug text-pretty m-0">{brewery.description}</p>
+                <h3 className="font-serif text-2xl sm:text-4xl leading-tight m-0 text-balance">
+                    {brewery.breweryName}
+                </h3>
+                <p className="text-base sm:text-lg leading-snug text-pretty m-0">
+                    {brewery.description}
+                </p>
                 {brewery.location && (
                     <p className="text-sm text-base-content/70 m-0">
                         {formatBreweryAddress(brewery.location)}
                     </p>
                 )}
-                <div className="flex gap-3 pt-2">
+                <div className="flex flex-wrap gap-3 pt-2">
                     <Link to={`/breweries/${brewery.breweryPostId}`} className="btn btn-primary">
                         View brewery
                     </Link>
@@ -42,7 +46,7 @@ const FeaturedBreweryCard = ({ brewery, onShowOnMap }: FeaturedBreweryCardProps)
                 </div>
             </div>
 
-            <div className="stats stats-vertical shadow w-full mt-6 md:mt-0">
+            <div className="stats stats-vertical shadow w-full mt-4 md:mt-0">
                 {FILLER_STATS.map((stat) => (
                     <div key={stat.label} className="stat">
                         <div className="stat-title text-xs font-bold uppercase tracking-widest">

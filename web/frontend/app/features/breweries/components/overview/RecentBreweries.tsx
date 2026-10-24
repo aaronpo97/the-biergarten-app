@@ -27,7 +27,7 @@ const RecentBreweries = ({ breweries }: RecentBreweriesProps) => {
                             </p>
                             <Link
                                 to={`/breweries/${brewery.breweryPostId}`}
-                                className="link link-hover text-sm font-semibold text-secondary hover:text-primary mt-2"
+                                className="link link-hover text-sm font-semibold text-secondary hover:text-primary mt-1 inline-flex min-h-11 items-center"
                             >
                                 View brewery &rarr;
                             </Link>

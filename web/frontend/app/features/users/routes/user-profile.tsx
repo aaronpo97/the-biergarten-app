@@ -81,11 +81,11 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
     ];
 
     return (
-        <div className="min-h-screen bg-base-200 pb-16">
-            <div className="mx-auto max-w-7xl px-5 pt-10">
-                <div className="rounded-box h-[190px] bg-base-300" />
+        <div className="min-h-dvh bg-base-200 pb-16">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10">
+                <div className="rounded-box h-28 sm:h-[190px] bg-base-300" />
 
-                <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start -mt-12">
+                <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 lg:gap-8 items-start -mt-12">
                     <div className="lg:sticky lg:top-8 flex flex-col gap-5 px-2">
                         <ProfileAvatar avatarUrl={profile.avatarUrl} displayName={displayName} />
 
@@ -102,7 +102,7 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
                         />
                     </div>
 
-                    <div className="mt-12">
+                    <div className="lg:mt-12">
                         <ProfileTabs
                             activeTab={activeTab}
                             onChange={setActiveTab}

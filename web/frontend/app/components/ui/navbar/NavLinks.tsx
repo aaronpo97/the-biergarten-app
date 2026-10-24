@@ -26,14 +26,14 @@ const NavLinks = ({ variant, showRegister }: NavLinksProps) => {
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
-                <Link key={link.to} to={link.to} className="btn btn-ghost btn-sm justify-start">
+                <Link key={link.to} to={link.to} className="btn btn-ghost justify-start text-base">
                     {link.label}
                 </Link>
             ))}
             {showRegister && (
-                <Link to="/register" className="btn btn-ghost btn-sm justify-start">
+                <Link to="/register" className="btn btn-ghost justify-start text-base">
                     Register User
                 </Link>
             )}

@@ -25,8 +25,8 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
     const { username, userAccountId } = loaderData;
 
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-7xl px-5 pt-10 pb-10 space-y-6">
+        <div className="min-h-dvh bg-base-200">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10 pb-10 space-y-6">
                 <SessionInfoCard username={username} userAccountId={userAccountId} />
                 <AuthFlowDemoCard />
             </div>

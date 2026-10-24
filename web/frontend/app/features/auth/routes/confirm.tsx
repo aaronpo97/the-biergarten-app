@@ -38,7 +38,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 const Confirm = ({ loaderData }: Route.ComponentProps) => {
     return (
-        <div className="hero min-h-screen bg-base-200">
+        <div className="hero min-h-dvh bg-base-200">
             <div className="card w-full max-w-md bg-base-100 shadow-xl">
                 <div className="card-body items-center text-center gap-4">
                     {loaderData.success ? (

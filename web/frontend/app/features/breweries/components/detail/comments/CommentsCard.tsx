@@ -28,7 +28,7 @@ const CommentsCard = ({
 
     return (
         <div className="card bg-base-100 shadow">
-            <div className="card-body gap-5 p-6">
+            <div className="card-body gap-5 p-5 sm:p-6">
                 <h3 className="text-xl m-0">Comments ({comments.length})</h3>
 
                 {loggedIn ? (
@@ -44,7 +44,7 @@ const CommentsCard = ({
                                 placeholder="Share your thoughts on this brewery"
                                 value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
-                                className="textarea w-full"
+                                className="textarea w-full text-base sm:text-sm"
                             />
                             <button
                                 type="button"

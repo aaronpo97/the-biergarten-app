@@ -93,7 +93,7 @@ const BreweryMap = ({ breweries }: BreweryMapProps) => {
             maxBounds={WORLD_BOUNDS}
             maxBoundsViscosity={1.0}
             worldCopyJump={false}
-            className="h-112 md:h-136 w-full rounded-box relative z-0"
+            className="h-88 md:h-136 w-full rounded-box relative z-0"
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

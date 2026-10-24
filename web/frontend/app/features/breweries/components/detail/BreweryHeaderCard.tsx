@@ -23,7 +23,7 @@ const BreweryHeaderCard = ({
     onToggleLike,
 }: BreweryHeaderCardProps) => (
     <div className="card bg-base-100 shadow">
-        <div className="card-body gap-4 p-7">
+        <div className="card-body gap-4 p-5 sm:p-7">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold uppercase tracking-widest text-base-content/70">
@@ -33,7 +33,7 @@ const BreweryHeaderCard = ({
                         Est. {foundedYear}
                     </span>
                 </div>
-                <h1 className="font-serif text-5xl font-bold leading-tight m-0">
+                <h1 className="font-serif text-3xl sm:text-5xl font-bold leading-tight m-0">
                     {brewery.breweryName}
                 </h1>
                 {brewery.location && (
@@ -56,7 +56,7 @@ const BreweryHeaderCard = ({
                     )}
                     {liked ? 'Liked' : 'Like'} · {likeCount}
                 </button>
-                <div className="flex items-baseline gap-1.5">
+                <div className="flex flex-wrap items-center gap-x-1.5">
                     <StarRating value={avgRating} size="sm" />
                     <span className="font-bold">{avgRating.toFixed(1)}</span>
                     <span className="text-sm text-base-content/70">({ratingsCount} ratings)</span>

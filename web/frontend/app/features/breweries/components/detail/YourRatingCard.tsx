@@ -7,7 +7,7 @@ interface YourRatingCardProps {
 
 const YourRatingCard = ({ value, onChange }: YourRatingCardProps) => (
     <div className="card bg-base-100 shadow">
-        <div className="card-body flex-row flex-wrap items-center justify-between gap-4 p-6">
+        <div className="card-body flex-row flex-wrap items-center justify-between gap-3 p-5 sm:p-6">
             <div className="flex flex-col gap-0.5">
                 <h3 className="text-xl m-0">Your rating</h3>
                 <p className="text-sm text-base-content/70 m-0">
@@ -16,7 +16,7 @@ const YourRatingCard = ({ value, onChange }: YourRatingCardProps) => (
                         : 'Tap a star to rate this brewery.'}
                 </p>
             </div>
-            <StarRating value={value} onChange={onChange} size="lg" />
+            <StarRating value={value} onChange={onChange} size="xl" />
         </div>
     </div>
 );

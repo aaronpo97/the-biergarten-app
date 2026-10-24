@@ -87,11 +87,11 @@ const BreweryDetail = ({ loaderData }: Route.ComponentProps) => {
     };
 
     return (
-        <div className="min-h-screen bg-base-200">
-            <div className="mx-auto max-w-7xl px-5 pt-10 pb-16">
+        <div className="min-h-dvh bg-base-200">
+            <div className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10 pb-16">
                 <Link
                     to="/breweries"
-                    className="link link-hover text-sm text-base-content/70 mb-4 inline-block"
+                    className="link link-hover -ml-1 mb-2 inline-flex min-h-11 items-center px-1 text-sm text-base-content/70 sm:mb-4"
                 >
                     &larr; Back to breweries
                 </Link>

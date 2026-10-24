@@ -48,9 +48,11 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
         : null;
 
     return (
-        <div className="min-h-screen bg-base-200 text-base-content pb-16">
-            <div className="max-w-7xl mx-auto px-5 pt-10">
-                <h1 className="font-serif text-5xl font-bold leading-tight mb-2">Breweries</h1>
+        <div className="min-h-dvh bg-base-200 text-base-content pb-16">
+            <div className="max-w-7xl mx-auto px-5 pt-6 sm:pt-10">
+                <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight mb-2">
+                    Breweries
+                </h1>
                 <p className="text-lg text-base-content/70 max-w-xl m-0">
                     Discover our partner breweries — start with this week&apos;s feature, then see
                     what&apos;s pouring near you.
@@ -87,7 +89,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
             <RecentBreweries breweries={recent} />
 
             <section className="max-w-7xl mx-auto px-5 pt-11">
-                <div className="bg-[var(--color-highlight)] text-[var(--color-highlight-content)] rounded-box p-7 flex items-center justify-between gap-6 flex-wrap">
+                <div className="bg-[var(--color-highlight)] text-[var(--color-highlight-content)] rounded-box p-5 sm:p-7 flex items-center justify-between gap-6 flex-wrap">
                     <div>
                         <h2 className="font-serif text-2xl mb-1">
                             Looking for something specific?
@@ -97,7 +99,7 @@ const Breweries = ({ loaderData }: Route.ComponentProps) => {
                             beer style.
                         </p>
                     </div>
-                    <Link to="/breweries/directory" className="btn btn-primary">
+                    <Link to="/breweries/directory" className="btn btn-primary w-full sm:w-auto">
                         Browse the full directory
                     </Link>
                 </div>

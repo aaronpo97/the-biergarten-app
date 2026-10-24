@@ -63,7 +63,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 const App = ({ loaderData }: Route.ComponentProps) => {
     const { auth } = loaderData;
     return (
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-dvh flex-col">
             <Navbar auth={auth} />
             <ToastProvider />
             <AiDisclosureDialog />
@@ -93,7 +93,7 @@ export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => {
     }
 
     return (
-        <main className="mx-auto max-w-7xl px-5 pt-10">
+        <main className="mx-auto max-w-7xl px-5 pt-6 sm:pt-10">
             <h1>{message}</h1>
             <p>{details}</p>
             {stack && (
