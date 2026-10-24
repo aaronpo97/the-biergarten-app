@@ -11,8 +11,7 @@ public class DeleteAccountHandler(UserManager<ApplicationUser> userManager)
 {
     /// <exception cref="NotFoundException">Thrown when the account does not exist.</exception>
     /// <exception cref="ConflictException">
-    ///     Thrown when the account cannot be deleted because other records (posts, comments, photos,
-    ///     follows) still reference it.
+    ///     Thrown when the account cannot be deleted because other records (posts, comments, photos) still reference it.
     /// </exception>
     public async Task Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
@@ -25,7 +24,7 @@ public class DeleteAccountHandler(UserManager<ApplicationUser> userManager)
         {
             if (result.Errors.Any(e => e.Code == "AccountHasDependentRecords"))
                 throw new ConflictException(
-                    "Account cannot be deleted while it still has associated posts, comments, photos, or follows."
+                    "Account cannot be deleted while it still has associated posts, comments, or photos."
                 );
             throw new ConflictException(
                 string.Join("; ", result.Errors.Select(e => e.Description))
