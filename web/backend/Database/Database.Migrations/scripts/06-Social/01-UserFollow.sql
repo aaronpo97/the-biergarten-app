@@ -26,13 +26,11 @@ CREATE TABLE Social.UserFollow
             ON DELETE NO ACTION,
 
     CONSTRAINT CK_CannotFollowOwnAccount
-        CHECK (UserAccountID != FollowingID
-)
-);
+        CHECK (UserAccountID != FollowingID),
 
-CREATE UNIQUE
-NONCLUSTERED INDEX IX_UserFollow_UserAccount_FollowingID
-    ON Social.UserFollow(UserAccountID, FollowingID);
+    CONSTRAINT UQ_UserFollow_UserAccount_FollowingID
+        UNIQUE (UserAccountID, FollowingID)
+);
 
 CREATE
 NONCLUSTERED INDEX IX_UserFollow_FollowingID_UserAccount
