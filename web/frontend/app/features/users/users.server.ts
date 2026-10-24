@@ -10,6 +10,17 @@ export interface PublicUserProfile {
     biography: string;
     avatarUrl: string;
     createdAt: string;
+    followerCount: number;
+    followingCount: number;
+}
+
+export interface FollowedUser {
+    userAccountId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string;
+    followedAt: string;
 }
 
 /**
@@ -52,6 +63,8 @@ export const getPublicUserProfile = async (
         biography: string;
         avatarUrl: string;
         createdAt: string;
+        followerCount: number;
+        followingCount: number;
     } = await res.json();
 
     return {
@@ -62,5 +75,71 @@ export const getPublicUserProfile = async (
         biography: account.biography,
         avatarUrl: account.avatarUrl,
         createdAt: account.createdAt,
+        followerCount: account.followerCount,
+        followingCount: account.followingCount,
     };
+};
+
+const fetchUserService = async (path: string, init?: RequestInit): Promise<Response> => {
+    try {
+        return await fetch(`${API_BASE_URL}${path}`, init);
+    } catch {
+        throw data('The user service is unreachable right now. Please try again in a moment.', {
+            status: 503,
+            statusText: 'Service Unavailable',
+        });
+    }
+};
+
+const bearer = (accessToken: string) => ({ Authorization: `Bearer ${accessToken}` });
+
+export const getFollowing = async (userAccountId: string): Promise<FollowedUser[]> => {
+    const res = await fetchUserService(`/api/user/${encodeURIComponent(userAccountId)}/following`);
+
+    if (!res.ok) {
+        throw data(`Failed to load followed users (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    return res.json();
+};
+
+export const getFollowStatus = async (
+    userAccountId: string,
+    accessToken: string,
+): Promise<boolean> => {
+    const res = await fetchUserService(
+        `/api/user/${encodeURIComponent(userAccountId)}/follow-status`,
+        { headers: bearer(accessToken) },
+    );
+
+    if (!res.ok) {
+        throw data(`Failed to load follow status (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
+
+    const status: { isFollowing: boolean } = await res.json();
+    return status.isFollowing;
+};
+
+export const setFollowing = async (
+    userAccountId: string,
+    shouldFollow: boolean,
+    accessToken: string,
+): Promise<void> => {
+    const res = await fetchUserService(`/api/user/${encodeURIComponent(userAccountId)}/follow`, {
+        method: shouldFollow ? 'PUT' : 'DELETE',
+        headers: bearer(accessToken),
+    });
+
+    if (!res.ok) {
+        throw data(`Failed to ${shouldFollow ? 'follow' : 'unfollow'} user (${res.status}).`, {
+            status: res.status,
+            statusText: res.statusText,
+        });
+    }
 };

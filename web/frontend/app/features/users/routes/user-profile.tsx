@@ -1,20 +1,22 @@
 import { useState } from 'react';
-import { data } from 'react-router';
+import { data, useFetcher } from 'react-router';
 import RouteErrorState from '../../../components/ui/error/RouteErrorState';
-import { getOptionalAuth } from '../../auth/auth.server';
-import { getPublicUserProfile, type PublicUserProfile } from '../users.server';
+import { getOptionalAuth, requireAuth } from '../../auth/auth.server';
+import {
+    getFollowing,
+    getFollowStatus,
+    getPublicUserProfile,
+    setFollowing,
+    type FollowedUser,
+    type PublicUserProfile,
+} from '../users.server';
 import ProfileAvatar from '../components/profile/ProfileAvatar';
 import ProfileSidebarCard from '../components/profile/ProfileSidebarCard';
 import ProfileTabs, { type ProfileTab } from '../components/profile/ProfileTabs';
 import ActivityTab from '../components/profile/tabs/ActivityTab';
-import FollowingTab from '../components/profile/tabs/FollowingTab';
+import FollowingTab, { type FollowingEntry } from '../components/profile/tabs/FollowingTab';
 import LikedTab from '../components/profile/tabs/LikedTab';
-import {
-    FILLER_ACTIVITY,
-    FILLER_FOLLOWING,
-    FILLER_LIKED,
-    FILLER_PROFILE_META,
-} from '../utils/filler-user-profile';
+import { FILLER_ACTIVITY, FILLER_LIKED, FILLER_PROFILE_META } from '../utils/filler-user-profile';
 import type { Route } from './+types/user-profile';
 
 export const meta = ({ loaderData }: Route.MetaArgs) => [
@@ -39,11 +41,36 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
         throw data('User not found.', { status: 404, statusText: 'Not Found' });
     }
 
-    return {
-        profile,
-        isOwnProfile: auth?.userAccountId === profile.userAccountId,
-    };
+    const isOwnProfile = auth?.userAccountId === profile.userAccountId;
+
+    const [following, isFollowingProfile] = await Promise.all([
+        getFollowing(profile.userAccountId),
+        auth && !isOwnProfile ? getFollowStatus(profile.userAccountId, auth.accessToken) : false,
+    ]);
+
+    return { profile, isOwnProfile, following, isFollowingProfile };
 };
+
+export const action = async ({ request }: Route.ActionArgs) => {
+    const auth = await requireAuth(request);
+    const form = await request.formData();
+    const intent = form.get('intent');
+    const targetId = form.get('targetId');
+
+    if (typeof targetId !== 'string' || (intent !== 'follow' && intent !== 'unfollow')) {
+        throw data('Invalid follow request.', { status: 400, statusText: 'Bad Request' });
+    }
+
+    await setFollowing(targetId, intent === 'follow', auth.accessToken);
+    return null;
+};
+
+const toFollowingEntry = (f: FollowedUser): FollowingEntry => ({
+    userAccountId: f.userAccountId,
+    name: `${f.firstName} ${f.lastName}`.trim() || f.username,
+    username: f.username,
+    avatarUrl: f.avatarUrl,
+});
 
 const joinedLabel = (isoDate: string) =>
     `Joined ${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(isoDate))}`;
@@ -51,6 +78,8 @@ const joinedLabel = (isoDate: string) =>
 interface ProfileContentProps {
     profile: PublicUserProfile;
     isOwnProfile: boolean;
+    following: FollowedUser[];
+    isFollowingProfile: boolean;
 }
 
 /**
@@ -58,24 +87,35 @@ interface ProfileContentProps {
  * parent so React remounts it (resetting follow/tab state) when the route's `:id` changes,
  * since React Router reuses the route component itself across param-only navigations.
  */
-const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
+const ProfileContent = ({
+    profile,
+    isOwnProfile,
+    following,
+    isFollowingProfile,
+}: ProfileContentProps) => {
     const [activeTab, setActiveTab] = useState<ProfileTab>('activity');
-    const [isFollowingProfile, setIsFollowingProfile] = useState(false);
-    const [following, setFollowing] = useState(() =>
-        FILLER_FOLLOWING.map((f) => ({ ...f, isFollowing: true })),
-    );
+    const followFetcher = useFetcher();
+    const unfollowFetcher = useFetcher();
 
-    const handleToggleFollowRow = (id: string) => {
-        setFollowing((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, isFollowing: !f.isFollowing } : f)),
+    const pendingIntent = followFetcher.formData?.get('intent');
+    const isFollowing = pendingIntent ? pendingIntent === 'follow' : isFollowingProfile;
+
+    const handleToggleFollow = () => {
+        followFetcher.submit(
+            { intent: isFollowing ? 'unfollow' : 'follow', targetId: profile.userAccountId },
+            { method: 'post' },
         );
+    };
+
+    const handleUnfollowRow = (targetId: string) => {
+        unfollowFetcher.submit({ intent: 'unfollow', targetId }, { method: 'post' });
     };
 
     const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.username;
 
     const stats = [
-        { label: 'Following', value: FILLER_PROFILE_META.following },
-        { label: 'Followers', value: FILLER_PROFILE_META.followers },
+        { label: 'Following', value: profile.followingCount },
+        { label: 'Followers', value: profile.followerCount },
         { label: 'Breweries visited', value: FILLER_PROFILE_META.breweriesVisited },
         { label: 'Ratings given', value: FILLER_PROFILE_META.ratingsGiven },
     ];
@@ -97,8 +137,8 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
                             joinedLabel={joinedLabel(profile.createdAt)}
                             stats={stats}
                             isOwnProfile={isOwnProfile}
-                            isFollowing={isFollowingProfile}
-                            onToggleFollow={() => setIsFollowingProfile((prev) => !prev)}
+                            isFollowing={isFollowing}
+                            onToggleFollow={handleToggleFollow}
                         />
                     </div>
 
@@ -110,8 +150,8 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
                                 activity: <ActivityTab activity={FILLER_ACTIVITY} />,
                                 following: (
                                     <FollowingTab
-                                        following={following}
-                                        onToggleFollow={handleToggleFollowRow}
+                                        following={following.map(toFollowingEntry)}
+                                        onUnfollow={isOwnProfile ? handleUnfollowRow : undefined}
                                     />
                                 ),
                                 liked: <LikedTab liked={FILLER_LIKED} />,
@@ -125,10 +165,16 @@ const ProfileContent = ({ profile, isOwnProfile }: ProfileContentProps) => {
 };
 
 const UserProfile = ({ loaderData }: Route.ComponentProps) => {
-    const { profile, isOwnProfile } = loaderData;
+    const { profile, isOwnProfile, following, isFollowingProfile } = loaderData;
 
     return (
-        <ProfileContent key={profile.userAccountId} profile={profile} isOwnProfile={isOwnProfile} />
+        <ProfileContent
+            key={profile.userAccountId}
+            profile={profile}
+            isOwnProfile={isOwnProfile}
+            following={following}
+            isFollowingProfile={isFollowingProfile}
+        />
     );
 };
 

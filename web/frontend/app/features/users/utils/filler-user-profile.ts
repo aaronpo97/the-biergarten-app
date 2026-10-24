@@ -1,11 +1,9 @@
 // see USER_PROFILE_HANDOFF.md — filler data pending backend support for
-// location, cover photos, follower/following stats, and activity feeds.
+// location, cover photos, and activity feeds.
 
 export interface FillerProfileMeta {
     bio: string;
     location: string;
-    following: number;
-    followers: number;
     breweriesVisited: number;
     ratingsGiven: number;
 }
@@ -13,8 +11,6 @@ export interface FillerProfileMeta {
 export const FILLER_PROFILE_META: FillerProfileMeta = {
     bio: 'Homebrewer turned hop enthusiast. Chasing the best stout in the Midwest, one taproom at a time. 🍺',
     location: 'Portland, OR',
-    following: 68,
-    followers: 214,
     breweriesVisited: 37,
     ratingsGiven: 112,
 };
@@ -68,22 +64,6 @@ export const FILLER_ACTIVITY: FillerActivity[] = [
         target: 'Ecliptic Brewing — Phase Shift IPA',
         time: '1 week ago',
     },
-];
-
-export interface FillerFollowing {
-    id: string;
-    name: string;
-    meta: string;
-    userAccountId?: string;
-}
-
-// `userAccountId` is left unset for rows below since no backend account backs them yet;
-// FollowingTab only links a row once a real account GUID is available (see USER_PROFILE_HANDOFF.md).
-export const FILLER_FOLLOWING: FillerFollowing[] = [
-    { id: '1', name: 'Breakside Brewery', meta: 'Portland, OR · Brewery' },
-    { id: '2', name: 'Jonah Weckstein', meta: '@jweck · 142 ratings' },
-    { id: '3', name: 'Wayfinder Beer', meta: 'Portland, OR · Brewery' },
-    { id: '4', name: 'Casey Blume', meta: '@caseyb · 88 ratings' },
 ];
 
 export interface FillerLiked {
