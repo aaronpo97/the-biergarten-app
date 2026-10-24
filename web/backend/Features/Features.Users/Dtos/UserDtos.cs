@@ -8,5 +8,18 @@ public record PublicUserProfileDto(
     string LastName,
     string Biography,
     string AvatarUrl,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    int FollowerCount,
+    int FollowingCount
 );
+
+public record FollowedUserDto(
+    Guid UserAccountId,
+    string Username,
+    string FirstName,
+    string LastName,
+    string AvatarUrl,
+    DateTime FollowedAt
+);
+
+public record FollowStatusDto(bool IsFollowing);

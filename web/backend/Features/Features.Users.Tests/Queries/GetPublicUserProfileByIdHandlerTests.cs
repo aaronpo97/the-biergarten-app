@@ -39,6 +39,8 @@ public class GetPublicUserProfileByIdHandlerTests
             CreatedAt = new DateTime(2024, 1, 1),
             UserProfile = new UserProfile { Biography = "Drinks lagers." },
             UserAvatar = new UserAvatar { Photo = new Photo { Hyperlink = avatarKey } },
+            FollowerCount = 7,
+            FollowingCount = 3,
         };
         _repoMock.Setup(r => r.GetByIdAsync(user.UserAccountId)).ReturnsAsync(user);
 
@@ -57,7 +59,9 @@ public class GetPublicUserProfileByIdHandlerTests
                     user.LastName,
                     "Drinks lagers.",
                     $"https://storage.test/{avatarKey}?signed",
-                    user.CreatedAt
+                    user.CreatedAt,
+                    7,
+                    3
                 )
             );
     }
