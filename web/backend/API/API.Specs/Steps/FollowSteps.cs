@@ -113,6 +113,7 @@ public class FollowSteps(ScenarioContext scenario) : ApiStepsBase(scenario)
         await SendAsync(HttpMethod.Put, $"/api/user/{GetActor(target).UserAccountId}/follow", null);
     }
 
+    [Given("{string} unfollows {string}")]
     [When("{string} unfollows {string}")]
     public async Task WhenUnfollows(string follower, string target)
     {
